@@ -1,3 +1,9 @@
+[![Scrutinizer logo](https://scrutinizer-ci.com/images/logo.png)](https://scrutinizer-ci.com/g/rsanjoseo/alixar/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/rsanjoseo/alixar/?branch=main)
+[![Code Coverage](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/rsanjoseo/alixar/?branch=main)
+[![Build Status](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/build.png?b=master)](https://scrutinizer-ci.com/g/rsanjoseo/alixar/build-status/master)
+[![Code Intelligence Status](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
+
 # Alixar ERP & CRM, una refactorización completa de Dolibarr
 
 Alixar es una refactorización completa del paquete Dolibarr (https://github.com/dolibarr/dolibarr).

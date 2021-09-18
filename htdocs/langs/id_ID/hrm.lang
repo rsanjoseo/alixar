@@ -1,0 +1,19 @@
+# Dolibarr language file - en_US - hrm
+# Admin
+HRM_EMAIL_EXTERNAL_SERVICE=Email untuk mencegah layanan eksternal HRM
+Establishments=Pembentukan
+Establishment=Pembentukan
+NewEstablishment=Pembentukan baru
+DeleteEstablishment=Hapus pembentukan
+ConfirmDeleteEstablishment=Anda yakin ingin menghapus pendirian ini?
+OpenEtablishment=Pembentukan terbuka
+CloseEtablishment=Pembentukan tertutup
+# Dictionary
+DictionaryPublicHolidays=Leave - Public holidays
+DictionaryDepartment=HRM - Daftar Departement
+DictionaryFunction=HRM - Posisi pekerjaan
+# Module
+Employees=karyawan
+Employee=karyawan
+NewEmployee=Karyawan Baru
+ListOfEmployees=Daftar Karyawan

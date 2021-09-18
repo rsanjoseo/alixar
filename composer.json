@@ -1,0 +1,89 @@
+{
+  "name": "rsanjoseo/alixar",
+  "type": "project",
+  "description": "Alixar ERP & CRM, a complete refactoring of Dolibarr",
+  "keywords": [
+    "rsanjoseo",
+    "alxarafe",
+    "alixar",
+    "dolibarr",
+    "erp",
+    "crm",
+    "invoice",
+    "sme",
+    "proposal",
+    "order",
+    "stock",
+    "agenda"
+  ],
+  "homepage": "https://www.alxarafe.com",
+  "license": "GPL-3.0-or-later",
+  "support": {
+    "issues": "https://github.com/rsanjoseo/alixar/issues",
+    "forum": "https://www.alxarafe.com/forum",
+    "wiki": "https://wiki.alxarafe.com",
+    "source": "https://github.com/rsanjoseo/alixar"
+  },
+  "config": {
+    "vendor-dir": "htdocs/vendor"
+  },
+  "require": {
+    "php": ">=7.4",
+    "phpmailer/phpmailer": "*",
+    "monolog/monolog": "*",
+    "components/jquery": "*",
+    "components/bootstrap": "*",
+    "components/font-awesome": "*",
+    "mk-j/php_xlsxwriter": "*",
+    "twbs/bootstrap": "*",
+    "thomaspark/bootswatch": "*",
+    "makeusabrew/bootbox": "*",
+    "rospdf/pdf-php": "*",
+    "maximebf/debugbar": "*",
+    "shuchkin/simplexlsx": "*",
+    "parsecsv/php-parsecsv": "*",
+    "mischiefcollective/colorjizz": "*",
+    "twig/twig": "*",
+    "symfony/http-foundation": "*",
+    "symfony/translation": "*",
+    "symfony/finder": "*",
+    "symfony/yaml": "*",
+    "symfony/var-dumper": "*",
+    "mouse0270/bootstrap-growl": "*",
+    "select2/select2": "*",
+    "aura/session": "*",
+    "ext-mbstring": "*",
+    "ext-zip": "*",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "ext-bcmath": "*",
+    "ext-simplexml": "*",
+    "ext-gd": "*",
+    "ext-dom": "*",
+    "ext-imagick": "*",
+    "ext-pdo": "*"
+  },
+  "require-dev": {
+    "php-parallel-lint/php-parallel-lint": "*",
+    "php-parallel-lint/php-console-highlighter": "*",
+    "phpunit/phpunit": "*",
+    "squizlabs/php_codesniffer": "*",
+    "phpunit/phpunit-selenium": "*"
+  },
+  "suggest": {
+    "ext-gd": "Image manipulation (Required but maybe built-in PHP)",
+    "ext-imagick": "Generation of thumbs from PDF",
+    "ext-mysqli": "",
+    "ext-pgsql": "",
+    "ext-intl": "",
+    "ext-fileinfo": ""
+  },
+  "autoload": {
+    "psr-4": {
+      "Alxarafe\\": "htdocs/"
+    },
+    "files": [
+      "htdocs/Core/Utils/functions.php"
+    ]
+  }
+}

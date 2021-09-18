@@ -1,0 +1,9 @@
+# Dolibarr language file - Source file is en_US - cashdesk
+CashDeskBankCash=Cash on Hand Account
+CashDeskBankCB=Card account
+CashDeskBankCheque=Current account
+NewSell=New sale
+RestartSelling=Go back to sales
+NoProductFound=No product found
+NoArticle=No product
+NotAvailableWithBrowserPrinter=Not available when printer for receipt is set to browser:

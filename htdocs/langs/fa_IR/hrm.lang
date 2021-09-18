@@ -1,0 +1,19 @@
+# Dolibarr language file - en_US - hrm
+# Admin
+HRM_EMAIL_EXTERNAL_SERVICE=رایانامۀ ممانعت کننده از خدمات خارجی مدیریت منابع انسانی
+Establishments=بنگاه‌ها
+Establishment=بنگاه
+NewEstablishment=بنگاه جدید
+DeleteEstablishment=حذف بنگاه
+ConfirmDeleteEstablishment=آیا شما مطمئن هستید که می‌خواهید این بنگاه را حذف کنید؟
+OpenEtablishment=باز‌کردن بنگاه
+CloseEtablishment=بستن بنگاه
+# Dictionary
+DictionaryPublicHolidays=Leave - Public holidays
+DictionaryDepartment=مدیریت منابع انسانی - فهرست بخش‌ها
+DictionaryFunction=HRM - Job positions
+# Module
+Employees=کارمندان
+Employee=کارمند
+NewEmployee=کارمند جدید
+ListOfEmployees=List of employees

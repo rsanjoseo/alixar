@@ -1,0 +1,19 @@
+# Dolibarr language file - en_US - hrm
+# Admin
+HRM_EMAIL_EXTERNAL_SERVICE=E-mail για αποτροπή εξωτερικών υπηρεσιών στο HRM
+Establishments=Εγκαταστάσεις
+Establishment=Εγκατάσταση
+NewEstablishment=Νέα εγκατάσταση
+DeleteEstablishment=Διαγραφή εγκατάστασης
+ConfirmDeleteEstablishment= Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτήν την σύσταση ?
+OpenEtablishment=Άνοιγμα εγκατάστασης
+CloseEtablishment=Κλείσιμο εγκατάστασης
+# Dictionary
+DictionaryPublicHolidays=Leave - Public holidays
+DictionaryDepartment=HRM - Λίστα τμημάτων
+DictionaryFunction=HRM - Job positions
+# Module
+Employees=Εργαζόμενοι
+Employee=Υπάλληλος
+NewEmployee=Νέος εργαζόμενος
+ListOfEmployees=Λίστα  εργαζομένων
