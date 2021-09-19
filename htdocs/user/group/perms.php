@@ -21,22 +21,22 @@
  */
 
 /**
- *		\file		htdocs/user/group/perms.php
- * 		\brief		Page to set permissions of a user group record
+ *        \file        htdocs/user/group/perms.php
+ *        \brief        Page to set permissions of a user group record
  */
 
-if (!defined('CSRFCHECK_WITH_TOKEN')) {
-	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
-}
+//if (!defined('CSRFCHECK_WITH_TOKEN')) {
+//	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
+//}
 
 require '../../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/user/class/usergroup.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 // Load translation files required by page
-$langs->loadLangs(array('users', 'admin'));
+$langs->loadLangs(['users', 'admin']);
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

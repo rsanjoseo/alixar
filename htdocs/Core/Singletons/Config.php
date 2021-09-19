@@ -18,7 +18,12 @@
 
 namespace Alxarafe\Core\Singletons;
 
+use Alxarafe\Core\Helpers\Auth;
 use Alxarafe\Core\Base\Singleton;
+use Alxarafe\Database\Engine;
+use Alxarafe\Database\SqlHelper;
+use DebugBar\DebugBarException;
+use Exception;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -81,8 +86,8 @@ class Config extends Singleton
     {
         parent::__construct($index);
         $this->username = null;
-        //        $this->render = TemplateRender::getInstance();
-        //        $this->debug = DebugTool::getInstance();
+        $this->render = TemplateRender::getInstance();
+        $this->debug = DebugTool::getInstance();
     }
 
     /**
@@ -106,6 +111,25 @@ class Config extends Singleton
                 return false;
             }
             $this->render->setSkin(self::getVar('templaterender', 'main', 'skin'));
+        }
+        return true;
+    }
+
+    /**
+     * @throws DebugBarException
+     */
+    public function connectToDatabaseAndAuth(): bool
+    {
+        if (!$this->connectToDataBase()) {
+            FlashMessages::setError('Database Connection error...');
+            return false;
+        }
+        if (!isset($this->user)) {
+            $this->user = new Auth();
+            $this->username = $this->user->getUser();
+            if ($this->username === null) {
+                $this->user->login();
+            }
         }
         return true;
     }
@@ -162,25 +186,6 @@ class Config extends Singleton
     static public function getVar(string $module, string $section, string $name): ?string
     {
         return self::$global[$module][$section][$name] ?? null;
-    }
-
-    /**
-     * @throws DebugBarException
-     */
-    public function connectToDatabaseAndAuth(): bool
-    {
-        if (!$this->connectToDataBase()) {
-            FlashMessages::setError('Database Connection error...');
-            return false;
-        }
-        if (!isset($this->user)) {
-            $this->user = new Auth();
-            $this->username = $this->user->getUser();
-            if ($this->username === null) {
-                $this->user->login();
-            }
-        }
-        return true;
     }
 
     /**

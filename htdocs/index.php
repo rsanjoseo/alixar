@@ -25,7 +25,7 @@
  *    \brief      Dolibarr home page
  */
 
-define('CSRFCHECK_WITH_TOKEN', 1);    // We force need to use a token to login when making a POST
+//define('CSRFCHECK_WITH_TOKEN', 1);    // We force need to use a token to login when making a POST
 
 require 'main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
@@ -42,13 +42,16 @@ $hookmanager->initHooks(['index']);
 
 // Check if company name is defined (first install)
 if (!isset($conf->global->MAIN_INFO_SOCIETE_NOM) || empty($conf->global->MAIN_INFO_SOCIETE_NOM)) {
+    die("1 Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
 if (count($conf->modules) <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only user module enabled
+    die("2 Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
+
 if (GETPOST('addbox')) {    // Add box (when submit is done from a form when ajax disabled)
     require_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
     $zone = GETPOST('areacode', 'int');
@@ -67,6 +70,7 @@ if (GETPOST('addbox')) {    // Add box (when submit is done from a form when aja
  */
 
 if (!isset($form) || !is_object($form)) {
+    require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
     $form = new Form($db);
 }
 

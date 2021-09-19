@@ -21,7 +21,7 @@ class Constants extends Provider
      */
     const CONSTANTS = [
         'NOREQUIREDB' => '1',                // Do not create database handler $db
-        'NOREQUIREUSER' => '1',                // Do not load object $user
+        // 'NOREQUIREUSER' => '1',                // Do not load object $user
         'NOREQUIRESOC' => '1',                // Do not load object $mysoc
         'NOREQUIRETRAN' => '1',                // Do not load object $langs
         'NOSCANGETFORINJECTION' => '1',        // Do not check injection attack on GET parameters
@@ -40,6 +40,9 @@ class Constants extends Provider
         'FORCECSP' => 'none',                // Disable all Content Security Policies
         'CSRFCHECK_WITH_TOKEN' => '1',        // Force use of CSRF protection with tokens even for GET
         'NOBROWSERNOTIF' => '1',                // Disable browser notification
+        'DOL_APPLICATION_TITLE' => 'Dolibarr',    // Change to Alixar?
+        'DOL_VERSION' => '15.0.0-alpha',            // Change to 0.0.0-beta?
+        'EURO' => '€',                          // It's really necessary?
     ];
 
     /**
@@ -121,13 +124,14 @@ class Constants extends Provider
         }
 
         // Load Dolibarr constants
-        foreach (self::CONSTANTS as $name=>$value) {
+        foreach (self::CONSTANTS as $name => $value) {
             define($name, $value);
         }
         return true;
     }
 
-    public static function defineConstantsFromArray(array $constants) {
+    public static function defineConstantsFromArray(array $constants)
+    {
         foreach ($constants as $type => $data) {
             foreach ($data as $name => $value) {
                 if (!defined($name)) {

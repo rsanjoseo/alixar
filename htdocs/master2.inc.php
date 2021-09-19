@@ -58,7 +58,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/conf.class.php';
 $conf = new Conf();
 
 // Set properties specific to database
-/*
 $conf->db->host = $dolibarr_main_db_host;
 $conf->db->port = $dolibarr_main_db_port;
 $conf->db->name = $dolibarr_main_db_name;
@@ -71,9 +70,8 @@ $conf->db->dolibarr_main_db_collation = $dolibarr_main_db_collation;
 $conf->db->dolibarr_main_db_encryption = $dolibarr_main_db_encryption;
 $conf->db->dolibarr_main_db_cryptkey = $dolibarr_main_db_cryptkey;
 if (defined('TEST_DB_FORCE_TYPE')) {
-	$conf->db->type = constant('TEST_DB_FORCE_TYPE'); // Force db type (for test purpose, by PHP unit for example)
+    $conf->db->type = constant('TEST_DB_FORCE_TYPE'); // Force db type (for test purpose, by PHP unit for example)
 }
-*/
 
 // Set properties specific to conf file
 $conf->file->main_limit_users = $dolibarr_main_limit_users;
@@ -85,7 +83,6 @@ $conf->file->strict_mode = empty($dolibarr_strict_mode) ? '' : $dolibarr_strict_
 $conf->file->instance_unique_id = empty($dolibarr_main_instance_unique_id) ? (empty($dolibarr_main_cookie_cryptkey) ? '' : $dolibarr_main_cookie_cryptkey) : $dolibarr_main_instance_unique_id; // Unique id of instance
 $conf->file->dol_document_root = ['main' => (string) DOL_DOCUMENT_ROOT]; // Define array of document root directories ('/home/htdocs')
 $conf->file->dol_url_root = ['main' => (string) DOL_URL_ROOT]; // Define array of url root path ('' or '/dolibarr')
-
 if (!empty($dolibarr_main_document_root_alt)) {
     // dolibarr_main_document_root_alt can contains several directories
     $values = preg_split('/[;,]/', $dolibarr_main_document_root_alt);
@@ -135,37 +132,33 @@ if (!defined('NOREQUIRETRAN')) {
 
 /*
  * Object $db
+ */
 $db = null;
 if (!defined('NOREQUIREDB')) {
-	$db = getDoliDBInstance($conf->db->type, $conf->db->host, $conf->db->user, $conf->db->pass, $conf->db->name, $conf->db->port);
+    $db = getDoliDBInstance($conf->db->type, $conf->db->host, $conf->db->user, $conf->db->pass, $conf->db->name, $conf->db->port);
 
-	if ($db->error) {
-		// If we were into a website context
-		if (!defined('USEDOLIBARREDITOR') && !defined('USEDOLIBARRSERVER') && !empty($_SERVER['SCRIPT_FILENAME']) && (strpos($_SERVER['SCRIPT_FILENAME'], DOL_DATA_ROOT.'/website') === 0)) {
-			$sapi_type = php_sapi_name();
-			if (substr($sapi_type, 0, 3) != 'cgi') {
-				http_response_code(503); // To tel search engine this is a temporary error
-			}
-			print '<div class="center" style="text-align: center; margin: 100px;">';
-			if (is_object($langs)) {
-				$langs->setDefaultLang('auto');
-				$langs->load("website");
-				print $langs->trans("SorryWebsiteIsCurrentlyOffLine");
-			} else {
-				print "SorryWebsiteIsCurrentlyOffLine";
-			}
-			print '</div>';
-			exit;
-		}
-		dol_print_error($db, "host=".$conf->db->host.", port=".$conf->db->port.", user=".$conf->db->user.", databasename=".$conf->db->name.", ".$db->error);
-		exit;
-	}
+    if ($db->error) {
+        // If we were into a website context
+        if (!defined('USEDOLIBARREDITOR') && !defined('USEDOLIBARRSERVER') && !empty($_SERVER['SCRIPT_FILENAME']) && (strpos($_SERVER['SCRIPT_FILENAME'], DOL_DATA_ROOT . '/website') === 0)) {
+            $sapi_type = php_sapi_name();
+            if (substr($sapi_type, 0, 3) != 'cgi') {
+                http_response_code(503); // To tel search engine this is a temporary error
+            }
+            print '<div class="center" style="text-align: center; margin: 100px;">';
+            if (is_object($langs)) {
+                $langs->setDefaultLang('auto');
+                $langs->load("website");
+                print $langs->trans("SorryWebsiteIsCurrentlyOffLine");
+            } else {
+                print "SorryWebsiteIsCurrentlyOffLine";
+            }
+            print '</div>';
+            exit;
+        }
+        dol_print_error($db, "host=" . $conf->db->host . ", port=" . $conf->db->port . ", user=" . $conf->db->user . ", databasename=" . $conf->db->name . ", " . $db->error);
+        exit;
+    }
 }
- */
-if (!$alxConfig->loadConfig() || !$alxConfig->connectToDatabase()) {
-    die('Failed to connect to database in master.inc.php');
-}
-$db = $alxConfig->getEngine();
 
 // Now database connexion is known, so we can forget password
 //unset($dolibarr_main_db_pass); 	// We comment this because this constant is used in a lot of pages

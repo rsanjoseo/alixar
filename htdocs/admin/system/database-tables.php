@@ -20,22 +20,22 @@
  */
 
 /**
- *	\file       htdocs/admin/system/database-tables.php
- *	\brief      Page with information on database tables. Add also some maintenance action to convert tables.
+ *    \file       htdocs/admin/system/database-tables.php
+ *    \brief      Page with information on database tables. Add also some maintenance action to convert tables.
  */
 
-if (! defined('CSRFCHECK_WITH_TOKEN')) {
-	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
-}
+//if (! defined('CSRFCHECK_WITH_TOKEN')) {
+//	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
+//}
 
 require '../../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 $langs->load("admin");
 
 if (!$user->admin) {
-	accessforbidden();
+    accessforbidden();
 }
 
 $action = GETPOST('action', 'aZ09');

@@ -18,19 +18,19 @@
 */
 
 /**
- *		\file 		htdocs/admin/tools/export_files.php
- *		\brief      Page to export documents into a compressed file
+ *        \file        htdocs/admin/tools/export_files.php
+ *        \brief      Page to export documents into a compressed file
  */
 
-if (! defined('CSRFCHECK_WITH_TOKEN')) {
-	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
-}
+//if (! defined('CSRFCHECK_WITH_TOKEN')) {
+//	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
+//}
 
 require '../../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/utils.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/utils.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 
 $langs->load("admin");
 

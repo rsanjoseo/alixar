@@ -27,7 +27,7 @@ abstract class Globals
     /**
      * The application name
      */
-    const APP_NAME = 'Alixar';
+    const APP_NAME = 'Alxarafe';
 
     /**
      * The application Version
@@ -66,49 +66,49 @@ abstract class Globals
      *
      * @var TemplateRender
      */
-    //    protected TemplateRender $render;
+    protected TemplateRender $render;
 
     /**
      * Contains an instance of the Translator provider
      *
      * @var Translator
      */
-    //     protected Translator $translator;
+    protected Translator $translator;
 
     /**
      * Contains an instance of the Session singleton
      *
      * @var Session
      */
-    //    protected Session $session;
+    protected Session $session;
 
     /**
      * Contains an instance of the FlashMessages singleton
      *
      * @var FlashMessages
      */
-    //    protected FlashMessages $flashMessages;
+    protected FlashMessages $flashMessages;
 
     /**
      * Contains an instance of the DebugTool singleton
      *
      * @var DebugTool
      */
-    //    protected DebugTool $debug;
+    protected DebugTool $debug;
 
     /**
      * Contains an instance of the Logger singleton
      *
      * @var Logger
      */
-    //    protected Logger $logger;
+    protected Logger $logger;
 
     /**
      * Contains an instance of the RegionalInfo provider
      *
      * @var RegionalInfo
      */
-    //    protected RegionalInfo $regional;
+    protected RegionalInfo $regional;
 
     /**
      * Globals constructor.
@@ -119,26 +119,22 @@ abstract class Globals
         if (!defined('APP_URI')) {
             Constants::defineConstants();
             $hasConfig = Constants::loadConstants();
-            // Not yet implemented!
             if (!$hasConfig) {
-                die('EditConfig has not been yet implemented!');
+                $data = new EditConfig();
+                $data->main();
+                die();
             }
-            //            if (!$hasConfig) {
-            //                $data = new EditConfig();
-            //                $data->main();
-            //                die();
-            //            }
         }
 
         // Instance in correct order all singletons and providers
-        //        $this->debug = DebugTool::getInstance();
-        //        $this->flashMessages = FlashMessages::getInstance();
-        //        $this->regional = RegionalInfo::getInstance();
-        //        $this->logger = Logger::getInstance();
+        $this->debug = DebugTool::getInstance();
+        $this->flashMessages = FlashMessages::getInstance();
+        $this->regional = RegionalInfo::getInstance();
+        $this->logger = Logger::getInstance();
         $this->config = Config::getInstance();
-        //        $this->render = TemplateRender::getInstance();
-        //        $this->session = Session::getInstance();
-        //        $this->translator = Translator::getInstance();
+        $this->render = TemplateRender::getInstance();
+        $this->session = Session::getInstance();
+        $this->translator = Translator::getInstance();
     }
 
     /**
@@ -163,7 +159,7 @@ abstract class Globals
      */
     public static function trans(string $txt, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
-//        return Translator::trans($txt, $parameters, $domain, $locale);
+        return Translator::trans($txt, $parameters, $domain, $locale);
     }
 
 }

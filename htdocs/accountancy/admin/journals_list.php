@@ -17,23 +17,23 @@
  */
 
 /**
- * \file		htdocs/accountancy/admin/journals_list.php
- * \ingroup		Accountancy (Double entries)
- * \brief		Setup page to configure journals
+ * \file        htdocs/accountancy/admin/journals_list.php
+ * \ingroup        Accountancy (Double entries)
+ * \brief        Setup page to configure journals
  */
 
-if (!defined('CSRFCHECK_WITH_TOKEN')) {
-	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
-}
+//if (!defined('CSRFCHECK_WITH_TOKEN')) {
+//	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
+//}
 
 require '../../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/accounting.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/accountancy/class/accountingjournal.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formadmin.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/doleditor.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/accounting.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/accountancy/class/accountingjournal.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(array("admin", "compta", "accountancy"));

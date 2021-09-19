@@ -68,6 +68,57 @@ abstract class Provider extends Singleton
     }
 
     /**
+     * Save config to file.
+     *
+     * @param array  $params
+     * @param bool   $merge
+     * @param string $index
+     *
+     * @return bool
+     */
+    public function setConfig(array $params, bool $merge = true, string $index = 'main'): bool
+    {
+        $paramsToSave = [];
+        $content = Config::getInstance()->getConfig();
+        if (!$merge) {
+            unset($content[self::yamlName()][$index]);
+        }
+        $paramsToSave[self::yamlName()][$index] = $params;
+        $content = ArrayUtils::arrayMergeRecursiveEx($content, $paramsToSave);
+        return file_put_contents($this->getFilePath(), Yaml::dump($content, 3), LOCK_EX) !== false;
+    }
+
+    /**
+     * Return the classname for yaml file.
+     *
+     * @return string
+     */
+    public static function yamlName(): string
+    {
+        return strtolower(parent::getClassName());
+    }
+
+    /**
+     * Return the full file config path.
+     *
+     * @return string
+     */
+    public static function getFilePath(): string
+    {
+        return realpath(self::$basePath) . constant('DIRECTORY_SEPARATOR') . self::getFileName() . '.yaml';
+    }
+
+    /**
+     * Return the file name.
+     *
+     * @return string
+     */
+    public static function getFileName(): string
+    {
+        return (self::yamlName());
+    }
+
+    /**
      * Returns the yaml config params.
      *
      * @param string $index
@@ -109,36 +160,6 @@ abstract class Provider extends Singleton
     }
 
     /**
-     * Return the full file config path.
-     *
-     * @return string
-     */
-    public static function getFilePath(): string
-    {
-        return realpath(self::$basePath) . constant('DIRECTORY_SEPARATOR') . self::getFileName() . '.yaml';
-    }
-
-    /**
-     * Return the file name.
-     *
-     * @return string
-     */
-    public static function getFileName(): string
-    {
-        return (self::yamlName());
-    }
-
-    /**
-     * Return the classname for yaml file.
-     *
-     * @return string
-     */
-    public static function yamlName(): string
-    {
-        return strtolower(parent::getClassName());
-    }
-
-    /**
      * Returns if file exists.
      *
      * @param string $filename
@@ -148,27 +169,6 @@ abstract class Provider extends Singleton
     protected static function fileExists(string $filename): bool
     {
         return (file_exists($filename) && is_file($filename));
-    }
-
-    /**
-     * Save config to file.
-     *
-     * @param array  $params
-     * @param bool   $merge
-     * @param string $index
-     *
-     * @return bool
-     */
-    public function setConfig(array $params, bool $merge = true, string $index = 'main'): bool
-    {
-        $paramsToSave = [];
-        $content = Config::getInstance()->getConfig();
-        if (!$merge) {
-            unset($content[self::yamlName()][$index]);
-        }
-        $paramsToSave[self::yamlName()][$index] = $params;
-        $content = ArrayUtils::arrayMergeRecursiveEx($content, $paramsToSave);
-        return file_put_contents($this->getFilePath(), Yaml::dump($content, 3), LOCK_EX) !== false;
     }
 
 }

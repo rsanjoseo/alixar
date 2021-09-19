@@ -18,21 +18,21 @@
  */
 
 /**
- *		\file 		htdocs/admin/tools/update.php
- *		\brief      Page to make a Dolibarr online upgrade
+ *        \file        htdocs/admin/tools/update.php
+ *        \brief      Page to make a Dolibarr online upgrade
  */
 
-if (! defined('CSRFCHECK_WITH_TOKEN')) {
-	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
-}
+//if (! defined('CSRFCHECK_WITH_TOKEN')) {
+//	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
+//}
 
 require '../../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/geturl.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "other"));
+$langs->loadLangs(["admin", "other"]);
 
 $action = GETPOST('action', 'aZ09');
 
