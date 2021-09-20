@@ -125,33 +125,181 @@ class Delivery extends CommonObject
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'delivery'
-		);
+     *  Create delivery receipt in database
+     *
+     * @param User $user Objet du user qui cree
+     *
+     * @return int                <0 si erreur, id delivery cree si ok
+     */
+    public function create($user)
+    {
+        global $conf;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+        dol_syslog("Delivery::create");
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        if (empty($this->model_pdf)) {
+            $this->model_pdf = $conf->global->DELIVERY_ADDON_PDF;
+        }
 
-	/**
-	 * 	Load a delivery receipt
-	 *
-	 * 	@param	int		$id			Id of object to load
-	 * 	@return	integer
-	 */
-	public function fetch($id)
-	{
-		global $conf;
+        $error = 0;
+
+        $now = dol_now();
+
+        /* Delivery note as draft On positionne en mode draft le bon de livraison */
+        $this->draft = 1;
+
+        $this->user = $user;
+
+        $this->db->begin();
+
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "delivery (";
+        $sql .= "ref";
+        $sql .= ", entity";
+        $sql .= ", fk_soc";
+        $sql .= ", ref_customer";
+        $sql .= ", date_creation";
+        $sql .= ", fk_user_author";
+        $sql .= ", date_delivery";
+        $sql .= ", fk_address";
+        $sql .= ", note_private";
+        $sql .= ", note_public";
+        $sql .= ", model_pdf";
+        $sql .= ", fk_incoterms, location_incoterms";
+        $sql .= ") VALUES (";
+        $sql .= "'(PROV)'";
+        $sql .= ", " . ((int) $conf->entity);
+        $sql .= ", " . ((int) $this->socid);
+        $sql .= ", '" . $this->db->escape($this->ref_customer) . "'";
+        $sql .= ", '" . $this->db->idate($now) . "'";
+        $sql .= ", " . ((int) $user->id);
+        $sql .= ", " . ($this->date_delivery ? "'" . $this->db->idate($this->date_delivery) . "'" : "null");
+        $sql .= ", " . ($this->fk_delivery_address > 0 ? $this->fk_delivery_address : "null");
+        $sql .= ", " . (!empty($this->note_private) ? "'" . $this->db->escape($this->note_private) . "'" : "null");
+        $sql .= ", " . (!empty($this->note_public) ? "'" . $this->db->escape($this->note_public) . "'" : "null");
+        $sql .= ", " . (!empty($this->model_pdf) ? "'" . $this->db->escape($this->model_pdf) . "'" : "null");
+        $sql .= ", " . (int) $this->fk_incoterms;
+        $sql .= ", '" . $this->db->escape($this->location_incoterms) . "'";
+        $sql .= ")";
+
+        dol_syslog("Delivery::create", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "delivery");
+
+            $numref = "(PROV" . $this->id . ")";
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "delivery ";
+            $sql .= "SET ref = '" . $this->db->escape($numref) . "'";
+            $sql .= " WHERE rowid = " . ((int) $this->id);
+
+            dol_syslog("Delivery::create", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                if (!$conf->expedition_bon->enabled) {
+                    $commande = new Commande($this->db);
+                    $commande->id = $this->commande_id;
+                    $commande->fetch_lines();
+                }
+
+                /*
+                 *  Inserting products into the database
+                 */
+                $num = count($this->lines);
+                for ($i = 0; $i < $num; $i++) {
+                    $origin_id = $this->lines[$i]->origin_line_id;
+                    if (!$origin_id) {
+                        $origin_id = $this->lines[$i]->commande_ligne_id; // For backward compatibility
+                    }
+
+                    if (!$this->create_line($origin_id, $this->lines[$i]->qty, $this->lines[$i]->fk_product, $this->lines[$i]->description)) {
+                        $error++;
+                    }
+                }
+
+                if (!$error && $this->id && $this->origin_id) {
+                    $ret = $this->add_object_linked();
+                    if (!$ret) {
+                        $error++;
+                    }
+
+                    if (!$conf->expedition_bon->enabled) {
+                        // TODO standardize status uniformiser les statuts
+                        $ret = $this->setStatut(2, $this->origin_id, $this->origin);
+                        if (!$ret) {
+                            $error++;
+                        }
+                    }
+                }
+
+                if (!$error) {
+                    $this->db->commit();
+                    return $this->id;
+                } else {
+                    $error++;
+                    $this->error = $this->db->lasterror() . " - sql=" . $this->db->lastqueryerror;
+                    $this->db->rollback();
+                    return -3;
+                }
+            } else {
+                $error++;
+                $this->error = $this->db->lasterror() . " - sql=" . $this->db->lastqueryerror;
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            $error++;
+            $this->error = $this->db->lasterror() . " - sql=" . $this->db->lastqueryerror;
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Create a line
+     *
+     * @param string $origin_id   Id of order
+     * @param string $qty         Quantity
+     * @param string $fk_product  Id of predefined product
+     * @param string $description Description
+     *
+     * @return    int                                <0 if KO, >0 if OK
+     */
+    public function create_line($origin_id, $qty, $fk_product, $description)
+    {
+        // phpcs:enable
+        $error = 0;
+        $idprod = $fk_product;
+        $j = 0;
+
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "deliverydet (fk_delivery, fk_origin_line,";
+        $sql .= " fk_product, description, qty)";
+        $sql .= " VALUES (" . $this->id . "," . ((int) $origin_id) . ",";
+        $sql .= " " . ($idprod > 0 ? ((int) $idprod) : "null") . ",";
+        $sql .= " " . ($description ? "'" . $this->db->escape($description) . "'" : "null") . ",";
+        $sql .= (price2num($qty, 'MS')) . ")";
+
+        dol_syslog(get_class($this) . "::create_line", LOG_DEBUG);
+        if (!$this->db->query($sql)) {
+            $error++;
+        }
+
+        if ($error == 0) {
+            return 1;
+        }
+    }
+
+    /**
+     *    Load a delivery receipt
+     *
+     * @param int $id Id of object to load
+     *
+     * @return    integer
+     */
+    public function fetch($id)
+    {
+        global $conf;
 
 		$sql = "SELECT l.rowid, l.fk_soc, l.date_creation, l.date_valid, l.ref, l.ref_customer, l.fk_user_author,";
 		$sql .= " l.total_ht, l.fk_statut, l.fk_user_valid, l.note_private, l.note_public";
@@ -219,80 +367,6 @@ class Delivery extends CommonObject
 			$this->error = $this->db->error();
 			return -1;
 		}
-	}
-
-	/**
-	 *	Load lines
-	 *
-	 *	@return	void
-	 */
-	public function fetch_lines()
-	{
-		// phpcs:enable
-		$this->lines = array();
-
-		$sql = "SELECT ld.rowid, ld.fk_product, ld.description, ld.subprice, ld.total_ht, ld.qty as qty_shipped, ld.fk_origin_line, ";
-		$sql .= " cd.qty as qty_asked, cd.label as custom_label, cd.fk_unit,";
-		$sql .= " p.ref as product_ref, p.fk_product_type as fk_product_type, p.label as product_label, p.description as product_desc,";
-		$sql .= " p.weight, p.weight_units,  p.width, p.width_units, p.length, p.length_units, p.height, p.height_units, p.surface, p.surface_units, p.volume, p.volume_units, p.tobatch as product_tobatch";
-		$sql .= " FROM ".MAIN_DB_PREFIX."commandedet as cd, ".MAIN_DB_PREFIX."deliverydet as ld";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."product as p on p.rowid = ld.fk_product";
-		$sql .= " WHERE ld.fk_origin_line = cd.rowid";
-		$sql .= " AND ld.fk_delivery = ".((int) $this->id);
-
-		dol_syslog(get_class($this)."::fetch_lines", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$line = new DeliveryLine($this->db);
-
-				$obj = $this->db->fetch_object($resql);
-
-				$line->id = $obj->rowid;
-				$line->label = $obj->custom_label;
-				$line->description		= $obj->description;
-				$line->fk_product = $obj->fk_product;
-				$line->qty_asked = $obj->qty_asked;
-				$line->qty_shipped		= $obj->qty_shipped;
-
-				$line->ref = $obj->product_ref; // deprecated
-				$line->libelle = $obj->product_label; // deprecated
-				$line->product_label	= $obj->product_label; // Product label
-				$line->product_ref = $obj->product_ref; // Product ref
-				$line->product_desc		= $obj->product_desc; // Product description
-				$line->product_type		= $obj->fk_product_type;
-				$line->fk_origin_line = $obj->fk_origin_line;
-
-				$line->price = $obj->price;
-				$line->total_ht = $obj->total_ht;
-
-				// units
-				$line->weight         	= $obj->weight;
-				$line->weight_units   	= $obj->weight_units;
-				$line->width         	= $obj->width;
-				$line->width_units   	= $obj->width_units;
-				$line->height         	= $obj->height;
-				$line->height_units   	= $obj->height_units;
-				$line->length         	= $obj->length;
-				$line->length_units   	= $obj->length_units;
-				$line->surface        	= $obj->surface;
-				$line->surface_units = $obj->surface_units;
-				$line->volume         	= $obj->volume;
-				$line->volume_units   	= $obj->volume_units;
-
-				$line->fk_unit = $obj->fk_unit;
-				$line->fetch_optionals();
-
-				$this->lines[$i] = $line;
-
-				$i++;
-			}
-			$this->db->free($resql);
-		}
-
-		return $this->lines;
 	}
 
 	/**
@@ -482,170 +556,6 @@ class Delivery extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Create delivery receipt in database
-	 *
-	 *  @param 	User	$user       Objet du user qui cree
-	 *  @return int         		<0 si erreur, id delivery cree si ok
-	 */
-	public function create($user)
-	{
-		global $conf;
-
-		dol_syslog("Delivery::create");
-
-		if (empty($this->model_pdf)) {
-			$this->model_pdf = $conf->global->DELIVERY_ADDON_PDF;
-		}
-
-		$error = 0;
-
-		$now = dol_now();
-
-		/* Delivery note as draft On positionne en mode draft le bon de livraison */
-		$this->draft = 1;
-
-		$this->user = $user;
-
-		$this->db->begin();
-
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."delivery (";
-		$sql .= "ref";
-		$sql .= ", entity";
-		$sql .= ", fk_soc";
-		$sql .= ", ref_customer";
-		$sql .= ", date_creation";
-		$sql .= ", fk_user_author";
-		$sql .= ", date_delivery";
-		$sql .= ", fk_address";
-		$sql .= ", note_private";
-		$sql .= ", note_public";
-		$sql .= ", model_pdf";
-		$sql .= ", fk_incoterms, location_incoterms";
-		$sql .= ") VALUES (";
-		$sql .= "'(PROV)'";
-		$sql .= ", ".((int) $conf->entity);
-		$sql .= ", ".((int) $this->socid);
-		$sql .= ", '".$this->db->escape($this->ref_customer)."'";
-		$sql .= ", '".$this->db->idate($now)."'";
-		$sql .= ", ".((int) $user->id);
-		$sql .= ", ".($this->date_delivery ? "'".$this->db->idate($this->date_delivery)."'" : "null");
-		$sql .= ", ".($this->fk_delivery_address > 0 ? $this->fk_delivery_address : "null");
-		$sql .= ", ".(!empty($this->note_private) ? "'".$this->db->escape($this->note_private)."'" : "null");
-		$sql .= ", ".(!empty($this->note_public) ? "'".$this->db->escape($this->note_public)."'" : "null");
-		$sql .= ", ".(!empty($this->model_pdf) ? "'".$this->db->escape($this->model_pdf)."'" : "null");
-		$sql .= ", ".(int) $this->fk_incoterms;
-		$sql .= ", '".$this->db->escape($this->location_incoterms)."'";
-		$sql .= ")";
-
-		dol_syslog("Delivery::create", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."delivery");
-
-			$numref = "(PROV".$this->id.")";
-
-			$sql = "UPDATE ".MAIN_DB_PREFIX."delivery ";
-			$sql .= "SET ref = '".$this->db->escape($numref)."'";
-			$sql .= " WHERE rowid = ".((int) $this->id);
-
-			dol_syslog("Delivery::create", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				if (!$conf->expedition_bon->enabled) {
-					$commande = new Commande($this->db);
-					$commande->id = $this->commande_id;
-					$commande->fetch_lines();
-				}
-
-
-				/*
-				 *  Inserting products into the database
-				 */
-				$num = count($this->lines);
-				for ($i = 0; $i < $num; $i++) {
-					$origin_id = $this->lines[$i]->origin_line_id;
-					if (!$origin_id) {
-						$origin_id = $this->lines[$i]->commande_ligne_id; // For backward compatibility
-					}
-
-					if (!$this->create_line($origin_id, $this->lines[$i]->qty, $this->lines[$i]->fk_product, $this->lines[$i]->description)) {
-						$error++;
-					}
-				}
-
-				if (!$error && $this->id && $this->origin_id) {
-					$ret = $this->add_object_linked();
-					if (!$ret) {
-						$error++;
-					}
-
-					if (!$conf->expedition_bon->enabled) {
-						// TODO standardize status uniformiser les statuts
-						$ret = $this->setStatut(2, $this->origin_id, $this->origin);
-						if (!$ret) {
-							$error++;
-						}
-					}
-				}
-
-				if (!$error) {
-					$this->db->commit();
-					return $this->id;
-				} else {
-					$error++;
-					$this->error = $this->db->lasterror()." - sql=".$this->db->lastqueryerror;
-					$this->db->rollback();
-					return -3;
-				}
-			} else {
-				$error++;
-				$this->error = $this->db->lasterror()." - sql=".$this->db->lastqueryerror;
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$error++;
-			$this->error = $this->db->lasterror()." - sql=".$this->db->lastqueryerror;
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	/**
-	 *	Create a line
-	 *
-	 *	@param	string	$origin_id				Id of order
-	 *	@param	string	$qty					Quantity
-	 *	@param	string	$fk_product				Id of predefined product
-	 *	@param	string	$description			Description
-	 *	@return	int								<0 if KO, >0 if OK
-	 */
-	public function create_line($origin_id, $qty, $fk_product, $description)
-	{
-		// phpcs:enable
-		$error = 0;
-		$idprod = $fk_product;
-		$j = 0;
-
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."deliverydet (fk_delivery, fk_origin_line,";
-		$sql .= " fk_product, description, qty)";
-		$sql .= " VALUES (".$this->id.",".((int) $origin_id).",";
-		$sql .= " ".($idprod > 0 ? ((int) $idprod) : "null").",";
-		$sql .= " ".($description ? "'".$this->db->escape($description)."'" : "null").",";
-		$sql .= (price2num($qty, 'MS')).")";
-
-		dol_syslog(get_class($this)."::create_line", LOG_DEBUG);
-		if (!$this->db->query($sql)) {
-			$error++;
-		}
-
-		if ($error == 0) {
-			return 1;
-		}
-	}
-
 	/**
 	 * Update a livraison line (only extrafields)
 	 *
@@ -677,6 +587,7 @@ class Delivery extends CommonObject
 			return -1;
 		}
 	}
+
 
 	/**
 	 * 	Add line
@@ -717,8 +628,6 @@ class Delivery extends CommonObject
 			}
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Delete object
@@ -828,28 +737,104 @@ class Delivery extends CommonObject
 		$linkend = '</a>';
 
 		if ($withpicto) {
-			$result .= ($linkstart.img_object($label, $this->picto, 'class="classfortooltip"').$linkend);
-		}
-		if ($withpicto && $withpicto != 2) {
-			$result .= ' ';
-		}
-		$result .= $linkstart.$this->ref.$linkend;
-		return $result;
-	}
+            $result .= ($linkstart . img_object($label, $this->picto, 'class="classfortooltip"') . $linkend);
+        }
+        if ($withpicto && $withpicto != 2) {
+            $result .= ' ';
+        }
+        $result .= $linkstart . $this->ref . $linkend;
+        return $result;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Retourne le libelle du statut d'une expedition
-	 *
-	 *  @param	int			$mode		Mode
-	 *  @return string      			Label
-	 */
-	public function getLibStatut($mode = 0)
+    /**
+     *    Load lines
+     *
+     * @return    void
+     */
+    public function fetch_lines()
+    {
+        // phpcs:enable
+        $this->lines = [];
+
+        $sql = "SELECT ld.rowid, ld.fk_product, ld.description, ld.subprice, ld.total_ht, ld.qty as qty_shipped, ld.fk_origin_line, ";
+        $sql .= " cd.qty as qty_asked, cd.label as custom_label, cd.fk_unit,";
+        $sql .= " p.ref as product_ref, p.fk_product_type as fk_product_type, p.label as product_label, p.description as product_desc,";
+        $sql .= " p.weight, p.weight_units,  p.width, p.width_units, p.length, p.length_units, p.height, p.height_units, p.surface, p.surface_units, p.volume, p.volume_units, p.tobatch as product_tobatch";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "commandedet as cd, " . MAIN_DB_PREFIX . "deliverydet as ld";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product as p on p.rowid = ld.fk_product";
+        $sql .= " WHERE ld.fk_origin_line = cd.rowid";
+        $sql .= " AND ld.fk_delivery = " . ((int) $this->id);
+
+        dol_syslog(get_class($this) . "::fetch_lines", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $line = new DeliveryLine($this->db);
+
+                $obj = $this->db->fetch_object($resql);
+
+                $line->id = $obj->rowid;
+                $line->label = $obj->custom_label;
+                $line->description = $obj->description;
+                $line->fk_product = $obj->fk_product;
+                $line->qty_asked = $obj->qty_asked;
+                $line->qty_shipped = $obj->qty_shipped;
+
+                $line->ref = $obj->product_ref; // deprecated
+                $line->libelle = $obj->product_label; // deprecated
+                $line->product_label = $obj->product_label; // Product label
+                $line->product_ref = $obj->product_ref; // Product ref
+                $line->product_desc = $obj->product_desc; // Product description
+                $line->product_type = $obj->fk_product_type;
+                $line->fk_origin_line = $obj->fk_origin_line;
+
+                $line->price = $obj->price;
+                $line->total_ht = $obj->total_ht;
+
+                // units
+                $line->weight = $obj->weight;
+                $line->weight_units = $obj->weight_units;
+                $line->width = $obj->width;
+                $line->width_units = $obj->width_units;
+                $line->height = $obj->height;
+                $line->height_units = $obj->height_units;
+                $line->length = $obj->length;
+                $line->length_units = $obj->length_units;
+                $line->surface = $obj->surface;
+                $line->surface_units = $obj->surface_units;
+                $line->volume = $obj->volume;
+                $line->volume_units = $obj->volume_units;
+
+                $line->fk_unit = $obj->fk_unit;
+                $line->fetch_optionals();
+
+                $this->lines[$i] = $line;
+
+                $i++;
+            }
+            $this->db->free($resql);
+        }
+
+        return $this->lines;
+    }
+
+    /**
+     *  Retourne le libelle du statut d'une expedition
+     *
+     * @param int $mode Mode
+     *
+     * @return string                Label
+     */
+    public function getLibStatut($mode = 0)
 	{
 		return $this->LibStatut($this->statut, $mode);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Renvoi le libelle d'un statut donne
 	 *
@@ -883,6 +868,7 @@ class Delivery extends CommonObject
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
+
 
 	/**
 	 *  Initialise an instance with random values.
@@ -1056,16 +1042,34 @@ class Delivery extends CommonObject
 			$modele = 'typhon';
 
 			if ($this->model_pdf) {
-				$modele = $this->model_pdf;
-			} elseif (!empty($conf->global->DELIVERY_ADDON_PDF)) {
-				$modele = $conf->global->DELIVERY_ADDON_PDF;
-			}
-		}
+                $modele = $this->model_pdf;
+            } elseif (!empty($conf->global->DELIVERY_ADDON_PDF)) {
+                $modele = $conf->global->DELIVERY_ADDON_PDF;
+            }
+        }
 
-		$modelpath = "core/modules/delivery/doc/";
+        $modelpath = "core/modules/delivery/doc/";
 
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
-	}
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'delivery',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
 
 

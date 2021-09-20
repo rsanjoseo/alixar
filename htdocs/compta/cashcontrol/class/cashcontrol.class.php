@@ -29,30 +29,32 @@
  */
 class CashControl extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-const STATUS_CLOSED = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'cashcontrol';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'pos_cash_fence';
-	/**
+
+    /**
 	 * @var int  Does pos_cash_fence support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 1;
-	/**
+
+    /**
 	 * @var int  Does pos_cash_fence support extrafields ? 0=No, 1=Yes
 	 */
 	public $isextrafieldmanaged = 0;
-	/**
+
+    /**
 	 * @var string String with name of icon for pos_cash_fence. Must be the part after the 'object_' into object_pos_cash_fence.png
 	 */
 	public $picto = 'cash-register';
-	/**
+
+    /**
 	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
 	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
 	 *  'label' the translation key.
@@ -99,7 +101,8 @@ const STATUS_CLOSED = 1;
 	'import_key' =>array('type'=>'varchar(14)', 'label'=>'Import key', 'enabled'=>1, 'visible'=>0, 'position'=>700),
 	'status' => array('type'=>'integer', 'label'=>'Status', 'enabled'=>1, 'visible'=>1, 'position'=>1000, 'notnull'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Draft', '1'=>'Validated')),
 	);
-	/**
+
+    /**
 	 * @var int Object Id
 	 */
 	public $id;
@@ -113,29 +116,36 @@ const STATUS_CLOSED = 1;
 	public $cash;
 	public $cheque;
 	public $card;
-	/**
+
+    /**
 	 * @var integer|string date_creation
 	 */
 	public $date_creation;
 	public $fk_user_creat;
-	/**
-	 * @var integer|string $date_modification
-	 */
-	public $date_modification;
-	/**
-	 * @var integer|string $date_valid
-	 */
-	public $date_valid;
-		public $fk_user_valid; // For the moment CLOSED = VALIDATED
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDB $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
+    /**
+     * @var integer|string $date_modification
+     */
+    public $date_modification;
+
+    /**
+     * @var integer|string $date_valid
+     */
+    public $date_valid;
+    public $fk_user_valid;
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_CLOSED = 1; // For the moment CLOSED = VALIDATED
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
 	}
 
 

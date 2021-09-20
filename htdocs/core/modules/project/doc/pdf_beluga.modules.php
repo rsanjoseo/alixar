@@ -116,29 +116,33 @@ class pdf_beluga extends ModelePDFProjects
 	 */
 	public $marge_droite;
 
-	/**
-	 * @var int marge_haute
-	 */
-	public $marge_haute;
+    /**
+     * @var int marge_haute
+     */
+    public $marge_haute;
 
-	/**
-	 * @var int marge_basse
-	 */
-	public $marge_basse;
-	/**
-	 * Issuer
-	 * @var Societe
-	 */
-	public $emetteur;
-	/**
-	 * Page orientation
-	 * @var string 'P' or 'Portait' (default), 'L' or 'Landscape'
-	 */
-	private $orientation = '';
+    /**
+     * @var int marge_basse
+     */
+    public $marge_basse;
 
-	/**
-	 *	Constructor
-	 *
+    /**
+     * Page orientation
+     *
+     * @var string 'P' or 'Portait' (default), 'L' or 'Landscape'
+     */
+    private $orientation = '';
+
+    /**
+     * Issuer
+     *
+     * @var Societe
+     */
+    public $emetteur;
+
+    /**
+     *    Constructor
+     *
 	 *  @param		DoliDB		$db      Database handler
 	 */
 	public function __construct($db)
@@ -765,27 +769,81 @@ class pdf_beluga extends ModelePDFProjects
 
 				return 1; // No error
 			} else {
-				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->transnoentities("ErrorConstantNotDefined", "PROJECT_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->transnoentities("ErrorConstantNotDefined", "PROJECT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Project		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf, $mysoc;
+
+        $heightoftitleline = 10;
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        $pdf->SetDrawColor(128, 128, 128);
+
+        // Draw rect of all tab (title + lines). Rect takes a length in 3rd parameter
+        $pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height);
+
+        // line prend une position y en 3eme param
+        $pdf->line($this->marge_gauche, $tab_top + $heightoftitleline, $this->page_largeur - $this->marge_droite, $tab_top + $heightoftitleline);
+
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size);
+
+        $pdf->SetXY($this->posxref, $tab_top + 1);
+        $pdf->MultiCell($this->posxlabel - $this->posxref, 3, $outputlangs->transnoentities("Tasks"), '', 'L');
+
+        $pdf->SetXY($this->posxlabel, $tab_top + 1);
+        $pdf->MultiCell($this->posxworkload - $this->posxlabel, 3, $outputlangs->transnoentities("Description"), 0, 'L');
+
+        $pdf->SetXY($this->posxworkload, $tab_top + 1);
+        $pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $outputlangs->transnoentities("PlannedWorkloadShort"), 0, 'R');
+
+        $pdf->SetXY($this->posxprogress, $tab_top + 1);
+        $pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, '%', 0, 'R');
+
+        $pdf->SetXY($this->posxdatestart, $tab_top + 1);
+        $pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, '', 0, 'C');
+
+        $pdf->SetXY($this->posxdateend, $tab_top + 1);
+        $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdatestart, 3, '', 0, 'C');
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Project   $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $langs, $conf, $mysoc;
 
@@ -842,7 +900,6 @@ class pdf_beluga extends ModelePDFProjects
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *  Show footer of page. Need this->emetteur object
 	 *
@@ -857,57 +914,5 @@ class pdf_beluga extends ModelePDFProjects
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'PROJECT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf, $mysoc;
-
-		$heightoftitleline = 10;
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		$pdf->SetDrawColor(128, 128, 128);
-
-		// Draw rect of all tab (title + lines). Rect takes a length in 3rd parameter
-		$pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height);
-
-		// line prend une position y en 3eme param
-		$pdf->line($this->marge_gauche, $tab_top + $heightoftitleline, $this->page_largeur - $this->marge_droite, $tab_top + $heightoftitleline);
-
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size);
-
-		$pdf->SetXY($this->posxref, $tab_top + 1);
-		$pdf->MultiCell($this->posxlabel - $this->posxref, 3, $outputlangs->transnoentities("Tasks"), '', 'L');
-
-		$pdf->SetXY($this->posxlabel, $tab_top + 1);
-		$pdf->MultiCell($this->posxworkload - $this->posxlabel, 3, $outputlangs->transnoentities("Description"), 0, 'L');
-
-		$pdf->SetXY($this->posxworkload, $tab_top + 1);
-		$pdf->MultiCell($this->posxprogress - $this->posxworkload, 3, $outputlangs->transnoentities("PlannedWorkloadShort"), 0, 'R');
-
-		$pdf->SetXY($this->posxprogress, $tab_top + 1);
-		$pdf->MultiCell($this->posxdatestart - $this->posxprogress, 3, '%', 0, 'R');
-
-		$pdf->SetXY($this->posxdatestart, $tab_top + 1);
-		$pdf->MultiCell($this->posxdateend - $this->posxdatestart, 3, '', 0, 'C');
-
-		$pdf->SetXY($this->posxdateend, $tab_top + 1);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxdatestart, 3, '', 0, 'C');
 	}
 }

@@ -33,42 +33,46 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Mo extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-const STATUS_VALIDATED = 1;
-	const STATUS_INPROGRESS = 2;
-	const STATUS_PRODUCED = 3;
-	const STATUS_CANCELED = 9;
-	/**
-	 * @var string ID to identify managed object
-	 */
-	public $element = 'mo';
-		/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'mrp_mo'; // To produce
-	/**
-	 * @var int  Does mo support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 */
-	public $ismultientitymanaged = 0;
-	/**
-	 * @var int  Does mo support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for mo. Must be the part after the 'object_' into object_mo.png
-	 */
-	public $picto = 'mrp';
+    /**
+     * @var string ID to identify managed object
+     */
+    public $element = 'mo';
 
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'mrp_mo';
 
-	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+    /**
+     * @var int  Does mo support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     */
+    public $ismultientitymanaged = 0;
+
+    /**
+     * @var int  Does mo support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 1;
+
+    /**
+     * @var string String with name of icon for mo. Must be the part after the 'object_' into object_mo.png
+     */
+    public $picto = 'mrp';
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1; // To produce
+    const STATUS_INPROGRESS = 2;
+    const STATUS_PRODUCED = 3;
+    const STATUS_CANCELED = 9;
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
@@ -179,29 +183,32 @@ const STATUS_VALIDATED = 1;
 	 * @var string    Name of subtable class that manage subtable lines
 	 */
 	public $class_element_line = 'MoLine';
-	/**
-	 * @var MoLine[]     Array of subtable lines
-	 */
-	public $lines = array();
-	/**
-	 * @var array	List of child tables. To test if we can delete object.
-	 */
-	protected $childtables = array();
-	/**
-	 * @var array	List of child tables. To know object to delete on cascade.
-	 */
-	protected $childtablesoncascade = array('mrp_production');
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf, $langs;
+    /**
+     * @var array    List of child tables. To test if we can delete object.
+     */
+    protected $childtables = [];
 
-		$this->db = $db;
+    /**
+     * @var array    List of child tables. To know object to delete on cascade.
+     */
+    protected $childtablesoncascade = ['mrp_production'];
+
+    /**
+     * @var MoLine[]     Array of subtable lines
+     */
+    public $lines = [];
+
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        global $conf, $langs;
+
+        $this->db = $db;
 
 		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) {
 			$this->fields['rowid']['visible'] = 0;
@@ -225,21 +232,6 @@ const STATUS_VALIDATED = 1;
 				}
 			}
 		}
-	}
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB 	$db 			Database handler
-	 * @param int 		$origin_id 		Old thirdparty id
-	 * @param int 		$dest_id 		New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty($db, $origin_id, $dest_id)
-	{
-		$tables = array('mrp_mo');
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
 	}
 
 	/**
@@ -300,116 +292,6 @@ const STATUS_VALIDATED = 1;
 		}
 
 		return $idcreated;
-	}
-
-	/**
-	 * Erase and update the line to consume and to produce.
-	 *
-	 * @param  User $user      User that modifies
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function updateProduction(User $user, $notrigger = true)
-	{
-		$error = 0;
-
-		if ($this->status != self::STATUS_DRAFT) {
-			$this->error = 'BadStatus';
-			return -1;
-		}
-
-		$this->db->begin();
-
-		// Insert lines in mrp_production table from BOM data
-		if (!$error) {
-			// TODO Check that production has not started. If yes, we stop here.
-
-			$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'mrp_production WHERE fk_mo = '.((int) $this->id);
-			$this->db->query($sql);
-
-			$moline = new MoLine($this->db);
-
-			// Line to produce
-			$moline->fk_mo = $this->id;
-			$moline->qty = $this->qty;
-			$moline->fk_product = $this->fk_product;
-			$moline->position = 1;
-
-			if ($this->fk_bom > 0) {	// If a BOM is defined, we know what to produce.
-				include_once DOL_DOCUMENT_ROOT.'/bom/class/bom.class.php';
-				$bom = new Bom($this->db);
-				$bom->fetch($this->fk_bom);
-				if ($bom->bomtype == 1) {
-					$role = 'toproduce';
-					$moline->role = 'toconsume';
-				} else {
-					$role = 'toconsume';
-					$moline->role = 'toproduce';
-				}
-			} else {
-				if ($this->mrptype == 1) {
-					$moline->role = 'toconsume';
-				} else {
-					$moline->role = 'toproduce';
-				}
-			}
-
-			$resultline = $moline->create($user, false); // Never use triggers here
-			if ($resultline <= 0) {
-				$error++;
-				$this->error = $moline->error;
-				$this->errors = $moline->errors;
-				dol_print_error($this->db, $moline->error, $moline->errors);
-			}
-
-			if ($this->fk_bom > 0) {	// If a BOM is defined, we know what to consume.
-				if ($bom->id > 0) {
-					// Lines to consume
-					if (!$error) {
-						foreach ($bom->lines as $line) {
-							$moline = new MoLine($this->db);
-
-							$moline->fk_mo = $this->id;
-							$moline->origin_id = $line->id;
-							$moline->origin_type = 'bomline';
-							if ($line->qty_frozen) {
-								$moline->qty = $line->qty; // Qty to consume does not depends on quantity to produce
-							} else {
-								$moline->qty = price2num(($line->qty / ( ! empty($bom->qty) ? $bom->qty : 1 ) ) * $this->qty / ( ! empty($line->efficiency) ? $line->efficiency : 1 ), 'MS'); // Calculate with Qty to produce and  more presition
-							}
-							if ($moline->qty <= 0) {
-								$error++;
-								$this->error = "BadValueForquantityToConsume";
-								break;
-							} else {
-								$moline->fk_product = $line->fk_product;
-								$moline->role = $role;
-								$moline->position = $line->position;
-								$moline->qty_frozen = $line->qty_frozen;
-								$moline->disable_stock_change = $line->disable_stock_change;
-
-								$resultline = $moline->create($user, false); // Never use triggers here
-								if ($resultline <= 0) {
-									$error++;
-									$this->error = $moline->error;
-									$this->errors = $moline->errors;
-									dol_print_error($this->db, $moline->error, $moline->errors);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
 	}
 
 	/**
@@ -500,19 +382,6 @@ const STATUS_VALIDATED = 1;
 	}
 
 	/**
-	 * Load object lines in memory from the database
-	 *
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetchLines()
-	{
-		$this->lines = array();
-
-		$result = $this->fetchLinesCommon();
-		return $result;
-	}
-
-	/**
 	 * Load object in memory from the database
 	 *
 	 * @param int    $id   Id object
@@ -520,25 +389,38 @@ const STATUS_VALIDATED = 1;
 	 * @return int         <0 if KO, 0 if not found, >0 if OK
 	 */
 	public function fetch($id, $ref = null)
-	{
-		$result = $this->fetchCommon($id, $ref);
-		if ($result > 0 && !empty($this->table_element_line)) {
-			$this->fetchLines();
-		}
-		return $result;
-	}
+    {
+        $result = $this->fetchCommon($id, $ref);
+        if ($result > 0 && !empty($this->table_element_line)) {
+            $this->fetchLines();
+        }
+        return $result;
+    }
 
-	/**
-	 * Load list of objects in memory from the database.
-	 *
-	 * @param  string      $sortorder    Sort Order
-	 * @param  string      $sortfield    Sort field
-	 * @param  int         $limit        limit
-	 * @param  int         $offset       Offset
-	 * @param  array       $filter       Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
-	 * @param  string      $filtermode   Filter mode (AND or OR)
-	 * @return array|int                 int <0 if KO, array of pages if OK
-	 */
+    /**
+     * Load object lines in memory from the database
+     *
+     * @return int         <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetchLines()
+    {
+        $this->lines = [];
+
+        $result = $this->fetchLinesCommon();
+        return $result;
+    }
+
+    /**
+     * Load list of objects in memory from the database.
+     *
+     * @param string $sortorder  Sort Order
+     * @param string $sortfield  Sort field
+     * @param int    $limit      limit
+     * @param int    $offset     Offset
+     * @param array  $filter     Filter array. Example array('field'=>'valueforlike', 'customurl'=>...)
+     * @param string $filtermode Filter mode (AND or OR)
+     * @return array|int                 int <0 if KO, array of pages if OK
+     */
 	public function fetchAll($sortorder = '', $sortfield = '', $limit = 0, $offset = 0, array $filter = array(), $filtermode = 'AND')
 	{
 		global $conf;
@@ -658,6 +540,7 @@ const STATUS_VALIDATED = 1;
 		}
 	}
 
+
 	/**
 	 * Count number of movement with origin of MO
 	 *
@@ -690,11 +573,13 @@ const STATUS_VALIDATED = 1;
 		return $result;
 	}
 
+
 	/**
 	 * Update object into database
 	 *
 	 * @param  User $user      User that modifies
 	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
+	 *
 	 * @return int             <0 if KO, >0 if OK
 	 */
 	public function update(User $user, $notrigger = false)
@@ -717,25 +602,137 @@ const STATUS_VALIDATED = 1;
 
 		if (!$error) {
 			setEventMessages($langs->trans("RecordModifiedSuccessfully"), null, 'mesgs');
-			$this->db->commit();
-			return 1;
-		} else {
-			setEventMessages($this->error, $this->errors, 'errors');
-			$this->db->rollback();
-			return -1;
-		}
-	}
+            $this->db->commit();
+            return 1;
+        } else {
+            setEventMessages($this->error, $this->errors, 'errors');
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 * Delete object in database
-	 *
-	 * @param User $user       User that deletes
-	 * @param bool $notrigger  false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		return $this->deleteCommon($user, $notrigger);
+    /**
+     * Erase and update the line to consume and to produce.
+     *
+     * @param User $user      User that modifies
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int             <0 if KO, >0 if OK
+     */
+    public function updateProduction(User $user, $notrigger = true)
+    {
+        $error = 0;
+
+        if ($this->status != self::STATUS_DRAFT) {
+            $this->error = 'BadStatus';
+            return -1;
+        }
+
+        $this->db->begin();
+
+        // Insert lines in mrp_production table from BOM data
+        if (!$error) {
+            // TODO Check that production has not started. If yes, we stop here.
+
+            $sql = 'DELETE FROM ' . MAIN_DB_PREFIX . 'mrp_production WHERE fk_mo = ' . ((int) $this->id);
+            $this->db->query($sql);
+
+            $moline = new MoLine($this->db);
+
+            // Line to produce
+            $moline->fk_mo = $this->id;
+            $moline->qty = $this->qty;
+            $moline->fk_product = $this->fk_product;
+            $moline->position = 1;
+
+            if ($this->fk_bom > 0) {    // If a BOM is defined, we know what to produce.
+                include_once DOL_DOCUMENT_ROOT . '/bom/class/bom.class.php';
+                $bom = new Bom($this->db);
+                $bom->fetch($this->fk_bom);
+                if ($bom->bomtype == 1) {
+                    $role = 'toproduce';
+                    $moline->role = 'toconsume';
+                } else {
+                    $role = 'toconsume';
+                    $moline->role = 'toproduce';
+                }
+            } else {
+                if ($this->mrptype == 1) {
+                    $moline->role = 'toconsume';
+                } else {
+                    $moline->role = 'toproduce';
+                }
+            }
+
+            $resultline = $moline->create($user, false); // Never use triggers here
+            if ($resultline <= 0) {
+                $error++;
+                $this->error = $moline->error;
+                $this->errors = $moline->errors;
+                dol_print_error($this->db, $moline->error, $moline->errors);
+            }
+
+            if ($this->fk_bom > 0) {    // If a BOM is defined, we know what to consume.
+                if ($bom->id > 0) {
+                    // Lines to consume
+                    if (!$error) {
+                        foreach ($bom->lines as $line) {
+                            $moline = new MoLine($this->db);
+
+                            $moline->fk_mo = $this->id;
+                            $moline->origin_id = $line->id;
+                            $moline->origin_type = 'bomline';
+                            if ($line->qty_frozen) {
+                                $moline->qty = $line->qty; // Qty to consume does not depends on quantity to produce
+                            } else {
+                                $moline->qty = price2num(($line->qty / (!empty($bom->qty) ? $bom->qty : 1)) * $this->qty / (!empty($line->efficiency) ? $line->efficiency : 1), 'MS'); // Calculate with Qty to produce and  more presition
+                            }
+                            if ($moline->qty <= 0) {
+                                $error++;
+                                $this->error = "BadValueForquantityToConsume";
+                                break;
+                            } else {
+                                $moline->fk_product = $line->fk_product;
+                                $moline->role = $role;
+                                $moline->position = $line->position;
+                                $moline->qty_frozen = $line->qty_frozen;
+                                $moline->disable_stock_change = $line->disable_stock_change;
+
+                                $resultline = $moline->create($user, false); // Never use triggers here
+                                if ($resultline <= 0) {
+                                    $error++;
+                                    $this->error = $moline->error;
+                                    $this->errors = $moline->errors;
+                                    dol_print_error($this->db, $moline->error, $moline->errors);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     * Delete object in database
+     *
+     * @param User $user      User that deletes
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int             <0 if KO, >0 if OK
+     */
+    public function delete(User $user, $notrigger = false)
+    {
+        return $this->deleteCommon($user, $notrigger);
 		//return $this->deleteCommon($user, $notrigger, 1);
 	}
 
@@ -748,25 +745,75 @@ const STATUS_VALIDATED = 1;
 	 *  @return int         		>0 if OK, <0 if KO
 	 */
 	public function deleteLine(User $user, $idline, $notrigger = false)
-	{
-		if ($this->status < 0) {
-			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
-			return -2;
-		}
+    {
+        if ($this->status < 0) {
+            $this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
+            return -2;
+        }
 
-		return $this->deleteLineCommon($user, $idline, $notrigger);
-	}
+        return $this->deleteLineCommon($user, $idline, $notrigger);
+    }
 
-	/**
-	 *	Validate Mo
-	 *
-	 *	@param		User	$user     		User making status change
-	 *  @param		int		$notrigger		1=Does not execute triggers, 0= execute triggers
-	 *	@return  	int						<=0 if OK, 0=Nothing done, >0 if KO
-	 */
-	public function validate($user, $notrigger = 0)
-	{
-		global $conf, $langs;
+    /**
+     *  Returns the reference to the following non used MO depending on the active numbering module
+     *  defined into MRP_MO_ADDON
+     *
+     * @param Product $prod Object product
+     *
+     * @return string            MO free reference
+     */
+    public function getNextNumRef($prod)
+    {
+        global $langs, $conf;
+        $langs->load("mrp");
+
+        if (!empty($conf->global->MRP_MO_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->MRP_MO_ADDON . ".php";
+            $classname = $conf->global->MRP_MO_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/mrp/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = $obj->getNextValue($prod, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                $this->error = $obj->error;
+                //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                return "";
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("Error_MRP_MO_ADDON_NotDefined");
+            return "";
+        }
+    }
+
+    /**
+     *    Validate Mo
+     *
+     * @param User $user      User making status change
+     * @param int  $notrigger 1=Does not execute triggers, 0= execute triggers
+     *
+     * @return    int                        <=0 if OK, 0=Nothing done, >0 if KO
+     */
+    public function validate($user, $notrigger = 0)
+    {
+        global $conf, $langs;
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -877,54 +924,6 @@ const STATUS_VALIDATED = 1;
 	}
 
 	/**
-	 *  Returns the reference to the following non used MO depending on the active numbering module
-	 *  defined into MRP_MO_ADDON
-	 *
-	 *  @param	Product		$prod 	Object product
-	 *  @return string      		MO free reference
-	 */
-	public function getNextNumRef($prod)
-	{
-		global $langs, $conf;
-		$langs->load("mrp");
-
-		if (!empty($conf->global->MRP_MO_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->MRP_MO_ADDON.".php";
-			$classname = $conf->global->MRP_MO_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/mrp/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = $obj->getNextValue($prod, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				$this->error = $obj->error;
-				//dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("Error_MRP_MO_ADDON_NotDefined");
-			return "";
-		}
-	}
-
-	/**
 	 *	Set draft status
 	 *
 	 *	@param	User	$user			Object user that modify
@@ -1026,12 +1025,12 @@ const STATUS_VALIDATED = 1;
 			$label .= '<br><b>'.$langs->trans('Label').':</b> '.$this->label;
 		}
 
-		$url = dol_buildpath('/mrp/mo_card.php', 1).'?id='.$this->id;
-		if ($option == 'production') {
-			$url = dol_buildpath('/mrp/mo_production.php', 1).'?id='.$this->id;
-		}
+		$url = DOL_URL_ROOT . '/mrp/mo_card.php?id=' . $this->id;
+        if ($option == 'production') {
+			$url = DOL_URL_ROOT . '/mrp/mo_production.php?id=' . $this->id;
+        }
 
-		if ($option != 'nolink') {
+        if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
 			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
 			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
@@ -1081,8 +1080,6 @@ const STATUS_VALIDATED = 1;
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return label of the status
 	 *
@@ -1094,13 +1091,15 @@ const STATUS_VALIDATED = 1;
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	/**
-	 *  Return the status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return the status
+     *
+     *  @param	int		$status        Id status
+     *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *  @return string 			       Label of status
+     */
 	public function LibStatut($status, $mode = 0)
 	{
 		// phpcs:enable
@@ -1337,8 +1336,9 @@ const STATUS_VALIDATED = 1;
 		}
 	}
 
+
 	/**
-	 * 	Return HTML with a line of table array of source object lines
+     * 	Return HTML with a line of table array of source object lines
 	 *  TODO Move this and previous function into output html class file (htmlline.class.php).
 	 *  If lines are into a template, title must also be into a template
 	 *  But for the moment we don't know if it's possible as we keep a method available on overloaded objects.
@@ -1348,6 +1348,7 @@ const STATUS_VALIDATED = 1;
 	 *	@param	string				$restrictlist		''=All lines, 'services'=Restrict to services only (strike line if not)
 	 *  @param	string				$defaulttpldir		Directory where to find the template
 	 *  @param  array       		$selectedLines      Array of lines id for selected lines
+	 *
 	 * 	@return	void
 	 */
 	public function printOriginLine($line, $var, $restrictlist = '', $defaulttpldir = '/core/tpl', $selectedLines = array())
@@ -1370,16 +1371,32 @@ const STATUS_VALIDATED = 1;
 		$this->tpl['qty_bom'] = 1;
 		if (is_object($this->bom) && $this->bom->qty > 1) {
 			$this->tpl['qty_bom'] = $this->bom->qty;
-		}
+        }
 
-		$this->tpl['qty'] = $line->qty;
-		$this->tpl['qty_frozen'] = $line->qty_frozen;
-		$this->tpl['disable_stock_change'] = $line->disable_stock_change;
-		$this->tpl['efficiency'] = $line->efficiency;
+        $this->tpl['qty'] = $line->qty;
+        $this->tpl['qty_frozen'] = $line->qty_frozen;
+        $this->tpl['disable_stock_change'] = $line->disable_stock_change;
+        $this->tpl['efficiency'] = $line->efficiency;
 
-		$tpl = DOL_DOCUMENT_ROOT.'/mrp/tpl/originproductline.tpl.php';
-		$res = include $tpl;
-	}
+        $tpl = DOL_DOCUMENT_ROOT . '/mrp/tpl/originproductline.tpl.php';
+        $res = include $tpl;
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty($db, $origin_id, $dest_id)
+    {
+        $tables = ['mrp_mo'];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
 
 /**

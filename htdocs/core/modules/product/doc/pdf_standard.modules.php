@@ -582,27 +582,130 @@ class pdf_standard extends ModelePDFProduct
 
 				return 1; // No error
 			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Product		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @param	string		$titlekey		Translation key to show as title of document
-	 *  @return	void
-	 */
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y (not used)
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
+     * @param int       $hidebottom  Hide bottom bar of array
+     * @param string    $currency    Currency code
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $currency = !empty($currency) ? $currency : $conf->currency;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        if (empty($hidetop)) {
+            $titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency" . $currency));
+            $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
+            $pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
+
+            //$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
+            if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+                $pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+            }
+        }
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', '', $default_font_size - 1);
+
+        // Output Rect
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
+
+        if (empty($hidetop)) {
+            $pdf->line($this->marge_gauche, $tab_top + 5, $this->page_largeur - $this->marge_droite, $tab_top + 5); // line takes a position y in 2nd parameter and 4th parameter
+
+            $pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
+            $pdf->MultiCell(108, 2, $outputlangs->transnoentities("Designation"), '', 'L');
+        }
+
+        if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) {
+            $pdf->line($this->posxtva - 1, $tab_top, $this->posxtva - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxtva - 3, $tab_top + 1);
+                $pdf->MultiCell($this->posxup - $this->posxtva + 3, 2, $outputlangs->transnoentities("VAT"), '', 'C');
+            }
+        }
+
+        $pdf->line($this->posxup - 1, $tab_top, $this->posxup - 1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxup - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxqty - $this->posxup - 1, 2, $outputlangs->transnoentities("PriceUHT"), '', 'C');
+        }
+
+        $pdf->line($this->posxqty - 1, $tab_top, $this->posxqty - 1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxqty - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxunit - $this->posxqty - 1, 2, $outputlangs->transnoentities("Qty"), '', 'C');
+        }
+
+        if (!empty($conf->global->PRODUCT_USE_UNITS)) {
+            $pdf->line($this->posxunit - 1, $tab_top, $this->posxunit - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxunit - 1, $tab_top + 1);
+                $pdf->MultiCell($this->posxdiscount - $this->posxunit - 1, 2, $outputlangs->transnoentities("Unit"), '', 'C');
+            }
+        }
+
+        $pdf->line($this->posxdiscount - 1, $tab_top, $this->posxdiscount - 1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            if ($this->atleastonediscount) {
+                $pdf->SetXY($this->posxdiscount - 1, $tab_top + 1);
+                $pdf->MultiCell($this->postotalht - $this->posxdiscount + 1, 2, $outputlangs->transnoentities("ReductionShort"), '', 'C');
+            }
+        }
+
+        if ($this->atleastonediscount) {
+            $pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
+        }
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->postotalht - 1, $tab_top + 1);
+            $pdf->MultiCell(30, 2, $outputlangs->transnoentities("TotalHT"), '', 'C');
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Product   $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     * @param string    $titlekey    Translation key to show as title of document
+     *
+     * @return    void
+     */
 	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $titlekey = "")
 	{
 		global $conf, $langs, $hookmanager;
@@ -739,7 +842,6 @@ class pdf_standard extends ModelePDFProduct
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *  Show footer of page. Need this->emetteur object
 	 *
@@ -754,106 +856,5 @@ class pdf_standard extends ModelePDFProduct
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'PRODUCT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y (not used)
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @param		string		$currency		Currency code
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$currency = !empty($currency) ? $currency : $conf->currency;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		if (empty($hidetop)) {
-			$titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency".$currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
-			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
-			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
-			if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
-				$pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
-			}
-		}
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', '', $default_font_size - 1);
-
-		// Output Rect
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
-
-		if (empty($hidetop)) {
-			$pdf->line($this->marge_gauche, $tab_top + 5, $this->page_largeur - $this->marge_droite, $tab_top + 5); // line takes a position y in 2nd parameter and 4th parameter
-
-			$pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
-			$pdf->MultiCell(108, 2, $outputlangs->transnoentities("Designation"), '', 'L');
-		}
-
-		if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN)) {
-			$pdf->line($this->posxtva - 1, $tab_top, $this->posxtva - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxtva - 3, $tab_top + 1);
-				$pdf->MultiCell($this->posxup - $this->posxtva + 3, 2, $outputlangs->transnoentities("VAT"), '', 'C');
-			}
-		}
-
-		$pdf->line($this->posxup - 1, $tab_top, $this->posxup - 1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxup - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxqty - $this->posxup - 1, 2, $outputlangs->transnoentities("PriceUHT"), '', 'C');
-		}
-
-		$pdf->line($this->posxqty - 1, $tab_top, $this->posxqty - 1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxqty - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxunit - $this->posxqty - 1, 2, $outputlangs->transnoentities("Qty"), '', 'C');
-		}
-
-		if (!empty($conf->global->PRODUCT_USE_UNITS)) {
-			$pdf->line($this->posxunit - 1, $tab_top, $this->posxunit - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxunit - 1, $tab_top + 1);
-				$pdf->MultiCell($this->posxdiscount - $this->posxunit - 1, 2, $outputlangs->transnoentities("Unit"), '', 'C');
-			}
-		}
-
-		$pdf->line($this->posxdiscount - 1, $tab_top, $this->posxdiscount - 1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			if ($this->atleastonediscount) {
-				$pdf->SetXY($this->posxdiscount - 1, $tab_top + 1);
-				$pdf->MultiCell($this->postotalht - $this->posxdiscount + 1, 2, $outputlangs->transnoentities("ReductionShort"), '', 'C');
-			}
-		}
-
-		if ($this->atleastonediscount) {
-			$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
-		}
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->postotalht - 1, $tab_top + 1);
-			$pdf->MultiCell(30, 2, $outputlangs->transnoentities("TotalHT"), '', 'C');
-		}
 	}
 }

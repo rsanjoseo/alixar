@@ -52,130 +52,47 @@ class Thirdparties extends DolibarrApi
 
 		require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 		require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-		require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
 
-		$this->company = new Societe($this->db);
+        $this->company = new Societe($this->db);
 
-		if (!empty($conf->global->SOCIETE_EMAIL_MANDATORY)) {
-			static::$FIELDS[] = 'email';
-		}
-	}
+        if (!empty($conf->global->SOCIETE_EMAIL_MANDATORY)) {
+            static::$FIELDS[] = 'email';
+        }
+    }
 
-	/**
-	 * Get properties of a thirdparty object by email.
-	 *
-	 * Return an array with thirdparty informations
-	 *
-	 * @param string    $email  Email of third party to load
-	 * @return array|mixed Cleaned Societe object
-	 *
-	 * @url     GET email/{email}
+    /**
+     * Get properties of a thirdparty object
+     *
+     * Return an array with thirdparty informations
+     *
+     * @param int $id Id of third party to load
+     *
+     * @return    array|mixed Cleaned Societe object
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        return $this->_fetch($id);
+    }
+
+    /**
+     * Get properties of a thirdparty object by email.
+     *
+     * Return an array with thirdparty informations
+     *
+     * @param string $email Email of third party to load
+     * @return array|mixed Cleaned Societe object
+     *
+     * @url     GET email/{email}
 	 *
 	 * @throws RestException
 	 */
 	public function getByEmail($email)
 	{
 		return $this->_fetch('', '', '', '', '', '', '', '', '', '', $email);
-	}
-
-	/**
-	 * Fetch properties of a thirdparty object.
-	 *
-	 * Return an array with thirdparty informations
-	 *
-	 * @param    int	$rowid      Id of third party to load (Use 0 to get a specimen record, use null to use other search criterias)
-	 * @param    string	$ref        Reference of third party, name (Warning, this can return several records)
-	 * @param    string	$ref_ext    External reference of third party (Warning, this information is a free field not provided by Dolibarr)
-	 * @param    string	$barcode    Barcode of third party to load
-	 * @param    string	$idprof1		Prof id 1 of third party (Warning, this can return several records)
-	 * @param    string	$idprof2		Prof id 2 of third party (Warning, this can return several records)
-	 * @param    string	$idprof3		Prof id 3 of third party (Warning, this can return several records)
-	 * @param    string	$idprof4		Prof id 4 of third party (Warning, this can return several records)
-	 * @param    string	$idprof5		Prof id 5 of third party (Warning, this can return several records)
-	 * @param    string	$idprof6		Prof id 6 of third party (Warning, this can return several records)
-	 * @param    string	$email   		Email of third party (Warning, this can return several records)
-	 * @param    string	$ref_alias  Name_alias of third party (Warning, this can return several records)
-	 * @return array|mixed cleaned Societe object
-	 *
-	 * @throws RestException
-	 */
-	private function _fetch($rowid, $ref = '', $ref_ext = '', $barcode = '', $idprof1 = '', $idprof2 = '', $idprof3 = '', $idprof4 = '', $idprof5 = '', $idprof6 = '', $email = '', $ref_alias = '')
-	{
-		global $conf;
-
-		if (!DolibarrApiAccess::$user->rights->societe->lire) {
-			throw new RestException(401);
-		}
-
-		if ($rowid === 0) {
-			$result = $this->company->initAsSpecimen();
-		} else {
-			$result = $this->company->fetch($rowid, $ref, $ref_ext, $barcode, $idprof1, $idprof2, $idprof3, $idprof4, $idprof5, $idprof6, $email, $ref_alias);
-		}
-		if (!$result) {
-			throw new RestException(404, 'Thirdparty not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('societe', $this->company->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if (!empty($conf->global->FACTURE_DEPOSITS_ARE_JUST_PAYMENTS)) {
-			$filterabsolutediscount = "fk_facture_source IS NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
-			$filtercreditnote = "fk_facture_source IS NOT NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
-		} else {
-			$filterabsolutediscount = "fk_facture_source IS NULL OR (description LIKE '(DEPOSIT)%' AND description NOT LIKE '(EXCESS RECEIVED)%')";
-			$filtercreditnote = "fk_facture_source IS NOT NULL AND (description NOT LIKE '(DEPOSIT)%' OR description LIKE '(EXCESS RECEIVED)%')";
-		}
-
-		$absolute_discount = $this->company->getAvailableDiscounts('', $filterabsolutediscount);
-		$absolute_creditnote = $this->company->getAvailableDiscounts('', $filtercreditnote);
-		$this->company->absolute_discount = price2num($absolute_discount, 'MT');
-		$this->company->absolute_creditnote = price2num($absolute_creditnote, 'MT');
-
-		return $this->_cleanObjectDatas($this->company);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  array|mixed         Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->nom); // ->name already defined and nom deprecated
-		unset($object->name_bis); // ->name_alias already defined
-		unset($object->note); // ->note_private and note_public already defined
-		unset($object->departement);
-		unset($object->departement_code);
-		unset($object->pays);
-		unset($object->particulier);
-		unset($object->prefix_comm);
-
-		unset($object->commercial_id); // This property is used in create/update only. It does not exists in read mode because there is several sales representatives.
-
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-
-		unset($object->lines);
-		unset($object->thirdparty);
-
-		unset($object->fk_delivery_address); // deprecated feature
-
-		unset($object->skype);
-		unset($object->twitter);
-		unset($object->facebook);
-		unset($object->linkedin);
-
-		return $object;
 	}
 
 	/**
@@ -351,26 +268,6 @@ class Thirdparties extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Datas to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$thirdparty = array();
-		foreach (Thirdparties::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$thirdparty[$field] = $data[$field];
-		}
-		return $thirdparty;
-	}
-
-	/**
 	 * Update thirdparty
 	 *
 	 * @param int   $id             Id of thirdparty to update
@@ -404,21 +301,6 @@ class Thirdparties extends DolibarrApi
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get properties of a thirdparty object
-	 *
-	 * Return an array with thirdparty informations
-	 *
-	 * @param 	int 	$id Id of third party to load
-	 * @return 	array|mixed Cleaned Societe object
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		return $this->_fetch($id);
 	}
 
 	/**
@@ -937,6 +819,7 @@ class Thirdparties extends DolibarrApi
 		return $this->_cleanObjectDatas($this->company);
 	}
 
+
 	/**
 	 * Get outstanding proposals of thirdparty
 	 *
@@ -977,6 +860,7 @@ class Thirdparties extends DolibarrApi
 
 		return $result;
 	}
+
 
 	/**
 	 * Get outstanding orders of thirdparty
@@ -1160,9 +1044,9 @@ class Thirdparties extends DolibarrApi
 		}
 
 		return $obj_ret;
-	}
+    }
 
-	/**
+    /**
 	 * Return list of invoices qualified to be replaced by another invoice.
 	 *
 	 * @param int   $id             Id of thirdparty
@@ -1739,8 +1623,6 @@ class Thirdparties extends DolibarrApi
 		return $account;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Update specified values of a specific gateway attached to a thirdparty
 	 *
@@ -1867,14 +1749,138 @@ class Thirdparties extends DolibarrApi
 			$num = $this->db->num_rows($result);
 			while ($i < $num) {
 				$obj = $this->db->fetch_object($result);
-				$account = new SocieteAccount($this->db);
-				$account->fetch($obj->rowid);
+                $account = new SocieteAccount($this->db);
+                $account->fetch($obj->rowid);
 
-				if ($account->delete(DolibarrApiAccess::$user) < 0) {
-					throw new RestException(500, 'Error while deleting gateways attached to this third party');
-				}
-				$i++;
-			}
-		}
-	}
+                if ($account->delete(DolibarrApiAccess::$user) < 0) {
+                    throw new RestException(500, 'Error while deleting gateways attached to this third party');
+                }
+                $i++;
+            }
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  array|mixed         Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->nom); // ->name already defined and nom deprecated
+        unset($object->name_bis); // ->name_alias already defined
+        unset($object->note); // ->note_private and note_public already defined
+        unset($object->departement);
+        unset($object->departement_code);
+        unset($object->pays);
+        unset($object->particulier);
+        unset($object->prefix_comm);
+
+        unset($object->commercial_id); // This property is used in create/update only. It does not exists in read mode because there is several sales representatives.
+
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+
+        unset($object->lines);
+        unset($object->thirdparty);
+
+        unset($object->fk_delivery_address); // deprecated feature
+
+        unset($object->skype);
+        unset($object->twitter);
+        unset($object->facebook);
+        unset($object->linkedin);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Datas to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $thirdparty = [];
+        foreach (Thirdparties::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $thirdparty[$field] = $data[$field];
+        }
+        return $thirdparty;
+    }
+
+    /**
+     * Fetch properties of a thirdparty object.
+     *
+     * Return an array with thirdparty informations
+     *
+     * @param int    $rowid     Id of third party to load (Use 0 to get a specimen record, use null to use other search criterias)
+     * @param string $ref       Reference of third party, name (Warning, this can return several records)
+     * @param string $ref_ext   External reference of third party (Warning, this information is a free field not provided by Dolibarr)
+     * @param string $barcode   Barcode of third party to load
+     * @param string $idprof1   Prof id 1 of third party (Warning, this can return several records)
+     * @param string $idprof2   Prof id 2 of third party (Warning, this can return several records)
+     * @param string $idprof3   Prof id 3 of third party (Warning, this can return several records)
+     * @param string $idprof4   Prof id 4 of third party (Warning, this can return several records)
+     * @param string $idprof5   Prof id 5 of third party (Warning, this can return several records)
+     * @param string $idprof6   Prof id 6 of third party (Warning, this can return several records)
+     * @param string $email     Email of third party (Warning, this can return several records)
+     * @param string $ref_alias Name_alias of third party (Warning, this can return several records)
+     *
+     * @return array|mixed cleaned Societe object
+     *
+     * @throws RestException
+     */
+    private function _fetch($rowid, $ref = '', $ref_ext = '', $barcode = '', $idprof1 = '', $idprof2 = '', $idprof3 = '', $idprof4 = '', $idprof5 = '', $idprof6 = '', $email = '', $ref_alias = '')
+    {
+        global $conf;
+
+        if (!DolibarrApiAccess::$user->rights->societe->lire) {
+            throw new RestException(401);
+        }
+
+        if ($rowid === 0) {
+            $result = $this->company->initAsSpecimen();
+        } else {
+            $result = $this->company->fetch($rowid, $ref, $ref_ext, $barcode, $idprof1, $idprof2, $idprof3, $idprof4, $idprof5, $idprof6, $email, $ref_alias);
+        }
+        if (!$result) {
+            throw new RestException(404, 'Thirdparty not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('societe', $this->company->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if (!empty($conf->global->FACTURE_DEPOSITS_ARE_JUST_PAYMENTS)) {
+            $filterabsolutediscount = "fk_facture_source IS NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
+            $filtercreditnote = "fk_facture_source IS NOT NULL"; // If we want deposit to be substracted to payments only and not to total of final invoice
+        } else {
+            $filterabsolutediscount = "fk_facture_source IS NULL OR (description LIKE '(DEPOSIT)%' AND description NOT LIKE '(EXCESS RECEIVED)%')";
+            $filtercreditnote = "fk_facture_source IS NOT NULL AND (description NOT LIKE '(DEPOSIT)%' OR description LIKE '(EXCESS RECEIVED)%')";
+        }
+
+        $absolute_discount = $this->company->getAvailableDiscounts('', $filterabsolutediscount);
+        $absolute_creditnote = $this->company->getAvailableDiscounts('', $filtercreditnote);
+        $this->company->absolute_discount = price2num($absolute_discount, 'MT');
+        $this->company->absolute_creditnote = price2num($absolute_creditnote, 'MT');
+
+        return $this->_cleanObjectDatas($this->company);
+    }
 }

@@ -148,37 +148,6 @@ class PriceGlobalVariableUpdater
 		}
 	}
 
-	/**
-	 *	Checks if all parameters are in order
-	 *
-	 *	@return	void
-	 */
-	public function checkParameters()
-	{
-		// Clean parameters
-		if (isset($this->description)) {
-			$this->description = trim($this->description);
-		}
-		if (isset($this->parameters)) {
-			$this->parameters = trim($this->parameters);
-		} else {
-			$this->parameters = "";
-		}
-		if (isset($this->last_status)) {
-			$this->last_status = trim($this->last_status);
-		}
-
-		// Check parameters
-		if (empty($this->type) || !is_numeric($this->type) || !in_array($this->type, $this->types)) {
-			$this->type = 0;
-		}
-		if (empty($this->update_interval) || !is_numeric($this->update_interval) || $this->update_interval < 1) {
-			$this->update_interval = $this->update_min;
-		}
-		if (empty($this->next_update) || !is_numeric($this->next_update) || $this->next_update < 0) {
-			$this->next_update = 0;
-		}
-	}
 
 	/**
 	 *  Load object in memory from the database
@@ -353,25 +322,57 @@ class PriceGlobalVariableUpdater
 	 *  @return	string
 	 */
 	public function getLastUpdated()
-	{
-		global $langs;
-		$last = $this->next_update - ($this->update_interval * 60);
-		if ($last < 1) {
-			return $langs->trans("Never");
-		}
-		$status = empty($this->last_status) ? $langs->trans("CorrectlyUpdated") : $this->last_status;
-		return $status.'<br>'.dol_print_date($last, '%d/%m/%Y %H:%M:%S');
-	}
+    {
+        global $langs;
+        $last = $this->next_update - ($this->update_interval * 60);
+        if ($last < 1) {
+            return $langs->trans("Never");
+        }
+        $status = empty($this->last_status) ? $langs->trans("CorrectlyUpdated") : $this->last_status;
+        return $status . '<br>' . dol_print_date($last, '%d/%m/%Y %H:%M:%S');
+    }
 
-	/**
-	 *  List all price global variables
-	 *
-	 *  @return	array				Array of price global variable updaters
-	 */
-	public function listUpdaters()
-	{
-		$sql = "SELECT rowid, type, description, parameters, fk_variable, update_interval, next_update, last_status";
-		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element;
+    /**
+     *    Checks if all parameters are in order
+     *
+     * @return    void
+     */
+    public function checkParameters()
+    {
+        // Clean parameters
+        if (isset($this->description)) {
+            $this->description = trim($this->description);
+        }
+        if (isset($this->parameters)) {
+            $this->parameters = trim($this->parameters);
+        } else {
+            $this->parameters = "";
+        }
+        if (isset($this->last_status)) {
+            $this->last_status = trim($this->last_status);
+        }
+
+        // Check parameters
+        if (empty($this->type) || !is_numeric($this->type) || !in_array($this->type, $this->types)) {
+            $this->type = 0;
+        }
+        if (empty($this->update_interval) || !is_numeric($this->update_interval) || $this->update_interval < 1) {
+            $this->update_interval = $this->update_min;
+        }
+        if (empty($this->next_update) || !is_numeric($this->next_update) || $this->next_update < 0) {
+            $this->next_update = 0;
+        }
+    }
+
+    /**
+     *  List all price global variables
+     *
+     * @return    array                Array of price global variable updaters
+     */
+    public function listUpdaters()
+    {
+        $sql = "SELECT rowid, type, description, parameters, fk_variable, update_interval, next_update, last_status";
+        $sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element;
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 		$resql = $this->db->query($sql);

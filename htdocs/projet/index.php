@@ -223,8 +223,8 @@ if ($resql) {
 	print '<div class="div-table-responsive-no-min">';
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<th colspan="4">'.$langs->trans("LatestModifiedProjects", $max).'</th>';
-	print '</tr>';
+    print '<th colspan="5">' . $langs->trans("LatestModifiedProjects", $max) . '</th>';
+    print '</tr>';
 
 	$num = $db->num_rows($resql);
 
@@ -268,25 +268,35 @@ if ($resql) {
 			print '&nbsp;';
 			print '</td>';
 
-			print '<td width="16" class="right nobordernopadding hideonsmartphone">';
-			$filename = dol_sanitizeFileName($obj->ref);
-			$filedir = $conf->commande->dir_output.'/'.dol_sanitizeFileName($obj->ref);
-			$urlsource = $_SERVER['PHP_SELF'].'?id='.$obj->rowid;
-			print $formfile->getDocumentsLink($projectstatic->element, $filename, $filedir);
-			print '</td></tr></table>';
+            print '<td width="16" class="right nobordernopadding hideonsmartphone">';
+            $filename = dol_sanitizeFileName($obj->ref);
+            $filedir = $conf->commande->dir_output . '/' . dol_sanitizeFileName($obj->ref);
+            $urlsource = $_SERVER['PHP_SELF'] . '?id=' . $obj->rowid;
+            print $formfile->getDocumentsLink($projectstatic->element, $filename, $filedir);
+            print '</td></tr></table>';
 
-			print '</td>';
+            print '</td>';
 
-			print '<td class="nowrap">';
-			if ($companystatic->id > 0) {
-				print $companystatic->getNomUrl(1, 'company', 16);
-			}
-			print '</td>';
-			print '<td>'.dol_print_date($db->jdate($obj->datem), 'day').'</td>';
-			print '<td class="right">'.$projectstatic->LibStatut($obj->status, 3).'</td>';
-			print '</tr>';
-			$i++;
-		}
+            // Label
+            print '<td class="tdoverflowmax150" title="' . dol_escape_htmltag($obj->title) . '">';
+            print $projectstatic->title;
+            print '</td>';
+
+            // Thirdparty
+            print '<td class="nowrap">';
+            if ($companystatic->id > 0) {
+                print $companystatic->getNomUrl(1, 'company', 16);
+            }
+            print '</td>';
+
+            // Date
+            print '<td>' . dol_print_date($db->jdate($obj->datem), 'day') . '</td>';
+
+            // Status
+            print '<td class="right">' . $projectstatic->LibStatut($obj->status, 3) . '</td>';
+            print '</tr>';
+            $i++;
+        }
 	} else {
 		print '<tr><td colspan="4"><span class="opacitymedium">'.$langs->trans("None").'</span></td></tr>';
 	}

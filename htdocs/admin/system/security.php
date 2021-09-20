@@ -330,28 +330,80 @@ if (!empty($eventstolog) && is_array($eventstolog)) {
 				$out .= '<span class="opacitymedium">'.$key.'</span>';
 				$i++;
 			}
-		}
-	}
-	print $out;
+        }
+    }
+    print $out;
 }
 
 if (empty($out)) {
-	print img_warning().' '.$langs->trans("NoSecurityEventsAreAduited", $langs->transnoentities("Home").' - '.$langs->transnoentities("Setup").' - '.$langs->transnoentities("Security").' - '.$langs->transnoentities("Audit")).'<br>';
+    print img_warning() . ' ' . $langs->trans("NoSecurityEventsAreAduited", $langs->transnoentities("Home") . ' - ' . $langs->transnoentities("Setup") . ' - ' . $langs->transnoentities("Security") . ' - ' . $langs->transnoentities("Audit")) . '<br>';
 }
 
 print '<br>';
+
+// Modules/Applications
+
 print '<br>';
 print '<br>';
 print '<br>';
+print load_fiche_titre($langs->trans("Modules"), '', 'folder');
 
+// Module log
+print '<strong>' . $langs->trans("Syslog") . '</strong>: ';
+$test = empty($conf->syslog->enabled);
+if ($test) {
+    print img_picto('', 'tick.png') . ' ' . $langs->trans("NotInstalled") . ' - ' . $langs->trans("NotRiskOfLeakWithThis");
+} else {
+    if ($conf->global->SYSLOG_LEVEL > LOG_NOTICE) {
+        print img_picto('', 'warning') . ' ' . $langs->trans("ModuleActivatedWithTooHighLogLevel", $langs->transnoentities("Syslog"));
+    } else {
+        print img_picto('', 'tick.png') . ' ' . $langs->trans("ModuleSyslogActivatedButLevelNotTooVerbose", $langs->transnoentities("Syslog"), $conf->global->SYSLOG_LEVEL);
+    }
+    //print ' '.$langs->trans("MoreInformation").' <a href="'.DOL_URL_ROOT.'/admin/system/xdebug.php'.'">XDebug admin page</a>';
+}
+print '<br>';
 
-print load_fiche_titre($langs->trans("OtherSetup").' ('.$langs->trans("Experimental").')', '', 'folder');
+// Module debugbar
+print '<strong>' . $langs->trans("DebugBar") . '</strong>: ';
+$test = empty($conf->debugbar->enabled);
+if ($test) {
+    print img_picto('', 'tick.png') . ' ' . $langs->trans("NotInstalled") . ' - ' . $langs->trans("NotRiskOfLeakWithThis");
+} else {
+    print img_picto('', 'error') . ' ' . $langs->trans("ModuleActivatedDoNotUseInProduction", $langs->transnoentities("DebugBar"));
+    //print ' '.$langs->trans("MoreInformation").' <a href="'.DOL_URL_ROOT.'/admin/system/xdebug.php'.'">XDebug admin page</a>';
+}
+print '<br>';
 
+// APIs
+
+print '<br>';
+print '<br>';
+print '<br>';
+print load_fiche_titre($langs->trans("API"), '', 'folder');
+
+if (empty($conf->api->enabled) && empty($conf->webservices->enabled)) {
+    print $langs->trans("APIsAreNotEnabled");
+} else {
+    if (!empty($conf->webservices->enabled)) {
+        print $langs->trans('YouEnableDeprecatedWSAPIsUseRESTAPIsInstead') . "<br>\n";
+        print '<br>';
+    }
+    if (!empty($conf->api->enabled)) {
+        print '<strong>API_ENDPOINT_RULES</strong> = ' . (empty($conf->global->API_ENDPOINT_RULES) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . ' &nbsp; (' . $langs->trans("Example") . ': endpoint1:1,endpoint2:1,...)</span>' : $conf->global->API_ENDPOINT_RULES) . "<br>\n";
+        print '<br>';
+    }
+}
+
+print '<br><br>';
+
+print '<br>';
+
+print load_fiche_titre($langs->trans("OtherSetup") . ' (' . $langs->trans("Experimental") . ')', '', 'folder');
 
 //print '<strong>'.$langs->trans("PasswordEncryption").'</strong>: ';
-print '<strong>MAIN_SECURITY_HASH_ALGO</strong> = '.(empty($conf->global->MAIN_SECURITY_HASH_ALGO) ? '<span class="opacitymedium">'.$langs->trans("Undefined").'</span>' : $conf->global->MAIN_SECURITY_HASH_ALGO)." &nbsp; ";
+print '<strong>MAIN_SECURITY_HASH_ALGO</strong> = ' . (empty($conf->global->MAIN_SECURITY_HASH_ALGO) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . '</span>' : $conf->global->MAIN_SECURITY_HASH_ALGO) . " &nbsp; ";
 if (empty($conf->global->MAIN_SECURITY_HASH_ALGO)) {
-	print '<span class="opacitymedium"> &nbsp; &nbsp; If unset: \'md5\'</span>';
+    print '<span class="opacitymedium"> &nbsp; &nbsp; If unset: \'md5\'</span>';
 }
 if ($conf->global->MAIN_SECURITY_HASH_ALGO != 'password_hash') {
 	print '<br><strong>MAIN_SECURITY_SALT</strong> = '.(empty($conf->global->MAIN_SECURITY_SALT) ? '<span class="opacitymedium">'.$langs->trans("Undefined").'</span>' : $conf->global->MAIN_SECURITY_SALT).'<br>';
@@ -375,24 +427,27 @@ print '<br>';
 print '<strong>MAIN_ALLOW_SVG_FILES_AS_IMAGES</strong> = '.(empty($conf->global->MAIN_ALLOW_SVG_FILES_AS_IMAGES) ? '0' : $conf->global->MAIN_ALLOW_SVG_FILES_AS_IMAGES).' &nbsp; <span class="opacitymedium">('.$langs->trans("Recommended").': 0)</span><br>';
 print '<br>';
 
-print '<strong>MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE</strong> = '.(empty($conf->global->MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE) ? '<span class="opacitymedium">'.$langs->trans("Undefined").'</span>' : $conf->global->MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE).' &nbsp; <span class="opacitymedium">('.$langs->trans("Recommended").': 1)</span><br>';
+print '<strong>MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE</strong> = ' . (empty($conf->global->MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . '</span>' : $conf->global->MAIN_ALWAYS_CREATE_LOCK_AFTER_LAST_UPGRADE) . ' &nbsp; <span class="opacitymedium">(' . $langs->trans("Recommended") . ': 1)</span><br>';
 print '<br>';
 
-print '<strong>MAIN_RESTRICTHTML_ONLY_VALID_HTML</strong> = '.(empty($conf->global->MAIN_RESTRICTHTML_ONLY_VALID_HTML) ? '<span class="opacitymedium">'.$langs->trans("Undefined").' &nbsp; ('.$langs->trans("Recommended").': 1)</span>' : $conf->global->MAIN_RESTRICTHTML_ONLY_VALID_HTML)."<br>";
+print '<strong>MAIN_RESTRICTHTML_ONLY_VALID_HTML</strong> = ' . (empty($conf->global->MAIN_RESTRICTHTML_ONLY_VALID_HTML) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . ' &nbsp; (' . $langs->trans("Recommended") . ': 1)</span>' : $conf->global->MAIN_RESTRICTHTML_ONLY_VALID_HTML) . "<br>";
 print '<br>';
 
-print '<strong>MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES</strong> = '.(empty($conf->global->MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES) ? '<span class="opacitymedium">'.$langs->trans("Undefined").' &nbsp; ('.$langs->trans("Recommended").': 1)</span>' : $conf->global->MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES)."<br>";
+print '<strong>MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES</strong> = ' . (empty($conf->global->MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . ' &nbsp; (' . $langs->trans("Recommended") . ': 1)</span>' : $conf->global->MAIN_RESTRICTHTML_REMOVE_ALSO_BAD_ATTRIBUTES) . "<br>";
+print '<br>';
+
+print '<strong>MAIN_SECURITY_CSRF_WITH_TOKEN</strong> = ' . (empty($conf->global->MAIN_SECURITY_CSRF_WITH_TOKEN) ? '<span class="opacitymedium">' . $langs->trans("Undefined") . ' &nbsp; (' . $langs->trans("Recommended") . ': 1)</span>' : $conf->global->MAIN_SECURITY_CSRF_WITH_TOKEN) . "<br>";
 print '<br>';
 
 print '<strong>MAIN_EXEC_USE_POPEN</strong> = ';
 if (empty($conf->global->MAIN_EXEC_USE_POPEN)) {
-	print '<span class="opacitymedium">'.$langs->trans("Undefined").'</span>';
+    print '<span class="opacitymedium">' . $langs->trans("Undefined") . '</span>';
 } else {
-	print $conf->global->MAIN_EXEC_USE_POPEN;
+    print $conf->global->MAIN_EXEC_USE_POPEN;
 }
 if ($execmethod == 1) {
-	print '<span class="opacitymedium">, "exec" PHP method will be used for shell commands';
-	print ' &nbsp; ('.$langs->trans("Recommended").': '.$langs->trans("Undefined").' '.$langs->trans("or").' 1)';
+    print '<span class="opacitymedium">, "exec" PHP method will be used for shell commands';
+    print ' &nbsp; (' . $langs->trans("Recommended") . ': ' . $langs->trans("Undefined") . ' ' . $langs->trans("or") . ' 1)';
 	print '</span>';
 }
 if ($execmethod == 2) {
@@ -403,64 +458,6 @@ if ($execmethod == 2) {
 print "<br>";
 print '<br>';
 
-
-
-// Modules/Applications
-
-print '<br>';
-print '<br>';
-print '<br>';
-print load_fiche_titre($langs->trans("Modules"), '', 'folder');
-
-// Module log
-print '<strong>'.$langs->trans("Syslog").'</strong>: ';
-$test = empty($conf->syslog->enabled);
-if ($test) {
-	print img_picto('', 'tick.png').' '.$langs->trans("NotInstalled").' - '.$langs->trans("NotRiskOfLeakWithThis");
-} else {
-	if ($conf->global->SYSLOG_LEVEL > LOG_NOTICE) {
-		print img_picto('', 'warning').' '.$langs->trans("ModuleActivatedWithTooHighLogLevel", $langs->transnoentities("Syslog"));
-	} else {
-		print img_picto('', 'tick.png').' '.$langs->trans("ModuleSyslogActivatedButLevelNotTooVerbose", $langs->transnoentities("Syslog"), $conf->global->SYSLOG_LEVEL);
-	}
-	//print ' '.$langs->trans("MoreInformation").' <a href="'.DOL_URL_ROOT.'/admin/system/xdebug.php'.'">XDebug admin page</a>';
-}
-print '<br>';
-
-// Module debugbar
-print '<strong>'.$langs->trans("DebugBar").'</strong>: ';
-$test = empty($conf->debugbar->enabled);
-if ($test) {
-	print img_picto('', 'tick.png').' '.$langs->trans("NotInstalled").' - '.$langs->trans("NotRiskOfLeakWithThis");
-} else {
-	print img_picto('', 'error').' '.$langs->trans("ModuleActivatedDoNotUseInProduction", $langs->transnoentities("DebugBar"));
-	//print ' '.$langs->trans("MoreInformation").' <a href="'.DOL_URL_ROOT.'/admin/system/xdebug.php'.'">XDebug admin page</a>';
-}
-print '<br>';
-
-
-// APIs
-
-print '<br>';
-print '<br>';
-print '<br>';
-print load_fiche_titre($langs->trans("API"), '', 'folder');
-
-if (empty($conf->api->enabled) && empty($conf->webservices->enabled)) {
-	print $langs->trans("APIsAreNotEnabled");
-} else {
-	if (!empty($conf->webservices->enabled)) {
-		print $langs->trans('YouEnableDeprecatedWSAPIsUseRESTAPIsInstead')."<br>\n";
-		print '<br>';
-	}
-	if (!empty($conf->api->enabled)) {
-		print '<strong>API_ENDPOINT_RULES</strong> = '.(empty($conf->global->API_ENDPOINT_RULES) ? '<span class="opacitymedium">'.$langs->trans("Undefined").' &nbsp; ('.$langs->trans("Example").': endpoint1:1,endpoint2:1,...)</span>' : $conf->global->API_ENDPOINT_RULES)."<br>\n";
-		print '<br>';
-	}
-}
-
-
-print '<br><br>';
 
 // End of page
 llxFooter();

@@ -62,31 +62,72 @@ class Categories extends DolibarrApi
 	 */
 	public $category;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->category = new Categorie($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->category = new Categorie($this->db);
+    }
 
-	/**
-	 * List categories
-	 *
-	 * Get a list of categories
-	 *
-	 * @param string	$sortfield	Sort field
-	 * @param string	$sortorder	Sort order
-	 * @param int		$limit		Limit for list
-	 * @param int		$page		Page number
-	 * @param string	$type		Type of category ('member', 'customer', 'supplier', 'product', 'contact')
-	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
-	 * @return array                Array of category objects
-	 *
-	 * @throws RestException
-	 */
+    /**
+     * Get properties of a category object
+     *
+     * Return an array with category informations
+     *
+     * @param int  $id             ID of category
+     * @param bool $include_childs Include child categories list (true or false)
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id, $include_childs = false)
+    {
+        if (!DolibarrApiAccess::$user->rights->categorie->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->category->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'category not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('categorie', $this->category->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if ($include_childs) {
+            $cats = $this->category->get_filles();
+            if (!is_array($cats)) {
+                throw new RestException(500, 'Error when fetching child categories', array_merge([$this->category->error], $this->category->errors));
+            }
+            $this->category->childs = [];
+            foreach ($cats as $cat) {
+                $this->category->childs[] = $this->_cleanObjectDatas($cat);
+            }
+        }
+
+        return $this->_cleanObjectDatas($this->category);
+    }
+
+    /**
+     * List categories
+     *
+     * Get a list of categories
+     *
+     * @param string $sortfield  Sort field
+     * @param string $sortorder  Sort order
+     * @param int    $limit      Limit for list
+     * @param int    $page       Page number
+     * @param string $type       Type of category ('member', 'customer', 'supplier', 'product', 'contact')
+     * @param string $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
+     * @return array                Array of category objects
+     *
+     * @throws RestException
+     */
 	public function index($sortfield = "t.rowid", $sortorder = 'ASC', $limit = 100, $page = 0, $type = '', $sqlfilters = '')
 	{
 		global $db, $conf;
@@ -145,61 +186,6 @@ class Categories extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Categorie  $object    Object to clean
-	 * @return  Object     Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		// Remove fields not relevent to categories
-		unset($object->country);
-		unset($object->country_id);
-		unset($object->country_code);
-		unset($object->total_ht);
-		unset($object->total_ht);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-		unset($object->total_tva);
-		unset($object->lines);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-		unset($object->civility_id);
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->shipping_method_id);
-		unset($object->fk_delivery_address);
-		unset($object->cond_reglement);
-		unset($object->cond_reglement_id);
-		unset($object->mode_reglement_id);
-		unset($object->barcode_type_coder);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type);
-		unset($object->canvas);
-		unset($object->cats);
-		unset($object->motherof);
-		unset($object->context);
-		unset($object->socid);
-		unset($object->thirdparty);
-		unset($object->contact);
-		unset($object->contact_id);
-		unset($object->user);
-		unset($object->fk_account);
-		unset($object->fk_project);
-		unset($object->note);
-		unset($object->statut);
-
-		return $object;
-	}
-
-	/**
 	 * Create category object
 	 *
 	 * @param array $request_data   Request data
@@ -221,26 +207,6 @@ class Categories extends DolibarrApi
 			throw new RestException(500, 'Error when creating category', array_merge(array($this->category->error), $this->category->errors));
 		}
 		return $this->category->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array|null    $data    Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$category = array();
-		foreach (Categories::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$category[$field] = $data[$field];
-		}
-		return $category;
 	}
 
 	/**
@@ -277,46 +243,6 @@ class Categories extends DolibarrApi
 		} else {
 			throw new RestException(500, $this->category->error);
 		}
-	}
-
-	/**
-	 * Get properties of a category object
-	 *
-	 * Return an array with category informations
-	 *
-	 * @param 	int 	$id ID of category
-	 * @param 	bool 	$include_childs Include child categories list (true or false)
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id, $include_childs = false)
-	{
-		if (!DolibarrApiAccess::$user->rights->categorie->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->category->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'category not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('categorie', $this->category->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if ($include_childs) {
-			$cats = $this->category->get_filles();
-			if (!is_array($cats)) {
-				throw new RestException(500, 'Error when fetching child categories', array_merge(array($this->category->error), $this->category->errors));
-			}
-			$this->category->childs = array();
-			foreach ($cats as $cat) {
-				$this->category->childs[] = $this->_cleanObjectDatas($cat);
-			}
-		}
-
-		return $this->_cleanObjectDatas($this->category);
 	}
 
 	/**
@@ -566,9 +492,6 @@ class Categories extends DolibarrApi
 		throw new RestException(401);
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Unlink an object from a category by id
 	 *
@@ -716,26 +639,106 @@ class Categories extends DolibarrApi
 
 			return array(
 				'success' => array(
-					'code' => 200,
-					'message' => 'Objects succefully unlinked from the category'
-				)
-			);
-		}
+                    'code' => 200,
+                    'message' => 'Objects succefully unlinked from the category',
+                ),
+            );
+        }
 
-		throw new RestException(401);
-	}
+        throw new RestException(401);
+    }
 
-	/**
-	 * Get the list of objects in a category.
-	 *
-	 * @param int        $id         ID of category
-	 * @param string     $type       Type of category ('member', 'customer', 'supplier', 'product', 'contact', 'project')
-	 * @param int        $onlyids    Return only ids of objects (consume less memory)
-	 *
-	 * @return mixed
-	 *
-	 * @url GET {id}/objects
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Categorie $object Object to clean
+     *
+     * @return  Object     Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        // Remove fields not relevent to categories
+        unset($object->country);
+        unset($object->country_id);
+        unset($object->country_code);
+        unset($object->total_ht);
+        unset($object->total_ht);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+        unset($object->total_tva);
+        unset($object->lines);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+        unset($object->civility_id);
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->shipping_method_id);
+        unset($object->fk_delivery_address);
+        unset($object->cond_reglement);
+        unset($object->cond_reglement_id);
+        unset($object->mode_reglement_id);
+        unset($object->barcode_type_coder);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type);
+        unset($object->canvas);
+        unset($object->cats);
+        unset($object->motherof);
+        unset($object->context);
+        unset($object->socid);
+        unset($object->thirdparty);
+        unset($object->contact);
+        unset($object->contact_id);
+        unset($object->user);
+        unset($object->fk_account);
+        unset($object->fk_project);
+        unset($object->note);
+        unset($object->statut);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $category = [];
+        foreach (Categories::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $category[$field] = $data[$field];
+        }
+        return $category;
+    }
+
+    /**
+     * Get the list of objects in a category.
+     *
+     * @param int    $id      ID of category
+     * @param string $type    Type of category ('member', 'customer', 'supplier', 'product', 'contact', 'project')
+     * @param int    $onlyids Return only ids of objects (consume less memory)
+     *
+     * @return mixed
+     *
+     * @url GET {id}/objects
+     */
 	public function getObjects($id, $type, $onlyids = 0)
 	{
 		dol_syslog("getObjects($id, $type, $onlyids)", LOG_DEBUG);

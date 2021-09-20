@@ -694,25 +694,108 @@ class BlockedLog
 				if (!is_object($value) && !is_null($value) && $value !== '') {
 					$this->object_data->{$key} = $value;
 				}
-			}
+            }
 
-			if (!empty($object->newref)) {
-				$this->object_data->ref = $object->newref;
-			}
-		}
+            if (!empty($object->newref)) {
+                $this->object_data->ref = $object->newref;
+            }
+        }
 
-		return 1;
-	}
+        return 1;
+    }
 
-	/**
-	 *	Set block certified by authority
-	 *
-	 *	@return	boolean
-	 */
-	public function setCertified()
-	{
+    /**
+     *    Get object from database
+     *
+     * @param int $id Id of object to load
+     *
+     * @return     int                    >0 if OK, <0 if KO, 0 if not found
+     */
+    public function fetch($id)
+    {
+        global $langs;
 
-		$res = $this->db->query("UPDATE ".MAIN_DB_PREFIX."blockedlog SET certified=1 WHERE rowid=".((int) $this->id));
+        if (empty($id)) {
+            $this->error = 'BadParameter';
+            return -1;
+        }
+
+        $sql = "SELECT b.rowid, b.date_creation, b.signature, b.signature_line, b.amounts, b.action, b.element, b.fk_object, b.entity,";
+        $sql .= " b.certified, b.tms, b.fk_user, b.user_fullname, b.date_object, b.ref_object, b.object_data, b.object_version";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "blockedlog as b";
+        if ($id) {
+            $sql .= " WHERE b.rowid = " . ((int) $id);
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $obj = $this->db->fetch_object($resql);
+            if ($obj) {
+                $this->id = $obj->rowid;
+                $this->entity = $obj->entity;
+                $this->ref = $obj->rowid;
+
+                $this->date_creation = $this->db->jdate($obj->date_creation);
+                $this->tms = $this->db->jdate($obj->tms);
+
+                $this->amounts = (double) $obj->amounts;
+                $this->action = $obj->action;
+                $this->element = $obj->element;
+
+                $this->fk_object = $obj->fk_object;
+                $this->date_object = $this->db->jdate($obj->date_object);
+                $this->ref_object = $obj->ref_object;
+
+                $this->fk_user = $obj->fk_user;
+                $this->user_fullname = $obj->user_fullname;
+
+                $this->object_data = $this->dolDecodeBlockedData($obj->object_data);
+                $this->object_version = $obj->object_version;
+
+                $this->signature = $obj->signature;
+                $this->signature_line = $obj->signature_line;
+                $this->certified = ($obj->certified == 1);
+
+                return 1;
+            } else {
+                $langs->load("blockedlog");
+                $this->error = $langs->trans("RecordNotFound");
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     * Decode data
+     *
+     * @param string $data Data to unserialize
+     * @param string $mode 0=unserialize, 1=json_decode
+     *
+     * @return    string            Value unserialized
+     */
+    public function dolDecodeBlockedData($data, $mode = 0)
+    {
+        try {
+            //include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
+            $aaa = unserialize($data);
+        } catch (Exception $e) {
+            //print $e->getErrs);
+        }
+        return $aaa;
+    }
+
+    /**
+     *    Set block certified by authority
+     *
+     * @return    boolean
+     */
+    public function setCertified()
+    {
+
+        $res = $this->db->query("UPDATE " . MAIN_DB_PREFIX . "blockedlog SET certified=1 WHERE rowid=" . ((int) $this->id));
 		if ($res === false) {
 			return false;
 		}
@@ -826,26 +909,82 @@ class BlockedLog
 			} else {
 				$this->db->rollback();
 				return -2;
-			}
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
+            }
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+        // The commit will release the lock so we can insert nex record
+    }
 
-		// The commit will release the lock so we can insert nex record
-	}
+    /**
+     *    Check if current signature still correct compared to the value in chain
+     *
+     * @param string $previoushash If previous signature hash is known, we can provide it to avoid to make a search of it in database.
+     * @param int    $returnarray  1=Return array of details, 2=Return array of details including keyforsignature, 0=Boolean
+     *
+     * @return    boolean|array                        True if OK, False if KO
+     */
+    public function checkSignature($previoushash = '', $returnarray = 0)
+    {
+        if (empty($previoushash)) {
+            $previoushash = $this->getPreviousHash(0, $this->id);
+        }
+        // Recalculate hash
+        $keyforsignature = $this->buildKeyForSignature();
 
-	/**
-	 *	Get previous signature/hash in chain
-	 *
-	 *	@param int	$withlock		1=With a lock
-	 *	@param int	$beforeid		ID of a record
-	 *  @return	string				Hash of previous record (if beforeid is defined) or hash of last record (if beforeid is 0)
-	 */
-	public function getPreviousHash($withlock = 0, $beforeid = 0)
-	{
-		global $conf;
+        //$signature_line = dol_hash($keyforsignature, '5'); // Not really usefull
+        $signature = dol_hash($previoushash . $keyforsignature, '5');
+        //var_dump($previoushash); var_dump($keyforsignature); var_dump($signature_line); var_dump($signature);
+
+        $res = ($signature === $this->signature);
+
+        if (!$res) {
+            $this->error = 'Signature KO';
+        }
+
+        if ($returnarray) {
+            if ($returnarray == 1) {
+                unset($keyforsignature);
+                return ['checkresult' => $res, 'calculatedsignature' => $signature, 'previoushash' => $previoushash];
+            } else {    // Consume much memory ($keyforsignature is a large var)
+                return ['checkresult' => $res, 'calculatedsignature' => $signature, 'previoushash' => $previoushash, 'keyforsignature' => $keyforsignature];
+            }
+        } else {
+            unset($keyforsignature);
+            return $res;
+        }
+    }
+
+    /**
+     * Return a string for signature.
+     * Note: rowid of line not included as it is not a business data and this allow to make backup of a year
+     * and restore it into another database with different id wihtout comprimising checksums
+     *
+     * @return string        Key for signature
+     */
+    private function buildKeyForSignature()
+    {
+        //print_r($this->object_data);
+        if (((int) $this->object_version) > 12) {
+            return $this->date_creation . '|' . $this->action . '|' . $this->amounts . '|' . $this->ref_object . '|' . $this->date_object . '|' . $this->user_fullname . '|' . print_r($this->object_data, true);
+        } else {
+            return $this->date_creation . '|' . $this->action . '|' . $this->amounts . '|' . $this->ref_object . '|' . $this->date_object . '|' . $this->user_fullname . '|' . print_r($this->object_data, true);
+        }
+    }
+
+    /**
+     *    Get previous signature/hash in chain
+     *
+     * @param int $withlock 1=With a lock
+     * @param int $beforeid ID of a record
+     *
+     * @return    string                Hash of previous record (if beforeid is defined) or hash of last record (if beforeid is 0)
+     */
+    public function getPreviousHash($withlock = 0, $beforeid = 0)
+    {
+        global $conf;
 
 		$previoussignature = '';
 
@@ -874,85 +1013,6 @@ class BlockedLog
 		}
 
 		return $previoussignature;
-	}
-
-	/**
-	 *	Return the signature (hash) of the "genesis-block" (Block 0).
-	 *
-	 *	@return	string					Signature of genesis-block for current conf->entity
-	 */
-	public function getSignature()
-	{
-		global $db, $conf, $mysoc;
-
-		if (empty($conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT)) { // creation of a unique fingerprint
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-
-			$fingerprint = dol_hash(print_r($mysoc, true).getRandomPassword(1), '5');
-
-			dolibarr_set_const($db, 'BLOCKEDLOG_ENTITY_FINGERPRINT', $fingerprint, 'chaine', 0, 'Numeric Unique Fingerprint', $conf->entity);
-
-			$conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT = $fingerprint;
-		}
-
-		return $conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT;
-	}
-
-	/**
-	 * Return a string for signature.
-	 * Note: rowid of line not included as it is not a business data and this allow to make backup of a year
-	 * and restore it into another database with different id wihtout comprimising checksums
-	 *
-	 * @return string		Key for signature
-	 */
-	private function buildKeyForSignature()
-	{
-		//print_r($this->object_data);
-		if (((int) $this->object_version) > 12) {
-			return $this->date_creation.'|'.$this->action.'|'.$this->amounts.'|'.$this->ref_object.'|'.$this->date_object.'|'.$this->user_fullname.'|'.print_r($this->object_data, true);
-		} else {
-			return $this->date_creation.'|'.$this->action.'|'.$this->amounts.'|'.$this->ref_object.'|'.$this->date_object.'|'.$this->user_fullname.'|'.print_r($this->object_data, true);
-		}
-	}
-
-	/**
-	 *	Check if current signature still correct compared to the value in chain
-	 *
-	 *	@param	string			$previoushash		If previous signature hash is known, we can provide it to avoid to make a search of it in database.
-	 *  @param	int				$returnarray		1=Return array of details, 2=Return array of details including keyforsignature, 0=Boolean
-	 *	@return	boolean|array						True if OK, False if KO
-	 */
-	public function checkSignature($previoushash = '', $returnarray = 0)
-	{
-		if (empty($previoushash)) {
-			$previoushash = $this->getPreviousHash(0, $this->id);
-		}
-		// Recalculate hash
-		$keyforsignature = $this->buildKeyForSignature();
-
-		//$signature_line = dol_hash($keyforsignature, '5'); // Not really usefull
-		$signature = dol_hash($previoushash.$keyforsignature, '5');
-		//var_dump($previoushash); var_dump($keyforsignature); var_dump($signature_line); var_dump($signature);
-
-		$res = ($signature === $this->signature);
-
-		if (!$res) {
-			$this->error = 'Signature KO';
-		}
-
-		if ($returnarray) {
-			if ($returnarray == 1) {
-				unset($keyforsignature);
-				return array('checkresult' => $res, 'calculatedsignature' => $signature, 'previoushash' => $previoushash);
-			} else {	// Consume much memory ($keyforsignature is a large var)
-				return array('checkresult' => $res, 'calculatedsignature' => $signature, 'previoushash' => $previoushash, 'keyforsignature'=>$keyforsignature);
-			}
-		} else {
-			unset($keyforsignature);
-			return $res;
-		}
 	}
 
 	/**
@@ -1046,88 +1106,32 @@ class BlockedLog
 		}
 
 		return -1;
+    }
+
+    /**
+     *    Return the signature (hash) of the "genesis-block" (Block 0).
+     *
+     * @return    string                    Signature of genesis-block for current conf->entity
+     */
+    public function getSignature()
+    {
+        global $db, $conf, $mysoc;
+
+        if (empty($conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT)) { // creation of a unique fingerprint
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+
+            $fingerprint = dol_hash(print_r($mysoc, true) . getRandomPassword(1), '5');
+
+            dolibarr_set_const($db, 'BLOCKEDLOG_ENTITY_FINGERPRINT', $fingerprint, 'chaine', 0, 'Numeric Unique Fingerprint', $conf->entity);
+
+            $conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT = $fingerprint;
+        }
+
+        return $conf->global->BLOCKEDLOG_ENTITY_FINGERPRINT;
 	}
 
-	/**
-	 *	Get object from database
-	 *
-	 *	@param      int		$id       	Id of object to load
-	 *	@return     int         			>0 if OK, <0 if KO, 0 if not found
-	 */
-	public function fetch($id)
-	{
-		global $langs;
-
-		if (empty($id)) {
-			$this->error = 'BadParameter';
-			return -1;
-		}
-
-		$sql = "SELECT b.rowid, b.date_creation, b.signature, b.signature_line, b.amounts, b.action, b.element, b.fk_object, b.entity,";
-		$sql .= " b.certified, b.tms, b.fk_user, b.user_fullname, b.date_object, b.ref_object, b.object_data, b.object_version";
-		$sql .= " FROM ".MAIN_DB_PREFIX."blockedlog as b";
-		if ($id) {
-			$sql .= " WHERE b.rowid = ".((int) $id);
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_object($resql);
-			if ($obj) {
-				$this->id = $obj->rowid;
-				$this->entity = $obj->entity;
-				$this->ref				= $obj->rowid;
-
-				$this->date_creation = $this->db->jdate($obj->date_creation);
-				$this->tms				= $this->db->jdate($obj->tms);
-
-				$this->amounts			= (double) $obj->amounts;
-				$this->action = $obj->action;
-				$this->element			= $obj->element;
-
-				$this->fk_object = $obj->fk_object;
-				$this->date_object = $this->db->jdate($obj->date_object);
-				$this->ref_object = $obj->ref_object;
-
-				$this->fk_user = $obj->fk_user;
-				$this->user_fullname = $obj->user_fullname;
-
-				$this->object_data = $this->dolDecodeBlockedData($obj->object_data);
-				$this->object_version = $obj->object_version;
-
-				$this->signature		= $obj->signature;
-				$this->signature_line = $obj->signature_line;
-				$this->certified		= ($obj->certified == 1);
-
-				return 1;
-			} else {
-				$langs->load("blockedlog");
-				$this->error = $langs->trans("RecordNotFound");
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	/**
-	 * Decode data
-	 *
-	 * @param	string	$data	Data to unserialize
-	 * @param	string	$mode	0=unserialize, 1=json_decode
-	 * @return 	string			Value unserialized
-	 */
-	public function dolDecodeBlockedData($data, $mode = 0)
-	{
-		try {
-			//include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
-			$aaa = unserialize($data);
-		} catch (Exception $e) {
-			//print $e->getErrs);
-		}
-		return $aaa;
-	}
 
 	/**
 	 * Check if module was already used or not for at least one recording.

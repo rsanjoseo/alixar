@@ -2156,26 +2156,29 @@ function dolGetElementUrl($objectid, $objecttype, $withpicto = 0, $option = '')
 		$myobject = 'contrat';
 	} elseif ($objecttype == 'member') {
 		$classpath = 'adherents/class';
-		$module = 'adherent';
-		$myobject = 'adherent';
-	} elseif ($objecttype == 'cabinetmed_cons') {
-		$classpath = 'cabinetmed/class';
-		$module = 'cabinetmed';
-		$myobject = 'cabinetmedcons';
-	} elseif ($objecttype == 'fichinter') {
-		$classpath = 'fichinter/class';
-		$module = 'ficheinter';
-		$myobject = 'fichinter';
-	} elseif ($objecttype == 'task') {
-		$classpath = 'projet/class';
-		$module = 'projet';
-		$myobject = 'task';
-	} elseif ($objecttype == 'stock') {
-		$classpath = 'product/stock/class';
-		$module = 'stock';
-		$myobject = 'stock';
-	} elseif ($objecttype == 'inventory') {
-		$classpath = 'product/inventory/class';
+        $module = 'adherent';
+        $myobject = 'adherent';
+    } elseif ($objecttype == 'cabinetmed_cons') {
+        $classpath = 'cabinetmed/class';
+        $module = 'cabinetmed';
+        $myobject = 'cabinetmedcons';
+    } elseif ($objecttype == 'fichinter') {
+        $classpath = 'fichinter/class';
+        $module = 'ficheinter';
+        $myobject = 'fichinter';
+    } elseif ($objecttype == 'project') {
+        $classpath = 'projet/class';
+        $module = 'projet';
+    } elseif ($objecttype == 'task') {
+        $classpath = 'projet/class';
+        $module = 'projet';
+        $myobject = 'task';
+    } elseif ($objecttype == 'stock') {
+        $classpath = 'product/stock/class';
+        $module = 'stock';
+        $myobject = 'stock';
+    } elseif ($objecttype == 'inventory') {
+        $classpath = 'product/inventory/class';
 		$module = 'stock';
 		$myobject = 'inventory';
 	} elseif ($objecttype == 'mo') {

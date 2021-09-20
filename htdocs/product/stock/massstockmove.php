@@ -631,9 +631,9 @@ foreach ($listofdata as $key => $val) {
 			print $val['batch'];
 			print '</td>';
 		}
-		print '<td class="center">'.$val['qty'].'</td>';
-		print '<td class="right"><a href="'.$_SERVER["PHP_SELF"].'?action=delline&idline='.$val['id'].'">'.img_delete($langs->trans("Remove")).'</a></td>';
-		print '</tr>';
+		print '<td class="center">' . $val['qty'] . '</td>';
+        print '<td class="right"><a href="' . $_SERVER["PHP_SELF"] . '?action=delline&token=' . newToken() . '&idline=' . $val['id'] . '">' . img_delete($langs->trans("Remove")) . '</a></td>';
+        print '</tr>';
 	}
 }
 

@@ -115,21 +115,6 @@ class mod_project_simple extends ModeleNumRefProjects
 		}
 	}
 
-	/**
-	 *  Return next reference not yet used as a reference
-	 *
-	 *  @param	Societe	$objsoc     Object third party
-	 *  @param  Project	$project	Object project
-	 *  @return string      		Next not used reference
-	 */
-	public function project_get_num($objsoc = 0, $project = '')
-	{
-		// phpcs:enable
-		return $this->getNextValue($objsoc, $project);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return next value
@@ -167,13 +152,30 @@ class mod_project_simple extends ModeleNumRefProjects
 		//$yymm = strftime("%y%m",time());
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_project_simple::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_project_simple::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return next reference not yet used as a reference
+     *
+     * @param Societe $objsoc  Object third party
+     * @param Project $project Object project
+     *
+     * @return string            Next not used reference
+     */
+    public function project_get_num($objsoc = 0, $project = '')
+    {
+        // phpcs:enable
+        return $this->getNextValue($objsoc, $project);
+    }
 }

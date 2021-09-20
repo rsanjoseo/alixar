@@ -58,36 +58,87 @@ abstract class ModeleNumRefBarCode
 	public $error = '';
 
 	/**     Return default description of numbering model
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Descriptive text
-	 */
-	public function info($langs)
-	{
-		$langs->load("bills");
-		return $langs->trans("NoDescription");
-	}
+     *
+     * @param Translate $langs Object langs
+     * @return string                Descriptive text
+     */
+    public function info($langs)
+    {
+        $langs->load("bills");
+        return $langs->trans("NoDescription");
+    }
 
-	/**     Return a numbering example
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Example
-	 */
-	public function getExample($langs)
-	{
-		$langs->load("bills");
-		return $langs->trans("NoExample");
-	}
+    /**     Return model name
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Model name
+     */
+    public function getNom($langs)
+    {
+        return empty($this->name) ? $this->nom : $this->name;
+    }
 
-	/**
-	 *      Return description of module parameters
-	 *
-	 *      @param	Translate	$langs      Output language
-	 *		@param	Societe		$soc		Third party object
-	 *		@param	int			$type		-1=Nothing, 0=Product, 1=Service
-	 *		@return	string					HTML translated description
-	 */
-	public function getToolTip($langs, $soc, $type)
+    /**     Return a numbering example
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Example
+     */
+    public function getExample($langs)
+    {
+        $langs->load("bills");
+        return $langs->trans("NoExample");
+    }
+
+    /**
+     *  Return next value available
+     *
+     * @param Product $objproduct Object Product
+     * @param string  $type       Type of barcode (EAN, ISBN, ...)
+     *
+     * @return string                Value
+     */
+    public function getNextValue($objproduct, $type = '')
+    {
+        global $langs;
+        return $langs->trans("Function_getNextValue_InModuleNotWorking");
+    }
+
+    /**     Return version of module
+     *
+     * @return     string      Version
+     */
+    public function getVersion()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($this->version == 'development') {
+            return $langs->trans("VersionDevelopment");
+        }
+        if ($this->version == 'experimental') {
+            return $langs->trans("VersionExperimental");
+        }
+        if ($this->version == 'dolibarr') {
+            return DOL_VERSION;
+        }
+        if ($this->version) {
+            return $this->version;
+        }
+        return $langs->trans("NotAvailable");
+    }
+
+    /**
+     *      Return description of module parameters
+     *
+     * @param Translate $langs Output language
+     * @param Societe   $soc   Third party object
+     * @param int       $type  -1=Nothing, 0=Product, 1=Service
+     *
+     * @return    string                    HTML translated description
+     */
+    public function getToolTip($langs, $soc, $type)
 	{
 		global $conf;
 
@@ -149,52 +200,5 @@ abstract class ModeleNumRefBarCode
 		$s .= $langs->trans("NextValue").': <b>'.$nextval.'</b><br>';
 
 		return $s;
-	}
-
-	/**     Return version of module
-	 *
-	 *      @return     string      Version
-	 */
-	public function getVersion()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($this->version == 'development') {
-			return $langs->trans("VersionDevelopment");
-		}
-		if ($this->version == 'experimental') {
-			return $langs->trans("VersionExperimental");
-		}
-		if ($this->version == 'dolibarr') {
-			return DOL_VERSION;
-		}
-		if ($this->version) {
-			return $this->version;
-		}
-		return $langs->trans("NotAvailable");
-	}
-
-	/**     Return model name
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Model name
-	 */
-	public function getNom($langs)
-	{
-		return empty($this->name) ? $this->nom : $this->name;
-	}
-
-	/**
-	 *  Return next value available
-	 *
-	 *	@param	Product		$objproduct	Object Product
-	 *	@param	string		$type		Type of barcode (EAN, ISBN, ...)
-	 *  @return string      			Value
-	 */
-	public function getNextValue($objproduct, $type = '')
-	{
-		global $langs;
-		return $langs->trans("Function_getNextValue_InModuleNotWorking");
 	}
 }

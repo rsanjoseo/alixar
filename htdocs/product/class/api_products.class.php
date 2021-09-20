@@ -65,169 +65,49 @@ class Products extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a product object by ref
-	 *
-	 * Return an array with product information.
-	 *
-	 * @param  string $ref                Ref of element
-	 * @param  int    $includestockdata   Load also information about stock (slower)
-	 * @param  bool   $includesubproducts Load information about subproducts
-	 * @param  bool   $includeparentid    Load also ID of parent product (if product is a variant of a parent product)
-	 * @param  bool   $includetrans		  Load also the translations of product label and description
-	 *
-	 * @return array|mixed                 Data without useless information
-	 *
-	 * @url GET ref/{ref}
-	 *
-	 * @throws RestException 401
-	 * @throws RestException 403
-	 * @throws RestException 404
-	 */
-	public function getByRef($ref, $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includetrans = false)
-	{
-		return $this->_fetch('', $ref, '', '', $includestockdata, $includesubproducts, $includeparentid, false, $includetrans);
-	}
+     * Get properties of a product object by id
+     *
+     * Return an array with product information.
+     *
+     * @param int  $id                 ID of product
+     * @param int  $includestockdata   Load also information about stock (slower)
+     * @param bool $includesubproducts Load information about subproducts
+     * @param bool $includeparentid    Load also ID of parent product (if product is a variant of a parent product)
+     * @param bool $includetrans       Load also the translations of product label and description
+     *
+     * @return array|mixed                 Data without useless information
+     *
+     * @throws RestException 401
+     * @throws RestException 403
+     * @throws RestException 404
+     */
+    public function get($id, $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includetrans = false)
+    {
+        return $this->_fetch($id, '', '', '', $includestockdata, $includesubproducts, $includeparentid, false, $includetrans);
+    }
 
-	/**
-	 * Get properties of 1 product object.
-	 * Return an array with product information.
-	 *
-	 * @param  int    $id                 		ID of product
-	 * @param  string $ref                		Ref of element
-	 * @param  string $ref_ext            		Ref ext of element
-	 * @param  string $barcode            		Barcode of element
-	 * @param  int    $includestockdata   		Load also information about stock (slower)
-	 * @param  bool   $includesubproducts 		Load information about subproducts (if product is a virtual product)
-	 * @param  bool   $includeparentid    		Load also ID of parent product (if product is a variant of a parent product)
-	 * @param  bool   $includeifobjectisused	Check if product object is used and set property 'is_object_used' with result.
-	 * @param  bool   $includetrans				Load also the translations of product label and description
-	 * @return array|mixed                		Data without useless information
-	 *
-	 * @throws RestException 401
-	 * @throws RestException 403
-	 * @throws RestException 404
-	 */
-	private function _fetch($id, $ref = '', $ref_ext = '', $barcode = '', $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includeifobjectisused = false, $includetrans = false)
-	{
-		if (empty($id) && empty($ref) && empty($ref_ext) && empty($barcode)) {
-			throw new RestException(400, 'bad value for parameter id, ref, ref_ext or barcode');
-		}
-
-		$id = (empty($id) ? 0 : $id);
-
-		if (!DolibarrApiAccess::$user->rights->produit->lire) {
-			throw new RestException(403);
-		}
-
-		$result = $this->product->fetch($id, $ref, $ref_ext, $barcode, 0, 0, ($includetrans ? 0 : 1));
-		if (!$result) {
-			throw new RestException(404, 'Product not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('product', $this->product->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if ($includestockdata) {
-			$this->product->load_stock();
-
-			if (is_array($this->product->stock_warehouse)) {
-				foreach ($this->product->stock_warehouse as $keytmp => $valtmp) {
-					if (is_array($this->product->stock_warehouse[$keytmp]->detail_batch)) {
-						foreach ($this->product->stock_warehouse[$keytmp]->detail_batch as $keytmp2 => $valtmp2) {
-							unset($this->product->stock_warehouse[$keytmp]->detail_batch[$keytmp2]->db);
-						}
-					}
-				}
-			}
-		}
-
-		if ($includesubproducts) {
-			$childsArbo = $this->product->getChildsArbo($id, 1);
-
-			$keys = array('rowid', 'qty', 'fk_product_type', 'label', 'incdec');
-			$childs = array();
-			foreach ($childsArbo as $values) {
-				$childs[] = array_combine($keys, $values);
-			}
-
-			$this->product->sousprods = $childs;
-		}
-
-		if ($includeparentid) {
-			$prodcomb = new ProductCombination($this->db);
-			$this->product->fk_product_parent = null;
-			if (($fk_product_parent = $prodcomb->fetchByFkProductChild($this->product->id)) > 0) {
-				$this->product->fk_product_parent = $fk_product_parent;
-			}
-		}
-
-		if ($includeifobjectisused) {
-			$this->product->is_object_used = ($this->product->isObjectUsed() > 0);
-		}
-
-		return $this->_cleanObjectDatas($this->product);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->statut);
-
-		unset($object->regeximgext);
-		unset($object->price_by_qty);
-		unset($object->prices_by_qty_id);
-		unset($object->libelle);
-		unset($object->product_id_already_linked);
-		unset($object->reputations);
-		unset($object->db);
-		unset($object->name);
-		unset($object->firstname);
-		unset($object->lastname);
-		unset($object->civility_id);
-		unset($object->contact);
-		unset($object->contact_id);
-		unset($object->thirdparty);
-		unset($object->user);
-		unset($object->origin);
-		unset($object->origin_id);
-		unset($object->fourn_pu);
-		unset($object->fourn_price_base_type);
-		unset($object->fourn_socid);
-		unset($object->ref_fourn);
-		unset($object->ref_supplier);
-		unset($object->product_fourn_id);
-		unset($object->fk_project);
-
-		unset($object->mode_reglement_id);
-		unset($object->cond_reglement_id);
-		unset($object->demand_reason_id);
-		unset($object->transport_mode_id);
-		unset($object->cond_reglement);
-		unset($object->shipping_method_id);
-		unset($object->model_pdf);
-		unset($object->note);
-
-		unset($object->nbphoto);
-		unset($object->recuperableonly);
-		unset($object->multiprices_recuperableonly);
-		unset($object->tva_npr);
-		unset($object->lines);
-		unset($object->fk_bank);
-		unset($object->fk_account);
-
-		unset($object->supplierprices);	// Mut use another API to get them
-
-
-		return $object;
+    /**
+     * Get properties of a product object by ref
+     *
+     * Return an array with product information.
+     *
+     * @param string $ref                Ref of element
+     * @param int    $includestockdata   Load also information about stock (slower)
+     * @param bool   $includesubproducts Load information about subproducts
+     * @param bool   $includeparentid    Load also ID of parent product (if product is a variant of a parent product)
+     * @param bool   $includetrans       Load also the translations of product label and description
+     *
+     * @return array|mixed                 Data without useless information
+     *
+     * @url GET ref/{ref}
+     *
+     * @throws RestException 401
+     * @throws RestException 403
+     * @throws RestException 404
+     */
+    public function getByRef($ref, $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includetrans = false)
+    {
+        return $this->_fetch('', $ref, '', '', $includestockdata, $includesubproducts, $includeparentid, false, $includetrans);
 	}
 
 	/**
@@ -429,25 +309,6 @@ class Products extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param  array $data Datas to validate
-	 * @return array
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$product = array();
-		foreach (Products::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$product[$field] = $data[$field];
-		}
-		return $product;
-	}
-
-	/**
 	 * Update product.
 	 * Price will be updated by this API only if option is set on "One price per product". See other APIs for other price modes.
 	 *
@@ -549,27 +410,6 @@ class Products extends DolibarrApi
 		}
 
 		return $this->get($id);
-	}
-
-	/**
-	 * Get properties of a product object by id
-	 *
-	 * Return an array with product information.
-	 *
-	 * @param  int    $id                  ID of product
-	 * @param  int    $includestockdata    Load also information about stock (slower)
-	 * @param  bool   $includesubproducts  Load information about subproducts
-	 * @param  bool   $includeparentid     Load also ID of parent product (if product is a variant of a parent product)
-	 * @param  bool   $includetrans		   Load also the translations of product label and description
-	 * @return array|mixed                 Data without useless information
-	 *
-	 * @throws RestException 401
-	 * @throws RestException 403
-	 * @throws RestException 404
-	 */
-	public function get($id, $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includetrans = false)
-	{
-		return $this->_fetch($id, '', '', '', $includestockdata, $includesubproducts, $includeparentid, false, $includetrans);
 	}
 
 	/**
@@ -694,7 +534,8 @@ class Products extends DolibarrApi
 			throw new RestException(500, "Error while removing product child");
 		}
 		return $result;
-	}
+    }
+
 
 	/**
 	 * Get categories for a product
@@ -1941,8 +1782,6 @@ class Products extends DolibarrApi
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Put product variants.
 	 *
@@ -2038,14 +1877,179 @@ class Products extends DolibarrApi
 			foreach ($stockData as $warehouse_id => $warehouse) {
 				if ($warehouse_id != $selected_warehouse_id) {
 					unset($stockData[$warehouse_id]);
-				}
-			}
-		}
+                }
+            }
+        }
 
-		if (empty($stockData)) {
-			throw new RestException(404, 'No stock found');
-		}
+        if (empty($stockData)) {
+            throw new RestException(404, 'No stock found');
+        }
 
-		return ['stock_warehouses'=>$stockData];
-	}
+        return ['stock_warehouses' => $stockData];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->statut);
+
+        unset($object->regeximgext);
+        unset($object->price_by_qty);
+        unset($object->prices_by_qty_id);
+        unset($object->libelle);
+        unset($object->product_id_already_linked);
+        unset($object->reputations);
+        unset($object->db);
+        unset($object->name);
+        unset($object->firstname);
+        unset($object->lastname);
+        unset($object->civility_id);
+        unset($object->contact);
+        unset($object->contact_id);
+        unset($object->thirdparty);
+        unset($object->user);
+        unset($object->origin);
+        unset($object->origin_id);
+        unset($object->fourn_pu);
+        unset($object->fourn_price_base_type);
+        unset($object->fourn_socid);
+        unset($object->ref_fourn);
+        unset($object->ref_supplier);
+        unset($object->product_fourn_id);
+        unset($object->fk_project);
+
+        unset($object->mode_reglement_id);
+        unset($object->cond_reglement_id);
+        unset($object->demand_reason_id);
+        unset($object->transport_mode_id);
+        unset($object->cond_reglement);
+        unset($object->shipping_method_id);
+        unset($object->model_pdf);
+        unset($object->note);
+
+        unset($object->nbphoto);
+        unset($object->recuperableonly);
+        unset($object->multiprices_recuperableonly);
+        unset($object->tva_npr);
+        unset($object->lines);
+        unset($object->fk_bank);
+        unset($object->fk_account);
+
+        unset($object->supplierprices);    // Mut use another API to get them
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Datas to validate
+     *
+     * @return array
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $product = [];
+        foreach (Products::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $product[$field] = $data[$field];
+        }
+        return $product;
+    }
+
+    /**
+     * Get properties of 1 product object.
+     * Return an array with product information.
+     *
+     * @param int    $id                    ID of product
+     * @param string $ref                   Ref of element
+     * @param string $ref_ext               Ref ext of element
+     * @param string $barcode               Barcode of element
+     * @param int    $includestockdata      Load also information about stock (slower)
+     * @param bool   $includesubproducts    Load information about subproducts (if product is a virtual product)
+     * @param bool   $includeparentid       Load also ID of parent product (if product is a variant of a parent product)
+     * @param bool   $includeifobjectisused Check if product object is used and set property 'is_object_used' with result.
+     * @param bool   $includetrans          Load also the translations of product label and description
+     *
+     * @return array|mixed                        Data without useless information
+     *
+     * @throws RestException 401
+     * @throws RestException 403
+     * @throws RestException 404
+     */
+    private function _fetch($id, $ref = '', $ref_ext = '', $barcode = '', $includestockdata = 0, $includesubproducts = false, $includeparentid = false, $includeifobjectisused = false, $includetrans = false)
+    {
+        if (empty($id) && empty($ref) && empty($ref_ext) && empty($barcode)) {
+            throw new RestException(400, 'bad value for parameter id, ref, ref_ext or barcode');
+        }
+
+        $id = (empty($id) ? 0 : $id);
+
+        if (!DolibarrApiAccess::$user->rights->produit->lire) {
+            throw new RestException(403);
+        }
+
+        $result = $this->product->fetch($id, $ref, $ref_ext, $barcode, 0, 0, ($includetrans ? 0 : 1));
+        if (!$result) {
+            throw new RestException(404, 'Product not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('product', $this->product->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if ($includestockdata) {
+            $this->product->load_stock();
+
+            if (is_array($this->product->stock_warehouse)) {
+                foreach ($this->product->stock_warehouse as $keytmp => $valtmp) {
+                    if (is_array($this->product->stock_warehouse[$keytmp]->detail_batch)) {
+                        foreach ($this->product->stock_warehouse[$keytmp]->detail_batch as $keytmp2 => $valtmp2) {
+                            unset($this->product->stock_warehouse[$keytmp]->detail_batch[$keytmp2]->db);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($includesubproducts) {
+            $childsArbo = $this->product->getChildsArbo($id, 1);
+
+            $keys = ['rowid', 'qty', 'fk_product_type', 'label', 'incdec'];
+            $childs = [];
+            foreach ($childsArbo as $values) {
+                $childs[] = array_combine($keys, $values);
+            }
+
+            $this->product->sousprods = $childs;
+        }
+
+        if ($includeparentid) {
+            $prodcomb = new ProductCombination($this->db);
+            $this->product->fk_product_parent = null;
+            if (($fk_product_parent = $prodcomb->fetchByFkProductChild($this->product->id)) > 0) {
+                $this->product->fk_product_parent = $fk_product_parent;
+            }
+        }
+
+        if ($includeifobjectisused) {
+            $this->product->is_object_used = ($this->product->isObjectUsed() > 0);
+        }
+
+        return $this->_cleanObjectDatas($this->product);
+    }
 }

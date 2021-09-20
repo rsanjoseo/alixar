@@ -27,17 +27,19 @@
  */
 class FormWebsite
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error;
-	/**
-	 * var int		A number of lines
-	 */
-	public $num;
-	private $db;
+    private $db;
 
-	/**
+    /**
+     * @var string Error code (or message)
+     */
+    public $error;
+
+    /**
+     * var int        A number of lines
+     */
+    public $num;
+
+    /**
 	 *	Constructor
 	 *
 	 *	@param	DoliDB		$db      Database handler

@@ -161,8 +161,8 @@ if ($conf->global->MAIN_FEATURES_LEVEL < 2) {
 							if ($conf->global->PRODUCTBATCH_LOT_ADDON == $file) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							} else {
-								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmodlot&amp;value='.$file.'">';
-								print img_picto($langs->trans("Disabled"), 'switch_off');
+								print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodlot&token=' . newToken() . '&value=' . urlencode($file) . '">';
+                                print img_picto($langs->trans("Disabled"), 'switch_off');
 								print '</a>';
 							}
 							print '</td>';
@@ -253,8 +253,8 @@ if ($conf->global->MAIN_FEATURES_LEVEL < 2) {
 							if ($conf->global->PRODUCTBATCH_SN_ADDON == $file) {
 								print img_picto($langs->trans("Activated"), 'switch_on');
 							} else {
-								print '<a class="reposition" href="'.$_SERVER["PHP_SELF"].'?action=setmodsn&amp;value='.$file.'">';
-								print img_picto($langs->trans("Disabled"), 'switch_off');
+                                print '<a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?action=setmodsn&token=' . newToken() . '&value=' . urlencode($file) . '">';
+                                print img_picto($langs->trans("Disabled"), 'switch_off');
 								print '</a>';
 							}
 							print '</td>';

@@ -39,26 +39,56 @@ class ActionsCardCompany extends ActionsCardCommon
 	 *    @param	string	$targetmodule	Name of directory of module where canvas is stored
 	 *    @param	string	$canvas			Name of canvas
 	 *    @param	string	$card			Name of tab (sub-canvas)
-	 */
-	public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
-	{
-		$this->db = $db;
-		$this->dirmodule = $dirmodule;
-		$this->targetmodule = $targetmodule;
-		$this->canvas = $canvas;
-		$this->card = $card;
-	}
+     */
+    public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
+    {
+        $this->db = $db;
+        $this->dirmodule = $dirmodule;
+        $this->targetmodule = $targetmodule;
+        $this->canvas = $canvas;
+        $this->card = $card;
+    }
 
-	/**
-	 *    Assign custom values for canvas (for example into this->tpl to be used by templates)
-	 *
-	 *    @param	string	$action    Type of action
-	 *    @param	integer	$id			Id of object
-	 *    @param	string	$ref		Ref of object
-	 *    @return	void
-	 */
-	public function assign_values(&$action, $id = 0, $ref = '')
-	{
+    /**
+     *  Return the title of card
+     *
+     * @param string $action Action code
+     *
+     * @return    string                Title
+     */
+    private function getTitle($action)
+    {
+        global $langs;
+
+        $out = '';
+
+        if ($action == 'view') {
+            $out .= $langs->trans("ThirdParty");
+        }
+        if ($action == 'edit') {
+            $out .= $langs->trans("EditCompany");
+        }
+        if ($action == 'create') {
+            $out .= $langs->trans("NewCompany");
+        }
+
+        return $out;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Assign custom values for canvas (for example into this->tpl to be used by templates)
+     *
+     * @param string  $action Type of action
+     * @param integer $id     Id of object
+     * @param string  $ref    Ref of object
+     *
+     * @return    void
+     */
+    public function assign_values(&$action, $id = 0, $ref = '')
+    {
 		// phpcs:enable
 		global $conf, $langs, $user, $mysoc;
 		global $form, $formadmin, $formcompany;
@@ -156,34 +186,6 @@ class ActionsCardCompany extends ActionsCardCommon
 				$this->tpl['parent_company'] = $langs->trans("NoParentCompany");
 			}
 		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return the title of card
-	 *
-	 *  @param	string	$action		Action code
-	 *  @return	string				Title
-	 */
-	private function getTitle($action)
-	{
-		global $langs;
-
-		$out = '';
-
-		if ($action == 'view') {
-			$out .= $langs->trans("ThirdParty");
-		}
-		if ($action == 'edit') {
-			$out .= $langs->trans("EditCompany");
-		}
-		if ($action == 'create') {
-			$out .= $langs->trans("NewCompany");
-		}
-
-		return $out;
 	}
 
 	/**

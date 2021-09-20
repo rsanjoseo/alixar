@@ -439,101 +439,6 @@ class pdf_sepamandate extends ModeleBankAccountDoc
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF				$pdf     		Object PDF
-	 *  @param  CompanyBankAccount	$object     	Object to show
-	 *  @param  int	    			$showaddress    0=no, 1=yes
-	 *  @param  Translate			$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
-	{
-		// phpcs:enable
-		global $langs, $conf, $mysoc;
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		pdf_pagehead($pdf, $outputlangs, $this->page_hauteur);
-
-		$pdf->SetTextColor(0, 0, 60);
-		$pdf->SetFont('', 'B', $default_font_size + 3);
-
-		$posx = $this->page_largeur - $this->marge_droite - 100;
-		$posy = $this->marge_haute;
-
-		$pdf->SetXY($this->marge_gauche, $posy);
-
-		// Logo
-		$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;
-		if ($mysoc->logo) {
-			if (is_readable($logo)) {
-				$height = pdf_getHeightForLogo($logo);
-				$pdf->Image($logo, $this->marge_gauche, $posy, 0, $height); // width=0 (auto)
-			} else {
-				$pdf->SetTextColor(200, 0, 0);
-				$pdf->SetFont('', 'B', $default_font_size - 2);
-				$pdf->MultiCell(100, 3, $langs->transnoentities("ErrorLogoFileNotFound", $logo), 0, 'L');
-				$pdf->MultiCell(100, 3, $langs->transnoentities("ErrorGoToModuleSetup"), 0, 'L');
-			}
-		} else {
-			$pdf->MultiCell(100, 4, $outputlangs->transnoentities($this->emetteur->name), 0, 'L');
-		}
-
-		$pdf->SetFont('', 'B', $default_font_size + 3);
-		$pdf->SetXY($posx, $posy);
-		$pdf->SetTextColor(0, 0, 60);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities("SepaMandate"), '', 'R');
-		$pdf->SetFont('', '', $default_font_size + 2);
-
-		$posy += 6;
-		$pdf->SetXY($posx, $posy);
-		$pdf->SetTextColor(0, 0, 60);
-		$daterum = '__________________';
-		if (!empty($object->date_rum)) {
-			$daterum = dol_print_date($object->date_rum, 'day', false, $outputlangs, true);
-		} else {
-			$daterum = dol_print_date($object->datec, 'day', false, $outputlangs, true); // For old record, the date_rum was not saved.
-		}
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities("Date")." : ".$daterum, '', 'R');
-		/*$posy+=6;
-		$pdf->SetXY($posx,$posy);
-		$pdf->MultiCell(100, 4, $outputlangs->transnoentities("DateEnd")." : " . dol_print_date($object->date_end,'day',false,$outputlangs,true), '', 'R');
-		*/
-
-		$pdf->SetTextColor(0, 0, 60);
-
-		// Add list of linked objects
-		/* Removed: A project can have more than thousands linked objects (orders, invoices, proposals, etc....
-		$object->fetchObjectLinked();
-
-		foreach($object->linkedObjects as $objecttype => $objects)
-		{
-			var_dump($objects);exit;
-			if ($objecttype == 'commande')
-			{
-				$outputlangs->load('orders');
-				$num=count($objects);
-				for ($i=0;$i<$num;$i++)
-				{
-					$posy+=4;
-					$pdf->SetXY($posx,$posy);
-					$pdf->SetFont('','', $default_font_size - 1);
-					$text=$objects[$i]->ref;
-					if ($objects[$i]->ref_client) $text.=' ('.$objects[$i]->ref_client.')';
-					$pdf->MultiCell(100, 4, $outputlangs->transnoentities("RefOrder")." : ".$outputlangs->transnoentities($text), '', 'R');
-				}
-			}
-		}
-		*/
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Show table for lines
 	 *
@@ -555,10 +460,8 @@ class pdf_sepamandate extends ModeleBankAccountDoc
 	}
 
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Show miscellaneous information (payment mode, payment term, ...)
 	 *
@@ -594,8 +497,9 @@ class pdf_sepamandate extends ModeleBankAccountDoc
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Show area for the customer to sign
 	 *
@@ -626,26 +530,120 @@ class pdf_sepamandate extends ModeleBankAccountDoc
 		$useborder = 0;
 		$index = 0;
 		// Total HT
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->SetXY($posx, $tab_top + 0);
-		$pdf->MultiCell($largcol, $tab_hl, $outputlangs->transnoentitiesnoconv("Signature"), 0, 'L', 1);
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->SetXY($posx, $tab_top + 0);
+        $pdf->MultiCell($largcol, $tab_hl, $outputlangs->transnoentitiesnoconv("Signature"), 0, 'L', 1);
 
-		$pdf->SetXY($posx, $tab_top + $tab_hl);
-		$pdf->MultiCell($largcol, $tab_hl * 3, '', 1, 'R');
+        $pdf->SetXY($posx, $tab_top + $tab_hl);
+        $pdf->MultiCell($largcol, $tab_hl * 3, '', 1, 'R');
 
-		return ($tab_hl * 7);
-	}
+        return ($tab_hl * 7);
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *	Show footer of page. Need this->emetteur object
-	 *
-	 *	@param	TCPDF				$pdf     			PDF
-	 * 	@param	CompanyBankAccount	$object				Object to show
-	 * 	@param	Translate			$outputlangs		Object lang for output
-	 *	@param	int					$hidefreetext		1=Hide free text
-	 *	@return	integer
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF              $pdf         Object PDF
+     * @param CompanyBankAccount $object      Object to show
+     * @param int                $showaddress 0=no, 1=yes
+     * @param Translate          $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    {
+        // phpcs:enable
+        global $langs, $conf, $mysoc;
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        pdf_pagehead($pdf, $outputlangs, $this->page_hauteur);
+
+        $pdf->SetTextColor(0, 0, 60);
+        $pdf->SetFont('', 'B', $default_font_size + 3);
+
+        $posx = $this->page_largeur - $this->marge_droite - 100;
+        $posy = $this->marge_haute;
+
+        $pdf->SetXY($this->marge_gauche, $posy);
+
+        // Logo
+        $logo = $conf->mycompany->dir_output . '/logos/' . $mysoc->logo;
+        if ($mysoc->logo) {
+            if (is_readable($logo)) {
+                $height = pdf_getHeightForLogo($logo);
+                $pdf->Image($logo, $this->marge_gauche, $posy, 0, $height); // width=0 (auto)
+            } else {
+                $pdf->SetTextColor(200, 0, 0);
+                $pdf->SetFont('', 'B', $default_font_size - 2);
+                $pdf->MultiCell(100, 3, $langs->transnoentities("ErrorLogoFileNotFound", $logo), 0, 'L');
+                $pdf->MultiCell(100, 3, $langs->transnoentities("ErrorGoToModuleSetup"), 0, 'L');
+            }
+        } else {
+            $pdf->MultiCell(100, 4, $outputlangs->transnoentities($this->emetteur->name), 0, 'L');
+        }
+
+        $pdf->SetFont('', 'B', $default_font_size + 3);
+        $pdf->SetXY($posx, $posy);
+        $pdf->SetTextColor(0, 0, 60);
+        $pdf->MultiCell(100, 4, $outputlangs->transnoentities("SepaMandate"), '', 'R');
+        $pdf->SetFont('', '', $default_font_size + 2);
+
+        $posy += 6;
+        $pdf->SetXY($posx, $posy);
+        $pdf->SetTextColor(0, 0, 60);
+        $daterum = '__________________';
+        if (!empty($object->date_rum)) {
+            $daterum = dol_print_date($object->date_rum, 'day', false, $outputlangs, true);
+        } else {
+            $daterum = dol_print_date($object->datec, 'day', false, $outputlangs, true); // For old record, the date_rum was not saved.
+        }
+        $pdf->MultiCell(100, 4, $outputlangs->transnoentities("Date") . " : " . $daterum, '', 'R');
+        /*$posy+=6;
+        $pdf->SetXY($posx,$posy);
+        $pdf->MultiCell(100, 4, $outputlangs->transnoentities("DateEnd")." : " . dol_print_date($object->date_end,'day',false,$outputlangs,true), '', 'R');
+        */
+
+        $pdf->SetTextColor(0, 0, 60);
+
+        // Add list of linked objects
+        /* Removed: A project can have more than thousands linked objects (orders, invoices, proposals, etc....
+        $object->fetchObjectLinked();
+
+        foreach($object->linkedObjects as $objecttype => $objects)
+        {
+            var_dump($objects);exit;
+            if ($objecttype == 'commande')
+            {
+                $outputlangs->load('orders');
+                $num=count($objects);
+                for ($i=0;$i<$num;$i++)
+                {
+                    $posy+=4;
+                    $pdf->SetXY($posx,$posy);
+                    $pdf->SetFont('','', $default_font_size - 1);
+                    $text=$objects[$i]->ref;
+                    if ($objects[$i]->ref_client) $text.=' ('.$objects[$i]->ref_client.')';
+                    $pdf->MultiCell(100, 4, $outputlangs->transnoentities("RefOrder")." : ".$outputlangs->transnoentities($text), '', 'R');
+                }
+            }
+        }
+        */
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *    Show footer of page. Need this->emetteur object
+     *
+     * @param TCPDF              $pdf          PDF
+     * @param CompanyBankAccount $object       Object to show
+     * @param Translate          $outputlangs  Object lang for output
+     * @param int                $hidefreetext 1=Hide free text
+     * @return    integer
 	 */
 	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
 	{

@@ -37,24 +37,50 @@ class Subscriptions extends DolibarrApi
 		'amount',
 	);
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+    }
 
-	/**
-	 * List subscriptions
-	 *
-	 * Get a list of subscriptions
-	 *
-	 * @param string    $sortfield  Sort field
-	 * @param string    $sortorder  Sort order
-	 * @param int       $limit      Limit for list
-	 * @param int       $page       Page number
+    /**
+     * Get properties of a subscription object
+     *
+     * Return an array with subscription informations
+     *
+     * @param int $id ID of subscription
+     *
+     * @return    Object data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->adherent->cotisation->lire) {
+            throw new RestException(401);
+        }
+
+        $subscription = new Subscription($this->db);
+        $result = $subscription->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Subscription not found');
+        }
+
+        return $this->_cleanObjectDatas($subscription);
+    }
+
+    /**
+     * List subscriptions
+     *
+     * Get a list of subscriptions
+     *
+     * @param string    $sortfield  Sort field
+     * @param string    $sortorder  Sort order
+     * @param int       $limit      Limit for list
+     * @param int       $page       Page number
 	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.import_key:<:'20160101')"
 	 * @return array Array of subscription objects
 	 *
@@ -139,26 +165,6 @@ class Subscriptions extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before creating an object
-	 *
-	 * @param array|null    $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$subscription = array();
-		foreach (Subscriptions::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$subscription[$field] = $data[$field];
-		}
-		return $subscription;
-	}
-
-	/**
 	 * Update subscription
 	 *
 	 * @param int   $id             ID of subscription to update
@@ -192,31 +198,6 @@ class Subscriptions extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a subscription object
-	 *
-	 * Return an array with subscription informations
-	 *
-	 * @param     int     $id ID of subscription
-	 * @return    Object data without useless information
-	 *
-	 * @throws    RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->adherent->cotisation->lire) {
-			throw new RestException(401);
-		}
-
-		$subscription = new Subscription($this->db);
-		$result = $subscription->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Subscription not found');
-		}
-
-		return $this->_cleanObjectDatas($subscription);
-	}
-
-	/**
 	 * Delete subscription
 	 *
 	 * @param int $id   ID of subscription to delete
@@ -235,14 +216,35 @@ class Subscriptions extends DolibarrApi
 		}
 
 		if (!$subscription->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(401, 'error when deleting subscription');
-		}
+            throw new RestException(401, 'error when deleting subscription');
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'subscription deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'subscription deleted',
+            ],
+        ];
+    }
+
+    /**
+     * Validate fields before creating an object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $subscription = [];
+        foreach (Subscriptions::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $subscription[$field] = $data[$field];
+        }
+        return $subscription;
+    }
 }

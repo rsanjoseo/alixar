@@ -34,24 +34,54 @@ class MembersTypes extends DolibarrApi
 		'label',
 	);
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+    }
 
-	/**
-	 * List members types
-	 *
-	 * Get a list of members types
-	 *
-	 * @param string    $sortfield  Sort field
-	 * @param string    $sortorder  Sort order
-	 * @param int       $limit      Limit for list
-	 * @param int       $page       Page number
+    /**
+     * Get properties of a member type object
+     *
+     * Return an array with member type informations
+     *
+     * @param int $id ID of member type
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->adherent->lire) {
+            throw new RestException(401);
+        }
+
+        $membertype = new AdherentType($this->db);
+        $result = $membertype->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'member type not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('member', $membertype->id, 'adherent_type')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        return $this->_cleanObjectDatas($membertype);
+    }
+
+    /**
+     * List members types
+     *
+     * Get a list of members types
+     *
+     * @param string    $sortfield  Sort field
+     * @param string    $sortorder  Sort order
+     * @param int       $limit      Limit for list
+     * @param int       $page       Page number
 	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.libelle:like:'SO-%') and (t.subscription:=:'1')"
 	 * @return array                Array of member type objects
 	 *
@@ -114,61 +144,6 @@ class MembersTypes extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object    Object to clean
-	 * @return    Object    Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->array_options);
-		unset($object->linkedObjectsIds);
-		unset($object->context);
-		unset($object->canvas);
-		unset($object->fk_project);
-		unset($object->contact);
-		unset($object->contact_id);
-		unset($object->thirdparty);
-		unset($object->user);
-		unset($object->origin);
-		unset($object->origin_id);
-		unset($object->ref_ext);
-		unset($object->country);
-		unset($object->country_id);
-		unset($object->country_code);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-		unset($object->mode_reglement_id);
-		unset($object->cond_reglement_id);
-		unset($object->cond_reglement);
-		unset($object->fk_delivery_address);
-		unset($object->shipping_method_id);
-		unset($object->model_pdf);
-		unset($object->fk_account);
-		unset($object->note_public);
-		unset($object->note_private);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-
-		return $object;
-	}
-
-	/**
 	 * Create member type object
 	 *
 	 * @param array $request_data   Request data
@@ -190,26 +165,6 @@ class MembersTypes extends DolibarrApi
 			throw new RestException(500, 'Error creating member type', array_merge(array($membertype->error), $membertype->errors));
 		}
 		return $membertype->id;
-	}
-
-	/**
-	 * Validate fields before creating an object
-	 *
-	 * @param array|null    $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$membertype = array();
-		foreach (MembersTypes::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$membertype[$field] = $data[$field];
-		}
-		return $membertype;
 	}
 
 	/**
@@ -254,37 +209,6 @@ class MembersTypes extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a member type object
-	 *
-	 * Return an array with member type informations
-	 *
-	 * @param     int     $id ID of member type
-	 * @return    array|mixed data without useless information
-	 *
-	 * @throws    RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->adherent->lire) {
-			throw new RestException(401);
-		}
-
-		$membertype = new AdherentType($this->db);
-		$result = $membertype->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'member type not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('member', $membertype->id, 'adherent_type')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		return $this->_cleanObjectDatas($membertype);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete member type
 	 *
 	 * @param int $id   member type ID
@@ -306,14 +230,93 @@ class MembersTypes extends DolibarrApi
 		}
 
 		if (!$membertype->delete()) {
-			throw new RestException(401, 'error when deleting member type');
-		}
+            throw new RestException(401, 'error when deleting member type');
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'member type deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'member type deleted',
+            ],
+        ];
+    }
+
+    /**
+     * Validate fields before creating an object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $membertype = [];
+        foreach (MembersTypes::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $membertype[$field] = $data[$field];
+        }
+        return $membertype;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return    Object    Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->array_options);
+        unset($object->linkedObjectsIds);
+        unset($object->context);
+        unset($object->canvas);
+        unset($object->fk_project);
+        unset($object->contact);
+        unset($object->contact_id);
+        unset($object->thirdparty);
+        unset($object->user);
+        unset($object->origin);
+        unset($object->origin_id);
+        unset($object->ref_ext);
+        unset($object->country);
+        unset($object->country_id);
+        unset($object->country_code);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+        unset($object->mode_reglement_id);
+        unset($object->cond_reglement_id);
+        unset($object->cond_reglement);
+        unset($object->fk_delivery_address);
+        unset($object->shipping_method_id);
+        unset($object->model_pdf);
+        unset($object->fk_account);
+        unset($object->note_public);
+        unset($object->note_private);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+
+        return $object;
+    }
 }

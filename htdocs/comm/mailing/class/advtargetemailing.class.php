@@ -118,26 +118,106 @@ class AdvanceTargetingMailing extends CommonObject
 			'1' => $langs->trans('Contacts').'+'.$langs->trans('ThirdParty'),
 			'3' => $langs->trans('ThirdParty'),
 			'4' => $langs->trans('ContactsWithThirdpartyFilter')
-		);
-		$this->type_statuscommprospect = array(
-			-1 => $langs->trans("StatusProspect-1"),
-			0 => $langs->trans("StatusProspect0"),
-			1 => $langs->trans("StatusProspect1"),
-			2 => $langs->trans("StatusProspect2"),
-			3 => $langs->trans("StatusProspect3")
-		);
-	}
+        );
+        $this->type_statuscommprospect = [
+            -1 => $langs->trans("StatusProspect-1"),
+            0 => $langs->trans("StatusProspect0"),
+            1 => $langs->trans("StatusProspect1"),
+            2 => $langs->trans("StatusProspect2"),
+            3 => $langs->trans("StatusProspect3"),
+        ];
+    }
 
-	/**
-	 *  Load object in memory from the database
-	 *
-	 *  @param	int		$id    Id object
-	 *  @return int          	<0 if KO, >0 if OK
-	 */
-	public function fetch($id)
-	{
-		global $langs;
-		$sql = "SELECT";
+    /**
+     *  Create object into database
+     *
+     * @param User $user      User that creates
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                 <0 if KO, Id of created object if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs;
+        $error = 0;
+
+        // Clean parameters
+        if (isset($this->fk_element)) {
+            $this->fk_element = (int) $this->fk_element;
+        }
+        if (isset($this->type_element)) {
+            $this->type_element = trim($this->type_element);
+        }
+
+        if (isset($this->name)) {
+            $this->name = trim($this->name);
+        }
+        if (isset($this->filtervalue)) {
+            $this->filtervalue = trim($this->filtervalue);
+        }
+
+        // Check parameters
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "advtargetemailing(";
+        $sql .= "name,";
+        $sql .= "entity,";
+        $sql .= "fk_element,";
+        $sql .= "type_element,";
+        $sql .= "filtervalue,";
+        $sql .= "fk_user_author,";
+        $sql .= "datec,";
+        $sql .= "fk_user_mod";
+        $sql .= ") VALUES (";
+        $sql .= " " . (!isset($this->name) ? 'NULL' : "'" . $this->db->escape($this->name) . "'") . ",";
+        $sql .= " " . $conf->entity . ",";
+        $sql .= " " . (!isset($this->fk_element) ? 'NULL' : "'" . $this->db->escape($this->fk_element) . "'") . ",";
+        $sql .= " " . (!isset($this->type_element) ? 'NULL' : "'" . $this->db->escape($this->type_element) . "'") . ",";
+        $sql .= " " . (!isset($this->filtervalue) ? 'NULL' : "'" . $this->db->escape($this->filtervalue) . "'") . ",";
+        $sql .= " " . $user->id . ",";
+        $sql .= " '" . $this->db->idate(dol_now()) . "',";
+        $sql .= " " . $user->id;
+        $sql .= ")";
+
+        $this->db->begin();
+
+        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "advtargetemailing");
+        }
+
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::create " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->id;
+        }
+    }
+
+    /**
+     *  Load object in memory from the database
+     *
+     * @param int $id Id object
+     *
+     * @return int            <0 if KO, >0 if OK
+     */
+    public function fetch($id)
+    {
+        global $langs;
+        $sql = "SELECT";
 		$sql .= " t.rowid,";
 
 		$sql .= " t.name,";
@@ -181,24 +261,25 @@ class AdvanceTargetingMailing extends CommonObject
 		}
 	}
 
-	/**
-	 *  Load object in memory from the database
-	 *
-	 *  @param	int		$id    			Id object
-	 *  @param	string	$type_element	Type target
-	 *  @return int          			<0 if KO, >0 if OK
-	 */
-	public function fetch_by_element($id = 0, $type_element = 'mailing')
-	{
-		// phpcs:enable
-		global $langs;
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$sql .= " t.name,";
-		$sql .= " t.entity,";
-		$sql .= " t.fk_element,";
-		$sql .= " t.type_element,";
+    /**
+     *  Load object in memory from the database
+     *
+     * @param int $id Id object
+     * @return int            <0 if KO, >0 if OK
+     */
+    public function fetch_by_mailing($id = 0)
+    {
+        // phpcs:enable
+        global $langs;
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
+
+        $sql .= " t.name,";
+        $sql .= " t.entity,";
+        $sql .= " t.fk_element,";
+        $sql .= " t.type_element,";
 		$sql .= " t.filtervalue,";
 		$sql .= " t.fk_user_author,";
 		$sql .= " t.datec,";
@@ -207,9 +288,9 @@ class AdvanceTargetingMailing extends CommonObject
 
 		$sql .= " FROM ".MAIN_DB_PREFIX."advtargetemailing as t";
 		if (!empty($id)) {
-			$sql .= " WHERE t.fk_element = ".((int) $id)." AND type_element = '".$this->db->escape($type_element)."'";
+            $sql .= " WHERE t.fk_element = " . ((int) $id) . " AND type_element = 'mailing'";
 		} else {
-			$sql .= " WHERE t.fk_element = ".((int) $this->fk_element)." AND type_element = '".$this->db->escape($type_element)."'";
+            $sql .= " WHERE t.fk_element = " . ((int) $this->fk_element) . " AND type_element = 'mailing'";
 		}
 
 		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
@@ -238,96 +319,31 @@ class AdvanceTargetingMailing extends CommonObject
 			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
 			return -1;
 		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Delete object in database
-	 *
-	 *	@param  User	$user        User that deletes
-	 *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
-	 *  @return	int					 <0 if KO, >0 if OK
-	 */
-	public function delete($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-		$error = 0;
-
-		$this->db->begin();
-
-		if (!$error) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."advtargetemailing";
-			$sql .= " WHERE rowid=".((int) $this->id);
-
-			dol_syslog(get_class($this)."::delete sql=".$sql);
-			$resql = $this->db->query($sql);
-			if (!$resql) {
-				$error++; $this->errors[] = "Error ".$this->db->lasterror();
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::delete ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
+    }
 
 
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Save query in database to retrieve it
-	 *
-	 *	@param  	User		$user    		User that deletes
-	 * 	@param		array		$arrayquery		All element to Query
-	 * 	@return		int			<0 if KO, >0 if OK
-	 */
-	public function savequery($user, $arrayquery)
-	{
-		global $langs, $conf;
+    /**
+     *  Load object in memory from the database
+     *
+     * @param int    $id           Id object
+     * @param string $type_element Type target
+     * @return int                    <0 if KO, >0 if OK
+     */
+    public function fetch_by_element($id = 0, $type_element = 'mailing')
+    {
+        // phpcs:enable
+        global $langs;
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
 
-		if (!empty($arrayquery)) {
-			$result = $this->fetch_by_mailing($this->fk_element);
-			$this->filtervalue = json_encode($arrayquery);
-			if ($result < 0) {
-				return -1;
-			}
-			if (!empty($this->id)) {
-				$this->update($user);
-			} else {
-				$this->create($user);
-			}
-		}
-	}
-
-	/**
-	 *  Load object in memory from the database
-	 *
-	 *  @param	int		$id    Id object
-	 *  @return int          	<0 if KO, >0 if OK
-	 */
-	public function fetch_by_mailing($id = 0)
-	{
-		// phpcs:enable
-		global $langs;
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
-
-		$sql .= " t.name,";
-		$sql .= " t.entity,";
-		$sql .= " t.fk_element,";
-		$sql .= " t.type_element,";
+        $sql .= " t.name,";
+        $sql .= " t.entity,";
+        $sql .= " t.fk_element,";
+        $sql .= " t.type_element,";
 		$sql .= " t.filtervalue,";
 		$sql .= " t.fk_user_author,";
 		$sql .= " t.datec,";
@@ -336,9 +352,9 @@ class AdvanceTargetingMailing extends CommonObject
 
 		$sql .= " FROM ".MAIN_DB_PREFIX."advtargetemailing as t";
 		if (!empty($id)) {
-			$sql .= " WHERE t.fk_element = ".((int) $id)." AND type_element = 'mailing'";
+            $sql .= " WHERE t.fk_element = " . ((int) $id) . " AND type_element = '" . $this->db->escape($type_element) . "'";
 		} else {
-			$sql .= " WHERE t.fk_element = ".((int) $this->fk_element)." AND type_element = 'mailing'";
+            $sql .= " WHERE t.fk_element = " . ((int) $this->fk_element) . " AND type_element = '" . $this->db->escape($type_element) . "'";
 		}
 
 		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
@@ -432,91 +448,80 @@ class AdvanceTargetingMailing extends CommonObject
 		}
 	}
 
-	/**
-	 *  Create object into database
-	 *
-	 *  @param	User    $user        User that creates
-	 *  @param  int		$notrigger   0=launch triggers after, 1=disable triggers
-	 *  @return int      		   	 <0 if KO, Id of created object if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-		$error = 0;
+    /**
+     *  Delete object in database
+     *
+     * @param User $user      User that deletes
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     * @return    int                     <0 if KO, >0 if OK
+     */
+    public function delete($user, $notrigger = 0)
+    {
+        global $conf, $langs;
+        $error = 0;
 
-		// Clean parameters
-		if (isset($this->fk_element)) {
-			$this->fk_element = (int) $this->fk_element;
-		}
-		if (isset($this->type_element)) {
-			$this->type_element = trim($this->type_element);
-		}
+        $this->db->begin();
 
-		if (isset($this->name)) {
-			$this->name = trim($this->name);
-		}
-		if (isset($this->filtervalue)) {
-			$this->filtervalue = trim($this->filtervalue);
-		}
+        if (!$error) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . "advtargetemailing";
+            $sql .= " WHERE rowid=" . ((int) $this->id);
 
-		// Check parameters
-		// Put here code to add control on parameters values
+            dol_syslog(get_class($this) . "::delete sql=" . $sql);
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $error++;
+                $this->errors[] = "Error " . $this->db->lasterror();
+            }
+        }
 
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."advtargetemailing(";
-		$sql .= "name,";
-		$sql .= "entity,";
-		$sql .= "fk_element,";
-		$sql .= "type_element,";
-		$sql .= "filtervalue,";
-		$sql .= "fk_user_author,";
-		$sql .= "datec,";
-		$sql .= "fk_user_mod";
-		$sql .= ") VALUES (";
-		$sql .= " ".(!isset($this->name) ? 'NULL' : "'".$this->db->escape($this->name)."'").",";
-		$sql .= " ".$conf->entity.",";
-		$sql .= " ".(!isset($this->fk_element) ? 'NULL' : "'".$this->db->escape($this->fk_element)."'").",";
-		$sql .= " ".(!isset($this->type_element) ? 'NULL' : "'".$this->db->escape($this->type_element)."'").",";
-		$sql .= " ".(!isset($this->filtervalue) ? 'NULL' : "'".$this->db->escape($this->filtervalue)."'").",";
-		$sql .= " ".$user->id.",";
-		$sql .= " '".$this->db->idate(dol_now())."',";
-		$sql .= " ".$user->id;
-		$sql .= ")";
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::delete " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
 
-		$this->db->begin();
+    /**
+     * Save query in database to retrieve it
+     *
+     * @param User  $user       User that deletes
+     * @param array $arrayquery All element to Query
+     *
+     * @return        int            <0 if KO, >0 if OK
+     */
+    public function savequery($user, $arrayquery)
+    {
+        global $langs, $conf;
 
-		dol_syslog(get_class($this)."::create", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++; $this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."advtargetemailing");
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->id;
-		}
-	}
+        if (!empty($arrayquery)) {
+            $result = $this->fetch_by_mailing($this->fk_element);
+            $this->filtervalue = json_encode($arrayquery);
+            if ($result < 0) {
+                return -1;
+            }
+            if (!empty($this->id)) {
+                $this->update($user);
+            } else {
+                $this->create($user);
+            }
+        }
+    }
 
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Load object in memory from database
-	 *
-	 * 	@param		array		$arrayquery	All element to Query
+    /**
+     * Load object in memory from database
+     *
+     * @param array $arrayquery All element to Query
 	 * 	@return		int			<0 if KO, >0 if OK
 	 */
 	public function query_thirdparty($arrayquery)
@@ -664,49 +669,6 @@ class AdvanceTargetingMailing extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Parse criteria to return a SQL qury formated
-	 *
-	 * 	@param		string		$column_to_test	column to test
-	 *  @param		string		$criteria	Use %% as magic caracters. For exemple to find all item like <b>jean, joe, jim</b>, you can input <b>j%%</b>, you can also use ; as separator for value,
-	 *  									and use ! for except this value.
-	 *  									For exemple  jean;joe;jim%%;!jimo;!jima%> will target all jean, joe, start with jim but not jimo and not everythnig taht start by jima
-	 * 	@return		string		Sql to use for the where condition
-	 */
-	public function transformToSQL($column_to_test, $criteria)
-	{
-		$return_sql_criteria = '(';
-
-		//This is a multiple value test
-		if (preg_match('/;/', $criteria)) {
-			$return_sql_not_like = array();
-			$return_sql_like = array();
-
-			$criteria_array = explode(';', $criteria);
-			foreach ($criteria_array as $inter_criteria) {
-				if (preg_match('/!/', $inter_criteria)) {
-					$return_sql_not_like[] = '('.$column_to_test.' NOT LIKE \''.str_replace('!', '', $inter_criteria).'\')';
-				} else {
-					$return_sql_like[] = '('.$column_to_test.' LIKE \''.$inter_criteria.'\')';
-				}
-			}
-
-			if (count($return_sql_like) > 0) {
-				$return_sql_criteria .= '('.implode(' OR ', $return_sql_like).')';
-			}
-			if (count($return_sql_not_like) > 0) {
-				$return_sql_criteria .= ' AND ('.implode(' AND ', $return_sql_not_like).')';
-			}
-		} else {
-			$return_sql_criteria .= $column_to_test.' LIKE \''.$this->db->escape($criteria).'\'';
-		}
-
-		$return_sql_criteria .= ')';
-
-		return $return_sql_criteria;
-	}
-
 	/**
 	 * Load object in memory from database
 	 *
@@ -936,15 +898,58 @@ class AdvanceTargetingMailing extends CommonObject
 					$this->contact_lines[$i] = $obj->rowid;
 
 					$i++;
-				}
-			}
-			$this->db->free($resql);
+                }
+            }
+            $this->db->free($resql);
 
-			return $num;
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this)."::query_contact ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
+            return $num;
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . "::query_contact " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
+
+    /**
+     * Parse criteria to return a SQL qury formated
+     *
+     * @param string $column_to_test      column to test
+     * @param string $criteria            Use %% as magic caracters. For exemple to find all item like <b>jean, joe, jim</b>, you can input <b>j%%</b>, you can also use ; as separator for value,
+     *                                    and use ! for except this value.
+     *                                    For exemple  jean;joe;jim%%;!jimo;!jima%> will target all jean, joe, start with jim but not jimo and not everythnig taht start by jima
+     *
+     * @return        string        Sql to use for the where condition
+     */
+    public function transformToSQL($column_to_test, $criteria)
+    {
+        $return_sql_criteria = '(';
+
+        //This is a multiple value test
+        if (preg_match('/;/', $criteria)) {
+            $return_sql_not_like = [];
+            $return_sql_like = [];
+
+            $criteria_array = explode(';', $criteria);
+            foreach ($criteria_array as $inter_criteria) {
+                if (preg_match('/!/', $inter_criteria)) {
+                    $return_sql_not_like[] = '(' . $column_to_test . ' NOT LIKE \'' . str_replace('!', '', $inter_criteria) . '\')';
+                } else {
+                    $return_sql_like[] = '(' . $column_to_test . ' LIKE \'' . $inter_criteria . '\')';
+                }
+            }
+
+            if (count($return_sql_like) > 0) {
+                $return_sql_criteria .= '(' . implode(' OR ', $return_sql_like) . ')';
+            }
+            if (count($return_sql_not_like) > 0) {
+                $return_sql_criteria .= ' AND (' . implode(' AND ', $return_sql_not_like) . ')';
+            }
+        } else {
+            $return_sql_criteria .= $column_to_test . ' LIKE \'' . $this->db->escape($criteria) . '\'';
+        }
+
+        $return_sql_criteria .= ')';
+
+        return $return_sql_criteria;
+    }
 }

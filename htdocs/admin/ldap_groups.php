@@ -120,8 +120,8 @@ print $langs->trans("LDAPDescGroups").'<br>';
 print '<br>';
 
 
-print '<form method="post" action="'.$_SERVER["PHP_SELF"].'?action=setvalue">';
-print '<input type="hidden" name="token" value="'.newToken().'">';
+print '<form method="post" action="' . $_SERVER["PHP_SELF"] . '?action=setvalue&token=' . newtoken() . '">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
 
 print '<table class="noborder centpercent">';
 

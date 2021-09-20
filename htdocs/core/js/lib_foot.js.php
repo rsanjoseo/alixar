@@ -20,7 +20,7 @@
  * \file       htdocs/core/js/lib_foot.js.php
  * \brief      File that include javascript functions (included if option use_javascript activated)
  */
-/*
+
 if (!defined('NOREQUIRESOC')) {
 	define('NOREQUIRESOC', '1');
 }
@@ -42,7 +42,7 @@ if (!defined('NOREQUIREHTML')) {
 if (!defined('NOREQUIREAJAX')) {
 	define('NOREQUIREAJAX', '1');
 }
-*/
+
 session_cache_limiter('public');
 
 require_once '../../main.inc.php';

@@ -194,125 +194,76 @@ class FormMail extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 * Get list of substitution keys available for emails. This is used for tooltips help.
-	 * This include the complete_substitutions_array.
-	 *
-	 * @param	string	$mode		'formemail', 'formemailwithlines', 'formemailforlines', 'emailing', ...
-	 * @param	Object	$object		Object if applicable
-	 * @return	array               Array of substitution values for emails.
-	 */
-	public static function getAvailableSubstitKey($mode = 'formemail', $object = null)
-	{
-		global $conf, $langs;
+     * Clear list of attached files in send mail form (also stored in session)
+     *
+     * @return    void
+     */
+    public function clear_attached_files()
+    {
+        // phpcs:enable
+        global $conf, $user;
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-		$tmparray = array();
-		if ($mode == 'formemail' || $mode == 'formemailwithlines' || $mode == 'formemailforlines') {
-			$parameters = array('mode'=>$mode);
-			$tmparray = getCommonSubstitutionArray($langs, 2, null, $object); // Note: On email templated edition, this is null because it is related to all type of objects
-			complete_substitutions_array($tmparray, $langs, null, $parameters);
+        // Set tmp user directory
+        $vardir = $conf->user->dir_output . "/" . $user->id;
+        $upload_dir = $vardir . '/temp/'; // TODO Add $keytoavoidconflict in upload_dir path
+        if (is_dir($upload_dir)) {
+            dol_delete_dir_recursive($upload_dir);
+        }
 
-			if ($mode == 'formwithlines') {
-				$tmparray['__LINES__'] = '__LINES__'; // Will be set by the get_form function
-			}
-			if ($mode == 'formforlines') {
-				$tmparray['__QUANTITY__'] = '__QUANTITY__'; // Will be set by the get_form function
-			}
-		}
+        $keytoavoidconflict = empty($this->trackid) ? '' : '-' . $this->trackid; // this->trackid must be defined
+        unset($_SESSION["listofpaths" . $keytoavoidconflict]);
+        unset($_SESSION["listofnames" . $keytoavoidconflict]);
+        unset($_SESSION["listofmimes" . $keytoavoidconflict]);
+    }
 
-		if ($mode == 'emailing') {
-			$parameters = array('mode'=>$mode);
-			$tmparray = getCommonSubstitutionArray($langs, 2, array('object', 'objectamount'), $object); // Note: On email templated edition, this is null because it is related to all type of objects
-			complete_substitutions_array($tmparray, $langs, null, $parameters);
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-			// For mass emailing, we have different keys
-			$tmparray['__ID__'] = 'IdRecord';
-			$tmparray['__EMAIL__'] = 'EMailRecipient';
-			$tmparray['__LASTNAME__'] = 'Lastname';
-			$tmparray['__FIRSTNAME__'] = 'Firstname';
-			$tmparray['__MAILTOEMAIL__'] = 'TagMailtoEmail';
-			$tmparray['__OTHER1__'] = 'Other1';
-			$tmparray['__OTHER2__'] = 'Other2';
-			$tmparray['__OTHER3__'] = 'Other3';
-			$tmparray['__OTHER4__'] = 'Other4';
-			$tmparray['__OTHER5__'] = 'Other5';
-			$tmparray['__USER_SIGNATURE__'] = 'TagSignature';
-			$tmparray['__CHECK_READ__'] = 'TagCheckMail';
-			$tmparray['__UNSUBSCRIBE__'] = 'TagUnsubscribe';
-			//,'__PERSONALIZED__' => 'Personalized'	// Hidden because not used yet in mass emailing
+    /**
+     * Add a file into the list of attached files (stored in SECTION array)
+     *
+     * @param string $path Full absolute path on filesystem of file, including file name
+     * @param string $file Only filename (can be basename($path))
+     * @param string $type Mime type (can be dol_mimetype($file))
+     *
+     * @return    void
+     */
+    public function add_attached_files($path, $file = '', $type = '')
+    {
+        // phpcs:enable
+        $listofpaths = [];
+        $listofnames = [];
+        $listofmimes = [];
 
-			$onlinepaymentenabled = 0;
-			if (!empty($conf->paypal->enabled)) {
-				$onlinepaymentenabled++;
-			}
-			if (!empty($conf->paybox->enabled)) {
-				$onlinepaymentenabled++;
-			}
-			if (!empty($conf->stripe->enabled)) {
-				$onlinepaymentenabled++;
-			}
-			if ($onlinepaymentenabled && !empty($conf->global->PAYMENT_SECURITY_TOKEN)) {
-				$tmparray['__SECUREKEYPAYMENT__'] = $conf->global->PAYMENT_SECURITY_TOKEN;
-				if (!empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-					if ($conf->adherent->enabled) {
-						$tmparray['__SECUREKEYPAYMENT_MEMBER__'] = 'SecureKeyPAYMENTUniquePerMember';
-					}
-					if ($conf->donation->enabled) {
-						$tmparray['__SECUREKEYPAYMENT_DONATION__'] = 'SecureKeyPAYMENTUniquePerDonation';
-					}
-					if ($conf->facture->enabled) {
-						$tmparray['__SECUREKEYPAYMENT_INVOICE__'] = 'SecureKeyPAYMENTUniquePerInvoice';
-					}
-					if ($conf->commande->enabled) {
-						$tmparray['__SECUREKEYPAYMENT_ORDER__'] = 'SecureKeyPAYMENTUniquePerOrder';
-					}
-					if ($conf->contrat->enabled) {
-						$tmparray['__SECUREKEYPAYMENT_CONTRACTLINE__'] = 'SecureKeyPAYMENTUniquePerContractLine';
-					}
+        if (empty($file)) {
+            $file = basename($path);
+        }
+        if (empty($type)) {
+            $type = dol_mimetype($file);
+        }
 
-					//Online payement link
-					if ($conf->adherent->enabled) {
-						$tmparray['__ONLINEPAYMENTLINK_MEMBER__'] = 'OnlinePaymentLinkUniquePerMember';
-					}
-					if ($conf->donation->enabled) {
-						$tmparray['__ONLINEPAYMENTLINK_DONATION__'] = 'OnlinePaymentLinkUniquePerDonation';
-					}
-					if ($conf->facture->enabled) {
-						$tmparray['__ONLINEPAYMENTLINK_INVOICE__'] = 'OnlinePaymentLinkUniquePerInvoice';
-					}
-					if ($conf->commande->enabled) {
-						$tmparray['__ONLINEPAYMENTLINK_ORDER__'] = 'OnlinePaymentLinkUniquePerOrder';
-					}
-					if ($conf->contrat->enabled) {
-						$tmparray['__ONLINEPAYMENTLINK_CONTRACTLINE__'] = 'OnlinePaymentLinkUniquePerContractLine';
-					}
-				}
-			} else {
-				/* No need to show into tooltip help, option is not enabled
-				$vars['__SECUREKEYPAYMENT__']='';
-				$vars['__SECUREKEYPAYMENT_MEMBER__']='';
-				$vars['__SECUREKEYPAYMENT_INVOICE__']='';
-				$vars['__SECUREKEYPAYMENT_ORDER__']='';
-				$vars['__SECUREKEYPAYMENT_CONTRACTLINE__']='';
-				*/
-			}
-			if (!empty($conf->global->MEMBER_ENABLE_PUBLIC)) {
-				$substitutionarray['__PUBLICLINK_NEWMEMBERFORM__'] = 'BlankSubscriptionForm';
-			}
-		}
+        $keytoavoidconflict = empty($this->trackid) ? '' : '-' . $this->trackid; // this->trackid must be defined
+        if (!empty($_SESSION["listofpaths" . $keytoavoidconflict])) {
+            $listofpaths = explode(';', $_SESSION["listofpaths" . $keytoavoidconflict]);
+        }
+        if (!empty($_SESSION["listofnames" . $keytoavoidconflict])) {
+            $listofnames = explode(';', $_SESSION["listofnames" . $keytoavoidconflict]);
+        }
+        if (!empty($_SESSION["listofmimes" . $keytoavoidconflict])) {
+            $listofmimes = explode(';', $_SESSION["listofmimes" . $keytoavoidconflict]);
+        }
+        if (!in_array($file, $listofnames)) {
+            $listofpaths[] = $path;
+            $listofnames[] = $file;
+            $listofmimes[] = $type;
+            $_SESSION["listofpaths" . $keytoavoidconflict] = join(';', $listofpaths);
+            $_SESSION["listofnames" . $keytoavoidconflict] = join(';', $listofnames);
+            $_SESSION["listofmimes" . $keytoavoidconflict] = join(';', $listofmimes);
+        }
+    }
 
-		foreach ($tmparray as $key => $val) {
-			if (empty($val)) {
-				$tmparray[$key] = $key;
-			}
-		}
-
-		return $tmparray;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Remove a file from the list of attached files (stored in SECTION array)
 	 *
@@ -348,7 +299,6 @@ class FormMail extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return list of attached files (stored in SECTION array)
 	 *
@@ -375,7 +325,6 @@ class FormMail extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Show the form to input an email
 	 *  this->withfile: 0=No attaches files, 1=Show attached files, 2=Can add new attached files
@@ -393,7 +342,6 @@ class FormMail extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Get the form to input an email
 	 *  this->withfile: 0=No attaches files, 1=Show attached files, 2=Can add new attached files
@@ -1050,278 +998,6 @@ class FormMail extends Form
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Clear list of attached files in send mail form (also stored in session)
-	 *
-	 * @return	void
-	 */
-	public function clear_attached_files()
-	{
-		// phpcs:enable
-		global $conf, $user;
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-		// Set tmp user directory
-		$vardir = $conf->user->dir_output."/".$user->id;
-		$upload_dir = $vardir.'/temp/'; // TODO Add $keytoavoidconflict in upload_dir path
-		if (is_dir($upload_dir)) {
-			dol_delete_dir_recursive($upload_dir);
-		}
-
-		$keytoavoidconflict = empty($this->trackid) ? '' : '-'.$this->trackid; // this->trackid must be defined
-		unset($_SESSION["listofpaths".$keytoavoidconflict]);
-		unset($_SESSION["listofnames".$keytoavoidconflict]);
-		unset($_SESSION["listofmimes".$keytoavoidconflict]);
-	}
-
-	/**
-	 *  Return templates of email with type = $type_template or type = 'all'.
-	 *  This search into table c_email_templates. Used by the get_form function.
-	 *
-	 *  @param	DoliDB		$db				Database handler
-	 *  @param	string		$type_template	Get message for model/type=$type_template, type='all' also included.
-	 *  @param	User		$user			Get template public or limited to this user
-	 *  @param	Translate	$outputlangs	Output lang object
-	 *  @param	int			$id				Id of template to find, or -1 for first found with position 0, or 0 for first found whatever is position (priority order depends on lang provided or not) or -2 for exact match with label (no answer if not found)
-	 *  @param  int         $active         1=Only active template, 0=Only disabled, -1=All
-	 *  @param	string		$label			Label of template
-	 *  @return ModelMail|integer			One instance of ModelMail or -1 if error
-	 */
-	public function getEMailTemplate($db, $type_template, $user, $outputlangs, $id = 0, $active = 1, $label = '')
-	{
-		global $conf, $langs;
-
-		$ret = new ModelMail();
-
-		if ($id == -2 && empty($label)) {
-			$this->error = 'LabelIsMandatoryWhenIdIs-2';
-			return -1;
-		}
-
-		$languagetosearch = (is_object($outputlangs) ? $outputlangs->defaultlang : '');
-		// Define $languagetosearchmain to fall back on main language (for example to get 'es_ES' for 'es_MX')
-		$tmparray = explode('_', $languagetosearch);
-		$languagetosearchmain = $tmparray[0].'_'.strtoupper($tmparray[0]);
-		if ($languagetosearchmain == $languagetosearch) {
-			$languagetosearchmain = '';
-		}
-
-		$sql = "SELECT rowid, module, label, type_template, topic, joinfiles, content, content_lines, lang";
-		$sql .= " FROM ".MAIN_DB_PREFIX.'c_email_templates';
-		$sql .= " WHERE (type_template='".$db->escape($type_template)."' OR type_template='all')";
-		$sql .= " AND entity IN (".getEntity('c_email_templates').")";
-		$sql .= " AND (private = 0 OR fk_user = ".((int) $user->id).")"; // Get all public or private owned
-		if ($active >= 0) {
-			$sql .= " AND active = ".((int) $active);
-		}
-		if ($label) {
-			$sql .= " AND label = '".$db->escape($label)."'";
-		}
-		if (!($id > 0) && $languagetosearch) {
-			$sql .= " AND (lang = '".$db->escape($languagetosearch)."'".($languagetosearchmain ? " OR lang = '".$db->escape($languagetosearchmain)."'" : "")." OR lang IS NULL OR lang = '')";
-		}
-		if ($id > 0) {
-			$sql .= " AND rowid=".(int) $id;
-		}
-		if ($id == -1) {
-			$sql .= " AND position=0";
-		}
-		if ($languagetosearch) {
-			$sql .= $db->order("position,lang,label", "ASC,DESC,ASC"); // We want line with lang set first, then with lang null or ''
-		} else {
-			$sql .= $db->order("position,lang,label", "ASC,ASC,ASC"); // If no language provided, we give priority to lang not defined
-		}
-		//$sql .= $db->plimit(1);
-		//print $sql;
-
-		$resql = $db->query($sql);
-		if (!$resql) {
-			dol_print_error($db);
-			return -1;
-		}
-
-		// Get first found
-		while (1) {
-			$obj = $db->fetch_object($resql);
-
-			if ($obj) {
-				// If template is for a module, check module is enabled; if not, take next template
-				if ($obj->module) {
-					$tempmodulekey = $obj->module;
-					if (empty($conf->$tempmodulekey) || empty($conf->$tempmodulekey->enabled)) {
-						continue;
-					}
-				}
-
-				// If a record was found
-				$ret->id = $obj->rowid;
-				$ret->module = $obj->module;
-				$ret->label = $obj->label;
-				$ret->lang = $obj->lang;
-				$ret->topic = $obj->topic;
-				$ret->content = $obj->content;
-				$ret->content_lines = $obj->content_lines;
-				$ret->joinfiles = $obj->joinfiles;
-
-				break;
-			} else {
-				// If no record found
-				if ($id == -2) {
-					// Not found with the provided label
-					return -1;
-				} else {
-					// If there is no template at all
-					$defaultmessage = '';
-
-					if ($type_template == 'body') {
-						// Special case to use this->withbody as content
-						$defaultmessage = $this->withbody;
-					} elseif ($type_template == 'facture_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendInvoice");
-					} elseif ($type_template == 'facture_relance') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendInvoiceReminder");
-					} elseif ($type_template == 'propal_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendProposal");
-					} elseif ($type_template == 'supplier_proposal_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierProposal");
-					} elseif ($type_template == 'order_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendOrder");
-					} elseif ($type_template == 'order_supplier_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierOrder");
-					} elseif ($type_template == 'invoice_supplier_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierInvoice");
-					} elseif ($type_template == 'shipping_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendShipping");
-					} elseif ($type_template == 'fichinter_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendFichInter");
-					} elseif ($type_template == 'actioncomm_send') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendActionComm");
-					} elseif ($type_template == 'thirdparty') {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentThirdparty");
-					} elseif (!empty($type_template)) {
-						$defaultmessage = $outputlangs->transnoentities("PredefinedMailContentGeneric");
-					}
-
-					$ret->label = 'default';
-					$ret->lang = $outputlangs->defaultlang;
-					$ret->topic = '';
-					$ret->joinfiles = 1;
-					$ret->content = $defaultmessage;
-					$ret->content_lines = '';
-
-					break;
-				}
-			}
-		}
-
-		$db->free($resql);
-		return $ret;
-	}
-
-	/**
-	 * Add a file into the list of attached files (stored in SECTION array)
-	 *
-	 * @param 	string   $path   Full absolute path on filesystem of file, including file name
-	 * @param 	string   $file   Only filename (can be basename($path))
-	 * @param 	string   $type   Mime type (can be dol_mimetype($file))
-	 * @return	void
-	 */
-	public function add_attached_files($path, $file = '', $type = '')
-	{
-		// phpcs:enable
-		$listofpaths = array();
-		$listofnames = array();
-		$listofmimes = array();
-
-		if (empty($file)) {
-			$file = basename($path);
-		}
-		if (empty($type)) {
-			$type = dol_mimetype($file);
-		}
-
-		$keytoavoidconflict = empty($this->trackid) ? '' : '-'.$this->trackid; // this->trackid must be defined
-		if (!empty($_SESSION["listofpaths".$keytoavoidconflict])) {
-			$listofpaths = explode(';', $_SESSION["listofpaths".$keytoavoidconflict]);
-		}
-		if (!empty($_SESSION["listofnames".$keytoavoidconflict])) {
-			$listofnames = explode(';', $_SESSION["listofnames".$keytoavoidconflict]);
-		}
-		if (!empty($_SESSION["listofmimes".$keytoavoidconflict])) {
-			$listofmimes = explode(';', $_SESSION["listofmimes".$keytoavoidconflict]);
-		}
-		if (!in_array($file, $listofnames)) {
-			$listofpaths[] = $path;
-			$listofnames[] = $file;
-			$listofmimes[] = $type;
-			$_SESSION["listofpaths".$keytoavoidconflict] = join(';', $listofpaths);
-			$_SESSION["listofnames".$keytoavoidconflict] = join(';', $listofnames);
-			$_SESSION["listofmimes".$keytoavoidconflict] = join(';', $listofmimes);
-		}
-	}
-
-	/**
-	 *      Find if template exists and are available for current user, then set them into $this->lines_module.
-	 *      Search into table c_email_templates
-	 *
-	 * 		@param	string		$type_template	Get message for key module
-	 *      @param	User		$user			Use template public or limited to this user
-	 *      @param	Translate	$outputlangs	Output lang object
-	 *      @param  int         $active         1=Only active template, 0=Only disabled, -1=All
-	 *      @return	int		                    <0 if KO, nb of records found if OK
-	 */
-	public function fetchAllEMailTemplate($type_template, $user, $outputlangs, $active = 1)
-	{
-		global $conf;
-
-		$sql = "SELECT rowid, module, label, topic, content, content_lines, lang, fk_user, private, position";
-		$sql .= " FROM ".MAIN_DB_PREFIX.'c_email_templates';
-		$sql .= " WHERE type_template IN ('".$this->db->escape($type_template)."', 'all')";
-		$sql .= " AND entity IN (".getEntity('c_email_templates').")";
-		$sql .= " AND (private = 0 OR fk_user = ".((int) $user->id).")"; // See all public templates or templates I own.
-		if ($active >= 0) {
-			$sql .= " AND active = ".((int) $active);
-		}
-		//if (is_object($outputlangs)) $sql.= " AND (lang = '".$this->db->escape($outputlangs->defaultlang)."' OR lang IS NULL OR lang = '')";	// Return all languages
-		$sql .= $this->db->order("position,lang,label", "ASC");
-		//print $sql;
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$this->lines_model = array();
-			while ($obj = $this->db->fetch_object($resql)) {
-				// If template is for a module, check module is enabled.
-				if ($obj->module) {
-					$tempmodulekey = $obj->module;
-					if (empty($conf->$tempmodulekey) || empty($conf->$tempmodulekey->enabled)) {
-						continue;
-					}
-				}
-
-				$line = new ModelMail();
-				$line->id = $obj->rowid;
-				$line->label = $obj->label;
-				$line->lang = $obj->lang;
-				$line->fk_user = $obj->fk_user;
-				$line->private = $obj->private;
-				$line->position = $obj->position;
-				$line->topic = $obj->topic;
-				$line->content = $obj->content;
-				$line->content_lines = $obj->content_lines;
-
-				$this->lines_model[] = $line;
-			}
-			$this->db->free($resql);
-			return $num;
-		} else {
-			$this->error = get_class($this).' '.__METHOD__.' ERROR:'.$this->db->lasterror();
-			return -1;
-		}
-	}
-
 	/**
 	 * get html For To
 	 *
@@ -1557,25 +1233,171 @@ class FormMail extends Form
 		$out .= '</td>';
 		$out .= '<td>';
 		if ($this->withtopicreadonly) {
-			$out .= $defaulttopic;
-			$out .= '<input type="hidden" class="quatrevingtpercent" id="subject" name="subject" value="'.$defaulttopic.'" />';
-		} else {
-			$out .= '<input type="text" class="quatrevingtpercent" id="subject" name="subject" value="'.((GETPOSTISSET("subject") && !GETPOST('modelselected')) ? GETPOST("subject") : ($defaulttopic ? $defaulttopic : '')).'" />';
-		}
-		$out .= "</td></tr>\n";
-		return $out;
-	}
+            $out .= $defaulttopic;
+            $out .= '<input type="hidden" class="quatrevingtpercent" id="subject" name="subject" value="' . $defaulttopic . '" />';
+        } else {
+            $out .= '<input type="text" class="quatrevingtpercent" id="subject" name="subject" value="' . ((GETPOSTISSET("subject") && !GETPOST('modelselected')) ? GETPOST("subject") : ($defaulttopic ? $defaulttopic : '')) . '" />';
+        }
+        $out .= "</td></tr>\n";
+        return $out;
+    }
 
-	/**
-	 *      Find if template exists
-	 *      Search into table c_email_templates
-	 *
-	 * 		@param	string		$type_template	Get message for key module
-	 *      @param	User		$user			Use template public or limited to this user
-	 *      @param	Translate	$outputlangs	Output lang object
-	 *      @return	int		<0 if KO,
-	 */
-	public function isEMailTemplate($type_template, $user, $outputlangs)
+    /**
+     *  Return templates of email with type = $type_template or type = 'all'.
+     *  This search into table c_email_templates. Used by the get_form function.
+     *
+     * @param DoliDB    $db            Database handler
+     * @param string    $type_template Get message for model/type=$type_template, type='all' also included.
+     * @param User      $user          Get template public or limited to this user
+     * @param Translate $outputlangs   Output lang object
+     * @param int       $id            Id of template to find, or -1 for first found with position 0, or 0 for first found whatever is position (priority order depends on lang provided or not) or -2 for exact match with label (no answer if not found)
+     * @param int       $active        1=Only active template, 0=Only disabled, -1=All
+     * @param string    $label         Label of template
+     *
+     * @return ModelMail|integer            One instance of ModelMail or -1 if error
+     */
+    public function getEMailTemplate($db, $type_template, $user, $outputlangs, $id = 0, $active = 1, $label = '')
+    {
+        global $conf, $langs;
+
+        $ret = new ModelMail();
+
+        if ($id == -2 && empty($label)) {
+            $this->error = 'LabelIsMandatoryWhenIdIs-2';
+            return -1;
+        }
+
+        $languagetosearch = (is_object($outputlangs) ? $outputlangs->defaultlang : '');
+        // Define $languagetosearchmain to fall back on main language (for example to get 'es_ES' for 'es_MX')
+        $tmparray = explode('_', $languagetosearch);
+        $languagetosearchmain = $tmparray[0] . '_' . strtoupper($tmparray[0]);
+        if ($languagetosearchmain == $languagetosearch) {
+            $languagetosearchmain = '';
+        }
+
+        $sql = "SELECT rowid, module, label, type_template, topic, joinfiles, content, content_lines, lang";
+        $sql .= " FROM " . MAIN_DB_PREFIX . 'c_email_templates';
+        $sql .= " WHERE (type_template='" . $db->escape($type_template) . "' OR type_template='all')";
+        $sql .= " AND entity IN (" . getEntity('c_email_templates') . ")";
+        $sql .= " AND (private = 0 OR fk_user = " . ((int) $user->id) . ")"; // Get all public or private owned
+        if ($active >= 0) {
+            $sql .= " AND active = " . ((int) $active);
+        }
+        if ($label) {
+            $sql .= " AND label = '" . $db->escape($label) . "'";
+        }
+        if (!($id > 0) && $languagetosearch) {
+            $sql .= " AND (lang = '" . $db->escape($languagetosearch) . "'" . ($languagetosearchmain ? " OR lang = '" . $db->escape($languagetosearchmain) . "'" : "") . " OR lang IS NULL OR lang = '')";
+        }
+        if ($id > 0) {
+            $sql .= " AND rowid=" . (int) $id;
+        }
+        if ($id == -1) {
+            $sql .= " AND position=0";
+        }
+        if ($languagetosearch) {
+            $sql .= $db->order("position,lang,label", "ASC,DESC,ASC"); // We want line with lang set first, then with lang null or ''
+        } else {
+            $sql .= $db->order("position,lang,label", "ASC,ASC,ASC"); // If no language provided, we give priority to lang not defined
+        }
+        //$sql .= $db->plimit(1);
+        //print $sql;
+
+        $resql = $db->query($sql);
+        if (!$resql) {
+            dol_print_error($db);
+            return -1;
+        }
+
+        // Get first found
+        while (1) {
+            $obj = $db->fetch_object($resql);
+
+            if ($obj) {
+                // If template is for a module, check module is enabled; if not, take next template
+                if ($obj->module) {
+                    $tempmodulekey = $obj->module;
+                    if (empty($conf->$tempmodulekey) || empty($conf->$tempmodulekey->enabled)) {
+                        continue;
+                    }
+                }
+
+                // If a record was found
+                $ret->id = $obj->rowid;
+                $ret->module = $obj->module;
+                $ret->label = $obj->label;
+                $ret->lang = $obj->lang;
+                $ret->topic = $obj->topic;
+                $ret->content = $obj->content;
+                $ret->content_lines = $obj->content_lines;
+                $ret->joinfiles = $obj->joinfiles;
+
+                break;
+            } else {
+                // If no record found
+                if ($id == -2) {
+                    // Not found with the provided label
+                    return -1;
+                } else {
+                    // If there is no template at all
+                    $defaultmessage = '';
+
+                    if ($type_template == 'body') {
+                        // Special case to use this->withbody as content
+                        $defaultmessage = $this->withbody;
+                    } elseif ($type_template == 'facture_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendInvoice");
+                    } elseif ($type_template == 'facture_relance') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendInvoiceReminder");
+                    } elseif ($type_template == 'propal_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendProposal");
+                    } elseif ($type_template == 'supplier_proposal_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierProposal");
+                    } elseif ($type_template == 'order_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendOrder");
+                    } elseif ($type_template == 'order_supplier_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierOrder");
+                    } elseif ($type_template == 'invoice_supplier_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendSupplierInvoice");
+                    } elseif ($type_template == 'shipping_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendShipping");
+                    } elseif ($type_template == 'fichinter_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendFichInter");
+                    } elseif ($type_template == 'actioncomm_send') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentSendActionComm");
+                    } elseif ($type_template == 'thirdparty') {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentThirdparty");
+                    } elseif (!empty($type_template)) {
+                        $defaultmessage = $outputlangs->transnoentities("PredefinedMailContentGeneric");
+                    }
+
+                    $ret->label = 'default';
+                    $ret->lang = $outputlangs->defaultlang;
+                    $ret->topic = '';
+                    $ret->joinfiles = 1;
+                    $ret->content = $defaultmessage;
+                    $ret->content_lines = '';
+
+                    break;
+                }
+            }
+        }
+
+        $db->free($resql);
+        return $ret;
+    }
+
+    /**
+     *      Find if template exists
+     *      Search into table c_email_templates
+     *
+     * @param string    $type_template Get message for key module
+     * @param User      $user          Use template public or limited to this user
+     * @param Translate $outputlangs   Output lang object
+     *
+     * @return    int        <0 if KO,
+     */
+    public function isEMailTemplate($type_template, $user, $outputlangs)
 	{
 		$sql = "SELECT label, topic, content, lang";
 		$sql .= " FROM ".MAIN_DB_PREFIX.'c_email_templates';
@@ -1590,26 +1412,88 @@ class FormMail extends Form
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$this->db->free($resql);
-			return $num;
-		} else {
-			$this->error = get_class($this).' '.__METHOD__.' ERROR:'.$this->db->lasterror();
-			return -1;
-		}
-	}
+            $num = $this->db->num_rows($resql);
+            $this->db->free($resql);
+            return $num;
+        } else {
+            $this->error = get_class($this) . ' ' . __METHOD__ . ' ERROR:' . $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 * Set substit array from object. This is call when suggesting the email template into forms before sending email.
-	 *
-	 * @param	CommonObject	$object		   Object to use
-	 * @param   Translate  		$outputlangs   Object lang
-	 * @return	void
-	 * @see getCommonSubstitutionArray()
-	 */
-	public function setSubstitFromObject($object, $outputlangs)
-	{
-		global $conf, $user, $extrafields;
+    /**
+     *      Find if template exists and are available for current user, then set them into $this->lines_module.
+     *      Search into table c_email_templates
+     *
+     * @param string    $type_template Get message for key module
+     * @param User      $user          Use template public or limited to this user
+     * @param Translate $outputlangs   Output lang object
+     * @param int       $active        1=Only active template, 0=Only disabled, -1=All
+     *
+     * @return    int                            <0 if KO, nb of records found if OK
+     */
+    public function fetchAllEMailTemplate($type_template, $user, $outputlangs, $active = 1)
+    {
+        global $conf;
+
+        $sql = "SELECT rowid, module, label, topic, content, content_lines, lang, fk_user, private, position";
+        $sql .= " FROM " . MAIN_DB_PREFIX . 'c_email_templates';
+        $sql .= " WHERE type_template IN ('" . $this->db->escape($type_template) . "', 'all')";
+        $sql .= " AND entity IN (" . getEntity('c_email_templates') . ")";
+        $sql .= " AND (private = 0 OR fk_user = " . ((int) $user->id) . ")"; // See all public templates or templates I own.
+        if ($active >= 0) {
+            $sql .= " AND active = " . ((int) $active);
+        }
+        //if (is_object($outputlangs)) $sql.= " AND (lang = '".$this->db->escape($outputlangs->defaultlang)."' OR lang IS NULL OR lang = '')";	// Return all languages
+        $sql .= $this->db->order("position,lang,label", "ASC");
+        //print $sql;
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $this->lines_model = [];
+            while ($obj = $this->db->fetch_object($resql)) {
+                // If template is for a module, check module is enabled.
+                if ($obj->module) {
+                    $tempmodulekey = $obj->module;
+                    if (empty($conf->$tempmodulekey) || empty($conf->$tempmodulekey->enabled)) {
+                        continue;
+                    }
+                }
+
+                $line = new ModelMail();
+                $line->id = $obj->rowid;
+                $line->label = $obj->label;
+                $line->lang = $obj->lang;
+                $line->fk_user = $obj->fk_user;
+                $line->private = $obj->private;
+                $line->position = $obj->position;
+                $line->topic = $obj->topic;
+                $line->content = $obj->content;
+                $line->content_lines = $obj->content_lines;
+
+                $this->lines_model[] = $line;
+            }
+            $this->db->free($resql);
+            return $num;
+        } else {
+            $this->error = get_class($this) . ' ' . __METHOD__ . ' ERROR:' . $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     * Set substit array from object. This is call when suggesting the email template into forms before sending email.
+     *
+     * @param CommonObject $object      Object to use
+     * @param Translate    $outputlangs Object lang
+     *
+     * @return    void
+     * @see getCommonSubstitutionArray()
+     */
+    public function setSubstitFromObject($object, $outputlangs)
+    {
+        global $conf, $user, $extrafields;
 
 		$parameters = array();
 		$tmparray = getCommonSubstitutionArray($outputlangs, 0, null, $object);
@@ -1643,18 +1527,134 @@ class FormMail extends Form
 					$product = new Product($this->db);
 					$product->fetch($line->fk_product, '', '', 1);
 					$product->fetch_optionals();
-					if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label']) > 0) {
-						foreach ($extrafields->attributes[$product->table_element]['label'] as $key => $label) {
-							$substit_line['__PRODUCT_EXTRAFIELD_'.strtoupper($key).'__'] = $product->array_options['options_'.$key];
-						}
-					}
-				}
-				$this->substit_lines[] = $substit_line;
-			}
-		}
-	}
-}
+                    if (is_array($extrafields->attributes[$object->table_element]['label']) && count($extrafields->attributes[$object->table_element]['label']) > 0) {
+                        foreach ($extrafields->attributes[$product->table_element]['label'] as $key => $label) {
+                            $substit_line['__PRODUCT_EXTRAFIELD_' . strtoupper($key) . '__'] = $product->array_options['options_' . $key];
+                        }
+                    }
+                }
+                $this->substit_lines[] = $substit_line;
+            }
+        }
+    }
 
+    /**
+     * Get list of substitution keys available for emails. This is used for tooltips help.
+     * This include the complete_substitutions_array.
+     *
+     * @param string $mode   'formemail', 'formemailwithlines', 'formemailforlines', 'emailing', ...
+     * @param Object $object Object if applicable
+     *
+     * @return    array               Array of substitution values for emails.
+     */
+    public static function getAvailableSubstitKey($mode = 'formemail', $object = null)
+    {
+        global $conf, $langs;
+
+        $tmparray = [];
+        if ($mode == 'formemail' || $mode == 'formemailwithlines' || $mode == 'formemailforlines') {
+            $parameters = ['mode' => $mode];
+            $tmparray = getCommonSubstitutionArray($langs, 2, null, $object); // Note: On email templated edition, this is null because it is related to all type of objects
+            complete_substitutions_array($tmparray, $langs, null, $parameters);
+
+            if ($mode == 'formwithlines') {
+                $tmparray['__LINES__'] = '__LINES__'; // Will be set by the get_form function
+            }
+            if ($mode == 'formforlines') {
+                $tmparray['__QUANTITY__'] = '__QUANTITY__'; // Will be set by the get_form function
+            }
+        }
+
+        if ($mode == 'emailing') {
+            $parameters = ['mode' => $mode];
+            $tmparray = getCommonSubstitutionArray($langs, 2, ['object', 'objectamount'], $object); // Note: On email templated edition, this is null because it is related to all type of objects
+            complete_substitutions_array($tmparray, $langs, null, $parameters);
+
+            // For mass emailing, we have different keys
+            $tmparray['__ID__'] = 'IdRecord';
+            $tmparray['__EMAIL__'] = 'EMailRecipient';
+            $tmparray['__LASTNAME__'] = 'Lastname';
+            $tmparray['__FIRSTNAME__'] = 'Firstname';
+            $tmparray['__MAILTOEMAIL__'] = 'TagMailtoEmail';
+            $tmparray['__OTHER1__'] = 'Other1';
+            $tmparray['__OTHER2__'] = 'Other2';
+            $tmparray['__OTHER3__'] = 'Other3';
+            $tmparray['__OTHER4__'] = 'Other4';
+            $tmparray['__OTHER5__'] = 'Other5';
+            $tmparray['__USER_SIGNATURE__'] = 'TagSignature';
+            $tmparray['__CHECK_READ__'] = 'TagCheckMail';
+            $tmparray['__UNSUBSCRIBE__'] = 'TagUnsubscribe';
+            //,'__PERSONALIZED__' => 'Personalized'	// Hidden because not used yet in mass emailing
+
+            $onlinepaymentenabled = 0;
+            if (!empty($conf->paypal->enabled)) {
+                $onlinepaymentenabled++;
+            }
+            if (!empty($conf->paybox->enabled)) {
+                $onlinepaymentenabled++;
+            }
+            if (!empty($conf->stripe->enabled)) {
+                $onlinepaymentenabled++;
+            }
+            if ($onlinepaymentenabled && !empty($conf->global->PAYMENT_SECURITY_TOKEN)) {
+                $tmparray['__SECUREKEYPAYMENT__'] = $conf->global->PAYMENT_SECURITY_TOKEN;
+                if (!empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
+                    if ($conf->adherent->enabled) {
+                        $tmparray['__SECUREKEYPAYMENT_MEMBER__'] = 'SecureKeyPAYMENTUniquePerMember';
+                    }
+                    if ($conf->donation->enabled) {
+                        $tmparray['__SECUREKEYPAYMENT_DONATION__'] = 'SecureKeyPAYMENTUniquePerDonation';
+                    }
+                    if ($conf->facture->enabled) {
+                        $tmparray['__SECUREKEYPAYMENT_INVOICE__'] = 'SecureKeyPAYMENTUniquePerInvoice';
+                    }
+                    if ($conf->commande->enabled) {
+                        $tmparray['__SECUREKEYPAYMENT_ORDER__'] = 'SecureKeyPAYMENTUniquePerOrder';
+                    }
+                    if ($conf->contrat->enabled) {
+                        $tmparray['__SECUREKEYPAYMENT_CONTRACTLINE__'] = 'SecureKeyPAYMENTUniquePerContractLine';
+                    }
+
+                    //Online payement link
+                    if ($conf->adherent->enabled) {
+                        $tmparray['__ONLINEPAYMENTLINK_MEMBER__'] = 'OnlinePaymentLinkUniquePerMember';
+                    }
+                    if ($conf->donation->enabled) {
+                        $tmparray['__ONLINEPAYMENTLINK_DONATION__'] = 'OnlinePaymentLinkUniquePerDonation';
+                    }
+                    if ($conf->facture->enabled) {
+                        $tmparray['__ONLINEPAYMENTLINK_INVOICE__'] = 'OnlinePaymentLinkUniquePerInvoice';
+                    }
+                    if ($conf->commande->enabled) {
+                        $tmparray['__ONLINEPAYMENTLINK_ORDER__'] = 'OnlinePaymentLinkUniquePerOrder';
+                    }
+                    if ($conf->contrat->enabled) {
+                        $tmparray['__ONLINEPAYMENTLINK_CONTRACTLINE__'] = 'OnlinePaymentLinkUniquePerContractLine';
+                    }
+                }
+            } else {
+                /* No need to show into tooltip help, option is not enabled
+                $vars['__SECUREKEYPAYMENT__']='';
+                $vars['__SECUREKEYPAYMENT_MEMBER__']='';
+                $vars['__SECUREKEYPAYMENT_INVOICE__']='';
+                $vars['__SECUREKEYPAYMENT_ORDER__']='';
+                $vars['__SECUREKEYPAYMENT_CONTRACTLINE__']='';
+                */
+            }
+            if (!empty($conf->global->MEMBER_ENABLE_PUBLIC)) {
+                $substitutionarray['__PUBLICLINK_NEWMEMBERFORM__'] = 'BlankSubscriptionForm';
+            }
+        }
+
+        foreach ($tmparray as $key => $val) {
+            if (empty($val)) {
+                $tmparray[$key] = $key;
+            }
+        }
+
+        return $tmparray;
+    }
+}
 
 /**
  * ModelMail

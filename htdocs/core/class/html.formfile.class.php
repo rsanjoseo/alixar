@@ -35,22 +35,24 @@
  */
 class FormFile
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error;
-	public $numoffiles;
-public $infofiles;
-		private $db; // Used to return informations by function getDocumentsLink
+    private $db;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    /**
+     * @var string Error code (or message)
+     */
+    public $error;
+
+    public $numoffiles;
+    public $infofiles; // Used to return informations by function getDocumentsLink
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
 		$this->numoffiles = 0;
 	}
 
@@ -320,38 +322,6 @@ public $infofiles;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *    Show form to upload a new file with jquery fileupload.
-	 *    This form use the fileupload.php file.
-	 *
-	 *    @param	Object	$object		Object to use
-	 *    @return	void
-	 */
-	private function _formAjaxFileUpload($object)
-	{
-		global $langs, $conf;
-
-		// PHP post_max_size
-		$post_max_size				= ini_get('post_max_size');
-		$mul_post_max_size			= substr($post_max_size, -1);
-		$mul_post_max_size			= ($mul_post_max_size == 'M' ? 1048576 : ($mul_post_max_size == 'K' ? 1024 : ($mul_post_max_size == 'G' ? 1073741824 : 1)));
-		$post_max_size				= $mul_post_max_size * (int) $post_max_size;
-		// PHP upload_max_filesize
-		$upload_max_filesize		= ini_get('upload_max_filesize');
-		$mul_upload_max_filesize	= substr($upload_max_filesize, -1);
-		$mul_upload_max_filesize	= ($mul_upload_max_filesize == 'M' ? 1048576 : ($mul_upload_max_filesize == 'K' ? 1024 : ($mul_upload_max_filesize == 'G' ? 1073741824 : 1)));
-		$upload_max_filesize		= $mul_upload_max_filesize * (int) $upload_max_filesize;
-		// Max file size
-		$max_file_size = (($post_max_size < $upload_max_filesize) ? $post_max_size : $upload_max_filesize);
-
-		// Include main
-		include DOL_DOCUMENT_ROOT.'/core/tpl/ajax/fileupload_main.tpl.php';
-
-		// Include template
-		include DOL_DOCUMENT_ROOT.'/core/tpl/ajax/fileupload_view.tpl.php';
-	}
-
 	/**
 	 *      Show the box with list of available documents for object
 	 *
@@ -929,19 +899,19 @@ public $infofiles;
 					if ($delallowed || $printer || $morepicto) {
 						$out .= '<td class="right nowraponall">';
 						if ($delallowed) {
-							$tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
-							$out .= '<a href="'.$tmpurlsource.((strpos($tmpurlsource, '?') === false) ? '?' : '&amp;').'action='.$removeaction.'&amp;file='.urlencode($relativepath);
-							$out .= ($param ? '&amp;'.$param : '');
-							//$out.= '&modulepart='.$modulepart; // TODO obsolete ?
-							//$out.= '&urlsource='.urlencode($urlsource); // TODO obsolete ?
-							$out .= '">'.img_picto($langs->trans("Delete"), 'delete').'</a>';
-						}
+                            $tmpurlsource = preg_replace('/#[a-zA-Z0-9_]*$/', '', $urlsource);
+                            $out .= '<a href="' . $tmpurlsource . ((strpos($tmpurlsource, '?') === false) ? '?' : '&') . 'action=' . urlencode($removeaction) . '&token=' . newToken() . '&file=' . urlencode($relativepath);
+                            $out .= ($param ? '&' . $param : '');
+                            //$out.= '&modulepart='.$modulepart; // TODO obsolete ?
+                            //$out.= '&urlsource='.urlencode($urlsource); // TODO obsolete ?
+                            $out .= '">' . img_picto($langs->trans("Delete"), 'delete') . '</a>';
+                        }
 						if ($printer) {
-							//$out.= '<td class="right">';
-							$out .= '<a class="marginleftonly" href="'.$urlsource.(strpos($urlsource, '?') ? '&amp;' : '?').'action=print_file&amp;printer='.$modulepart.'&amp;file='.urlencode($relativepath);
-							$out .= ($param ? '&amp;'.$param : '');
-							$out .= '">'.img_picto($langs->trans("PrintFile", $relativepath), 'printer.png').'</a>';
-						}
+                            //$out.= '<td class="right">';
+                            $out .= '<a class="marginleftonly" href="' . $urlsource . (strpos($urlsource, '?') ? '&' : '?') . 'action=print_file&token=' . newToken() . 'printer=' . urlencode($modulepart) . '&file=' . urlencode($relativepath);
+                            $out .= ($param ? '&' . $param : '');
+                            $out .= '">' . img_picto($langs->trans("PrintFile", $relativepath), 'printer.png') . '</a>';
+                        }
 						if ($morepicto) {
 							$morepicto = preg_replace('/__FILENAMEURLENCODED__/', urlencode($relativepath), $morepicto);
 							$out .= $morepicto;
@@ -1004,9 +974,6 @@ public $infofiles;
 		//return ($i?$i:$headershown);
 		return $out;
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Show a Document icon with link(s)
@@ -1127,39 +1094,6 @@ public $infofiles;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Show detail icon with link for preview
-	 *
-	 * @param   array     $file           Array with data of file. Example: array('name'=>...)
-	 * @param   string    $modulepart     propal, facture, facture_fourn, ...
-	 * @param   string    $relativepath   Relative path of docs
-	 * @param   integer   $ruleforpicto   Rule for picto: 0=Use the generic preview picto, 1=Use the picto of mime type of file)
-	 * @param	string	  $param		  More param on http links
-	 * @return  string    $out            Output string with HTML
-	 */
-	public function showPreview($file, $modulepart, $relativepath, $ruleforpicto = 0, $param = '')
-	{
-		global $langs, $conf;
-
-		$out = '';
-		if ($conf->browser->layout != 'phone' && !empty($conf->use_javascript_ajax)) {
-			$urladvancedpreview = getAdvancedPreviewUrl($modulepart, $relativepath, 1, $param); // Return if a file is qualified for preview.
-			if (count($urladvancedpreview)) {
-				$out .= '<a class="pictopreview '.$urladvancedpreview['css'].'" href="'.$urladvancedpreview['url'].'"'.(empty($urladvancedpreview['mime']) ? '' : ' mime="'.$urladvancedpreview['mime'].'"').' '.(empty($urladvancedpreview['target']) ? '' : ' target="'.$urladvancedpreview['target'].'"').'>';
-				//$out.= '<a class="pictopreview">';
-				if (empty($ruleforpicto)) {
-					//$out.= img_picto($langs->trans('Preview').' '.$file['name'], 'detail');
-					$out .= '<span class="fa fa-search-plus" style="color: gray"></span>';
-				} else {
-					$out .= img_mime($relativepath, $langs->trans('Preview').' '.$file['name']);
-				}
-				$out .= '</a>';
-			}
-		}
-		return $out;
-	}
-
 	/**
 	 *  Show list of documents in $filearray (may be they are all in same directory but may not)
 	 *  This also sync database if $upload_dir is defined.
@@ -1591,26 +1525,29 @@ public $infofiles;
 				}
 			}
 
-			print ajax_autoselect('downloadlink');
+            print ajax_autoselect('downloadlink');
 
-			if (GETPOST('action', 'aZ09') == 'editfile' && $permtoeditline) {
-				print '</form>';
-			}
+            if (GETPOST('action', 'aZ09') == 'editfile' && $permtoeditline) {
+                print '</form>';
+            }
 
-			return $nboffiles;
-		}
-	}
+            return $nboffiles;
+        }
+    }
 
-	/**
-	 *	Show list of documents in a directory of ECM module.
-	 *
-	 *  @param	string	$upload_dir         Directory that was scanned. This directory will contains files into subdirs REF/files
-	 *  @param  array	$filearray          Array of files loaded by dol_dir_list function before calling this function
-	 *  @param  string	$modulepart         Value for modulepart used by download wrapper
-	 *  @param  string	$param              Parameters on sort links
-	 *  @param  int		$forcedownload      Force to open dialog box "Save As" when clicking on file
-	 *  @param  string	$relativepath       Relative path of docs (autodefined if not provided)
-	 *  @param  int		$permissiontodelete       Permission to delete
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Show list of documents in a directory of ECM module.
+     *
+     * @param string         $upload_dir         Directory that was scanned. This directory will contains files into subdirs REF/files
+     * @param array          $filearray          Array of files loaded by dol_dir_list function before calling this function
+     * @param string         $modulepart         Value for modulepart used by download wrapper
+     * @param string         $param              Parameters on sort links
+     * @param int            $forcedownload      Force to open dialog box "Save As" when clicking on file
+     * @param string         $relativepath       Relative path of docs (autodefined if not provided)
+     * @param int            $permissiontodelete Permission to delete
 	 *  @param  int		$useinecm           Change output for use in ecm module
 	 *  @param  int		$textifempty        Text to show if filearray is empty
 	 *  @param  int		$maxlength          Maximum length of file name shown
@@ -1948,25 +1885,57 @@ public $infofiles;
 				print '<span class="opacitymedium">'.$textifempty.'</span>';
 			}
 			print '</td></tr>';
-		}
-		print "</table>";
-		print '</div>';
+        }
+        print "</table>";
+        print '</div>';
 
-		if (!empty($addfilterfields)) {
-			print '</form>';
-		}
-		// Fin de zone
-	}
+        if (!empty($addfilterfields)) {
+            print '</form>';
+        }
+        // Fin de zone
+    }
 
-	/**
-	 * Show array with linked files
-	 *
-	 * @param 	Object		$object			Object
-	 * @param 	int			$permissiontodelete	Deletion is allowed
-	 * @param 	string		$action			Action
-	 * @param 	string		$selected		???
-	 * @param	string		$param			More param to add into URL
-	 * @return 	int							Number of links
+    /**
+     *    Show form to upload a new file with jquery fileupload.
+     *    This form use the fileupload.php file.
+     *
+     * @param Object $object Object to use
+     *
+     * @return    void
+     */
+    private function _formAjaxFileUpload($object)
+    {
+        global $langs, $conf;
+
+        // PHP post_max_size
+        $post_max_size = ini_get('post_max_size');
+        $mul_post_max_size = substr($post_max_size, -1);
+        $mul_post_max_size = ($mul_post_max_size == 'M' ? 1048576 : ($mul_post_max_size == 'K' ? 1024 : ($mul_post_max_size == 'G' ? 1073741824 : 1)));
+        $post_max_size = $mul_post_max_size * (int) $post_max_size;
+        // PHP upload_max_filesize
+        $upload_max_filesize = ini_get('upload_max_filesize');
+        $mul_upload_max_filesize = substr($upload_max_filesize, -1);
+        $mul_upload_max_filesize = ($mul_upload_max_filesize == 'M' ? 1048576 : ($mul_upload_max_filesize == 'K' ? 1024 : ($mul_upload_max_filesize == 'G' ? 1073741824 : 1)));
+        $upload_max_filesize = $mul_upload_max_filesize * (int) $upload_max_filesize;
+        // Max file size
+        $max_file_size = (($post_max_size < $upload_max_filesize) ? $post_max_size : $upload_max_filesize);
+
+        // Include main
+        include DOL_DOCUMENT_ROOT . '/core/tpl/ajax/fileupload_main.tpl.php';
+
+        // Include template
+        include DOL_DOCUMENT_ROOT . '/core/tpl/ajax/fileupload_view.tpl.php';
+    }
+
+    /**
+     * Show array with linked files
+     *
+     * @param Object $object             Object
+     * @param int    $permissiontodelete Deletion is allowed
+     * @param string $action             Action
+     * @param string $selected           ???
+     * @param string $param              More param to add into URL
+     * @return    int                            Number of links
 	 */
 	public function listOfLinks($object, $permissiontodelete = 1, $action = null, $selected = null, $param = '')
 	{
@@ -2090,14 +2059,47 @@ public $infofiles;
 			print "</tr>\n";
 		}
 		if ($nboflinks == 0) {
-			print '<tr class="oddeven"><td colspan="5" class="opacitymedium">';
-			print $langs->trans("NoLinkFound");
-			print '</td></tr>';
-		}
-		print "</table>";
+            print '<tr class="oddeven"><td colspan="5" class="opacitymedium">';
+            print $langs->trans("NoLinkFound");
+            print '</td></tr>';
+        }
+        print "</table>";
 
-		print '</form>';
+        print '</form>';
 
-		return $nboflinks;
-	}
+        return $nboflinks;
+    }
+
+    /**
+     * Show detail icon with link for preview
+     *
+     * @param array   $file         Array with data of file. Example: array('name'=>...)
+     * @param string  $modulepart   propal, facture, facture_fourn, ...
+     * @param string  $relativepath Relative path of docs
+     * @param integer $ruleforpicto Rule for picto: 0=Use the generic preview picto, 1=Use the picto of mime type of file)
+     * @param string  $param        More param on http links
+     *
+     * @return  string    $out            Output string with HTML
+     */
+    public function showPreview($file, $modulepart, $relativepath, $ruleforpicto = 0, $param = '')
+    {
+        global $langs, $conf;
+
+        $out = '';
+        if ($conf->browser->layout != 'phone' && !empty($conf->use_javascript_ajax)) {
+            $urladvancedpreview = getAdvancedPreviewUrl($modulepart, $relativepath, 1, $param); // Return if a file is qualified for preview.
+            if (count($urladvancedpreview)) {
+                $out .= '<a class="pictopreview ' . $urladvancedpreview['css'] . '" href="' . $urladvancedpreview['url'] . '"' . (empty($urladvancedpreview['mime']) ? '' : ' mime="' . $urladvancedpreview['mime'] . '"') . ' ' . (empty($urladvancedpreview['target']) ? '' : ' target="' . $urladvancedpreview['target'] . '"') . '>';
+                //$out.= '<a class="pictopreview">';
+                if (empty($ruleforpicto)) {
+                    //$out.= img_picto($langs->trans('Preview').' '.$file['name'], 'detail');
+                    $out .= '<span class="fa fa-search-plus" style="color: gray"></span>';
+                } else {
+                    $out .= img_mime($relativepath, $langs->trans('Preview') . ' ' . $file['name']);
+                }
+                $out .= '</a>';
+            }
+        }
+        return $out;
+    }
 }

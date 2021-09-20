@@ -449,48 +449,78 @@ print dol_get_fiche_head($head, 'preview', $langs->trans("Survey"), -1, 'poll');
 
 $morehtmlref = '';
 
-$linkback = '<a href="'.DOL_URL_ROOT.'/opensurvey/list.php?restore_lastsearch_values=1">'.$langs->trans("BackToList").'</a>';
+$linkback = '<a href="' . DOL_URL_ROOT . '/opensurvey/list.php?restore_lastsearch_values=1">' . $langs->trans("BackToList") . '</a>';
 
 dol_banner_tab($object, 'id', $linkback, 1, 'id_sondage', 'id_sondage', $morehtmlref);
 
-
 print '<div class="fichecenter">';
-print '<div class="underbanner clearboth"></div>';
 
+print '<div class="fichehalfleft">';
+print '<div class="underbanner clearboth"></div>';
 print '<table class="border tableforfield centpercent">';
 
 // Type
 $type = ($object->format == "A") ? 'classic' : 'date';
-print '<tr><td class="titlefield">'.$langs->trans("Type").'</td><td colspan="2">';
-print img_picto('', dol_buildpath('/opensurvey/img/'.($type == 'classic' ? 'chart-32.png' : 'calendar-32.png'), 1), 'width="16"', 1);
-print ' '.$langs->trans($type == 'classic' ? "TypeClassic" : "TypeDate").'</td></tr>';
+print '<tr><td class="titlefield">' . $langs->trans("Type") . '</td><td>';
+print img_picto('', dol_buildpath('/opensurvey/img/' . ($type == 'classic' ? 'chart-32.png' : 'calendar-32.png'), 1), 'width="16"', 1);
+print ' ' . $langs->trans($type == 'classic' ? "TypeClassic" : "TypeDate") . '</td></tr>';
 
 // Title
 print '<tr><td>';
 $adresseadmin = $object->mail_admin;
-print $langs->trans("Title").'</td><td colspan="2">';
+print $langs->trans("Title") . '</td><td>';
 if ($action == 'edit') {
-	print '<input type="text" name="nouveautitre" size="40" value="'.dol_escape_htmltag(dol_htmlentities($object->title)).'">';
+    print '<input type="text" name="nouveautitre" size="40" value="' . dol_escape_htmltag(dol_htmlentities($object->title)) . '">';
 } else {
-	print dol_htmlentities($object->title);
+    print dol_htmlentities($object->title);
 }
 print '</td></tr>';
 
-// Expire date
-print '<tr><td>'.$langs->trans('ExpireDate').'</td><td colspan="2">';
+// Description
+print '<tr><td class="tdtop">' . $langs->trans("Description") . '</td><td>';
 if ($action == 'edit') {
-	print $form->selectDate($expiredate ? $expiredate : $object->date_fin, 'expire', 0, 0, 0, '', 1, 0);
+    $doleditor = new DolEditor('nouveauxcommentaires', $object->description, '', 120, 'dolibarr_notes', 'In', 1, 1, 1, ROWS_7, '90%');
+    $doleditor->Create(0, '');
 } else {
-	print dol_print_date($object->date_fin, 'day');
-	if ($object->date_fin && $object->date_fin < dol_now() && $object->status == Opensurveysondage::STATUS_VALIDATED) {
-		print img_warning($langs->trans("Expired"));
-	}
+    print (dol_textishtml($object->description) ? $object->description : dol_nl2br($object->description, 1, true));
+}
+print '</td></tr>';
+
+// EMail
+//If linked user, then emails are going to be sent to users' email
+if (!$object->fk_user_creat) {
+    print '<tr><td>' . $langs->trans("EMail") . '</td><td>';
+    if ($action == 'edit') {
+        print '<input type="text" name="nouvelleadresse" class="minwith200" value="' . $object->mail_admin . '">';
+    } else {
+        print dol_print_email($object->mail_admin, 0, 0, 1, 0, 1, 1);
+    }
+    print '</td></tr>';
+}
+
+print '</table>';
+
+print '</div>';
+print '<div class="fichehalfright">';
+print '<div class="underbanner clearboth"></div>';
+
+print '<table class="border tableforfield centpercent">';
+
+// Expire date
+print '<tr><td>' . $langs->trans('ExpireDate') . '</td><td>';
+if ($action == 'edit') {
+    print $form->selectDate($expiredate ? $expiredate : $object->date_fin, 'expire', 0, 0, 0, '', 1, 0);
+} else {
+    print dol_print_date($object->date_fin, 'day');
+    if ($object->date_fin && $object->date_fin < dol_now() && $object->status == Opensurveysondage::STATUS_VALIDATED) {
+        print img_warning($langs->trans("Expired"));
+    }
 }
 print '</td></tr>';
 
 // Author
 print '<tr><td>';
-print $langs->trans("Author").'</td><td colspan="2">';
+print $langs->trans("Author") . '</td><td>';
 if ($object->fk_user_creat) {
 	print $userstatic->getLoginUrl(1);
 } else {
@@ -499,7 +529,7 @@ if ($object->fk_user_creat) {
 print '</td></tr>';
 
 // Link
-print '<tr><td>'.img_picto('', 'globe').' '.$langs->trans("UrlForSurvey", '').'</td><td colspan="2">';
+print '<tr><td>' . img_picto('', 'globe') . ' ' . $langs->trans("UrlForSurvey", '') . '</td><td>';
 
 // Define $urlwithroot
 $urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
@@ -515,19 +545,20 @@ if ($action != 'edit') {
 				    jQuery("#opensurveyurl").click(function() { jQuery(this).select(); } );
 				});
 		    </script>';
-	print ' <a href="'.$url.'" target="_blank">'.$langs->trans("Link").'</a>';
+    print ' <a href="' . $url . '" target="_blank">' . $langs->trans("Link") . '</a>';
 }
 
 print '</td></tr>';
 
 print '</table>';
+print '</div>';
 
 print '</div>';
+print '<div class="clearboth"></div>';
 
 print dol_get_fiche_end();
 
-print '</form>'."\n";
-
+print '</form>' . "\n";
 
 // Buttons
 

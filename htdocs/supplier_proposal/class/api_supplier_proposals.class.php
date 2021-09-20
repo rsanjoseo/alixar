@@ -82,28 +82,6 @@ class Supplierproposals extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->address);
-		unset($object->datec);
-		unset($object->datev);
-
-		return $object;
-	}
-
-	/**
 	 * List supplier proposals
 	 *
 	 * Get a list of supplier proposals
@@ -202,8 +180,6 @@ class Supplierproposals extends DolibarrApi
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Validate fields before create or update object
 	 *
@@ -212,14 +188,40 @@ class Supplierproposals extends DolibarrApi
 	 * @throws  RestException
 	 */
 	private function _validate($data)
-	{
-		$propal = array();
-		foreach (SupplierProposals::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$propal[$field] = $data[$field];
-		}
-		return $propal;
-	}
+    {
+        $propal = [];
+        foreach (SupplierProposals::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $propal[$field] = $data[$field];
+        }
+        return $propal;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->address);
+        unset($object->datec);
+        unset($object->datev);
+
+        return $object;
+    }
 }

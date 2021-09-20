@@ -462,112 +462,6 @@ class Paiement extends CommonObject
 		}
 	}
 
-	/**
-	 * 	get the right way of payment
-	 *
-	 * 	@return 	string 	'dolibarr' if standard comportment or paid in main currency, 'customer' if payment received from multicurrency inputs
-	 */
-	public function getWay()
-	{
-		global $conf;
-
-		$way = 'dolibarr';
-		if (!empty($conf->multicurrency->enabled)) {
-			foreach ($this->multicurrency_amounts as $value) {
-				if (!empty($value)) { // one value found then payment is in invoice currency
-					$way = 'customer';
-					break;
-				}
-			}
-		}
-
-		return $way;
-	}
-
-	/**
-	 *      Return next reference of customer invoice not already used (or last reference)
-	 *      according to numbering module defined into constant FACTURE_ADDON
-	 *
-	 *      @param	   Societe		$soc		object company
-	 *      @param     string		$mode		'next' for next value or 'last' for last value
-	 *      @return    string					free ref or last ref
-	 */
-	public function getNextNumRef($soc, $mode = 'next')
-	{
-		global $conf, $db, $langs;
-		$langs->load("bills");
-
-		// Clean parameters (if not defined or using deprecated value)
-		if (empty($conf->global->PAYMENT_ADDON)) {
-			$conf->global->PAYMENT_ADDON = 'mod_payment_cicada';
-		} elseif ($conf->global->PAYMENT_ADDON == 'ant') {
-			$conf->global->PAYMENT_ADDON = 'mod_payment_ant';
-		} elseif ($conf->global->PAYMENT_ADDON == 'cicada') {
-			$conf->global->PAYMENT_ADDON = 'mod_payment_cicada';
-		}
-
-		if (!empty($conf->global->PAYMENT_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->PAYMENT_ADDON.".php";
-			$classname = $conf->global->PAYMENT_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/payment/");
-
-				// Load file with numbering class (if found)
-				if (is_file($dir.$file) && is_readable($dir.$file)) {
-					$mybool |= include_once $dir.$file;
-				}
-			}
-
-			// For compatibility
-			if (!$mybool) {
-				$file = $conf->global->PAYMENT_ADDON.".php";
-				$classname = "mod_payment_".$conf->global->PAYMENT_ADDON;
-				$classname = preg_replace('/\-.*$/', '', $classname);
-				// Include file with class
-				foreach ($conf->file->dol_document_root as $dirroot) {
-					$dir = $dirroot."/core/modules/payment/";
-
-					// Load file with numbering class (if found)
-					if (is_file($dir.$file) && is_readable($dir.$file)) {
-						$mybool |= include_once $dir.$file;
-					}
-				}
-			}
-
-			if (!$mybool) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			/**
-			 * $numref can be empty in case we ask for the last value because if there is no invoice created with the
-			 * set up mask.
-			 */
-			if ($mode != 'last' && !$numref) {
-				dol_print_error($db, "Payment::getNextNumRef ".$obj->error);
-				return "";
-			}
-
-			return $numref;
-		} else {
-			$langs->load("errors");
-			print $langs->trans("Error")." ".$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Invoice"));
-			return "";
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Delete a payment and generated links into account
@@ -662,43 +556,6 @@ class Paiement extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return list of invoices the payment is related to.
-	 *
-	 *  @param	string		$filter         Filter
-	 *  @return int|array					<0 if KO or array of invoice id
-	 */
-	public function getBillsArray($filter = '')
-	{
-		$sql = 'SELECT pf.fk_facture';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'paiement_facture as pf, '.MAIN_DB_PREFIX.'facture as f'; // We keep link on invoice to allow use of some filters on invoice
-		$sql .= ' WHERE pf.fk_facture = f.rowid AND pf.fk_paiement = '.((int) $this->id);
-		if ($filter) {
-			$sql .= ' AND '.$filter;
-		}
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$i = 0;
-			$num = $this->db->num_rows($resql);
-			$billsarray = array();
-
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$billsarray[$i] = $obj->fk_facture;
-				$i++;
-			}
-
-			return $billsarray;
-		} else {
-			$this->error = $this->db->error();
-			dol_syslog(get_class($this).'::getBillsArray Error '.$this->error.' -', LOG_DEBUG);
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *      Add a record into bank for payment + links between this bank record and sources of payment.
@@ -877,26 +734,30 @@ class Paiement extends CommonObject
 				$this->db->commit();
 			} else {
 				$this->db->rollback();
-			}
-		}
+            }
+        }
 
-		if (!$error) {
-			return $bank_line_id;
-		} else {
-			return -1;
-		}
-	}
+        if (!$error) {
+            return $bank_line_id;
+        } else {
+            return -1;
+        }
+    }
 
-	/**
-	 *      Mise a jour du lien entre le paiement et la ligne generee dans llx_bank
-	 *
-	 *      @param	int		$id_bank    Id compte bancaire
-	 *      @return	int					<0 if KO, >0 if OK
-	 */
-	public function update_fk_bank($id_bank)
-	{
-		// phpcs:enable
-		$sql = 'UPDATE '.MAIN_DB_PREFIX.$this->table_element.' set fk_bank = '.((int) $id_bank);
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Mise a jour du lien entre le paiement et la ligne generee dans llx_bank
+     *
+     * @param int $id_bank Id compte bancaire
+     *
+     * @return    int                    <0 if KO, >0 if OK
+     */
+    public function update_fk_bank($id_bank)
+    {
+        // phpcs:enable
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element . ' set fk_bank = ' . ((int) $id_bank);
 		$sql .= " WHERE rowid = ".((int) $this->id);
 
 		dol_syslog(get_class($this).'::update_fk_bank', LOG_DEBUG);
@@ -908,8 +769,9 @@ class Paiement extends CommonObject
 			dol_syslog(get_class($this).'::update_fk_bank '.$this->error);
 			return -1;
 		}
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Updates the payment date
 	 *
@@ -964,8 +826,9 @@ class Paiement extends CommonObject
 			}
 		}
 		return -1; //no date given or already validated
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Updates the payment number
 	 *
@@ -1075,26 +938,61 @@ class Paiement extends CommonObject
 					$muser = new User($this->db);
 					$muser->fetch($obj->fk_user_modif);
 					$this->user_modification = $muser;
-				}
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->tms);
-			}
-			$this->db->free($result);
-		} else {
-			dol_print_error($this->db);
-		}
-	}
+                }
+                $this->date_creation = $this->db->jdate($obj->datec);
+                $this->date_modification = $this->db->jdate($obj->tms);
+            }
+            $this->db->free($result);
+        } else {
+            dol_print_error($this->db);
+        }
+    }
 
-	/**
-	 *  Return list of amounts of payments.
-	 *
-	 *  @return int|array					Array of amount of payments
-	 */
-	public function getAmountsArray()
-	{
-		$sql = 'SELECT pf.fk_facture, pf.amount';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'paiement_facture as pf';
-		$sql .= ' WHERE pf.fk_paiement = '.((int) $this->id);
+    /**
+     *  Return list of invoices the payment is related to.
+     *
+     * @param string $filter Filter
+     *
+     * @return int|array                    <0 if KO or array of invoice id
+     */
+    public function getBillsArray($filter = '')
+    {
+        $sql = 'SELECT pf.fk_facture';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'paiement_facture as pf, ' . MAIN_DB_PREFIX . 'facture as f'; // We keep link on invoice to allow use of some filters on invoice
+        $sql .= ' WHERE pf.fk_facture = f.rowid AND pf.fk_paiement = ' . ((int) $this->id);
+        if ($filter) {
+            $sql .= ' AND ' . $filter;
+        }
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $i = 0;
+            $num = $this->db->num_rows($resql);
+            $billsarray = [];
+
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $billsarray[$i] = $obj->fk_facture;
+                $i++;
+            }
+
+            return $billsarray;
+        } else {
+            $this->error = $this->db->error();
+            dol_syslog(get_class($this) . '::getBillsArray Error ' . $this->error . ' -', LOG_DEBUG);
+            return -1;
+        }
+    }
+
+    /**
+     *  Return list of amounts of payments.
+     *
+     * @return int|array                    Array of amount of payments
+     */
+    public function getAmountsArray()
+    {
+        $sql = 'SELECT pf.fk_facture, pf.amount';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'paiement_facture as pf';
+        $sql .= ' WHERE pf.fk_paiement = '.((int) $this->id);
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			$i = 0;
@@ -1105,26 +1003,132 @@ class Paiement extends CommonObject
 				$obj = $this->db->fetch_object($resql);
 				$amounts[$obj->fk_facture] = $obj->amount;
 				$i++;
-			}
+            }
 
-			return $amounts;
-		} else {
-			$this->error = $this->db->error();
-			dol_syslog(get_class($this).'::getAmountsArray Error '.$this->error.' -', LOG_DEBUG);
-			return -1;
-		}
-	}
+            return $amounts;
+        } else {
+            $this->error = $this->db->error();
+            dol_syslog(get_class($this) . '::getAmountsArray Error ' . $this->error . ' -', LOG_DEBUG);
+            return -1;
+        }
+    }
 
-	/**
-	 *  Initialise an instance with random values.
-	 *  Used to build previews or test instances.
-	 *	id must be 0 if object instance is a specimen.
-	 *
-	 *	@param	string		$option		''=Create a specimen invoice with lines, 'nolines'=No lines
-	 *  @return	void
-	 */
-	public function initAsSpecimen($option = '')
-	{
+    /**
+     *      Return next reference of customer invoice not already used (or last reference)
+     *      according to numbering module defined into constant FACTURE_ADDON
+     *
+     * @param Societe $soc  object company
+     * @param string  $mode 'next' for next value or 'last' for last value
+     *
+     * @return    string                    free ref or last ref
+     */
+    public function getNextNumRef($soc, $mode = 'next')
+    {
+        global $conf, $db, $langs;
+        $langs->load("bills");
+
+        // Clean parameters (if not defined or using deprecated value)
+        if (empty($conf->global->PAYMENT_ADDON)) {
+            $conf->global->PAYMENT_ADDON = 'mod_payment_cicada';
+        } elseif ($conf->global->PAYMENT_ADDON == 'ant') {
+            $conf->global->PAYMENT_ADDON = 'mod_payment_ant';
+        } elseif ($conf->global->PAYMENT_ADDON == 'cicada') {
+            $conf->global->PAYMENT_ADDON = 'mod_payment_cicada';
+        }
+
+        if (!empty($conf->global->PAYMENT_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->PAYMENT_ADDON . ".php";
+            $classname = $conf->global->PAYMENT_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/payment/");
+
+                // Load file with numbering class (if found)
+                if (is_file($dir . $file) && is_readable($dir . $file)) {
+                    $mybool |= include_once $dir . $file;
+                }
+            }
+
+            // For compatibility
+            if (!$mybool) {
+                $file = $conf->global->PAYMENT_ADDON . ".php";
+                $classname = "mod_payment_" . $conf->global->PAYMENT_ADDON;
+                $classname = preg_replace('/\-.*$/', '', $classname);
+                // Include file with class
+                foreach ($conf->file->dol_document_root as $dirroot) {
+                    $dir = $dirroot . "/core/modules/payment/";
+
+                    // Load file with numbering class (if found)
+                    if (is_file($dir . $file) && is_readable($dir . $file)) {
+                        $mybool |= include_once $dir . $file;
+                    }
+                }
+            }
+
+            if (!$mybool) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            /**
+             * $numref can be empty in case we ask for the last value because if there is no invoice created with the
+             * set up mask.
+             */
+            if ($mode != 'last' && !$numref) {
+                dol_print_error($db, "Payment::getNextNumRef " . $obj->error);
+                return "";
+            }
+
+            return $numref;
+        } else {
+            $langs->load("errors");
+            print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Invoice"));
+            return "";
+        }
+    }
+
+    /**
+     *    get the right way of payment
+     *
+     * @return    string    'dolibarr' if standard comportment or paid in main currency, 'customer' if payment received from multicurrency inputs
+     */
+    public function getWay()
+    {
+        global $conf;
+
+        $way = 'dolibarr';
+        if (!empty($conf->multicurrency->enabled)) {
+            foreach ($this->multicurrency_amounts as $value) {
+                if (!empty($value)) { // one value found then payment is in invoice currency
+                    $way = 'customer';
+                    break;
+                }
+            }
+        }
+
+        return $way;
+    }
+
+    /**
+     *  Initialise an instance with random values.
+     *  Used to build previews or test instances.
+     *    id must be 0 if object instance is a specimen.
+     *
+     * @param string $option ''=Create a specimen invoice with lines, 'nolines'=No lines
+     *
+     * @return    void
+     */
+    public function initAsSpecimen($option = '')
+    {
 		global $user, $langs, $conf;
 
 		$now = dol_now();

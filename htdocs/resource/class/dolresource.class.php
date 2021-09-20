@@ -166,25 +166,86 @@ class Dolresource extends CommonObject
 		if ($error) {
 			foreach ($this->errors as $errmsg) {
 				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->id;
-		}
-	}
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->id;
+        }
+    }
 
-	/**
-	 *  Update object into database
-	 *
-	 *  @param	User	$user        User that modifies
-	 *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
-	 *  @return int     		   	 <0 if KO, >0 if OK
-	 */
-	public function update($user = null, $notrigger = 0)
-	{
+    /**
+     *    Load object in memory from database
+     *
+     * @param int    $id  Id of object
+     * @param string $ref Ref of object
+     *
+     * @return   int            <0 if KO, >0 if OK
+     */
+    public function fetch($id, $ref = '')
+    {
+        global $langs;
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
+        $sql .= " t.entity,";
+        $sql .= " t.ref,";
+        $sql .= " t.description,";
+        $sql .= " t.fk_country,";
+        $sql .= " t.fk_code_type_resource,";
+        $sql .= " t.note_public,";
+        $sql .= " t.note_private,";
+        $sql .= " t.tms,";
+        $sql .= " ty.label as type_label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element . " as t";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_type_resource as ty ON ty.code=t.fk_code_type_resource";
+        if ($id) {
+            $sql .= " WHERE t.rowid = " . ((int) $id);
+        } else {
+            $sql .= " WHERE t.ref = '" . $this->db->escape($ref) . "'";
+        }
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->entity = $obj->entity;
+                $this->ref = $obj->ref;
+                $this->description = $obj->description;
+                $this->country_id = $obj->fk_country;
+                $this->fk_code_type_resource = $obj->fk_code_type_resource;
+                $this->note_public = $obj->note_public;
+                $this->note_private = $obj->note_private;
+                $this->type_label = $obj->type_label;
+
+                // Retrieve all extrafield
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+            }
+            $this->db->free($resql);
+
+            return $this->id;
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . "::fetch " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
+
+    /**
+     *  Update object into database
+     *
+     * @param User $user      User that modifies
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                 <0 if KO, >0 if OK
+     */
+    public function update($user = null, $notrigger = 0)
+    {
 		global $conf, $langs, $hookmanager;
 		$error = 0;
 
@@ -278,67 +339,7 @@ class Dolresource extends CommonObject
 		}
 	}
 
-	/**
-	 *    Load object in memory from database
-	 *
-	 *    @param    int		$id     Id of object
-	 *    @param	string	$ref	Ref of object
-	 *    @return   int         	<0 if KO, >0 if OK
-	 */
-	public function fetch($id, $ref = '')
-	{
-		global $langs;
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
-		$sql .= " t.entity,";
-		$sql .= " t.ref,";
-		$sql .= " t.description,";
-		$sql .= " t.fk_country,";
-		$sql .= " t.fk_code_type_resource,";
-		$sql .= " t.note_public,";
-		$sql .= " t.note_private,";
-		$sql .= " t.tms,";
-		$sql .= " ty.label as type_label";
-		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element." as t";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_type_resource as ty ON ty.code=t.fk_code_type_resource";
-		if ($id) {
-			$sql .= " WHERE t.rowid = ".((int) $id);
-		} else {
-			$sql .= " WHERE t.ref = '".$this->db->escape($ref)."'";
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->entity = $obj->entity;
-				$this->ref = $obj->ref;
-				$this->description				= $obj->description;
-				$this->country_id = $obj->fk_country;
-				$this->fk_code_type_resource = $obj->fk_code_type_resource;
-				$this->note_public				= $obj->note_public;
-				$this->note_private = $obj->note_private;
-				$this->type_label = $obj->type_label;
-
-				// Retrieve all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-			}
-			$this->db->free($resql);
-
-			return $this->id;
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Load object in memory from database
 	 *
@@ -815,23 +816,6 @@ class Dolresource extends CommonObject
 		}
 	}
 
-	/**
-	 *  Return an int number of resources linked to the element
-	 *
-	 *  @param		string	$element		Element type
-	 *  @param		int		$element_id		Element id
-	 *  @return     int						Nb of resources loaded
-	 */
-	public function fetchElementResources($element, $element_id)
-	{
-		$resources = $this->getElementResources($element, $element_id);
-		$i = 0;
-		foreach ($resources as $nb => $resource) {
-			$this->lines[$i] = fetchObjectByElement($resource['resource_id'], $resource['resource_type']);
-			$i++;
-		}
-		return $i;
-	}
 
 	/**
 	 * Return an array with resources linked to the element
@@ -865,28 +849,47 @@ class Dolresource extends CommonObject
 				$obj = $this->db->fetch_object($resql);
 
 				$resources[$i] = array(
-					'rowid' => $obj->rowid,
-					'resource_id' => $obj->resource_id,
-					'resource_type'=>$obj->resource_type,
-					'busy'=>$obj->busy,
-					'mandatory'=>$obj->mandatory
-				);
-				$i++;
-			}
-		}
+                    'rowid' => $obj->rowid,
+                    'resource_id' => $obj->resource_id,
+                    'resource_type'=>$obj->resource_type,
+                    'busy' => $obj->busy,
+                    'mandatory' => $obj->mandatory,
+                );
+                $i++;
+            }
+        }
 
-		return $resources;
-	}
+        return $resources;
+    }
+
+    /**
+     *  Return an int number of resources linked to the element
+     *
+     * @param string $element    Element type
+     * @param int    $element_id Element id
+     *
+     * @return     int                        Nb of resources loaded
+     */
+    public function fetchElementResources($element, $element_id)
+    {
+        $resources = $this->getElementResources($element, $element_id);
+        $i = 0;
+        foreach ($resources as $nb => $resource) {
+            $this->lines[$i] = fetchObjectByElement($resource['resource_id'], $resource['resource_type']);
+            $i++;
+        }
+        return $i;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *      Load in cache resource type code (setup in dictionary)
-	 *
-	 *      @return     int             Number of lines loaded, 0 if already loaded, <0 if KO
-	 */
-	public function load_cache_code_type_resource()
+    /**
+     *      Load in cache resource type code (setup in dictionary)
+     *
+     * @return     int             Number of lines loaded, 0 if already loaded, <0 if KO
+     */
+    public function load_cache_code_type_resource()
 	{
 		// phpcs:enable
 		global $langs;
@@ -974,8 +977,8 @@ class Dolresource extends CommonObject
 		$linkstart = '<a href="'.$url.$get_params.'"';
 		$linkstart .= $linkclose.'>';
 		$linkend = '</a>';
-		/*$linkstart = '<a href="'.dol_buildpath('/resource/card.php', 1).'?id='.$this->id.$get_params.'" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
-		$linkend = '</a>';*/
+        /*$linkstart = '<a href="'.DOL_URL_ROOT.'/resource/card.php?id='.$this->id.$get_params.'" title="'.dol_escape_htmltag($label, 1).'" class="classfortooltip">';
+        $linkend = '</a>';*/
 
 		$result .= $linkstart;
 		if ($withpicto) {

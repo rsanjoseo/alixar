@@ -35,6 +35,7 @@
 // Declaration of variables. May have been already require by main.inc.php. But may not by scripts. So, here the require_once must be kept.
 require_once 'filefunc.inc.php';
 
+
 if (!function_exists('is_countable')) {
     /**
      * function is_countable (to remove when php version supported will be >= 7.3)
@@ -58,7 +59,6 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/conf.class.php';
 $conf = new Conf();
 
 // Set properties specific to database
-/*
 $conf->db->host = $dolibarr_main_db_host;
 $conf->db->port = $dolibarr_main_db_port;
 $conf->db->name = $dolibarr_main_db_name;
@@ -73,7 +73,6 @@ $conf->db->dolibarr_main_db_cryptkey = $dolibarr_main_db_cryptkey;
 if (defined('TEST_DB_FORCE_TYPE')) {
 	$conf->db->type = constant('TEST_DB_FORCE_TYPE'); // Force db type (for test purpose, by PHP unit for example)
 }
-*/
 
 // Set properties specific to conf file
 $conf->file->main_limit_users = $dolibarr_main_limit_users;
@@ -85,7 +84,6 @@ $conf->file->strict_mode = empty($dolibarr_strict_mode) ? '' : $dolibarr_strict_
 $conf->file->instance_unique_id = empty($dolibarr_main_instance_unique_id) ? (empty($dolibarr_main_cookie_cryptkey) ? '' : $dolibarr_main_cookie_cryptkey) : $dolibarr_main_instance_unique_id; // Unique id of instance
 $conf->file->dol_document_root = ['main' => (string) DOL_DOCUMENT_ROOT]; // Define array of document root directories ('/home/htdocs')
 $conf->file->dol_url_root = ['main' => (string) DOL_URL_ROOT]; // Define array of url root path ('' or '/dolibarr')
-
 if (!empty($dolibarr_main_document_root_alt)) {
     // dolibarr_main_document_root_alt can contains several directories
     $values = preg_split('/[;,]/', $dolibarr_main_document_root_alt);
@@ -120,11 +118,12 @@ if (!defined('NOREQUIREUSER')) {
     require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php'; // Need 500ko memory
 }
 if (!defined('NOREQUIRETRAN')) {
-    require_once DOL_DOCUMENT_ROOT . '/core/class/translate.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/core/class/translate.class.php';
 }
 if (!defined('NOREQUIRESOC')) {
-    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+	require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
 }
+
 
 /*
  * Creation objet $langs (must be before all other code)
@@ -135,6 +134,7 @@ if (!defined('NOREQUIRETRAN')) {
 
 /*
  * Object $db
+ */
 $db = null;
 if (!defined('NOREQUIREDB')) {
 	$db = getDoliDBInstance($conf->db->type, $conf->db->host, $conf->db->user, $conf->db->pass, $conf->db->name, $conf->db->port);
@@ -161,11 +161,6 @@ if (!defined('NOREQUIREDB')) {
 		exit;
 	}
 }
- */
-if (!$alxConfig->loadConfig() || !$alxConfig->connectToDatabase()) {
-    die('Failed to connect to database in master.inc.php');
-}
-$db = $alxConfig->getEngine();
 
 // Now database connexion is known, so we can forget password
 //unset($dolibarr_main_db_pass); 	// We comment this because this constant is used in a lot of pages
@@ -175,7 +170,7 @@ unset($conf->db->pass); // This is to avoid password to be shown in memory/swap 
  * Object $user
  */
 if (!defined('NOREQUIREUSER')) {
-    $user = new User($db);
+	$user = new User($db);
 }
 
 /*
@@ -200,7 +195,7 @@ if (session_id() && !empty($_SESSION["dol_entity"])) {
 
 // Sanitize entity
 if (!is_numeric($conf->entity)) {
-    $conf->entity = 1;
+	$conf->entity = 1;
 }
 
 //print "We work with data into entity instance number '".$conf->entity."'";
@@ -235,6 +230,6 @@ include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 $hookmanager = new HookManager($db);
 
 if (!defined('MAIN_LABEL_MENTION_NPR')) {
-    define('MAIN_LABEL_MENTION_NPR', 'NPR');
+	define('MAIN_LABEL_MENTION_NPR', 'NPR');
 }
 //if (! defined('PCLZIP_TEMPORARY_DIR')) define('PCLZIP_TEMPORARY_DIR', $conf->user->dir_temp);

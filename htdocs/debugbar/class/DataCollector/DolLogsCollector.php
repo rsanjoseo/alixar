@@ -39,18 +39,6 @@ class DolLogsCollector extends MessagesCollector
 	}
 
 	/**
-	 * Get the path to the logs file
-	 *
-	 * @return string
-	 */
-	public function getLogsFile()
-	{
-		// default dolibarr log file
-		$path = DOL_DATA_ROOT.'/dolibarr.log';
-		return $path;
-	}
-
-	/**
 	 *	Return widget settings
 	 *
 	 *  @return array  Array
@@ -98,25 +86,38 @@ class DolLogsCollector extends MessagesCollector
 				}
 				foreach ($log_levels as $level_key => $level) {
 					if (strpos(strtolower($line), strtolower($level_key)) == 20) {
-						$this->nboflines++;
-						$this->addMessage($line, $level, false);
-					}
-				}
-			}
-		}
+                        $this->nboflines++;
+                        $this->addMessage($line, $level, false);
+                    }
+                }
+            }
+        }
 
-		return parent::collect();
-	}
+        return parent::collect();
+    }
 
-	/**
-	 * Get logs
-	 *
-	 * @param string $path     Path
-	 * @return array
-	 */
-	public function getStorageLogs($path)
-	{
-		if (!file_exists($path)) {
+    /**
+     * Get the path to the logs file
+     *
+     * @return string
+     */
+    public function getLogsFile()
+    {
+        // default dolibarr log file
+        $path = DOL_DATA_ROOT . '/dolibarr.log';
+        return $path;
+    }
+
+    /**
+     * Get logs
+     *
+     * @param string $path Path
+     *
+     * @return array
+     */
+    public function getStorageLogs($path)
+    {
+        if (!file_exists($path)) {
 			return;
 		}
 

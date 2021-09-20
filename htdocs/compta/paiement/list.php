@@ -6,7 +6,7 @@
  * Copyright (C) 2015		Jean-François Ferry		<jfefe@aternatik.fr>
  * Copyright (C) 2015		Juanjo Menent			<jmenent@2byte.es>
  * Copyright (C) 2017-2021	Alexandre Spangaro		<aspangaro@open-dsi.fr>
- * Copyright (C) 2018		Ferran Marcet			<fmarcet@2byte.es>
+ * Copyright (C) 2018-2021	Ferran Marcet			<fmarcet@2byte.es>
  * Copyright (C) 2018		Charlene Benke			<charlie@patas-monkey.com>
  * Copyright (C) 2020		Tobias Sekan			<tobias.sekan@startmail.com>
  *
@@ -31,13 +31,6 @@
  */
 
 require '../../main.inc.php';
-
-// Security check
-if ($user->socid) {
-	$socid = $user->socid;
-}
-$result = restrictedArea($user, 'facture', $facid, '');
-
 require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
@@ -47,15 +40,21 @@ require_once DOL_DOCUMENT_ROOT.'/accountancy/class/accountingjournal.class.php';
 // Load translation files required by the page
 $langs->loadLangs(array('bills', 'banks', 'compta', 'companies'));
 
-$action				= GETPOST('action', 'alpha');
-$massaction			= GETPOST('massaction', 'alpha');
-$confirm			= GETPOST('confirm', 'alpha');
+$action = GETPOST('action', 'alpha');
+$massaction = GETPOST('massaction', 'alpha');
+$confirm = GETPOST('confirm', 'alpha');
 $optioncss = GETPOST('optioncss', 'alpha');
-$contextpage		= GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'paymentlist';
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'paymentlist';
 
-$facid				= GETPOST('facid', 'int');
-$socid				= GETPOST('socid', 'int');
+$facid = GETPOST('facid', 'int');
+$socid = GETPOST('socid', 'int');
 $userid = GETPOST('userid', 'int');
+
+// Security check
+if ($user->socid) {
+    $socid = $user->socid;
+}
+$result = restrictedArea($user, 'facture', $facid, '');
 
 $search_ref = GETPOST("search_ref", "alpha");
 $search_date_startday = GETPOST('search_date_startday', 'int');
@@ -64,7 +63,7 @@ $search_date_startyear = GETPOST('search_date_startyear', 'int');
 $search_date_endday = GETPOST('search_date_endday', 'int');
 $search_date_endmonth = GETPOST('search_date_endmonth', 'int');
 $search_date_endyear = GETPOST('search_date_endyear', 'int');
-$search_date_start = dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);	// Use tzserver
+$search_date_start = dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);    // Use tzserver
 $search_date_end = dol_mktime(23, 59, 59, $search_date_endmonth, $search_date_endday, $search_date_endyear);
 $search_company = GETPOST("search_company", 'alpha');
 $search_paymenttype = GETPOST("search_paymenttype");

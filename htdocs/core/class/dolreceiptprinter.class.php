@@ -560,69 +560,6 @@ class dolReceiptPrinter extends Printer
 	}
 
 	/**
-	 *  Function Init Printer
-	 *
-	 *  @param   int       $printerid       Printer id
-	 *  @return  int                        0 if OK; >0 if KO
-	 */
-	public function initPrinter($printerid)
-	{
-		global $conf;
-		if (getDolGlobalString('TAKEPOS_PRINT_METHOD') == "takeposconnector") {
-			$this->connector = new DummyPrintConnector();
-			$this->printer = new Printer($this->connector, $this->profile);
-			return;
-		}
-		$error = 0;
-		$sql = 'SELECT rowid, name, fk_type, fk_profile, parameter';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'printer_receipt';
-		$sql .= ' WHERE rowid = '.((int) $printerid);
-		$sql .= ' AND entity = '.((int) $conf->entity);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_array($resql);
-		} else {
-			$error++;
-			$this->errors[] = $this->db->lasterror;
-		}
-		if (empty($obj)) {
-			$error++;
-			$this->errors[] = 'PrinterDontExist';
-		}
-		if (!$error) {
-			$parameter = $obj['parameter'];
-			try {
-				switch ($obj['fk_type']) {
-					case 1:
-						$this->connector = new DummyPrintConnector();
-						break;
-					case 2:
-						$this->connector = new FilePrintConnector($parameter);
-						break;
-					case 3:
-						$parameters = explode(':', $parameter);
-						$this->connector = new NetworkPrintConnector($parameters[0], $parameters[1]);
-						break;
-					case 4:	// LPT1, smb://...
-						$this->connector = new WindowsPrintConnector(dol_sanitizePathName($parameter));
-						break;
-					case 5:
-						$this->connector = new CupsPrintConnector($parameter);
-						break;
-					default:
-						$this->connector = 'CONNECTOR_UNKNOWN';
-						break;
-				}
-				$this->printer = new Printer($this->connector, $this->profile);
-			} catch (Exception $e) {
-				$this->errors[] = $e->getMessage();
-				$error++;
-			}
-		}
-		return $error;
-	}
-
-	/**
 	 *  Function to Print Receipt Ticket
 	 *
 	 *  @param   Facture|Commande   $object         Order or invoice object
@@ -939,16 +876,80 @@ class dolReceiptPrinter extends Printer
 		if ($resql) {
 			$obj = $this->db->fetch_array($resql);
 		} else {
-			$error++;
-			$this->errors[] = $this->db->lasterror;
-		}
-		if (empty($obj)) {
-			$error++;
-			$this->errors[] = 'TemplateDontExist';
-		} else {
-			$this->template = $obj['0'];
-		}
+            $error++;
+            $this->errors[] = $this->db->lasterror;
+        }
+        if (empty($obj)) {
+            $error++;
+            $this->errors[] = 'TemplateDontExist';
+        } else {
+            $this->template = $obj['0'];
+        }
 
-		return $error;
-	}
+        return $error;
+    }
+
+    /**
+     *  Function Init Printer
+     *
+     * @param int $printerid Printer id
+     *
+     * @return  int                        0 if OK; >0 if KO
+     */
+    public function initPrinter($printerid)
+    {
+        global $conf;
+        if (getDolGlobalString('TAKEPOS_PRINT_METHOD') == "takeposconnector") {
+            $this->connector = new DummyPrintConnector();
+            $this->printer = new Printer($this->connector, $this->profile);
+            return;
+        }
+        $error = 0;
+        $sql = 'SELECT rowid, name, fk_type, fk_profile, parameter';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'printer_receipt';
+        $sql .= ' WHERE rowid = ' . ((int) $printerid);
+        $sql .= ' AND entity = ' . ((int) $conf->entity);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $obj = $this->db->fetch_array($resql);
+        } else {
+            $error++;
+            $this->errors[] = $this->db->lasterror;
+        }
+        if (empty($obj)) {
+            $error++;
+            $this->errors[] = 'PrinterDontExist';
+        }
+        if (!$error) {
+            $parameter = $obj['parameter'];
+            try {
+                switch ($obj['fk_type']) {
+                    case 1:
+                        $this->connector = new DummyPrintConnector();
+                        break;
+                    case 2:
+                        $this->connector = new FilePrintConnector($parameter);
+                        break;
+                    case 3:
+                        $parameters = explode(':', $parameter);
+                        $this->connector = new NetworkPrintConnector($parameters[0], $parameters[1]);
+                        break;
+                    case 4:    // LPT1, smb://...
+                        $this->connector = new WindowsPrintConnector(dol_sanitizePathName($parameter));
+                        break;
+                    case 5:
+                        $this->connector = new CupsPrintConnector($parameter);
+                        break;
+                    default:
+                        $this->connector = 'CONNECTOR_UNKNOWN';
+                        break;
+                }
+                $this->printer = new Printer($this->connector, $this->profile);
+            } catch (Exception $e) {
+                $this->errors[] = $e->getMessage();
+                $error++;
+            }
+        }
+        return $error;
+    }
 }

@@ -37,124 +37,173 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Don extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_PAID = 2;
-	const STATUS_CANCELED = -1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'don';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'don';
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_donation';
+
 	/**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var string String with name of icon for object don. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'donation';
+
 	/**
 	 * @var string Date of the donation
 	 */
 	public $date;
+
 	/**
 	 * amount of donation
 	 * @var double
 	 */
 	public $amount;
-	/**
+
+    /**
 	 * @var string Thirdparty name
 	 */
 	public $societe;
-	/**
+
+    /**
 	 * @var string Address
 	 */
 	public $address;
-	/**
+
+    /**
 	 * @var string Zipcode
 	 */
 	public $zip;
-	/**
+
+    /**
 	 * @var string Town
 	 */
 	public $town;
-	/**
+
+    /**
 	 * @var string Email
 	 */
 	public $email;
-	/**
+
+    /**
 	 * @var int 0 or 1
 	 */
 	public $public;
-	/**
+
+    /**
 	 * @var int project ID
 	 */
 	public $fk_project;
-	/**
+
+    /**
 	 * @var int type payment ID
 	 */
 	public $fk_typepayment;
-	public $num_payment;
+
+    public $num_payment;
 	public $date_valid;
-	/**
+
+    /**
 	 * @var int payment mode id
 	 */
 	public $modepaymentid = 0;
-	/**
-	 * @var array Array of status label
-	 */
-	public $labelStatus;
-	/**
-	 * @var array Array of status label short
-	 */
-	public $labelStatusShort;
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param	DoliDB	$db 	Database handler
-	 */
-	public function __construct($db)
-	{
-		 $this->db = $db;
-	}
+    /**
+     * @var array Array of status label
+     */
+    public $labelStatus;
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param  DoliDB  $db             Database handler
-	 * @param  int     $origin_id      Old third-party id
-	 * @param  int     $dest_id        New third-party id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'don'
-		);
+    /**
+     * @var array Array of status label short
+     */
+    public $labelStatusShort;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_PAID = 2;
+    const STATUS_CANCELED = -1;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 *  Initialise an instance with random values.
-	 *  Used to build previews or test instances.
-	 *	id must be 0 if object instance is a specimen.
-	 *
-	 *  @return	void
-	 */
-	public function initAsSpecimen()
+    /**
+     *    Returns the donation status label (draft, valid, abandoned, paid)
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return string                    Label of status
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->statut, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return the label of a given status
+     *
+     * @param int $status Id statut
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return string                   Label of status
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+            global $langs;
+            $langs->load("donations");
+            $this->labelStatus[-1] = $langs->transnoentitiesnoconv("Canceled");
+            $this->labelStatus[0] = $langs->transnoentitiesnoconv("DonationStatusPromiseNotValidated");
+            $this->labelStatus[1] = $langs->transnoentitiesnoconv("DonationStatusPromiseValidated");
+            $this->labelStatus[2] = $langs->transnoentitiesnoconv("DonationStatusPaid");
+            $this->labelStatusShort[-1] = $langs->transnoentitiesnoconv("Canceled");
+            $this->labelStatusShort[0] = $langs->transnoentitiesnoconv("DonationStatusPromiseNotValidatedShort");
+            $this->labelStatusShort[1] = $langs->transnoentitiesnoconv("DonationStatusPromiseValidatedShort");
+            $this->labelStatusShort[2] = $langs->transnoentitiesnoconv("DonationStatusPaidShort");
+        }
+
+        $statusType = 'status' . $status;
+        if ($status == self::STATUS_CANCELED) {
+            $statusType = 'status9';
+        }
+        if ($status == self::STATUS_PAID) {
+            $statusType = 'status6';
+        }
+
+        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
+
+    /**
+     *  Initialise an instance with random values.
+     *  Used to build previews or test instances.
+     *    id must be 0 if object instance is a specimen.
+     *
+     * @return    void
+     */
+    public function initAsSpecimen()
 	{
 		global $conf, $user, $langs;
 
@@ -203,6 +252,7 @@ class Don extends CommonObject
 		$this->phone_mobile = '0606060606';
 		$this->statut = 1;
 	}
+
 
 	/**
 	 *	Check params and init ->errors array.
@@ -632,8 +682,9 @@ class Don extends CommonObject
 	public function setValid($user, $notrigger = 0)
 	{
 		return $this->valid_promesse($this->id, $user->id, $notrigger);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Validate a promise of donation
 	 *
@@ -681,7 +732,6 @@ class Don extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Classify the donation as paid, the donation was received
 	 *
@@ -697,8 +747,6 @@ class Don extends CommonObject
 		dol_syslog(get_class($this)."::set_paid is deprecated, use setPaid instead", LOG_NOTICE);
 		return $this->setPaid($id, $modepayment);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Classify the donation as paid, the donation was received
@@ -726,9 +774,10 @@ class Don extends CommonObject
 		} else {
 			dol_print_error($this->db);
 			return -1;
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Set donation to status cancelled
 	 *
@@ -754,8 +803,6 @@ class Don extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set cancel status
 	 *
@@ -778,8 +825,9 @@ class Don extends CommonObject
 		 }*/
 
 		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'DON_REOPEN');
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Sum of donations
 	 *
@@ -808,7 +856,6 @@ class Don extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Charge indicateurs this->nb pour le tableau de bord
 	 *
@@ -839,8 +886,6 @@ class Don extends CommonObject
 			return -1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Return clicable name (with picto eventually)
@@ -898,51 +943,6 @@ class Don extends CommonObject
 	}
 
 	/**
-	 * 	Returns the donation status label (draft, valid, abandoned, paid)
-	 *
-	 *  @param  int		$mode          	0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string        			Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->statut, $mode);
-	}
-
-	/**
-	 *  Return the label of a given status
-	 *
-	 *  @param	int		$status        Id statut
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-			$langs->load("donations");
-			$this->labelStatus[-1] = $langs->transnoentitiesnoconv("Canceled");
-			$this->labelStatus[0] = $langs->transnoentitiesnoconv("DonationStatusPromiseNotValidated");
-			$this->labelStatus[1] = $langs->transnoentitiesnoconv("DonationStatusPromiseValidated");
-			$this->labelStatus[2] = $langs->transnoentitiesnoconv("DonationStatusPaid");
-			$this->labelStatusShort[-1] = $langs->transnoentitiesnoconv("Canceled");
-			$this->labelStatusShort[0] = $langs->transnoentitiesnoconv("DonationStatusPromiseNotValidatedShort");
-			$this->labelStatusShort[1] = $langs->transnoentitiesnoconv("DonationStatusPromiseValidatedShort");
-			$this->labelStatusShort[2] = $langs->transnoentitiesnoconv("DonationStatusPaidShort");
-		}
-
-		$statusType = 'status'.$status;
-		if ($status == self::STATUS_CANCELED) {
-			$statusType = 'status9';
-		}
-		if ($status == self::STATUS_PAID) {
-			$statusType = 'status6';
-		}
-
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
-
-	/**
 	 * Information on record
 	 *
 	 * @param	int		$id      Id of record
@@ -978,8 +978,9 @@ class Don extends CommonObject
 			$this->db->free($result);
 		} else {
 			dol_print_error($this->db);
-		}
+        }
 	}
+
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -1071,24 +1072,42 @@ class Don extends CommonObject
 				return 1;
 			} else {
 				$outputlangs->charset_output = $sav_charset_output;
-				dol_syslog("Erreur dans don_create");
-				dol_print_error($this->db, $obj->error);
-				return 0;
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("ErrorFileDoesNotExists", $file);
-			return 0;
-		}
-	}
+                dol_syslog("Erreur dans don_create");
+                dol_print_error($this->db, $obj->error);
+                return 0;
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("ErrorFileDoesNotExists", $file);
+            return 0;
+        }
+    }
 
-	/**
-	 * Function to get reamain to pay for a donation
-	 *
-	 * @return   int      					<0 if KO, > reamain to pay if  OK
-	 */
-	public function getRemainToPay()
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old third-party id
+     * @param int    $dest_id   New third-party id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'don',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Function to get reamain to pay for a donation
+     *
+     * @return   int                        <0 if KO, > reamain to pay if  OK
+     */
+    public function getRemainToPay()
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
 		if (empty($this->id)) {
 			$this->error = 'Missing object id';

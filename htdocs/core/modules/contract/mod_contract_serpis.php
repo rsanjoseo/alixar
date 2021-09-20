@@ -121,22 +121,6 @@ class mod_contract_serpis extends ModelNumRefContracts
 	 *	Return next value
 	 *
 	 *	@param	Societe		$objsoc     third party object
-	 *	@param	Object		$objforref  contract object
-	 *	@return string      			Value if OK, 0 if KO
-	 */
-	public function contract_get_num($objsoc, $objforref)
-	{
-		// phpcs:enable
-		return $this->getNextValue($objsoc, $objforref);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return next value
-	 *
-	 *	@param	Societe		$objsoc     third party object
 	 *	@param	Object		$contract	contract object
 	 *	@return string      			Value if OK, 0 if KO
 	 */
@@ -166,13 +150,30 @@ class mod_contract_serpis extends ModelNumRefContracts
 		$date = $contract->date_contrat;
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_contract_serpis::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_contract_serpis::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return next value
+     *
+     * @param Societe $objsoc    third party object
+     * @param Object  $objforref contract object
+     *
+     * @return string                Value if OK, 0 if KO
+     */
+    public function contract_get_num($objsoc, $objforref)
+    {
+        // phpcs:enable
+        return $this->getNextValue($objsoc, $objforref);
+    }
 }

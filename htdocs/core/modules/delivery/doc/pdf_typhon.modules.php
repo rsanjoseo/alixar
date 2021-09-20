@@ -623,27 +623,126 @@ class pdf_typhon extends ModelePDFDeliveryOrder
 				return 1; // No error
 			} else {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		}
+                return 0;
+            }
+        }
 
-		$this->error = $langs->transnoentities("ErrorConstantNotDefined", "DELIVERY_OUTPUTDIR");
-		return 0;
-	}
+        $this->error = $langs->transnoentities("ErrorConstantNotDefined", "DELIVERY_OUTPUTDIR");
+        return 0;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *   Show miscellaneous information (payment mode, payment term, ...)
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Delivery  $object      Object to show
+     * @param int       $posy        Y
+     * @param Translate $outputlangs Langs object
+     *
+     * @return    void
+     */
+    protected function _tableau_info(&$pdf, $object, $posy, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf, $mysoc;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Delivery	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+        $pdf->SetFont('', '', $default_font_size);
+        $pdf->SetXY($this->marge_gauche, $posy);
+
+        $larg_sign = ($this->page_largeur - $this->marge_gauche - $this->marge_droite) / 3;
+        $pdf->Rect($this->marge_gauche, $posy + 1, $larg_sign, 25);
+        $pdf->SetXY($this->marge_gauche + 2, $posy + 2);
+        $pdf->MultiCell($larg_sign, 2, $outputlangs->trans("For") . ' ' . $outputlangs->convToOutputCharset($mysoc->name) . ":", '', 'L');
+
+        $pdf->Rect(2 * $larg_sign + $this->marge_gauche, $posy + 1, $larg_sign, 25);
+        $pdf->SetXY(2 * $larg_sign + $this->marge_gauche + 2, $posy + 2);
+        $pdf->MultiCell($larg_sign, 2, $outputlangs->trans("ForCustomer") . ':', '', 'L');
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y (not used)
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf, $mysoc;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        // Output Rec
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
+
+        if (empty($hidetop)) {
+            $pdf->line($this->marge_gauche, $tab_top + 10, $this->page_largeur - $this->marge_droite, $tab_top + 10);
+        }
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', '', $default_font_size - 1);
+
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxcomm - $this->posxdesc, 2, $outputlangs->transnoentities("Designation"), '', 'L');
+        }
+
+        // Modif SEB pour avoir une col en plus pour les commentaires clients
+        $pdf->line($this->posxcomm, $tab_top, $this->posxcomm, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxcomm, $tab_top + 1);
+            $pdf->MultiCell($this->posxqty - $this->posxcomm, 2, $outputlangs->transnoentities("Comments"), '', 'L');
+        }
+
+        // Qty
+        $pdf->line($this->posxqty, $tab_top, $this->posxqty, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxqty, $tab_top + 1);
+            $pdf->MultiCell($this->posxremainingqty - $this->posxqty, 2, $outputlangs->transnoentities("QtyShippedShort"), '', 'R');
+        }
+
+        // Remain to ship
+        $pdf->line($this->posxremainingqty, $tab_top, $this->posxremainingqty, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxremainingqty, $tab_top + 1);
+            $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxremainingqty, 2, $outputlangs->transnoentities("KeepToShipShort"), '', 'R');
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Delivery  $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $conf, $langs, $hookmanager;
 
@@ -810,74 +909,6 @@ class pdf_typhon extends ModelePDFDeliveryOrder
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y (not used)
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf, $mysoc;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		// Output Rec
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
-
-		if (empty($hidetop)) {
-			$pdf->line($this->marge_gauche, $tab_top + 10, $this->page_largeur - $this->marge_droite, $tab_top + 10);
-		}
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', '', $default_font_size - 1);
-
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxcomm - $this->posxdesc, 2, $outputlangs->transnoentities("Designation"), '', 'L');
-		}
-
-		// Modif SEB pour avoir une col en plus pour les commentaires clients
-		$pdf->line($this->posxcomm, $tab_top, $this->posxcomm, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxcomm, $tab_top + 1);
-			$pdf->MultiCell($this->posxqty - $this->posxcomm, 2, $outputlangs->transnoentities("Comments"), '', 'L');
-		}
-
-		// Qty
-		$pdf->line($this->posxqty, $tab_top, $this->posxqty, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxqty, $tab_top + 1);
-			$pdf->MultiCell($this->posxremainingqty - $this->posxqty, 2, $outputlangs->transnoentities("QtyShippedShort"), '', 'R');
-		}
-
-		// Remain to ship
-		$pdf->line($this->posxremainingqty, $tab_top, $this->posxremainingqty, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxremainingqty, $tab_top + 1);
-			$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxremainingqty, 2, $outputlangs->transnoentities("KeepToShipShort"), '', 'R');
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *  Show footer of page. Need this->emetteur object
 	 *
@@ -892,35 +923,5 @@ class pdf_typhon extends ModelePDFDeliveryOrder
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'DELIVERY_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show miscellaneous information (payment mode, payment term, ...)
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		Delivery	$object			Object to show
-	 *   @param		int			$posy			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @return	void
-	 */
-	protected function _tableau_info(&$pdf, $object, $posy, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf, $mysoc;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		$pdf->SetFont('', '', $default_font_size);
-		$pdf->SetXY($this->marge_gauche, $posy);
-
-		$larg_sign = ($this->page_largeur - $this->marge_gauche - $this->marge_droite) / 3;
-		$pdf->Rect($this->marge_gauche, $posy + 1, $larg_sign, 25);
-		$pdf->SetXY($this->marge_gauche + 2, $posy + 2);
-		$pdf->MultiCell($larg_sign, 2, $outputlangs->trans("For").' '.$outputlangs->convToOutputCharset($mysoc->name).":", '', 'L');
-
-		$pdf->Rect(2 * $larg_sign + $this->marge_gauche, $posy + 1, $larg_sign, 25);
-		$pdf->SetXY(2 * $larg_sign + $this->marge_gauche + 2, $posy + 2);
-		$pdf->MultiCell($larg_sign, 2, $outputlangs->trans("ForCustomer").':', '', 'L');
 	}
 }

@@ -615,26 +615,6 @@ class Menubase
 		return $this->newmenu;
 	}
 
-	/**
-	 *  Complete this->newmenu with menu entry found in $tab
-	 *
-	 *  @param  array	$tab			Tab array with all menu entries
-	 *  @param  int		$pere			Id of parent
-	 *  @param  int		$level			Level
-	 *  @return	void
-	 */
-	private function recur($tab, $pere, $level)
-	{
-		// Loop on tab array
-		$num = count($tab);
-		for ($x = 0; $x < $num; $x++) {
-			//si un element a pour pere : $pere
-			if ((($tab[$x]['fk_menu'] >= 0 && $tab[$x]['fk_menu'] == $pere)) && $tab[$x]['enabled']) {
-				$this->newmenu->add($tab[$x]['url'], $tab[$x]['titre'], ($level - 1), $tab[$x]['perms'], $tab[$x]['target'], $tab[$x]['mainmenu'], $tab[$x]['leftmenu'], 0, '', '', '', $tab[$x]['prefix']);
-				$this->recur($tab, $tab[$x]['rowid'], ($level + 1));
-			}
-		}
-	}
 
 	/**
 	 *  Load entries found in database into variable $tabMenu. Note that only "database menu entries" are loaded here, hardcoded will not be present into output.
@@ -760,14 +740,36 @@ class Menubase
 			}
 			$this->db->free($resql);
 
-			// Currently $tabMenu is sorted on position.
-			// If a child have a position lower that its parent, we can make a loop to fix this here, but we prefer to show a warning
-			// into the leftMenuCharger later to avoid useless operations.
+            // Currently $tabMenu is sorted on position.
+            // If a child have a position lower that its parent, we can make a loop to fix this here, but we prefer to show a warning
+            // into the leftMenuCharger later to avoid useless operations.
 
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     *  Complete this->newmenu with menu entry found in $tab
+     *
+     * @param array $tab   Tab array with all menu entries
+     * @param int   $pere  Id of parent
+     * @param int   $level Level
+     *
+     * @return    void
+     */
+    private function recur($tab, $pere, $level)
+    {
+        // Loop on tab array
+        $num = count($tab);
+        for ($x = 0; $x < $num; $x++) {
+            //si un element a pour pere : $pere
+            if ((($tab[$x]['fk_menu'] >= 0 && $tab[$x]['fk_menu'] == $pere)) && $tab[$x]['enabled']) {
+                $this->newmenu->add($tab[$x]['url'], $tab[$x]['titre'], ($level - 1), $tab[$x]['perms'], $tab[$x]['target'], $tab[$x]['mainmenu'], $tab[$x]['leftmenu'], 0, '', '', '', $tab[$x]['prefix']);
+                $this->recur($tab, $tab[$x]['rowid'], ($level + 1));
+            }
+        }
+    }
 }

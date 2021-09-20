@@ -28,19 +28,21 @@
  */
 class ExpeditionLineBatch extends CommonObject
 {
-private static $_table_element = 'expeditiondet_batch';
-	/**
-	 * @var string ID to identify managed object
-	 */
-	public $element = 'expeditionlignebatch'; //!< Name of table without prefix where object is stored
-	public $sellby;
-	public $eatby;
-	public $batch;
-	public $qty;
-	public $dluo_qty; // deprecated, use qty
-	public $entrepot_id;
-	public $fk_origin_stock;
-	public $fk_expeditiondet;
+    /**
+     * @var string ID to identify managed object
+     */
+    public $element = 'expeditionlignebatch';
+
+    private static $_table_element = 'expeditiondet_batch'; //!< Name of table without prefix where object is stored
+
+    public $sellby;
+    public $eatby;
+    public $batch;
+    public $qty;
+    public $dluo_qty; // deprecated, use qty
+    public $entrepot_id;
+    public $fk_origin_stock;
+    public $fk_expeditiondet;
 
 	/**
 	 *  Constructor
@@ -50,85 +52,6 @@ private static $_table_element = 'expeditiondet_batch';
 	public function __construct($db)
 	{
 		$this->db = $db;
-	}
-
-	/**
-	 * Delete batch record attach to a shipment
-	 *
-	 * @param	DoliDB	$db				Database object
-	 * @param	int		$id_expedition	rowid of shipment
-	 * @return 	int						-1 if KO, 1 if OK
-	 */
-	public static function deletefromexp($db, $id_expedition)
-	{
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX.self::$_table_element;
-		$sql .= " WHERE fk_expeditiondet in (SELECT rowid FROM ".MAIN_DB_PREFIX."expeditiondet WHERE fk_expedition=".((int) $id_expedition).")";
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-		if ($db->query($sql)) {
-			return 1;
-		} else {
-			return -1;
-		}
-	}
-
-	/**
-	 * Retrieve all batch number detailed information of a shipment line
-	 *
-	 * @param	DoliDB		$db					Database object
-	 * @param	int			$id_line_expdet		id of shipment line
-	 * @param	int			$fk_product			If provided, load also detailed information of lot
-	 * @return	int|array						-1 if KO, array of ExpeditionLineBatch if OK
-	 */
-	public static function fetchAll($db, $id_line_expdet, $fk_product = 0)
-	{
-		$sql = "SELECT";
-		$sql .= " eb.rowid,";
-		$sql .= " eb.fk_expeditiondet,";
-		$sql .= " eb.sellby as oldsellby,"; // deprecated
-		$sql .= " eb.eatby as oldeatby,"; // deprecated
-		$sql .= " eb.batch,";
-		$sql .= " eb.qty,";
-		$sql .= " eb.fk_origin_stock";
-		if ($fk_product > 0) {
-			$sql .= ", pl.sellby";
-			$sql .= ", pl.eatby";
-		}
-		$sql .= " FROM ".MAIN_DB_PREFIX.self::$_table_element." as eb";
-		if ($fk_product > 0) {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."product_lot as pl ON pl.batch = eb.batch AND pl.fk_product = ".((int) $fk_product);
-		}
-		$sql .= " WHERE fk_expeditiondet=".(int) $id_line_expdet;
-
-		dol_syslog(__METHOD__."", LOG_DEBUG);
-		$resql = $db->query($sql);
-		if ($resql) {
-			$num = $db->num_rows($resql);
-			$i = 0;
-			$ret = array();
-			while ($i < $num) {
-				$tmp = new self($db);
-
-				$obj = $db->fetch_object($resql);
-
-				$tmp->sellby = $db->jdate($obj->sellby ? $obj->sellby : $obj->oldsellby);
-				$tmp->eatby = $db->jdate($obj->eatby ? $obj->eatby : $obj->oldeatby);
-				$tmp->batch = $obj->batch;
-				$tmp->id = $obj->rowid;
-				$tmp->fk_origin_stock = $obj->fk_origin_stock;
-				$tmp->fk_expeditiondet = $obj->fk_expeditiondet;
-				$tmp->dluo_qty = $obj->qty; // dluo_qty deprecated, use qty
-				$tmp->qty = $obj->qty;
-
-				$ret[] = $tmp;
-				$i++;
-			}
-			$db->free($resql);
-			return $ret;
-		} else {
-			dol_print_error($db);
-			return -1;
-		}
 	}
 
 	/**
@@ -208,14 +131,95 @@ private static $_table_element = 'expeditiondet_batch';
 		if (!$error) {
 			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.self::$_table_element);
 			$this->fk_expeditiondet = $id_line_expdet;
-			return $this->id;
-		} else {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		}
-	}
+            return $this->id;
+        } else {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::create " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        }
+    }
+
+    /**
+     * Delete batch record attach to a shipment
+     *
+     * @param DoliDB $db            Database object
+     * @param int    $id_expedition rowid of shipment
+     *
+     * @return    int                        -1 if KO, 1 if OK
+     */
+    public static function deletefromexp($db, $id_expedition)
+    {
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . self::$_table_element;
+        $sql .= " WHERE fk_expeditiondet in (SELECT rowid FROM " . MAIN_DB_PREFIX . "expeditiondet WHERE fk_expedition=" . ((int) $id_expedition) . ")";
+
+        dol_syslog(__METHOD__, LOG_DEBUG);
+        if ($db->query($sql)) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Retrieve all batch number detailed information of a shipment line
+     *
+     * @param DoliDB $db             Database object
+     * @param int    $id_line_expdet id of shipment line
+     * @param int    $fk_product     If provided, load also detailed information of lot
+     *
+     * @return    int|array                        -1 if KO, array of ExpeditionLineBatch if OK
+     */
+    public static function fetchAll($db, $id_line_expdet, $fk_product = 0)
+    {
+        $sql = "SELECT";
+        $sql .= " eb.rowid,";
+        $sql .= " eb.fk_expeditiondet,";
+        $sql .= " eb.sellby as oldsellby,"; // deprecated
+        $sql .= " eb.eatby as oldeatby,"; // deprecated
+        $sql .= " eb.batch,";
+        $sql .= " eb.qty,";
+        $sql .= " eb.fk_origin_stock";
+        if ($fk_product > 0) {
+            $sql .= ", pl.sellby";
+            $sql .= ", pl.eatby";
+        }
+        $sql .= " FROM " . MAIN_DB_PREFIX . self::$_table_element . " as eb";
+        if ($fk_product > 0) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_lot as pl ON pl.batch = eb.batch AND pl.fk_product = " . ((int) $fk_product);
+        }
+        $sql .= " WHERE fk_expeditiondet=" . (int) $id_line_expdet;
+
+        dol_syslog(__METHOD__ . "", LOG_DEBUG);
+        $resql = $db->query($sql);
+        if ($resql) {
+            $num = $db->num_rows($resql);
+            $i = 0;
+            $ret = [];
+            while ($i < $num) {
+                $tmp = new self($db);
+
+                $obj = $db->fetch_object($resql);
+
+                $tmp->sellby = $db->jdate($obj->sellby ? $obj->sellby : $obj->oldsellby);
+                $tmp->eatby = $db->jdate($obj->eatby ? $obj->eatby : $obj->oldeatby);
+                $tmp->batch = $obj->batch;
+                $tmp->id = $obj->rowid;
+                $tmp->fk_origin_stock = $obj->fk_origin_stock;
+                $tmp->fk_expeditiondet = $obj->fk_expeditiondet;
+                $tmp->dluo_qty = $obj->qty; // dluo_qty deprecated, use qty
+                $tmp->qty = $obj->qty;
+
+                $ret[] = $tmp;
+                $i++;
+            }
+            $db->free($resql);
+            return $ret;
+        } else {
+            dol_print_error($db);
+            return -1;
+        }
+    }
 }

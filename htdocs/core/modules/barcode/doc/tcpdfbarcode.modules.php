@@ -96,68 +96,6 @@ class modTcpdfbarcode extends ModeleBarCode
 	}
 
 	/**
-	 *	get available output_modes for tcpdf class wth its translated description
-	 *
-	 * @param	string $dolEncodingType dolibarr barcode encoding type
-	 * @return	string tcpdf encoding type
-	 */
-	public function getTcpdfEncodingType($dolEncodingType)
-	{
-		$tcpdf1dEncodingTypes = array(
-						'C39' => 'C39',
-						'C39+' => 'C39+',
-						'C39E' => 'C39E',
-						'C39E+' => 'C39E+',
-						'S25' => 'S25',
-						'S25+' => 'S25+',
-						'I25' => 'I25',
-						'I25+' => 'I25+',
-						'C128' => 'C128',
-						'C128A' => 'C128A',
-						'C128B' => 'C128B',
-						'C128C' => 'C128C',
-						'EAN2' => 'EAN2',
-						'EAN5' => 'EAN5',
-						'EAN8' => 'EAN8',
-						'EAN13' => 'EAN13',
-						'ISBN' => 'EAN13',
-						'UPC' => 'UPCA',
-						'UPCE' => 'UPCE',
-						'MSI' => 'MSI',
-						'MSI+' => 'MSI+',
-						'POSTNET' => 'POSTNET',
-						'PLANET' => 'PLANET',
-						'RMS4CC' => 'RMS4CC',
-						'KIX' => 'KIX',
-						'IMB' => 'IMB',
-						'CODABAR' => 'CODABAR',
-						'CODE11' => 'CODE11',
-						'PHARMA' => 'PHARMA',
-						'PHARMA2T' => 'PHARMA2T'
-		);
-
-		$tcpdf2dEncodingTypes = array(
-						'DATAMATRIX' => 'DATAMATRIX',
-						'PDF417' => 'PDF417',
-						'QRCODE' => 'QRCODE,L',
-						'QRCODE,L' => 'QRCODE,L',
-						'QRCODE,M' => 'QRCODE,M',
-						'QRCODE,Q' => 'QRCODE,Q',
-						'QRCODE,H' => 'QRCODE,H'
-		);
-
-		if (array_key_exists($dolEncodingType, $tcpdf1dEncodingTypes)) {
-			$this->is2d = false;
-			return $tcpdf1dEncodingTypes[$dolEncodingType];
-		} elseif (array_key_exists($dolEncodingType, $tcpdf2dEncodingTypes)) {
-			$this->is2d = true;
-			return $tcpdf2dEncodingTypes[$dolEncodingType];
-		} else {
-			return '';
-		}
-	}
-
-	/**
 	 *	Return an image file on the fly (no need to write on disk)
 	 *
 	 *	@param	   string	    $code		      Value to encode
@@ -260,14 +198,77 @@ class modTcpdfbarcode extends ModeleBarCode
 				}
 				if (imagepng($imageData, $file)) {
 					return 1;
-				} else {
-					return -3;
-				}
-			} else {
-				return -4;
-			}
-		} else {
-			return -2;
-		}
-	}
+                } else {
+                    return -3;
+                }
+            } else {
+                return -4;
+            }
+        } else {
+            return -2;
+        }
+    }
+
+    /**
+     *    get available output_modes for tcpdf class wth its translated description
+     *
+     * @param string $dolEncodingType dolibarr barcode encoding type
+     *
+     * @return    string tcpdf encoding type
+     */
+    public function getTcpdfEncodingType($dolEncodingType)
+    {
+        $tcpdf1dEncodingTypes = [
+            'C39' => 'C39',
+            'C39+' => 'C39+',
+            'C39E' => 'C39E',
+            'C39E+' => 'C39E+',
+            'S25' => 'S25',
+            'S25+' => 'S25+',
+            'I25' => 'I25',
+            'I25+' => 'I25+',
+            'C128' => 'C128',
+            'C128A' => 'C128A',
+            'C128B' => 'C128B',
+            'C128C' => 'C128C',
+            'EAN2' => 'EAN2',
+            'EAN5' => 'EAN5',
+            'EAN8' => 'EAN8',
+            'EAN13' => 'EAN13',
+            'ISBN' => 'EAN13',
+            'UPC' => 'UPCA',
+            'UPCE' => 'UPCE',
+            'MSI' => 'MSI',
+            'MSI+' => 'MSI+',
+            'POSTNET' => 'POSTNET',
+            'PLANET' => 'PLANET',
+            'RMS4CC' => 'RMS4CC',
+            'KIX' => 'KIX',
+            'IMB' => 'IMB',
+            'CODABAR' => 'CODABAR',
+            'CODE11' => 'CODE11',
+            'PHARMA' => 'PHARMA',
+            'PHARMA2T' => 'PHARMA2T',
+        ];
+
+        $tcpdf2dEncodingTypes = [
+            'DATAMATRIX' => 'DATAMATRIX',
+            'PDF417' => 'PDF417',
+            'QRCODE' => 'QRCODE,L',
+            'QRCODE,L' => 'QRCODE,L',
+            'QRCODE,M' => 'QRCODE,M',
+            'QRCODE,Q' => 'QRCODE,Q',
+            'QRCODE,H' => 'QRCODE,H',
+        ];
+
+        if (array_key_exists($dolEncodingType, $tcpdf1dEncodingTypes)) {
+            $this->is2d = false;
+            return $tcpdf1dEncodingTypes[$dolEncodingType];
+        } elseif (array_key_exists($dolEncodingType, $tcpdf2dEncodingTypes)) {
+            $this->is2d = true;
+            return $tcpdf2dEncodingTypes[$dolEncodingType];
+        } else {
+            return '';
+        }
+    }
 }

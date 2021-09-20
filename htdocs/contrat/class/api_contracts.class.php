@@ -45,25 +45,55 @@ class Contracts extends DolibarrApi
 	 */
 	public $contract;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->contract = new Contrat($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->contract = new Contrat($this->db);
+    }
 
-	/**
-	 * List contracts
-	 *
-	 * Get a list of contracts
-	 *
-	 * @param string	       $sortfield	        Sort field
-	 * @param string	       $sortorder	        Sort order
-	 * @param int		       $limit		        Limit for list
-	 * @param int		       $page		        Page number
+    /**
+     * Get properties of a contract object
+     *
+     * Return an array with contract informations
+     *
+     * @param int $id ID of contract
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->contrat->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->contract->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Contract not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('contrat', $this->contract->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $this->contract->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->contract);
+    }
+
+    /**
+     * List contracts
+     *
+     * Get a list of contracts
+     *
+     * @param string           $sortfield             Sort field
+     * @param string           $sortorder             Sort order
+     * @param int              $limit                 Limit for list
+     * @param int              $page                  Page number
 	 * @param string   	       $thirdparty_ids	    Thirdparty ids to filter contracts of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string           $sqlfilters          Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
 	 * @return  array                               Array of contract objects
@@ -158,32 +188,6 @@ class Contracts extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->address);
-
-		unset($object->date_ouverture_prevue);
-		unset($object->date_ouverture);
-		unset($object->date_fin_validite);
-		unset($object->date_cloture);
-		unset($object->date_debut_prevue);
-		unset($object->date_debut_reel);
-		unset($object->date_fin_prevue);
-		unset($object->date_fin_reel);
-		unset($object->civility_id);
-
-		return $object;
-	}
-
-	/**
 	 * Create contract object
 	 *
 	 * @param   array   $request_data   Request data
@@ -212,25 +216,6 @@ class Contracts extends DolibarrApi
 		}
 
 		return $this->contract->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$contrat = array();
-		foreach (Contracts::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$contrat[$field] = $data[$field];
-		}
-		return $contrat;
 	}
 
 	/**
@@ -380,35 +365,6 @@ class Contracts extends DolibarrApi
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get properties of a contract object
-	 *
-	 * Return an array with contract informations
-	 *
-	 * @param       int         $id         ID of contract
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->contrat->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->contract->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Contract not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('contrat', $this->contract->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$this->contract->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->contract);
 	}
 
 	/**
@@ -596,10 +552,6 @@ class Contracts extends DolibarrApi
 		);
 	}
 
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Validate a contract
 	 *
@@ -681,14 +633,65 @@ class Contracts extends DolibarrApi
 			throw new RestException(304, 'Error nothing done. May be object is already close');
 		}
 		if ($result < 0) {
-			throw new RestException(500, 'Error when closing Contract: '.$this->contract->error);
-		}
+            throw new RestException(500, 'Error when closing Contract: ' . $this->contract->error);
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Contract closed (Ref='.$this->contract->ref.'). All services were closed.'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Contract closed (Ref=' . $this->contract->ref . '). All services were closed.',
+            ],
+        ];
+    }
+
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->address);
+
+        unset($object->date_ouverture_prevue);
+        unset($object->date_ouverture);
+        unset($object->date_fin_validite);
+        unset($object->date_cloture);
+        unset($object->date_debut_prevue);
+        unset($object->date_debut_reel);
+        unset($object->date_fin_prevue);
+        unset($object->date_fin_reel);
+        unset($object->civility_id);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $contrat = [];
+        foreach (Contracts::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $contrat[$field] = $data[$field];
+        }
+        return $contrat;
+    }
 }

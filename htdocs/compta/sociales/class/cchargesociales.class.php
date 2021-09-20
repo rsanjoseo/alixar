@@ -70,28 +70,171 @@ class Cchargesociales
 	public $module;
 	public $accountancy_code;
 
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * Create object into database
+     *
+     * @param User $user      User that creates
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = false)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-	/**
-	 * Update object into database
-	 *
-	 * @param  User $user      User that modifies
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, >0 if OK
-	 */
-	public function update(User $user, $notrigger = false)
-	{
-		$error = 0;
+        $error = 0;
+
+        // Clean parameters
+        $this->trimParameters(
+            [
+                'libelle',
+                'deductible',
+                'active',
+                'code',
+                'fk_pays',
+                'module',
+                'accountancy_code',
+            ]
+        );
+
+        // Check parameters
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
+        $sql .= 'libelle,';
+        $sql .= 'deductible,';
+        $sql .= 'active,';
+        $sql .= 'code,';
+        $sql .= 'fk_pays,';
+        $sql .= 'module';
+        $sql .= 'accountancy_code';
+        $sql .= ') VALUES (';
+        $sql .= ' ' . (!isset($this->libelle) ? 'NULL' : "'" . $this->db->escape($this->libelle) . "'") . ',';
+        $sql .= ' ' . (!isset($this->deductible) ? 'NULL' : $this->deductible) . ',';
+        $sql .= ' ' . (!isset($this->active) ? 'NULL' : $this->active) . ',';
+        $sql .= ' ' . (!isset($this->code) ? 'NULL' : "'" . $this->db->escape($this->code) . "'") . ',';
+        $sql .= ' ' . (!isset($this->fk_pays) ? 'NULL' : $this->fk_pays) . ',';
+        $sql .= ' ' . (!isset($this->module) ? 'NULL' : "'" . $this->db->escape($this->module) . "'") . ',';
+        $sql .= ' ' . (!isset($this->accountancy_code) ? 'NULL' : "'" . $this->db->escape($this->accountancy_code) . "'");
+        $sql .= ')';
+
+        $this->db->begin();
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
+
+            //if (!$notrigger) {
+            // Uncomment this and change MYOBJECT to your own tag if you
+            // want this action to call a trigger.
+
+            //// Call triggers
+            //$result=$this->call_trigger('MYOBJECT_CREATE',$user);
+            //if ($result < 0) $error++;
+            //// End call triggers
+            //}
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+
+            return $this->id;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int    $id  Id object
+     * @param string $ref Ref
+     *
+     * @return int <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id, $ref = null)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $sql = 'SELECT';
+        $sql .= " t.id,";
+        $sql .= " t.libelle as label,";
+        $sql .= " t.deductible,";
+        $sql .= " t.active,";
+        $sql .= " t.code,";
+        $sql .= " t.fk_pays,";
+        $sql .= " t.module,";
+        $sql .= " t.accountancy_code";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        if (null !== $ref) {
+            $sql .= " WHERE t.code = '" . $this->db->escape($ref) . "'";
+        } else {
+            $sql .= ' WHERE t.id = ' . ((int) $id);
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $numrows = $this->db->num_rows($resql);
+            if ($numrows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->id;
+
+                $this->libelle = $obj->label;
+                $this->label = $obj->label;
+                $this->deductible = $obj->deductible;
+                $this->active = $obj->active;
+                $this->code = $obj->code;
+                $this->fk_pays = $obj->fk_pays;
+                $this->module = $obj->module;
+                $this->accountancy_code = $obj->accountancy_code;
+            }
+            $this->db->free($resql);
+
+            if ($numrows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+
+            return -1;
+        }
+    }
+
+    /**
+     * Update object into database
+     *
+     * @param User $user      User that modifies
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, >0 if OK
+     */
+    public function update(User $user, $notrigger = false)
+    {
+        $error = 0;
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -152,21 +295,6 @@ class Cchargesociales
 			$this->db->commit();
 
 			return 1;
-		}
-	}
-
-	/**
-	 * Trim object parameters
-	 *
-	 * @param string[] $parameters array of parameters to trim
-	 * @return void
-	 */
-	private function trimParameters($parameters)
-	{
-		foreach ($parameters as $parameter) {
-			if (isset($this->$parameter)) {
-				$this->$parameter = trim($this->$parameter);
-			}
 		}
 	}
 
@@ -272,150 +400,6 @@ class Cchargesociales
 	}
 
 	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id  Id object
-	 * @param string $ref Ref
-	 *
-	 * @return int <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = null)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql = 'SELECT';
-		$sql .= " t.id,";
-		$sql .= " t.libelle as label,";
-		$sql .= " t.deductible,";
-		$sql .= " t.active,";
-		$sql .= " t.code,";
-		$sql .= " t.fk_pays,";
-		$sql .= " t.module,";
-		$sql .= " t.accountancy_code";
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (null !== $ref) {
-			$sql .= " WHERE t.code = '".$this->db->escape($ref)."'";
-		} else {
-			$sql .= ' WHERE t.id = '.((int) $id);
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numrows = $this->db->num_rows($resql);
-			if ($numrows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->id;
-
-				$this->libelle = $obj->label;
-				$this->label = $obj->label;
-				$this->deductible = $obj->deductible;
-				$this->active = $obj->active;
-				$this->code = $obj->code;
-				$this->fk_pays = $obj->fk_pays;
-				$this->module = $obj->module;
-				$this->accountancy_code = $obj->accountancy_code;
-			}
-			$this->db->free($resql);
-
-			if ($numrows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$error = 0;
-
-		// Clean parameters
-		$this->trimParameters(
-			array(
-				'libelle',
-				'deductible',
-				'active',
-				'code',
-				'fk_pays',
-				'module',
-				'accountancy_code',
-			)
-		);
-
-		// Check parameters
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element.'(';
-		$sql .= 'libelle,';
-		$sql .= 'deductible,';
-		$sql .= 'active,';
-		$sql .= 'code,';
-		$sql .= 'fk_pays,';
-		$sql .= 'module';
-		$sql .= 'accountancy_code';
-		$sql .= ') VALUES (';
-		$sql .= ' '.(!isset($this->libelle) ? 'NULL' : "'".$this->db->escape($this->libelle)."'").',';
-		$sql .= ' '.(!isset($this->deductible) ? 'NULL' : $this->deductible).',';
-		$sql .= ' '.(!isset($this->active) ? 'NULL' : $this->active).',';
-		$sql .= ' '.(!isset($this->code) ? 'NULL' : "'".$this->db->escape($this->code)."'").',';
-		$sql .= ' '.(!isset($this->fk_pays) ? 'NULL' : $this->fk_pays).',';
-		$sql .= ' '.(!isset($this->module) ? 'NULL' : "'".$this->db->escape($this->module)."'").',';
-		$sql .= ' '.(!isset($this->accountancy_code) ? 'NULL' : "'".$this->db->escape($this->accountancy_code)."'");
-		$sql .= ')';
-
-		$this->db->begin();
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
-
-			//if (!$notrigger) {
-				// Uncomment this and change MYOBJECT to your own tag if you
-				// want this action to call a trigger.
-
-				//// Call triggers
-				//$result=$this->call_trigger('MYOBJECT_CREATE',$user);
-				//if ($result < 0) $error++;
-				//// End call triggers
-			//}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-
-			return $this->id;
-		}
-	}
-
-	/**
 	 *  Return a link to the user card (with optionaly the picto)
 	 * 	Use this->id,this->lastname, this->firstname
 	 *
@@ -455,8 +439,6 @@ class Cchargesociales
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Retourne le libelle du status d'un user (actif, inactif)
 	 *
@@ -468,13 +450,15 @@ class Cchargesociales
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	/**
-	 *  Renvoi le libelle d'un status donne
-	 *
-	 *  @param	int		$status        	Id status
-	 *  @param  int		$mode          	0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
-	 *  @return string 			       	Label of status
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoi le libelle d'un status donne
+     *
+     *  @param	int		$status        	Id status
+     *  @param  int		$mode          	0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
+     *  @return string 			       	Label of status
+     */
 	public function LibStatut($status, $mode = 0)
 	{
 		// phpcs:enable
@@ -519,6 +503,7 @@ class Cchargesociales
 		}
 	}
 
+
 	/**
 	 * Initialise object with example values
 	 * Id must be 0 if object instance is a specimen
@@ -530,12 +515,28 @@ class Cchargesociales
 		$this->id = 0;
 
 		$this->libelle = '';
-		$this->label = '';
-		$this->deductible = '';
-		$this->active = '';
-		$this->code = '';
-		$this->fk_pays = '';
-		$this->module = '';
-		$this->accountancy_code = '';
-	}
+        $this->label = '';
+        $this->deductible = '';
+        $this->active = '';
+        $this->code = '';
+        $this->fk_pays = '';
+        $this->module = '';
+        $this->accountancy_code = '';
+    }
+
+    /**
+     * Trim object parameters
+     *
+     * @param string[] $parameters array of parameters to trim
+     *
+     * @return void
+     */
+    private function trimParameters($parameters)
+    {
+        foreach ($parameters as $parameter) {
+            if (isset($this->$parameter)) {
+                $this->$parameter = trim($this->$parameter);
+            }
+        }
+    }
 }

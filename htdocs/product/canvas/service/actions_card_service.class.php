@@ -201,28 +201,79 @@ class ActionsCardService
 			} elseif ($this->object->duration_value > 0) {
 				$dur = array("h"=>$langs->trans("Hour"), "d"=>$langs->trans("Day"), "w"=>$langs->trans("Week"), "m"=>$langs->trans("Month"), "y"=>$langs->trans("Year"));
 			}
-			$this->tpl['duration_unit'] = $langs->trans($dur[$this->object->duration_unit]);
+            $this->tpl['duration_unit'] = $langs->trans($dur[$this->object->duration_unit]);
 
-			$this->tpl['fiche_end'] = dol_get_fiche_end();
-		}
+            $this->tpl['fiche_end'] = dol_get_fiche_end();
+        }
 
-		if ($action == 'list') {
-			$this->LoadListDatas($limit, $offset, $sortfield, $sortorder);
-		}
-	}
+        if ($action == 'list') {
+            $this->LoadListDatas($limit, $offset, $sortfield, $sortorder);
+        }
+    }
 
-	/**
-	 * 	Fetch datas list and save into ->list_datas
-	 *
-	 *  @param	int		$limit		Limit number of responses
-	 *  @param	int		$offset		Offset for first response
-	 *  @param	string	$sortfield	Sort field
-	 *  @param	string	$sortorder	Sort order ('ASC' or 'DESC')
-	 *  @return	void
-	 */
-	public function LoadListDatas($limit, $offset, $sortfield, $sortorder)
-	{
-		// phpcs:enable
+    /**
+     *    Fetch field list
+     *
+     * @return    void
+     */
+    private function getFieldListCanvas()
+    {
+        global $conf, $langs;
+
+        $this->field_list = [];
+
+        $sql = "SELECT rowid, name, alias, title, align, sort, search, visible, enabled, rang";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_field_list";
+        $sql .= " WHERE element = '" . $this->db->escape($this->fieldListName) . "'";
+        $sql .= " AND entity = " . $conf->entity;
+        $sql .= " ORDER BY rang ASC";
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+
+            $i = 0;
+            while ($i < $num) {
+                $fieldlist = [];
+
+                $obj = $this->db->fetch_object($resql);
+
+                $fieldlist["id"] = $obj->rowid;
+                $fieldlist["name"] = $obj->name;
+                $fieldlist["alias"] = $obj->alias;
+                $fieldlist["title"] = $langs->trans($obj->title);
+                $fieldlist["align"] = $obj->align;
+                $fieldlist["sort"] = $obj->sort;
+                $fieldlist["search"] = $obj->search;
+                $fieldlist["visible"] = $obj->visible;
+                $fieldlist["enabled"] = verifCond($obj->enabled);
+                $fieldlist["order"] = $obj->rang;
+
+                array_push($this->field_list, $fieldlist);
+
+                $i++;
+            }
+            $this->db->free($resql);
+        } else {
+            dol_print_error($this->db, $sql);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Fetch datas list and save into ->list_datas
+     *
+     * @param int    $limit     Limit number of responses
+     * @param int    $offset    Offset for first response
+     * @param string $sortfield Sort field
+     * @param string $sortorder Sort order ('ASC' or 'DESC')
+     *
+     * @return    void
+     */
+    public function LoadListDatas($limit, $offset, $sortfield, $sortorder)
+    {
+        // phpcs:enable
 		global $conf;
 		global $search_categ, $sall, $sref, $search_barcode, $snom, $catid;
 
@@ -299,56 +350,6 @@ class ActionsCardService
 			$this->db->free($resql);
 		} else {
 			print $sql;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	Fetch field list
-	 *
-	 *  @return	void
-	 */
-	private function getFieldListCanvas()
-	{
-		global $conf, $langs;
-
-		$this->field_list = array();
-
-		$sql = "SELECT rowid, name, alias, title, align, sort, search, visible, enabled, rang";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_field_list";
-		$sql .= " WHERE element = '".$this->db->escape($this->fieldListName)."'";
-		$sql .= " AND entity = ".$conf->entity;
-		$sql .= " ORDER BY rang ASC";
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-
-			$i = 0;
-			while ($i < $num) {
-				$fieldlist = array();
-
-				$obj = $this->db->fetch_object($resql);
-
-				$fieldlist["id"] = $obj->rowid;
-				$fieldlist["name"] = $obj->name;
-				$fieldlist["alias"]		= $obj->alias;
-				$fieldlist["title"]		= $langs->trans($obj->title);
-				$fieldlist["align"]		= $obj->align;
-				$fieldlist["sort"] = $obj->sort;
-				$fieldlist["search"]	= $obj->search;
-				$fieldlist["visible"]	= $obj->visible;
-				$fieldlist["enabled"]	= verifCond($obj->enabled);
-				$fieldlist["order"]		= $obj->rang;
-
-				array_push($this->field_list, $fieldlist);
-
-				$i++;
-			}
-			$this->db->free($resql);
-		} else {
-			dol_print_error($this->db, $sql);
 		}
 	}
 }

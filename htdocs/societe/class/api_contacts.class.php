@@ -47,25 +47,69 @@ class Contacts extends DolibarrApi
 	 * Constructor
 	 */
 	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
+    {
+        global $db, $conf;
+        $this->db = $db;
 
-		require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
-		$this->contact = new Contact($this->db);
-	}
+        $this->contact = new Contact($this->db);
+    }
 
-	/**
-	 * Get properties of a contact object by Email
-	 *
-	 * @param 	string 	$email 					Email of contact
-	 * @param   int    $includecount        Count and return also number of elements the contact is used as a link for
-	 * @param   int    $includeroles        Includes roles of the contact
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET email/{email}
+    /**
+     * Get properties of a contact object
+     *
+     * Return an array with contact informations
+     *
+     * @param int $id           ID of contact
+     * @param int $includecount Count and return also number of elements the contact is used as a link for
+     * @param int $includeroles Includes roles of the contact
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id, $includecount = 0, $includeroles = 0)
+    {
+        if (!DolibarrApiAccess::$user->rights->societe->contact->lire) {
+            throw new RestException(401, 'No permission to read contacts');
+        }
+
+        if ($id === 0) {
+            $result = $this->contact->initAsSpecimen();
+        } else {
+            $result = $this->contact->fetch($id);
+        }
+
+        if (!$result) {
+            throw new RestException(404, 'Contact not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('contact', $this->contact->id, 'socpeople&societe')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if ($includecount) {
+            $this->contact->load_ref_elements();
+        }
+
+        if ($includeroles) {
+            $this->contact->fetchRoles();
+        }
+
+        return $this->_cleanObjectDatas($this->contact);
+    }
+
+    /**
+     * Get properties of a contact object by Email
+     *
+     * @param string $email        Email of contact
+     * @param int    $includecount Count and return also number of elements the contact is used as a link for
+     * @param int    $includeroles Includes roles of the contact
+     * @return    array|mixed data without useless information
+     *
+     * @url GET email/{email}
 	 *
 	 * @throws RestException 401     Insufficient rights
 	 * @throws RestException 404     User or group not found
@@ -99,30 +143,6 @@ class Contacts extends DolibarrApi
 		}
 
 		return $this->_cleanObjectDatas($this->contact);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-
-		unset($object->note);
-		unset($object->lines);
-		unset($object->thirdparty);
-
-		return $object;
 	}
 
 	/**
@@ -269,26 +289,6 @@ class Contacts extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array|null     $data   Data to validate
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$contact = array();
-		foreach (Contacts::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$contact[$field] = $data[$field];
-		}
-
-		return $contact;
-	}
-
-	/**
 	 * Update contact
 	 *
 	 * @param int   $id             Id of contact to update
@@ -322,49 +322,6 @@ class Contacts extends DolibarrApi
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get properties of a contact object
-	 *
-	 * Return an array with contact informations
-	 *
-	 * @param 	int    $id                  ID of contact
-	 * @param   int    $includecount        Count and return also number of elements the contact is used as a link for
-	 * @param   int    $includeroles        Includes roles of the contact
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id, $includecount = 0, $includeroles = 0)
-	{
-		if (!DolibarrApiAccess::$user->rights->societe->contact->lire) {
-			throw new RestException(401, 'No permission to read contacts');
-		}
-
-		if ($id === 0) {
-			$result = $this->contact->initAsSpecimen();
-		} else {
-			$result = $this->contact->fetch($id);
-		}
-
-		if (!$result) {
-			throw new RestException(404, 'Contact not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('contact', $this->contact->id, 'socpeople&societe')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if ($includecount) {
-			$this->contact->load_ref_elements();
-		}
-
-		if ($includeroles) {
-			$this->contact->fetchRoles();
-		}
-
-		return $this->_cleanObjectDatas($this->contact);
 	}
 
 	/**
@@ -477,8 +434,6 @@ class Contacts extends DolibarrApi
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Add a category to a contact
 	 *
@@ -549,14 +504,62 @@ class Contacts extends DolibarrApi
 		}
 
 		if (!DolibarrApi::_checkAccessToResource('contact', $this->contact->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-		if (!DolibarrApi::_checkAccessToResource('category', $category->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+        if (!DolibarrApi::_checkAccessToResource('category', $category->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
 
-		$category->del_type($this->contact, 'contact');
+        $category->del_type($this->contact, 'contact');
 
-		return $this->_cleanObjectDatas($this->contact);
-	}
+        return $this->_cleanObjectDatas($this->contact);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+
+        unset($object->note);
+        unset($object->lines);
+        unset($object->thirdparty);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $contact = [];
+        foreach (Contacts::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $contact[$field] = $data[$field];
+        }
+
+        return $contact;
+    }
 }

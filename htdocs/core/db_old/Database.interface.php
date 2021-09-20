@@ -26,17 +26,6 @@
 interface Database
 {
 	/**
-	 *  Convert a SQL request in Mysql syntax to native syntax
-	 *
-	 * @param   string $line SQL request line to convert
-	 * @param   string $type Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
-	 * @return  string        SQL request line converted
-	 */
-	public static function convertSQLFromMysql($line, $type = 'ddl');
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 * Format a SQL IF
 	 *
 	 * @param   string $test Test string (example: 'cd.statut=0', 'field IS NULL')
@@ -45,8 +34,8 @@ interface Database
 	 * @return	string                SQL string
 	 */
 	public function ifsql($test, $resok, $resko);
-	// phpcs:enable
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return datas as an array
 	 *
@@ -54,6 +43,7 @@ interface Database
 	 * @return  array                    Array
 	 */
 	public function fetch_row($resultset);
+    // phpcs:enable
 
 	/**
 	 * Convert (by PHP) a GM Timestamp date into a string date with PHP server TZ to insert into a date field.
@@ -71,16 +61,14 @@ interface Database
 	 */
 	public function lasterrno();
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Start transaction
 	 *
 	 * @return  int         1 if transaction successfuly opened or already opened, 0 if error
 	 */
 	public function begin();
-	// phpcs:enable
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Create a new database
 	 * Do not use function xxx_create_db (xxx=mysql, ...) as they are deprecated
@@ -92,25 +80,37 @@ interface Database
 	 * @param   string 		$owner 			Username of database owner
 	 * @return  resource                	resource defined if OK, null if KO
 	 */
-	public function DDLCreateDb($database, $charset = '', $collation = '', $owner = '');
+    public function DDLCreateDb($database, $charset = '', $collation = '', $owner = '');
+    // phpcs:enable
 
-	/**
-	 * Return version of database server into an array
-	 *
-	 * @return	array        Version array
-	 */
-	public function getVersionArray();
+    /**
+     * Return version of database server into an array
+     *
+     * @return    array        Version array
+     */
+    public function getVersionArray();
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Convert a SQL request in Mysql syntax to native syntax
+     *
+     * @param string $line SQL request line to convert
+     * @param string $type Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
+     *
+     * @return  string        SQL request line converted
+     */
+    public static function convertSQLFromMysql($line, $type = 'ddl');
 
-	/**
-	 * Return the number of lines in the result of a request INSERT, DELETE or UPDATE
-	 *
-	 * @param   resource $resultset Cursor of the desired request
-	 * @return 	int            Number of lines
-	 * @see    	num_rows()
-	 */
-	public function affected_rows($resultset);
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return the number of lines in the result of a request INSERT, DELETE or UPDATE
+     *
+     * @param resource $resultset Cursor of the desired request
+     *
+     * @return    int            Number of lines
+     * @see        num_rows()
+     */
+    public function affected_rows($resultset);
 	// phpcs:enable
 
 	/**

@@ -34,56 +34,65 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Tva extends CommonObject
 {
-	const STATUS_UNPAID = 0;
-	const STATUS_PAID = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'tva';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'tva';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'payment';
+
 	public $tms;
 	public $datep;
 	public $datev;
 	public $amount;
 	public $type_payment;
 	public $num_payment;
+
 	/**
 	 * @var string label
 	 */
 	public $label;
+
 	/**
 	 * @var int ID
 	 */
 	public $fk_bank;
-	/**
+
+    /**
 	 * @var int accountid
 	 */
 	public $accountid;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_creat;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_modif;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * @var int ID
+     */
+    public $fk_user_creat;
+
+    /**
+     * @var int ID
+     */
+    public $fk_user_modif;
+
+    const STATUS_UNPAID = 0;
+    const STATUS_PAID = 1;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
 
 	/**
@@ -408,29 +417,29 @@ class Tva extends CommonObject
 
     // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * 	Total of the VAT payed
-	 *
-	 *	@param	int		$year		Year
-	 *	@return	double				Amount
-	 */
-	public function tva_sum_reglee($year = 0)
-	{
+    /**
+     *    Total of the VAT from invoices emitted by the thirdparty.
+     *
+     * @param int $year Year
+     *
+     * @return    double                Amount
+     */
+    public function tva_sum_collectee($year = 0)
+    {
         // phpcs:enable
 
-		$sql = "SELECT sum(f.amount) as amount";
-		$sql .= " FROM ".MAIN_DB_PREFIX."tva as f";
+        $sql = "SELECT sum(f.total_tva) as amount";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "facture as f WHERE f.paye = 1";
+        if ($year) {
+            $sql .= " AND f.datef >= '" . $this->db->escape($year) . "-01-01' AND f.datef <= '" . $this->db->escape($year) . "-12-31' ";
+        }
 
-		if ($year) {
-			$sql .= " WHERE f.datev >= '".$this->db->escape($year)."-01-01' AND f.datev <= '".$this->db->escape($year)."-12-31' ";
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj = $this->db->fetch_object($result);
-				$ret = $obj->amount;
-				$this->db->free($result);
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result)) {
+                $obj = $this->db->fetch_object($result);
+                $ret = $obj->amount;
+                $this->db->free($result);
 				return $ret;
 			} else {
 				$this->db->free($result);
@@ -443,7 +452,6 @@ class Tva extends CommonObject
 	}
 
     // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	VAT payed
 	 *
@@ -480,27 +488,28 @@ class Tva extends CommonObject
 
     // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * 	Total of the VAT from invoices emitted by the thirdparty.
-	 *
-	 *	@param	int		$year		Year
-	 *  @return	double				Amount
-	 */
-	public function tva_sum_collectee($year = 0)
-	{
+    /**
+     *    Total of the VAT payed
+     *
+     * @param int $year Year
+     * @return    double                Amount
+     */
+    public function tva_sum_reglee($year = 0)
+    {
         // phpcs:enable
 
-		$sql = "SELECT sum(f.total_tva) as amount";
-		$sql .= " FROM ".MAIN_DB_PREFIX."facture as f WHERE f.paye = 1";
-		if ($year) {
-			$sql .= " AND f.datef >= '".$this->db->escape($year)."-01-01' AND f.datef <= '".$this->db->escape($year)."-12-31' ";
-		}
+        $sql = "SELECT sum(f.amount) as amount";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "tva as f";
 
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj = $this->db->fetch_object($result);
-				$ret = $obj->amount;
+        if ($year) {
+            $sql .= " WHERE f.datev >= '" . $this->db->escape($year) . "-01-01' AND f.datev <= '" . $this->db->escape($year) . "-12-31' ";
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result)) {
+                $obj = $this->db->fetch_object($result);
+                $ret = $obj->amount;
 				$this->db->free($result);
 				return $ret;
 			} else {
@@ -511,7 +520,8 @@ class Tva extends CommonObject
 			print $this->db->lasterror();
 			return -1;
 		}
-	}
+    }
+
 
 	/**
 	 *  Create in database

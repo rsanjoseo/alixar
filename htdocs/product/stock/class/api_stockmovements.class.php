@@ -138,26 +138,149 @@ class StockMovements extends DolibarrApi
 					$obj_ret[] = $this->_cleanObjectDatas($stockmovement_static);
 				}
 				$i++;
-			}
-		} else {
-			throw new RestException(503, 'Error when retrieve stock movement list : '.$this->db->lasterror());
-		}
-		if (!count($obj_ret)) {
-			throw new RestException(404, 'No stock movement found');
-		}
-		return $obj_ret;
-	}
+            }
+        } else {
+            throw new RestException(503, 'Error when retrieve stock movement list : ' . $this->db->lasterror());
+        }
+        if (!count($obj_ret)) {
+            throw new RestException(404, 'No stock movement found');
+        }
+        return $obj_ret;
+    }
 
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   MouvementStock $object     Object to clean
-	 * @return  Object                     Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
+    /**
+     * Create stock movement object.
+     * You can use the following message to test this RES API:
+     * { "product_id": 1, "warehouse_id": 1, "qty": 1, "lot": "", "movementcode": "INV123", "movementlabel": "Inventory 123", "price": 0 }
+     * $price Can be set to update AWP (Average Weighted Price) when you make a stock increase
+     * $dlc Eat-by date. Will be used if lot does not exists yet and will be created.
+     * $dluo Sell-by date. Will be used if lot does not exists yet and will be created.
+     *
+     * @param int    $product_id    Id product id {@min 1} {@from body} {@required true}
+     * @param int    $warehouse_id  Id warehouse {@min 1} {@from body} {@required true}
+     * @param float  $qty           Qty to add (Use negative value for a stock decrease) {@from body} {@required true}
+     * @param string $lot           Lot {@from body}
+     * @param string $movementcode  Movement code {@example INV123} {@from body}
+     * @param string $movementlabel Movement label {@example Inventory number 123} {@from body}
+     * @param string $price         To update AWP (Average Weighted Price) when you make a stock increase (qty must be higher then 0). {@from body}
+     * @param string $dlc           Eat-by date. {@from body} {@type date}
+     * @param string $dluo          Sell-by date. {@from body} {@type date}
+     *
+     * @return  int                         ID of stock movement
+     * @throws RestException
+     */
+    public function post($product_id, $warehouse_id, $qty, $lot = '', $movementcode = '', $movementlabel = '', $price = '', $dlc = '', $dluo = '')
+    {
+        if (!DolibarrApiAccess::$user->rights->stock->creer) {
+            throw new RestException(401);
+        }
+
+        if ($qty == 0) {
+            throw new RestException(503, "Making a stock movement with a quantity of 0 is not possible");
+        }
+
+        // Type increase or decrease
+        $type = 2;
+        if ($qty >= 0) {
+            $type = 3;
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+        $eatBy = empty($dluo) ? '' : dol_stringtotime($dluo);
+        $sellBy = empty($dlc) ? '' : dol_stringtotime($dlc);
+
+        if ($this->stockmovement->_create(DolibarrApiAccess::$user, $product_id, $warehouse_id, $qty, $type, $price, $movementlabel, $movementcode, '', $eatBy, $sellBy, $lot) <= 0) {
+            $errormessage = $this->stockmovement->error;
+            if (empty($errormessage)) {
+                $errormessage = join(',', $this->stockmovement->errors);
+            }
+            throw new RestException(503, 'Error when create stock movement : ' . $errormessage);
+        }
+
+        return $this->stockmovement->id;
+    }
+
+    /**
+     * Update stock movement
+     *
+     * @param int   $id           Id of warehouse to update
+     * @param array $request_data Datas
+     *
+     * @return int
+     */
+    /*
+    public function put($id, $request_data = null)
+    {
+        if(! DolibarrApiAccess::$user->rights->stock->creer) {
+            throw new RestException(401);
+        }
+
+        $result = $this->stockmovement->fetch($id);
+        if( ! $result ) {
+            throw new RestException(404, 'stock movement not found');
+        }
+
+        if( ! DolibarrApi::_checkAccessToResource('stock',$this->stockmovement->id)) {
+            throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+        }
+
+        foreach($request_data as $field => $value) {
+            if ($field == 'id') continue;
+            $this->stockmovement->$field = $value;
+        }
+
+        if($this->stockmovement->update($id, DolibarrApiAccess::$user))
+            return $this->get ($id);
+
+        return false;
+    }*/
+
+    /**
+     * Delete stock movement
+     *
+     * @param int $id Stock movement ID
+     *
+     * @return array
+     */
+    /*
+    public function delete($id)
+    {
+        if(! DolibarrApiAccess::$user->rights->stock->supprimer) {
+            throw new RestException(401);
+        }
+        $result = $this->stockmovement->fetch($id);
+        if( ! $result ) {
+            throw new RestException(404, 'stock movement not found');
+        }
+
+        if( ! DolibarrApi::_checkAccessToResource('stock',$this->stockmovement->id)) {
+            throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
+        }
+
+        if (! $this->stockmovement->delete(DolibarrApiAccess::$user)) {
+            throw new RestException(401,'error when delete stock movement');
+        }
+
+        return array(
+            'success' => array(
+                'code' => 200,
+                'message' => 'Warehouse deleted'
+            )
+        );
+    }*/
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     * Clean sensible object datas
+     *
+     * @param MouvementStock $object Object to clean
+     *
+     * @return  Object                     Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
 
 		// Remove useless data
 		unset($object->civility_id);
@@ -202,129 +325,6 @@ class StockMovements extends DolibarrApi
 		//unset($object->sellby);       Filled correctly in read mode
 
 		return $object;
-	}
-
-	/**
-	 * Update stock movement
-	 *
-	 * @param int   $id             Id of warehouse to update
-	 * @param array $request_data   Datas
-	 * @return int
-	 */
-	/*
-	public function put($id, $request_data = null)
-	{
-		if(! DolibarrApiAccess::$user->rights->stock->creer) {
-			throw new RestException(401);
-		}
-
-		$result = $this->stockmovement->fetch($id);
-		if( ! $result ) {
-			throw new RestException(404, 'stock movement not found');
-		}
-
-		if( ! DolibarrApi::_checkAccessToResource('stock',$this->stockmovement->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		foreach($request_data as $field => $value) {
-			if ($field == 'id') continue;
-			$this->stockmovement->$field = $value;
-		}
-
-		if($this->stockmovement->update($id, DolibarrApiAccess::$user))
-			return $this->get ($id);
-
-		return false;
-	}*/
-
-	/**
-	 * Delete stock movement
-	 *
-	 * @param int $id   Stock movement ID
-	 * @return array
-	 */
-	/*
-	public function delete($id)
-	{
-		if(! DolibarrApiAccess::$user->rights->stock->supprimer) {
-			throw new RestException(401);
-		}
-		$result = $this->stockmovement->fetch($id);
-		if( ! $result ) {
-			throw new RestException(404, 'stock movement not found');
-		}
-
-		if( ! DolibarrApi::_checkAccessToResource('stock',$this->stockmovement->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if (! $this->stockmovement->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(401,'error when delete stock movement');
-		}
-
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Warehouse deleted'
-			)
-		);
-	}*/
-
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Create stock movement object.
-	 * You can use the following message to test this RES API:
-	 * { "product_id": 1, "warehouse_id": 1, "qty": 1, "lot": "", "movementcode": "INV123", "movementlabel": "Inventory 123", "price": 0 }
-	 * $price Can be set to update AWP (Average Weighted Price) when you make a stock increase
-	 * $dlc Eat-by date. Will be used if lot does not exists yet and will be created.
-	 * $dluo Sell-by date. Will be used if lot does not exists yet and will be created.
-	 *
-	 * @param int $product_id Id product id {@min 1} {@from body} {@required true}
-	 * @param int $warehouse_id Id warehouse {@min 1} {@from body} {@required true}
-	 * @param float $qty Qty to add (Use negative value for a stock decrease) {@from body} {@required true}
-	 * @param string $lot Lot {@from body}
-	 * @param string $movementcode Movement code {@example INV123} {@from body}
-	 * @param string $movementlabel Movement label {@example Inventory number 123} {@from body}
-	 * @param string $price To update AWP (Average Weighted Price) when you make a stock increase (qty must be higher then 0). {@from body}
-	 * @param string $dlc Eat-by date. {@from body} {@type date}
-	 * @param string $dluo Sell-by date. {@from body} {@type date}
-	 *
-	 * @return  int                         ID of stock movement
-	 * @throws RestException
-	 */
-	public function post($product_id, $warehouse_id, $qty, $lot = '', $movementcode = '', $movementlabel = '', $price = '', $dlc = '', $dluo = '')
-	{
-		if (!DolibarrApiAccess::$user->rights->stock->creer) {
-			throw new RestException(401);
-		}
-
-		if ($qty == 0) {
-			throw new RestException(503, "Making a stock movement with a quantity of 0 is not possible");
-		}
-
-		// Type increase or decrease
-		$type = 2;
-		if ($qty >= 0) {
-			$type = 3;
-		}
-
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-		$eatBy = empty($dluo) ? '' : dol_stringtotime($dluo);
-		$sellBy = empty($dlc) ? '' : dol_stringtotime($dlc);
-
-		if ($this->stockmovement->_create(DolibarrApiAccess::$user, $product_id, $warehouse_id, $qty, $type, $price, $movementlabel, $movementcode, '', $eatBy, $sellBy, $lot) <= 0) {
-			$errormessage = $this->stockmovement->error;
-			if (empty($errormessage)) {
-				$errormessage = join(',', $this->stockmovement->errors);
-			}
-			throw new RestException(503, 'Error when create stock movement : '.$errormessage);
-		}
-
-		return $this->stockmovement->id;
 	}
 
 	/**

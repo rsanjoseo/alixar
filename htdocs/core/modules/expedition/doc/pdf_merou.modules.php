@@ -433,29 +433,104 @@ class pdf_merou extends ModelePdfExpedition
 
 				return 1;
 			} else {
-				$this->error = $outputlangs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $outputlangs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $outputlangs->transnoentities("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $outputlangs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Expedition	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
-	{
-		global $conf, $langs, $hookmanager;
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $langs;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Translations
+        $langs->loadLangs(["main", "bills", "orders"]);
+
+        if (empty($hidetop)) {
+            $pdf->SetFont('', 'B', $default_font_size - 2);
+            $pdf->SetXY(10, $tab_top);
+            $pdf->MultiCell(10, 5, "LS", 0, 'C', 1);
+            $pdf->line(20, $tab_top, 20, $tab_top + $tab_height);
+            $pdf->SetXY(20, $tab_top);
+            $pdf->MultiCell(10, 5, "LR", 0, 'C', 1);
+            $pdf->line(30, $tab_top, 30, $tab_top + $tab_height);
+            $pdf->SetXY(30, $tab_top);
+            $pdf->MultiCell(20, 5, $outputlangs->transnoentities("Ref"), 0, 'C', 1);
+            $pdf->SetXY(50, $tab_top);
+            $pdf->MultiCell(90, 5, $outputlangs->transnoentities("Description"), 0, 'L', 1);
+            $pdf->SetXY(140, $tab_top);
+            $pdf->MultiCell(30, 5, $outputlangs->transnoentities("QtyOrdered"), 0, 'C', 1);
+            $pdf->SetXY(170, $tab_top);
+            $pdf->MultiCell(30, 5, $outputlangs->transnoentities("QtyToShip"), 0, 'C', 1);
+        }
+        $pdf->Rect(10, $tab_top, 190, $tab_height);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *    Show footer of page. Need this->emetteur object
+     *
+     * @param TCPDF      $pdf          PDF
+     * @param Expedition $object       Object to show
+     * @param Translate  $outputlangs  Object lang for output
+     * @param int        $hidefreetext 1=Hide free text
+     *
+     * @return    void
+     */
+    protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
+    {
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+        $pdf->SetFont('', '', $default_font_size - 2);
+        $pdf->SetY(-23);
+        $pdf->MultiCell(100, 3, $outputlangs->transnoentities("GoodStatusDeclaration"), 0, 'L');
+        $pdf->SetY(-13);
+        $pdf->MultiCell(100, 3, $outputlangs->transnoentities("ToAndDate"), 0, 'C');
+        $pdf->SetXY(120, -23);
+        $pdf->MultiCell(100, 3, $outputlangs->transnoentities("NameAndSignature"), 0, 'C');
+
+        // Show page nb only on iso languages (so default Helvetica font)
+        //if (pdf_getPDFFont($outputlangs) == 'Helvetica')
+        //{
+        //    $pdf->SetXY(-10,-10);
+        //    $pdf->MultiCell(11, 2, $pdf->PageNo().'/'.$pdf->getAliasNbPages(), 0, 'R', 0);
+        //}
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF      $pdf         Object PDF
+     * @param Expedition $object      Object to show
+     * @param int        $showaddress 0=no, 1=yes
+     * @param Translate  $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    {
+        global $conf, $langs, $hookmanager;
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
@@ -640,77 +715,5 @@ class pdf_merou extends ModelePdfExpedition
 		$pdf->SetFont('', '', $default_font_size - 3);
 		$pdf->SetXY($blDestX, $posy);
 		$pdf->MultiCell($widthrecbox, 4, $carac_client, 0, 'L');
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $langs;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Translations
-		$langs->loadLangs(array("main", "bills", "orders"));
-
-		if (empty($hidetop)) {
-			$pdf->SetFont('', 'B', $default_font_size - 2);
-			$pdf->SetXY(10, $tab_top);
-			$pdf->MultiCell(10, 5, "LS", 0, 'C', 1);
-			$pdf->line(20, $tab_top, 20, $tab_top + $tab_height);
-			$pdf->SetXY(20, $tab_top);
-			$pdf->MultiCell(10, 5, "LR", 0, 'C', 1);
-			$pdf->line(30, $tab_top, 30, $tab_top + $tab_height);
-			$pdf->SetXY(30, $tab_top);
-			$pdf->MultiCell(20, 5, $outputlangs->transnoentities("Ref"), 0, 'C', 1);
-			$pdf->SetXY(50, $tab_top);
-			$pdf->MultiCell(90, 5, $outputlangs->transnoentities("Description"), 0, 'L', 1);
-			$pdf->SetXY(140, $tab_top);
-			$pdf->MultiCell(30, 5, $outputlangs->transnoentities("QtyOrdered"), 0, 'C', 1);
-			$pdf->SetXY(170, $tab_top);
-			$pdf->MultiCell(30, 5, $outputlangs->transnoentities("QtyToShip"), 0, 'C', 1);
-		}
-		$pdf->Rect(10, $tab_top, 190, $tab_height);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   	Show footer of page. Need this->emetteur object
-	 *
-	 *   	@param	TCPDF		$pdf     			PDF
-	 * 		@param	Expedition	$object				Object to show
-	 *      @param	Translate	$outputlangs		Object lang for output
-	 *      @param	int			$hidefreetext		1=Hide free text
-	 *      @return	void
-	 */
-	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
-	{
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-		$pdf->SetFont('', '', $default_font_size - 2);
-		$pdf->SetY(-23);
-		$pdf->MultiCell(100, 3, $outputlangs->transnoentities("GoodStatusDeclaration"), 0, 'L');
-		$pdf->SetY(-13);
-		$pdf->MultiCell(100, 3, $outputlangs->transnoentities("ToAndDate"), 0, 'C');
-		$pdf->SetXY(120, -23);
-		$pdf->MultiCell(100, 3, $outputlangs->transnoentities("NameAndSignature"), 0, 'C');
-
-		// Show page nb only on iso languages (so default Helvetica font)
-		//if (pdf_getPDFFont($outputlangs) == 'Helvetica')
-		//{
-		//    $pdf->SetXY(-10,-10);
-		//    $pdf->MultiCell(11, 2, $pdf->PageNo().'/'.$pdf->getAliasNbPages(), 0, 'R', 0);
-		//}
 	}
 }

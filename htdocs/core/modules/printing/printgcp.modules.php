@@ -35,63 +35,74 @@ use OAuth\OAuth2\Service\Google;
  */
 class printing_printgcp extends PrintingDriver
 {
-	const LOGIN_URL = 'https://accounts.google.com/o/oauth2/token';
-	const PRINTERS_SEARCH_URL = 'https://www.google.com/cloudprint/search';
-	const PRINTERS_GET_JOBS = 'https://www.google.com/cloudprint/jobs';
-	const PRINT_URL = 'https://www.google.com/cloudprint/submit';
-	const LANGFILE = 'printgcp';
 	/**
 	 * @var string module name
 	 */
 	public $name = 'printgcp';
+
 	/**
 	 * @var string module description
 	 */
 	public $desc = 'PrintGCPDesc';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'printer';
-	/**
+
+    /**
 	 * @var string module description
 	 */
 	public $active = 'PRINTING_PRINTGCP';
-	/**
+
+    /**
 	 * @var array module parameters
 	 */
 	public $conf = array();
-	/**
+
+    /**
 	 * @var string google id
 	 */
 	public $google_id = '';
-	/**
+
+    /**
 	 * @var string google secret
 	 */
 	public $google_secret = '';
-	/**
+
+    /**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-	/**
+
+    /**
 	 * @var string[] Error codes (or messages)
-	 */
-	public $errors = array();
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-	private $OAUTH_SERVICENAME_GOOGLE = 'Google';
+     */
+    public $errors = [];
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB      $db      Database handler
-	 */
-	public function __construct($db)
-	{
-		global $conf, $langs, $dolibarr_main_url_root;
+    /**
+     * @var DoliDB Database handler.
+     */
+    public $db;
 
-		// Define $urlwithroot
+    private $OAUTH_SERVICENAME_GOOGLE = 'Google';
+
+    const LOGIN_URL = 'https://accounts.google.com/o/oauth2/token';
+    const PRINTERS_SEARCH_URL = 'https://www.google.com/cloudprint/search';
+    const PRINTERS_GET_JOBS = 'https://www.google.com/cloudprint/jobs';
+    const PRINT_URL = 'https://www.google.com/cloudprint/submit';
+    const LANGFILE = 'printgcp';
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        global $conf, $langs, $dolibarr_main_url_root;
+
+        // Define $urlwithroot
 		$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
 		$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domain name found into config file
 		//$urlwithroot=DOL_MAIN_URL_ROOT;					// This is to use same domain name than current
@@ -226,8 +237,8 @@ class printing_printgcp extends PrintingDriver
 			if ($conf->global->PRINTING_GCP_DEFAULT == $printer_det['id']) {
 				$html .= img_picto($langs->trans("Default"), 'on');
 			} else {
-				$html .= '<a href="'.$_SERVER["PHP_SELF"].'?action=setvalue&amp;token='.newToken().'&amp;mode=test&amp;varname=PRINTING_GCP_DEFAULT&amp;driver=printgcp&amp;value='.urlencode($printer_det['id']).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
-			}
+				$html .= '<a href="' . $_SERVER["PHP_SELF"] . '?action=setvalue&token=' . newToken() . '&mode=test&varname=PRINTING_GCP_DEFAULT&driver=printgcp&value=' . urlencode($printer_det['id']) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'off') . '</a>';
+            }
 			$html .= '</td>';
 			$html .= '</tr>'."\n";
 		}

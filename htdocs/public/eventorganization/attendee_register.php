@@ -63,27 +63,29 @@ require_once DOL_DOCUMENT_ROOT.'/eventorganization/class/conferenceorboothattend
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/paymentterm.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
+require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 
 global $dolibarr_main_instance_unique_id;
 global $dolibarr_main_url_root;
 
 // Init vars
 $errmsg = '';
-$num = 0;
 $error = 0;
 $backtopage = GETPOST('backtopage', 'alpha');
 $action = GETPOST('action', 'aZ09');
 
 $email = GETPOST("email");
 $societe = GETPOST("societe");
+$emailcompany = GETPOST("emailcompany");
+$note_public = GETPOST('note_public', "nohtml");
 
 // Getting id from Post and decoding it
 $type = GETPOST('type', 'aZ09');
 if ($type == 'conf') {
-	$id = GETPOST('id', 'int');
+    $id = GETPOST('id', 'int');
 } else {
-	$id = GETPOST('fk_project', 'int') ? GETPOST('fk_project', 'int') : GETPOST('id', 'int');
+    $id = GETPOST('fk_project', 'int') ? GETPOST('fk_project', 'int') : GETPOST('id', 'int');
 }
 
 $conference = new ConferenceOrBooth($db);
@@ -233,8 +235,8 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 	}
 	// If the price has been set, name is required for the invoice
 	if (!GETPOST("societe") && !empty(floatval($project->price_registration))) {
-		$error++;
-		$errmsg .= $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Societe"))."<br>\n";
+        $error++;
+        $errmsg .= $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Company")) . "<br>\n";
 	}
 	if (GETPOST("email") && !isValidEmail(GETPOST("email"))) {
 		$error++;
@@ -268,8 +270,9 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 			$confattendee->date_creation = dol_now();
 			$confattendee->email = $email;
 			$confattendee->fk_project = $project->id;
-			$confattendee->fk_actioncomm = $id;
-			$resultconfattendee = $confattendee->create($user);
+            $confattendee->fk_actioncomm = $id;
+            $confattendee->note_public = $note_public;
+            $resultconfattendee = $confattendee->create($user);
 			if ($resultconfattendee < 0) {
 				$error++;
 				$errmsg .= $confattendee->error;
@@ -284,73 +287,134 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 			$securekeyurl = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY.'conferenceorbooth'.$id, 'master');
 			$redirection = $dolibarr_main_url_root.'/public/eventorganization/subscriptionok.php?id='.((int) $id).'&securekey='.urlencode($securekeyurl);
 
-			$mesg = $langs->trans("RegistrationAndPaymentWereAlreadyRecorder", $email);
-			setEventMessages($mesg, null, 'mesgs');
+            $mesg = $langs->trans("RegistrationAndPaymentWereAlreadyRecorder", $email);
+            setEventMessages($mesg, null, 'mesgs');
 
-			$db->commit();
+            $db->commit();
 
-			Header("Location: ".$redirection);
-			exit;
-		}
+            Header("Location: " . $redirection);
+            exit;
+        }
 
-		$resultfetchthirdparty = -1;
+        $resultfetchthirdparty = 0;
 
-		// Getting the thirdparty or creating it
-		$thirdparty = new Societe($db);
-		$contact = new Contact($db);
-		// Fetch using fk_soc if the attendee was already found
-		if (!empty($confattendee->fk_soc) && $confattendee->fk_soc > 0) {
-			$resultfetchthirdparty = $thirdparty->fetch($confattendee->fk_soc);
-		} else {
-			if (empty($conf->global->EVENTORGANIZATION_DISABLE_RETREIVE_THIRDPARTY_FROM_NAME)) {
-				// Fetch using the input field by user if we just created the attendee
-				if (!empty($societe)) {
-					$resultfetchthirdparty = $thirdparty->fetch('', $societe, '', '', '', '', '', '', '', '', $email);
-					if ($resultfetchthirdparty <= 0) {
-						// Try to find the thirdparty from the contact
-						$resultfetchcontact = $contact->fetch('', null, '', $email);
-						if ($resultfetchcontact <= 0 || $contact->fk_soc <= 0) {
-							// Need to create a new one (not found or multiple with the same name/email)
-							$resultfetchthirdparty = 0;
-						} else {
-							$thirdparty->fetch($contact->fk_soc);
-							$confattendee->fk_soc = $thirdparty->id;
-							$confattendee->update($user);
-							$resultfetchthirdparty = 1;
-						}
-					} else {
-						// We found a unique result with that name/email, so we set the fk_soc of attendee
-						$confattendee->fk_soc = $thirdparty->id;
-						$confattendee->update($user);
-					}
-				} else {
-					// Need to create a thirdparty (put number>0 if we do not want to create a thirdparty for free-conferences)
-					$resultfetchthirdparty = 0;
-				}
-			} else {
-				// Need to create a thirdparty (put number>0 if we do not want to create a thirdparty for free-conferences)
-				$resultfetchthirdparty = 0;
-			}
-		}
+        $genericcompanyname = $langs->trans('EventParticipant') . ' ' . ($emailcompany ? $emailcompany : $email);    // Keep this label simple so we can retreive same thirdparty for another event
 
-		if ($resultfetchthirdparty < 0) {
-			$error++;
-			$errmsg .= $thirdparty->error;
-		} elseif ($resultfetchthirdparty == 0) {
-			// Creation of a new thirdparty
-			if (!empty($societe)) {
-				$thirdparty->name     = $societe;
-			} else {
-				$thirdparty->name     = $email;
-			}
-			$thirdparty->address      = GETPOST("address");
-			$thirdparty->zip          = GETPOST("zipcode");
-			$thirdparty->town         = GETPOST("town");
-			$thirdparty->client       = $thirdparty::PROSPECT;
+        // Getting the thirdparty or creating it
+        $thirdparty = new Societe($db);
+        $contact = new Contact($db);
+        // Fetch using fk_soc if the attendee was already found
+        if (!empty($confattendee->fk_soc) && $confattendee->fk_soc > 0) {
+            $resultfetchthirdparty = $thirdparty->fetch($confattendee->fk_soc);
+        } else {
+            if (empty($conf->global->EVENTORGANIZATION_DISABLE_RETREIVE_THIRDPARTY_FROM_NAME)) {
+                // Fetch using the field input by end user if we have just created the attendee
+                if ($resultfetchthirdparty <= 0 && !empty($societe) && !empty($emailcompany)) {
+                    $resultfetchthirdparty = $thirdparty->fetch('', $societe, '', '', '', '', '', '', '', '', $emailcompany);
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with the name + emailcompany, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = $langs->trans("ErrorSeveralCompaniesWithNameContactUs", $mysoc->email);
+                    }
+                }
+                // Fetch using the field input by end user if we have just created the attendee
+                if ($resultfetchthirdparty <= 0 && !empty($societe) && !empty($email) && $email != $emailcompany) {
+                    $resultfetchthirdparty = $thirdparty->fetch('', $societe, '', '', '', '', '', '', '', '', $email);
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with the name + email, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = $langs->trans("ErrorSeveralCompaniesWithNameContactUs", $mysoc->email);
+                    }
+                }
+                if ($resultfetchthirdparty <= 0 && !empty($emailcompany)) {
+                    // Try to find thirdparty from the email only
+                    $resultfetchthirdparty = $thirdparty->fetch('', '', '', '', '', '', '', '', '', '', $emailcompany);
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with that email only, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = $langs->trans("ErrorSeveralCompaniesWithEmailContactUs", $mysoc->email);
+                    }
+                }
+                if ($resultfetchthirdparty <= 0 && !empty($email) && $email != $emailcompany) {
+                    // Try to find thirdparty from the email only
+                    $resultfetchthirdparty = $thirdparty->fetch('', '', '', '', '', '', '', '', '', '', $email);
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with that email only, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = $langs->trans("ErrorSeveralCompaniesWithEmailContactUs", $mysoc->email);
+                    }
+                }
+                if ($resultfetchthirdparty <= 0 && !empty($genericcompanyname)) {
+                    // Try to find thirdparty from the generic mail only
+                    $resultfetchthirdparty = $thirdparty->fetch('', $genericcompanyname, '', '', '', '', '', '', '', '', '');
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with that name + email, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = $langs->trans("ErrorSeveralCompaniesWithNameContactUs", $mysoc->email);
+                    }
+                }
+
+                // TODO Add more tests on a VAT number, profid or a name ?
+
+                if ($resultfetchthirdparty <= 0 && !empty($email)) {
+                    // Try to find the thirdparty from the contact
+                    $resultfetchcontact = $contact->fetch('', null, '', $email);
+                    if ($resultfetchcontact > 0 && $contact->fk_soc > 0) {
+                        $thirdparty->fetch($contact->fk_soc);
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                        $resultfetchthirdparty = 1;
+                    }
+                }
+
+                if ($resultfetchthirdparty <= 0 && !empty($societe)) {
+                    // Try to find thirdparty from the company name only
+                    $resultfetchthirdparty = $thirdparty->fetch('', $societe, '', '', '', '', '', '', '', '', '');
+                    if ($resultfetchthirdparty > 0) {
+                        // We found a unique result with that name only, so we set the fk_soc of attendee
+                        $confattendee->fk_soc = $thirdparty->id;
+                        $confattendee->update($user);
+                    } elseif ($resultfetchthirdparty == -2) {
+                        $thirdparty->error = "ErrorSeveralCompaniesWithNameContactUs";
+                    }
+                }
+            }
+        }
+
+        // If price is empty, no need to create a thirdparty, so we force $resultfetchthirdparty as if we have already found thirdp party.
+        if (empty(floatval($project->price_registration))) {
+            $resultfetchthirdparty = 1;
+        }
+
+        if ($resultfetchthirdparty < 0) {
+            // If an error was found
+            $error++;
+            $errmsg .= $thirdparty->error;
+        } elseif ($resultfetchthirdparty == 0) {    // No thirdparty found + a payment is expected
+            // Creation of a new thirdparty
+            if (!empty($societe)) {
+                $thirdparty->name = $societe;
+            } else {
+                $thirdparty->name = $genericcompanyname;
+            }
+            $thirdparty->address = GETPOST("address");
+            $thirdparty->zip = GETPOST("zipcode");
+            $thirdparty->town = GETPOST("town");
+            $thirdparty->client = $thirdparty::PROSPECT;
 			$thirdparty->fournisseur  = 0;
 			$thirdparty->country_id   = GETPOST("country_id", 'int');
-			$thirdparty->state_id     = GETPOST("state_id", 'int');
-			$thirdparty->email        = $email;
+            $thirdparty->state_id = GETPOST("state_id", 'int');
+            $thirdparty->email = ($emailcompany ? $emailcompany : $email);
 
 			// Load object modCodeTiers
 			$module = (!empty($conf->global->SOCIETE_CODECLIENT_ADDON) ? $conf->global->SOCIETE_CODECLIENT_ADDON : 'mod_codeclient_leopard');
@@ -388,6 +452,7 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 	if (!$error) {
 		if (!empty(floatval($project->price_registration))) {
 			$outputlangs = $langs;
+
 			// TODO Use default language of $thirdparty->default_lang to build $outputlang
 
 			// Get product to use for invoice
@@ -404,32 +469,43 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 				$error++;
 				$errmsg .= $productforinvoicerow->error;
 			} else {
-				$facture = new Facture($db);
-				$facture->type = Facture::TYPE_STANDARD;
-				$facture->socid = $thirdparty->id;
-				$facture->paye = 0;
-				$facture->date = dol_now();
-				$facture->cond_reglement_id = $confattendee->cond_reglement_id;
-				$facture->fk_project = $project->id;
+                $facture = new Facture($db);
+                if (empty($confattendee->fk_invoice)) {
+                    $facture->type = Facture::TYPE_STANDARD;
+                    $facture->socid = $thirdparty->id;
+                    $facture->paye = 0;
+                    $facture->date = dol_now();
+                    $facture->cond_reglement_id = $confattendee->cond_reglement_id;
+                    $facture->fk_project = $project->id;
+                    $facture->status = Facture::STATUS_DRAFT;
 
-				if (empty($facture->cond_reglement_id)) {
-					$paymenttermstatic = new PaymentTerm($confattendee->db);
-					$facture->cond_reglement_id = $paymenttermstatic->getDefaultId();
-					if (empty($facture->cond_reglement_id)) {
-						$error++;
-						$confattendee->error = 'ErrorNoPaymentTermRECEPFound';
-						$confattendee->errors[] = $confattendee->error;
-					}
-				}
-				$resultfacture = $facture->create($user);
-				if ($resultfacture <= 0) {
-					$confattendee->error = $facture->error;
-					$confattendee->errors = $facture->errors;
-					$error++;
-				} else {
-					$facture->add_object_linked($confattendee->element, $confattendee->id);
-				}
-			}
+                    if (empty($facture->cond_reglement_id)) {
+                        $paymenttermstatic = new PaymentTerm($confattendee->db);
+                        $facture->cond_reglement_id = $paymenttermstatic->getDefaultId();
+                        if (empty($facture->cond_reglement_id)) {
+                            $error++;
+                            $confattendee->error = 'ErrorNoPaymentTermRECEPFound';
+                            $confattendee->errors[] = $confattendee->error;
+                        }
+                    }
+                    $resultfacture = $facture->create($user);
+                    if ($resultfacture <= 0) {
+                        $confattendee->error = $facture->error;
+                        $confattendee->errors = $facture->errors;
+                        $error++;
+                    } else {
+                        $confattendee->fk_invoice = $resultfacture;
+                        $confattendee->update($user);
+                    }
+                } else {
+                    $facture->fetch($confattendee->fk_invoice);
+                }
+
+                // Add link between invoice and the attendee registration
+                /*if (!$error) {
+                    $facture->add_object_linked($confattendee->element, $confattendee->id);
+                }*/
+            }
 
 			if (!$error) {
 				// Add line to draft invoice
@@ -607,30 +683,43 @@ if (!empty($conference->id) && $conference->status==ConferenceOrBooth::STATUS_CO
 	});
 	</script>';
 
-	print '<table class="border" summary="form to subscribe" id="tablesubscribe">' . "\n";
+    print '<table class="border" summary="form to subscribe" id="tablesubscribe">' . "\n";
 
-	// Email
-	print '<tr><td>' . $langs->trans("Email") . '<font color="red">*</font></td><td><input type="text" name="email" maxlength="255" class="minwidth200" value="' . dol_escape_htmltag(GETPOST('email')) . '"></td></tr>' . "\n";
-	// Company
-	print '<tr id="trcompany" class="trcompany"><td>' . $langs->trans("Company");
-	if (!empty(floatval($project->price_registration))) {
-		print '<font color="red">*</font>';
-	}
-	print ' </td><td>';
-	print img_picto('', 'company', 'class="pictofixedwidth"');
-	print '<input type="text" name="societe" class="minwidth200" value="' . dol_escape_htmltag(GETPOST('societe')) . '"></td></tr>' . "\n";
-	// Address
-	print '<tr><td>' . $langs->trans("Address") . '</td><td>' . "\n";
-	print '<textarea name="address" id="address" wrap="soft" class="quatrevingtpercent" rows="' . ROWS_3 . '">' . dol_escape_htmltag(GETPOST('address', 'restricthtml'), 0, 1) . '</textarea></td></tr>' . "\n";
-	// Zip / Town
-	print '<tr><td>' . $langs->trans('Zip') . ' / ' . $langs->trans('Town') . '</td><td>';
-	print $formcompany->select_ziptown(GETPOST('zipcode'), 'zipcode', array('town', 'selectcountry_id', 'state_id'), 6, 1);
-	print ' / ';
-	print $formcompany->select_ziptown(GETPOST('town'), 'town', array('zipcode', 'selectcountry_id', 'state_id'), 0, 1);
-	print '</td></tr>';
-	// Country
-	print '<tr><td>' . $langs->trans('Country') . '<font color="red">*</font></td><td>';
-	print img_picto('', 'country', 'class="pictofixedwidth"');
+    // Email
+    print '<tr><td>' . $langs->trans("EmailAttendee") . '<font color="red">*</font></td><td>';
+    print img_picto('', 'email', 'class="pictofixedwidth"');
+    print '<input type="text" name="email" maxlength="255" class="minwidth200" value="' . dol_escape_htmltag(GETPOST('email')) . '"></td></tr>' . "\n";
+
+    // Company
+    print '<tr id="trcompany" class="trcompany"><td>' . $langs->trans("Company");
+    if (!empty(floatval($project->price_registration))) {
+        print '<font color="red">*</font>';
+    }
+    print ' </td><td>';
+    print img_picto('', 'company', 'class="pictofixedwidth"');
+    print '<input type="text" name="societe" class="minwidth200" value="' . dol_escape_htmltag(GETPOST('societe')) . '"></td></tr>' . "\n";
+
+    // Email company for invoice
+    if ($project->price_registration) {
+        print '<tr><td>' . $langs->trans("EmailCompanyForInvoice") . '</td><td>';
+        print img_picto('', 'email', 'class="pictofixedwidth"');
+        print '<input type="text" name="emailcompany" maxlength="255" class="minwidth200" value="' . dol_escape_htmltag(GETPOST('emailcompany')) . '"></td></tr>' . "\n";
+    }
+
+    // Address
+    print '<tr><td>' . $langs->trans("Address") . '</td><td>' . "\n";
+    print '<textarea name="address" id="address" wrap="soft" class="centpercent" rows="' . ROWS_2 . '">' . dol_escape_htmltag(GETPOST('address', 'restricthtml'), 0, 1) . '</textarea></td></tr>' . "\n";
+
+    // Zip / Town
+    print '<tr><td>' . $langs->trans('Zip') . ' / ' . $langs->trans('Town') . '</td><td>';
+    print $formcompany->select_ziptown(GETPOST('zipcode'), 'zipcode', ['town', 'selectcountry_id', 'state_id'], 6, 1);
+    print ' / ';
+    print $formcompany->select_ziptown(GETPOST('town'), 'town', ['zipcode', 'selectcountry_id', 'state_id'], 0, 1);
+    print '</td></tr>';
+
+    // Country
+    print '<tr><td>' . $langs->trans('Country') . '<font color="red">*</font></td><td>';
+    print img_picto('', 'country', 'class="pictofixedwidth"');
 	$country_id = GETPOST('country_id');
 	if (!$country_id && !empty($conf->global->MEMBER_NEWFORM_FORCECOUNTRYCODE)) {
 		$country_id = getCountry($conf->global->MEMBER_NEWFORM_FORCECOUNTRYCODE, 2, $db, $langs);
@@ -656,27 +745,35 @@ if (!empty($conference->id) && $conference->status==ConferenceOrBooth::STATUS_CO
 			print $formcompany->select_state(GETPOST("state_id"), $country_code);
 		} else {
 			print '';
-		}
-		print '</td></tr>';
-	}
+        }
+        print '</td></tr>';
+    }
 
-	if ($project->price_registration) {
-		print '<tr><td>' . $langs->trans('Price') . '</td><td>';
-		print price($project->price_registration, 1, $langs, 1, -1, -1, $conf->currency);
-		print '</td></tr>';
-	}
+    if ($project->price_registration) {
+        print '<tr><td>' . $langs->trans('Price') . '</td><td>';
+        print price($project->price_registration, 1, $langs, 1, -1, -1, $conf->currency);
+        print '</td></tr>';
+    }
 
-	print "</table>\n";
+    $notetoshow = $note_public;
+    print '<tr><td>' . $langs->trans('Note') . '</td><td>';
+    if (!empty($conf->global->EVENTORGANIZATION_DEFAULT_NOTE_ON_REGISTRATION)) {
+        $notetoshow = str_replace('\n', "\n", $conf->global->EVENTORGANIZATION_DEFAULT_NOTE_ON_REGISTRATION);
+    }
+    print '<textarea name="note_public" class="centpercent" rows="' . ROWS_9 . '">' . dol_escape_htmltag($notetoshow, 0, 1) . '</textarea>';
+    print '</td></tr>';
 
-	print dol_get_fiche_end();
+    print "</table>\n";
 
-	// Save
-	print '<div class="center">';
-	print '<input type="submit" value="' . $langs->trans("Submit") . '" id="submitsave" class="button">';
-	if (!empty($backtopage)) {
-		print ' &nbsp; &nbsp; <input type="submit" value="' . $langs->trans("Cancel") . '" id="submitcancel" class="button button-cancel">';
-	}
-	print '</div>';
+    print dol_get_fiche_end();
+
+    // Save
+    print '<div class="center">';
+    print '<input type="submit" value="' . $langs->trans("Submit") . '" id="submitsave" class="button">';
+    if (!empty($backtopage)) {
+        print ' &nbsp; &nbsp; <input type="submit" value="' . $langs->trans("Cancel") . '" id="submitcancel" class="button button-cancel">';
+    }
+    print '</div>';
 
 
 	print "</form>\n";

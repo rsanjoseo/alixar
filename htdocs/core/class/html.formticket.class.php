@@ -1062,26 +1062,51 @@ class FormTicket
 				print $value ? $value : '&nbsp;';
 				print '</option>';
 			}
-		}
-		print '</select>';
-		if ($user->admin && !$noadmininfo) {
-			print info_admin($langs->trans("YouCanChangeValuesForThisListFromDictionarySetup"), 1);
-		}
+        }
+        print '</select>';
+        if ($user->admin && !$noadmininfo) {
+            print info_admin($langs->trans("YouCanChangeValuesForThisListFromDictionarySetup"), 1);
+        }
 
-		print ajax_combobox('select'.$htmlname);
-	}
+        print ajax_combobox('select' . $htmlname);
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Show the form to add message on ticket
-	 *
-	 * @param  	string  $width      	Width of form
-	 * @return 	void
-	 */
-	public function showMessageForm($width = '40%')
-	{
-		global $conf, $langs, $user, $hookmanager, $form, $mysoc;
+    /**
+     * Clear list of attached files in send mail form (also stored in session)
+     *
+     * @return    void
+     */
+    public function clear_attached_files()
+    {
+        // phpcs:enable
+        global $conf, $user;
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+
+        // Set tmp user directory
+        $vardir = $conf->user->dir_output . "/" . $user->id;
+        $upload_dir = $vardir . '/temp/'; // TODO Add $keytoavoidconflict in upload_dir path
+        if (is_dir($upload_dir)) {
+            dol_delete_dir_recursive($upload_dir);
+        }
+
+        $keytoavoidconflict = empty($this->trackid) ? '' : '-' . $this->trackid; // this->trackid must be defined
+        unset($_SESSION["listofpaths" . $keytoavoidconflict]);
+        unset($_SESSION["listofnames" . $keytoavoidconflict]);
+        unset($_SESSION["listofmimes" . $keytoavoidconflict]);
+    }
+
+    /**
+     * Show the form to add message on ticket
+     *
+     * @param string $width Width of form
+     *
+     * @return    void
+     */
+    public function showMessageForm($width = '40%')
+    {
+        global $conf, $langs, $user, $hookmanager, $form, $mysoc;
 
 		$formmail = new FormMail($this->db);
 		$addfileaction = 'addfile';
@@ -1405,29 +1430,5 @@ class FormTicket
 
 		print "</form>\n";
 		print "<!-- End form TICKET -->\n";
-	}
-
-	/**
-	 * Clear list of attached files in send mail form (also stored in session)
-	 *
-	 * @return	void
-	 */
-	public function clear_attached_files()
-	{
-		// phpcs:enable
-		global $conf, $user;
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-
-		// Set tmp user directory
-		$vardir = $conf->user->dir_output."/".$user->id;
-		$upload_dir = $vardir.'/temp/'; // TODO Add $keytoavoidconflict in upload_dir path
-		if (is_dir($upload_dir)) {
-			dol_delete_dir_recursive($upload_dir);
-		}
-
-		$keytoavoidconflict = empty($this->trackid) ? '' : '-'.$this->trackid; // this->trackid must be defined
-		unset($_SESSION["listofpaths".$keytoavoidconflict]);
-		unset($_SESSION["listofnames".$keytoavoidconflict]);
-		unset($_SESSION["listofmimes".$keytoavoidconflict]);
 	}
 }

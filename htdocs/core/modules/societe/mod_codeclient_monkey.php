@@ -211,29 +211,6 @@ class mod_codeclient_monkey extends ModeleThirdPartyCode
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Renvoi si un code respecte la syntaxe
-	 *
-	 *  @param  string      $code       Code a verifier
-	 *  @return int                     0 si OK, <0 si KO
-	 */
-	public function verif_syntax($code)
-	{
-		// phpcs:enable
-		$res = 0;
-
-		if (dol_strlen($code) < 11) {
-			$res = -1;
-		} else {
-			$res = 0;
-		}
-		return $res;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *		Renvoi si un code est pris ou non (par autre tiers)
 	 *
@@ -261,14 +238,37 @@ class mod_codeclient_monkey extends ModeleThirdPartyCode
 
 		dol_syslog(get_class($this)."::verif_dispo", LOG_DEBUG);
 		$resql = $db->query($sql);
-		if ($resql) {
-			if ($db->num_rows($resql) == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		} else {
-			return -2;
-		}
-	}
+        if ($resql) {
+            if ($db->num_rows($resql) == 0) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else {
+            return -2;
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoi si un code respecte la syntaxe
+     *
+     * @param string $code Code a verifier
+     *
+     * @return int                     0 si OK, <0 si KO
+     */
+    public function verif_syntax($code)
+    {
+        // phpcs:enable
+        $res = 0;
+
+        if (dol_strlen($code) < 11) {
+            $res = -1;
+        } else {
+            $res = 0;
+        }
+        return $res;
+    }
 }

@@ -37,28 +37,217 @@ class pdf_standard extends CommonStickerGenerator
 	/**
 	 * Output a sticker on page at position _COUNTX, _COUNTY (_COUNTX and _COUNTY start from 0)
 	 *
-	 * @param	TCPDF		$pdf			PDF reference
-	 * @param	Translate	$outputlangs	Output langs
-	 * @param	array		$param			Associative array containing label content and optional parameters
-	 * @return	void
-	 */
-	public function addSticker(&$pdf, $outputlangs, $param)
-	{
-		// use this method in future refactoring
-	}
+	 * @param	TCPDF  $pdf         PDF reference
+     * @param Translate $outputlangs Output langs
+     * @param array     $param       Associative array containing label content and optional parameters
+     * @return    void
+     */
+    public function addSticker(&$pdf, $outputlangs, $param)
+    {
+        // use this method in future refactoring
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Function to build PDF on disk, then output on HTTP stream.
-	 *
-	 *	@param	Adherent	$object		        Member object. Old usage: Array of record informations (array('textleft'=>,'textheader'=>, ...'id'=>,'photo'=>)
-	 *	@param	Translate	$outputlangs		Lang object for output language
-	 *	@param	string		$srctemplatepath	Full path of source filename for generator using a template file. Example: '5161', 'AVERYC32010', 'CARD', ...
-	 *	@param	string		$mode				Tell if doc module is called for 'member', ...
-	 *  @param  int         $nooutput           1=Generate only file on disk and do not return it on response
-	 *	@return	int								1=OK, 0=KO
-	 */
+    /**
+     * Output a sticker on page at position _COUNTX, _COUNTY (_COUNTX and _COUNTY start from 0)
+     * - __LOGO__ is replace with company logo
+     * - __PHOTO__ is replace with photo provided as parameter
+     *
+     * @param TCPDF     $pdf         PDF
+     * @param string    $textleft    Text left
+     * @param string    $header      Header
+     * @param string    $footer      Footer
+     * @param Translate $outputlangs Output langs
+     * @param string    $textright   Text right
+     * @param int       $idmember    Id member
+     * @param string    $photo       Photo (full path to image file used as replacement for key __PHOTOS__ into left, right, header or footer text)
+     *
+     * @return     void
+     */
+    public function Add_PDF_card(&$pdf, $textleft, $header, $footer, $outputlangs, $textright = '', $idmember = 0, $photo = '')
+    {
+        // phpcs:enable
+        global $db, $mysoc, $conf, $langs;
+        global $forceimgscalewidth, $forceimgscaleheight;
+
+        $imgscalewidth = (empty($forceimgscalewidth) ? 0.3 : $forceimgscalewidth); // Scale of image for width (1=Full width of sticker)
+        $imgscaleheight = (empty($forceimgscalewidth) ? 0.5 : $forceimgscalewidth); // Scale of image for height (1=Full height of sticker)
+
+        // We are in a new page, then we must add a page
+        if (($this->_COUNTX == 0) && ($this->_COUNTY == 0) and (!$this->_First == 1)) {
+            $pdf->AddPage();
+        }
+        $this->_First = 0;
+        $_PosX = $this->_Margin_Left + ($this->_COUNTX * ($this->_Width + $this->_X_Space));
+        $_PosY = $this->_Margin_Top + ($this->_COUNTY * ($this->_Height + $this->_Y_Space));
+
+        // Define logo
+        $logo = $conf->mycompany->dir_output . '/logos/' . $mysoc->logo;
+        if (!is_readable($logo)) {
+            $logo = '';
+            if (!empty($mysoc->logo_small) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $mysoc->logo_small)) {
+                $logo = $conf->mycompany->dir_output . '/logos/thumbs/' . $mysoc->logo_small;
+            } elseif (!empty($mysoc->logo) && is_readable($conf->mycompany->dir_output . '/logos/' . $mysoc->logo)) {
+                $logo = $conf->mycompany->dir_output . '/logos/' . $mysoc->logo;
+            }
+        }
+
+        $member = new Adherent($db);
+        $member->id = $idmember;
+        $member->ref = $idmember;
+
+        // Define photo
+        $dir = $conf->adherent->dir_output;
+        if (!empty($photo)) {
+            $file = get_exdir(0, 0, 0, 0, $member, 'member') . 'photos/' . $photo;
+            $photo = $dir . '/' . $file;
+            if (!is_readable($photo)) {
+                $photo = '';
+            }
+        }
+
+        // Define background image
+        $backgroundimage = '';
+        if (!empty($conf->global->ADHERENT_CARD_BACKGROUND) && file_exists($conf->adherent->dir_output . '/' . $conf->global->ADHERENT_CARD_BACKGROUND)) {
+            $backgroundimage = $conf->adherent->dir_output . '/' . $conf->global->ADHERENT_CARD_BACKGROUND;
+        }
+
+        // Print lines
+        if ($this->code == "CARD") {
+            $this->Tformat = $this->_Avery_Labels["CARD"];
+            //$this->_Pointille($pdf,$_PosX,$_PosY,$_PosX+$this->_Width,$_PosY+$this->_Height,0.3,25);
+            $this->_Croix($pdf, $_PosX, $_PosY, $_PosX + $this->_Width, $_PosY + $this->_Height, 0.1, 10);
+        }
+
+        // Background
+        if ($backgroundimage) {
+            $pdf->image($backgroundimage, $_PosX, $_PosY, $this->_Width, $this->_Height);
+        }
+
+        $xleft = 2;
+        $ytop = 2;
+
+        // Top
+        if ($header != '') {
+            if ($this->code == "CARD") {
+                $pdf->SetDrawColor(128, 128, 128);
+                $pdf->Line($_PosX, $_PosY + $this->_Line_Height + 1, $_PosX + $this->_Width, $_PosY + $this->_Line_Height + 1); // Only 1 mm and not ytop for top text
+                $pdf->SetDrawColor(0, 0, 0);
+            }
+            $pdf->SetXY($_PosX + $xleft, $_PosY + 1); // Only 1 mm and not ytop for top text
+            $pdf->Cell($this->_Width - 2 * $xleft, $this->_Line_Height, $outputlangs->convToOutputCharset($header), 0, 1, 'C');
+        }
+
+        $ytop += (empty($header) ? 0 : (1 + $this->_Line_Height));
+
+        // Define widthtouse and heighttouse
+        $maxwidthtouse = round(($this->_Width - 2 * $xleft) * $imgscalewidth);
+        $maxheighttouse = round(($this->_Height - 2 * $ytop) * $imgscaleheight);
+        $defaultratio = ($maxwidthtouse / $maxheighttouse);
+        $widthtouse = $maxwidthtouse;
+        $heighttouse = 0; // old value for image
+        $tmp = dol_getImageSize($photo, false);
+        if ($tmp['height']) {
+            $imgratio = $tmp['width'] / $tmp['height'];
+            if ($imgratio >= $defaultratio) {
+                $widthtouse = $maxwidthtouse;
+                $heighttouse = round($widthtouse / $imgratio);
+            } else {
+                $heightouse = $maxheighttouse;
+                $widthtouse = round($heightouse * $imgratio);
+            }
+        }
+        //var_dump($this->_Width.'x'.$this->_Height.' with border and scale '.$imgscale.' => max '.$maxwidthtouse.'x'.$maxheighttouse.' => We use '.$widthtouse.'x'.$heighttouse);exit;
+
+        // Center
+        if ($textright == '') {    // Only a left part
+            // Output left area
+            if ($textleft == '__LOGO__' && $logo) {
+                $pdf->Image($logo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+            } elseif ($textleft == '__PHOTO__' && $photo) {
+                $pdf->Image($photo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+            } else {
+                $pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
+                $pdf->MultiCell($this->_Width, $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
+            }
+        } elseif ($textleft != '' && $textright != '') {    //
+            if ($textleft == '__LOGO__' || $textleft == '__PHOTO__') {
+                if ($textleft == '__LOGO__' && $logo) {
+                    $pdf->Image($logo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+                } elseif ($textleft == '__PHOTO__' && $photo) {
+                    $pdf->Image($photo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+                }
+                $pdf->SetXY($_PosX + $xleft + $widthtouse + 1, $_PosY + $ytop);
+                $pdf->MultiCell($this->_Width - $xleft - $xleft - $widthtouse - 1, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
+            } elseif ($textright == '__LOGO__' || $textright == '__PHOTO__') {
+                if ($textright == '__LOGO__' && $logo) {
+                    $pdf->Image($logo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+                } elseif ($textright == '__PHOTO__' && $photo) {
+                    $pdf->Image($photo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+                }
+                $pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
+                $pdf->MultiCell($this->_Width - $widthtouse - $xleft - $xleft - 1, $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
+            } else // text on halft left and text on half right
+            {
+                $pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
+                $pdf->MultiCell(round($this->_Width / 2), $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
+                $pdf->SetXY($_PosX + round($this->_Width / 2), $_PosY + $ytop);
+                $pdf->MultiCell(round($this->_Width / 2) - 2, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
+            }
+        } else // Only a right part
+        {
+            // Output right area
+            if ($textright == '__LOGO__' && $logo) {
+                $pdf->Image($logo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+            } elseif ($textright == '__PHOTO__' && $photo) {
+                $pdf->Image($photo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
+            } else {
+                $pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
+                $pdf->MultiCell($this->_Width - $xleft, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
+            }
+        }
+
+        // Bottom
+        if ($footer != '') {
+            if ($this->code == "CARD") {
+                $pdf->SetDrawColor(128, 128, 128);
+                $pdf->Line($_PosX, $_PosY + $this->_Height - $this->_Line_Height - 2, $_PosX + $this->_Width, $_PosY + $this->_Height - $this->_Line_Height - 2);
+                $pdf->SetDrawColor(0, 0, 0);
+            }
+            $pdf->SetXY($_PosX, $_PosY + $this->_Height - $this->_Line_Height - 1);
+            $pdf->Cell($this->_Width, $this->_Line_Height, $outputlangs->convToOutputCharset($footer), 0, 1, 'C');
+        }
+        //print "$_PosY+$this->_Height-$this->_Line_Height-1<br>\n";
+
+        $this->_COUNTY++;
+
+        if ($this->_COUNTY == $this->_Y_Number) {
+            // Si on est en bas de page, on remonte le 'curseur' de position
+            $this->_COUNTX++;
+            $this->_COUNTY = 0;
+        }
+
+        if ($this->_COUNTX == $this->_X_Number) {
+            // Si on est en bout de page, alors on repart sur une nouvelle page
+            $this->_COUNTX = 0;
+            $this->_COUNTY = 0;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Function to build PDF on disk, then output on HTTP stream.
+     *
+     * @param Adherent  $object          Member object. Old usage: Array of record informations (array('textleft'=>,'textheader'=>, ...'id'=>,'photo'=>)
+     * @param Translate $outputlangs     Lang object for output language
+     * @param string    $srctemplatepath Full path of source filename for generator using a template file. Example: '5161', 'AVERYC32010', 'CARD', ...
+     * @param string    $mode            Tell if doc module is called for 'member', ...
+     * @param int       $nooutput        1=Generate only file on disk and do not return it on response
+     *
+     * @return    int                                1=OK, 0=KO
+     */
 	public function write_file($object, $outputlangs, $srctemplatepath, $mode = 'member', $nooutput = 0)
 	{
 		// phpcs:enable
@@ -274,193 +463,5 @@ class pdf_standard extends CommonStickerGenerator
 		}
 
 		return 1;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Output a sticker on page at position _COUNTX, _COUNTY (_COUNTX and _COUNTY start from 0)
-	 * - __LOGO__ is replace with company logo
-	 * - __PHOTO__ is replace with photo provided as parameter
-	 *
-	 * @param	 TCPDF		$pdf			PDF
-	 * @param	 string		$textleft		Text left
-	 * @param	 string		$header			Header
-	 * @param	 string		$footer			Footer
-	 * @param	 Translate	$outputlangs	Output langs
-	 * @param	 string		$textright		Text right
-	 * @param	 int		$idmember		Id member
-	 * @param	 string		$photo			Photo (full path to image file used as replacement for key __PHOTOS__ into left, right, header or footer text)
-	 * @return	 void
-	 */
-	public function Add_PDF_card(&$pdf, $textleft, $header, $footer, $outputlangs, $textright = '', $idmember = 0, $photo = '')
-	{
-		// phpcs:enable
-		global $db, $mysoc, $conf, $langs;
-		global $forceimgscalewidth, $forceimgscaleheight;
-
-		$imgscalewidth = (empty($forceimgscalewidth) ? 0.3 : $forceimgscalewidth); // Scale of image for width (1=Full width of sticker)
-		$imgscaleheight = (empty($forceimgscalewidth) ? 0.5 : $forceimgscalewidth); // Scale of image for height (1=Full height of sticker)
-
-		// We are in a new page, then we must add a page
-		if (($this->_COUNTX == 0) && ($this->_COUNTY == 0) and (!$this->_First == 1)) {
-			$pdf->AddPage();
-		}
-		$this->_First = 0;
-		$_PosX = $this->_Margin_Left + ($this->_COUNTX * ($this->_Width + $this->_X_Space));
-		$_PosY = $this->_Margin_Top + ($this->_COUNTY * ($this->_Height + $this->_Y_Space));
-
-		// Define logo
-		$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;
-		if (!is_readable($logo)) {
-			$logo = '';
-			if (!empty($mysoc->logo_small) && is_readable($conf->mycompany->dir_output.'/logos/thumbs/'.$mysoc->logo_small)) {
-				$logo = $conf->mycompany->dir_output.'/logos/thumbs/'.$mysoc->logo_small;
-			} elseif (!empty($mysoc->logo) && is_readable($conf->mycompany->dir_output.'/logos/'.$mysoc->logo)) {
-				$logo = $conf->mycompany->dir_output.'/logos/'.$mysoc->logo;
-			}
-		}
-
-		$member = new Adherent($db);
-		$member->id = $idmember;
-		$member->ref = $idmember;
-
-		// Define photo
-		$dir = $conf->adherent->dir_output;
-		if (!empty($photo)) {
-			$file = get_exdir(0, 0, 0, 0, $member, 'member').'photos/'.$photo;
-			$photo = $dir.'/'.$file;
-			if (!is_readable($photo)) {
-				$photo = '';
-			}
-		}
-
-		// Define background image
-		$backgroundimage = '';
-		if (!empty($conf->global->ADHERENT_CARD_BACKGROUND) && file_exists($conf->adherent->dir_output.'/'.$conf->global->ADHERENT_CARD_BACKGROUND)) {
-			$backgroundimage = $conf->adherent->dir_output.'/'.$conf->global->ADHERENT_CARD_BACKGROUND;
-		}
-
-		// Print lines
-		if ($this->code == "CARD") {
-			$this->Tformat = $this->_Avery_Labels["CARD"];
-			//$this->_Pointille($pdf,$_PosX,$_PosY,$_PosX+$this->_Width,$_PosY+$this->_Height,0.3,25);
-			$this->_Croix($pdf, $_PosX, $_PosY, $_PosX + $this->_Width, $_PosY + $this->_Height, 0.1, 10);
-		}
-
-		// Background
-		if ($backgroundimage) {
-			$pdf->image($backgroundimage, $_PosX, $_PosY, $this->_Width, $this->_Height);
-		}
-
-		$xleft = 2;
-		$ytop = 2;
-
-		// Top
-		if ($header != '') {
-			if ($this->code == "CARD") {
-				$pdf->SetDrawColor(128, 128, 128);
-				$pdf->Line($_PosX, $_PosY + $this->_Line_Height + 1, $_PosX + $this->_Width, $_PosY + $this->_Line_Height + 1); // Only 1 mm and not ytop for top text
-				$pdf->SetDrawColor(0, 0, 0);
-			}
-			$pdf->SetXY($_PosX + $xleft, $_PosY + 1); // Only 1 mm and not ytop for top text
-			$pdf->Cell($this->_Width - 2 * $xleft, $this->_Line_Height, $outputlangs->convToOutputCharset($header), 0, 1, 'C');
-		}
-
-
-		$ytop += (empty($header) ? 0 : (1 + $this->_Line_Height));
-
-		// Define widthtouse and heighttouse
-		$maxwidthtouse = round(($this->_Width - 2 * $xleft) * $imgscalewidth);
-		$maxheighttouse = round(($this->_Height - 2 * $ytop) * $imgscaleheight);
-		$defaultratio = ($maxwidthtouse / $maxheighttouse);
-		$widthtouse = $maxwidthtouse;
-		$heighttouse = 0; // old value for image
-		$tmp = dol_getImageSize($photo, false);
-		if ($tmp['height']) {
-			$imgratio = $tmp['width'] / $tmp['height'];
-			if ($imgratio >= $defaultratio) {
-				$widthtouse = $maxwidthtouse;
-				$heighttouse = round($widthtouse / $imgratio);
-			} else {
-				$heightouse = $maxheighttouse;
-				$widthtouse = round($heightouse * $imgratio);
-			}
-		}
-		//var_dump($this->_Width.'x'.$this->_Height.' with border and scale '.$imgscale.' => max '.$maxwidthtouse.'x'.$maxheighttouse.' => We use '.$widthtouse.'x'.$heighttouse);exit;
-
-		// Center
-		if ($textright == '') {	// Only a left part
-			// Output left area
-			if ($textleft == '__LOGO__' && $logo) {
-				$pdf->Image($logo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-			} elseif ($textleft == '__PHOTO__' && $photo) {
-				$pdf->Image($photo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-			} else {
-				$pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
-				$pdf->MultiCell($this->_Width, $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
-			}
-		} elseif ($textleft != '' && $textright != '') {	//
-			if ($textleft == '__LOGO__' || $textleft == '__PHOTO__') {
-				if ($textleft == '__LOGO__' && $logo) {
-					$pdf->Image($logo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-				} elseif ($textleft == '__PHOTO__' && $photo) {
-					$pdf->Image($photo, $_PosX + $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-				}
-				$pdf->SetXY($_PosX + $xleft + $widthtouse + 1, $_PosY + $ytop);
-				$pdf->MultiCell($this->_Width - $xleft - $xleft - $widthtouse - 1, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
-			} elseif ($textright == '__LOGO__' || $textright == '__PHOTO__') {
-				if ($textright == '__LOGO__' && $logo) {
-					$pdf->Image($logo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-				} elseif ($textright == '__PHOTO__' && $photo) {
-					$pdf->Image($photo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-				}
-				$pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
-				$pdf->MultiCell($this->_Width - $widthtouse - $xleft - $xleft - 1, $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
-			} else // text on halft left and text on half right
-			{
-				$pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
-				$pdf->MultiCell(round($this->_Width / 2), $this->_Line_Height, $outputlangs->convToOutputCharset($textleft), 0, 'L');
-				$pdf->SetXY($_PosX + round($this->_Width / 2), $_PosY + $ytop);
-				$pdf->MultiCell(round($this->_Width / 2) - 2, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
-			}
-		} else // Only a right part
-		{
-			// Output right area
-			if ($textright == '__LOGO__' && $logo) {
-				$pdf->Image($logo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-			} elseif ($textright == '__PHOTO__' && $photo) {
-				$pdf->Image($photo, $_PosX + $this->_Width - $widthtouse - $xleft, $_PosY + $ytop, $widthtouse, $heighttouse);
-			} else {
-				$pdf->SetXY($_PosX + $xleft, $_PosY + $ytop);
-				$pdf->MultiCell($this->_Width - $xleft, $this->_Line_Height, $outputlangs->convToOutputCharset($textright), 0, 'R');
-			}
-		}
-
-		// Bottom
-		if ($footer != '') {
-			if ($this->code == "CARD") {
-				$pdf->SetDrawColor(128, 128, 128);
-				$pdf->Line($_PosX, $_PosY + $this->_Height - $this->_Line_Height - 2, $_PosX + $this->_Width, $_PosY + $this->_Height - $this->_Line_Height - 2);
-				$pdf->SetDrawColor(0, 0, 0);
-			}
-			$pdf->SetXY($_PosX, $_PosY + $this->_Height - $this->_Line_Height - 1);
-			$pdf->Cell($this->_Width, $this->_Line_Height, $outputlangs->convToOutputCharset($footer), 0, 1, 'C');
-		}
-		//print "$_PosY+$this->_Height-$this->_Line_Height-1<br>\n";
-
-		$this->_COUNTY++;
-
-		if ($this->_COUNTY == $this->_Y_Number) {
-			// Si on est en bas de page, on remonte le 'curseur' de position
-			$this->_COUNTX++;
-			$this->_COUNTY = 0;
-		}
-
-		if ($this->_COUNTX == $this->_X_Number) {
-			// Si on est en bout de page, alors on repart sur une nouvelle page
-			$this->_COUNTX = 0;
-			$this->_COUNTY = 0;
-		}
 	}
 }

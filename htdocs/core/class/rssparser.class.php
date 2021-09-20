@@ -35,32 +35,32 @@ class RssParser
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-public $stack = array();
-	private $_format = '';
-	private $_urlRSS;
-	private $_language;
-	private $_generator;
-	private $_copyright;
-	private $_lastbuilddate;
-	private $_imageurl;
-	private $_link;
-	private $_title;
-		private $_description; // Last successful fetch
-private $_lastfetchdate;
 
-	// For parsing with xmlparser
-		private $_rssarray = array(); // parser stack
-	private $_CONTENT_CONSTRUCTS = array('content', 'summary', 'info', 'title', 'tagline', 'copyright');
+    private $_format = '';
+    private $_urlRSS;
+    private $_language;
+    private $_generator;
+    private $_copyright;
+    private $_lastbuilddate;
+    private $_imageurl;
+    private $_link;
+    private $_title;
+    private $_description;
+    private $_lastfetchdate; // Last successful fetch
+    private $_rssarray = [];
 
+    // For parsing with xmlparser
+    public $stack = []; // parser stack
+    private $_CONTENT_CONSTRUCTS = ['content', 'summary', 'info', 'title', 'tagline', 'copyright'];
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
 	}
 
 	/**
@@ -496,74 +496,6 @@ private $_lastfetchdate;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return a URL to a image of the given ATOM feed
-	 *
-	 * @param	array	$feed	The ATOM feed that possible contain a link to a logo or icon
-	 * @return	string			A URL to a image from a ATOM feed when found, otherwise a empty string
-	 */
-	private function getAtomImageUrl(array $feed)
-	{
-		if (isset($feed['icon'])) {
-			return $feed['logo'];
-		}
-
-		if (isset($feed['icon'])) {
-			return $feed['logo'];
-		}
-
-		if (isset($feed['webfeeds:logo'])) {
-			return $feed['webfeeds:logo'];
-		}
-
-		if (isset($feed['webfeeds:icon'])) {
-			return $feed['webfeeds:icon'];
-		}
-
-		if (isset($feed['webfeeds:wordmark'])) {
-			return $feed['webfeeds:wordmark'];
-		}
-
-		return "";
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return a description/summary for one item from a ATOM feed
-	 *
-	 * @param	array	$item		A parsed item of a ATOM feed
-	 * @param	int		$maxlength	(optional) The maximum length for the description
-	 * @return	string				A summary description
-	 */
-	private function getAtomItemDescription(array $item, $maxlength = 500)
-	{
-		$result = "";
-
-		if (isset($item['summary'])) {
-			$result = $item['summary'];
-		} elseif (isset($item['atom_content'])) {
-			$result = $item['atom_content'];
-		}
-
-		// remove all HTML elements that can possible break the maximum size of a tooltip,
-		// like headings, image, video etc. and allow only simple style elements
-		$result = strip_tags($result, "<br><p><ul><ol><li>");
-
-		$result = str_replace("\n", "", $result);
-
-		if (strlen($result) > $maxlength) {
-			$result = substr($result, 0, $maxlength);
-			$result .= "...";
-		}
-
-		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Triggered when opened tag is found
 	 *
@@ -581,7 +513,7 @@ private $_lastfetchdate;
 		// check for a namespace, and split if found
 		$ns = false;
 		if (strpos($element, ':')) {
-			list($ns, $el) = explode(':', $element, 2);
+			[$ns, $el] = explode(':', $element, 2);
 		}
 		if ($ns and $ns != 'rdf') {
 			$this->current_namespace = $ns;
@@ -651,74 +583,8 @@ private $_lastfetchdate;
 		}
 	}
 
-	/**
-	 * Enter description here ...
-	 *
-	 * @param	string	$text		Text
-	 * @return	void
-	 */
-	public function append_content($text)
-	{
-		// phpcs:enable
-		if ($this->initem) {
-			$this->concat($this->current_item[$this->incontent], $text);
-		} elseif ($this->inchannel) {
-			$this->concat($this->channel[$this->incontent], $text);
-		}
-	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	To concat 2 string with no warning if an operand is not defined
-	 *
-	 * 	@param	string	$str1		Str1
-	 *  @param	string	$str2		Str2
-	 *  @return	string				String cancatenated
-	 */
-	public function concat(&$str1, $str2 = "")
-	{
-		if (!isset($str1)) {
-			$str1 = "";
-		}
-		$str1 .= $str2;
-	}
-
-	/**
-	 * 	smart append - field and namespace aware
-	 *
-	 * 	@param	string	$el		El
-	 * 	@param	string	$text	Text
-	 * 	@return	void
-	 */
-	public function append($el, $text)
-	{
-		if (!$el) {
-			return;
-		}
-		if ($this->current_namespace) {
-			if ($this->initem) {
-				$this->concat($this->current_item[$this->current_namespace][$el], $text);
-			} elseif ($this->inchannel) {
-				$this->concat($this->channel[$this->current_namespace][$el], $text);
-			} elseif ($this->intextinput) {
-				$this->concat($this->textinput[$this->current_namespace][$el], $text);
-			} elseif ($this->inimage) {
-				$this->concat($this->image[$this->current_namespace][$el], $text);
-			}
-		} else {
-			if ($this->initem) {
-				$this->concat($this->current_item[$el], $text);
-			} elseif ($this->intextinput) {
-				$this->concat($this->textinput[$el], $text);
-			} elseif ($this->inimage) {
-				$this->concat($this->image[$el], $text);
-			} elseif ($this->inchannel) {
-				$this->concat($this->channel[$el], $text);
-			}
-		}
-	}
-
 	/**
 	 * 	Triggered when CDATA is found
 	 *
@@ -737,13 +603,15 @@ private $_lastfetchdate;
 		}
 	}
 
-	/**
-	 * 	Triggered when closed tag is found
-	 *
-	 * 	@param	string		$p		P
-	 *  @param	string		$el		Tag
-	 *  @return	void
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Triggered when closed tag is found
+     *
+     * 	@param	string		$p		P
+     *  @param	string		$el		Tag
+     *  @return	void
+     */
 	public function feed_end_element($p, $el)
 	{
 		// phpcs:enable
@@ -768,17 +636,151 @@ private $_lastfetchdate;
 				$this->append_content("</$el>");
 			} else {
 				$this->append_content("<$el />");
-			}
+            }
 
-			array_shift($this->stack);
-		} else {
-			array_shift($this->stack);
-		}
+            array_shift($this->stack);
+        } else {
+            array_shift($this->stack);
+        }
 
-		$this->current_namespace = false;
-	}
+        $this->current_namespace = false;
+    }
+
+    /**
+     *    To concat 2 string with no warning if an operand is not defined
+     *
+     * @param string $str1 Str1
+     * @param string $str2 Str2
+     *
+     * @return    string                String cancatenated
+     */
+    public function concat(&$str1, $str2 = "")
+    {
+        if (!isset($str1)) {
+            $str1 = "";
+        }
+        $str1 .= $str2;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Enter description here ...
+     *
+     * @param string $text Text
+     *
+     * @return    void
+     */
+    public function append_content($text)
+    {
+        // phpcs:enable
+        if ($this->initem) {
+            $this->concat($this->current_item[$this->incontent], $text);
+        } elseif ($this->inchannel) {
+            $this->concat($this->channel[$this->incontent], $text);
+        }
+    }
+
+    /**
+     *    smart append - field and namespace aware
+     *
+     * @param string $el   El
+     * @param string $text Text
+     *
+     * @return    void
+     */
+    public function append($el, $text)
+    {
+        if (!$el) {
+            return;
+        }
+        if ($this->current_namespace) {
+            if ($this->initem) {
+                $this->concat($this->current_item[$this->current_namespace][$el], $text);
+            } elseif ($this->inchannel) {
+                $this->concat($this->channel[$this->current_namespace][$el], $text);
+            } elseif ($this->intextinput) {
+                $this->concat($this->textinput[$this->current_namespace][$el], $text);
+            } elseif ($this->inimage) {
+                $this->concat($this->image[$this->current_namespace][$el], $text);
+            }
+        } else {
+            if ($this->initem) {
+                $this->concat($this->current_item[$el], $text);
+            } elseif ($this->intextinput) {
+                $this->concat($this->textinput[$el], $text);
+            } elseif ($this->inimage) {
+                $this->concat($this->image[$el], $text);
+            } elseif ($this->inchannel) {
+                $this->concat($this->channel[$el], $text);
+            }
+        }
+    }
+
+    /**
+     * Return a description/summary for one item from a ATOM feed
+     *
+     * @param array $item      A parsed item of a ATOM feed
+     * @param int   $maxlength (optional) The maximum length for the description
+     *
+     * @return    string                A summary description
+     */
+    private function getAtomItemDescription(array $item, $maxlength = 500)
+    {
+        $result = "";
+
+        if (isset($item['summary'])) {
+            $result = $item['summary'];
+        } elseif (isset($item['atom_content'])) {
+            $result = $item['atom_content'];
+        }
+
+        // remove all HTML elements that can possible break the maximum size of a tooltip,
+        // like headings, image, video etc. and allow only simple style elements
+        $result = strip_tags($result, "<br><p><ul><ol><li>");
+
+        $result = str_replace("\n", "", $result);
+
+        if (strlen($result) > $maxlength) {
+            $result = substr($result, 0, $maxlength);
+            $result .= "...";
+        }
+
+        return $result;
+    }
+
+    /**
+     * Return a URL to a image of the given ATOM feed
+     *
+     * @param array $feed The ATOM feed that possible contain a link to a logo or icon
+     *
+     * @return    string            A URL to a image from a ATOM feed when found, otherwise a empty string
+     */
+    private function getAtomImageUrl(array $feed)
+    {
+        if (isset($feed['icon'])) {
+            return $feed['logo'];
+        }
+
+        if (isset($feed['icon'])) {
+            return $feed['logo'];
+        }
+
+        if (isset($feed['webfeeds:logo'])) {
+            return $feed['webfeeds:logo'];
+        }
+
+        if (isset($feed['webfeeds:icon'])) {
+            return $feed['webfeeds:icon'];
+        }
+
+        if (isset($feed['webfeeds:wordmark'])) {
+            return $feed['webfeeds:wordmark'];
+        }
+
+        return "";
+    }
 }
-
 
 /**
  * Function to convert an XML object into an array

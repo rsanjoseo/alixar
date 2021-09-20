@@ -353,109 +353,6 @@ class PaiementFourn extends Paiement
 		}
 	}
 
-	/**
-	 * 	get the right way of payment
-	 *
-	 * 	@return 	string 	'dolibarr' if standard comportment or paid in dolibarr currency, 'customer' if payment received from multicurrency inputs
-	 */
-	public function getWay()
-	{
-		global $conf;
-
-		$way = 'dolibarr';
-		if (!empty($conf->multicurrency->enabled)) {
-			foreach ($this->multicurrency_amounts as $value) {
-				if (!empty($value)) { // one value found then payment is in invoice currency
-					$way = 'customer';
-					break;
-				}
-			}
-		}
-
-		return $way;
-	}
-
-	/**
-	 *      Return next reference of supplier invoice not already used (or last reference)
-	 *      according to numbering module defined into constant SUPPLIER_PAYMENT_ADDON
-	 *
-	 *      @param	   Societe		$soc		object company
-	 *      @param     string		$mode		'next' for next value or 'last' for last value
-	 *      @return    string					free ref or last ref
-	 */
-	public function getNextNumRef($soc, $mode = 'next')
-	{
-		global $conf, $db, $langs;
-		$langs->load("bills");
-
-		// Clean parameters (if not defined or using deprecated value)
-		if (empty($conf->global->SUPPLIER_PAYMENT_ADDON)) {
-			$conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_bronan';
-		} elseif ($conf->global->SUPPLIER_PAYMENT_ADDON == 'brodator') {
-			$conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_brodator';
-		} elseif ($conf->global->SUPPLIER_PAYMENT_ADDON == 'bronan') {
-			$conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_bronan';
-		}
-
-		if (!empty($conf->global->SUPPLIER_PAYMENT_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->SUPPLIER_PAYMENT_ADDON.".php";
-			$classname = $conf->global->SUPPLIER_PAYMENT_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/supplier_payment/");
-
-				// Load file with numbering class (if found)
-				if (is_file($dir.$file) && is_readable($dir.$file)) {
-					$mybool |= include_once $dir.$file;
-				}
-			}
-
-			// For compatibility
-			if ($mybool === false) {
-				$file = $conf->global->SUPPLIER_PAYMENT_ADDON.".php";
-				$classname = "mod_supplier_payment_".$conf->global->SUPPLIER_PAYMENT_ADDON;
-				$classname = preg_replace('/\-.*$/', '', $classname);
-				// Include file with class
-				foreach ($conf->file->dol_document_root as $dirroot) {
-					$dir = $dirroot."/core/modules/supplier_payment/";
-
-					// Load file with numbering class (if found)
-					if (is_file($dir.$file) && is_readable($dir.$file)) {
-						$mybool |= include_once $dir.$file;
-					}
-				}
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			/**
-			 * $numref can be empty in case we ask for the last value because if there is no invoice created with the
-			 * set up mask.
-			 */
-			if ($mode != 'last' && !$numref) {
-				dol_print_error($db, "SupplierPayment::getNextNumRef ".$obj->error);
-				return "";
-			}
-
-			return $numref;
-		} else {
-			$langs->load("errors");
-			print $langs->trans("Error")." ".$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Supplier"));
-			return "";
-		}
-	}
 
 	/**
 	 *	Delete a payment and lines generated into accounts
@@ -547,44 +444,6 @@ class PaiementFourn extends Paiement
 	}
 
 	/**
-	 *	Return list of supplier invoices the payment point to
-	 *
-	 *	@param      string	$filter         SQL filter. Warning: This value must not come from a user input.
-	 *	@return     array           		Array of supplier invoice id
-	 */
-	public function getBillsArray($filter = '')
-	{
-		$sql = 'SELECT fk_facturefourn';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'paiementfourn_facturefourn as pf, '.MAIN_DB_PREFIX.'facture_fourn as f';
-		$sql .= ' WHERE pf.fk_facturefourn = f.rowid AND fk_paiementfourn = '.((int) $this->id);
-		if ($filter) {
-			$sql .= " AND ".$filter;
-		}
-
-		dol_syslog(get_class($this).'::getBillsArray', LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$i = 0;
-			$num = $this->db->num_rows($resql);
-			$billsarray = array();
-
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$billsarray[$i] = $obj->fk_facturefourn;
-				$i++;
-			}
-
-			return $billsarray;
-		} else {
-			$this->error = $this->db->error();
-			dol_syslog(get_class($this).'::getBillsArray Error '.$this->error);
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 *	Information on object
 	 *
 	 *	@param	int		$id      Id du paiement dont il faut afficher les infos
@@ -612,27 +471,66 @@ class PaiementFourn extends Paiement
 					$muser = new User($this->db);
 					$muser->fetch($obj->fk_user_modif);
 					$this->user_modification = $muser;
-				}
-				$this->date_creation     = $this->db->jdate($obj->datec);
-				$this->date_modification = $this->db->jdate($obj->tms);
-			}
-			$this->db->free($resql);
-		} else {
-			dol_print_error($this->db);
-		}
-	}
+                }
+                $this->date_creation = $this->db->jdate($obj->datec);
+                $this->date_modification = $this->db->jdate($obj->tms);
+            }
+            $this->db->free($resql);
+        } else {
+            dol_print_error($this->db);
+        }
+    }
 
-	/**
-	 *	Retourne le libelle du statut d'une facture (brouillon, validee, abandonnee, payee)
-	 *
-	 *	@param      int		$mode       0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
-	 *	@return     string				Libelle
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->statut, $mode);
-	}
+    /**
+     *    Return list of supplier invoices the payment point to
+     *
+     * @param string $filter SQL filter. Warning: This value must not come from a user input.
+     *
+     * @return     array                Array of supplier invoice id
+     */
+    public function getBillsArray($filter = '')
+    {
+        $sql = 'SELECT fk_facturefourn';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'paiementfourn_facturefourn as pf, ' . MAIN_DB_PREFIX . 'facture_fourn as f';
+        $sql .= ' WHERE pf.fk_facturefourn = f.rowid AND fk_paiementfourn = ' . ((int) $this->id);
+        if ($filter) {
+            $sql .= " AND " . $filter;
+        }
 
+        dol_syslog(get_class($this) . '::getBillsArray', LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $i = 0;
+            $num = $this->db->num_rows($resql);
+            $billsarray = [];
+
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $billsarray[$i] = $obj->fk_facturefourn;
+                $i++;
+            }
+
+            return $billsarray;
+        } else {
+            $this->error = $this->db->error();
+            dol_syslog(get_class($this) . '::getBillsArray Error ' . $this->error);
+            return -1;
+        }
+    }
+
+    /**
+     *    Retourne le libelle du statut d'une facture (brouillon, validee, abandonnee, payee)
+     *
+     * @param int $mode 0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
+     *
+     * @return     string                Libelle
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->statut, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Renvoi le libelle d'un statut donne
 	 *
@@ -683,6 +581,7 @@ class PaiementFourn extends Paiement
 		}*/
 		return '';
 	}
+
 
 	/**
 	 *	Return clicable name (with picto eventually)
@@ -760,25 +659,108 @@ class PaiementFourn extends Paiement
 		$arraynow = dol_getdate($now);
 		$nownotime = dol_mktime(0, 0, 0, $arraynow['mon'], $arraynow['mday'], $arraynow['year']);
 
-		// Initialize parameters
-		$this->id = 0;
-		$this->ref = 'SPECIMEN';
-		$this->specimen = 1;
-		$this->facid = 1;
-		$this->socid = 1;
-		$this->datepaye = $nownotime;
-	}
+        // Initialize parameters
+        $this->id = 0;
+        $this->ref = 'SPECIMEN';
+        $this->specimen = 1;
+        $this->facid = 1;
+        $this->socid = 1;
+        $this->datepaye = $nownotime;
+    }
 
-	/**
-	 *	Create a document onto disk according to template model.
-	 *
-	 *	@param	    string		$modele			Force template to use ('' to not force)
-	 *	@param		Translate	$outputlangs	Object lang a utiliser pour traduction
-	 *  @param      int			$hidedetails    Hide details of lines
-	 *  @param      int			$hidedesc       Hide description
-	 *  @param      int			$hideref        Hide ref
-	 *  @param   null|array  $moreparams     Array to provide more information
-	 *  @return     int         				<0 if KO, 0 if nothing done, >0 if OK
+    /**
+     *      Return next reference of supplier invoice not already used (or last reference)
+     *      according to numbering module defined into constant SUPPLIER_PAYMENT_ADDON
+     *
+     * @param Societe $soc  object company
+     * @param string  $mode 'next' for next value or 'last' for last value
+     *
+     * @return    string                    free ref or last ref
+     */
+    public function getNextNumRef($soc, $mode = 'next')
+    {
+        global $conf, $db, $langs;
+        $langs->load("bills");
+
+        // Clean parameters (if not defined or using deprecated value)
+        if (empty($conf->global->SUPPLIER_PAYMENT_ADDON)) {
+            $conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_bronan';
+        } elseif ($conf->global->SUPPLIER_PAYMENT_ADDON == 'brodator') {
+            $conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_brodator';
+        } elseif ($conf->global->SUPPLIER_PAYMENT_ADDON == 'bronan') {
+            $conf->global->SUPPLIER_PAYMENT_ADDON = 'mod_supplier_payment_bronan';
+        }
+
+        if (!empty($conf->global->SUPPLIER_PAYMENT_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->SUPPLIER_PAYMENT_ADDON . ".php";
+            $classname = $conf->global->SUPPLIER_PAYMENT_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/supplier_payment/");
+
+                // Load file with numbering class (if found)
+                if (is_file($dir . $file) && is_readable($dir . $file)) {
+                    $mybool |= include_once $dir . $file;
+                }
+            }
+
+            // For compatibility
+            if ($mybool === false) {
+                $file = $conf->global->SUPPLIER_PAYMENT_ADDON . ".php";
+                $classname = "mod_supplier_payment_" . $conf->global->SUPPLIER_PAYMENT_ADDON;
+                $classname = preg_replace('/\-.*$/', '', $classname);
+                // Include file with class
+                foreach ($conf->file->dol_document_root as $dirroot) {
+                    $dir = $dirroot . "/core/modules/supplier_payment/";
+
+                    // Load file with numbering class (if found)
+                    if (is_file($dir . $file) && is_readable($dir . $file)) {
+                        $mybool |= include_once $dir . $file;
+                    }
+                }
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            /**
+             * $numref can be empty in case we ask for the last value because if there is no invoice created with the
+             * set up mask.
+             */
+            if ($mode != 'last' && !$numref) {
+                dol_print_error($db, "SupplierPayment::getNextNumRef " . $obj->error);
+                return "";
+            }
+
+            return $numref;
+        } else {
+            $langs->load("errors");
+            print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Supplier"));
+            return "";
+        }
+    }
+
+    /**
+     *    Create a document onto disk according to template model.
+     *
+     * @param string     $modele      Force template to use ('' to not force)
+     * @param Translate  $outputlangs Object lang a utiliser pour traduction
+     * @param int        $hidedetails Hide details of lines
+     * @param int        $hidedesc    Hide description
+     * @param int        $hideref     Hide ref
+     * @param null|array $moreparams  Array to provide more information
+     *  @return     int         				<0 if KO, 0 if nothing done, >0 if OK
 	 */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
@@ -795,26 +777,49 @@ class PaiementFourn extends Paiement
 			}
 		}
 
-		if (empty($modele)) {
-			return 0;
-		} else {
-			$modelpath = "core/modules/supplier_payment/doc/";
+        if (empty($modele)) {
+            return 0;
+        } else {
+            $modelpath = "core/modules/supplier_payment/doc/";
 
-			return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-		}
-	}
+            return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+        }
+    }
+
+    /**
+     *    get the right way of payment
+     *
+     * @return    string    'dolibarr' if standard comportment or paid in dolibarr currency, 'customer' if payment received from multicurrency inputs
+     */
+    public function getWay()
+    {
+        global $conf;
+
+        $way = 'dolibarr';
+        if (!empty($conf->multicurrency->enabled)) {
+            foreach ($this->multicurrency_amounts as $value) {
+                if (!empty($value)) { // one value found then payment is in invoice currency
+                    $way = 'customer';
+                    break;
+                }
+            }
+        }
+
+        return $way;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Load the third party of object, from id into this->thirdparty
-	 *
-	 *	@param		int		$force_thirdparty_id	Force thirdparty id
-	 *	@return		int								<0 if KO, >0 if OK
-	 */
-	public function fetch_thirdparty($force_thirdparty_id = 0)
-	{
+    /**
+     *  Load the third party of object, from id into this->thirdparty
+     *
+     * @param int $force_thirdparty_id Force thirdparty id
+     *
+     * @return        int                                <0 if KO, >0 if OK
+     */
+    public function fetch_thirdparty($force_thirdparty_id = 0)
+    {
 		// phpcs:enable
 		require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 

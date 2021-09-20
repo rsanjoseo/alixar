@@ -116,20 +116,6 @@ class mod_task_simple extends ModeleNumRefTask
 		}
 	}
 
-	/**
-	 *  Return next reference not yet used as a reference
-	 *
-	 *  @param  Societe	$objsoc     Object third party
-	 *  @param  Task	$object     Object task
-	 *  @return string              Next not used reference
-	 */
-	public function task_get_num($objsoc = 0, $object = '')
-	{
-		return $this->getNextValue($objsoc, $object);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return next value
@@ -166,13 +152,29 @@ class mod_task_simple extends ModeleNumRefTask
 		//$yymm = strftime("%y%m",time());
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_task_simple::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_task_simple::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return next reference not yet used as a reference
+     *
+     * @param Societe $objsoc Object third party
+     * @param Task    $object Object task
+     *
+     * @return string              Next not used reference
+     */
+    public function task_get_num($objsoc = 0, $object = '')
+    {
+        return $this->getNextValue($objsoc, $object);
+    }
 }

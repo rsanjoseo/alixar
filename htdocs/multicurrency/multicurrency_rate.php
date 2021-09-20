@@ -522,14 +522,14 @@ if ($resql) {
 			// Action
 			print '<td class="nowrap" align="center">';
 			if ($massactionbutton || $massaction) {   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
-				$selected = 0;
-				if (in_array($obj->rowid, $arrayofselected)) {
-					$selected = 1;
-				}
-				print '<a class="editfielda marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?action=updateRate&amp;id_rate='.$obj->rowid.'">'.img_picto('edit', 'edit').'</a>';
-				print '<a class="marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?action=deleteRate&amp;id_rate='.$obj->rowid.'">'.img_picto('delete', 'delete').'</a>';
-				print '<input id="cb'.$obj->rowid.'" class="flat checkforselect marginleftonly" type="checkbox" name="toselect[]" value="'.$obj->rowid.'"'.($selected ? ' checked="checked"' : '').'>';
-			}
+                $selected = 0;
+                if (in_array($obj->rowid, $arrayofselected)) {
+                    $selected = 1;
+                }
+                print '<a class="editfielda marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?action=updateRate&token=' . newToken() . '&id_rate=' . $obj->rowid . '">' . img_picto('edit', 'edit') . '</a>';
+                print '<a class="marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?action=deleteRate&token=' . newToken() . '&id_rate=' . $obj->rowid . '">' . img_picto('delete', 'delete') . '</a>';
+                print '<input id="cb' . $obj->rowid . '" class="flat checkforselect marginleftonly" type="checkbox" name="toselect[]" value="' . $obj->rowid . '"' . ($selected ? ' checked="checked"' : '') . '>';
+            }
 			print '</td>';
 			if (!$i) {
 				$totalarray['nbfield']++;

@@ -131,27 +131,297 @@ class doc_generic_project_odt extends ModelePDFProjects
 		$this->option_freetext = 1; // Support add of a personalised text
 		$this->option_draft_watermark = 0; // Support add of a watermark on drafts
 
-		// Get source company
-		$this->emetteur = $mysoc;
-		if (!$this->emetteur->pays_code) {
-			$this->emetteur->pays_code = substr($langs->defaultlang, -2); // Par defaut, si n'etait pas defini
-		}
-	}
+        // Get source company
+        $this->emetteur = $mysoc;
+        if (!$this->emetteur->pays_code) {
+            $this->emetteur->pays_code = substr($langs->defaultlang, -2); // Par defaut, si n'etait pas defini
+        }
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return description of a module
-	 *
-	 *	@param	Translate	$langs      Lang object to use for output
-	 *	@return string       			Description
-	 */
-	public function info($langs)
-	{
-		global $conf, $langs;
+    /**
+     * Define array with couple substitution key => substitution value
+     *
+     * @param Project   $object      Main object to use as data source
+     * @param Translate $outputlangs Lang object to use for output
+     * @param string    $array_key   Name of the key for return array
+     *
+     * @return    array                                Array of substitution
+     */
+    public function get_substitutionarray_object($object, $outputlangs, $array_key = 'object')
+    {
+        // phpcs:enable
+        global $conf;
 
-		// Load translation files required by the page
+        $resarray = [
+            $array_key . '_id' => $object->id,
+            $array_key . '_ref' => $object->ref,
+            $array_key . '_title' => $object->title,
+            $array_key . '_description' => $object->description,
+            $array_key . '_date_creation' => dol_print_date($object->date_c, 'day'),
+            $array_key . '_date_modification' => dol_print_date($object->date_m, 'day'),
+            $array_key . '_date_start' => dol_print_date($object->date_start, 'day'),
+            $array_key . '_date_end' => dol_print_date($object->date_end, 'day'),
+            $array_key . '_note_private' => $object->note_private,
+            $array_key . '_note_public' => $object->note_public,
+            $array_key . '_public' => $object->public,
+            $array_key . '_statut' => $object->getLibStatut(),
+        ];
+
+        require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+        $extrafields = new ExtraFields($this->db);
+        $extrafields->fetch_name_optionals_label($object->table_element, true);
+        $object->fetch_optionals();
+
+        $resarray = $this->fill_substitutionarray_with_extrafields($object, $resarray, $extrafields, $array_key, $outputlangs);
+
+        return $resarray;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $task        Task Object
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_tasks(Task $task, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        $resarray = [
+            'task_ref' => $task->ref,
+            'task_fk_project' => $task->fk_project,
+            'task_projectref' => $task->projectref,
+            'task_projectlabel' => $task->projectlabel,
+            'task_label' => $task->label,
+            'task_description' => $task->description,
+            'task_fk_parent' => $task->fk_parent,
+            'task_duration' => $task->duration,
+            'task_duration_hour' => convertSecondToTime($task->duration, 'all'),
+            'task_progress' => $task->progress,
+            'task_public' => $task->public,
+            'task_date_start' => dol_print_date($task->date_start, 'day'),
+            'task_date_end' => dol_print_date($task->date_end, 'day'),
+            'task_note_private' => $task->note_private,
+            'task_note_public' => $task->note_public,
+        ];
+
+        require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+        $extrafields = new ExtraFields($this->db);
+        $extrafields->fetch_name_optionals_label($task->table_element, true);
+        $task->fetch_optionals();
+
+        $resarray = $this->fill_substitutionarray_with_extrafields($task, $resarray, $extrafields, 'task', $outputlangs);
+
+        return $resarray;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $contact     Contact array
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_project_contacts($contact, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+        $pc = 'projcontacts_'; // prefix to avoid typos
+
+        $ret = [
+            $pc . 'id' => $contact['id'],
+            $pc . 'rowid' => $contact['rowid'],
+            $pc . 'role' => $contact['libelle'],
+            $pc . 'lastname' => $contact['lastname'],
+            $pc . 'firstname' => $contact['firstname'],
+            $pc . 'civility' => $contact['civility'],
+            $pc . 'fullcivname' => $contact['fullname'],
+            $pc . 'socname' => $contact['socname'],
+            $pc . 'email' => $contact['email'],
+        ];
+
+        if ($contact['source'] == 'external') {
+            $ret[$pc . 'isInternal'] = ''; // not internal
+
+            $ct = new Contact($this->db);
+            $ct->fetch($contact['id']);
+            $ret[$pc . 'phone_pro'] = $ct->phone_pro;
+            $ret[$pc . 'phone_perso'] = $ct->phone_perso;
+            $ret[$pc . 'phone_mobile'] = $ct->phone_mobile;
+
+            // fetch external user extrafields
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+            $extrafields = new ExtraFields($this->db);
+            $extrafields->fetch_name_optionals_label($ct->table_element, true);
+            $extrafields_num = $ct->fetch_optionals();
+            //dol_syslog(get_class($this)."::get_substitutionarray_project_contacts: ===== Number of Extrafields found: ".$extrafields_num, LOG_DEBUG);
+            foreach ($ct->array_options as $efkey => $efval) {
+                dol_syslog(get_class($this) . "::get_substitutionarray_project_contacts: +++++ Extrafield " . $efkey . " => " . $efval, LOG_DEBUG);
+                $ret[$pc . $efkey] = $efval; // add nothing else because it already comes as 'options_XX'
+            }
+        } elseif ($contact['source'] == 'internal') {
+            $ret[$pc . 'isInternal'] = '1'; // this is an internal user
+
+            $ct = new User($this->db);
+            $ct->fetch($contact['id']);
+            $ret[$pc . 'phone_pro'] = $ct->office_phone;
+            $ret[$pc . 'phone_perso'] = '';
+            $ret[$pc . 'phone_mobile'] = $ct->user_mobile;
+            // do internal users have extrafields ?
+        }
+        return $ret;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $file        file array
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_project_file($file, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        return [
+            'projfile_name' => $file['name'],
+            'projfile_date' => dol_print_date($file['date'], 'day'),
+            'projfile_size' => $file['size'],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $refdetail   Reference array
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_project_reference($refdetail, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        return [
+            'projref_type' => $refdetail['type'],
+            'projref_ref' => $refdetail['ref'],
+            'projref_date' => dol_print_date($refdetail['date'], 'day'),
+            'projref_socname' => $refdetail['socname'],
+            'projref_amountht' => price($refdetail['amountht'], 0, $outputlangs),
+            'projref_amountttc' => price($refdetail['amountttc'], 0, $outputlangs),
+            'projref_status' => $refdetail['status'],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $taskressource Reference array
+     * @param Translate $outputlangs   Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_tasksressource($taskressource, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+        //dol_syslog(get_class($this).'::get_substitutionarray_tasksressource taskressource='.var_export($taskressource,true),LOG_DEBUG);
+        return [
+            'taskressource_rowid' => $taskressource['rowid'],
+            'taskressource_role' => $taskressource['libelle'],
+            'taskressource_lastname' => $taskressource['lastname'],
+            'taskressource_firstname' => $taskressource['firstname'],
+            'taskressource_fullcivname' => $taskressource['fullname'],
+            'taskressource_socname' => $taskressource['socname'],
+            'taskressource_email' => $taskressource['email'],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param object    $tasktime    times object
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_taskstime($tasktime, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        return [
+            'tasktime_rowid' => $tasktime['rowid'],
+            'tasktime_task_date' => dol_print_date($tasktime['task_date'], 'day'),
+            'tasktime_task_duration_sec' => $tasktime['task_duration'],
+            'tasktime_task_duration' => convertSecondToTime($tasktime['task_duration'], 'all'),
+            'tasktime_note' => $tasktime['note'],
+            'tasktime_fk_user' => $tasktime['fk_user'],
+            'tasktime_user_name' => $tasktime['name'],
+            'tasktime_user_first' => $tasktime['firstname'],
+            'tasktime_fullcivname' => $tasktime['fullcivname'],
+            'tasktime_amountht' => $tasktime['amountht'],
+            'tasktime_amountttc' => $tasktime['amountttc'],
+            'tasktime_thm' => $tasktime['thm'],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define array with couple substitution key => substitution value
+     *
+     * @param array     $file        file array
+     * @param Translate $outputlangs Lang object to use for output
+     *
+     * @return    array                                Return a substitution array
+     */
+    public function get_substitutionarray_task_file($file, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        return [
+            'tasksfile_name' => $file['name'],
+            'tasksfile_date' => dol_print_date($file['date'], 'day'),
+            'tasksfile_size' => $file['size'],
+        ];
+    }
+
+    /**
+     *    Return description of a module
+     *
+     * @param Translate $langs Lang object to use for output
+     *
+     * @return string                Description
+     */
+    public function info($langs)
+    {
+        global $conf, $langs;
+
+        // Load translation files required by the page
 		$langs->loadLangs(array("companies", "errors"));
 
 		$form = new Form($this->db);
@@ -231,7 +501,6 @@ class doc_generic_project_odt extends ModelePDFProjects
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Function to build a document on disk using the generic odt module.
 	 *
@@ -924,266 +1193,5 @@ class doc_generic_project_odt extends ModelePDFProjects
 		}
 
 		return -1;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Define array with couple substitution key => substitution value
-	 *
-	 * @param   Project			$object             Main object to use as data source
-	 * @param   Translate		$outputlangs        Lang object to use for output
-	 * @param   string		    $array_key	        Name of the key for return array
-	 * @return	array								Array of substitution
-	 */
-	public function get_substitutionarray_object($object, $outputlangs, $array_key = 'object')
-	{
-		// phpcs:enable
-		global $conf;
-
-		$resarray = array(
-			$array_key.'_id'=>$object->id,
-			$array_key.'_ref'=>$object->ref,
-			$array_key.'_title'=>$object->title,
-			$array_key.'_description'=>$object->description,
-			$array_key.'_date_creation'=>dol_print_date($object->date_c, 'day'),
-			$array_key.'_date_modification'=>dol_print_date($object->date_m, 'day'),
-			$array_key.'_date_start'=>dol_print_date($object->date_start, 'day'),
-			$array_key.'_date_end'=>dol_print_date($object->date_end, 'day'),
-			$array_key.'_note_private'=>$object->note_private,
-			$array_key.'_note_public'=>$object->note_public,
-			$array_key.'_public'=>$object->public,
-			$array_key.'_statut'=>$object->getLibStatut()
-		);
-
-		require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-		$extrafields = new ExtraFields($this->db);
-		$extrafields->fetch_name_optionals_label($object->table_element, true);
-		$object->fetch_optionals();
-
-		$resarray = $this->fill_substitutionarray_with_extrafields($object, $resarray, $extrafields, $array_key, $outputlangs);
-
-		return $resarray;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$task				Task Object
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_tasks(Task $task, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$resarray = array(
-			'task_ref'=>$task->ref,
-			'task_fk_project'=>$task->fk_project,
-			'task_projectref'=>$task->projectref,
-			'task_projectlabel'=>$task->projectlabel,
-			'task_label'=>$task->label,
-			'task_description'=>$task->description,
-			'task_fk_parent'=>$task->fk_parent,
-			'task_duration'=>$task->duration,
-			'task_duration_hour'=>convertSecondToTime($task->duration, 'all'),
-			'task_progress'=>$task->progress,
-			'task_public'=>$task->public,
-			'task_date_start'=>dol_print_date($task->date_start, 'day'),
-			'task_date_end'=>dol_print_date($task->date_end, 'day'),
-			'task_note_private'=>$task->note_private,
-			'task_note_public'=>$task->note_public
-		);
-
-		require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-		$extrafields = new ExtraFields($this->db);
-		$extrafields->fetch_name_optionals_label($task->table_element, true);
-		$task->fetch_optionals();
-
-		$resarray = $this->fill_substitutionarray_with_extrafields($task, $resarray, $extrafields, 'task', $outputlangs);
-
-		return $resarray;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$taskressource			Reference array
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_tasksressource($taskressource, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-		//dol_syslog(get_class($this).'::get_substitutionarray_tasksressource taskressource='.var_export($taskressource,true),LOG_DEBUG);
-		return array(
-		'taskressource_rowid'=>$taskressource['rowid'],
-		'taskressource_role'=>$taskressource['libelle'],
-		'taskressource_lastname'=>$taskressource['lastname'],
-		'taskressource_firstname'=>$taskressource['firstname'],
-		'taskressource_fullcivname'=>$taskressource['fullname'],
-		'taskressource_socname'=>$taskressource['socname'],
-		'taskressource_email'=>$taskressource['email']
-		);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  object			$tasktime			times object
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_taskstime($tasktime, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		return array(
-		'tasktime_rowid'=>$tasktime['rowid'],
-		'tasktime_task_date'=>dol_print_date($tasktime['task_date'], 'day'),
-		'tasktime_task_duration_sec'=>$tasktime['task_duration'],
-		'tasktime_task_duration'=>convertSecondToTime($tasktime['task_duration'], 'all'),
-		'tasktime_note'=>$tasktime['note'],
-		'tasktime_fk_user'=>$tasktime['fk_user'],
-		'tasktime_user_name'=>$tasktime['name'],
-		'tasktime_user_first'=>$tasktime['firstname'],
-		'tasktime_fullcivname'=>$tasktime['fullcivname'],
-		'tasktime_amountht'=>$tasktime['amountht'],
-		'tasktime_amountttc'=>$tasktime['amountttc'],
-		'tasktime_thm'=>$tasktime['thm'],
-		);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$file				file array
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_task_file($file, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		return array(
-		'tasksfile_name'=>$file['name'],
-		'tasksfile_date'=>dol_print_date($file['date'], 'day'),
-		'tasksfile_size'=>$file['size']
-		);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$file				file array
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_project_file($file, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		return array(
-			'projfile_name'=>$file['name'],
-			'projfile_date'=>dol_print_date($file['date'], 'day'),
-			'projfile_size'=>$file['size']
-		);
-	}
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$contact			Contact array
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_project_contacts($contact, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-		$pc = 'projcontacts_'; // prefix to avoid typos
-
-		$ret = array(
-			$pc.'id'=>$contact['id'],
-			$pc.'rowid'=>$contact['rowid'],
-			$pc.'role'=>$contact['libelle'],
-			$pc.'lastname'=>$contact['lastname'],
-			$pc.'firstname'=>$contact['firstname'],
-			$pc.'civility'=>$contact['civility'],
-			$pc.'fullcivname'=>$contact['fullname'],
-			$pc.'socname'=>$contact['socname'],
-			$pc.'email'=>$contact['email']
-			);
-
-		if ($contact['source'] == 'external') {
-			$ret[$pc.'isInternal'] = ''; // not internal
-
-			$ct = new Contact($this->db);
-			$ct->fetch($contact['id']);
-			$ret[$pc.'phone_pro'] = $ct->phone_pro;
-			$ret[$pc.'phone_perso'] = $ct->phone_perso;
-			$ret[$pc.'phone_mobile'] = $ct->phone_mobile;
-
-			// fetch external user extrafields
-			require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-			$extrafields = new ExtraFields($this->db);
-			$extrafields->fetch_name_optionals_label($ct->table_element, true);
-			$extrafields_num = $ct->fetch_optionals();
-			//dol_syslog(get_class($this)."::get_substitutionarray_project_contacts: ===== Number of Extrafields found: ".$extrafields_num, LOG_DEBUG);
-			foreach ($ct->array_options as $efkey => $efval) {
-				dol_syslog(get_class($this)."::get_substitutionarray_project_contacts: +++++ Extrafield ".$efkey." => ".$efval, LOG_DEBUG);
-				$ret[$pc.$efkey] = $efval; // add nothing else because it already comes as 'options_XX'
-			}
-		} elseif ($contact['source'] == 'internal') {
-			$ret[$pc.'isInternal'] = '1'; // this is an internal user
-
-			$ct = new User($this->db);
-			$ct->fetch($contact['id']);
-			$ret[$pc.'phone_pro'] = $ct->office_phone;
-			$ret[$pc.'phone_perso'] = '';
-			$ret[$pc.'phone_mobile'] = $ct->user_mobile;
-			// do internal users have extrafields ?
-		}
-		return $ret;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Define array with couple substitution key => substitution value
-	 *
-	 *	@param  array			$refdetail			Reference array
-	 *	@param  Translate		$outputlangs        Lang object to use for output
-	 *  @return	array								Return a substitution array
-	 */
-	public function get_substitutionarray_project_reference($refdetail, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		return array(
-			'projref_type'=>$refdetail['type'],
-			'projref_ref'=>$refdetail['ref'],
-			'projref_date'=>dol_print_date($refdetail['date'], 'day'),
-			'projref_socname'=>$refdetail['socname'],
-			'projref_amountht'=>price($refdetail['amountht'], 0, $outputlangs),
-			'projref_amountttc'=>price($refdetail['amountttc'], 0, $outputlangs),
-			'projref_status'=>$refdetail['status']
-		);
 	}
 }

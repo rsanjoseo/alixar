@@ -40,19 +40,21 @@ foreach ($linkedObjectBlock as $key => $objectlink) {
 
 	$trclass = 'oddeven';
 	if ($ilink == count($linkedObjectBlock) && empty($noMoreLinkedObjectBlockAfter) && count($linkedObjectBlock) <= 1) {
-		$trclass .= ' liste_sub_total';
-	}
-	?>
-<tr class="<?php echo $trclass; ?>">
-	<td><?php echo $langs->trans("MyObject"); ?></td>
-	<td><?php echo $objectlink->getNomUrl(1); ?></td>
-	<td></td>
-	<td class="center"><?php echo dol_print_date($objectlink->date, 'day'); ?></td>
-	<td class="right"><?php echo ''; ?></td>
-	<td class="right"><?php echo $objectlink->getLibStatut(7); ?></td>
-	<td class="right"><a class="reposition" href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=dellink&dellinkid='.$key; ?>"><?php echo img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink'); ?></a></td>
-</tr>
-	<?php
+        $trclass .= ' liste_sub_total';
+    }
+    ?>
+    <tr class="<?php echo $trclass; ?>">
+        <td><?php echo $langs->trans("MyObject"); ?></td>
+        <td><?php echo $objectlink->getNomUrl(1); ?></td>
+        <td></td>
+        <td class="center"><?php echo dol_print_date($objectlink->date, 'day'); ?></td>
+        <td class="right"><?php echo ''; ?></td>
+        <td class="right"><?php echo $objectlink->getLibStatut(7); ?></td>
+        <td class="right"><a class="reposition"
+                             href="<?php echo $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=dellink&token=' . newToken() . '&dellinkid=' . $key; ?>"><?php echo img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink'); ?></a>
+        </td>
+    </tr>
+    <?php
 }
 
 print "<!-- END PHP TEMPLATE -->\n";

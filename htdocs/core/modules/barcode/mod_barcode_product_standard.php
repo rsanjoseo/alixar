@@ -128,17 +128,48 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
 	public function getExample($langs, $objproduct = 0)
 	{
 		$examplebarcode = $this->getNextValue($objproduct, '');
-		if (!$examplebarcode) {
-			$examplebarcode = $langs->trans('NotConfigured');
-		}
-		if ($examplebarcode == "ErrorBadMask") {
-			$langs->load("errors");
-			$examplebarcode = $langs->trans($examplebarcode);
-		}
+        if (!$examplebarcode) {
+            $examplebarcode = $langs->trans('NotConfigured');
+        }
+        if ($examplebarcode == "ErrorBadMask") {
+            $langs->load("errors");
+            $examplebarcode = $langs->trans($examplebarcode);
+        }
 
-		return $examplebarcode;
-	}
+        return $examplebarcode;
+    }
 
+    /**
+     *  Return literal barcode type code from numerical rowid type of barcode
+     *
+     * @param Database $db   Database
+     * @param int      $type Type of barcode (EAN, ISBN, ...) as rowid
+     *
+     * @return string
+     */
+    public function literalBarcodeType($db, $type = '')
+    {
+        global $conf;
+        $out = '';
+
+        $sql = "SELECT rowid, code, libelle as label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_barcode_type";
+        $sql .= " WHERE rowid = '" . $db->escape($type) . "'";
+        $sql .= " AND entity = " . ((int) $conf->entity);
+        $result = $db->query($sql);
+        if ($result) {
+            $num = $db->num_rows($result);
+
+            if ($num > 0) {
+                $obj = $db->fetch_object($result);
+                $out .= $obj->label; //take the label corresponding to the type rowid in the database
+            }
+        } else {
+            dol_print_error($db);
+        }
+
+        return $out;
+    }
 	/**
 	 * Return next value
 	 *
@@ -198,36 +229,6 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
 		return  $numFinal;
 	}
 
-	/**
-	 *  Return literal barcode type code from numerical rowid type of barcode
-	 *
-	 *	@param	Database    $db         Database
-	 *  @param  int  		$type       Type of barcode (EAN, ISBN, ...) as rowid
-	 *  @return string
-	 */
-	public function literalBarcodeType($db, $type = '')
-	{
-		global $conf;
-		$out = '';
-
-		$sql = "SELECT rowid, code, libelle as label";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_barcode_type";
-		$sql .= " WHERE rowid = '".$db->escape($type)."'";
-		$sql .= " AND entity = ".((int) $conf->entity);
-		$result = $db->query($sql);
-		if ($result) {
-			$num = $db->num_rows($result);
-
-			if ($num > 0) {
-				$obj = $db->fetch_object($result);
-				$out .= $obj->label; //take the label corresponding to the type rowid in the database
-			}
-		} else {
-			dol_print_error($db);
-		}
-
-		return $out;
-	}
 
 	/**
 	 * 	Check validity of code according to its rules
@@ -271,27 +272,60 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
 					$result = -2;
 				} else {
 					$result = -1;
-				}
-			}
-		}
+                }
+            }
+        }
 
-		dol_syslog(get_class($this)."::verif type=".$thirdparty_type." result=".$result);
-		return $result;
-	}
+        dol_syslog(get_class($this) . "::verif type=" . $thirdparty_type . " result=" . $result);
+        return $result;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return if a barcode value match syntax
-	 *
-	 *	@param	string	$codefortest	Code to check syntax
-	 *  @param	string	$typefortest	Type of barcode (ISBN, EAN, ...)
-	 *	@return	int						0 if OK, <0 if KO
-	 */
-	public function verif_syntax($codefortest, $typefortest)
-	{
-		// phpcs:enable
+    /**
+     *    Return if a code is used (by other element)
+     *
+     * @param DoliDB  $db      Handler acces base
+     * @param string  $code    Code to check
+     * @param Product $product Objet product
+     *
+     * @return    int                        0 if available, <0 if KO
+     */
+    public function verif_dispo($db, $code, $product)
+    {
+        // phpcs:enable
+        $sql = "SELECT barcode FROM " . MAIN_DB_PREFIX . "product";
+        $sql .= " WHERE barcode = '" . $db->escape($code) . "'";
+        if ($product->id > 0) {
+            $sql .= " AND rowid <> " . $product->id;
+        }
+
+        $resql = $db->query($sql);
+        if ($resql) {
+            if ($db->num_rows($resql) == 0) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else {
+            return -2;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return if a barcode value match syntax
+     *
+     * @param string $codefortest Code to check syntax
+     * @param string $typefortest Type of barcode (ISBN, EAN, ...)
+     *
+     * @return    int                        0 if OK, <0 if KO
+     */
+    public function verif_syntax($codefortest, $typefortest)
+    {
+        // phpcs:enable
 		global $conf;
 
 		$result = 0;
@@ -324,36 +358,5 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
 		}
 
 		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return if a code is used (by other element)
-	 *
-	 *	@param	DoliDB		$db			Handler acces base
-	 *	@param	string		$code		Code to check
-	 *	@param	Product		$product	Objet product
-	 *	@return	int						0 if available, <0 if KO
-	 */
-	public function verif_dispo($db, $code, $product)
-	{
-		// phpcs:enable
-		$sql = "SELECT barcode FROM ".MAIN_DB_PREFIX."product";
-		$sql .= " WHERE barcode = '".$db->escape($code)."'";
-		if ($product->id > 0) {
-			$sql .= " AND rowid <> ".$product->id;
-		}
-
-		$resql = $db->query($sql);
-		if ($resql) {
-			if ($db->num_rows($resql) == 0) {
-				return 0;
-			} else {
-				return -1;
-			}
-		} else {
-			return -2;
-		}
 	}
 }

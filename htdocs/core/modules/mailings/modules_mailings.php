@@ -111,26 +111,58 @@ class MailingTargets // This can't be abstract as it is used for some method
 
 	/**
 	 * Affiche formulaire de filtre qui apparait dans page de selection
-	 * des destinataires de mailings
-	 *
-	 * @return     string      Retourne zone select
-	 */
-	public function formFilter()
-	{
-		return '';
-	}
+     * des destinataires de mailings
+     *
+     * @return     string      Retourne zone select
+     */
+    public function formFilter()
+    {
+        return '';
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Add a list of targets int the database
-	 *
-	 * @param	int		$mailing_id    Id of emailing
-	 * @param   array	$cibles        Array with targets
-	 * @return  int      			   < 0 si erreur, nb ajout si ok
-	 */
-	public function addTargetsToDatabase($mailing_id, $cibles)
-	{
+    /**
+     * Met a jour nombre de destinataires
+     *
+     * @param int $mailing_id Id of emailing
+     *
+     * @return  int                             < 0 si erreur, nb destinataires si ok
+     */
+    public function update_nb($mailing_id)
+    {
+        // phpcs:enable
+        // Mise a jour nombre de destinataire dans table des mailings
+        $sql = "SELECT COUNT(*) nb FROM " . MAIN_DB_PREFIX . "mailing_cibles";
+        $sql .= " WHERE fk_mailing = " . ((int) $mailing_id);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            $nb = $obj->nb;
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "mailing";
+            $sql .= " SET nbemail = " . $nb . " WHERE rowid = " . ((int) $mailing_id);
+            if (!$this->db->query($sql)) {
+                dol_syslog($this->db->error());
+                $this->error = $this->db->error();
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+        return $nb;
+    }
+
+    /**
+     * Add a list of targets int the database
+     *
+     * @param int   $mailing_id Id of emailing
+     * @param array $cibles     Array with targets
+     *
+     * @return  int                   < 0 si erreur, nb ajout si ok
+     */
+    public function addTargetsToDatabase($mailing_id, $cibles)
+    {
 		global $conf;
 		global $dolibarr_main_instance_unique_id;
 
@@ -210,38 +242,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 		return $j;
 	}
 
-	/**
-	 * Met a jour nombre de destinataires
-	 *
-	 * @param	int		$mailing_id          Id of emailing
-	 * @return  int			                 < 0 si erreur, nb destinataires si ok
-	 */
-	public function update_nb($mailing_id)
-	{
-		// phpcs:enable
-		// Mise a jour nombre de destinataire dans table des mailings
-		$sql = "SELECT COUNT(*) nb FROM ".MAIN_DB_PREFIX."mailing_cibles";
-		$sql .= " WHERE fk_mailing = ".((int) $mailing_id);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			$nb = $obj->nb;
-
-			$sql = "UPDATE ".MAIN_DB_PREFIX."mailing";
-			$sql .= " SET nbemail = ".$nb." WHERE rowid = ".((int) $mailing_id);
-			if (!$this->db->query($sql)) {
-				dol_syslog($this->db->error());
-				$this->error = $this->db->error();
-				return -1;
-			}
-		} else {
-			return -1;
-		}
-		return $nb;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Supprime tous les destinataires de la table des cibles
 	 *

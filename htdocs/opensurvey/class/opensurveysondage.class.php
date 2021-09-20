@@ -36,89 +36,105 @@ require_once DOL_DOCUMENT_ROOT."/core/class/commonobject.class.php";
 class Opensurveysondage extends CommonObject
 {
 	/**
-	 * Draft status (not used)
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated/Opened status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Closed
-	 */
-	const STATUS_CLOSED = 2;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'opensurvey_sondage';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'opensurvey_sondage';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'poll';
+
 	/**
 	 * @var string	ID survey
 	 */
 	public $id_sondage;
-	/**
+
+    /**
 	 * @var string description
 	 */
 	public $description;
-	/**
+
+    /**
 	 * @var string email admin
 	 */
 	public $mail_admin;
-	/**
+
+    /**
 	 * @var string admin name
 	 */
 	public $nom_admin;
-	/**
+
+    /**
 	 * Id of user author of the poll
 	 * @var int
 	 */
 	public $fk_user_creat;
-	/**
+
+    /**
 	 * @var string	Title
 	 */
 	public $title;
-	public $date_fin = '';
-	/**
+
+    public $date_fin = '';
+
+    /**
 	 * @var int status
 	 */
 	public $status = 1;
-	/**
+
+    /**
 	 * @var string format of survey
 	 */
 	public $format;
-	/**
+
+    /**
 	 * @var int mailsonde
 	 */
 	public $mailsonde;
-	/**
+
+    /**
 	 * @var string subject
 	 */
 	public $sujet;
-	/**
-	 * @var int		Allow comments on this poll
-	 */
-	public $allow_comments;
-	/**
-	 * @var int		Allow users see others vote
-	 */
-	public $allow_spy;
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param	DoliDb		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * @var int        Allow comments on this poll
+     */
+    public $allow_comments;
+
+    /**
+     * @var int        Allow users see others vote
+     */
+    public $allow_spy;
+
+    /**
+     * Draft status (not used)
+     */
+    const STATUS_DRAFT = 0;
+    /**
+     * Validated/Opened status
+     */
+    const STATUS_VALIDATED = 1;
+    /**
+     * Closed
+     */
+    const STATUS_CLOSED = 2;
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
 
 	/**
@@ -206,25 +222,6 @@ class Opensurveysondage extends CommonObject
 		}
 	}
 
-	/**
-	 * Cleans all the class variables before doing an update or an insert
-	 *
-	 * @return void
-	 */
-	private function cleanParameters()
-	{
-		$this->id_sondage = trim($this->id_sondage);
-		$this->description = trim($this->description);
-		$this->mail_admin = trim($this->mail_admin);
-		$this->nom_admin = trim($this->nom_admin);
-		$this->title = trim($this->title);
-		$this->status = (int) $this->status;
-		$this->format = trim($this->format);
-		$this->mailsonde = ($this->mailsonde ? 1 : 0);
-		$this->allow_comments = ($this->allow_comments ? 1 : 0);
-		$this->allow_spy = ($this->allow_spy ? 1 : 0);
-		$this->sujet = trim($this->sujet);
-	}
 
 	/**
 	 *  Load object in memory from the database
@@ -293,7 +290,7 @@ class Opensurveysondage extends CommonObject
 		return $ret;
 	}
 
-	/**
+    /**
 	 *  Update object into database
 	 *
 	 *  @param	User    $user        User that modifies
@@ -418,8 +415,6 @@ class Opensurveysondage extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return a link to the object card (with optionaly the picto)
 	 *
@@ -485,6 +480,7 @@ class Opensurveysondage extends CommonObject
 		return $result;
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return array of lines
 	 *
@@ -595,25 +591,46 @@ class Opensurveysondage extends CommonObject
 	 */
 	public function deleteComment($id_comment)
 	{
-		$sql = 'DELETE FROM '.MAIN_DB_PREFIX.'opensurvey_comments WHERE id_comment = '.((int) $id_comment).' AND id_sondage = "'.$this->db->escape($this->id_sondage).'"';
-		$resql = $this->db->query($sql);
+        $sql = 'DELETE FROM ' . MAIN_DB_PREFIX . 'opensurvey_comments WHERE id_comment = ' . ((int) $id_comment) . ' AND id_sondage = "' . $this->db->escape($this->id_sondage) . '"';
+        $resql = $this->db->query($sql);
 
-		if (!$resql) {
-			return false;
-		}
+        if (!$resql) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
-	 *	Return status label of Order
-	 *
-	 *	@param      int     $mode       0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
-	 *	@return     string              Libelle
-	 */
-	public function getLibStatut($mode)
-	{
-		return $this->LibStatut($this->status, $mode);
+    /**
+     * Cleans all the class variables before doing an update or an insert
+     *
+     * @return void
+     */
+    private function cleanParameters()
+    {
+        $this->id_sondage = trim($this->id_sondage);
+        $this->description = trim($this->description);
+        $this->mail_admin = trim($this->mail_admin);
+        $this->nom_admin = trim($this->nom_admin);
+        $this->title = trim($this->title);
+        $this->status = (int) $this->status;
+        $this->format = trim($this->format);
+        $this->mailsonde = ($this->mailsonde ? 1 : 0);
+        $this->allow_comments = ($this->allow_comments ? 1 : 0);
+        $this->allow_spy = ($this->allow_spy ? 1 : 0);
+        $this->sujet = trim($this->sujet);
+    }
+
+    /**
+     *    Return status label of Order
+     *
+     * @param int $mode 0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
+     *
+     * @return     string              Libelle
+     */
+    public function getLibStatut($mode)
+    {
+        return $this->LibStatut($this->status, $mode);
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

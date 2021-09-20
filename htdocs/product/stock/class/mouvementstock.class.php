@@ -124,112 +124,6 @@ class MouvementStock extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id  Id object
-	 *
-	 * @return int <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql = 'SELECT';
-		$sql .= ' t.rowid,';
-		$sql .= " t.tms,";
-		$sql .= " t.datem,";
-		$sql .= " t.fk_product,";
-		$sql .= " t.fk_entrepot,";
-		$sql .= " t.value,";
-		$sql .= " t.price,";
-		$sql .= " t.type_mouvement,";
-		$sql .= " t.fk_user_author,";
-		$sql .= " t.label,";
-		$sql .= " t.fk_origin,";
-		$sql .= " t.origintype,";
-		$sql .= " t.inventorycode,";
-		$sql .= " t.batch,";
-		$sql .= " t.eatby,";
-		$sql .= " t.sellby,";
-		$sql .= " t.fk_projet as fk_project";
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE t.rowid = '.((int) $id);
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numrows = $this->db->num_rows($resql);
-			if ($numrows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-
-				$this->product_id = $obj->fk_product;
-				$this->warehouse_id = $obj->fk_entrepot;
-				$this->qty = $obj->value;
-				$this->type = $obj->type_mouvement;
-
-				$this->tms = $this->db->jdate($obj->tms);
-				$this->datem = $this->db->jdate($obj->datem);
-				$this->price = $obj->price;
-				$this->fk_user_author = $obj->fk_user_author;
-				$this->label = $obj->label;
-				$this->fk_origin = $obj->fk_origin;
-				$this->origintype = $obj->origintype;
-				$this->inventorycode = $obj->inventorycode;
-				$this->batch = $obj->batch;
-				$this->eatby = $this->db->jdate($obj->eatby);
-				$this->sellby = $this->db->jdate($obj->sellby);
-				$this->fk_project = $obj->fk_project;
-			}
-
-			// Retrieve all extrafield
-			$this->fetch_optionals();
-
-			// $this->fetch_lines();
-
-			$this->db->free($resql);
-
-			if ($numrows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 *	Decrease stock for product and subproducts
-	 *
-	 * 	@param 		User	$user			    Object user
-	 * 	@param		int		$fk_product		    Id product
-	 * 	@param		int		$entrepot_id	    Warehouse id
-	 * 	@param		int		$qty			    Quantity
-	 * 	@param		int		$price			    Price
-	 * 	@param		string	$label			    Label of stock movement
-	 * 	@param		string	$datem			    Force date of movement
-	 *	@param		integer	$eatby			    eat-by date
-	 *	@param		integer	$sellby			    sell-by date
-	 *	@param		string	$batch			    batch number
-	 * 	@param		int		$id_product_batch	Id product_batch
-	 *  @param      string  $inventorycode      Inventory code
-	 * 	@return		int						    <0 if KO, >0 if OK
-	 */
-	public function livraison($user, $fk_product, $entrepot_id, $qty, $price = 0, $label = '', $datem = '', $eatby = '', $sellby = '', $batch = '', $id_product_batch = 0, $inventorycode = '')
-	{
-		global $conf;
-
-		$skip_batch = empty($conf->productbatch->enabled);
-
-		return $this->_create($user, $fk_product, $entrepot_id, (0 - $qty), 2, $price, $label, $inventorycode, $datem, $eatby, $sellby, $batch, $skip_batch, $id_product_batch);
-	}
-
 	/**
 	 *	Add a movement of stock (in one direction only).
 	 *  This is the lowest level method to record a stock change.
@@ -708,82 +602,92 @@ class MouvementStock extends CommonObject
 		}
 	}
 
-	/**
-	 * Create or update batch record (update table llx_product_batch). No check is done here, done by parent.
-	 *
-	 * @param	array|int	$dluo	      Could be either
-	 *                                    - int if row id of product_batch table
-	 *                                    - or complete array('fk_product_stock'=>, 'batchnumber'=>)
-	 * @param	int			$qty	      Quantity of product with batch number. May be a negative amount.
-	 * @return 	int   				      <0 if KO, else return productbatch id
-	 */
-	private function createBatch($dluo, $qty)
-	{
-		global $user;
+    /**
+     * Load object in memory from the database
+     *
+     * @param int $id Id object
+     *
+     * @return int <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-		$pdluo = new Productbatch($this->db);
+        $sql = 'SELECT';
+        $sql .= ' t.rowid,';
+        $sql .= " t.tms,";
+        $sql .= " t.datem,";
+        $sql .= " t.fk_product,";
+        $sql .= " t.fk_entrepot,";
+        $sql .= " t.value,";
+        $sql .= " t.price,";
+        $sql .= " t.type_mouvement,";
+        $sql .= " t.fk_user_author,";
+        $sql .= " t.label,";
+        $sql .= " t.fk_origin,";
+        $sql .= " t.origintype,";
+        $sql .= " t.inventorycode,";
+        $sql .= " t.batch,";
+        $sql .= " t.eatby,";
+        $sql .= " t.sellby,";
+        $sql .= " t.fk_projet as fk_project";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE t.rowid = ' . ((int) $id);
 
-		$result = 0;
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $numrows = $this->db->num_rows($resql);
+            if ($numrows) {
+                $obj = $this->db->fetch_object($resql);
 
-		// Try to find an existing record with same batch number or id
-		if (is_numeric($dluo)) {
-			$result = $pdluo->fetch($dluo);
-			if (empty($pdluo->id)) {
-				// We didn't find the line. May be it was deleted before by a previous move in same transaction.
-				$this->error = 'Error. You ask a move on a record for a serial that does not exists anymore. May be you take the same serial on same warehouse several times in same shipment or it was used by another shipment. Remove this shipment and prepare another one.';
-				$this->errors[] = $this->error;
-				$result = -2;
-			}
-		} elseif (is_array($dluo)) {
-			if (isset($dluo['fk_product_stock'])) {
-				$vfk_product_stock = $dluo['fk_product_stock'];
-				$vbatchnumber = $dluo['batchnumber'];
+                $this->id = $obj->rowid;
 
-				$result = $pdluo->find($vfk_product_stock, '', '', $vbatchnumber); // Search on batch number only (eatby and sellby are deprecated here)
-			} else {
-				dol_syslog(get_class($this)."::createBatch array param dluo must contain at least key fk_product_stock", LOG_ERR);
-				$result = -1;
-			}
-		} else {
-			dol_syslog(get_class($this)."::createBatch error invalid param dluo", LOG_ERR);
-			$result = -1;
-		}
+                $this->product_id = $obj->fk_product;
+                $this->warehouse_id = $obj->fk_entrepot;
+                $this->qty = $obj->value;
+                $this->type = $obj->type_mouvement;
 
-		if ($result >= 0) {
-			// No error
-			if ($pdluo->id > 0) {	// product_batch record found
-				//print "Avant ".$pdluo->qty." Apres ".($pdluo->qty + $qty)."<br>";
-				$pdluo->qty += $qty;
-				if ($pdluo->qty == 0) {
-					$result = $pdluo->delete($user, 1);
-				} else {
-					$result = $pdluo->update($user, 1);
-				}
-			} else {					// product_batch record not found
-				$pdluo->fk_product_stock = $vfk_product_stock;
-				$pdluo->qty = $qty;
-				$pdluo->eatby = empty($dluo['eatby']) ? '' : $dluo['eatby'];		// No more used. Now eatby date is store in table of lot, no more into prouct_batch table.
-				$pdluo->sellby = empty($dluo['sellby']) ? '' : $dluo['sellby'];		// No more used. Now sellby date is store in table of lot, no more into prouct_batch table.
-				$pdluo->batch = $vbatchnumber;
+                $this->tms = $this->db->jdate($obj->tms);
+                $this->datem = $this->db->jdate($obj->datem);
+                $this->price = $obj->price;
+                $this->fk_user_author = $obj->fk_user_author;
+                $this->label = $obj->label;
+                $this->fk_origin = $obj->fk_origin;
+                $this->origintype = $obj->origintype;
+                $this->inventorycode = $obj->inventorycode;
+                $this->batch = $obj->batch;
+                $this->eatby = $this->db->jdate($obj->eatby);
+                $this->sellby = $this->db->jdate($obj->sellby);
+                $this->fk_project = $obj->fk_project;
+            }
 
-				$result = $pdluo->create($user, 1);
-				if ($result < 0) {
-					$this->error = $pdluo->error;
-					$this->errors = $pdluo->errors;
-				}
-			}
-		}
+            // Retrieve all extrafield
+            $this->fetch_optionals();
 
-		return $result;
-	}
+            // $this->fetch_lines();
 
-	/**
-	 *  Create movement in database for all subproducts
-	 *
-	 * 	@param 		User	$user			Object user
-	 * 	@param		int		$idProduct		Id product
-	 * 	@param		int		$entrepot_id	Warehouse id
-	 * 	@param		int		$qty			Quantity
+            $this->db->free($resql);
+
+            if ($numrows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return -1;
+        }
+    }
+
+    /**
+     *  Create movement in database for all subproducts
+     *
+     * @param User                 $user             Object user
+     * @param int                  $idProduct        Id product
+     * @param int                  $entrepot_id      Warehouse id
+     * @param int                  $qty              Quantity
 	 * 	@param		int		$type			Type
 	 * 	@param		int		$price			Price
 	 * 	@param		string	$label			Label of movement
@@ -837,59 +741,31 @@ class MouvementStock extends CommonObject
 		return $error;
 	}
 
+    /**
+     *    Decrease stock for product and subproducts
+     *
+     * @param User    $user             Object user
+     * @param int     $fk_product       Id product
+     * @param int     $entrepot_id      Warehouse id
+     * @param int     $qty              Quantity
+     * @param int     $price            Price
+     * @param string  $label            Label of stock movement
+     * @param string  $datem            Force date of movement
+     * @param integer $eatby            eat-by date
+     * @param integer $sellby           sell-by date
+     * @param string  $batch            batch number
+     * @param int     $id_product_batch Id product_batch
+     * @param string  $inventorycode    Inventory code
+     *
+     * @return        int                            <0 if KO, >0 if OK
+     */
+    public function livraison($user, $fk_product, $entrepot_id, $qty, $price = 0, $label = '', $datem = '', $eatby = '', $sellby = '', $batch = '', $id_product_batch = 0, $inventorycode = '')
+    {
+        global $conf;
 
-	// /**
-	//  * Return nb of subproducts lines for a product
-	//  *
-	//  * @param      int		$id				Id of product
-	//  * @return     int						<0 if KO, nb of subproducts if OK
-	//  * @deprecated A count($product->getChildsArbo($id,1)) is same. No reason to have this in this class.
-	//  */
-	// public function nbOfSubProducts($id)
-	// {
-	// 	$nbSP=0;
+        $skip_batch = empty($conf->productbatch->enabled);
 
-	// 	$resql = "SELECT count(*) as nb FROM ".MAIN_DB_PREFIX."product_association";
-	// 	$resql.= " WHERE fk_product_pere = ".((int) $id);
-	// 	if ($this->db->query($resql))
-	// 	{
-	// 		$obj=$this->db->fetch_object($resql);
-	// 		$nbSP=$obj->nb;
-	// 	}
-	// 	return $nbSP;
-	// }
-
-	/**
-	 * Retrieve number of equipments for a product lot/serial
-	 *
-	 * @param 	int 		$fk_product 	Product id
-	 * @param 	string 		$batch  		batch number
-	 * @return 	int            				<0 if KO, number of equipments found if OK
-	 */
-	private function getBatchCount($fk_product, $batch)
-	{
-		$cpt = 0;
-
-		$sql = "SELECT sum(pb.qty) as cpt";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_batch as pb";
-		$sql .= " INNER JOIN ".MAIN_DB_PREFIX."product_stock as ps ON ps.rowid = pb.fk_product_stock";
-		$sql .= " WHERE ps.fk_product = " . ((int) $fk_product);
-		$sql .= " AND pb.batch = '" . $this->db->escape($batch) . "'";
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj = $this->db->fetch_object($result);
-				$cpt = $obj->cpt;
-			}
-
-			$this->db->free($result);
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-
-		return $cpt;
+        return $this->_create($user, $fk_product, $entrepot_id, (0 - $qty), 2, $price, $label, $inventorycode, $datem, $eatby, $sellby, $batch, $skip_batch, $id_product_batch);
 	}
 
 	/**
@@ -908,26 +784,47 @@ class MouvementStock extends CommonObject
 	 * 	@param		int				$id_product_batch    Id product_batch
 	 *  @param      string			$inventorycode       Inventory code
 	 *	@return		int								     <0 if KO, >0 if OK
-	 */
-	public function reception($user, $fk_product, $entrepot_id, $qty, $price = 0, $label = '', $eatby = '', $sellby = '', $batch = '', $datem = '', $id_product_batch = 0, $inventorycode = '')
-	{
-		global $conf;
+     */
+    public function reception($user, $fk_product, $entrepot_id, $qty, $price = 0, $label = '', $eatby = '', $sellby = '', $batch = '', $datem = '', $id_product_batch = 0, $inventorycode = '')
+    {
+        global $conf;
 
-		$skip_batch = empty($conf->productbatch->enabled);
+        $skip_batch = empty($conf->productbatch->enabled);
 
-		return $this->_create($user, $fk_product, $entrepot_id, $qty, 3, $price, $label, $inventorycode, $datem, $eatby, $sellby, $batch, $skip_batch, $id_product_batch);
-	}
+        return $this->_create($user, $fk_product, $entrepot_id, $qty, 3, $price, $label, $inventorycode, $datem, $eatby, $sellby, $batch, $skip_batch, $id_product_batch);
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Count number of product in stock before a specific date
-	 *
-	 * @param 	int			$productidselected		Id of product to count
-	 * @param 	integer 	$datebefore				Date limit
-	 * @return	int			Number
-	 */
-	public function calculateBalanceForProductBefore($productidselected, $datebefore)
+    // /**
+    //  * Return nb of subproducts lines for a product
+    //  *
+    //  * @param      int		$id				Id of product
+    //  * @return     int						<0 if KO, nb of subproducts if OK
+    //  * @deprecated A count($product->getChildsArbo($id,1)) is same. No reason to have this in this class.
+    //  */
+    // public function nbOfSubProducts($id)
+    // {
+    // 	$nbSP=0;
+
+    // 	$resql = "SELECT count(*) as nb FROM ".MAIN_DB_PREFIX."product_association";
+    // 	$resql.= " WHERE fk_product_pere = ".((int) $id);
+    // 	if ($this->db->query($resql))
+    // 	{
+    // 		$obj=$this->db->fetch_object($resql);
+    // 		$nbSP=$obj->nb;
+    // 	}
+    // 	return $nbSP;
+    // }
+
+    /**
+     * Count number of product in stock before a specific date
+     *
+     * @param int     $productidselected Id of product to count
+     * @param integer $datebefore        Date limit
+     *
+     * @return    int            Number
+     */
+    public function calculateBalanceForProductBefore($productidselected, $datebefore)
 	{
 		$nb = 0;
 
@@ -937,26 +834,101 @@ class MouvementStock extends CommonObject
 
 		dol_syslog(get_class($this).__METHOD__.'', LOG_DEBUG);
 		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_object($resql);
-			if ($obj) $nb = $obj->nb;
-			return (empty($nb) ? 0 : $nb);
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+        if ($resql) {
+            $obj = $this->db->fetch_object($resql);
+            if ($obj) {
+                $nb = $obj->nb;
+            }
+            return (empty($nb) ? 0 : $nb);
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
 
-	/**
-	 * Return Url link of origin object
-	 *
-	 * @param  int     $fk_origin      Id origin
-	 * @param  int     $origintype     Type origin
-	 * @return string
-	 */
-	public function get_origin($fk_origin, $origintype)
-	{
-		// phpcs:enable
+    /**
+     * Create or update batch record (update table llx_product_batch). No check is done here, done by parent.
+     *
+     * @param array|int $dluo             Could be either
+     *                                    - int if row id of product_batch table
+     *                                    - or complete array('fk_product_stock'=>, 'batchnumber'=>)
+     * @param int       $qty              Quantity of product with batch number. May be a negative amount.
+     *
+     * @return    int                      <0 if KO, else return productbatch id
+     */
+    private function createBatch($dluo, $qty)
+    {
+        global $user;
+
+        $pdluo = new Productbatch($this->db);
+
+        $result = 0;
+
+        // Try to find an existing record with same batch number or id
+        if (is_numeric($dluo)) {
+            $result = $pdluo->fetch($dluo);
+            if (empty($pdluo->id)) {
+                // We didn't find the line. May be it was deleted before by a previous move in same transaction.
+                $this->error = 'Error. You ask a move on a record for a serial that does not exists anymore. May be you take the same serial on same warehouse several times in same shipment or it was used by another shipment. Remove this shipment and prepare another one.';
+                $this->errors[] = $this->error;
+                $result = -2;
+            }
+        } elseif (is_array($dluo)) {
+            if (isset($dluo['fk_product_stock'])) {
+                $vfk_product_stock = $dluo['fk_product_stock'];
+                $vbatchnumber = $dluo['batchnumber'];
+
+                $result = $pdluo->find($vfk_product_stock, '', '', $vbatchnumber); // Search on batch number only (eatby and sellby are deprecated here)
+            } else {
+                dol_syslog(get_class($this) . "::createBatch array param dluo must contain at least key fk_product_stock", LOG_ERR);
+                $result = -1;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::createBatch error invalid param dluo", LOG_ERR);
+            $result = -1;
+        }
+
+        if ($result >= 0) {
+            // No error
+            if ($pdluo->id > 0) {    // product_batch record found
+                //print "Avant ".$pdluo->qty." Apres ".($pdluo->qty + $qty)."<br>";
+                $pdluo->qty += $qty;
+                if ($pdluo->qty == 0) {
+                    $result = $pdluo->delete($user, 1);
+                } else {
+                    $result = $pdluo->update($user, 1);
+                }
+            } else {                    // product_batch record not found
+                $pdluo->fk_product_stock = $vfk_product_stock;
+                $pdluo->qty = $qty;
+                $pdluo->eatby = empty($dluo['eatby']) ? '' : $dluo['eatby'];        // No more used. Now eatby date is store in table of lot, no more into prouct_batch table.
+                $pdluo->sellby = empty($dluo['sellby']) ? '' : $dluo['sellby'];        // No more used. Now sellby date is store in table of lot, no more into prouct_batch table.
+                $pdluo->batch = $vbatchnumber;
+
+                $result = $pdluo->create($user, 1);
+                if ($result < 0) {
+                    $this->error = $pdluo->error;
+                    $this->errors = $pdluo->errors;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return Url link of origin object
+     *
+     * @param int $fk_origin  Id origin
+     * @param int $origintype Type origin
+     *
+     * @return string
+     */
+    public function get_origin($fk_origin, $origintype)
+    {
+        // phpcs:enable
 		$origin = '';
 
 		switch ($origintype) {
@@ -1052,6 +1024,7 @@ class MouvementStock extends CommonObject
 			}
 		}
 	}
+
 
 	/**
 	 *  Initialise an instance with random values.
@@ -1150,8 +1123,6 @@ class MouvementStock extends CommonObject
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return label statut
 	 *
@@ -1161,8 +1132,9 @@ class MouvementStock extends CommonObject
 	public function getLibStatut($mode = 0)
 	{
 		return $this->LibStatut($mode);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Renvoi le libelle d'un status donne
 	 *
@@ -1221,14 +1193,48 @@ class MouvementStock extends CommonObject
 
 	/**
 	 * Delete object in database
-	 *
-	 * @param User $user       User that deletes
-	 * @param bool $notrigger  false=launch triggers after, true=disable triggers
-	 * @return int             <0 if KO, >0 if OK
-	 */
-	public function delete(User $user, $notrigger = false)
-	{
-		return $this->deleteCommon($user, $notrigger);
-		//return $this->deleteCommon($user, $notrigger, 1);
-	}
+     *
+     * @param User $user      User that deletes
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     * @return int             <0 if KO, >0 if OK
+     */
+    public function delete(User $user, $notrigger = false)
+    {
+        return $this->deleteCommon($user, $notrigger);
+        //return $this->deleteCommon($user, $notrigger, 1);
+    }
+
+    /**
+     * Retrieve number of equipments for a product lot/serial
+     *
+     * @param int    $fk_product Product id
+     * @param string $batch      batch number
+     *
+     * @return    int                            <0 if KO, number of equipments found if OK
+     */
+    private function getBatchCount($fk_product, $batch)
+    {
+        $cpt = 0;
+
+        $sql = "SELECT sum(pb.qty) as cpt";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_batch as pb";
+        $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "product_stock as ps ON ps.rowid = pb.fk_product_stock";
+        $sql .= " WHERE ps.fk_product = " . ((int) $fk_product);
+        $sql .= " AND pb.batch = '" . $this->db->escape($batch) . "'";
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result)) {
+                $obj = $this->db->fetch_object($result);
+                $cpt = $obj->cpt;
+            }
+
+            $this->db->free($result);
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+
+        return $cpt;
+    }
 }

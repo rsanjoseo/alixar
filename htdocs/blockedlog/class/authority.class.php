@@ -69,38 +69,39 @@ class BlockedLogAuthority
 
 		$blocks = $block_static->getLog('all', 0, 0, 'rowid', 'ASC');
 
-		$this->blockchain = '';
+        $this->blockchain = '';
 
-		if (is_array($blocks)) {
-			foreach ($blocks as &$b) {
-				$this->blockchain .= $b->signature;
-			}
-		}
+        if (is_array($blocks)) {
+            foreach ($blocks as &$b) {
+                $this->blockchain .= $b->signature;
+            }
+        }
 
-		return $this->blockchain;
-	}
+        return $this->blockchain;
+    }
 
-	/**
-	 *	Get hash of the block chain to check
-	 *
-	 *	@param      string		$hash		hash md5 of blockchain to test
-	 *	@return     boolean
-	 */
-	public function checkBlockchain($hash)
-	{
+    /**
+     *    Get hash of the block chain to check
+     *
+     * @return     string                    hash md5 of blockchain
+     */
+    public function getBlockchainHash()
+    {
+
+        return md5($this->signature . $this->blockchain);
+    }
+
+    /**
+     *    Get hash of the block chain to check
+     *
+     * @param string $hash hash md5 of blockchain to test
+     *
+     * @return     boolean
+     */
+    public function checkBlockchain($hash)
+    {
 
 		return ($hash === $this->getBlockchainHash());
-	}
-
-	/**
-	 *	Get hash of the block chain to check
-	 *
-	 *	@return     string         			hash md5 of blockchain
-	 */
-	public function getBlockchainHash()
-	{
-
-		return md5($this->signature.$this->blockchain);
 	}
 
 	/**

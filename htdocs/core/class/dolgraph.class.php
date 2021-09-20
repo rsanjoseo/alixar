@@ -39,65 +39,72 @@
  */
 class DolGraph
 {
-	public $type = array(); // Array with type of each series. Example: array('bars', 'horizontalbars', 'lines', 'pies', 'piesemicircle', 'polar'...)
-	public $mode = 'side'; // Mode bars graph: side, depth
-	public $data; // Graphic library to use (jflot, chart, artichow)
+    public $type = []; // Array with type of each series. Example: array('bars', 'horizontalbars', 'lines', 'pies', 'piesemicircle', 'polar'...)
+    public $mode = 'side'; // Mode bars graph: side, depth
+    private $_library = 'chart'; // Graphic library to use (jflot, chart, artichow)
 
-	//! Array of data
-	public $title; // Data of graph: array(array('abs1',valA1,valB1), array('abs2',valA2,valB2), ...)
-	public $cssprefix = ''; // Title of graph
-		/**
-	 * @var int|string 		Width of graph. It can be a numeric for pixels or a string like '100%'
-	 */
-	public $width = 380; // To add into css styles
-	/**
-	 * @var int 			Height of graph
-	 */
-	public $height = 200;
-	public $MaxValue = 0;
-	public $MinValue = 0;
-	public $SetShading = 0;
+    //! Array of data
+    public $data; // Data of graph: array(array('abs1',valA1,valB1), array('abs2',valA2,valB2), ...)
+    public $title; // Title of graph
+    public $cssprefix = ''; // To add into css styles
+
+    /**
+     * @var int|string        Width of graph. It can be a numeric for pixels or a string like '100%'
+     */
+    public $width = 380;
+    /**
+     * @var int            Height of graph
+     */
+    public $height = 200;
+
+    public $MaxValue = 0;
+    public $MinValue = 0;
+    public $SetShading = 0;
+
 	public $horizTickIncrement = -1;
 	public $SetNumXTicks = -1;
 	public $labelInterval = -1;
+
 	public $hideXGrid = false;
-	public $hideXValues = false;
-	public $hideYGrid = false;
-	public $Legend = array();
-	public $LegendWidthMin = 0;
-	public $showlegend = 1;
-	public $showpointvalue = 1;
-	public $showpercent = 0;
-public $combine = 0;
-	public $graph; // 0.05 if you want to combine records < 5% into "other"
-		/**
-	 * @var boolean 					Mirrors graph values
-	 */
-	public $mirrorGraphValues = false; // Objet Graph (Artichow, Phplot...)
-	public $tooltipsTitles = null;
-	public $tooltipsLabels = null;
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
-public $bordercolor;
-public $bgcolor; // array(R,G,B)
-	public $bgcolorgrid = array(255, 255, 255); // array(R,G,B)
-	public $datacolor; // array(R,G,B)
-		public $borderwidth = 1; // array(array(R,G,B),...)
-private $_library = 'chart';
-private $stringtoshow; // To store string to output graph into HTML page
+    public $hideXValues = false;
+    public $hideYGrid = false;
 
+    public $Legend = [];
+    public $LegendWidthMin = 0;
+    public $showlegend = 1;
+    public $showpointvalue = 1;
+    public $showpercent = 0;
+    public $combine = 0; // 0.05 if you want to combine records < 5% into "other"
+    public $graph; // Objet Graph (Artichow, Phplot...)
+    /**
+     * @var boolean                    Mirrors graph values
+     */
+    public $mirrorGraphValues = false;
+    public $tooltipsTitles = null;
+    public $tooltipsLabels = null;
 
-	/**
-	 * Constructor
-	 *
-	 * @param	string	$library		'auto' (default)
-	 */
-	public function __construct($library = 'auto')
-	{
-		global $conf;
-		global $theme_bordercolor, $theme_datacolor, $theme_bgcolor;
+    /**
+     * @var string Error code (or message)
+     */
+    public $error = '';
+
+    public $bordercolor; // array(R,G,B)
+    public $bgcolor; // array(R,G,B)
+    public $bgcolorgrid = [255, 255, 255]; // array(R,G,B)
+    public $datacolor; // array(array(R,G,B),...)
+    public $borderwidth = 1;
+
+    private $stringtoshow; // To store string to output graph into HTML page
+
+    /**
+     * Constructor
+     *
+     * @param string $library 'auto' (default)
+     */
+    public function __construct($library = 'auto')
+    {
+        global $conf;
+        global $theme_bordercolor, $theme_datacolor, $theme_bgcolor;
 
 		$this->bordercolor = array(235, 235, 224);
 		$this->datacolor = array(array(120, 130, 150), array(160, 160, 180), array(190, 190, 220));
@@ -126,33 +133,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * getDefaultGraphSizeForStats
-	 *
-	 * @param	string	$direction		'width' or 'height'
-	 * @param	string	$defaultsize	Value we want as default size
-	 * @return	int						Value of width or height to use by default
-	 */
-	public static function getDefaultGraphSizeForStats($direction, $defaultsize = '')
-	{
-		global $conf;
-
-		if ($direction == 'width') {
-			if (empty($conf->dol_optimize_smallscreen)) {
-				return ($defaultsize ? $defaultsize : '500');
-			} else {
-				return (empty($_SESSION['dol_screen_width']) ? '280' : ($_SESSION['dol_screen_width'] - 40));
-			}
-		}
-		if ($direction == 'height') {
-			return (empty($conf->dol_optimize_smallscreen) ? ($defaultsize ? $defaultsize : '200') : '160');
-		}
-		return 0;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Utiliser SetNumTicks ou SetHorizTickIncrement mais pas les 2
 	 *
@@ -167,7 +147,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Utiliser SetNumTicks ou SetHorizTickIncrement mais pas les 2
 	 *
@@ -182,7 +161,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set label interval to reduce number of labels
 	 *
@@ -196,20 +174,20 @@ private $stringtoshow; // To store string to output graph into HTML page
 		return true;
 	}
 
-	/**
-	 * Hide X grid
-	 *
-	 * @param	boolean		$bool	XGrid or not
-	 * @return	boolean				true
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Hide X grid
+     *
+     * @param	boolean		$bool	XGrid or not
+     * @return	boolean				true
+     */
 	public function SetHideXGrid($bool)
 	{
 		// phpcs:enable
 		$this->hideXGrid = $bool;
 		return true;
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Hide X Values
@@ -224,7 +202,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Hide Y grid
 	 *
@@ -239,7 +216,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set y label
 	 *
@@ -253,7 +229,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set width
 	 *
@@ -267,7 +242,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set title
 	 *
@@ -281,7 +255,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set data
 	 *
@@ -295,12 +268,14 @@ private $stringtoshow; // To store string to output graph into HTML page
 		$this->data = $data;
 	}
 
-	/**
-	 * Set data color
-	 *
-	 * @param 	array	$datacolor		Data color array(array(R,G,B),array(R,G,B)...) or array('#......','#......'...)
-	 * @return	void
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Set data color
+     *
+     * @param 	array	$datacolor		Data color array(array(R,G,B),array(R,G,B)...) or array('#......','#......'...)
+     * @return	void
+     */
 	public function SetDataColor($datacolor)
 	{
 		// phpcs:enable
@@ -340,8 +315,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 		$this->tooltipsLabels = $tooltipsLabels;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set tooltips titles of the graph
 	 *
@@ -354,7 +327,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set type
 	 *
@@ -369,7 +341,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set legend
 	 *
@@ -383,7 +354,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set min width
 	 *
@@ -397,20 +367,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Get max value
-	 *
-	 * @return	int		Max value
-	 */
-	public function GetMaxValue()
-	{
-		// phpcs:enable
-		return $this->MaxValue;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set max value
 	 *
@@ -424,48 +380,59 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 * Get min value
-	 *
-	 * @return	int		Max value
-	 */
-	public function GetMinValue()
-	{
-		// phpcs:enable
-		return $this->MinValue;
-	}
+	 * Get max value
+     *
+     * @return    int        Max value
+     */
+    public function GetMaxValue()
+    {
+        // phpcs:enable
+        return $this->MaxValue;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Set min value
 	 *
-	 * @param 	int		$min			Min value
-	 * @return	void
-	 */
-	public function SetMinValue($min)
-	{
-		// phpcs:enable
-		$this->MinValue = $min;
-	}
+	 * @param 	int $min Min value
+     * @return    void
+     */
+    public function SetMinValue($min)
+    {
+        // phpcs:enable
+        $this->MinValue = $min;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Set height
-	 *
-	 * @param 	int		$h				Height
-	 * @return	void
-	 */
-	public function SetHeight($h)
-	{
-		// phpcs:enable
-		$this->height = $h;
-	}
+    /**
+     * Get min value
+     *
+     * @return    int        Max value
+     */
+    public function GetMinValue()
+    {
+        // phpcs:enable
+        return $this->MinValue;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+    /**
+     * Set height
+     *
+     * @param int $h Height
+     *
+     * @return    void
+     */
+    public function SetHeight($h)
+    {
+        // phpcs:enable
+        $this->height = $h;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Set shading
 	 *
@@ -479,7 +446,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set shading
 	 *
@@ -493,7 +459,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Reset bg color
 	 *
@@ -505,11 +470,13 @@ private $stringtoshow; // To store string to output graph into HTML page
 		unset($this->bgcolor);
 	}
 
-	/**
-	 * Reset bgcolorgrid
-	 *
-	 * @return	void
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Reset bgcolorgrid
+     *
+     * @return	void
+     */
 	public function ResetBgColorGrid()
 	{
 		// phpcs:enable
@@ -559,10 +526,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 		$this->showpointvalue = $showpointvalue;
 	}
 
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Show percent or not
 	 *
@@ -574,8 +537,9 @@ private $stringtoshow; // To store string to output graph into HTML page
 		$this->showpercent = $showpercent;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Define background color of complete image
 	 *
@@ -600,7 +564,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define background color of grid
 	 *
@@ -625,31 +588,92 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Reset data color
 	 *
-	 * @return	void
-	 */
-	public function ResetDataColor()
-	{
-		// phpcs:enable
-		unset($this->datacolor);
-	}
+	 * @return    void
+     */
+    public function ResetDataColor()
+    {
+        // phpcs:enable
+        unset($this->datacolor);
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Return max value of all data
-	 *
-	 * @return 	int		Max value of all data
-	 */
-	public function GetCeilMaxValue()
-	{
-		// phpcs:enable
-		$max = $this->GetMaxValueInData();
-		if ($max != 0) {
-			$max++;
+    /**
+     * Get max value among all values of all series
+     *
+     * @return    int        Max value
+     */
+    public function GetMaxValueInData()
+    {
+        // phpcs:enable
+        if (!is_array($this->data)) {
+            return 0;
+        }
+
+        $max = null;
+
+        $nbseries = (empty($this->data[0]) ? 0 : count($this->data[0]) - 1);
+
+        foreach ($this->data as $x) {    // Loop on each x
+            for ($i = 0; $i < $nbseries; $i++) {    // Loop on each serie
+                if (is_null($max)) {
+                    $max = $x[$i + 1];        // $i+1 because the index 0 is the legend
+                } elseif ($max < $x[$i + 1]) {
+                    $max = $x[$i + 1];
+                }
+            }
+        }
+
+        return $max;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return min value of all values of all series
+     *
+     * @return    int        Min value of all data
+     */
+    public function GetMinValueInData()
+    {
+        // phpcs:enable
+        if (!is_array($this->data)) {
+            return 0;
+        }
+
+        $min = null;
+
+        $nbseries = (empty($this->data[0]) ? 0 : count($this->data[0]) - 1);
+
+        foreach ($this->data as $x) {    // Loop on each x
+            for ($i = 0; $i < $nbseries; $i++) {    // Loop on each serie
+                if (is_null($min)) {
+                    $min = $x[$i + 1];        // $i+1 because the index 0 is the legend
+                } elseif ($min > $x[$i + 1]) {
+                    $min = $x[$i + 1];
+                }
+            }
+        }
+
+        return $min;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return max value of all data
+     *
+     * @return    int        Max value of all data
+     */
+    public function GetCeilMaxValue()
+    {
+        // phpcs:enable
+        $max = $this->GetMaxValueInData();
+        if ($max != 0) {
+            $max++;
 		}
 		$size = dol_strlen(abs(ceil($max)));
 		$factor = 1;
@@ -667,38 +691,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Get max value among all values of all series
-	 *
-	 * @return	int		Max value
-	 */
-	public function GetMaxValueInData()
-	{
-		// phpcs:enable
-		if (!is_array($this->data)) {
-			return 0;
-		}
-
-		$max = null;
-
-		$nbseries = (empty($this->data[0]) ? 0 : count($this->data[0]) - 1);
-
-		foreach ($this->data as $x) {	// Loop on each x
-			for ($i = 0; $i < $nbseries; $i++) {	// Loop on each serie
-				if (is_null($max)) {
-					$max = $x[$i + 1];		// $i+1 because the index 0 is the legend
-				} elseif ($max < $x[$i + 1]) {
-					$max = $x[$i + 1];
-				}
-			}
-		}
-
-		return $max;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return min value of all data
 	 *
@@ -727,37 +719,6 @@ private $stringtoshow; // To store string to output graph into HTML page
 	}
 
 	/**
-	 * Return min value of all values of all series
-	 *
-	 * @return	int		Min value of all data
-	 */
-	public function GetMinValueInData()
-	{
-		// phpcs:enable
-		if (!is_array($this->data)) {
-			return 0;
-		}
-
-		$min = null;
-
-		$nbseries = (empty($this->data[0]) ? 0 : count($this->data[0]) - 1);
-
-		foreach ($this->data as $x) {	// Loop on each x
-			for ($i = 0; $i < $nbseries; $i++) {	// Loop on each serie
-				if (is_null($min)) {
-					$min = $x[$i + 1];		// $i+1 because the index 0 is the legend
-				} elseif ($min > $x[$i + 1]) {
-					$min = $x[$i + 1];
-				}
-			}
-		}
-
-		return $min;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 * Build a graph into memory using correct library  (may also be wrote on disk, depending on library used)
 	 *
 	 * @param	string	$file    	Image file name to use to save onto disk (also used as javascript unique id)
@@ -784,48 +745,7 @@ private $stringtoshow; // To store string to output graph into HTML page
 		call_user_func_array(array($this, $call), array($file, $fileurl));
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Output HTML string to total value
-	 *
-	 * @return	string							HTML string to total value
-	 */
-	public function total()
-	{
-		$value = 0;
-		foreach ($this->data as $valarray) {	// Loop on each x
-			$value += $valarray[1];
-		}
-		return $value;
-	}
-
-	/**
-	 * Output HTML string to show graph
-	 *
-	 * @param	int|string		$shownographyet    Show graph to say there is not enough data or the message in $shownographyet if it is a string.
-	 * @return	string							   HTML string to show graph
-	 */
-	public function show($shownographyet = 0)
-	{
-		global $langs;
-
-		if ($shownographyet) {
-			$s = '<div class="nographyet" style="width:' . (preg_match('/%/', $this->width) ? $this->width : $this->width . 'px') . '; height:' . (preg_match('/%/', $this->height) ? $this->height : $this->height . 'px') . ';"></div>';
-			$s .= '<div class="nographyettext margintoponly">';
-			if (is_numeric($shownographyet)) {
-				$s .= $langs->trans("NotEnoughDataYet") . '...';
-			} else {
-				$s .= $shownographyet . '...';
-			}
-			$s .= '</div>';
-			return $s;
-		}
-
-		return $this->stringtoshow;
-	}
-
 	/**
 	 * Build a graph using JFlot library. Input when calling this method should be:
 	 *	$this->data  = array(array(0=>'labelxA',1=>yA),  array('labelxB',yB));
@@ -1102,31 +1022,34 @@ private $stringtoshow; // To store string to output graph into HTML page
 			$color1 = sprintf("%02x%02x%02x", $this->bgcolorgrid[0], $this->bgcolorgrid[0], $this->bgcolorgrid[2]);
 			$color2 = sprintf("%02x%02x%02x", $this->bgcolorgrid[0], $this->bgcolorgrid[1], $this->bgcolorgrid[2]);
 			$this->stringtoshow .= ', grid: { hoverable: true, backgroundColor: { colors: ["#' . $color1 . '", "#' . $color2 . '"] }, borderWidth: 1, borderColor: \'#e6e6e6\', tickColor  : \'#e6e6e6\' }' . "\n";
-			$this->stringtoshow .= '});' . "\n";
-			$this->stringtoshow .= '}' . "\n";
-		}
+            $this->stringtoshow .= '});' . "\n";
+            $this->stringtoshow .= '}' . "\n";
+        }
 
-		$this->stringtoshow .= 'plotWithOptions_' . $tag . '();' . "\n";
-		$this->stringtoshow .= '});' . "\n";
-		$this->stringtoshow .= '</script>' . "\n";
-	}
+        $this->stringtoshow .= 'plotWithOptions_' . $tag . '();' . "\n";
+        $this->stringtoshow .= '});' . "\n";
+        $this->stringtoshow .= '</script>' . "\n";
+    }
 
-	/**
-	 * Build a graph using Chart library. Input when calling this method should be:
-	 *	$this->data  = array(array(0=>'labelxA',1=>yA),  array('labelxB',yB));
-	 *	$this->data  = array(array(0=>'labelxA',1=>yA1,...,n=>yAn), array('labelxB',yB1,...yBn));   // or when there is n series to show for each x
-	 *  $this->data  = array(array('label'=>'labelxA','data'=>yA),  array('labelxB',yB));			// Syntax deprecated
-	 *  $this->legend= array("Val1",...,"Valn");													// list of n series name
-	 *  $this->type  = array('bars',...'lines', 'linesnopoint'); or array('pie') or array('polar') or array('piesemicircle');
-	 *  $this->mode = 'depth' ???
-	 *  $this->bgcolorgrid
-	 *  $this->datacolor
-	 *  $this->shownodatagraph
-	 *
-	 * @param	string	$file    	Image file name to use to save onto disk (also used as javascript unique id)
-	 * @param	string	$fileurl	Url path to show image if saved onto disk. Never used here.
-	 * @return	void
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Build a graph using Chart library. Input when calling this method should be:
+     *    $this->data  = array(array(0=>'labelxA',1=>yA),  array('labelxB',yB));
+     *    $this->data  = array(array(0=>'labelxA',1=>yA1,...,n=>yAn), array('labelxB',yB1,...yBn));   // or when there is n series to show for each x
+     *  $this->data  = array(array('label'=>'labelxA','data'=>yA),  array('labelxB',yB));            // Syntax deprecated
+     *  $this->legend= array("Val1",...,"Valn");                                                    // list of n series name
+     *  $this->type  = array('bars',...'lines', 'linesnopoint'); or array('pie') or array('polar') or array('piesemicircle');
+     *  $this->mode = 'depth' ???
+     *  $this->bgcolorgrid
+     *  $this->datacolor
+     *  $this->shownodatagraph
+     *
+     * @param	string $file    Image file name to use to save onto disk (also used as javascript unique id)
+     * @param	string $fileurl Url path to show image if saved onto disk. Never used here.
+     * @return	void
+     */
 	private function draw_chart($file, $fileurl)
 	{
 		// phpcs:enable
@@ -1537,13 +1460,78 @@ private $stringtoshow; // To store string to output graph into HTML page
 				$this->stringtoshow .= '}' . "\n";
 
 				$i++;
-				$iinstack++;
-			}
-			$this->stringtoshow .= ']' . "\n";
-			$this->stringtoshow .= '}' . "\n";
-			$this->stringtoshow .= '});' . "\n";
-		}
+                $iinstack++;
+            }
+            $this->stringtoshow .= ']' . "\n";
+            $this->stringtoshow .= '}' . "\n";
+            $this->stringtoshow .= '});' . "\n";
+        }
 
-		$this->stringtoshow .= '</script>' . "\n";
-	}
+        $this->stringtoshow .= '</script>' . "\n";
+    }
+
+    /**
+     * Output HTML string to total value
+     *
+     * @return    string                            HTML string to total value
+     */
+    public function total()
+    {
+        $value = 0;
+        foreach ($this->data as $valarray) {    // Loop on each x
+            $value += $valarray[1];
+        }
+        return $value;
+    }
+
+    /**
+     * Output HTML string to show graph
+     *
+     * @param int|string $shownographyet Show graph to say there is not enough data or the message in $shownographyet if it is a string.
+     *
+     * @return    string                               HTML string to show graph
+     */
+    public function show($shownographyet = 0)
+    {
+        global $langs;
+
+        if ($shownographyet) {
+            $s = '<div class="nographyet" style="width:' . (preg_match('/%/', $this->width) ? $this->width : $this->width . 'px') . '; height:' . (preg_match('/%/', $this->height) ? $this->height : $this->height . 'px') . ';"></div>';
+            $s .= '<div class="nographyettext margintoponly">';
+            if (is_numeric($shownographyet)) {
+                $s .= $langs->trans("NotEnoughDataYet") . '...';
+            } else {
+                $s .= $shownographyet . '...';
+            }
+            $s .= '</div>';
+            return $s;
+        }
+
+        return $this->stringtoshow;
+    }
+
+    /**
+     * getDefaultGraphSizeForStats
+     *
+     * @param string $direction   'width' or 'height'
+     * @param string $defaultsize Value we want as default size
+     *
+     * @return    int                        Value of width or height to use by default
+     */
+    public static function getDefaultGraphSizeForStats($direction, $defaultsize = '')
+    {
+        global $conf;
+
+        if ($direction == 'width') {
+            if (empty($conf->dol_optimize_smallscreen)) {
+                return ($defaultsize ? $defaultsize : '500');
+            } else {
+                return (empty($_SESSION['dol_screen_width']) ? '280' : ($_SESSION['dol_screen_width'] - 40));
+            }
+        }
+        if ($direction == 'height') {
+            return (empty($conf->dol_optimize_smallscreen) ? ($defaultsize ? $defaultsize : '200') : '160');
+        }
+        return 0;
+    }
 }

@@ -367,24 +367,6 @@ class Contact extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'socpeople', 'societe_contacts'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
 	/**
 	 *  Load indicators into this->nb for board
 	 *
@@ -535,10 +517,6 @@ class Contact extends CommonObject
 			return -1;
 		}
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 *      Update informations into database
@@ -736,165 +714,6 @@ class Contact extends CommonObject
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Updates all roles (default contact for companies) according to values inside the ->roles array.
-	 * This is called by update of contact.
-	 *
-	 * @return float|int
-	 * @see fetchRoles()
-	 */
-	public function updateRoles()
-	{
-		global $conf;
-
-		$error = 0;
-
-		if (!isset($this->roles)) {
-			return;	// Avoid to loose roles when property not set
-		}
-
-		$this->db->begin();
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."societe_contacts WHERE fk_socpeople=".((int) $this->id)." AND entity IN (".getEntity("societe_contact").")";
-
-		$result = $this->db->query($sql);
-		if (!$result) {
-			$this->errors[] = $this->db->lasterror().' sql='.$sql;
-			$error++;
-		} else {
-			if (count($this->roles) > 0) {
-				foreach ($this->roles as $keyRoles => $valRoles) {
-					$idrole = 0;
-					if (is_array($valRoles)) {
-						$idrole = $valRoles['id'];
-					} else {
-						$idrole = $valRoles;
-					}
-
-					$socid = 0;
-					if (is_array($valRoles)) {
-						$socid = $valRoles['socid'];
-					} else {
-						$socid = $this->socid;
-					}
-
-					if ($socid > 0) {
-						$sql = "INSERT INTO ".MAIN_DB_PREFIX."societe_contacts";
-						$sql .= " (entity,";
-						$sql .= "date_creation,";
-						$sql .= "fk_soc,";
-						$sql .= "fk_c_type_contact,";
-						$sql .= "fk_socpeople) ";
-						$sql .= " VALUES (".$conf->entity.",";
-						$sql .= "'".$this->db->idate(dol_now())."',";
-						$sql .= $socid.", ";
-						$sql .= $idrole." , ";
-						$sql .= $this->id;
-						$sql .= ")";
-
-						$result = $this->db->query($sql);
-						if (!$result) {
-							$this->errors[] = $this->db->lasterror().' sql='.$sql;
-							$error++;
-						}
-					}
-				}
-			}
-		}
-		if (empty($error)) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->error = implode(' ', $this->errors);
-			$this->db->rollback();
-			return $error * -1;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Update field alert birthday
-	 *
-	 *  @param      int			$id         Id of contact
-	 *  @param      User		$user		User asking to change alert or birthday
-	 *  @param      int		    $notrigger	0=no, 1=yes
-	 *  @return     int         			<0 if KO, >=0 if OK
-	 */
-	public function update_perso($id, $user = null, $notrigger = 0)
-	{
-		// phpcs:enable
-		$error = 0;
-		$result = false;
-
-		$this->db->begin();
-
-		// Mis a jour contact
-		$sql = "UPDATE ".MAIN_DB_PREFIX."socpeople SET";
-		$sql .= " birthday = ".($this->birthday ? "'".$this->db->idate($this->birthday)."'" : "null");
-		$sql .= ", photo = ".($this->photo ? "'".$this->db->escape($this->photo)."'" : "null");
-		if ($user) {
-			$sql .= ", fk_user_modif = ".((int) $user->id);
-		}
-		$sql .= " WHERE rowid = ".((int) $id);
-
-		dol_syslog(get_class($this)."::update_perso this->birthday=".$this->birthday." -", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->error = $this->db->lasterror();
-		}
-
-		if ($user) {
-			// Update birthday alert
-			if (!empty($this->birthday_alert)) {
-				//check existing
-				$sql_check = "SELECT rowid FROM " . MAIN_DB_PREFIX . "user_alert WHERE type = 1 AND fk_contact = " . ((int) $id) . " AND fk_user = " . ((int) $user->id);
-				$result_check = $this->db->query($sql_check);
-				if (!$result_check || ($this->db->num_rows($result_check) < 1)) {
-					//insert
-					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "user_alert(type, fk_contact, fk_user) ";
-					$sql .= "VALUES (1," . ((int) $id) . "," . ((int) $user->id) . ")";
-					$result = $this->db->query($sql);
-					if (!$result) {
-						$error++;
-						$this->error = $this->db->lasterror();
-					}
-				} else {
-					$result = true;
-				}
-			} else {
-				$sql = "DELETE FROM " . MAIN_DB_PREFIX . "user_alert ";
-				$sql .= "WHERE type=1 AND fk_contact=" . ((int) $id) . " AND fk_user=" . ((int) $user->id);
-				$result = $this->db->query($sql);
-				if (!$result) {
-					$error++;
-					$this->error = $this->db->lasterror();
-				}
-			}
-		}
-
-		if (!$error && !$notrigger) {
-			// Call trigger
-			$result = $this->call_trigger('CONTACT_MODIFY', $user);
-			if ($result < 0) {
-				$error++;
-			}
-			// End call triggers
-		}
-
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			dol_syslog(get_class($this)."::update Error ".$this->error, LOG_ERR);
-			$this->db->rollback();
-			return -$error;
-		}
-	}
-
 	/**
 	 *	Retourne chaine DN complete dans l'annuaire LDAP pour l'objet
 	 *
@@ -909,25 +728,28 @@ class Contact extends CommonObject
 		// phpcs:enable
 		global $conf;
 		$dn = '';
-		if ($mode == 0) {
-			$dn = $conf->global->LDAP_KEY_CONTACTS."=".$info[$conf->global->LDAP_KEY_CONTACTS].",".$conf->global->LDAP_CONTACT_DN;
-		} elseif ($mode == 1) {
-			$dn = $conf->global->LDAP_CONTACT_DN;
-		} elseif ($mode == 2) {
-			$dn = $conf->global->LDAP_KEY_CONTACTS."=".$info[$conf->global->LDAP_KEY_CONTACTS];
-		}
-		return $dn;
-	}
+        if ($mode == 0) {
+            $dn = $conf->global->LDAP_KEY_CONTACTS . "=" . $info[$conf->global->LDAP_KEY_CONTACTS] . "," . $conf->global->LDAP_CONTACT_DN;
+        } elseif ($mode == 1) {
+            $dn = $conf->global->LDAP_CONTACT_DN;
+        } elseif ($mode == 2) {
+            $dn = $conf->global->LDAP_KEY_CONTACTS . "=" . $info[$conf->global->LDAP_KEY_CONTACTS];
+        }
+        return $dn;
+    }
 
-	/**
-	 *	Initialise tableau info (tableau des attributs LDAP)
-	 *
-	 *	@return		array		Tableau info des attributs
-	 */
-	public function _load_ldap_info()
-	{
-		// phpcs:enable
-		global $conf, $langs;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     *    Initialise tableau info (tableau des attributs LDAP)
+     *
+     * @return        array        Tableau info des attributs
+     */
+    public function _load_ldap_info()
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		$info = array();
 
@@ -1021,24 +843,106 @@ class Contact extends CommonObject
 			if ($this->email) {
 				$info["rfc822Mailbox"] = $this->email;
 			}
-			if ($this->phone_mobile) {
-				$info["phpgwCellTelephoneNumber"] = $this->phone_mobile;
-			}
-		}
+            if ($this->phone_mobile) {
+                $info["phpgwCellTelephoneNumber"] = $this->phone_mobile;
+            }
+        }
 
-		return $info;
-	}
+        return $info;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Load object contact.
-	 *
-	 *  @param      int		$id         	Id of contact
-	 *  @param      User	$user       	Load also alerts of this user (subscribing to alerts) that want alerts about this contact
-	 *  @param      string  $ref_ext    	External reference, not given by Dolibarr
-	 *  @param		string	$email			Email
-	 *  @param		int		$loadalsoroles	Load also roles. Try to always 0 here and load roles with a separate call of fetchRoles().
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Update field alert birthday
+     *
+     * @param int  $id        Id of contact
+     * @param User $user      User asking to change alert or birthday
+     * @param int  $notrigger 0=no, 1=yes
+     *
+     * @return     int                    <0 if KO, >=0 if OK
+     */
+    public function update_perso($id, $user = null, $notrigger = 0)
+    {
+        // phpcs:enable
+        $error = 0;
+        $result = false;
+
+        $this->db->begin();
+
+        // Mis a jour contact
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "socpeople SET";
+        $sql .= " birthday = " . ($this->birthday ? "'" . $this->db->idate($this->birthday) . "'" : "null");
+        $sql .= ", photo = " . ($this->photo ? "'" . $this->db->escape($this->photo) . "'" : "null");
+        if ($user) {
+            $sql .= ", fk_user_modif = " . ((int) $user->id);
+        }
+        $sql .= " WHERE rowid = " . ((int) $id);
+
+        dol_syslog(get_class($this) . "::update_perso this->birthday=" . $this->birthday . " -", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->error = $this->db->lasterror();
+        }
+
+        if ($user) {
+            // Update birthday alert
+            if (!empty($this->birthday_alert)) {
+                //check existing
+                $sql_check = "SELECT rowid FROM " . MAIN_DB_PREFIX . "user_alert WHERE type = 1 AND fk_contact = " . ((int) $id) . " AND fk_user = " . ((int) $user->id);
+                $result_check = $this->db->query($sql_check);
+                if (!$result_check || ($this->db->num_rows($result_check) < 1)) {
+                    //insert
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "user_alert(type, fk_contact, fk_user) ";
+                    $sql .= "VALUES (1," . ((int) $id) . "," . ((int) $user->id) . ")";
+                    $result = $this->db->query($sql);
+                    if (!$result) {
+                        $error++;
+                        $this->error = $this->db->lasterror();
+                    }
+                } else {
+                    $result = true;
+                }
+            } else {
+                $sql = "DELETE FROM " . MAIN_DB_PREFIX . "user_alert ";
+                $sql .= "WHERE type=1 AND fk_contact=" . ((int) $id) . " AND fk_user=" . ((int) $user->id);
+                $result = $this->db->query($sql);
+                if (!$result) {
+                    $error++;
+                    $this->error = $this->db->lasterror();
+                }
+            }
+        }
+
+        if (!$error && !$notrigger) {
+            // Call trigger
+            $result = $this->call_trigger('CONTACT_MODIFY', $user);
+            if ($result < 0) {
+                $error++;
+            }
+            // End call triggers
+        }
+
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            dol_syslog(get_class($this) . "::update Error " . $this->error, LOG_ERR);
+            $this->db->rollback();
+            return -$error;
+        }
+    }
+
+    /**
+     *  Load object contact.
+     *
+     * @param int    $id            Id of contact
+     * @param User   $user          Load also alerts of this user (subscribing to alerts) that want alerts about this contact
+     * @param string $ref_ext       External reference, not given by Dolibarr
+     * @param string $email         Email
+     * @param int    $loadalsoroles Load also roles. Try to always 0 here and load roles with a separate call of fetchRoles().
 	 *  @return     int     		    	>0 if OK, <0 if KO or if two records found for same ref or idprof, 0 if not found.
 	 */
 	public function fetch($id, $user = null, $ref_ext = '', $email = '', $loadalsoroles = 0)
@@ -1220,10 +1124,10 @@ class Contact extends CommonObject
 		} else {
 			$this->error = $this->db->error();
 			return -1;
-		}
-	}
+        }
+    }
 
-	/**
+    /**
 	 * Set the property "gender" of this class, based on the property "civility_id"
 	 * or use property "civility_code" as fallback, when "civility_id" is not available.
 	 *
@@ -1238,53 +1142,9 @@ class Contact extends CommonObject
 		} elseif (in_array($this->civility_id, array('MME', 'MLE')) || in_array($this->civility_code, array('MME', 'MLE'))) {
 			$this->gender = 'woman';
 		}
-	}
+    }
 
-	/**
-	 * Fetch roles (default contact of some companies) for the current contact.
-	 * This load the array ->roles.
-	 *
-	 * @return 	int			<0 if KO, Nb of roles found if OK
-	 * @see updateRoles()
-	 */
-	public function fetchRoles()
-	{
-		global $langs;
-		$error = 0;
-		$num = 0;
-
-		$sql = "SELECT tc.rowid, tc.element, tc.source, tc.code, tc.libelle as label, sc.rowid as contactroleid, sc.fk_soc as socid";
-		$sql .= " FROM ".MAIN_DB_PREFIX."societe_contacts as sc, ".MAIN_DB_PREFIX."c_type_contact as tc";
-		$sql .= " WHERE tc.rowid = sc.fk_c_type_contact";
-		$sql .= " AND tc.source = 'external' AND tc.active=1";
-		$sql .= " AND sc.fk_socpeople = ".((int) $this->id);
-		$sql .= " AND sc.entity IN (".getEntity('societe').')';
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$this->roles = array();
-
-			$num = $this->db->num_rows($resql);
-			if ($num > 0) {
-				while ($obj = $this->db->fetch_object($resql)) {
-					$transkey = "TypeContact_".$obj->element."_".$obj->source."_".$obj->code;
-					$libelle_element = $langs->trans('ContactDefault_'.$obj->element);
-					$this->roles[$obj->contactroleid] = array('id'=>$obj->rowid, 'socid'=>$obj->socid, 'element'=>$obj->element, 'source'=>$obj->source, 'code'=>$obj->code, 'label'=>$libelle_element.' - '.($langs->trans($transkey) != $transkey ? $langs->trans($transkey) : $obj->label));
-				}
-			}
-		} else {
-			$error++;
-			$this->error = $this->db->lasterror();
-			$this->errors[] = $this->db->lasterror();
-		}
-
-		if (empty($error)) {
-			return $num;
-		} else {
-			return $error * -1;
-		}
-	}
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Load number of elements the contact is used as a link for
 	 *  ref_facturation
@@ -1454,6 +1314,7 @@ class Contact extends CommonObject
 		}
 	}
 
+
 	/**
 	 *  Charge les informations sur le contact, depuis la base
 	 *
@@ -1520,8 +1381,6 @@ class Contact extends CommonObject
 			return -1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return name of contact with link (and eventually picto)
@@ -1626,18 +1485,33 @@ class Contact extends CommonObject
 		global $action;
 		$hookmanager->initHooks(array('contactdao'));
 		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) {
-			$result = $hookmanager->resPrint;
-		} else {
-			$result .= $hookmanager->resPrint;
-		}
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
+    /**
+     *    Return civility label of contact
+     *
+     * @return    string                Translated name of civility
+     */
+    public function getCivilityLabel()
+    {
+        global $langs;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        $code = ($this->civility_code ? $this->civility_code : (!empty($this->civility_id) ? $this->civility : (!empty($this->civilite) ? $this->civilite : '')));
+        if (empty($code)) {
+            return '';
+        }
+
+        $langs->load("dict");
+        return $langs->getLabelFromKey($this->db, "Civility" . $code, "c_civility", "code", "label", $code);
+    }
 
 	/**
 	 *	Return label of contact status
@@ -1648,8 +1522,9 @@ class Contact extends CommonObject
 	public function getLibStatut($mode)
 	{
 		return $this->LibStatut($this->statut, $mode);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Renvoi le libelle d'un statut donne
 	 *
@@ -1686,24 +1561,8 @@ class Contact extends CommonObject
 		return dolGetStatus($label, $labelshort, '', $statusType, $mode);
 	}
 
-	/**
-	 *    Return civility label of contact
-	 *
-	 *    @return	string      			Translated name of civility
-	 */
-	public function getCivilityLabel()
-	{
-		global $langs;
 
-		$code = ($this->civility_code ? $this->civility_code : (!empty($this->civility_id) ? $this->civility : (!empty($this->civilite) ? $this->civilite : '')));
-		if (empty($code)) {
-			return '';
-		}
-
-		$langs->load("dict");
-		return $langs->getLabelFromKey($this->db, "Civility".$code, "c_civility", "code", "label", $code);
-	}
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Return translated label of Public or Private
 	 *
@@ -1720,6 +1579,7 @@ class Contact extends CommonObject
 			return $langs->trans('ContactPublic');
 		}
 	}
+
 
 	/**
 	 *  Initialise an instance with random values.
@@ -1822,26 +1682,90 @@ class Contact extends CommonObject
 	 * Deletes object from existing categories not supplied.
 	 * Adds it to non existing supplied categories.
 	 * Existing categories are left untouch.
-	 *
-	 * @param int[]|int $categories Category or categories IDs
-	 * @return void
-	 */
-	public function setCategories($categories)
-	{
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-		return parent::setCategoriesCommon($categories, Categorie::TYPE_CONTACT);
-	}
+     *
+     * @param int[]|int $categories Category or categories IDs
+     * @return void
+     */
+    public function setCategories($categories)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        return parent::setCategoriesCommon($categories, Categorie::TYPE_CONTACT);
+    }
 
-	/**
-	 * Get Contact roles for a thirdparty
-	 *
-	 * @param  string 	$element 	Element type
-	 * @return array|int			Array of contact roles or -1
-	 * @throws Exception
-	 */
-	public function getContactRoles($element = '')
-	{
-		$tab = array();
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'socpeople', 'societe_contacts',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Fetch roles (default contact of some companies) for the current contact.
+     * This load the array ->roles.
+     *
+     * @return    int            <0 if KO, Nb of roles found if OK
+     * @see updateRoles()
+     */
+    public function fetchRoles()
+    {
+        global $langs;
+        $error = 0;
+        $num = 0;
+
+        $sql = "SELECT tc.rowid, tc.element, tc.source, tc.code, tc.libelle as label, sc.rowid as contactroleid, sc.fk_soc as socid";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "societe_contacts as sc, " . MAIN_DB_PREFIX . "c_type_contact as tc";
+        $sql .= " WHERE tc.rowid = sc.fk_c_type_contact";
+        $sql .= " AND tc.source = 'external' AND tc.active=1";
+        $sql .= " AND sc.fk_socpeople = " . ((int) $this->id);
+        $sql .= " AND sc.entity IN (" . getEntity('societe') . ')';
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $this->roles = [];
+
+            $num = $this->db->num_rows($resql);
+            if ($num > 0) {
+                while ($obj = $this->db->fetch_object($resql)) {
+                    $transkey = "TypeContact_" . $obj->element . "_" . $obj->source . "_" . $obj->code;
+                    $libelle_element = $langs->trans('ContactDefault_' . $obj->element);
+                    $this->roles[$obj->contactroleid] = ['id' => $obj->rowid, 'socid' => $obj->socid, 'element' => $obj->element, 'source' => $obj->source, 'code' => $obj->code, 'label' => $libelle_element . ' - ' . ($langs->trans($transkey) != $transkey ? $langs->trans($transkey) : $obj->label)];
+                }
+            }
+        } else {
+            $error++;
+            $this->error = $this->db->lasterror();
+            $this->errors[] = $this->db->lasterror();
+        }
+
+        if (empty($error)) {
+            return $num;
+        } else {
+            return $error * -1;
+        }
+    }
+
+    /**
+     * Get Contact roles for a thirdparty
+     *
+     * @param string $element Element type
+     *
+     * @return array|int            Array of contact roles or -1
+     * @throws Exception
+     */
+    public function getContactRoles($element = '')
+    {
+        $tab = array();
 
 		if ($element == 'action') {
 			$element = 'agenda';
@@ -1865,27 +1789,103 @@ class Contact extends CommonObject
 				$tab[] = array('fk_socpeople'=>$obj->id, 'type_contact'=>$obj->fk_c_type_contact);
 
 				$i++;
-			}
+            }
 
-			return $tab;
-		} else {
-			$this->error = $this->db->error();
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+            return $tab;
+        } else {
+            $this->error = $this->db->error();
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
 
-	/**
-	 *  Load array of prospect status
-	 *
-	 *  @param	int		$active     1=Active only, 0=Not active only, -1=All
-	 *  @return int					<0 if KO, >0 if OK
-	 */
-	public function loadCacheOfProspStatus($active = 1)
-	{
-		global $langs;
+    /**
+     * Updates all roles (default contact for companies) according to values inside the ->roles array.
+     * This is called by update of contact.
+     *
+     * @return float|int
+     * @see fetchRoles()
+     */
+    public function updateRoles()
+    {
+        global $conf;
 
-		$sql = "SELECT id, code, libelle as label, picto FROM ".MAIN_DB_PREFIX."c_stcommcontact";
+        $error = 0;
+
+        if (!isset($this->roles)) {
+            return;    // Avoid to loose roles when property not set
+        }
+
+        $this->db->begin();
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "societe_contacts WHERE fk_socpeople=" . ((int) $this->id) . " AND entity IN (" . getEntity("societe_contact") . ")";
+
+        $result = $this->db->query($sql);
+        if (!$result) {
+            $this->errors[] = $this->db->lasterror() . ' sql=' . $sql;
+            $error++;
+        } else {
+            if (count($this->roles) > 0) {
+                foreach ($this->roles as $keyRoles => $valRoles) {
+                    $idrole = 0;
+                    if (is_array($valRoles)) {
+                        $idrole = $valRoles['id'];
+                    } else {
+                        $idrole = $valRoles;
+                    }
+
+                    $socid = 0;
+                    if (is_array($valRoles)) {
+                        $socid = $valRoles['socid'];
+                    } else {
+                        $socid = $this->socid;
+                    }
+
+                    if ($socid > 0) {
+                        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_contacts";
+                        $sql .= " (entity,";
+                        $sql .= "date_creation,";
+                        $sql .= "fk_soc,";
+                        $sql .= "fk_c_type_contact,";
+                        $sql .= "fk_socpeople) ";
+                        $sql .= " VALUES (" . $conf->entity . ",";
+                        $sql .= "'" . $this->db->idate(dol_now()) . "',";
+                        $sql .= $socid . ", ";
+                        $sql .= $idrole . " , ";
+                        $sql .= $this->id;
+                        $sql .= ")";
+
+                        $result = $this->db->query($sql);
+                        if (!$result) {
+                            $this->errors[] = $this->db->lasterror() . ' sql=' . $sql;
+                            $error++;
+                        }
+                    }
+                }
+            }
+        }
+        if (empty($error)) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->error = implode(' ', $this->errors);
+            $this->db->rollback();
+            return $error * -1;
+        }
+    }
+
+    /**
+     *  Load array of prospect status
+     *
+     * @param int $active 1=Active only, 0=Not active only, -1=All
+     *
+     * @return int                    <0 if KO, >0 if OK
+     */
+    public function loadCacheOfProspStatus($active = 1)
+    {
+        global $langs;
+
+        $sql = "SELECT id, code, libelle as label, picto FROM ".MAIN_DB_PREFIX."c_stcommcontact";
 		if ($active >= 0) {
 			$sql .= " WHERE active = ".((int) $active);
 		}
@@ -2020,29 +2020,6 @@ class Contact extends CommonObject
 		return "Error, mode/status not found";
 	}
 
-	/**
-	 *  get "blacklist" mailing status
-	 * 	set no_email attribut to 1 or 0
-	 *
-	 *  @return int					<0 if KO, >0 if OK
-	 */
-	public function getNoEmail()
-	{
-		if ($this->email) {
-			$sql = "SELECT COUNT(rowid) as nb FROM ".MAIN_DB_PREFIX."mailing_unsubscribe WHERE entity IN (".getEntity('mailing').") AND email = '".$this->db->escape($this->email)."'";
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$obj = $this->db->fetch_object($resql);
-				$this->no_email = $obj->nb;
-				return 1;
-			} else {
-				$this->error = $this->db->lasterror();
-				$this->errors[] = $this->error;
-				return -1;
-			}
-		}
-		return 0;
-	}
 
 	/**
 	 *  Set "blacklist" mailing status
@@ -2088,16 +2065,40 @@ class Contact extends CommonObject
 				}
 			}
 
-			if (empty($error)) {
-				$this->no_email = $no_email;
-				$this->db->commit();
-				return 1;
-			} else {
-				$this->db->rollback();
-				return $error * -1;
-			}
-		}
+            if (empty($error)) {
+                $this->no_email = $no_email;
+                $this->db->commit();
+                return 1;
+            } else {
+                $this->db->rollback();
+                return $error * -1;
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
+
+    /**
+     *  get "blacklist" mailing status
+     *    set no_email attribut to 1 or 0
+     *
+     * @return int                    <0 if KO, >0 if OK
+     */
+    public function getNoEmail()
+    {
+        if ($this->email) {
+            $sql = "SELECT COUNT(rowid) as nb FROM " . MAIN_DB_PREFIX . "mailing_unsubscribe WHERE entity IN (" . getEntity('mailing') . ") AND email = '" . $this->db->escape($this->email) . "'";
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $obj = $this->db->fetch_object($resql);
+                $this->no_email = $obj->nb;
+                return 1;
+            } else {
+                $this->error = $this->db->lasterror();
+                $this->errors[] = $this->error;
+                return -1;
+            }
+        }
+        return 0;
+    }
 }

@@ -113,21 +113,6 @@ class mod_expedition_safor extends ModelNumRefExpedition
 	}
 
 	/**
-	 *  Return next free value
-	 *
-	 *	@param	Societe		$objsoc     Third party object
-	 *	@param	Object		$objforref	Shipment object
-	 *	@return string      			Next free value
-	 */
-	public function expedition_get_num($objsoc, $objforref)
-	{
-		// phpcs:enable
-		return $this->getNextValue($objsoc, $objforref);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 *	Return next value
 	 *
 	 *	@param	Societe		$objsoc     Third party object
@@ -160,13 +145,29 @@ class mod_expedition_safor extends ModelNumRefExpedition
 		$date = time();
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_expedition_safor::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_expedition_safor::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return next free value
+     *
+     * @param Societe $objsoc    Third party object
+     * @param Object  $objforref Shipment object
+     *
+     * @return string                Next free value
+     */
+    public function expedition_get_num($objsoc, $objforref)
+    {
+        // phpcs:enable
+        return $this->getNextValue($objsoc, $objforref);
+    }
 }

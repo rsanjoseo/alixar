@@ -173,16 +173,6 @@ class mailing_thirdparties extends MailingTargets
 		return parent::addTargetsToDatabase($mailing_id, $cibles);
 	}
 
-	/**
-	 *  Can include an URL link on each record provided by selector shown on target page.
-	 *
-	 *  @param	int		$id		ID
-	 *  @return string      	Url link
-	 */
-	public function url($id)
-	{
-		return '<a href="'.DOL_URL_ROOT.'/societe/card.php?socid='.$id.'">'.img_object('', "company").'</a>';
-	}
 
 	/**
 	 *	On the main mailing area, there is a box with statistics.
@@ -200,6 +190,7 @@ class mailing_thirdparties extends MailingTargets
 		//$this->statssql[0]="SELECT field1 as label, count(distinct(email)) as nb FROM mytable WHERE email IS NOT NULL";
 		return array();
 	}
+
 
 	/**
 	 *	Return here number of distinct emails returned by your selector.
@@ -298,14 +289,26 @@ class mailing_thirdparties extends MailingTargets
 		}
 		$s .= '<option value="0">'.$langs->trans('NorProspectNorCustomer').'</option>';
 
-		$s .= '</select> ';
+        $s .= '</select> ';
 
-		$s .= $langs->trans("Status");
-		$s .= ' <select name="filter_status" class="flat marginrightonly">';
-		$s .= '<option value="-1">&nbsp;</option>';
-		$s .= '<option value="1" selected>'.$langs->trans("Enabled").'</option>';
-		$s .= '<option value="0">'.$langs->trans("Disabled").'</option>';
-		$s .= '</select>';
-		return $s;
-	}
+        $s .= $langs->trans("Status");
+        $s .= ' <select name="filter_status" class="flat marginrightonly">';
+        $s .= '<option value="-1">&nbsp;</option>';
+        $s .= '<option value="1" selected>' . $langs->trans("Enabled") . '</option>';
+        $s .= '<option value="0">' . $langs->trans("Disabled") . '</option>';
+        $s .= '</select>';
+        return $s;
+    }
+
+    /**
+     *  Can include an URL link on each record provided by selector shown on target page.
+     *
+     * @param int $id ID
+     *
+     * @return string        Url link
+     */
+    public function url($id)
+    {
+        return '<a href="' . DOL_URL_ROOT . '/societe/card.php?socid=' . $id . '">' . img_object('', "company") . '</a>';
+    }
 }

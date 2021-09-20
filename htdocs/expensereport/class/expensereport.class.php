@@ -35,58 +35,43 @@ require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport_rule.class.ph
 class ExpenseReport extends CommonObject
 {
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated (need to be paid)
-	 */
-	const STATUS_VALIDATED = 2;
-	/**
-	 * Classified canceled
-	 */
-	const STATUS_CANCELED = 4;
-	/**
-	 * Classified approved
-	 */
-	const STATUS_APPROVED = 5;
-	/**
-	 * Classified refused
-	 */
-	const STATUS_REFUSED = 99;
-	/**
-	 * Classified paid.
-	 */
-	const STATUS_CLOSED = 6;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'expensereport';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'expensereport';
+
 	/**
 	 * @var string table element line name
 	 */
 	public $table_element_line = 'expensereport_det';
+
 	/**
 	 * @var string Fieldname with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_expensereport';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'trip';
+
 	public $lines = array();
+
 	public $date_debut;
+
 	public $date_fin;
+
 	/**
 	 * 0=draft, 2=validated (attente approb), 4=canceled, 5=approved, 6=paid, 99=denied
 	 *
 	 * @var int		Status
 	 */
 	public $status;
+
 	/**
 	 * 0=draft, 2=validated (attente approb), 4=canceled, 5=approved, 6=paid, 99=denied
 	 *
@@ -95,53 +80,89 @@ class ExpenseReport extends CommonObject
 	 */
 	public $fk_statut;
 
-	// ACTIONS
+    public $vat_src_code;
 
-	// Create
-	public $vat_src_code;
-		public $fk_c_paiement; // Note fk_user_author is not the 'author' but the guy the expense report is for.
+    public $fk_c_paiement;
+    public $paid;
 
-	// Update
-	public $paid;
-	public $user_author_infos;
+    public $user_author_infos;
+    public $user_validator_infos;
 
-	// Refus
-	public $user_validator_infos;
-	public $rule_warning_message;
-	public $date_create;
+    public $rule_warning_message;
 
-	// Annulation
-public $fk_user_author;
-	public $date_modif;
-	public $fk_user_modif;
-	public $date_refuse; // User that is defined to approve
+    // ACTIONS
 
-	// Validation
-		public $detail_refuse; // User making validation
-	public $fk_user_refuse;
-	public $date_cancel;
+    // Create
+    public $date_create;
+    public $fk_user_author; // Note fk_user_author is not the 'author' but the guy the expense report is for.
 
-	// Approve
-	public $detail_cancel;
-		public $fk_user_cancel; // User that has approved
+    // Update
+    public $date_modif;
+    public $fk_user_modif;
 
-	// Paiement
-public $fk_user_validator;
-public $date_valid;
-	public $fk_user_valid;
-	public $user_valid_infos;
-	public $date_approve;
-public $fk_user_approve;
-	public $user_paid_infos;
-	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
-		'ref' =>array('type'=>'varchar(50)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>15),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>20),
-		'ref_number_int' =>array('type'=>'integer', 'label'=>'Ref number int', 'enabled'=>1, 'visible'=>-1, 'position'=>25),
-		'ref_ext' =>array('type'=>'integer', 'label'=>'Ref ext', 'enabled'=>1, 'visible'=>-1, 'position'=>30),
-		'total_ht' =>array('type'=>'double(24,8)', 'label'=>'Total ht', 'enabled'=>1, 'visible'=>-1, 'position'=>35),
-		'total_tva' =>array('type'=>'double(24,8)', 'label'=>'Total tva', 'enabled'=>1, 'visible'=>-1, 'position'=>40),
-		'localtax1' =>array('type'=>'double(24,8)', 'label'=>'Localtax1', 'enabled'=>1, 'visible'=>-1, 'position'=>45),
+    // Refus
+    public $date_refuse;
+    public $detail_refuse;
+    public $fk_user_refuse;
+
+    // Annulation
+    public $date_cancel;
+    public $detail_cancel;
+    public $fk_user_cancel;
+
+    public $fk_user_validator; // User that is defined to approve
+
+    // Validation
+    public $date_valid; // User making validation
+    public $fk_user_valid;
+    public $user_valid_infos;
+
+    // Approve
+    public $date_approve;
+    public $fk_user_approve; // User that has approved
+
+    // Paiement
+    public $user_paid_infos;
+
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
+
+    /**
+     * Validated (need to be paid)
+     */
+    const STATUS_VALIDATED = 2;
+
+    /**
+     * Classified canceled
+     */
+    const STATUS_CANCELED = 4;
+
+    /**
+     * Classified approved
+     */
+    const STATUS_APPROVED = 5;
+
+    /**
+     * Classified refused
+     */
+    const STATUS_REFUSED = 99;
+
+    /**
+     * Classified paid.
+     */
+    const STATUS_CLOSED = 6;
+
+    public $fields = array(
+        'rowid' => array('type' => 'integer', 'label' => 'ID', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 10),
+        'ref' => array('type' => 'varchar(50)', 'label' => 'Ref', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'showoncombobox' => 1, 'position' => 15),
+        'entity' => array('type' => 'integer', 'label' => 'Entity', 'default' => 1, 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'position' => 20),
+        'ref_number_int' => array('type' => 'integer', 'label' => 'Ref number int', 'enabled' => 1, 'visible' => -1, 'position' => 25),
+        'ref_ext' => array('type' => 'integer', 'label' => 'Ref ext', 'enabled' => 1, 'visible' => -1, 'position' => 30),
+        'total_ht' => array('type' => 'double(24,8)', 'label' => 'Total ht', 'enabled' => 1, 'visible' => -1, 'position' => 35),
+        'total_tva' => array('type' => 'double(24,8)', 'label' => 'Total tva', 'enabled' => 1, 'visible' => -1, 'position' => 40),
+        'localtax1' => array('type' => 'double(24,8)', 'label' => 'Localtax1', 'enabled' => 1, 'visible' => -1, 'position' => 45),
 		'localtax2' =>array('type'=>'double(24,8)', 'label'=>'Localtax2', 'enabled'=>1, 'visible'=>-1, 'position'=>50),
 		'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'Total ttc', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
 		'date_debut' =>array('type'=>'date', 'label'=>'Date debut', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>60),
@@ -196,83 +217,6 @@ public $fk_user_approve;
 		$this->statuts_short = array(0 => 'Draft', 2 => 'Validated', 4 => 'Canceled', 5 => 'Approved', 6 => 'Paid', 99 => 'Refused');
 		$this->statuts = array(0 => 'Draft', 2 => 'ValidatedWaitingApproval', 4 => 'Canceled', 5 => 'Approved', 6 => 'Paid', 99 => 'Refused');
 		$this->statuts_logo = array(0 => 'status0', 2 => 'status1', 4 => 'status6', 5 => 'status4', 6 => 'status6', 99 => 'status5');
-	}
-
-	/**
-	 *	Load an object from its id and create a new one in database
-	 *
-	 *  @param	    User	$user		        User making the clone
-	 *	@param		int     $fk_user_author		Id of new user
-	 *	@return		int							New id of clone
-	 */
-	public function createFromClone(User $user, $fk_user_author)
-	{
-		global $hookmanager;
-
-		$error = 0;
-
-		if (empty($fk_user_author)) {
-			$fk_user_author = $user->id;
-		}
-
-		$this->db->begin();
-
-		// get extrafields so they will be clone
-		//foreach($this->lines as $line)
-			//$line->fetch_optionals();
-
-		// Load source object
-		$objFrom = clone $this;
-
-		$this->id = 0;
-		$this->ref = '';
-		$this->status = 0;
-		$this->fk_statut = 0; // deprecated
-
-		// Clear fields
-		$this->fk_user_creat      = $user->id;
-		$this->fk_user_author     = $fk_user_author; // Note fk_user_author is not the 'author' but the guy the expense report is for.
-		$this->fk_user_valid      = '';
-		$this->date_create = '';
-		$this->date_creation      = '';
-		$this->date_validation    = '';
-
-		// Remove link on lines to a joined file
-		if (is_array($this->lines) && count($this->lines) > 0) {
-			foreach ($this->lines as $key => $line) {
-				$this->lines[$key]->fk_ecm_files = 0;
-			}
-		}
-
-		// Create clone
-		$this->context['createfromclone'] = 'createfromclone';
-		$result = $this->create($user);
-		if ($result < 0) {
-			$error++;
-		}
-
-		if (!$error) {
-			// Hook of thirdparty module
-			if (is_object($hookmanager)) {
-				$parameters = array('objFrom'=>$objFrom);
-				$action = '';
-				$reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-				if ($reshook < 0) {
-					$error++;
-				}
-			}
-		}
-
-		unset($this->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $this->id;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
 	}
 
 	/**
@@ -427,27 +371,106 @@ public $fk_user_approve;
 				}
 			} else {
 				dol_syslog(get_class($this)."::create error ".$this->error, LOG_ERR);
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$this->error = $this->db->lasterror()." sql=".$sql;
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            $this->error = $this->db->lasterror() . " sql=" . $sql;
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 * update
-	 *
-	 * @param   User    $user                   User making change
-	 * @param   int     $notrigger              Disable triggers
-	 * @param   User    $userofexpensereport    New user we want to have the expense report on.
-	 * @return  int                             <0 if KO, >0 if OK
-	 */
-	public function update($user, $notrigger = 0, $userofexpensereport = null)
-	{
-		global $langs;
+    /**
+     *    Load an object from its id and create a new one in database
+     *
+     * @param User $user           User making the clone
+     * @param int  $fk_user_author Id of new user
+     *
+     * @return        int                            New id of clone
+     */
+    public function createFromClone(User $user, $fk_user_author)
+    {
+        global $hookmanager;
+
+        $error = 0;
+
+        if (empty($fk_user_author)) {
+            $fk_user_author = $user->id;
+        }
+
+        $this->db->begin();
+
+        // get extrafields so they will be clone
+        //foreach($this->lines as $line)
+        //$line->fetch_optionals();
+
+        // Load source object
+        $objFrom = clone $this;
+
+        $this->id = 0;
+        $this->ref = '';
+        $this->status = 0;
+        $this->fk_statut = 0; // deprecated
+
+        // Clear fields
+        $this->fk_user_creat = $user->id;
+        $this->fk_user_author = $fk_user_author; // Note fk_user_author is not the 'author' but the guy the expense report is for.
+        $this->fk_user_valid = '';
+        $this->date_create = '';
+        $this->date_creation = '';
+        $this->date_validation = '';
+
+        // Remove link on lines to a joined file
+        if (is_array($this->lines) && count($this->lines) > 0) {
+            foreach ($this->lines as $key => $line) {
+                $this->lines[$key]->fk_ecm_files = 0;
+            }
+        }
+
+        // Create clone
+        $this->context['createfromclone'] = 'createfromclone';
+        $result = $this->create($user);
+        if ($result < 0) {
+            $error++;
+        }
+
+        if (!$error) {
+            // Hook of thirdparty module
+            if (is_object($hookmanager)) {
+                $parameters = ['objFrom' => $objFrom];
+                $action = '';
+                $reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+                if ($reshook < 0) {
+                    $error++;
+                }
+            }
+        }
+
+        unset($this->context['createfromclone']);
+
+        // End
+        if (!$error) {
+            $this->db->commit();
+            return $this->id;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     * update
+     *
+     * @param User $user                User making change
+     * @param int  $notrigger           Disable triggers
+     * @param User $userofexpensereport New user we want to have the expense report on.
+     *
+     * @return  int                             <0 if KO, >0 if OK
+     */
+    public function update($user, $notrigger = 0, $userofexpensereport = null)
+    {
+        global $langs;
 
 		$error = 0;
 		$this->db->begin();
@@ -606,84 +629,6 @@ public $fk_user_approve;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * fetch_lines
-	 *
-	 * @return  int     <0 if OK, >0 if KO
-	 */
-	public function fetch_lines()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$this->lines = array();
-
-		$sql = ' SELECT de.rowid, de.comments, de.qty, de.value_unit, de.date, de.rang,';
-		$sql .= " de.".$this->fk_element.", de.fk_c_type_fees, de.fk_c_exp_tax_cat, de.fk_projet as fk_project, de.tva_tx, de.fk_ecm_files,";
-		$sql .= ' de.total_ht, de.total_tva, de.total_ttc,';
-		$sql .= ' ctf.code as code_type_fees, ctf.label as libelle_type_fees,';
-		$sql .= ' p.ref as ref_projet, p.title as title_projet';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element_line.' as de';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_type_fees as ctf ON de.fk_c_type_fees = ctf.id';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'projet as p ON de.fk_projet = p.rowid';
-		$sql .= " WHERE de.".$this->fk_element." = ".((int) $this->id);
-		if (!empty($conf->global->EXPENSEREPORT_LINES_SORTED_BY_ROWID)) {
-			$sql .= ' ORDER BY de.rang ASC, de.rowid ASC';
-		} else {
-			$sql .= ' ORDER BY de.rang ASC, de.date ASC';
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$objp = $this->db->fetch_object($resql);
-
-				$deplig = new ExpenseReportLine($this->db);
-
-				$deplig->rowid          = $objp->rowid;
-				$deplig->id             = $objp->rowid;
-				$deplig->comments       = $objp->comments;
-				$deplig->qty            = $objp->qty;
-				$deplig->value_unit     = $objp->value_unit;
-				$deplig->date           = $objp->date;
-				$deplig->dates          = $this->db->jdate($objp->date);
-
-				$deplig->fk_expensereport = $objp->fk_expensereport;
-				$deplig->fk_c_type_fees   = $objp->fk_c_type_fees;
-				$deplig->fk_c_exp_tax_cat = $objp->fk_c_exp_tax_cat;
-				$deplig->fk_projet        = $objp->fk_project; // deprecated
-				$deplig->fk_project       = $objp->fk_project;
-				$deplig->fk_ecm_files     = $objp->fk_ecm_files;
-
-				$deplig->total_ht         = $objp->total_ht;
-				$deplig->total_tva        = $objp->total_tva;
-				$deplig->total_ttc        = $objp->total_ttc;
-
-				$deplig->type_fees_code     = empty($objp->code_type_fees) ? 'TF_OTHER' : $objp->code_type_fees;
-				$deplig->type_fees_libelle  = $objp->libelle_type_fees;
-				$deplig->tva_tx = $objp->tva_tx;
-				$deplig->vatrate            = $objp->tva_tx;
-				$deplig->projet_ref         = $objp->ref_projet;
-				$deplig->projet_title       = $objp->title_projet;
-
-				$deplig->rang               = $objp->rang;
-
-				$this->lines[$i] = $deplig;
-
-				$i++;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			$this->error = $this->db->lasterror();
-			dol_syslog(get_class($this)."::fetch_lines: Error ".$this->error, LOG_ERR);
-			return -3;
-		}
-	}
-
 	/**
 	 *    Classify the expense report as paid
 	 *
@@ -741,25 +686,59 @@ public $fk_user_approve;
 					return -2;
 				}
 			} else {
-				$this->db->commit();
-				return 0;
-			}
-		} else {
-			$this->db->rollback();
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+                $this->db->commit();
+                return 0;
+            }
+        } else {
+            $this->db->rollback();
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Returns the label status
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     *
+     * @return     string              Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->status, $mode);
+    }
 
-	/**
-	 *  Load information on object
-	 *
-	 *  @param  int     $id      Id of object
-	 *  @return void
-	 */
-	public function info($id)
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Returns the label of a status
+     *
+     * @param int $status ID status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return     string              Label
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        global $langs;
+
+        $labelStatus = $langs->transnoentitiesnoconv($this->statuts[$status]);
+        $labelStatusShort = $langs->transnoentitiesnoconv($this->statuts_short[$status]);
+
+        $statusType = $this->statuts_logo[$status];
+
+        return dolGetStatus($labelStatus, $labelStatusShort, '', $statusType, $mode);
+    }
+
+    /**
+     *  Load information on object
+     *
+     * @param int $id Id of object
+     *
+     * @return void
+     */
+    public function info($id)
 	{
 		global $conf;
 
@@ -818,6 +797,8 @@ public $fk_user_approve;
 			dol_print_error($this->db);
 		}
 	}
+
+
 
 	/**
 	 *  Initialise an instance with random values.
@@ -879,9 +860,10 @@ public $fk_user_approve;
 			$this->total_ht += $line->total_ht;
 			$this->total_tva += $line->total_tva;
 			$this->total_ttc += $line->total_ttc;
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * fetch_line_by_project
 	 *
@@ -981,8 +963,6 @@ public $fk_user_approve;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * recalculer
 	 * TODO Replace this with call to update_price if not already done
@@ -1021,24 +1001,104 @@ public $fk_user_approve;
 				return 1;
 			} else {
 				$this->error = $this->db->lasterror();
-				dol_syslog(get_class($this)."::recalculer: Error ".$this->error, LOG_ERR);
-				return -3;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			dol_syslog(get_class($this)."::recalculer: Error ".$this->error, LOG_ERR);
-			return -3;
-		}
-	}
+                dol_syslog(get_class($this) . "::recalculer: Error " . $this->error, LOG_ERR);
+                return -3;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            dol_syslog(get_class($this) . "::recalculer: Error " . $this->error, LOG_ERR);
+            return -3;
+        }
+    }
 
-	/**
-	 * Delete object in database
-	 *
-	 * @param   User    $user       User that delete
-	 * @param 	bool 	$notrigger  false=launch triggers after, true=disable triggers
-	 * @return  int                 <0 if KO, >0 if OK
-	 */
-	public function delete(User $user = null, $notrigger = false)
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * fetch_lines
+     *
+     * @return  int     <0 if OK, >0 if KO
+     */
+    public function fetch_lines()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $this->lines = [];
+
+        $sql = ' SELECT de.rowid, de.comments, de.qty, de.value_unit, de.date, de.rang,';
+        $sql .= " de." . $this->fk_element . ", de.fk_c_type_fees, de.fk_c_exp_tax_cat, de.fk_projet as fk_project, de.tva_tx, de.fk_ecm_files,";
+        $sql .= ' de.total_ht, de.total_tva, de.total_ttc,';
+        $sql .= ' ctf.code as code_type_fees, ctf.label as libelle_type_fees,';
+        $sql .= ' p.ref as ref_projet, p.title as title_projet';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element_line . ' as de';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_type_fees as ctf ON de.fk_c_type_fees = ctf.id';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet as p ON de.fk_projet = p.rowid';
+        $sql .= " WHERE de." . $this->fk_element . " = " . ((int) $this->id);
+        if (!empty($conf->global->EXPENSEREPORT_LINES_SORTED_BY_ROWID)) {
+            $sql .= ' ORDER BY de.rang ASC, de.rowid ASC';
+        } else {
+            $sql .= ' ORDER BY de.rang ASC, de.date ASC';
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $objp = $this->db->fetch_object($resql);
+
+                $deplig = new ExpenseReportLine($this->db);
+
+                $deplig->rowid = $objp->rowid;
+                $deplig->id = $objp->rowid;
+                $deplig->comments = $objp->comments;
+                $deplig->qty = $objp->qty;
+                $deplig->value_unit = $objp->value_unit;
+                $deplig->date = $objp->date;
+                $deplig->dates = $this->db->jdate($objp->date);
+
+                $deplig->fk_expensereport = $objp->fk_expensereport;
+                $deplig->fk_c_type_fees = $objp->fk_c_type_fees;
+                $deplig->fk_c_exp_tax_cat = $objp->fk_c_exp_tax_cat;
+                $deplig->fk_projet = $objp->fk_project; // deprecated
+                $deplig->fk_project = $objp->fk_project;
+                $deplig->fk_ecm_files = $objp->fk_ecm_files;
+
+                $deplig->total_ht = $objp->total_ht;
+                $deplig->total_tva = $objp->total_tva;
+                $deplig->total_ttc = $objp->total_ttc;
+
+                $deplig->type_fees_code = empty($objp->code_type_fees) ? 'TF_OTHER' : $objp->code_type_fees;
+                $deplig->type_fees_libelle = $objp->libelle_type_fees;
+                $deplig->tva_tx = $objp->tva_tx;
+                $deplig->vatrate = $objp->tva_tx;
+                $deplig->projet_ref = $objp->ref_projet;
+                $deplig->projet_title = $objp->title_projet;
+
+                $deplig->rang = $objp->rang;
+
+                $this->lines[$i] = $deplig;
+
+                $i++;
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror();
+            dol_syslog(get_class($this) . "::fetch_lines: Error " . $this->error, LOG_ERR);
+            return -3;
+        }
+    }
+
+    /**
+     * Delete object in database
+     *
+     * @param User $user      User that delete
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return  int                 <0 if KO, >0 if OK
+     */
+    public function delete(User $user = null, $notrigger = false)
 	{
 		global $conf;
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
@@ -1152,8 +1212,6 @@ public $fk_user_approve;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set to status validate
 	 *
@@ -1266,56 +1324,10 @@ public $fk_user_approve;
 			$this->db->rollback();
 			$this->error = $this->db->lasterror();
 			return -1;
-		}
-	}
+        }
+    }
 
-	/**
-	 * Return next reference of expense report not already used
-	 *
-	 * @return    string            free ref
-	 */
-	public function getNextNumRef()
-	{
-		global $langs, $conf;
-		$langs->load("trips");
-
-		if (!empty($conf->global->EXPENSEREPORT_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->EXPENSEREPORT_ADDON.".php";
-			$classname = $conf->global->EXPENSEREPORT_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/expensereport/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = $obj->getNextValue($this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				$this->error = $obj->error;
-				$this->errors = $obj->errors;
-				//dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
-				return -1;
-			}
-		} else {
-			$this->error = "Error_EXPENSEREPORT_ADDON_NotDefined";
-			return -2;
-		}
-	}
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * set_save_from_refuse
 	 *
@@ -1355,8 +1367,6 @@ public $fk_user_approve;
 			dol_syslog(get_class($this)."::set_save_from_refuse expensereport already with save status", LOG_WARNING);
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Set status to approved
@@ -1463,9 +1473,10 @@ public $fk_user_approve;
 			}
 		} else {
 			dol_syslog(get_class($this)."::setDeny expensereport already with refuse status", LOG_WARNING);
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * set_unpaid
 	 *
@@ -1481,8 +1492,6 @@ public $fk_user_approve;
 		dol_syslog(get_class($this)."::set_unpaid is deprecated, use setUnpaid instead", LOG_NOTICE);
 		return $this->setUnpaid($fuser, $notrigger);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * set_unpaid
@@ -1530,9 +1539,10 @@ public $fk_user_approve;
 			}
 		} else {
 			dol_syslog(get_class($this)."::set_unpaid expensereport already with unpaid status", LOG_WARNING);
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * set_cancel
 	 *
@@ -1575,28 +1585,73 @@ public $fk_user_approve;
 					$this->db->rollback();
 					$this->error = $this->db->error();
 					return -2;
-				}
-			} else {
-				$this->db->rollback();
-				$this->error = $this->db->error();
-				return -1;
-			}
-		} else {
-			dol_syslog(get_class($this)."::set_cancel expensereport already with cancel status", LOG_WARNING);
-		}
-	}
+                }
+            } else {
+                $this->db->rollback();
+                $this->error = $this->db->error();
+                return -1;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::set_cancel expensereport already with cancel status", LOG_WARNING);
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * Return next reference of expense report not already used
+     *
+     * @return    string            free ref
+     */
+    public function getNextNumRef()
+    {
+        global $langs, $conf;
+        $langs->load("trips");
 
-	/**
-	 *  Return clicable name (with picto eventually)
-	 *
-	 *	@param		int		$withpicto					0=No picto, 1=Include picto into link, 2=Only picto
-	 *  @param  	string 	$option                		Where point the link ('', 'document', ..)
-	 *	@param		int		$max						Max length of shown ref
-	 *	@param		int		$short						1=Return just URL
-	 *	@param		string	$moretitle					Add more text to title tooltip
-	 *	@param		int		$notooltip					1=Disable tooltip
+        if (!empty($conf->global->EXPENSEREPORT_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->EXPENSEREPORT_ADDON . ".php";
+            $classname = $conf->global->EXPENSEREPORT_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/expensereport/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = $obj->getNextValue($this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                $this->error = $obj->error;
+                $this->errors = $obj->errors;
+                //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                return -1;
+            }
+        } else {
+            $this->error = "Error_EXPENSEREPORT_ADDON_NotDefined";
+            return -2;
+        }
+    }
+
+    /**
+     *  Return clicable name (with picto eventually)
+     *
+     * @param int         $withpicto                    0=No picto, 1=Include picto into link, 2=Only picto
+     * @param string      $option                       Where point the link ('', 'document', ..)
+     * @param int         $max                          Max length of shown ref
+     * @param int         $short                        1=Return just URL
+     * @param string      $moretitle                    Add more text to title tooltip
+     * @param int         $notooltip                    1=Disable tooltip
 	 *  @param  	int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *	@return		string								String with URL
 	 */
@@ -1674,39 +1729,7 @@ public $fk_user_approve;
 		return $result;
 	}
 
-	/**
-	 *  Returns the label status
-	 *
-	 *  @param      int     $mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 *  @return     string              Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->status, $mode);
-	}
-
-	/**
-	 *  Returns the label of a status
-	 *
-	 *  @param      int     $status     ID status
-	 *  @param      int     $mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return     string              Label
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		global $langs;
-
-		$labelStatus = $langs->transnoentitiesnoconv($this->statuts[$status]);
-		$labelStatusShort = $langs->transnoentitiesnoconv($this->statuts_short[$status]);
-
-		$statusType = $this->statuts_logo[$status];
-
-		return dolGetStatus($labelStatus, $labelStatusShort, '', $statusType, $mode);
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Update total of an expense report when you add a line.
 	 *
@@ -1865,26 +1888,97 @@ public $fk_user_approve;
 			} else {
 				$this->error = $this->line->error;
 				dol_syslog(get_class($this)."::addline error=".$this->error, LOG_ERR);
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			dol_syslog(get_class($this)."::addline status of expense report must be Draft to allow use of ->addline()", LOG_ERR);
-			$this->error = 'ErrorExpenseNotDraft';
-			return -3;
-		}
-	}
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::addline status of expense report must be Draft to allow use of ->addline()", LOG_ERR);
+            $this->error = 'ErrorExpenseNotDraft';
+            return -3;
+        }
+    }
 
-	/**
-	 * Method to apply the offset if needed
-	 *
-	 * @return boolean		true=applied, false=not applied
-	 */
-	public function applyOffset()
-	{
-		global $conf;
+    /**
+     * Check constraint of rules and update price if needed
+     *
+     * @param int    $type   type of line
+     * @param string $seller seller, but actually he is unknown
+     *
+     * @return true or false
+     */
+    public function checkRules($type = 0, $seller = '')
+    {
+        global $user, $conf, $db, $langs;
 
-		if (empty($conf->global->MAIN_USE_EXPENSE_IK)) {
+        $langs->load('trips');
+
+        if (empty($conf->global->MAIN_USE_EXPENSE_RULE)) {
+            return true; // if don't use rules
+        }
+
+        $rulestocheck = ExpenseReportRule::getAllRule($this->line->fk_c_type_fees, $this->line->date, $this->fk_user_author);
+
+        $violation = 0;
+        $rule_warning_message_tab = [];
+
+        $current_total_ttc = $this->line->total_ttc;
+        $new_current_total_ttc = $this->line->total_ttc;
+
+        // check if one is violated
+        foreach ($rulestocheck as $rule) {
+            if (in_array($rule->code_expense_rules_type, ['EX_DAY', 'EX_MON', 'EX_YEA'])) {
+                $amount_to_test = $this->line->getExpAmount($rule, $this->fk_user_author, $rule->code_expense_rules_type);
+            } else {
+                $amount_to_test = $current_total_ttc; // EX_EXP
+            }
+
+            $amount_to_test = $amount_to_test - $current_total_ttc + $new_current_total_ttc; // if amount as been modified by a previous rule
+
+            if ($amount_to_test > $rule->amount) {
+                $violation++;
+
+                if ($rule->restrictive) {
+                    $this->error = 'ExpenseReportConstraintViolationError';
+                    $this->errors[] = $this->error;
+
+                    $new_current_total_ttc -= $amount_to_test - $rule->amount; // ex, entered 16€, limit 12€, subtracts 4€;
+                    $rule_warning_message_tab[] = $langs->trans('ExpenseReportConstraintViolationError', $rule->id, price($amount_to_test, 0, $langs, 1, -1, -1, $conf->currency), price($rule->amount, 0, $langs, 1, -1, -1, $conf->currency), $langs->trans('by' . $rule->code_expense_rules_type, price($new_current_total_ttc, 0, $langs, 1, -1, -1, $conf->currency)));
+                } else {
+                    $this->error = 'ExpenseReportConstraintViolationWarning';
+                    $this->errors[] = $this->error;
+
+                    $rule_warning_message_tab[] = $langs->trans('ExpenseReportConstraintViolationWarning', $rule->id, price($amount_to_test, 0, $langs, 1, -1, -1, $conf->currency), price($rule->amount, 0, $langs, 1, -1, -1, $conf->currency), $langs->trans('nolimitby' . $rule->code_expense_rules_type));
+                }
+                // No break, we sould test if another rule is violated
+            }
+        }
+
+        $this->line->rule_warning_message = implode('\n', $rule_warning_message_tab);
+
+        if ($violation > 0) {
+            $tmp = calcul_price_total($this->line->qty, $new_current_total_ttc / $this->line->qty, 0, $this->line->vatrate, 0, 0, 0, 'TTC', 0, $type, $seller);
+
+            $this->line->value_unit = $tmp[5];
+            $this->line->total_ttc = $tmp[2];
+            $this->line->total_ht = $tmp[0];
+            $this->line->total_tva = $tmp[1];
+
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Method to apply the offset if needed
+     *
+     * @return boolean        true=applied, false=not applied
+     */
+    public function applyOffset()
+    {
+        global $conf;
+
+        if (empty($conf->global->MAIN_USE_EXPENSE_IK)) {
 			return false;
 		}
 
@@ -1953,77 +2047,6 @@ public $fk_user_approve;
 		}
 
 		return false;
-	}
-
-	/**
-	 * Check constraint of rules and update price if needed
-	 *
-	 * @param	int		$type		type of line
-	 * @param	string	$seller		seller, but actually he is unknown
-	 * @return true or false
-	 */
-	public function checkRules($type = 0, $seller = '')
-	{
-		global $user, $conf, $db, $langs;
-
-		$langs->load('trips');
-
-		if (empty($conf->global->MAIN_USE_EXPENSE_RULE)) {
-			return true; // if don't use rules
-		}
-
-		$rulestocheck = ExpenseReportRule::getAllRule($this->line->fk_c_type_fees, $this->line->date, $this->fk_user_author);
-
-		$violation = 0;
-		$rule_warning_message_tab = array();
-
-		$current_total_ttc = $this->line->total_ttc;
-		$new_current_total_ttc = $this->line->total_ttc;
-
-		// check if one is violated
-		foreach ($rulestocheck as $rule) {
-			if (in_array($rule->code_expense_rules_type, array('EX_DAY', 'EX_MON', 'EX_YEA'))) {
-				$amount_to_test = $this->line->getExpAmount($rule, $this->fk_user_author, $rule->code_expense_rules_type);
-			} else {
-				$amount_to_test = $current_total_ttc; // EX_EXP
-			}
-
-			$amount_to_test = $amount_to_test - $current_total_ttc + $new_current_total_ttc; // if amount as been modified by a previous rule
-
-			if ($amount_to_test > $rule->amount) {
-				$violation++;
-
-				if ($rule->restrictive) {
-					$this->error = 'ExpenseReportConstraintViolationError';
-					$this->errors[] = $this->error;
-
-					$new_current_total_ttc -= $amount_to_test - $rule->amount; // ex, entered 16€, limit 12€, subtracts 4€;
-					$rule_warning_message_tab[] = $langs->trans('ExpenseReportConstraintViolationError', $rule->id, price($amount_to_test, 0, $langs, 1, -1, -1, $conf->currency), price($rule->amount, 0, $langs, 1, -1, -1, $conf->currency), $langs->trans('by'.$rule->code_expense_rules_type, price($new_current_total_ttc, 0, $langs, 1, -1, -1, $conf->currency)));
-				} else {
-					$this->error = 'ExpenseReportConstraintViolationWarning';
-					$this->errors[] = $this->error;
-
-					$rule_warning_message_tab[] = $langs->trans('ExpenseReportConstraintViolationWarning', $rule->id, price($amount_to_test, 0, $langs, 1, -1, -1, $conf->currency), price($rule->amount, 0, $langs, 1, -1, -1, $conf->currency), $langs->trans('nolimitby'.$rule->code_expense_rules_type));
-				}
-
-				// No break, we sould test if another rule is violated
-			}
-		}
-
-		$this->line->rule_warning_message = implode('\n', $rule_warning_message_tab);
-
-		if ($violation > 0) {
-			$tmp = calcul_price_total($this->line->qty, $new_current_total_ttc / $this->line->qty, 0, $this->line->vatrate, 0, 0, 0, 'TTC', 0, $type, $seller);
-
-			$this->line->value_unit = $tmp[5];
-			$this->line->total_ttc = $tmp[2];
-			$this->line->total_ht = $tmp[0];
-			$this->line->total_tva = $tmp[1];
-
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	/**

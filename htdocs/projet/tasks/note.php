@@ -31,7 +31,7 @@ $langs->load('projects');
 
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
-$mine = $_REQUEST['mode'] == 'mine' ? 1 : 0;
+$mine = GETPOST('mode') == 'mine' ? 1 : 0;
 //if (! $user->rights->projet->all->lire) $mine=1;	// Special for projects
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
@@ -75,26 +75,31 @@ if ($id > 0 || !empty($ref)) {
 // Retrieve First Task ID of Project if withprojet is on to allow project prev next to work
 if (!empty($project_ref) && !empty($withproject)) {
 	if ($projectstatic->fetch(0, $project_ref) > 0) {
-		$tasksarray = $object->getTasksArray(0, 0, $projectstatic->id, $socid, 0);
-		if (count($tasksarray) > 0) {
-			$id = $tasksarray[0]->id;
-			$object->fetch($id);
-		} else {
-			header("Location: ".DOL_URL_ROOT.'/projet/tasks.php?id='.$projectstatic->id.(empty($mode) ? '' : '&mode='.$mode));
-		}
-	}
+        $tasksarray = $object->getTasksArray(0, 0, $projectstatic->id, $socid, 0);
+        if (count($tasksarray) > 0) {
+            $id = $tasksarray[0]->id;
+            $object->fetch($id);
+        } else {
+            header("Location: " . DOL_URL_ROOT . '/projet/tasks.php?id=' . $projectstatic->id . (empty($mode) ? '' : '&mode=' . $mode));
+        }
+    }
 }
 
-$permissionnote = ($user->rights->projet->creer || $user->rights->projet->all->creer);
+if ($id > 0 || $ref) {
+    $object->fetch($id, $ref);
+}
 
+restrictedArea($user, 'projet', $object->fk_project, 'projet&project');
+
+$permissionnote = ($user->rights->projet->creer || $user->rights->projet->all->creer);
 
 /*
  * Actions
  */
 
-$reshook = $hookmanager->executeHooks('doActions', array(), $object, $action); // Note that $action and $object may have been modified by some hooks
+$reshook = $hookmanager->executeHooks('doActions', [], $object, $action); // Note that $action and $object may have been modified by some hooks
 if ($reshook < 0) {
-	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+    setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 if (empty($reshook)) {
 	include DOL_DOCUMENT_ROOT.'/core/actions_setnotes.inc.php'; // Must be include, not include_once

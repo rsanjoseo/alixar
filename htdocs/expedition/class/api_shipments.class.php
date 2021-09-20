@@ -43,25 +43,55 @@ class Shipments extends DolibarrApi
 	 */
 	public $shipment;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->shipment = new Expedition($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->shipment = new Expedition($this->db);
+    }
 
-	/**
-	 * List shipments
-	 *
-	 * Get a list of shipments
-	 *
-	 * @param string	       $sortfield	        Sort field
-	 * @param string	       $sortorder	        Sort order
-	 * @param int		       $limit		        Limit for list
-	 * @param int		       $page		        Page number
+    /**
+     * Get properties of a shipment object
+     *
+     * Return an array with shipment informations
+     *
+     * @param int $id ID of shipment
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->expedition->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->shipment->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Shipment not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $this->shipment->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->shipment);
+    }
+
+    /**
+     * List shipments
+     *
+     * Get a list of shipments
+     *
+     * @param string           $sortfield             Sort field
+     * @param string           $sortorder             Sort order
+     * @param int              $limit                 Limit for list
+     * @param int              $page                  Page number
 	 * @param string   	       $thirdparty_ids	    Thirdparty ids to filter shipments of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string           $sqlfilters          Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
 	 * @return  array                               Array of shipment objects
@@ -152,42 +182,6 @@ class Shipments extends DolibarrApi
 			throw new RestException(404, 'No shipment found');
 		}
 		return $obj_ret;
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->thirdparty); // id already returned
-
-		unset($object->note);
-		unset($object->address);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		if (!empty($object->lines) && is_array($object->lines)) {
-			foreach ($object->lines as $line) {
-				unset($line->tva_tx);
-				unset($line->vat_src_code);
-				unset($line->total_ht);
-				unset($line->total_ttc);
-				unset($line->total_tva);
-				unset($line->total_localtax1);
-				unset($line->total_localtax2);
-				unset($line->remise_percent);
-			}
-		}
-
-		return $object;
 	}
 
 	/**
@@ -388,25 +382,6 @@ class Shipments extends DolibarrApi
 	}*/
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$shipment = array();
-		foreach (Shipments::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$shipment[$field] = $data[$field];
-		}
-		return $shipment;
-	}
-
-	/**
 	 * Delete a line to given shipment
 	 *
 	 *
@@ -446,35 +421,6 @@ class Shipments extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a shipment object
-	 *
-	 * Return an array with shipment informations
-	 *
-	 * @param       int         $id         ID of shipment
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->expedition->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->shipment->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Shipment not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$this->shipment->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->shipment);
-	}
-
-	/**
 	 * Update shipment general fields (won't touch lines of shipment)
 	 *
 	 * @param int   $id             Id of shipment to update
@@ -499,27 +445,108 @@ class Shipments extends DolibarrApi
 		foreach ($request_data as $field => $value) {
 			if ($field == 'id') {
 				continue;
-			}
-			$this->shipment->$field = $value;
-		}
+            }
+            $this->shipment->$field = $value;
+        }
 
-		if ($this->shipment->update(DolibarrApiAccess::$user) > 0) {
-			return $this->get($id);
-		} else {
-			throw new RestException(500, $this->shipment->error);
-		}
-	}
+        if ($this->shipment->update(DolibarrApiAccess::$user) > 0) {
+            return $this->get($id);
+        } else {
+            throw new RestException(500, $this->shipment->error);
+        }
+    }
+
+    /**
+     * Delete shipment
+     *
+     * @param int $id Shipment ID
+     *
+     * @return  array
+     */
+    public function delete($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->expedition->supprimer) {
+            throw new RestException(401);
+        }
+        $result = $this->shipment->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Shipment not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if (!$this->shipment->delete(DolibarrApiAccess::$user)) {
+            throw new RestException(500, 'Error when deleting shipment : ' . $this->shipment->error);
+        }
+
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Shipment deleted',
+            ],
+        ];
+    }
+
+    /**
+     * Validate a shipment
+     *
+     * This may record stock movements if module stock is enabled and option to
+     * decrease stock on shipment is on.
+     *
+     * @param int $id        Shipment ID
+     * @param int $notrigger 1=Does not execute triggers, 0= execute triggers
+     *
+     * @url POST    {id}/validate
+     *
+     * @return  array
+     * \todo An error 403 is returned if the request has an empty body.
+     * Error message: "Forbidden: Content type `text/plain` is not supported."
+     * Workaround: send this in the body
+     * {
+     *   "notrigger": 0
+     * }
+     */
+    public function validate($id, $notrigger = 0)
+    {
+        if (!DolibarrApiAccess::$user->rights->expedition->creer) {
+            throw new RestException(401);
+        }
+        $result = $this->shipment->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Shipment not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $result = $this->shipment->valid(DolibarrApiAccess::$user, $notrigger);
+        if ($result == 0) {
+            throw new RestException(304, 'Error nothing done. May be object is already validated');
+        }
+        if ($result < 0) {
+            throw new RestException(500, 'Error when validating Shipment: ' . $this->shipment->error);
+        }
+
+        // Reload shipment
+        $result = $this->shipment->fetch($id);
+
+        $this->shipment->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->shipment);
+    }
 
 
-	// /**
-	//  *  Classify the shipment as invoiced
-	//  *
-	//  * @param int   $id           Id of the shipment
-	//  *
-	//  * @url     POST {id}/setinvoiced
-	//  *
-	//  * @return int
-	//  *
+    // /**
+    //  *  Classify the shipment as invoiced
+    //  *
+    //  * @param int   $id           Id of the shipment
+    //  *
+    //  * @url     POST {id}/setinvoiced
+    //  *
+    //  * @return int
+    //  *
 	//  * @throws RestException 400
 	//  * @throws RestException 401
 	//  * @throws RestException 404
@@ -594,89 +621,6 @@ class Shipments extends DolibarrApi
 	*/
 
 	/**
-	 * Delete shipment
-	 *
-	 * @param   int     $id         Shipment ID
-	 *
-	 * @return  array
-	 */
-	public function delete($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->expedition->supprimer) {
-			throw new RestException(401);
-		}
-		$result = $this->shipment->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Shipment not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if (!$this->shipment->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(500, 'Error when deleting shipment : '.$this->shipment->error);
-		}
-
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Shipment deleted'
-			)
-		);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Validate a shipment
-	 *
-	 * This may record stock movements if module stock is enabled and option to
-	 * decrease stock on shipment is on.
-	 *
-	 * @param   int $id             Shipment ID
-	 * @param   int $notrigger      1=Does not execute triggers, 0= execute triggers
-	 *
-	 * @url POST    {id}/validate
-	 *
-	 * @return  array
-	 * \todo An error 403 is returned if the request has an empty body.
-	 * Error message: "Forbidden: Content type `text/plain` is not supported."
-	 * Workaround: send this in the body
-	 * {
-	 *   "notrigger": 0
-	 * }
-	 */
-	public function validate($id, $notrigger = 0)
-	{
-		if (!DolibarrApiAccess::$user->rights->expedition->creer) {
-			throw new RestException(401);
-		}
-		$result = $this->shipment->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Shipment not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('expedition', $this->shipment->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$result = $this->shipment->valid(DolibarrApiAccess::$user, $notrigger);
-		if ($result == 0) {
-			throw new RestException(304, 'Error nothing done. May be object is already validated');
-		}
-		if ($result < 0) {
-			throw new RestException(500, 'Error when validating Shipment: '.$this->shipment->error);
-		}
-
-		// Reload shipment
-		$result = $this->shipment->fetch($id);
-
-		$this->shipment->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->shipment);
-	}
-
-	/**
 	* Close a shipment (Classify it as "Delivered")
 	*
 	* @param   int     $id             Expedition ID
@@ -706,14 +650,73 @@ class Shipments extends DolibarrApi
 			throw new RestException(304, 'Error nothing done. May be object is already closed');
 		}
 		if ($result < 0) {
-			throw new RestException(500, 'Error when closing Order: '.$this->commande->error);
-		}
+			throw new RestException(500, 'Error when closing Order: ' . $this->commande->error);
+        }
 
-		// Reload shipment
-		$result = $this->shipment->fetch($id);
+        // Reload shipment
+        $result = $this->shipment->fetch($id);
 
-		$this->shipment->fetchObjectLinked();
+        $this->shipment->fetchObjectLinked();
 
-		return $this->_cleanObjectDatas($this->shipment);
-	}
+        return $this->_cleanObjectDatas($this->shipment);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->thirdparty); // id already returned
+
+        unset($object->note);
+        unset($object->address);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        if (!empty($object->lines) && is_array($object->lines)) {
+            foreach ($object->lines as $line) {
+                unset($line->tva_tx);
+                unset($line->vat_src_code);
+                unset($line->total_ht);
+                unset($line->total_ttc);
+                unset($line->total_tva);
+                unset($line->total_localtax1);
+                unset($line->total_localtax2);
+                unset($line->remise_percent);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $shipment = [];
+        foreach (Shipments::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $shipment[$field] = $data[$field];
+        }
+        return $shipment;
+    }
 }

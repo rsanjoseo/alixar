@@ -469,27 +469,92 @@ class pdf_soleil extends ModelePDFFicheinter
 
 				return 1;
 			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "FICHEINTER_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "FICHEINTER_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Fichinter	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf;
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+        /*
+        $pdf->SetXY($this->marge_gauche, $tab_top);
+        $pdf->MultiCell(190,8,$outputlangs->transnoentities("Description"),0,'L',0);
+        $pdf->line($this->marge_gauche, $tab_top + 8, $this->page_largeur-$this->marge_droite, $tab_top + 8);
+
+        $pdf->SetFont('','', $default_font_size - 1);
+
+        $pdf->MultiCell(0, 3, '');		// Set interline to 3
+        $pdf->SetXY($this->marge_gauche, $tab_top + 8);
+        $text=$object->description;
+        if ($object->duration > 0)
+        {
+            $totaltime=convertSecondToTime($object->duration,'all',$conf->global->MAIN_DURATION_OF_WORKDAY);
+            $text.=($text?' - ':'').$langs->trans("Total").": ".$totaltime;
+        }
+        $desc=dol_htmlentitiesbr($text,1);
+        //print $outputlangs->convToOutputCharset($desc); exit;
+
+        $pdf->writeHTMLCell(180, 3, 10, $tab_top + 8, $outputlangs->convToOutputCharset($desc), 0, 1);
+        $nexY = $pdf->GetY();
+
+        $pdf->line($this->marge_gauche, $nexY, $this->page_largeur-$this->marge_droite, $nexY);
+
+        $pdf->MultiCell(0, 3, '');		// Set interline to 3. Then writeMultiCell must use 3 also.
+        */
+
+        // Output Rect
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height + 1, 0, 0); // Rect takes a length in 3rd parameter and 4th parameter
+
+        if (empty($hidebottom)) {
+            $pdf->SetXY(20, 230);
+            $pdf->MultiCell(80, 5, $outputlangs->transnoentities("NameAndSignatureOfInternalContact"), 0, 'L', 0);
+
+            $pdf->SetXY(20, 235);
+            $pdf->MultiCell(80, 25, '', 1);
+
+            $pdf->SetXY(110, 230);
+            $pdf->MultiCell(80, 5, $outputlangs->transnoentities("NameAndSignatureOfExternalContact"), 0, 'L', 0);
+
+            $pdf->SetXY(110, 235);
+            $pdf->MultiCell(80, 25, '', 1);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Fichinter $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $conf, $langs;
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
@@ -657,71 +722,6 @@ class pdf_soleil extends ModelePDFFicheinter
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf;
-
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-		/*
-		$pdf->SetXY($this->marge_gauche, $tab_top);
-		$pdf->MultiCell(190,8,$outputlangs->transnoentities("Description"),0,'L',0);
-		$pdf->line($this->marge_gauche, $tab_top + 8, $this->page_largeur-$this->marge_droite, $tab_top + 8);
-
-		$pdf->SetFont('','', $default_font_size - 1);
-
-		$pdf->MultiCell(0, 3, '');		// Set interline to 3
-		$pdf->SetXY($this->marge_gauche, $tab_top + 8);
-		$text=$object->description;
-		if ($object->duration > 0)
-		{
-			$totaltime=convertSecondToTime($object->duration,'all',$conf->global->MAIN_DURATION_OF_WORKDAY);
-			$text.=($text?' - ':'').$langs->trans("Total").": ".$totaltime;
-		}
-		$desc=dol_htmlentitiesbr($text,1);
-		//print $outputlangs->convToOutputCharset($desc); exit;
-
-		$pdf->writeHTMLCell(180, 3, 10, $tab_top + 8, $outputlangs->convToOutputCharset($desc), 0, 1);
-		$nexY = $pdf->GetY();
-
-		$pdf->line($this->marge_gauche, $nexY, $this->page_largeur-$this->marge_droite, $nexY);
-
-		$pdf->MultiCell(0, 3, '');		// Set interline to 3. Then writeMultiCell must use 3 also.
-		*/
-
-		// Output Rect
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height + 1, 0, 0); // Rect takes a length in 3rd parameter and 4th parameter
-
-		if (empty($hidebottom)) {
-			$pdf->SetXY(20, 230);
-			$pdf->MultiCell(80, 5, $outputlangs->transnoentities("NameAndSignatureOfInternalContact"), 0, 'L', 0);
-
-			$pdf->SetXY(20, 235);
-			$pdf->MultiCell(80, 25, '', 1);
-
-			$pdf->SetXY(110, 230);
-			$pdf->MultiCell(80, 5, $outputlangs->transnoentities("NameAndSignatureOfExternalContact"), 0, 'L', 0);
-
-			$pdf->SetXY(110, 235);
-			$pdf->MultiCell(80, 25, '', 1);
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   	Show footer of page. Need this->emetteur object
 	 *

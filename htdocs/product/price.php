@@ -953,10 +953,10 @@ if (!empty($conf->global->PRODUIT_MULTIPRICES) || !empty($conf->global->PRODUIT_
 							print '<td class="right">'.price($prices['remise_percent']).' %</td>';
 							print '<td class="center">';
 							if (($user->rights->produit->creer || $user->rights->service->creer)) {
-								print '<a class="editfielda marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit_price_by_qty&amp;rowid='.$prices["rowid"].'">';
-								print img_edit().'</a>';
-								print '<a class="marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete_price_by_qty&amp;token='.newToken().'&amp;rowid='.$prices["rowid"].'">';
-								print img_delete().'</a>';
+								print '<a class="editfielda marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit_price_by_qty&rowid=' . $prices["rowid"] . '">';
+                                print img_edit() . '</a>';
+                                print '<a class="marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete_price_by_qty&token=' . newToken() . '&rowid=' . $prices["rowid"] . '">';
+                                print img_delete() . '</a>';
 							} else {
 								print '&nbsp;';
 							}
@@ -1106,10 +1106,10 @@ if (!empty($conf->global->PRODUIT_MULTIPRICES) || !empty($conf->global->PRODUIT_
 					print '<td class="right">'.price($prices['remise_percent']).' %</td>';
 					print '<td class="center">';
 					if (($user->rights->produit->creer || $user->rights->service->creer)) {
-						print '<a class="editfielda marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit_price_by_qty&amp;rowid='.$prices["rowid"].'">';
-						print img_edit().'</a>';
-						print '<a class="marginleftonly marginrightonly" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete_price_by_qty&amp;token='.newToken().'&amp;rowid='.$prices["rowid"].'">';
-						print img_delete().'</a>';
+                        print '<a class="editfielda marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=edit_price_by_qty&rowid=' . $prices["rowid"] . '">';
+                        print img_edit() . '</a>';
+                        print '<a class="marginleftonly marginrightonly" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete_price_by_qty&token=' . newToken() . '&rowid=' . $prices["rowid"] . '">';
+                        print img_delete() . '</a>';
 					} else {
 						print '&nbsp;';
 					}
@@ -1638,8 +1638,8 @@ if ((empty($conf->global->PRODUIT_CUSTOMER_PRICES) || $action == 'showlog_defaul
 
 					print '<td class="right">';
 					if ($candelete || ($db->jdate($objp->dp) >= dol_now())) {		// Test on date is to be able to delete a corrupted record with a date in future
-						print '<a href="'.$_SERVER["PHP_SELF"].'?action=delete&amp;token='.newToken().'&amp;id='.$object->id.'&amp;lineid='.$objp->rowid.'">';
-						print img_delete();
+                        print '<a href="' . $_SERVER["PHP_SELF"] . '?action=delete&token=' . newToken() . '&id=' . $object->id . '&lineid=' . $objp->rowid . '">';
+                        print img_delete();
 						print '</a>';
 					} else {
 						print '&nbsp;'; // Can not delete last price (it's current price)
@@ -2192,13 +2192,13 @@ if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) {
 					print '<a href="'.$_SERVER["PHP_SELF"].'?action=showlog_customer_price&amp;id='.$object->id.'&amp;socid='.$line->fk_soc.'">';
 					print img_info($langs->trans('PriceByCustomerLog'));
 					print '</a>';
-					print ' ';
-					print '<a class="marginleftonly editfielda" href="'.$_SERVER["PHP_SELF"].'?action=edit_customer_price&amp;id='.$object->id.'&amp;lineid='.$line->id.'">';
-					print img_edit('default', 0, 'style="vertical-align: middle;"');
+                    print ' ';
+                    print '<a class="marginleftonly editfielda" href="' . $_SERVER["PHP_SELF"] . '?action=edit_customer_price&id=' . $object->id . '&lineid=' . $line->id . '">';
+                    print img_edit('default', 0, 'style="vertical-align: middle;"');
 					print '</a>';
-					print ' ';
-					print '<a class="marginleftonly" href="'.$_SERVER["PHP_SELF"].'?action=delete_customer_price&amp;token='.newToken().'&amp;id='.$object->id.'&amp;lineid='.$line->id.'">';
-					print img_delete('default', 'style="vertical-align: middle;"');
+                    print ' ';
+                    print '<a class="marginleftonly" href="' . $_SERVER["PHP_SELF"] . '?action=delete_customer_price&token=' . newToken() . '&id=' . $object->id . '&lineid=' . $line->id . '">';
+                    print img_delete('default', 'style="vertical-align: middle;"');
 					print '</a>';
 					print '</td>';
 				}

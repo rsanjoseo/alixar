@@ -150,27 +150,6 @@ class ProductFournisseur extends Product
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'product_fournisseur_price'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Remove all prices for this couple supplier-product
 	 *
@@ -205,7 +184,6 @@ class ProductFournisseur extends Product
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Remove a price for a couple supplier-product
 	 *
@@ -249,8 +227,8 @@ class ProductFournisseur extends Product
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Modify the purchase price for a supplier
 	 *
@@ -548,72 +526,7 @@ class ProductFournisseur extends Product
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *    List supplier prices log of a supplier price
-	 *
-	 *    @param    int     $product_fourn_price_id Id of supplier price
-	 *    @param	string  $sortfield	            Sort field
-	 *    @param	string  $sortorder              Sort order
-	 *    @param	int     $limit                  Limit
-	 *    @param	int     $offset                 Offset
-	 *    @return	array   Array of Log prices
-	 */
-	public function listProductFournisseurPriceLog($product_fourn_price_id, $sortfield = '', $sortorder = '', $limit = 0, $offset = 0)
-	{
-		$sql = "SELECT";
-		$sql .= " u.lastname,";
-		$sql .= " pfpl.rowid, pfp.ref_fourn as supplier_ref, pfpl.datec,";
-		$sql .= " pfpl.price, pfpl.quantity,";
-		$sql .= " pfpl.fk_multicurrency, pfpl.multicurrency_code, pfpl.multicurrency_tx, pfpl.multicurrency_price, pfpl.multicurrency_unitprice";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_fournisseur_price_log as pfpl,";
-		$sql .= " ".MAIN_DB_PREFIX."product_fournisseur_price as pfp,";
-		$sql .= " ".MAIN_DB_PREFIX."user as u";
-		$sql .= " WHERE pfp.entity IN (".getEntity('productprice').")";
-		$sql .= " AND pfpl.fk_user = u.rowid";
-		$sql .= " AND pfp.rowid = pfpl.fk_product_fournisseur";
-		$sql .= " AND pfpl.fk_product_fournisseur = ".((int) $product_fourn_price_id);
-		if (empty($sortfield)) {
-			$sql .= " ORDER BY pfpl.datec";
-		} else {
-			$sql .= $this->db->order($sortfield, $sortorder);
-		}
-		$sql .= $this->db->plimit($limit, $offset);
-		dol_syslog(get_class($this)."::list_product_fournisseur_price_log", LOG_DEBUG);
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$retarray = array();
-
-			while ($obj = $this->db->fetch_object($resql)) {
-				$tmparray = array();
-				$tmparray['rowid'] = $obj->rowid;
-				$tmparray['supplier_ref'] = $obj->supplier_ref;
-				$tmparray['datec'] = $this->db->jdate($obj->datec);
-				$tmparray['lastname'] = $obj->lastname;
-				$tmparray['price'] = $obj->price;
-				$tmparray['quantity'] = $obj->quantity;
-				$tmparray['fk_multicurrency'] = $obj->fk_multicurrency;
-				$tmparray['multicurrency_code'] = $obj->multicurrency_code;
-				$tmparray['multicurrency_tx'] = $obj->multicurrency_tx;
-				$tmparray['multicurrency_price'] = $obj->multicurrency_price;
-				$tmparray['multicurrency_unitprice'] = $obj->multicurrency_unitprice;
-
-				$retarray[] = $tmparray;
-			}
-
-			$this->db->free($resql);
-			return $retarray;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Loads the price information of a provider
 	 *
@@ -711,48 +624,8 @@ class ProductFournisseur extends Product
 		}
 	}
 
-	/**
-	 * Private function to log price history
-	 *
-	 * @param User      $user                           Object user who adds/changes price
-	 * @param integer   $datec                          date create
-	 * @param float     $buyprice                       price for qty
-	 * @param float     $qty                            qty for price
-	 * @param float     $multicurrency_buyprice         Purchase price for the quantity min in currency
-	 * @param float     $multicurrency_unitBuyPrice     Unit Purchase price in currency
-	 * @param float     $multicurrency_tx               Rate currency
-	 * @param int       $fk_multicurrency               key multi currency
-	 * @param string    $multicurrency_code	            Currency code
-	 *
-	 * @return int < 0 NOK > 0 OK
-	 */
-	private function logPrice($user, $datec, $buyprice, $qty, $multicurrency_buyprice = null, $multicurrency_unitBuyPrice = null, $multicurrency_tx = null, $fk_multicurrency = null, $multicurrency_code = null)
-	{
-		// Add record into log table
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."product_fournisseur_price_log(";
-		$sql .= " multicurrency_price, multicurrency_unitprice, multicurrency_tx, fk_multicurrency, multicurrency_code,";
-		$sql .= "datec, fk_product_fournisseur,fk_user,price,quantity)";
-		$sql .= "values(";
-		$sql .= (isset($multicurrency_buyprice) ? "'".$this->db->escape(price2num($multicurrency_buyprice))."'" : 'null').",";
-		$sql .= (isset($multicurrency_unitBuyPrice) ? "'".$this->db->escape(price2num($multicurrency_unitBuyPrice))."'" : 'null').",";
-		$sql .= (isset($multicurrency_tx) ? "'".$this->db->escape($multicurrency_tx)."'" : '1').",";
-		$sql .= (isset($fk_multicurrency) ? "'".$this->db->escape($fk_multicurrency)."'" : 'null').",";
-		$sql .= (isset($multicurrency_code) ? "'".$this->db->escape($multicurrency_code)."'" : 'null').",";
-		$sql .= "'".$this->db->idate($datec)."',";
-		$sql .= " ".((int) $this->product_fourn_price_id).",";
-		$sql .= " ".$user->id.",";
-		$sql .= " ".price2num($buyprice).",";
-		$sql .= " ".price2num($qty);
-		$sql .= ")";
 
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			return -1;
-		} else {
-			return 1;
-		}
-	}
-
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    List all supplier prices of a product
 	 *
@@ -871,7 +744,6 @@ class ProductFournisseur extends Product
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Load properties for minimum price
 	 *
@@ -1021,26 +893,47 @@ class ProductFournisseur extends Product
 		dol_syslog(get_class($this)."::setSupplierPriceExpression", LOG_DEBUG);
 
 		$resql = $this->db->query($sql);
-		if ($resql) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->error = $this->db->error()." sql=".$sql;
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        if ($resql) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->error = $this->db->error() . " sql=" . $sql;
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Display price of product
-	 *
-	 *  @param  int     $showunitprice    Show "Unit price" into output string
-	 *  @param  int     $showsuptitle     Show "Supplier" into output string
-	 *  @param  int     $maxlen           Max length of name
-	 *  @param  integer $notooltip        1=Disable tooltip
-	 *  @param  array   $productFournList list of ProductFournisseur objects
-	 *                                    to display in table format.
-	 *  @return string                    String with supplier price
+    /**
+     *    Display supplier of product
+     *
+     * @param int     $withpicto Add picto
+     * @param string  $option    Target of link ('', 'customer', 'prospect', 'supplier')
+     * @param int     $maxlen    Max length of name
+     * @param integer $notooltip 1=Disable tooltip
+     *
+     * @return    string                    String with supplier price
+     *  TODO Remove this method. Use getNomUrl directly.
+     */
+    public function getSocNomUrl($withpicto = 0, $option = 'supplier', $maxlen = 0, $notooltip = 0)
+    {
+        $thirdparty = new Fournisseur($this->db);
+        $thirdparty->fetch($this->fourn_id);
+
+        return $thirdparty->getNomUrl($withpicto, $option, $maxlen, $notooltip);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Display price of product
+     *
+     * @param int     $showunitprice      Show "Unit price" into output string
+     * @param int     $showsuptitle       Show "Supplier" into output string
+     * @param int     $maxlen             Max length of name
+     * @param integer $notooltip          1=Disable tooltip
+     * @param array   $productFournList   list of ProductFournisseur objects
+     *                                    to display in table format.
+     * @return string                    String with supplier price
 	 */
 	public function display_price_product_fournisseur($showunitprice = 1, $showsuptitle = 1, $maxlen = 0, $notooltip = 0, $productFournList = array())
 	{
@@ -1060,43 +953,140 @@ class ProductFournisseur extends Product
 				$out .= '<td class="right">'.($showunitprice ? $productFourn->fourn_qty : '').'</td>';
 				$out .= '<td>'.$productFourn->getSocNomUrl(1, 'supplier', $maxlen, $notooltip).'</td>';
 				$out .= '<td>'.$productFourn->fourn_ref.'<td></tr>';
-			}
-			$out .= '</table>';
-		} else {
-			$out = ($showunitprice ? price($this->fourn_unitprice * (1 - $this->fourn_remise_percent / 100) + $this->fourn_remise).' '.$langs->trans("HT").' &nbsp; <span class="opacitymedium">(</span>' : '');
-			$out .= ($showsuptitle ? '<span class="opacitymedium">'.$langs->trans("Supplier").'</span>: ' : '').$this->getSocNomUrl(1, 'supplier', $maxlen, $notooltip).' / <span class="opacitymedium">'.$langs->trans("SupplierRef").'</span>: '.$this->ref_supplier;
-			$out .= ($showunitprice ? '<span class="opacitymedium">)</span>' : '');
-		}
-		return $out;
-	}
+            }
+            $out .= '</table>';
+        } else {
+            $out = ($showunitprice ? price($this->fourn_unitprice * (1 - $this->fourn_remise_percent / 100) + $this->fourn_remise) . ' ' . $langs->trans("HT") . ' &nbsp; <span class="opacitymedium">(</span>' : '');
+            $out .= ($showsuptitle ? '<span class="opacitymedium">' . $langs->trans("Supplier") . '</span>: ' : '') . $this->getSocNomUrl(1, 'supplier', $maxlen, $notooltip) . ' / <span class="opacitymedium">' . $langs->trans("SupplierRef") . '</span>: ' . $this->ref_supplier;
+            $out .= ($showunitprice ? '<span class="opacitymedium">)</span>' : '');
+        }
+        return $out;
+    }
 
-	/**
-	 *	Display supplier of product
-	 *
-	 *	@param	int		$withpicto		Add picto
-	 *	@param	string	$option			Target of link ('', 'customer', 'prospect', 'supplier')
-	 *	@param	int		$maxlen			Max length of name
-	 *  @param	integer	$notooltip		1=Disable tooltip
-	 *	@return	string					String with supplier price
-	 *  TODO Remove this method. Use getNomUrl directly.
-	 */
-	public function getSocNomUrl($withpicto = 0, $option = 'supplier', $maxlen = 0, $notooltip = 0)
-	{
-		$thirdparty = new Fournisseur($this->db);
-		$thirdparty->fetch($this->fourn_id);
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'product_fournisseur_price',
+        ];
 
-		return $thirdparty->getNomUrl($withpicto, $option, $maxlen, $notooltip);
-	}
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 
-	/**
-	 *  Return a link to the object card (with optionaly the picto).
-	 *  Used getNomUrl of ProductFournisseur if a specific supplier ref is loaded. Otherwise use Product->getNomUrl().
-	 *
-	 *	@param	int		$withpicto					Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
-	 *	@param	string	$option						On what the link point to ('nolink', ...)
-	 *  @param	int  	$notooltip					1=Disable tooltip
-	 *  @param  string  $morecss            		Add more css on link
-	 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+    /**
+     *    List supplier prices log of a supplier price
+     *
+     * @param int    $product_fourn_price_id Id of supplier price
+     * @param string $sortfield              Sort field
+     * @param string $sortorder              Sort order
+     * @param int    $limit                  Limit
+     * @param int    $offset                 Offset
+     *
+     * @return    array   Array of Log prices
+     */
+    public function listProductFournisseurPriceLog($product_fourn_price_id, $sortfield = '', $sortorder = '', $limit = 0, $offset = 0)
+    {
+        $sql = "SELECT";
+        $sql .= " u.lastname,";
+        $sql .= " pfpl.rowid, pfp.ref_fourn as supplier_ref, pfpl.datec,";
+        $sql .= " pfpl.price, pfpl.quantity,";
+        $sql .= " pfpl.fk_multicurrency, pfpl.multicurrency_code, pfpl.multicurrency_tx, pfpl.multicurrency_price, pfpl.multicurrency_unitprice";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_fournisseur_price_log as pfpl,";
+        $sql .= " " . MAIN_DB_PREFIX . "product_fournisseur_price as pfp,";
+        $sql .= " " . MAIN_DB_PREFIX . "user as u";
+        $sql .= " WHERE pfp.entity IN (" . getEntity('productprice') . ")";
+        $sql .= " AND pfpl.fk_user = u.rowid";
+        $sql .= " AND pfp.rowid = pfpl.fk_product_fournisseur";
+        $sql .= " AND pfpl.fk_product_fournisseur = " . ((int) $product_fourn_price_id);
+        if (empty($sortfield)) {
+            $sql .= " ORDER BY pfpl.datec";
+        } else {
+            $sql .= $this->db->order($sortfield, $sortorder);
+        }
+        $sql .= $this->db->plimit($limit, $offset);
+        dol_syslog(get_class($this) . "::list_product_fournisseur_price_log", LOG_DEBUG);
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $retarray = [];
+
+            while ($obj = $this->db->fetch_object($resql)) {
+                $tmparray = [];
+                $tmparray['rowid'] = $obj->rowid;
+                $tmparray['supplier_ref'] = $obj->supplier_ref;
+                $tmparray['datec'] = $this->db->jdate($obj->datec);
+                $tmparray['lastname'] = $obj->lastname;
+                $tmparray['price'] = $obj->price;
+                $tmparray['quantity'] = $obj->quantity;
+                $tmparray['fk_multicurrency'] = $obj->fk_multicurrency;
+                $tmparray['multicurrency_code'] = $obj->multicurrency_code;
+                $tmparray['multicurrency_tx'] = $obj->multicurrency_tx;
+                $tmparray['multicurrency_price'] = $obj->multicurrency_price;
+                $tmparray['multicurrency_unitprice'] = $obj->multicurrency_unitprice;
+
+                $retarray[] = $tmparray;
+            }
+
+            $this->db->free($resql);
+            return $retarray;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     *    Display log price of product supplier price
+     *
+     * @param array $productFournLogList        list of ProductFournisseur price log objects
+     *                                          to display in table format.
+     *
+     * @return string  HTML String with supplier price
+     */
+    public function displayPriceProductFournisseurLog($productFournLogList = [])
+    {
+        global $conf, $langs;
+
+        $out = '';
+        $langs->load("suppliers");
+        if (count($productFournLogList) > 0) {
+            $out .= '<table class="noborder centpercent">';
+            $out .= '<tr class="liste_titre"><td class="liste_titre">' . $langs->trans("Date") . '</td>';
+            $out .= '<td class="liste_titre right">' . $langs->trans("Price") . '</td>';
+            //$out .= '<td class="liste_titre right">'.$langs->trans("QtyMin").'</td>';
+            $out .= '<td class="liste_titre">' . $langs->trans("User") . '</td></tr>';
+            foreach ($productFournLogList as $productFournLog) {
+                $out .= '<tr><td>' . dol_print_date($productFournLog['datec'], 'dayhour', 'tzuser') . '</td>';
+                $out .= '<td class="right">' . price($productFournLog['price'], 0, $langs, 1, -1, -1, $conf->currency);
+                if ($productFournLog['multicurrency_code'] != $conf->currency) {
+                    $out .= ' (' . price($productFournLog['multicurrency_price'], 0, $langs, 1, -1, -1, $productFournLog['multicurrency_code']) . ')';
+                }
+                $out .= '</td>';
+                //$out.= '<td class="right">'.$productFournLog['quantity'].'</td>';
+                $out .= '<td>' . $productFournLog['lastname'] . '</td></tr>';
+            }
+            $out .= '</table>';
+        }
+        return $out;
+    }
+
+    /**
+     *  Return a link to the object card (with optionaly the picto).
+     *  Used getNomUrl of ProductFournisseur if a specific supplier ref is loaded. Otherwise use Product->getNomUrl().
+     *
+     * @param int     $withpicto                    Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
+     * @param string  $option                       On what the link point to ('nolink', ...)
+     * @param int     $notooltip                    1=Disable tooltip
+     * @param string  $morecss                      Add more css on link
+     * @param int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *	@return	string								String with URL
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
@@ -1240,36 +1230,44 @@ class ProductFournisseur extends Product
 	}
 
 	/**
-	 *	Display log price of product supplier price
-	 *
-	 *  @param  array   $productFournLogList    list of ProductFournisseur price log objects
-	 *                                          to display in table format.
-	 *  @return string  HTML String with supplier price
-	 */
-	public function displayPriceProductFournisseurLog($productFournLogList = array())
-	{
-		global $conf, $langs;
+     * Private function to log price history
+     *
+     * @param User    $user                       Object user who adds/changes price
+     * @param integer $datec                      date create
+     * @param float   $buyprice                   price for qty
+     * @param float   $qty                        qty for price
+     * @param float   $multicurrency_buyprice     Purchase price for the quantity min in currency
+     * @param float   $multicurrency_unitBuyPrice Unit Purchase price in currency
+     * @param float   $multicurrency_tx           Rate currency
+     * @param int     $fk_multicurrency           key multi currency
+     * @param string  $multicurrency_code         Currency code
+     *
+     * @return int < 0 NOK > 0 OK
+     */
+    private function logPrice($user, $datec, $buyprice, $qty, $multicurrency_buyprice = null, $multicurrency_unitBuyPrice = null, $multicurrency_tx = null, $fk_multicurrency = null, $multicurrency_code = null)
+    {
+        // Add record into log table
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "product_fournisseur_price_log(";
+        $sql .= " multicurrency_price, multicurrency_unitprice, multicurrency_tx, fk_multicurrency, multicurrency_code,";
+        $sql .= "datec, fk_product_fournisseur,fk_user,price,quantity)";
+        $sql .= "values(";
+        $sql .= (isset($multicurrency_buyprice) ? "'" . $this->db->escape(price2num($multicurrency_buyprice)) . "'" : 'null') . ",";
+        $sql .= (isset($multicurrency_unitBuyPrice) ? "'" . $this->db->escape(price2num($multicurrency_unitBuyPrice)) . "'" : 'null') . ",";
+        $sql .= (isset($multicurrency_tx) ? "'" . $this->db->escape($multicurrency_tx) . "'" : '1') . ",";
+        $sql .= (isset($fk_multicurrency) ? "'" . $this->db->escape($fk_multicurrency) . "'" : 'null') . ",";
+        $sql .= (isset($multicurrency_code) ? "'" . $this->db->escape($multicurrency_code) . "'" : 'null') . ",";
+        $sql .= "'" . $this->db->idate($datec) . "',";
+        $sql .= " " . ((int) $this->product_fourn_price_id) . ",";
+        $sql .= " " . $user->id . ",";
+        $sql .= " " . price2num($buyprice) . ",";
+        $sql .= " " . price2num($qty);
+        $sql .= ")";
 
-		$out = '';
-		$langs->load("suppliers");
-		if (count($productFournLogList) > 0) {
-			$out .= '<table class="noborder centpercent">';
-			$out .= '<tr class="liste_titre"><td class="liste_titre">'.$langs->trans("Date").'</td>';
-			$out .= '<td class="liste_titre right">'.$langs->trans("Price").'</td>';
-			//$out .= '<td class="liste_titre right">'.$langs->trans("QtyMin").'</td>';
-			$out .= '<td class="liste_titre">'.$langs->trans("User").'</td></tr>';
-			foreach ($productFournLogList as $productFournLog) {
-				$out .= '<tr><td>'.dol_print_date($productFournLog['datec'], 'dayhour', 'tzuser').'</td>';
-				$out .= '<td class="right">'.price($productFournLog['price'], 0, $langs, 1, -1, -1, $conf->currency);
-				if ($productFournLog['multicurrency_code'] != $conf->currency) {
-					$out .= ' ('.price($productFournLog['multicurrency_price'], 0, $langs, 1, -1, -1, $productFournLog['multicurrency_code']).')';
-				}
-				$out .= '</td>';
-				//$out.= '<td class="right">'.$productFournLog['quantity'].'</td>';
-				$out .= '<td>'.$productFournLog['lastname'].'</td></tr>';
-			}
-			$out .= '</table>';
-		}
-		return $out;
-	}
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 }

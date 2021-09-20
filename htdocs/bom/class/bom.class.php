@@ -32,40 +32,44 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class BOM extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_CANCELED = 9;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'bom';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'bom_bom';
+
 	/**
 	 * @var int  Does bom support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 1;
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for bom. Must be the part after the 'object_' into object_bom.png
-	 */
-	public $picto = 'bom';
-
 
 	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 1;
+
+    /**
+     * @var string String with name of icon for bom. Must be the part after the 'object_' into object_bom.png
+     */
+    public $picto = 'bom';
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_CANCELED = 9;
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
@@ -88,21 +92,21 @@ class BOM extends CommonObject
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-2, 'position'=>1, 'notnull'=>1, 'index'=>1, 'comment'=>"Id",),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'notnull'=> 1, 'default'=>1, 'index'=>1, 'position'=>5),
-		'ref' => array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>1, 'noteditable'=>1, 'visible'=>4, 'position'=>10, 'notnull'=>1, 'default'=>'(PROV)', 'index'=>1, 'searchall'=>1, 'comment'=>"Reference of BOM", 'showoncombobox'=>'1',),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>1, 'visible'=>1, 'position'=>30, 'notnull'=>1, 'searchall'=>1, 'showoncombobox'=>'2', 'autofocusoncreate'=>1, 'css'=>'maxwidth300', 'csslist'=>'tdoverflowmax200'),
-		'bomtype' => array('type'=>'integer', 'label'=>'Type', 'enabled'=>1, 'visible'=>1, 'position'=>33, 'notnull'=>1, 'default'=>'0', 'arrayofkeyval'=>array(0=>'Manufacturing', 1=>'Disassemble'), 'css'=>'minwidth150', 'csslist'=>'minwidth150 center'),
-		//'bomtype' => array('type'=>'integer', 'label'=>'Type', 'enabled'=>1, 'visible'=>-1, 'position'=>32, 'notnull'=>1, 'default'=>'0', 'arrayofkeyval'=>array(0=>'Manufacturing')),
-		'fk_product' => array('type'=>'integer:Product:product/class/product.class.php:1:(finished IS NULL or finished <> 0)', 'label'=>'Product', 'picto'=>'product', 'enabled'=>1, 'visible'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'help'=>'ProductBOMHelp', 'css'=>'maxwidth500', 'csslist'=>'tdoverflowmax100'),
-		'description' => array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>-1, 'position'=>60, 'notnull'=>-1,),
-		'qty' => array('type'=>'real', 'label'=>'Quantity', 'enabled'=>1, 'visible'=>1, 'default'=>1, 'position'=>55, 'notnull'=>1, 'isameasure'=>'1', 'css'=>'maxwidth75imp'),
-		//'efficiency' => array('type'=>'real', 'label'=>'ManufacturingEfficiency', 'enabled'=>1, 'visible'=>-1, 'default'=>1, 'position'=>100, 'notnull'=>0, 'css'=>'maxwidth50imp', 'help'=>'ValueOfMeansLossForProductProduced'),
-		'duration' => array('type'=>'duration', 'label'=>'EstimatedDuration', 'enabled'=>1, 'visible'=>-1, 'position'=>101, 'notnull'=>-1, 'css'=>'maxwidth50imp', 'help'=>'EstimatedDurationDesc'),
-		'fk_warehouse' => array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:0', 'label'=>'WarehouseForProduction', 'picto'=>'stock', 'enabled'=>1, 'visible'=>-1, 'position'=>102, 'css'=>'maxwidth500', 'csslist'=>'tdoverflowmax100'),
-		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>-2, 'position'=>161, 'notnull'=>-1,),
-		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>-2, 'position'=>162, 'notnull'=>-1,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'position'=>300, 'notnull'=>1,),
+        'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => 1, 'visible' => -2, 'position' => 1, 'notnull' => 1, 'index' => 1, 'comment' => "Id",),
+        'entity' => array('type' => 'integer', 'label' => 'Entity', 'enabled' => 1, 'visible' => 0, 'notnull' => 1, 'default' => 1, 'index' => 1, 'position' => 5),
+        'ref' => array('type' => 'varchar(128)', 'label' => 'Ref', 'enabled' => 1, 'noteditable' => 1, 'visible' => 4, 'position' => 10, 'notnull' => 1, 'default' => '(PROV)', 'index' => 1, 'searchall' => 1, 'comment' => "Reference of BOM", 'showoncombobox' => '1',),
+        'label' => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => 1, 'visible' => 1, 'position' => 30, 'notnull' => 1, 'searchall' => 1, 'showoncombobox' => '2', 'autofocusoncreate' => 1, 'css' => 'maxwidth300', 'csslist' => 'tdoverflowmax200'),
+        'bomtype' => array('type' => 'integer', 'label' => 'Type', 'enabled' => 1, 'visible' => 1, 'position' => 33, 'notnull' => 1, 'default' => '0', 'arrayofkeyval' => array(0 => 'Manufacturing', 1 => 'Disassemble'), 'css' => 'minwidth175', 'csslist' => 'minwidth175 center'),
+        //'bomtype' => array('type'=>'integer', 'label'=>'Type', 'enabled'=>1, 'visible'=>-1, 'position'=>32, 'notnull'=>1, 'default'=>'0', 'arrayofkeyval'=>array(0=>'Manufacturing')),
+        'fk_product' => array('type' => 'integer:Product:product/class/product.class.php:1:(finished IS NULL or finished <> 0)', 'label' => 'Product', 'picto' => 'product', 'enabled' => 1, 'visible' => 1, 'position' => 35, 'notnull' => 1, 'index' => 1, 'help' => 'ProductBOMHelp', 'css' => 'maxwidth500', 'csslist' => 'tdoverflowmax100'),
+        'description' => array('type' => 'text', 'label' => 'Description', 'enabled' => 1, 'visible' => -1, 'position' => 60, 'notnull' => -1,),
+        'qty' => array('type' => 'real', 'label' => 'Quantity', 'enabled' => 1, 'visible' => 1, 'default' => 1, 'position' => 55, 'notnull' => 1, 'isameasure' => '1', 'css' => 'maxwidth75imp'),
+        //'efficiency' => array('type'=>'real', 'label'=>'ManufacturingEfficiency', 'enabled'=>1, 'visible'=>-1, 'default'=>1, 'position'=>100, 'notnull'=>0, 'css'=>'maxwidth50imp', 'help'=>'ValueOfMeansLossForProductProduced'),
+        'duration' => array('type' => 'duration', 'label' => 'EstimatedDuration', 'enabled' => 1, 'visible' => -1, 'position' => 101, 'notnull' => -1, 'css' => 'maxwidth50imp', 'help' => 'EstimatedDurationDesc'),
+        'fk_warehouse' => array('type' => 'integer:Entrepot:product/stock/class/entrepot.class.php:0', 'label' => 'WarehouseForProduction', 'picto' => 'stock', 'enabled' => 1, 'visible' => -1, 'position' => 102, 'css' => 'maxwidth500', 'csslist' => 'tdoverflowmax100'),
+        'note_public' => array('type' => 'html', 'label' => 'NotePublic', 'enabled' => 1, 'visible' => -2, 'position' => 161, 'notnull' => -1,),
+        'note_private' => array('type' => 'html', 'label' => 'NotePrivate', 'enabled' => 1, 'visible' => -2, 'position' => 162, 'notnull' => -1,),
+        'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -2, 'position' => 300, 'notnull' => 1,),
 		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-2, 'position'=>501, 'notnull'=>1,),
 		'date_valid' => array('type'=>'datetime', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-2, 'position'=>502, 'notnull'=>0,),
 		'fk_user_creat' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserCreation', 'picto'=>'user', 'enabled'=>1, 'visible'=>-2, 'position'=>510, 'notnull'=>1, 'foreignkey'=>'user.rowid', 'csslist'=>'tdoverflowmax100'),
@@ -187,34 +191,40 @@ class BOM extends CommonObject
 	 */
 	public $fk_element = 'fk_bom';
 
-	/**
-	 * @var string    Name of subtable class that manage subtable lines
-	 */
-	public $class_element_line = 'BOMLine';
+    /**
+     * @var string    Name of subtable class that manage subtable lines
+     */
+    public $class_element_line = 'BOMLine';
 
-	// /**
-	//  * @var array	List of child tables. To test if we can delete object.
-	//  */
-	// protected $childtables=array();
-	/**
-	 * @var BOMLine[]     Array of subtable lines
-	 */
-	public $lines = array();
-	/**
-	 * @var int		Calculated cost for the BOM
-	 */
-	public $total_cost = 0;
-	/**
-	 * @var int		Calculated cost for 1 unit of the product in BOM
+    // /**
+    //  * @var array	List of child tables. To test if we can delete object.
+    //  */
+    // protected $childtables=array();
+
+    /**
+     * @var array    List of child tables. To know object to delete on cascade.
+     */
+    protected $childtablesoncascade = ['bom_bomline'];
+
+    /**
+     * @var BOMLine[]     Array of subtable lines
+     */
+    public $lines = [];
+
+    /**
+     * @var int        Calculated cost for the BOM
+     */
+    public $total_cost = 0;
+
+    /**
+     * @var int		Calculated cost for 1 unit of the product in BOM
 	 */
 	public $unit_cost = 0;
-	/**
-	 * @var array	List of child tables. To know object to delete on cascade.
-	 */
-	protected $childtablesoncascade = array('bom_bomline');
+
+
 
 	/**
-	 * Constructor
+     * Constructor
 	 *
 	 * @param DoliDb $db Database handler
 	 */
@@ -356,19 +366,6 @@ class BOM extends CommonObject
 	}
 
 	/**
-	 * Load object lines in memory from the database
-	 *
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetchLines()
-	{
-		$this->lines = array();
-
-		$result = $this->fetchLinesCommon();
-		return $result;
-	}
-
-	/**
 	 * Load object in memory from the database
 	 *
 	 * @param int    $id   Id object
@@ -382,51 +379,26 @@ class BOM extends CommonObject
 		if ($result > 0 && !empty($this->table_element_line)) {
 			$this->fetchLines();
 		}
-		$this->calculateCosts();
+		//$this->calculateCosts();		// This consume a high number of subrequests. Do not call it into fetch but when you need it.
 
-		return $result;
+        return $result;
 	}
 
 	/**
-	 * BOM costs calculation based on cost_price or pmp of each BOM line
-	 *
-	 * @return void
-	 */
-	public function calculateCosts()
-	{
-		include_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
-		$this->unit_cost = 0;
-		$this->total_cost = 0;
+	 * Load object lines in memory from the database
+     *
+     * @return int         <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetchLines()
+    {
+        $this->lines = [];
 
-		require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
-		$productFournisseur = new ProductFournisseur($this->db);
+        $result = $this->fetchLinesCommon();
+        return $result;
+    }
 
-		foreach ($this->lines as &$line) {
-			$tmpproduct = new Product($this->db);
-			$result = $tmpproduct->fetch($line->fk_product);
-			if ($result < 0) {
-				$this->error = $tmpproduct->error;
-				return -1;
-			}
-			$line->unit_cost = price2num((!empty($tmpproduct->cost_price)) ? $tmpproduct->cost_price : $tmpproduct->pmp);
-			if (empty($line->unit_cost)) {
-				if ($productFournisseur->find_min_price_product_fournisseur($line->fk_product) > 0) {
-					$line->unit_cost = $productFournisseur->fourn_unitprice;
-				}
-			}
-
-			$line->total_cost = price2num($line->qty * $line->unit_cost, 'MT');
-			$this->total_cost += $line->total_cost;
-		}
-
-		$this->total_cost = price2num($this->total_cost, 'MT');
-		if ($this->qty) {
-			$this->unit_cost = price2num($this->total_cost / $this->qty, 'MU');
-		}
-	}
-
-	/**
-	 * Load list of objects in memory from the database.
+    /**
+     * Load list of objects in memory from the database.
 	 *
 	 * @param  string      $sortorder    Sort Order
 	 * @param  string      $sortfield    Sort field
@@ -537,25 +509,75 @@ class BOM extends CommonObject
 	 *  @return int         		>0 if OK, <0 if KO
 	 */
 	public function deleteLine(User $user, $idline, $notrigger = false)
-	{
-		if ($this->status < 0) {
-			$this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
-			return -2;
-		}
+    {
+        if ($this->status < 0) {
+            $this->error = 'ErrorDeleteLineNotAllowedByObjectStatus';
+            return -2;
+        }
 
-		return $this->deleteLineCommon($user, $idline, $notrigger);
-	}
+        return $this->deleteLineCommon($user, $idline, $notrigger);
+    }
 
-	/**
-	 *	Validate bom
-	 *
-	 *	@param		User	$user     		User making status change
-	 *  @param		int		$notrigger		1=Does not execute triggers, 0= execute triggers
-	 *	@return  	int						<=0 if OK, 0=Nothing done, >0 if KO
-	 */
-	public function validate($user, $notrigger = 0)
-	{
-		global $conf, $langs;
+    /**
+     *  Returns the reference to the following non used BOM depending on the active numbering module
+     *  defined into BOM_ADDON
+     *
+     * @param Product $prod Object product
+     *
+     * @return string            BOM free reference
+     */
+    public function getNextNumRef($prod)
+    {
+        global $langs, $conf;
+        $langs->load("mrp");
+
+        if (!empty($conf->global->BOM_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->BOM_ADDON . ".php";
+            $classname = $conf->global->BOM_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/bom/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = $obj->getNextValue($prod, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                $this->error = $obj->error;
+                //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                return "";
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("Error_BOM_ADDON_NotDefined");
+            return "";
+        }
+    }
+
+    /**
+     *    Validate bom
+     *
+     * @param User $user      User making status change
+     * @param int  $notrigger 1=Does not execute triggers, 0= execute triggers
+     *
+     * @return    int                        <=0 if OK, 0=Nothing done, >0 if KO
+     */
+    public function validate($user, $notrigger = 0)
+    {
+        global $conf, $langs;
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -666,54 +688,6 @@ class BOM extends CommonObject
 	}
 
 	/**
-	 *  Returns the reference to the following non used BOM depending on the active numbering module
-	 *  defined into BOM_ADDON
-	 *
-	 *  @param	Product		$prod 	Object product
-	 *  @return string      		BOM free reference
-	 */
-	public function getNextNumRef($prod)
-	{
-		global $langs, $conf;
-		$langs->load("mrp");
-
-		if (!empty($conf->global->BOM_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->BOM_ADDON.".php";
-			$classname = $conf->global->BOM_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/bom/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = $obj->getNextValue($prod, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				$this->error = $obj->error;
-				//dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("Error_BOM_ADDON_NotDefined");
-			return "";
-		}
-	}
-
-	/**
 	 *	Set draft status
 	 *
 	 *	@param	User	$user			Object user that modify
@@ -785,6 +759,7 @@ class BOM extends CommonObject
 		return $this->setStatusCommon($user, self::STATUS_VALIDATED, $notrigger, 'BOM_REOPEN');
 	}
 
+
 	/**
 	 *  Return a link to the object card (with optionaly the picto)
 	 *
@@ -793,6 +768,7 @@ class BOM extends CommonObject
 	 *  @param	int  	$notooltip					1=Disable tooltip
 	 *  @param  string  $morecss            		Add more css on link
 	 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+	 *
 	 *	@return	string								String with URL
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
@@ -874,8 +850,6 @@ class BOM extends CommonObject
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return label of the status
 	 *
@@ -887,13 +861,15 @@ class BOM extends CommonObject
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	/**
-	 *  Return the status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return the status
+     *
+     *  @param	int		$status        Id status
+     *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *  @return string 			       Label of status
+     */
 	public function LibStatut($status, $mode = 0)
 	{
 		// phpcs:enable
@@ -1030,8 +1006,9 @@ class BOM extends CommonObject
 		$this->date = $this->date_creation;
 	}
 
+
 	/**
-	 * Action executed by scheduler
+     * Action executed by scheduler
 	 * CAN BE A CRON TASK. In such a case, parameters come from the schedule job setup field 'Parameters'
 	 *
 	 * @return	int			0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
@@ -1050,16 +1027,60 @@ class BOM extends CommonObject
 
 		$now = dol_now();
 
-		$this->db->begin();
+        $this->db->begin();
 
-		// ...
+        // ...
 
-		$this->db->commit();
+        $this->db->commit();
 
-		return $error;
-	}
+        return $error;
+    }
+
+    /**
+     * BOM costs calculation based on cost_price or pmp of each BOM line.
+     * Set the property ->total_cost and ->unit_cost of BOM.
+     *
+     * @return void
+     */
+    public function calculateCosts()
+    {
+        include_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+        $this->unit_cost = 0;
+        $this->total_cost = 0;
+
+        if (is_array($this->lines) && count($this->lines)) {
+            require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+            $productFournisseur = new ProductFournisseur($this->db);
+            $tmpproduct = new Product($this->db);
+
+            foreach ($this->lines as &$line) {
+                $tmpproduct->cost_price = 0;
+                $tmpproduct->pmp = 0;
+
+                $result = $tmpproduct->fetch($line->fk_product, '', '', '', 0, 1, 1);    // We discard selling price and language loading
+                if ($result < 0) {
+                    $this->error = $tmpproduct->error;
+                    return -1;
+                }
+                $line->unit_cost = price2num((!empty($tmpproduct->cost_price)) ? $tmpproduct->cost_price : $tmpproduct->pmp);
+                if (empty($line->unit_cost)) {
+                    if ($productFournisseur->find_min_price_product_fournisseur($line->fk_product) > 0) {
+                        $line->unit_cost = $productFournisseur->fourn_unitprice;
+                    }
+                }
+
+                $line->total_cost = price2num($line->qty * $line->unit_cost, 'MT');
+
+                $this->total_cost += $line->total_cost;
+            }
+
+            $this->total_cost = price2num($this->total_cost, 'MT');
+            if ($this->qty) {
+                $this->unit_cost = price2num($this->total_cost / $this->qty, 'MU');
+            }
+        }
+    }
 }
-
 
 /**
  * Class for BOMLine
@@ -1370,9 +1391,9 @@ class BOMLine extends CommonObjectLine
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 
-		$url = dol_buildpath('/bom/bomline_card.php', 1).'?id='.$this->id;
+		$url = DOL_URL_ROOT . '/bom/bomline_card.php?id=' . $this->id;
 
-		if ($option != 'nolink') {
+        if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
 			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
 			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {

@@ -22,31 +22,37 @@
  */
 class ProductCombination2ValuePair
 {
-	/**
-	 * Combination 2 value pair id
-	 * @var int
-	 */
-	public $id;
-	/**
-	 * Product combination id
-	 * @var int
+    /**
+     * Database handler
+     *
+     * @var DoliDB
+     */
+    private $db;
+
+    /**
+     * Combination 2 value pair id
+     *
+     * @var int
+     */
+    public $id;
+
+    /**
+     * Product combination id
+     * @var int
 	 */
 	public $fk_prod_combination;
+
 	/**
 	 * Product attribute id
 	 * @var int
 	 */
 	public $fk_prod_attr;
+
 	/**
 	 * Product attribute value id
 	 * @var int
 	 */
 	public $fk_prod_attr_val;
-	/**
-	 * Database handler
-	 * @var DoliDB
-	 */
-	private $db;
 
 	/**
 	 * Constructor

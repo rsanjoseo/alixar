@@ -127,26 +127,42 @@ class mailing_pomme extends MailingTargets
 		$s .= '</select>';
 
 		$s .= ' ';
-		$s .= $langs->trans("Employee").' ';
-		$s .= '<select name="filteremployee" class="flat marginrightonly">';
-		$s .= '<option value="-1">&nbsp;</option>';
-		$s .= '<option value="1">'.$langs->trans("Yes").'</option>';
-		$s .= '<option value="0">'.$langs->trans("No").'</option>';
-		$s .= '</select>';
+        $s .= $langs->trans("Employee") . ' ';
+        $s .= '<select name="filteremployee" class="flat marginrightonly">';
+        $s .= '<option value="-1">&nbsp;</option>';
+        $s .= '<option value="1">' . $langs->trans("Yes") . '</option>';
+        $s .= '<option value="0">' . $langs->trans("No") . '</option>';
+        $s .= '</select>';
 
-		return $s;
-	}
+        return $s;
+    }
 
-	/**
-	 *  Ajoute destinataires dans table des cibles
-	 *
-	 *  @param	int		$mailing_id    	Id of emailing
-	 *  @return int           			< 0 si erreur, nb ajout si ok
-	 */
-	public function add_to_target($mailing_id)
-	{
-		// phpcs:enable
-		global $conf, $langs;
+    /**
+     *  Renvoie url lien vers fiche de la source du destinataire du mailing
+     *
+     * @param int $id ID
+     *
+     * @return     string      Url lien
+     */
+    public function url($id)
+    {
+        return '<a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $id . '">' . img_object('', "user") . '</a>';
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Ajoute destinataires dans table des cibles
+     *
+     * @param int $mailing_id Id of emailing
+     *
+     * @return int                    < 0 si erreur, nb ajout si ok
+     */
+    public function add_to_target($mailing_id)
+    {
+        // phpcs:enable
+        global $conf, $langs;
 		$langs->load("companies");
 
 		$cibles = array();
@@ -211,19 +227,5 @@ class mailing_pomme extends MailingTargets
 		}
 
 		return parent::addTargetsToDatabase($mailing_id, $cibles);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Renvoie url lien vers fiche de la source du destinataire du mailing
-	 *
-	 *  @param	int		$id		ID
-	 *  @return     string      Url lien
-	 */
-	public function url($id)
-	{
-		return '<a href="'.DOL_URL_ROOT.'/user/card.php?id='.$id.'">'.img_object('', "user").'</a>';
 	}
 }

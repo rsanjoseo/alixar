@@ -42,43 +42,80 @@ class Orders extends DolibarrApi
 	 */
 	public $commande;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->commande = new Commande($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->commande = new Commande($this->db);
+    }
 
-	/**
-	 * Get properties of an order object by ref
-	 *
-	 * Return an array with order informations
-	 *
-	 * @param       string		$ref			Ref of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref/{ref}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRef($ref, $contact_list = 1)
-	{
-		return $this->_fetch('', $ref, '', $contact_list);
-	}
+    /**
+     * Get properties of an order object by id
+     *
+     * Return an array with order informations
+     *
+     * @param int $id           ID of order
+     * @param int $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id, $contact_list = 1)
+    {
+        return $this->_fetch($id, '', '', $contact_list);
+    }
 
-	/**
-	 * Get properties of an order object
-	 *
-	 * Return an array with order informations
-	 *
-	 * @param       int         $id            ID of order
-	 * @param		string		$ref			Ref of object
-	 * @param		string		$ref_ext		External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+    /**
+     * Get properties of an order object by ref
+     *
+     * Return an array with order informations
+     *
+     * @param string $ref          Ref of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref/{ref}
+     *
+     * @throws    RestException
+     */
+    public function getByRef($ref, $contact_list = 1)
+    {
+        return $this->_fetch('', $ref, '', $contact_list);
+    }
+
+    /**
+     * Get properties of an order object by ref_ext
+     *
+     * Return an array with order informations
+     *
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref_ext/{ref_ext}
+     *
+     * @throws    RestException
+     */
+    public function getByRefExt($ref_ext, $contact_list = 1)
+    {
+        return $this->_fetch('', '', $ref_ext, $contact_list);
+    }
+
+    /**
+     * Get properties of an order object
+     *
+     * Return an array with order informations
+     *
+     * @param int    $id           ID of order
+     * @param string $ref          Ref of object
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
 	 * @return 	array|mixed data without useless information
 	 *
 	 * @throws 	RestException
@@ -102,45 +139,6 @@ class Orders extends DolibarrApi
 		$this->commande->contacts_ids = $this->commande->liste_contact(-1, 'external', $contact_list);
 		$this->commande->fetchObjectLinked();
 		return $this->_cleanObjectDatas($this->commande);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->note);
-		unset($object->address);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		return $object;
-	}
-
-	/**
-	 * Get properties of an order object by ref_ext
-	 *
-	 * Return an array with order informations
-	 *
-	 * @param       string		$ref_ext			External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref_ext/{ref_ext}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRefExt($ref_ext, $contact_list = 1)
-	{
-		return $this->_fetch('', '', $ref_ext, $contact_list);
 	}
 
 	/**
@@ -279,25 +277,6 @@ class Orders extends DolibarrApi
 		}
 
 		return $this->commande->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$commande = array();
-		foreach (Orders::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, $field." field missing");
-			}
-			$commande[$field] = $data[$field];
-		}
-		return $commande;
 	}
 
 	/**
@@ -462,22 +441,6 @@ class Orders extends DolibarrApi
 			return $this->_cleanObjectDatas($result);
 		}
 		return false;
-	}
-
-	/**
-	 * Get properties of an order object by id
-	 *
-	 * Return an array with order informations
-	 *
-	 * @param       int         $id            ID of order
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id, $contact_list = 1)
-	{
-		return $this->_fetch($id, '', '', $contact_list);
 	}
 
 	/**
@@ -957,6 +920,7 @@ class Orders extends DolibarrApi
 		return $this->_cleanObjectDatas($this->commande);
 	}
 
+
 	/**
 	 * Create an order using an existing proposal.
 	 *
@@ -1000,8 +964,6 @@ class Orders extends DolibarrApi
 
 		return $this->_cleanObjectDatas($this->commande);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 * Get the shipments of an order
@@ -1089,14 +1051,58 @@ class Orders extends DolibarrApi
 		$result = $shipment->create(DolibarrApiAccess::$user);
 		if ($result <= 0) {
 			throw new RestException(500, 'Error on creating expedition :'.$this->db->lasterror());
-		}
-		foreach ($this->commande->lines as $line) {
-			$result = $shipment->create_line($warehouse_id, $line->id, $line->qty);
-			if ($result <= 0) {
-				throw new RestException(500, 'Error on creating expedition lines:'.$this->db->lasterror());
-			}
-			$i++;
-		}
-		return $shipment->id;
-	}
+        }
+        foreach ($this->commande->lines as $line) {
+            $result = $shipment->create_line($warehouse_id, $line->id, $line->qty);
+            if ($result <= 0) {
+                throw new RestException(500, 'Error on creating expedition lines:' . $this->db->lasterror());
+            }
+            $i++;
+        }
+        return $shipment->id;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->note);
+        unset($object->address);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $commande = [];
+        foreach (Orders::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, $field . " field missing");
+            }
+            $commande[$field] = $data[$field];
+        }
+        return $commande;
+    }
 }

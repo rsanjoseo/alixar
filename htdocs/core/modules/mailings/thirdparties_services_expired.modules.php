@@ -158,16 +158,6 @@ class mailing_thirdparties_services_expired extends MailingTargets
 		return parent::addTargetsToDatabase($mailing_id, $cibles);
 	}
 
-	/**
-	 *  Can include an URL link on each record provided by selector	shown on target page.
-	 *
-	 *  @param	int		$id		ID
-	 *  @return string      	Url link
-	 */
-	public function url($id)
-	{
-		return '<a href="'.DOL_URL_ROOT.'/societe/card.php?socid='.$id.'">'.img_object('', "company").'</a>';
-	}
 
 	/**
 	 *	On the main mailing area, there is a box with statistics.
@@ -185,6 +175,7 @@ class mailing_thirdparties_services_expired extends MailingTargets
 
 		return array();
 	}
+
 
 	/**
 	 *	Return here number of distinct emails returned by your selector.
@@ -227,14 +218,26 @@ class mailing_thirdparties_services_expired extends MailingTargets
 		$s = $langs->trans("ProductOrService");
 		$s .= '<select name="filter" class="flat">';
 		if (count($this->arrayofproducts)) {
-			$s .= '<option value="0">&nbsp;</option>';
-		} else {
-			$s .= '<option value="0">'.$langs->trans("ContactsAllShort").'</option>';
-		}
-		foreach ($this->arrayofproducts as $key => $val) {
-			$s .= '<option value="'.$key.'">'.$val.'</option>';
-		}
-		$s .= '</select>';
-		return $s;
-	}
+            $s .= '<option value="0">&nbsp;</option>';
+        } else {
+            $s .= '<option value="0">' . $langs->trans("ContactsAllShort") . '</option>';
+        }
+        foreach ($this->arrayofproducts as $key => $val) {
+            $s .= '<option value="' . $key . '">' . $val . '</option>';
+        }
+        $s .= '</select>';
+        return $s;
+    }
+
+    /**
+     *  Can include an URL link on each record provided by selector    shown on target page.
+     *
+     * @param int $id ID
+     *
+     * @return string        Url link
+     */
+    public function url($id)
+    {
+        return '<a href="' . DOL_URL_ROOT . '/societe/card.php?socid=' . $id . '">' . img_object('', "company") . '</a>';
+    }
 }

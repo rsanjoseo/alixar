@@ -302,17 +302,17 @@ foreach ($list as $entry) {
 	print '<td class="tdoverflowmax200 center">'.$entry->status.'</td>';
 
 	if ($permission) {
-		$href = $_SERVER["PHP_SELF"];
-		$href .= '?id='.$object->id;
-		$href .= '&action=deletecontact&token='.newToken();
-		$href .= '&lineid='.$entry->id;
+        $href = $_SERVER["PHP_SELF"];
+        $href .= '?id=' . ((int) $object->id);
+        $href .= '&action=deletecontact&token=' . newToken();
+        $href .= '&lineid=' . ((int) $entry->id);
 
-		print "<td class='center'>";
-		print "<a href='$href'>";
-		print img_picto($langs->trans("Unlink"), "unlink");
-		print "</a>";
-		print "</td>";
-	}
+        print '<td class="center">';
+        print '<a href="' . $href . '">';
+        print img_picto($langs->trans("Unlink"), "unlink");
+        print "</a>";
+        print "</td>";
+    }
 
 	print "</tr>";
 }

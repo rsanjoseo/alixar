@@ -33,44 +33,50 @@ require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
  */
 class RemiseCheque extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'chequereceipt';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'bordereau_cheque';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'payment';
-	//! Numero d'erreur Plage 1024-1279
+
 	public $num;
 	public $intitule;
+	//! Numero d'erreur Plage 1024-1279
 	public $errno;
+
 	public $amount;
 	public $date_bordereau;
-	public $account_id;
-	public $account_label;
-	public $author_id;
-	public $nbcheque;
-	/**
-	 * @var string Ref
-	 */
-	public $ref;
+    public $account_id;
+    public $account_label;
+    public $author_id;
+    public $nbcheque;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->next_id = 0;
+    /**
+     * @var string Ref
+     */
+    public $ref;
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->next_id = 0;
 		$this->previous_id = 0;
 	}
 
@@ -269,54 +275,51 @@ class RemiseCheque extends CommonObject
 		}
 	}
 
-	/**
-	 *	Mets a jour le montant total
-	 *
-	 *	@return 	int		0 en cas de succes
-	 */
-	public function updateAmount()
-	{
-		global $conf;
+    /**
+     *    Supprime la remise en base
+     *
+     * @param User $user Utilisateur qui effectue l'operation
+     *
+     * @return    int
+     */
+    public function delete($user = '')
+    {
+        global $conf;
 
-		$this->errno = 0;
+        $this->errno = 0;
+        $this->db->begin();
 
-		$this->db->begin();
-		$total = 0;
-		$nb = 0;
-		$sql = "SELECT amount ";
-		$sql .= " FROM ".MAIN_DB_PREFIX."bank";
-		$sql .= " WHERE fk_bordereau = ".((int) $this->id);
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "bordereau_cheque";
+        $sql .= " WHERE rowid = " . ((int) $this->id);
+        $sql .= " AND entity = " . $conf->entity;
 
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			while ($row = $this->db->fetch_row($resql)) {
-				$total += $row[0];
-				$nb++;
-			}
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->affected_rows($resql);
 
-			$this->db->free($resql);
+            if ($num <> 1) {
+                $this->errno = -2;
+                dol_syslog("Remisecheque::Delete Erreur Lecture ID ($this->errno)");
+            }
 
-			$sql = "UPDATE ".MAIN_DB_PREFIX."bordereau_cheque";
-			$sql .= " SET amount = ".price2num($total);
-			$sql .= ", nbcheque = ".((int) $nb);
-			$sql .= " WHERE rowid = ".((int) $this->id);
-			$sql .= " AND entity = ".$conf->entity;
+            if ($this->errno === 0) {
+                $sql = "UPDATE " . MAIN_DB_PREFIX . "bank";
+                $sql .= " SET fk_bordereau = 0";
+                $sql .= " WHERE fk_bordereau = " . ((int) $this->id);
 
-			$resql = $this->db->query($sql);
-			if (!$resql) {
-				$this->errno = -1030;
-				dol_syslog("RemiseCheque::updateAmount ERREUR UPDATE ($this->errno)");
-			}
-		} else {
-			$this->errno = -1031;
-			dol_syslog("RemiseCheque::updateAmount ERREUR SELECT ($this->errno)");
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $this->errno = -1028;
+                    dol_syslog("RemiseCheque::Delete ERREUR UPDATE ($this->errno)");
+                }
+            }
 		}
 
 		if ($this->errno === 0) {
 			$this->db->commit();
 		} else {
-			$this->db->rollback();
-			dol_syslog("RemiseCheque::updateAmount ROLLBACK ($this->errno)");
+            $this->db->rollback();
+            dol_syslog("RemiseCheque::Delete ROLLBACK ($this->errno)");
 		}
 
 		return $this->errno;
@@ -457,59 +460,6 @@ class RemiseCheque extends CommonObject
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Supprime la remise en base
-	 *
-	 *	@param  User	$user 		Utilisateur qui effectue l'operation
-	 *	@return	int
-	 */
-	public function delete($user = '')
-	{
-		global $conf;
-
-		$this->errno = 0;
-		$this->db->begin();
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."bordereau_cheque";
-		$sql .= " WHERE rowid = ".((int) $this->id);
-		$sql .= " AND entity = ".$conf->entity;
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->affected_rows($resql);
-
-			if ($num <> 1) {
-				$this->errno = -2;
-				dol_syslog("Remisecheque::Delete Erreur Lecture ID ($this->errno)");
-			}
-
-			if ($this->errno === 0) {
-				$sql = "UPDATE ".MAIN_DB_PREFIX."bank";
-				$sql .= " SET fk_bordereau = 0";
-				$sql .= " WHERE fk_bordereau = ".((int) $this->id);
-
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					$this->errno = -1028;
-					dol_syslog("RemiseCheque::Delete ERREUR UPDATE ($this->errno)");
-				}
-			}
-		}
-
-		if ($this->errno === 0) {
-			$this->db->commit();
-		} else {
-			$this->db->rollback();
-			dol_syslog("RemiseCheque::Delete ROLLBACK ($this->errno)");
-		}
-
-		return $this->errno;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
 	 *
@@ -551,26 +501,29 @@ class RemiseCheque extends CommonObject
 
 				if ($this->db->jdate($obj->datefin) < ($now - $conf->bank->cheque->warning_delay)) {
 					$response->nbtodolate++;
-				}
-			}
+                }
+            }
 
-			return $response;
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            return $response;
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *      Charge indicateurs this->nb de tableau de bord
-	 *
-	 *      @return     int         <0 if ko, >0 if ok
-	 */
-	public function load_state_board()
-	{
-		// phpcs:enable
-		global $user;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Charge indicateurs this->nb de tableau de bord
+     *
+     * @return     int         <0 if ko, >0 if ok
+     */
+    public function load_state_board()
+    {
+        // phpcs:enable
+        global $user;
 
 		if ($user->socid) {
 			return -1; // protection pour eviter appel par utilisateur externe
@@ -596,7 +549,8 @@ class RemiseCheque extends CommonObject
 			$this->error = $this->db->error();
 			return -1;
 		}
-	}
+    }
+
 
 	/**
 	 *	Build document
@@ -668,25 +622,79 @@ class RemiseCheque extends CommonObject
 				return 1;
 			} else {
 				//$outputlangs->charset_output=$sav_charset_output;
-				dol_syslog("Error");
-				dol_print_error($this->db, $docmodel->error);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorFileDoesNotExists", $dir.$file);
-			return -1;
-		}
-	}
+                dol_syslog("Error");
+                dol_print_error($this->db, $docmodel->error);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorFileDoesNotExists", $dir . $file);
+            return -1;
+        }
+    }
 
-	/**
-	 *	Insere la remise en base
-	 *
-	 *	@param	int		$account_id 		Compte bancaire concerne
-	 * 	@return	int
-	 */
-	public function removeCheck($account_id)
-	{
-		$this->errno = 0;
+    /**
+     *    Mets a jour le montant total
+     *
+     * @return    int        0 en cas de succes
+     */
+    public function updateAmount()
+    {
+        global $conf;
+
+        $this->errno = 0;
+
+        $this->db->begin();
+        $total = 0;
+        $nb = 0;
+        $sql = "SELECT amount ";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "bank";
+        $sql .= " WHERE fk_bordereau = " . ((int) $this->id);
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            while ($row = $this->db->fetch_row($resql)) {
+                $total += $row[0];
+                $nb++;
+            }
+
+            $this->db->free($resql);
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "bordereau_cheque";
+            $sql .= " SET amount = " . price2num($total);
+            $sql .= ", nbcheque = " . ((int) $nb);
+            $sql .= " WHERE rowid = " . ((int) $this->id);
+            $sql .= " AND entity = " . $conf->entity;
+
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $this->errno = -1030;
+                dol_syslog("RemiseCheque::updateAmount ERREUR UPDATE ($this->errno)");
+            }
+        } else {
+            $this->errno = -1031;
+            dol_syslog("RemiseCheque::updateAmount ERREUR SELECT ($this->errno)");
+        }
+
+        if ($this->errno === 0) {
+            $this->db->commit();
+        } else {
+            $this->db->rollback();
+            dol_syslog("RemiseCheque::updateAmount ROLLBACK ($this->errno)");
+        }
+
+        return $this->errno;
+    }
+
+    /**
+     *    Insere la remise en base
+     *
+     * @param int $account_id Compte bancaire concerne
+     *
+     * @return    int
+     */
+    public function removeCheck($account_id)
+    {
+        $this->errno = 0;
 
 		if ($this->id > 0) {
 			$sql = "UPDATE ".MAIN_DB_PREFIX."bank";

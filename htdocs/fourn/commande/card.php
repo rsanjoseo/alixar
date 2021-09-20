@@ -1989,7 +1989,7 @@ if ($action == 'create') {
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($usercancreate) {
 			if ($action != 'classify') {
-				$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=classify&amp;id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetProject')).'</a> : ';
+				$morehtmlref .= '<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token=' . newToken() . '&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
 			}
 			if ($action == 'classify') {
 				//$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
@@ -2140,7 +2140,7 @@ if ($action == 'create') {
 			print '</td><td>';
 			if ($action == 'editmulticurrencyrate' || $action == 'actualizemulticurrencyrate') {
 				if ($action == 'actualizemulticurrencyrate') {
-					list($object->fk_multicurrency, $object->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($object->db, $object->multicurrency_code);
+					[$object->fk_multicurrency, $object->multicurrency_tx] = MultiCurrency::getIdAndTxFromCode($object->db, $object->multicurrency_code);
 				}
 				$form->form_multicurrency_rate($_SERVER['PHP_SELF'].'?id='.$object->id, $object->multicurrency_tx, 'multicurrency_tx', $object->multicurrency_code);
 			} else {
@@ -2410,8 +2410,8 @@ if ($action == 'create') {
 			// Modify
 			if ($object->statut == CommandeFournisseur::STATUS_VALIDATED) {
 				if ($usercanorder) {
-					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("Modify").'</a>';
-				}
+					print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=reopen&token=' . newToken() . '">' . $langs->trans("Modify") . '</a>';
+                }
 			}
 
 			// Approve
@@ -2466,21 +2466,21 @@ if ($action == 'create') {
 				if (!$buttonshown && $usercanapprove) {
 					if (empty($conf->global->SUPPLIER_ORDER_REOPEN_BY_APPROVER_ONLY)
 						|| (!empty($conf->global->SUPPLIER_ORDER_REOPEN_BY_APPROVER_ONLY) && $user->id == $object->user_approve_id)) {
-						print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("Disapprove").'</a>';
-						$buttonshown++;
-					}
+						print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=reopen&token=' . newToken() . '">' . $langs->trans("Disapprove") . '</a>';
+                        $buttonshown++;
+                    }
 				}
 				if (!$buttonshown && $usercanapprovesecond && !empty($conf->global->SUPPLIER_ORDER_3_STEPS_TO_BE_APPROVED)) {
 					if (empty($conf->global->SUPPLIER_ORDER_REOPEN_BY_APPROVER2_ONLY)
 						|| (!empty($conf->global->SUPPLIER_ORDER_REOPEN_BY_APPROVER2_ONLY) && $user->id == $object->user_approve_id2)) {
-						print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("Disapprove").'</a>';
-					}
+						print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=reopen&token=' . newToken() . '">' . $langs->trans("Disapprove") . '</a>';
+                    }
 				}
 			}
 			if (in_array($object->statut, array(3, 4, 5, 6, 7, 9))) {
 				if ($usercanorder) {
-					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans("ReOpen").'</a>';
-				}
+					print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=reopen&token=' . newToken() . '">' . $langs->trans("ReOpen") . '</a>';
+                }
 			}
 
 			// Ship
@@ -2519,8 +2519,8 @@ if ($action == 'create') {
 			// Classify received (this does not record reception)
 			if ($object->statut == CommandeFournisseur::STATUS_ORDERSENT || $object->statut == CommandeFournisseur::STATUS_RECEIVED_PARTIALLY) {
 				if ($usercanreceived) {
-					print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=classifyreception#classifyreception">'.$langs->trans("ClassifyReception").'</a></div>';
-				}
+					print '<div class="inline-block divButAction"><a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&token=' . newToken() . '&action=classifyreception#classifyreception">' . $langs->trans("ClassifyReception") . '</a></div>';
+                }
 			}
 
 			// Create bill
@@ -2536,12 +2536,12 @@ if ($action == 'create') {
 			// Classify billed manually (need one invoice if module invoice is on, no condition on invoice if not)
 			if ($usercancreate && $object->statut >= 2 && $object->statut != 7 && $object->billed != 1) {  // statut 2 means approved
 				if (empty($conf->facture->enabled)) {
-					print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=classifybilled">'.$langs->trans("ClassifyBilled").'</a>';
-				} else {
+					print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=classifybilled&token=' . newToken() . '">' . $langs->trans("ClassifyBilled") . '</a>';
+                } else {
 					if (!empty($object->linkedObjectsIds['invoice_supplier'])) {
 						if ($user->rights->fournisseur->facture->creer || $user->rights->supplier_invoice->creer) {
-							print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=classifybilled">'.$langs->trans("ClassifyBilled").'</a>';
-						}
+							print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=classifybilled&token=' . newToken() . '">' . $langs->trans("ClassifyBilled") . '</a>';
+                        }
 					} else {
 						print '<a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NeedAtLeastOneInvoice")).'">'.$langs->trans("ClassifyBilled").'</a>';
 					}
@@ -2550,8 +2550,8 @@ if ($action == 'create') {
 
 			// Create a remote order using WebService only if module is activated
 			if (!empty($conf->syncsupplierwebservices->enabled) && $object->statut >= 2) { // 2 means accepted
-				print '<a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=webservice&amp;mode=init">'.$langs->trans('CreateRemoteOrder').'</a>';
-			}
+				print '<a class="butAction" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=webservice&token=' . newToken() . '&mode=init">' . $langs->trans('CreateRemoteOrder') . '</a>';
+            }
 
 			// Clone
 			if ($usercancreate) {
@@ -2570,8 +2570,8 @@ if ($action == 'create') {
 				if ($hasreception) {
 					print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans("ReceptionExist").'">'.$langs->trans("Delete").'</a>';
 				} else {
-					print '<a class="butActionDelete" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delete&amp;token='.newToken().'">'.$langs->trans("Delete").'</a>';
-				}
+					print '<a class="butActionDelete" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delete&token=' . newToken() . '">' . $langs->trans("Delete") . '</a>';
+                }
 			}
 		}
 

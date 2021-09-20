@@ -40,17 +40,71 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 class FormCompany extends Form
 {
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *	Renvoie la liste des types d'effectifs possibles (pas de traduction car nombre)
-	 *
-	 *	@param	int		$mode		0=renvoi id+libelle, 1=renvoi code+libelle
-	 *	@param  string	$filter     Add a SQL filter to select. Data must not come from user input.
-	 *  @return array				Array of types d'effectifs
-	 */
-	public function effectif_array($mode = 0, $filter = '')
-	{
-		// phpcs:enable
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *        Return list of labels (translated) of third parties type
+     *
+     * @param int    $mode   0=Return id+label, 1=Return code+label
+     * @param string $filter Add a SQL filter to select. Data must not come from user input.
+     *
+     * @return array                Array of types
+     */
+    public function typent_array($mode = 0, $filter = '')
+    {
+        // phpcs:enable
+        global $langs, $mysoc;
+
+        $effs = [];
+
+        $sql = "SELECT id, code, libelle";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_typent";
+        $sql .= " WHERE active = 1 AND (fk_country IS NULL OR fk_country = " . (empty($mysoc->country_id) ? '0' : $mysoc->country_id) . ")";
+        if ($filter) {
+            $sql .= " " . $filter;
+        }
+        $sql .= " ORDER by position, id";
+        dol_syslog(get_class($this) . '::typent_array', LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+
+            while ($i < $num) {
+                $objp = $this->db->fetch_object($resql);
+                if (!$mode) {
+                    $key = $objp->id;
+                } else {
+                    $key = $objp->code;
+                }
+                if ($langs->trans($objp->code) != $objp->code) {
+                    $effs[$key] = $langs->trans($objp->code);
+                } else {
+                    $effs[$key] = $objp->libelle;
+                }
+                if ($effs[$key] == '-') {
+                    $effs[$key] = '';
+                }
+                $i++;
+            }
+            $this->db->free($resql);
+        }
+
+        return $effs;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Renvoie la liste des types d'effectifs possibles (pas de traduction car nombre)
+     *
+     * @param int    $mode   0=renvoi id+libelle, 1=renvoi code+libelle
+     * @param string $filter Add a SQL filter to select. Data must not come from user input.
+     *
+     * @return array                Array of types d'effectifs
+     */
+    public function effectif_array($mode = 0, $filter = '')
+    {
+        // phpcs:enable
 		$effs = array();
 
 		$sql = "SELECT id, code, libelle";
@@ -82,8 +136,8 @@ class FormCompany extends Form
 		return $effs;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Affiche formulaire de selection des modes de reglement
 	 *
@@ -136,9 +190,6 @@ class FormCompany extends Form
 		print '</form>';
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Affiche formulaire de selection des niveau de prospection pour les contacts
 	 *
@@ -190,6 +241,7 @@ class FormCompany extends Form
 		print '</form>';
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *   Returns the drop-down list of departments/provinces/cantons for all countries or for a given country.
 	 *   In the case of an all-country list, the display breaks on the country.
@@ -208,7 +260,6 @@ class FormCompany extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Returns the drop-down list of departments/provinces/cantons for all countries or for a given country.
 	 *   In the case of an all-country list, the display breaks on the country.
@@ -315,10 +366,10 @@ class FormCompany extends Form
 		}
 
 		return $out;
-	}
+    }
+
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Retourne la liste deroulante des regions actives dont le pays est actif
 	 *   La cle de la liste est le code (il peut y avoir plusieurs entree pour
@@ -377,9 +428,7 @@ class FormCompany extends Form
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return combo list with people title
 	 *
@@ -439,7 +488,6 @@ class FormCompany extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Retourne la liste deroulante des formes juridiques tous pays confondus ou pour un pays donne.
 	 *    Dans le cas d'une liste tous pays confondu, on affiche une rupture sur le pays.
@@ -458,7 +506,6 @@ class FormCompany extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Retourne la liste deroulante des formes juridiques tous pays confondus ou pour un pays donne.
 	 *    Dans le cas d'une liste tous pays confondu, on affiche une rupture sur le pays
@@ -557,7 +604,6 @@ class FormCompany extends Form
 		return $out;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Output list of third parties.
@@ -803,6 +849,7 @@ class FormCompany extends Form
 		return 'ErrorBadValueForParameterRenderMode'; // Should not happened
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Return a select list with zip codes and their town
 	 *
@@ -837,7 +884,6 @@ class FormCompany extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return HTML string to use as input of professional id into a HTML page (siren, siret, etc...)
 	 *
@@ -916,7 +962,6 @@ class FormCompany extends Form
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return a HTML select with localtax values for thirdparties
 	 *
@@ -952,8 +997,6 @@ class FormCompany extends Form
 			}
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Return a HTML select for thirdparty type
@@ -1059,55 +1102,5 @@ class FormCompany extends Form
 		} else {
 			print $out;
 		}
-	}
-
-	/**
-	 *    	Return list of labels (translated) of third parties type
-	 *
-	 *		@param	int		$mode		0=Return id+label, 1=Return code+label
-	 *      @param  string	$filter     Add a SQL filter to select. Data must not come from user input.
-	 *    	@return array      			Array of types
-	 */
-	public function typent_array($mode = 0, $filter = '')
-	{
-		// phpcs:enable
-		global $langs, $mysoc;
-
-		$effs = array();
-
-		$sql = "SELECT id, code, libelle";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_typent";
-		$sql .= " WHERE active = 1 AND (fk_country IS NULL OR fk_country = ".(empty($mysoc->country_id) ? '0' : $mysoc->country_id).")";
-		if ($filter) {
-			$sql .= " ".$filter;
-		}
-		$sql .= " ORDER by position, id";
-		dol_syslog(get_class($this).'::typent_array', LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-
-			while ($i < $num) {
-				$objp = $this->db->fetch_object($resql);
-				if (!$mode) {
-					$key = $objp->id;
-				} else {
-					$key = $objp->code;
-				}
-				if ($langs->trans($objp->code) != $objp->code) {
-					$effs[$key] = $langs->trans($objp->code);
-				} else {
-					$effs[$key] = $objp->libelle;
-				}
-				if ($effs[$key] == '-') {
-					$effs[$key] = '';
-				}
-				$i++;
-			}
-			$this->db->free($resql);
-		}
-
-		return $effs;
 	}
 }

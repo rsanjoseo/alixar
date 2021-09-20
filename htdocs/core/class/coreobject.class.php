@@ -38,26 +38,79 @@ class CoreObject extends CommonObject
 	 */
 	protected $fields = array();
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB		$db      Database handler
-	 */
-	public function __construct(DoliDB &$db)
-	{
-		$this->db = $db;
-	}
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB &$db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 *	Get object and children from database
-	 *
-	 *	@param      int			$id       		Id of object to load
-	 * 	@param		bool		$loadChild		used to load children from database
-	 *	@return     int         				>0 if OK, <0 if KO, 0 if not found
-	 */
-	public function fetch($id, $loadChild = true)
-	{
-		$res = $this->fetchCommon($id);
+    /**
+     * Function to init fields
+     *
+     * @return bool
+     */
+    protected function init()
+    {
+        $this->id = 0;
+        $this->datec = 0;
+        $this->tms = 0;
+
+        if (!empty($this->fields)) {
+            foreach ($this->fields as $field => $info) {
+                if ($this->isDate($info)) {
+                    $this->{$field} = time();
+                } elseif ($this->isArray($info)) {
+                    $this->{$field} = [];
+                } elseif ($this->isInt($info)) {
+                    $this->{$field} = (int) 0;
+                } elseif ($this->isFloat($info)) {
+                    $this->{$field} = (double) 0;
+                } else {
+                    $this->{$field} = '';
+                }
+            }
+
+            $this->to_delete = false;
+            $this->is_clone = false;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Test type of field
+     *
+     * @param string $field name of field
+     * @param string $type  type of field to test
+     *
+     * @return  boolean         value of field or false
+     */
+    private function checkFieldType($field, $type)
+    {
+        if (isset($this->fields[$field]) && method_exists($this, 'is_' . $type)) {
+            return $this->{'is_' . $type}($this->fields[$field]);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *    Get object and children from database
+     *
+     * @param int  $id        Id of object to load
+     * @param bool $loadChild used to load children from database
+     *
+     * @return     int                        >0 if OK, <0 if KO, 0 if not found
+     */
+    public function fetch($id, $loadChild = true)
+    {
+        $res = $this->fetchCommon($id);
 		if ($res > 0) {
 			if ($loadChild) {
 				$this->fetchChild();
@@ -67,35 +120,6 @@ class CoreObject extends CommonObject
 		return $res;
 	}
 
-	/**
-	 * Function to fetch children objects
-	 *
-	 * @return void
-	 */
-	public function fetchChild()
-	{
-		if ($this->withChild && !empty($this->childtables) && !empty($this->fk_element)) {
-			foreach ($this->childtables as &$childTable) {
-				$className = ucfirst($childTable);
-
-				$this->{$className} = array();
-
-				$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX.$childTable." WHERE ".$this->fk_element." = ".((int) $this->id);
-				$res = $this->db->query($sql);
-
-				if ($res) {
-					while ($obj = $this->db->fetch_object($res)) {
-						$o = new $className($this->db);
-						$o->fetch($obj->rowid);
-
-						$this->{$className}[] = $o;
-					}
-				} else {
-					$this->errors[] = $this->db->lasterror();
-				}
-			}
-		}
-	}
 
 	/**
 	 * Function to instantiate a new child
@@ -127,6 +151,7 @@ class CoreObject extends CommonObject
 		return $k;
 	}
 
+
 	/**
 	 * Function to set a child as to delete
 	 *
@@ -136,26 +161,83 @@ class CoreObject extends CommonObject
 	 * @return                          bool
 	 */
 	public function removeChild($tabName, $id, $key = 'id')
-	{
-		foreach ($this->{$tabName} as &$object) {
-			if ($object->{$key} == $id) {
-				$object->to_delete = true;
-				return true;
-			}
-		}
-		return false;
-	}
+    {
+        foreach ($this->{$tabName} as &$object) {
+            if ($object->{$key} == $id) {
+                $object->to_delete = true;
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Function to update object or create or delete if needed
-	 *
-	 * @param   User    $user   User object
-	 * @return  int             < 0 if KO, > 0 if OK
-	 */
-	public function update(User &$user)
-	{
-		if (empty($this->id)) {
-			return $this->create($user); // To test, with that, no need to test on high level object, the core decide it, update just needed
+    /**
+     * Function to fetch children objects
+     *
+     * @return void
+     */
+    public function fetchChild()
+    {
+        if ($this->withChild && !empty($this->childtables) && !empty($this->fk_element)) {
+            foreach ($this->childtables as &$childTable) {
+                $className = ucfirst($childTable);
+
+                $this->{$className} = [];
+
+                $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . $childTable . " WHERE " . $this->fk_element . " = " . ((int) $this->id);
+                $res = $this->db->query($sql);
+
+                if ($res) {
+                    while ($obj = $this->db->fetch_object($res)) {
+                        $o = new $className($this->db);
+                        $o->fetch($obj->rowid);
+
+                        $this->{$className}[] = $o;
+                    }
+                } else {
+                    $this->errors[] = $this->db->lasterror();
+                }
+            }
+        }
+    }
+
+    /**
+     * Function to update children data
+     *
+     * @param User $user user object
+     *
+     * @return void
+     */
+    public function saveChild(User &$user)
+    {
+        if ($this->withChild && !empty($this->childtables) && !empty($this->fk_element)) {
+            foreach ($this->childtables as &$childTable) {
+                $className = ucfirst($childTable);
+                if (!empty($this->{$className})) {
+                    foreach ($this->{$className} as $i => &$object) {
+                        $object->{$this->fk_element} = $this->id;
+
+                        $object->update($user);
+                        if ($this->unsetChildDeleted && isset($object->to_delete) && $object->to_delete == true) {
+                            unset($this->{$className}[$i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Function to update object or create or delete if needed
+     *
+     * @param User $user User object
+     *
+     * @return  int             < 0 if KO, > 0 if OK
+     */
+    public function update(User &$user)
+    {
+        if (empty($this->id)) {
+            return $this->create($user); // To test, with that, no need to test on high level object, the core decide it, update just needed
 		} elseif (isset($this->to_delete) && $this->to_delete == true) {
 			return $this->delete($user);
 		}
@@ -227,31 +309,6 @@ class CoreObject extends CommonObject
 	}
 
 	/**
-	 * Function to update children data
-	 *
-	 * @param   User    $user   user object
-	 * @return void
-	 */
-	public function saveChild(User &$user)
-	{
-		if ($this->withChild && !empty($this->childtables) && !empty($this->fk_element)) {
-			foreach ($this->childtables as &$childTable) {
-				$className = ucfirst($childTable);
-				if (!empty($this->{$className})) {
-					foreach ($this->{$className} as $i => &$object) {
-						$object->{$this->fk_element} = $this->id;
-
-						$object->update($user);
-						if ($this->unsetChildDeleted && isset($object->to_delete) && $object->to_delete == true) {
-							unset($this->{$className}[$i]);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 * Function to delete object in database
 	 *
 	 * @param   User    $user   user object
@@ -293,8 +350,9 @@ class CoreObject extends CommonObject
 			$this->errors[] = $this->error;
 			$this->db->rollback();
 			return -1;
-		}
+        }
 	}
+
 
 	/**
 	 * Function to get a formatted date
@@ -302,25 +360,46 @@ class CoreObject extends CommonObject
 	 * @param   string  $field  Attribute to return
 	 * @param   string  $format Output date format
 	 * @return          string
-	 */
-	public function getDate($field, $format = '')
-	{
-		if (empty($this->{$field})) {
-			return '';
-		} else {
-			return dol_print_date($this->{$field}, $format);
-		}
-	}
+     */
+    public function getDate($field, $format = '')
+    {
+        if (empty($this->{$field})) {
+            return '';
+        } else {
+            return dol_print_date($this->{$field}, $format);
+        }
+    }
 
-	/**
-	 * Function to update current object
-	 *
-	 * @param   array   $Tab    Array of values
-	 * @return                  int
-	 */
-	public function setValues(&$Tab)
-	{
-		foreach ($Tab as $key => $value) {
+    /**
+     * Function to set date in field
+     *
+     * @param string $field field to set
+     * @param string $date  formatted date to convert
+     *
+     * @return                  mixed
+     */
+    public function setDate($field, $date)
+    {
+        if (empty($date)) {
+            $this->{$field} = 0;
+        } else {
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+            $this->{$field} = dol_stringtotime($date);
+        }
+
+        return $this->{$field};
+    }
+
+    /**
+     * Function to update current object
+     *
+     * @param array $Tab Array of values
+     *
+     * @return                  int
+     */
+    public function setValues(&$Tab)
+    {
+        foreach ($Tab as $key => $value) {
 			if ($this->checkFieldType($key, 'date')) {
 				$this->setDate($key, $value);
 			} elseif ($this->checkFieldType($key, 'float')) {
@@ -333,75 +412,5 @@ class CoreObject extends CommonObject
 		}
 
 		return 1;
-	}
-
-	/**
-	 * Test type of field
-	 *
-	 * @param   string  $field  name of field
-	 * @param   string  $type   type of field to test
-	 * @return  boolean         value of field or false
-	 */
-	private function checkFieldType($field, $type)
-	{
-		if (isset($this->fields[$field]) && method_exists($this, 'is_'.$type)) {
-			return $this->{'is_'.$type}($this->fields[$field]);
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Function to set date in field
-	 *
-	 * @param   string  $field  field to set
-	 * @param   string  $date   formatted date to convert
-	 * @return                  mixed
-	 */
-	public function setDate($field, $date)
-	{
-		if (empty($date)) {
-			$this->{$field} = 0;
-		} else {
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-			$this->{$field} = dol_stringtotime($date);
-		}
-
-		return $this->{$field};
-	}
-
-	/**
-	 * Function to init fields
-	 *
-	 * @return bool
-	 */
-	protected function init()
-	{
-		$this->id = 0;
-		$this->datec = 0;
-		$this->tms = 0;
-
-		if (!empty($this->fields)) {
-			foreach ($this->fields as $field => $info) {
-				if ($this->isDate($info)) {
-					$this->{$field} = time();
-				} elseif ($this->isArray($info)) {
-					$this->{$field} = array();
-				} elseif ($this->isInt($info)) {
-					$this->{$field} = (int) 0;
-				} elseif ($this->isFloat($info)) {
-					$this->{$field} = (double) 0;
-				} else {
-					$this->{$field} = '';
-				}
-			}
-
-			$this->to_delete = false;
-			$this->is_clone = false;
-
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

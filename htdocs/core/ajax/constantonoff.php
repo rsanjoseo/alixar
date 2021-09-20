@@ -31,7 +31,7 @@ if (!defined('NOREQUIREHTML')) {
 	define('NOREQUIREHTML', '1');
 }
 if (!defined('NOREQUIREAJAX')) {
-    define('NOREQUIREAJAX', '1');
+	define('NOREQUIREAJAX', '1');
 }
 if (!defined('NOREQUIRESOC')) {
     define('NOREQUIRESOC', '1');
@@ -39,9 +39,9 @@ if (!defined('NOREQUIRESOC')) {
 if (!defined('NOREQUIRETRAN')) {
     define('NOREQUIRETRAN', '1');
 }
-//if (!defined('CSRFCHECK_WITH_TOKEN')) {
-//	define('CSRFCHECK_WITH_TOKEN', '1'); // Token is required even in GET mode
-//}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1'); // Token is required even in GET mode
+}
 
 require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';

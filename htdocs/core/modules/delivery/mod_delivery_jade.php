@@ -121,22 +121,6 @@ class mod_delivery_jade extends ModeleNumRefDeliveryOrder
 	}
 
 	/**
-	 *  Return next free ref
-	 *
-	 *  @param  Societe     $objsoc         Object thirdparty
-	 *  @param  Object      $object         Object livraison
-	 *  @return string                      Texte descriptif
-	 */
-	public function delivery_get_num($objsoc = 0, $object = '')
-	{
-		// phpcs:enable
-		return $this->getNextValue($objsoc, $object);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 * 	Return next free value
 	 *
 	 *  @param	Societe		$objsoc     Object thirdparty
@@ -173,13 +157,30 @@ class mod_delivery_jade extends ModeleNumRefDeliveryOrder
 		}
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_delivery_jade::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_delivery_jade::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return next free ref
+     *
+     * @param Societe $objsoc Object thirdparty
+     * @param Object  $object Object livraison
+     *
+     * @return string                      Texte descriptif
+     */
+    public function delivery_get_num($objsoc = 0, $object = '')
+    {
+        // phpcs:enable
+        return $this->getNextValue($objsoc, $object);
+    }
 }

@@ -757,27 +757,182 @@ class pdf_espadon extends ModelePdfExpedition
 				return 1; // No error
 			} else {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
-			return 0;
-		}
-	}
+                return 0;
+            }
+        } else {
+            $this->error = $langs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Show total to pay
+     *
+     * @param TCPDF      $pdf         Object PDF
+     * @param Expedition $object      Object expedition
+     * @param int        $deja_regle  Amount already paid
+     * @param int        $posy        Start Position
+     * @param Translate  $outputlangs Objet langs
+     *
+     * @return int                            Position for suite
+     */
+    protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf, $mysoc;
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Expedition	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+        $sign = 1;
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        $tab2_top = $posy;
+        $tab2_hl = 4;
+        $pdf->SetFont('', 'B', $default_font_size - 1);
+
+        // Total table
+        $col1x = $this->posxweightvol - 50;
+        $col2x = $this->posxweightvol;
+        /*if ($this->page_largeur < 210) // To work with US executive format
+        {
+            $col2x-=20;
+        }*/
+        if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
+            $largcol2 = ($this->posxqtyordered - $this->posxweightvol);
+        } else {
+            $largcol2 = ($this->posxqtytoship - $this->posxweightvol);
+        }
+
+        $useborder = 0;
+        $index = 0;
+
+        $totalWeighttoshow = '';
+        $totalVolumetoshow = '';
+
+        // Load dim data
+        $tmparray = $object->getTotalWeightVolume();
+        $totalWeight = $tmparray['weight'];
+        $totalVolume = $tmparray['volume'];
+        $totalOrdered = $tmparray['ordered'];
+        $totalToShip = $tmparray['toship'];
+        // Set trueVolume and volume_units not currently stored into database
+        if ($object->trueWidth && $object->trueHeight && $object->trueDepth) {
+            $object->trueVolume = price(($object->trueWidth * $object->trueHeight * $object->trueDepth), 0, $outputlangs, 0, 0);
+            $object->volume_units = $object->size_units * 3;
+        }
+
+        if ($totalWeight != '') {
+            $totalWeighttoshow = showDimensionInBestUnit($totalWeight, 0, "weight", $outputlangs);
+        }
+        if ($totalVolume != '') {
+            $totalVolumetoshow = showDimensionInBestUnit($totalVolume, 0, "volume", $outputlangs);
+        }
+        if ($object->trueWeight) {
+            $totalWeighttoshow = showDimensionInBestUnit($object->trueWeight, $object->weight_units, "weight", $outputlangs);
+        }
+        if ($object->trueVolume) {
+            $totalVolumetoshow = showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
+        }
+
+        if ($this->getColumnStatus('desc')) {
+            $this->printStdColumnContent($pdf, $tab2_top, 'desc', $outputlangs->transnoentities("Total"));
+        }
+
+        if ($this->getColumnStatus('weight')) {
+            if ($totalWeighttoshow) {
+                $this->printStdColumnContent($pdf, $tab2_top, 'weight', $totalWeighttoshow);
+                $index++;
+            }
+
+            if ($totalVolumetoshow) {
+                $y = $tab2_top + ($tab2_hl * $index);
+                $this->printStdColumnContent($pdf, $y, 'weight', $totalVolumetoshow);
+            }
+        }
+
+        if ($this->getColumnStatus('qty_asked') && $totalOrdered) {
+            $this->printStdColumnContent($pdf, $tab2_top, 'qty_asked', $totalOrdered);
+        }
+
+        if ($this->getColumnStatus('qty_shipped') && $totalToShip) {
+            $this->printStdColumnContent($pdf, $tab2_top, 'qty_shipped', $totalToShip);
+        }
+
+        if ($this->getColumnStatus('subprice')) {
+            $this->printStdColumnContent($pdf, $tab2_top, 'subprice', price($object->total_ht, 0, $outputlangs));
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+
+        return ($tab2_top + ($tab2_hl * $index));
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $currency = !empty($currency) ? $currency : $conf->currency;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        if (empty($hidetop)) {
+            //$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
+            if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+                $pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, $this->tabTitleHeight, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+            }
+        }
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', '', $default_font_size - 1);
+
+        // Output Rect
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
+
+        $this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
+
+        if (empty($hidetop)) {
+            $pdf->line($this->marge_gauche, $tab_top + $this->tabTitleHeight, $this->page_largeur - $this->marge_droite, $tab_top + $this->tabTitleHeight); // line takes a position y in 2nd parameter and 4th parameter
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF      $pdf         Object PDF
+     * @param Expedition $object      Object to show
+     * @param int        $showaddress 0=no, 1=yes
+     * @param Translate  $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $conf, $langs, $mysoc;
 
@@ -1013,7 +1168,6 @@ class pdf_espadon extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   	Show footer of page. Need this->emetteur object
 	 *
@@ -1028,164 +1182,6 @@ class pdf_espadon extends ModelePdfExpedition
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'SHIPPING_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$currency = !empty($currency) ? $currency : $conf->currency;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		if (empty($hidetop)) {
-			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
-			if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
-				$pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, $this->tabTitleHeight, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
-			}
-		}
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', '', $default_font_size - 1);
-
-		// Output Rect
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
-
-
-		$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
-
-		if (empty($hidetop)) {
-			$pdf->line($this->marge_gauche, $tab_top + $this->tabTitleHeight, $this->page_largeur - $this->marge_droite, $tab_top + $this->tabTitleHeight); // line takes a position y in 2nd parameter and 4th parameter
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *	Show total to pay
-	 *
-	 *	@param	TCPDF		$pdf            Object PDF
-	 *	@param  Expedition	$object         Object expedition
-	 *	@param  int			$deja_regle     Amount already paid
-	 *	@param	int         $posy           Start Position
-	 *	@param	Translate	$outputlangs	Objet langs
-	 *	@return int							Position for suite
-	 */
-	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf, $mysoc;
-
-		$sign = 1;
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		$tab2_top = $posy;
-		$tab2_hl = 4;
-		$pdf->SetFont('', 'B', $default_font_size - 1);
-
-		// Total table
-		$col1x = $this->posxweightvol - 50;
-		$col2x = $this->posxweightvol;
-		/*if ($this->page_largeur < 210) // To work with US executive format
-		{
-			$col2x-=20;
-		}*/
-		if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
-			$largcol2 = ($this->posxqtyordered - $this->posxweightvol);
-		} else {
-			$largcol2 = ($this->posxqtytoship - $this->posxweightvol);
-		}
-
-		$useborder = 0;
-		$index = 0;
-
-		$totalWeighttoshow = '';
-		$totalVolumetoshow = '';
-
-		// Load dim data
-		$tmparray = $object->getTotalWeightVolume();
-		$totalWeight = $tmparray['weight'];
-		$totalVolume = $tmparray['volume'];
-		$totalOrdered = $tmparray['ordered'];
-		$totalToShip = $tmparray['toship'];
-		// Set trueVolume and volume_units not currently stored into database
-		if ($object->trueWidth && $object->trueHeight && $object->trueDepth) {
-			$object->trueVolume = price(($object->trueWidth * $object->trueHeight * $object->trueDepth), 0, $outputlangs, 0, 0);
-			$object->volume_units = $object->size_units * 3;
-		}
-
-		if ($totalWeight != '') {
-			$totalWeighttoshow = showDimensionInBestUnit($totalWeight, 0, "weight", $outputlangs);
-		}
-		if ($totalVolume != '') {
-			$totalVolumetoshow = showDimensionInBestUnit($totalVolume, 0, "volume", $outputlangs);
-		}
-		if ($object->trueWeight) {
-			$totalWeighttoshow = showDimensionInBestUnit($object->trueWeight, $object->weight_units, "weight", $outputlangs);
-		}
-		if ($object->trueVolume) {
-			$totalVolumetoshow = showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
-		}
-
-
-
-
-		if ($this->getColumnStatus('desc')) {
-			$this->printStdColumnContent($pdf, $tab2_top, 'desc', $outputlangs->transnoentities("Total"));
-		}
-
-
-		if ($this->getColumnStatus('weight')) {
-			if ($totalWeighttoshow) {
-				$this->printStdColumnContent($pdf, $tab2_top, 'weight', $totalWeighttoshow);
-				$index++;
-			}
-
-			if ($totalVolumetoshow) {
-				$y = $tab2_top + ($tab2_hl * $index);
-				$this->printStdColumnContent($pdf, $y, 'weight', $totalVolumetoshow);
-			}
-		}
-
-		if ($this->getColumnStatus('qty_asked') && $totalOrdered) {
-			$this->printStdColumnContent($pdf, $tab2_top, 'qty_asked', $totalOrdered);
-		}
-
-		if ($this->getColumnStatus('qty_shipped') && $totalToShip) {
-			$this->printStdColumnContent($pdf, $tab2_top, 'qty_shipped', $totalToShip);
-		}
-
-		if ($this->getColumnStatus('subprice')) {
-			$this->printStdColumnContent($pdf, $tab2_top, 'subprice', price($object->total_ht, 0, $outputlangs));
-		}
-
-		$pdf->SetTextColor(0, 0, 0);
-
-		return ($tab2_top + ($tab2_hl * $index));
 	}
 
 	/**

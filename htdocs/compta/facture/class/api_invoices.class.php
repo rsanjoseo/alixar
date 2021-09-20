@@ -41,43 +41,80 @@ class Invoices extends DolibarrApi
 	 */
 	public $invoice;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->invoice = new Facture($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->invoice = new Facture($this->db);
+    }
 
-	/**
-	 * Get properties of an invoice object by ref
-	 *
-	 * Return an array with invoice informations
-	 *
-	 * @param       string		$ref			Ref of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref/{ref}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRef($ref, $contact_list = 1)
-	{
-		return $this->_fetch('', $ref, '', $contact_list);
-	}
+    /**
+     * Get properties of a invoice object
+     *
+     * Return an array with invoice informations
+     *
+     * @param int $id           ID of invoice
+     * @param int $contact_list 0:Return array contains all properties, 1:Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id, $contact_list = 1)
+    {
+        return $this->_fetch($id, '', '', $contact_list);
+    }
 
-	/**
-	 * Get properties of an invoice object
-	 *
-	 * Return an array with invoice informations
-	 *
-	 * @param       int         $id            ID of order
-	 * @param		string		$ref			Ref of object
-	 * @param		string		$ref_ext		External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+    /**
+     * Get properties of an invoice object by ref
+     *
+     * Return an array with invoice informations
+     *
+     * @param string $ref          Ref of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref/{ref}
+     *
+     * @throws    RestException
+     */
+    public function getByRef($ref, $contact_list = 1)
+    {
+        return $this->_fetch('', $ref, '', $contact_list);
+    }
+
+    /**
+     * Get properties of an invoice object by ref_ext
+     *
+     * Return an array with invoice informations
+     *
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref_ext/{ref_ext}
+     *
+     * @throws    RestException
+     */
+    public function getByRefExt($ref_ext, $contact_list = 1)
+    {
+        return $this->_fetch('', '', $ref_ext, $contact_list);
+    }
+
+    /**
+     * Get properties of an invoice object
+     *
+     * Return an array with invoice informations
+     *
+     * @param int    $id           ID of order
+     * @param string $ref          Ref of object
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
 	 * @return 	array|mixed data without useless information
 	 *
 	 * @throws 	RestException
@@ -108,45 +145,6 @@ class Invoices extends DolibarrApi
 
 		$this->invoice->fetchObjectLinked();
 		return $this->_cleanObjectDatas($this->invoice);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->note);
-		unset($object->address);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		return $object;
-	}
-
-	/**
-	 * Get properties of an invoice object by ref_ext
-	 *
-	 * Return an array with invoice informations
-	 *
-	 * @param       string		$ref_ext			External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref_ext/{ref_ext}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRefExt($ref_ext, $contact_list = 1)
-	{
-		return $this->_fetch('', '', $ref_ext, $contact_list);
 	}
 
 	/**
@@ -309,26 +307,6 @@ class Invoices extends DolibarrApi
 		return $this->invoice->id;
 	}
 
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array|null    $data       Datas to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$invoice = array();
-		foreach (Invoices::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$invoice[$field] = $data[$field];
-		}
-		return $invoice;
-	}
-
 	 /**
 	  * Create an invoice using an existing order.
 	  *
@@ -473,22 +451,6 @@ class Invoices extends DolibarrApi
 		} else {
 			throw new RestException(304, $this->invoice->error);
 		}
-	}
-
-	/**
-	 * Get properties of a invoice object
-	 *
-	 * Return an array with invoice informations
-	 *
-	 * @param 	int 	$id           ID of invoice
-	 * @param   int     $contact_list 0:Return array contains all properties, 1:Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id, $contact_list = 1)
-	{
-		return $this->_fetch($id, '', '', $contact_list);
 	}
 
 	/**
@@ -842,6 +804,8 @@ class Invoices extends DolibarrApi
 		return $this->_cleanObjectDatas($this->invoice);
 	}
 
+
+
 	/**
 	 * Sets an invoice as draft
 	 *
@@ -891,6 +855,7 @@ class Invoices extends DolibarrApi
 
 		return $this->_cleanObjectDatas($this->invoice);
 	}
+
 
 	/**
 	 * Validate an invoice
@@ -993,6 +958,7 @@ class Invoices extends DolibarrApi
 
 		return $this->_cleanObjectDatas($this->invoice);
 	}
+
 
 	/**
 	 * Sets an invoice as unpaid
@@ -1387,6 +1353,7 @@ class Invoices extends DolibarrApi
 		return $result;
 	}
 
+
 	/**
 	 * Add payment line to a specific invoice with the remain to pay as amount.
 	 *
@@ -1504,8 +1471,6 @@ class Invoices extends DolibarrApi
 
 		return $payment_id;
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 * Add a payment to pay partially or completely one or several invoices.
@@ -1689,14 +1654,59 @@ class Invoices extends DolibarrApi
 			$result = $paymentobj->update_num($num_payment);
 			if ($result < 0) {
 				throw new RestException(500, 'Error when updating the payment num');
-			}
-		}
+            }
+        }
 
-		return [
-			'success' => [
-				'code' => 200,
-				'message' => 'Payment updated'
-			]
-		];
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Payment updated',
+            ],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->note);
+        unset($object->address);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array|null $data Datas to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $invoice = [];
+        foreach (Invoices::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $invoice[$field] = $data[$field];
+        }
+        return $invoice;
+    }
 }

@@ -42,43 +42,80 @@ class Proposals extends DolibarrApi
 	 */
 	public $propal;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->propal = new Propal($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->propal = new Propal($this->db);
+    }
 
-	/**
-	 * Get properties of an proposal object by ref
-	 *
-	 * Return an array with proposal informations
-	 *
-	 * @param       string		$ref			Ref of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref/{ref}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRef($ref, $contact_list = 1)
-	{
-		return $this->_fetch('', $ref, '', $contact_list);
-	}
+    /**
+     * Get properties of a commercial proposal object
+     *
+     * Return an array with commercial proposal informations
+     *
+     * @param int $id           ID of commercial proposal
+     * @param int $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id, $contact_list = 1)
+    {
+        return $this->_fetch($id, '', '', $contact_list);
+    }
 
-	/**
-	 * Get properties of an proposal object
-	 *
-	 * Return an array with proposal informations
-	 *
-	 * @param       int         $id             ID of order
-	 * @param		string		$ref			Ref of object
-	 * @param		string		$ref_ext		External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+    /**
+     * Get properties of an proposal object by ref
+     *
+     * Return an array with proposal informations
+     *
+     * @param string $ref          Ref of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref/{ref}
+     *
+     * @throws    RestException
+     */
+    public function getByRef($ref, $contact_list = 1)
+    {
+        return $this->_fetch('', $ref, '', $contact_list);
+    }
+
+    /**
+     * Get properties of an proposal object by ref_ext
+     *
+     * Return an array with proposal informations
+     *
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url GET    ref_ext/{ref_ext}
+     *
+     * @throws    RestException
+     */
+    public function getByRefExt($ref_ext, $contact_list = 1)
+    {
+        return $this->_fetch('', '', $ref_ext, $contact_list);
+    }
+
+    /**
+     * Get properties of an proposal object
+     *
+     * Return an array with proposal informations
+     *
+     * @param int    $id           ID of order
+     * @param string $ref          Ref of object
+     * @param string $ref_ext      External reference of object
+     * @param int    $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
 	 * @return 	array|mixed data without useless information
 	 *
 	 * @throws 	RestException
@@ -102,45 +139,6 @@ class Proposals extends DolibarrApi
 		$this->propal->contacts_ids = $this->propal->liste_contact(-1, 'external', $contact_list);
 		$this->propal->fetchObjectLinked();
 		return $this->_cleanObjectDatas($this->propal);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->note);
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->address);
-
-		return $object;
-	}
-
-	/**
-	 * Get properties of an proposal object by ref_ext
-	 *
-	 * Return an array with proposal informations
-	 *
-	 * @param       string		$ref_ext			External reference of object
-	 * @param       int         $contact_list  0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url GET    ref_ext/{ref_ext}
-	 *
-	 * @throws 	RestException
-	 */
-	public function getByRefExt($ref_ext, $contact_list = 1)
-	{
-		return $this->_fetch('', '', $ref_ext, $contact_list);
 	}
 
 	/**
@@ -273,25 +271,6 @@ class Proposals extends DolibarrApi
 		}
 
 		return $this->propal->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$propal = array();
-		foreach (Proposals::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$propal[$field] = $data[$field];
-		}
-		return $propal;
 	}
 
 	/**
@@ -459,22 +438,6 @@ class Proposals extends DolibarrApi
 			return $this->_cleanObjectDatas($result);
 		}
 		return false;
-	}
-
-	/**
-	 * Get properties of a commercial proposal object
-	 *
-	 * Return an array with commercial proposal informations
-	 *
-	 * @param       int         $id           ID of commercial proposal
-	 * @param       int         $contact_list 0: Returned array of contacts/addresses contains all properties, 1: Return array contains just id
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id, $contact_list = 1)
-	{
-		return $this->_fetch($id, '', '', $contact_list);
 	}
 
 	/**
@@ -729,6 +692,7 @@ class Proposals extends DolibarrApi
 		return $this->_cleanObjectDatas($this->propal);
 	}
 
+
 	/**
 	 * Validate a commercial proposal
 	 *
@@ -833,9 +797,6 @@ class Proposals extends DolibarrApi
 		return $this->_cleanObjectDatas($this->propal);
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Set a commercial proposal billed. Could be also called setbilled
 	 *
@@ -867,14 +828,59 @@ class Proposals extends DolibarrApi
 		$result = $this->propal->fetch($id);
 		if (!$result) {
 			throw new RestException(404, 'Proposal not found');
-		}
+        }
 
-		if (!DolibarrApi::_checkAccessToResource('propal', $this->propal->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+        if (!DolibarrApi::_checkAccessToResource('propal', $this->propal->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
 
-		$this->propal->fetchObjectLinked();
+        $this->propal->fetchObjectLinked();
 
-		return $this->_cleanObjectDatas($this->propal);
-	}
+        return $this->_cleanObjectDatas($this->propal);
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $propal = [];
+        foreach (Proposals::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $propal[$field] = $data[$field];
+        }
+        return $propal;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->note);
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->address);
+
+        return $object;
+    }
 }

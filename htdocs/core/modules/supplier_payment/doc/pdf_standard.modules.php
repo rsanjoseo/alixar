@@ -509,27 +509,135 @@ class pdf_standard extends ModelePDFSuppliersPayments
 				return 1; // No error
 			} else {
 				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "SUPPLIER_OUTPUTDIR");
-			return 0;
-		}
-	}
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "SUPPLIER_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     *    Show total to pay
+     *
+     * @param TCPDF         $pdf         Object PDF
+     * @param PaiementFourn $object      Object PaiementFourn
+     * @param int           $posy        Position depart
+     * @param Translate     $outputlangs Objet langs
+     *
+     * @return int                                Position pour suite
+     */
+    protected function _tableau_cheque(&$pdf, $object, $posy, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf, $mysoc;
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  FactureFournisseur		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        $pdf->SetFont('', '', $default_font_size - 1);
+        $pdf->SetFillColor(255, 255, 255);
+
+        // N° payment
+        $pdf->SetXY($this->marge_gauche, $posy);
+        $pdf->MultiCell(30, 4, 'N° ' . $outputlangs->transnoentities("Payment"), 0, 'L', 1);
+
+        // Ref payment
+        $pdf->SetXY($this->marge_gauche + 30, $posy);
+        $pdf->MultiCell(50, 4, $object->ref, 0, 'L', 1);
+
+        // Total payments
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - 50, $posy);
+        $pdf->MultiCell(50, 4, price($object->amount), 0, 'R', 1);
+        $posy += 20;
+
+        // translate amount
+        $currency = $conf->currency;
+        $translateinletter = strtoupper(dol_convertToWord($object->amount, $outputlangs, $currency));
+        $pdf->SetXY($this->marge_gauche + 50, $posy);
+        $pdf->MultiCell(90, 8, $translateinletter, 0, 'L', 1);
+        $posy += 8;
+
+        // To
+        $pdf->SetXY($this->marge_gauche + 50, $posy);
+        $pdf->MultiCell(150, 4, $object->thirdparty->nom, 0, 'L', 1);
+
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
+        $pdf->MultiCell(35, 4, str_pad(price($object->amount) . ' ' . $currency, 18, '*', STR_PAD_LEFT), 0, 'R', 1);
+        $posy += 10;
+
+        // City
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
+        $pdf->MultiCell(150, 4, $mysoc->town, 0, 'L', 1);
+        $posy += 4;
+
+        // Date
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
+        $pdf->MultiCell(150, 4, date("d") . ' ' . $outputlangs->transnoentitiesnoconv(date("F")) . ' ' . date("Y"), 0, 'L', 1);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param integer   $tab_top     Top position of table
+     * @param integer   $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y (not used)
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     * @param string    $currency    Currency code
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
+    {
+        global $conf, $mysoc;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $currency = !empty($currency) ? $currency : $conf->currency;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        /*$titre = strtoupper($mysoc->town).' - '.dol_print_date(dol_now(), 'day', 'tzserver', $outputlangs);
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3) - 60, $tab_top - 6);
+        $pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);*/
+
+        $titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency" . $currency));
+        $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top);
+        $pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', '', $default_font_size - 1);
+
+        // Output Rect
+        //$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF              $pdf         Object PDF
+     * @param FactureFournisseur $object      Object to show
+     * @param int                $showaddress 0=no, 1=yes
+     * @param Translate          $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $langs, $conf, $mysoc;
 
@@ -712,55 +820,6 @@ class pdf_standard extends ModelePDFSuppliersPayments
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		integer		$tab_top		Top position of table
-	 *   @param		integer		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y (not used)
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @param		string		$currency		Currency code
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
-	{
-		global $conf, $mysoc;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$currency = !empty($currency) ? $currency : $conf->currency;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		/*$titre = strtoupper($mysoc->town).' - '.dol_print_date(dol_now(), 'day', 'tzserver', $outputlangs);
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3) - 60, $tab_top - 6);
-		$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);*/
-
-		$titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency".$currency));
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top);
-		$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', '', $default_font_size - 1);
-
-		// Output Rect
-		//$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   	Show footer of page. Need this->emetteur object
 	 *
@@ -775,64 +834,5 @@ class pdf_standard extends ModelePDFSuppliersPayments
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'SUPPLIER_INVOICE_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *	Show total to pay
-	 *
-	 *	@param	TCPDF			$pdf			Object PDF
-	 *	@param  PaiementFourn	$object         Object PaiementFourn
-	 *	@param	int				$posy			Position depart
-	 *	@param	Translate		$outputlangs	Objet langs
-	 *	@return int								Position pour suite
-	 */
-	protected function _tableau_cheque(&$pdf, $object, $posy, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf, $mysoc;
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		$pdf->SetFont('', '', $default_font_size - 1);
-		$pdf->SetFillColor(255, 255, 255);
-
-		// N° payment
-		$pdf->SetXY($this->marge_gauche, $posy);
-		$pdf->MultiCell(30, 4, 'N° '.$outputlangs->transnoentities("Payment"), 0, 'L', 1);
-
-		// Ref payment
-		$pdf->SetXY($this->marge_gauche + 30, $posy);
-		$pdf->MultiCell(50, 4, $object->ref, 0, 'L', 1);
-
-		// Total payments
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - 50, $posy);
-		$pdf->MultiCell(50, 4, price($object->amount), 0, 'R', 1);
-		$posy += 20;
-
-		// translate amount
-		$currency = $conf->currency;
-		$translateinletter = strtoupper(dol_convertToWord($object->amount, $outputlangs, $currency));
-		$pdf->SetXY($this->marge_gauche + 50, $posy);
-		$pdf->MultiCell(90, 8, $translateinletter, 0, 'L', 1);
-		$posy += 8;
-
-		// To
-		$pdf->SetXY($this->marge_gauche + 50, $posy);
-		$pdf->MultiCell(150, 4, $object->thirdparty->nom, 0, 'L', 1);
-
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
-		$pdf->MultiCell(35, 4, str_pad(price($object->amount).' '.$currency, 18, '*', STR_PAD_LEFT), 0, 'R', 1);
-		$posy += 10;
-
-		// City
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
-		$pdf->MultiCell(150, 4, $mysoc->town, 0, 'L', 1);
-		$posy += 4;
-
-		// Date
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - 30, $posy);
-		$pdf->MultiCell(150, 4, date("d").' '.$outputlangs->transnoentitiesnoconv(date("F")).' '.date("Y"), 0, 'L', 1);
 	}
 }

@@ -43,27 +43,48 @@ abstract class ActionsCardCommon
 	public $object;
 
 	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
+     * @var string Error code (or message)
+     */
+    public $error = '';
 
+    /**
+     * @var string[] Error codes (or messages)
+     */
+    public $errors = [];
 
-	/**
-	 * @var string[] Error codes (or messages)
-	 */
-	public $errors = array();
+    /**
+     *  Get object from id or ref and save it into this->object
+     *
+     * @param int    $id  Object id
+     * @param string $ref Object ref
+     *
+     * @return        object                Object loaded
+     */
+    protected function getObject($id, $ref = '')
+    {
+        //$ret = $this->getInstanceDao();
 
-	/**
-	 *    Assign custom values for canvas (for example into this->tpl to be used by templates)
-	 *
-	 *    @param	string	$action    Type of action
-	 *    @param	integer	$id			Id of object
-	 *    @param	string	$ref		Ref of object
-	 *    @return	void
-	 */
-	public function assign_values(&$action, $id = 0, $ref = '')
-	{
-		// phpcs:enable
+        $object = new Societe($this->db);
+        if (!empty($id) || !empty($ref)) {
+            $object->fetch($id, $ref);
+        }
+        $this->object = $object;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Assign custom values for canvas (for example into this->tpl to be used by templates)
+     *
+     * @param string  $action Type of action
+     * @param integer $id     Id of object
+     * @param string  $ref    Ref of object
+     *
+     * @return    void
+     */
+    public function assign_values(&$action, $id = 0, $ref = '')
+    {
+        // phpcs:enable
 		global $conf, $langs, $db, $user, $mysoc, $canvas;
 		global $form, $formadmin, $formcompany;
 
@@ -356,7 +377,6 @@ abstract class ActionsCardCommon
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Assign POST values into object
 	 *
@@ -409,25 +429,5 @@ abstract class ActionsCardCommon
 			$this->object->country_code = $tmparray['code'];
 			$this->object->country_label = $tmparray['label'];
 		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Get object from id or ref and save it into this->object
-	 *
-	 *  @param		int		$id			Object id
-	 *  @param		string	$ref		Object ref
-	 *  @return		object				Object loaded
-	 */
-	protected function getObject($id, $ref = '')
-	{
-		//$ret = $this->getInstanceDao();
-
-		$object = new Societe($this->db);
-		if (!empty($id) || !empty($ref)) {
-			$object->fetch($id, $ref);
-		}
-		$this->object = $object;
 	}
 }

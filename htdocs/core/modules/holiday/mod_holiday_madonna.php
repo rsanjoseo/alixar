@@ -121,22 +121,6 @@ class mod_holiday_madonna extends ModelNumRefHolidays
 	/**
 	 *	Return next value
 	 *
-	 *	@param	User		$fuser     	User object
-	 *	@param	Object		$objforref	Holiday object
-	 *	@return string      			Value if OK, 0 if KO
-	 */
-	public function holiday_get_num($fuser, $objforref)
-	{
-		// phpcs:enable
-		return $this->getNextValue($fuser, $objforref);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return next value
-	 *
 	 *	@param	Societe		$objsoc     third party object
 	 *	@param	Object		$holiday	Holiday object
 	 *	@return string      			Value if OK, 0 if KO
@@ -167,13 +151,30 @@ class mod_holiday_madonna extends ModelNumRefHolidays
 		$date = $holiday->date_debut;
 		$yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		dol_syslog("mod_holiday_madonna::getNextValue return ".$this->prefix.$yymm."-".$num);
-		return $this->prefix.$yymm."-".$num;
-	}
+        dol_syslog("mod_holiday_madonna::getNextValue return " . $this->prefix . $yymm . "-" . $num);
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return next value
+     *
+     * @param User   $fuser     User object
+     * @param Object $objforref Holiday object
+     *
+     * @return string                Value if OK, 0 if KO
+     */
+    public function holiday_get_num($fuser, $objforref)
+    {
+        // phpcs:enable
+        return $this->getNextValue($fuser, $objforref);
+    }
 }

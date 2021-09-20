@@ -45,26 +45,117 @@ class BankCateg // extends CommonObject
 	 */
 	public $label;
 
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDB $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+    /**
+     *  Create in database
+     *
+     * @param User $user      User that create
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = 0)
+    {
+        global $conf;
 
-	/**
-	 * Update database
-	 *
-	 * @param  User $user User that modify
-	 * @param  int $notrigger 0=launch triggers after, 1=disable triggers
-	 * @return int                    <0 if KO, >0 if OK
-	 */
-	public function update(User $user = null, $notrigger = 0)
-	{
+        $error = 0;
+
+        // Clean parameters
+        if (isset($this->label)) {
+            $this->label = trim($this->label);
+        }
+
+        // Insert request
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "bank_categ (";
+        $sql .= "label";
+        $sql .= ", entity";
+        $sql .= ") VALUES (";
+        $sql .= " " . (!isset($this->label) ? 'NULL' : "'" . $this->db->escape($this->label) . "'") . "";
+        $sql .= ", " . ((int) $conf->entity);
+        $sql .= ")";
+
+        $this->db->begin();
+
+        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "bank_categ");
+        }
+
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::create " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->id;
+        }
+    }
+
+    /**
+     * Load object in memory from database
+     *
+     * @param int $id Id object
+     *
+     * @return int <0 if KO, >0 if OK
+     */
+    public function fetch($id)
+    {
+        global $conf;
+
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
+        $sql .= " t.label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "bank_categ as t";
+        $sql .= " WHERE t.rowid = " . ((int) $id);
+        $sql .= " AND t.entity = " . $conf->entity;
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->label = $obj->label;
+            }
+            $this->db->free($resql);
+
+            return 1;
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     * Update database
+     *
+     * @param User $user      User that modify
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                    <0 if KO, >0 if OK
+     */
+    public function update(User $user = null, $notrigger = 0)
+    {
 		global $conf;
 		$error = 0;
 
@@ -208,95 +299,6 @@ class BankCateg // extends CommonObject
 		} else {
 			$this->db->rollback();
 			return -1;
-		}
-	}
-
-	/**
-	 * Load object in memory from database
-	 *
-	 * @param  int $id Id object
-	 * @return int <0 if KO, >0 if OK
-	 */
-	public function fetch($id)
-	{
-		global $conf;
-
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
-		$sql .= " t.label";
-		$sql .= " FROM ".MAIN_DB_PREFIX."bank_categ as t";
-		$sql .= " WHERE t.rowid = ".((int) $id);
-		$sql .= " AND t.entity = ".$conf->entity;
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->label = $obj->label;
-			}
-			$this->db->free($resql);
-
-			return 1;
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Create in database
-	 *
-	 * @param  User $user User that create
-	 * @param  int $notrigger 0=launch triggers after, 1=disable triggers
-	 * @return int <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = 0)
-	{
-		global $conf;
-
-		$error = 0;
-
-		// Clean parameters
-		if (isset($this->label)) {
-			$this->label = trim($this->label);
-		}
-
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."bank_categ (";
-		$sql .= "label";
-		$sql .= ", entity";
-		$sql .= ") VALUES (";
-		$sql .= " ".(!isset($this->label) ? 'NULL' : "'".$this->db->escape($this->label)."'")."";
-		$sql .= ", ".((int) $conf->entity);
-		$sql .= ")";
-
-		$this->db->begin();
-
-		dol_syslog(get_class($this)."::create", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."bank_categ");
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->id;
 		}
 	}
 

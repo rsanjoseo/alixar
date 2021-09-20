@@ -125,25 +125,37 @@ class vCard
 	 *	mise en forme de la photo
 	 *  warning NON TESTE !
 	 *
-	 *  @param  string  $type			Type
-	 *  @param  string  $photo			Photo
-	 *  @return	void
-	 */
-	public function setPhoto($type, $photo)
-	{
-		// $type = "GIF" | "JPEG"
-		$this->properties["PHOTO;TYPE=$type;ENCODING=BASE64"] = base64_encode($photo);
-	}
+     * @param string $type  Type
+     * @param string $photo Photo
+     * @return    void
+     */
+    public function setPhoto($type, $photo)
+    {
+        // $type = "GIF" | "JPEG"
+        $this->properties["PHOTO;TYPE=$type;ENCODING=BASE64"] = base64_encode($photo);
+    }
 
-	/**
-	 *	mise en forme du nom complet
-	 *
-	 *	@param	string	$family			Family name
-	 *	@param	string	$first			First name
-	 *	@param	string	$additional		Additional (e.g. second name, nick name)
-	 *	@param	string	$prefix			Prefix (e.g. "Mr.", "Ms.", "Prof.")
-	 *	@param	string	$suffix			Suffix (e.g. "sen." for senior, "jun." for junior)
-	 *	@return	void
+    /**
+     *    mise en forme du nom formate
+     *
+     * @param string $name Name
+     *
+     * @return    void
+     */
+    public function setFormattedName($name)
+    {
+        $this->properties["FN;CHARSET=" . $this->encoding] = encode($name);
+    }
+
+    /**
+     *    mise en forme du nom complet
+     *
+     * @param string $family     Family name
+     * @param string $first      First name
+     * @param string $additional Additional (e.g. second name, nick name)
+     * @param string $prefix     Prefix (e.g. "Mr.", "Ms.", "Prof.")
+     * @param string $suffix     Suffix (e.g. "sen." for senior, "jun." for junior)
+     * @return    void
 	 */
 	public function setName($family = "", $first = "", $additional = "", $prefix = "", $suffix = "")
 	{
@@ -152,17 +164,6 @@ class vCard
 		if (empty($this->properties["FN"])) {
 			$this->setFormattedName(trim("$prefix $first $additional $family $suffix"));
 		}
-	}
-
-	/**
-	 *	mise en forme du nom formate
-	 *
-	 *	@param	string	$name			Name
-	 *	@return	void
-	 */
-	public function setFormattedName($name)
-	{
-		$this->properties["FN;CHARSET=".$this->encoding] = encode($name);
 	}
 
 	/**

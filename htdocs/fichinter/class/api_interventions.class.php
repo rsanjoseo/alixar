@@ -92,24 +92,6 @@ class Interventions extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->statuts_short);
-		unset($object->statuts_logo);
-		unset($object->statuts);
-
-		return $object;
-	}
-
-	/**
 	 * List of interventions
 	 *
 	 * Return a list of interventions
@@ -200,26 +182,51 @@ class Interventions extends DolibarrApi
 					$obj_ret[] = $this->_cleanObjectDatas($fichinter_static);
 				}
 				$i++;
-			}
-		} else {
-			throw new RestException(503, 'Error when retrieve intervention list : '.$this->db->lasterror());
-		}
-		if (!count($obj_ret)) {
-			throw new RestException(404, 'No intervention found');
-		}
-		return $obj_ret;
-	}
+            }
+        } else {
+            throw new RestException(503, 'Error when retrieve intervention list : ' . $this->db->lasterror());
+        }
+        if (!count($obj_ret)) {
+            throw new RestException(404, 'No intervention found');
+        }
+        return $obj_ret;
+    }
+
+    /**
+     * Create intervention object
+     *
+     * @param array $request_data Request data
+     *
+     * @return  int     ID of intervention
+     */
+    public function post($request_data = null)
+    {
+        if (!DolibarrApiAccess::$user->rights->ficheinter->creer) {
+            throw new RestException(401, "Insuffisant rights");
+        }
+        // Check mandatory fields
+        $result = $this->_validate($request_data);
+        foreach ($request_data as $field => $value) {
+            $this->fichinter->$field = $value;
+        }
+
+        if ($this->fichinter->create(DolibarrApiAccess::$user) < 0) {
+            throw new RestException(500, "Error creating intervention", array_merge([$this->fichinter->error], $this->fichinter->errors));
+        }
+
+        return $this->fichinter->id;
+    }
 
 
-	/**
-	 * Get lines of an intervention
-	 *
-	 * @param int   $id             Id of intervention
-	 *
-	 * @url	GET {id}/lines
-	 *
-	 * @return int
-	 */
+    /**
+     * Get lines of an intervention
+     *
+     * @param int $id Id of intervention
+     *
+     * @url    GET {id}/lines
+     *
+     * @return int
+     */
 	/* TODO
 	public function getLines($id)
 	{
@@ -243,50 +250,6 @@ class Interventions extends DolibarrApi
 		return $result;
 	}
 	*/
-
-	/**
-	 * Create intervention object
-	 *
-	 * @param   array   $request_data   Request data
-	 * @return  int     ID of intervention
-	 */
-	public function post($request_data = null)
-	{
-		if (!DolibarrApiAccess::$user->rights->ficheinter->creer) {
-			throw new RestException(401, "Insuffisant rights");
-		}
-		// Check mandatory fields
-		$result = $this->_validate($request_data);
-		foreach ($request_data as $field => $value) {
-			$this->fichinter->$field = $value;
-		}
-
-		if ($this->fichinter->create(DolibarrApiAccess::$user) < 0) {
-			throw new RestException(500, "Error creating intervention", array_merge(array($this->fichinter->error), $this->fichinter->errors));
-		}
-
-		return $this->fichinter->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$fichinter = array();
-		foreach (Interventions::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$fichinter[$field] = $data[$field];
-		}
-		return $fichinter;
-	}
 
 	/**
 	 * Add a line to given intervention
@@ -334,26 +297,6 @@ class Interventions extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validateLine($data)
-	{
-		$fichinter = array();
-		foreach (Interventions::$FIELDSLINE as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$fichinter[$field] = $data[$field];
-		}
-		return $fichinter;
-	}
-
-	/**
 	 * Delete order
 	 *
 	 * @param   int     $id         Order ID
@@ -384,9 +327,6 @@ class Interventions extends DolibarrApi
 			)
 		);
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 * Validate an intervention
@@ -456,14 +396,78 @@ class Interventions extends DolibarrApi
 		$result = $this->fichinter->setStatut(3);
 
 		if ($result == 0) {
-			throw new RestException(304, 'Error nothing done. May be object is already closed');
-		}
-		if ($result < 0) {
-			throw new RestException(500, 'Error when closing Intervention: '.$this->fichinter->error);
-		}
+            throw new RestException(304, 'Error nothing done. May be object is already closed');
+        }
+        if ($result < 0) {
+            throw new RestException(500, 'Error when closing Intervention: ' . $this->fichinter->error);
+        }
 
-		$this->fichinter->fetchObjectLinked();
+        $this->fichinter->fetchObjectLinked();
 
-		return $this->_cleanObjectDatas($this->fichinter);
-	}
+        return $this->_cleanObjectDatas($this->fichinter);
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $fichinter = [];
+        foreach (Interventions::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $fichinter[$field] = $data[$field];
+        }
+        return $fichinter;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->statuts_short);
+        unset($object->statuts_logo);
+        unset($object->statuts);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validateLine($data)
+    {
+        $fichinter = [];
+        foreach (Interventions::$FIELDSLINE as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $fichinter[$field] = $data[$field];
+        }
+        return $fichinter;
+    }
 }

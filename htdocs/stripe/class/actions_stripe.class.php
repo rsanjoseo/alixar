@@ -36,22 +36,23 @@ $langs->load("stripe@stripe");
  */
 class ActionsStripeconnect
 {
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-	public $resprints;
+    /**
+     * @var DoliDB Database handler.
+     */
+    public $db;
 
-	// For Hookmanager return
-	public $results = array();
-	private $config = array();
+    private $config = [];
 
-	/**
-	 *	Constructor
-	 *
-	 *	@param	DoliDB	$db		Database handler
-	 */
-	public function __construct($db)
+    // For Hookmanager return
+    public $resprints;
+    public $results = [];
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
 	{
 		$this->db = $db;
 	}

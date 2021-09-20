@@ -56,26 +56,165 @@ class Ctyperesource
 
 	public $active;
 
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * Create object into database
+     *
+     * @param User $user      User that creates
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = false)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int    $limit     offset limit
-	 * @param int    $offset    offset limit
-	 * @param array  $filter    filter array
-	 * @param string $filtermode filter mode (AND or OR)
+        $error = 0;
+
+        // Clean parameters
+
+        if (isset($this->code)) {
+            $this->code = trim($this->code);
+        }
+        if (isset($this->label)) {
+            $this->label = trim($this->label);
+        }
+        if (isset($this->active)) {
+            $this->active = trim($this->active);
+        }
+
+        // Check parameters
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
+
+        $sql .= 'code,';
+        $sql .= 'label';
+        $sql .= 'active';
+
+        $sql .= ') VALUES (';
+
+        $sql .= ' ' . (!isset($this->code) ? 'NULL' : "'" . $this->db->escape($this->code) . "'") . ',';
+        $sql .= ' ' . (!isset($this->label) ? 'NULL' : "'" . $this->db->escape($this->label) . "'") . ',';
+        $sql .= ' ' . (!isset($this->active) ? 'NULL' : $this->active);
+
+        $sql .= ')';
+
+        $this->db->begin();
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
+
+            // Uncomment this and change MYOBJECT to your own tag if you
+            // want this action to call a trigger.
+            //if (!$notrigger) {
+
+            //  // Call triggers
+            //  $result=$this->call_trigger('MYOBJECT_CREATE',$user);
+            //  if ($result < 0) $error++;
+            //  // End call triggers
+            //}
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+
+            return $this->id;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int    $id    Id object
+     * @param string $code  code
+     * @param string $label Label
+     *
+     * @return int <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id, $code = '', $label = '')
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $sql = 'SELECT';
+        $sql .= ' t.rowid,';
+        $sql .= " t.code,";
+        $sql .= " t.label,";
+        $sql .= " t.active";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        if ($id) {
+            $sql .= " WHERE t.id = " . ((int) $id);
+        } elseif ($code) {
+            $sql .= " WHERE t.code = '" . $this->db->escape($code) . "'";
+        } elseif ($label) {
+            $sql .= " WHERE t.label = '" . $this->db->escape($label) . "'";
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $numrows = $this->db->num_rows($resql);
+            if ($numrows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+
+                $this->code = $obj->code;
+                $this->label = $obj->label;
+                $this->active = $obj->active;
+            }
+
+            // Retrieve all extrafields for invoice
+            // fetch optionals attributes and labels
+            // $this->fetch_optionals();
+
+            // $this->fetch_lines();
+
+            $this->db->free($resql);
+
+            if ($numrows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return -1;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param string $sortorder  Sort Order
+     * @param string $sortfield  Sort field
+     * @param int    $limit      offset limit
+     * @param int    $offset     offset limit
+     * @param array  $filter     filter array
+     * @param string $filtermode filter mode (AND or OR)
 	 *
 	 * @return int <0 if KO, >0 if OK
 	 */
@@ -300,151 +439,6 @@ class Ctyperesource
 			$this->db->rollback();
 
 			return -1;
-		}
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id  Id object
-	 * @param string $code code
-	 * @param string $label Label
-	 *
-	 * @return int <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $code = '', $label = '')
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql = 'SELECT';
-		$sql .= ' t.rowid,';
-		$sql .= " t.code,";
-		$sql .= " t.label,";
-		$sql .= " t.active";
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if ($id) {
-			$sql .= " WHERE t.id = ".((int) $id);
-		} elseif ($code) {
-			$sql .= " WHERE t.code = '".$this->db->escape($code)."'";
-		} elseif ($label) {
-			$sql .= " WHERE t.label = '".$this->db->escape($label)."'";
-		}
-
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numrows = $this->db->num_rows($resql);
-			if ($numrows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-
-				$this->code = $obj->code;
-				$this->label = $obj->label;
-				$this->active = $obj->active;
-			}
-
-			// Retrieve all extrafields for invoice
-			// fetch optionals attributes and labels
-			// $this->fetch_optionals();
-
-			// $this->fetch_lines();
-
-			$this->db->free($resql);
-
-			if ($numrows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$error = 0;
-
-		// Clean parameters
-
-		if (isset($this->code)) {
-			 $this->code = trim($this->code);
-		}
-		if (isset($this->label)) {
-			 $this->label = trim($this->label);
-		}
-		if (isset($this->active)) {
-			 $this->active = trim($this->active);
-		}
-
-
-
-		// Check parameters
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element.'(';
-
-		$sql .= 'code,';
-		$sql .= 'label';
-		$sql .= 'active';
-
-
-		$sql .= ') VALUES (';
-
-		$sql .= ' '.(!isset($this->code) ? 'NULL' : "'".$this->db->escape($this->code)."'").',';
-		$sql .= ' '.(!isset($this->label) ? 'NULL' : "'".$this->db->escape($this->label)."'").',';
-		$sql .= ' '.(!isset($this->active) ? 'NULL' : $this->active);
-
-
-		$sql .= ')';
-
-		$this->db->begin();
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
-
-			// Uncomment this and change MYOBJECT to your own tag if you
-			// want this action to call a trigger.
-			//if (!$notrigger) {
-
-			//  // Call triggers
-			//  $result=$this->call_trigger('MYOBJECT_CREATE',$user);
-			//  if ($result < 0) $error++;
-			//  // End call triggers
-			//}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-
-			return $this->id;
 		}
 	}
 

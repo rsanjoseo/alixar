@@ -32,17 +32,19 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
  */
 class FormAccounting extends Form
 {
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
-	private $options_cache = array();
+    private $options_cache = [];
 
-	/**
+    /**
+     * @var DoliDB Database handler.
+     */
+    public $db;
+
+    /**
+     * @var string Error code (or message)
+     */
+    public $error = '';
+
+    /**
 	 * Constructor
 	 *
 	 * @param		DoliDB		$db      Database handler

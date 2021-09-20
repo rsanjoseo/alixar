@@ -49,22 +49,6 @@ class Fournisseur extends Societe
 		$this->fournisseur = 1;
 	}
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param  DoliDB  $db             Database handler
-	 * @param  int     $origin_id      Old third-party id
-	 * @param  int     $dest_id        New third-party id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'facture_fourn'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
 
 	/**
 	 * Return nb of orders
@@ -90,8 +74,6 @@ class Fournisseur extends Societe
 		return $num;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Returns number of ref prices (not number of products).
 	 *
@@ -116,7 +98,6 @@ class Fournisseur extends Societe
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Load statistics indicators
 	 *
@@ -155,7 +136,6 @@ class Fournisseur extends Societe
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Create a supplier category
 	 *
@@ -182,6 +162,7 @@ class Fournisseur extends Societe
 		}
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * 	Return the suppliers list
 	 *
@@ -208,14 +189,32 @@ class Fournisseur extends Societe
 
 		$resql = $this->db->query($sql);
 
-		if ($resql) {
-			while ($obj = $this->db->fetch_object($resql)) {
-				$arr[$obj->rowid] = $obj->name;
-			}
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->lasterror();
-		}
-		return $arr;
-	}
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $arr[$obj->rowid] = $obj->name;
+            }
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->lasterror();
+        }
+        return $arr;
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old third-party id
+     * @param int    $dest_id   New third-party id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'facture_fourn',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }

@@ -50,44 +50,86 @@ class Tickets extends DolibarrApi
 	 */
 	public $ticket;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db;
-		$this->db = $db;
-		$this->ticket = new Ticket($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db;
+        $this->db = $db;
+        $this->ticket = new Ticket($this->db);
+    }
 
-	/**
-	 * Get properties of a Ticket object from track id
-	 *
-	 * Return an array with ticket informations
-	 *
-	 * @param	string  		$track_id 	Tracking ID of ticket
-	 * @return 	array|mixed 				Data without useless information
-	 *
-	 * @url GET track_id/{track_id}
-	 *
-	 * @throws RestException 	401
-	 * @throws RestException 	403
-	 * @throws RestException 	404
-	 */
-	public function getByTrackId($track_id)
-	{
-		return $this->getCommon(0, $track_id, '');
-	}
+    /**
+     * Get properties of a Ticket object.
+     *
+     * Return an array with ticket informations
+     *
+     * @param int $id ID of ticket
+     *
+     * @return    array|mixed                Data without useless information
+     *
+     * @throws RestException 401
+     * @throws RestException 403
+     * @throws RestException 404
+     */
+    public function get($id)
+    {
+        return $this->getCommon($id, '', '');
+    }
 
-	/**
-	 * Get properties of a Ticket object
-	 * Return an array with ticket informations
-	 *
-	 * @param	int 			$id 		ID of ticket
-	 * @param	string  		$track_id 	Tracking ID of ticket
-	 * @param	string  		$ref    	Reference for ticket
-	 * @return 	array|mixed 				Data without useless information
-	 */
+    /**
+     * Get properties of a Ticket object from track id
+     *
+     * Return an array with ticket informations
+     *
+     * @param string $track_id Tracking ID of ticket
+     * @return    array|mixed                Data without useless information
+     *
+     * @url GET track_id/{track_id}
+     *
+     * @throws RestException    401
+     * @throws RestException    403
+     * @throws RestException    404
+     */
+    public function getByTrackId($track_id)
+    {
+        return $this->getCommon(0, $track_id, '');
+    }
+
+    /**
+     * Get properties of a Ticket object from ref
+     *
+     * Return an array with ticket informations
+     *
+     * @param string $ref Reference for ticket
+     *
+     * @return    array|mixed                Data without useless information
+     *
+     * @url GET ref/{ref}
+     *
+     * @throws RestException 401
+     * @throws RestException 403
+     * @throws RestException 404
+     */
+    public function getByRef($ref)
+    {
+        try {
+            return $this->getCommon(0, '', $ref);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Get properties of a Ticket object
+     * Return an array with ticket informations
+     *
+     * @param int    $id       ID of ticket
+     * @param string $track_id Tracking ID of ticket
+     * @param string $ref      Reference for ticket
+     * @return    array|mixed                Data without useless information
+     */
 	private function getCommon($id = 0, $track_id = '', $ref = '')
 	{
 		if (!DolibarrApiAccess::$user->rights->ticket->read) {
@@ -171,113 +213,6 @@ class Tickets extends DolibarrApi
 			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
 		}
 		return $this->_cleanObjectDatas($this->ticket);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 *
-	 * @todo use an array for properties to clean
-	 *
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		// Other attributes to clean
-		$attr2clean = array(
-			"contact",
-			"contact_id",
-			"ref_previous",
-			"ref_next",
-			"ref_ext",
-			"table_element_line",
-			"statut",
-			"country",
-			"country_id",
-			"country_code",
-			"barcode_type",
-			"barcode_type_code",
-			"barcode_type_label",
-			"barcode_type_coder",
-			"mode_reglement_id",
-			"cond_reglement_id",
-			"cond_reglement",
-			"fk_delivery_address",
-			"shipping_method_id",
-			"modelpdf",
-			"fk_account",
-			"note_public",
-			"note_private",
-			"note",
-			"total_ht",
-			"total_tva",
-			"total_localtax1",
-			"total_localtax2",
-			"total_ttc",
-			"fk_incoterms",
-			"label_incoterms",
-			"location_incoterms",
-			"name",
-			"lastname",
-			"firstname",
-			"civility_id",
-			"canvas",
-			"cache_msgs_ticket",
-			"cache_logs_ticket",
-			"cache_types_tickets",
-			"cache_category_tickets",
-			"regeximgext",
-			"statuts_short",
-			"statuts"
-		);
-		foreach ($attr2clean as $toclean) {
-			unset($object->$toclean);
-		}
-
-		// If object has lines, remove $db property
-		if (isset($object->lines) && count($object->lines) > 0) {
-			$nboflines = count($object->lines);
-			for ($i = 0; $i < $nboflines; $i++) {
-				$this->_cleanObjectDatas($object->lines[$i]);
-			}
-		}
-
-		// If object has linked objects, remove $db property
-		if (isset($object->linkedObjects) && count($object->linkedObjects) > 0) {
-			foreach ($object->linkedObjects as $type_object => $linked_object) {
-				foreach ($linked_object as $object2clean) {
-					$this->_cleanObjectDatas($object2clean);
-				}
-			}
-		}
-		return $object;
-	}
-
-	/**
-	 * Get properties of a Ticket object from ref
-	 *
-	 * Return an array with ticket informations
-	 *
-	 * @param	string  		$ref    	Reference for ticket
-	 * @return 	array|mixed 				Data without useless information
-	 *
-	 * @url GET ref/{ref}
-	 *
-	 * @throws RestException 401
-	 * @throws RestException 403
-	 * @throws RestException 404
-	 */
-	public function getByRef($ref)
-	{
-		try {
-			return $this->getCommon(0, '', $ref);
-		} catch (Exception $e) {
-			   throw $e;
-		}
 	}
 
 	/**
@@ -418,26 +353,6 @@ class Tickets extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$ticket = array();
-		foreach (Tickets::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$ticket[$field] = $data[$field];
-		}
-		return $ticket;
-	}
-
-	/**
 	 * Create ticket object
 	 *
 	 * @param array $request_data   Request datas
@@ -466,26 +381,6 @@ class Tickets extends DolibarrApi
 			throw new RestException(500);
 		}
 		return $this->ticket->id;
-	}
-
-	/**
-	 * Validate fields before create or update object message
-	 *
-	 * @param array $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validateMessage($data)
-	{
-		$ticket = array();
-		foreach (Tickets::$FIELDS_MESSAGES as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$ticket[$field] = $data[$field];
-		}
-		return $ticket;
 	}
 
 	/**
@@ -523,25 +418,6 @@ class Tickets extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a Ticket object.
-	 *
-	 * Return an array with ticket informations
-	 *
-	 * @param	int 			$id 		ID of ticket
-	 * @return 	array|mixed 				Data without useless information
-	 *
-	 * @throws RestException 401
-	 * @throws RestException 403
-	 * @throws RestException 404
-	 */
-	public function get($id)
-	{
-		return $this->getCommon($id, '', '');
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete ticket
 	 *
 	 * @param   int     $id   Ticket ID
@@ -563,14 +439,143 @@ class Tickets extends DolibarrApi
 		}
 
 		if (!$this->ticket->delete($id)) {
-			throw new RestException(500);
-		}
+            throw new RestException(500);
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Ticket deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Ticket deleted',
+            ],
+        ];
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $ticket = [];
+        foreach (Tickets::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $ticket[$field] = $data[$field];
+        }
+        return $ticket;
+    }
+
+    /**
+     * Validate fields before create or update object message
+     *
+     * @param array $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validateMessage($data)
+    {
+        $ticket = [];
+        foreach (Tickets::$FIELDS_MESSAGES as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $ticket[$field] = $data[$field];
+        }
+        return $ticket;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     *
+     * @todo use an array for properties to clean
+     *
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        // Other attributes to clean
+        $attr2clean = [
+            "contact",
+            "contact_id",
+            "ref_previous",
+            "ref_next",
+            "ref_ext",
+            "table_element_line",
+            "statut",
+            "country",
+            "country_id",
+            "country_code",
+            "barcode_type",
+            "barcode_type_code",
+            "barcode_type_label",
+            "barcode_type_coder",
+            "mode_reglement_id",
+            "cond_reglement_id",
+            "cond_reglement",
+            "fk_delivery_address",
+            "shipping_method_id",
+            "modelpdf",
+            "fk_account",
+            "note_public",
+            "note_private",
+            "note",
+            "total_ht",
+            "total_tva",
+            "total_localtax1",
+            "total_localtax2",
+            "total_ttc",
+            "fk_incoterms",
+            "label_incoterms",
+            "location_incoterms",
+            "name",
+            "lastname",
+            "firstname",
+            "civility_id",
+            "canvas",
+            "cache_msgs_ticket",
+            "cache_logs_ticket",
+            "cache_types_tickets",
+            "cache_category_tickets",
+            "regeximgext",
+            "statuts_short",
+            "statuts",
+        ];
+        foreach ($attr2clean as $toclean) {
+            unset($object->$toclean);
+        }
+
+        // If object has lines, remove $db property
+        if (isset($object->lines) && count($object->lines) > 0) {
+            $nboflines = count($object->lines);
+            for ($i = 0; $i < $nboflines; $i++) {
+                $this->_cleanObjectDatas($object->lines[$i]);
+            }
+        }
+
+        // If object has linked objects, remove $db property
+        if (isset($object->linkedObjects) && count($object->linkedObjects) > 0) {
+            foreach ($object->linkedObjects as $type_object => $linked_object) {
+                foreach ($linked_object as $object2clean) {
+                    $this->_cleanObjectDatas($object2clean);
+                }
+            }
+        }
+        return $object;
+    }
 }

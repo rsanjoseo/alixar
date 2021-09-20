@@ -145,19 +145,6 @@ class mod_facture_mars extends ModeleNumRefFactures
 	}
 
 	/**
-	 *  Return next free value
-	 *
-	 *  @param  Societe     $objsoc         Object third party
-	 *  @param  string      $objforref      Object for number to search
-	 *  @param  string      $mode           'next' for next value or 'last' for last value
-	 *  @return string                      Next free value
-	 */
-	public function getNumRef($objsoc, $objforref, $mode = 'next')
-	{
-		return $this->getNextValue($objsoc, $objforref, $mode);
-	}
-
-	/**
 	 * Return next value not used or last value used
 	 *
 	 * @param	Societe		$objsoc		Object third party
@@ -230,14 +217,28 @@ class mod_facture_mars extends ModeleNumRefFactures
 
 			if ($max >= (pow(10, 4) - 1)) {
 				$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-			} else {
-				$num = sprintf("%04s", $max + 1);
-			}
+            } else {
+                $num = sprintf("%04s", $max + 1);
+            }
 
-			dol_syslog(get_class($this)."::getNextValue return ".$prefix.$yymm."-".$num);
-			return $prefix.$yymm."-".$num;
-		} else {
-			dol_print_error('', 'Bad parameter for getNextValue');
-		}
-	}
+            dol_syslog(get_class($this) . "::getNextValue return " . $prefix . $yymm . "-" . $num);
+            return $prefix . $yymm . "-" . $num;
+        } else {
+            dol_print_error('', 'Bad parameter for getNextValue');
+        }
+    }
+
+    /**
+     *  Return next free value
+     *
+     * @param Societe $objsoc    Object third party
+     * @param string  $objforref Object for number to search
+     * @param string  $mode      'next' for next value or 'last' for last value
+     *
+     * @return string                      Next free value
+     */
+    public function getNumRef($objsoc, $objforref, $mode = 'next')
+    {
+        return $this->getNextValue($objsoc, $objforref, $mode);
+    }
 }

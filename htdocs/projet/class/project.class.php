@@ -35,140 +35,174 @@ class Project extends CommonObject
 {
 
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Open/Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Closed status
-	 */
-	const STATUS_CLOSED = 2;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'project';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'projet';
+
 	/**
 	 * @var string    Name of subtable line
 	 */
 	public $table_element_line = 'projet_task';
+
 	/**
 	 * @var string    Name of field date
 	 */
 	public $table_element_date;
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_projet';
-	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1;
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'project';
-	/**
-	 * @var string description
-	 */
-	public $description;
-	/**
-	 * @var string
-	 */
-	public $title;
-	public $date_start;
-	public $date_end; // To store id of thirdparty
-		public $date_close; // To store name of thirdparty (defined only in some cases)
-public $socid; //!< Id of project creator. Not defined if shared project.
-public $thirdparty_name;
-public $user_author_id;
-		/**
-	 * @var int user close id
-	 */
-	public $fk_user_close; //!< Tell if this is a public or private project
-	/**
-	 * @var int user close id
-	 */
-	public $user_close_id;
-public $public;
-	/**
-	 * @var float budget Amount
-	 */
-	public $budget_amount;
-	/**
-	 * @var integer		Can use projects to follow opportunities
-	 */
-	public $usage_opportunity; // Is the time spent on project must be invoiced or not
-	/**
-	 * @var integer		Can follow tasks on project and enter time spent on it
-	 */
-	public $usage_task;
-/**
-	 * @var integer	 	Use to bill task spend time
-	 */
-	public $usage_bill_time;
-	/**
-	   * @var integer		Event organization: Use Event Organization
-	   */
-	public $usage_organize_event;
-	/**
-	 * @var integer		Event organization: Allow unknown people to suggest new conferences
-	 */
-	public $accept_conference_suggestions;
+
+    /**
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     *
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'project';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    /**
+     * @var string description
+     */
+    public $description;
+
+    /**
+     * @var string
+     */
+    public $title;
+
+    public $date_start;
+    public $date_end;
+    public $date_close;
+
+    public $socid; // To store id of thirdparty
+    public $thirdparty_name; // To store name of thirdparty (defined only in some cases)
+
+    public $user_author_id; //!< Id of project creator. Not defined if shared project.
+
+    /**
+     * @var int user close id
+     */
+    public $fk_user_close;
+
+    /**
+     * @var int user close id
+     */
+    public $user_close_id;
+    public $public; //!< Tell if this is a public or private project
+
+    /**
+     * @var float budget Amount
+     */
+    public $budget_amount;
+
+    /**
+     * @var integer        Can use projects to follow opportunities
+     */
+    public $usage_opportunity;
+
+    /**
+     * @var integer        Can follow tasks on project and enter time spent on it
+     */
+    public $usage_task;
+
+    /**
+     * @var integer        Use to bill task spend time
+     */
+    public $usage_bill_time; // Is the time spent on project must be invoiced or not
+
+    /**
+     * @var integer        Event organization: Use Event Organization
+     */
+    public $usage_organize_event;
+
+    /**
+     * @var integer        Event organization: Allow unknown people to suggest new conferences
+     */
+    public $accept_conference_suggestions;
+
 	/**
 	 * @var integer		Event organization: Allow unknown people to suggest new booth
 	 */
 	public $accept_booth_suggestions;
-	/**
-	 * @var float Event organization: registration price
-	 */
-	public $price_registration;
-	/**
-	 * @var float Event organization: booth price
-	 */
-	public $price_booth;
-	public $statuts_short; // 0=draft, 1=opened, 2=closed
-		public $statuts_long; // opportunity status, into table llx_c_lead_status
-	public $statut; // opportunity probability
-public $opp_status;
-public $opp_percent;
-	public $email_msgid; // Used to store workload details of a projet
-		public $oldcopy; // Used to store workload details of tasks of a projet
-public $weekWorkLoad;
-public $weekWorkLoadPerTask;
-	/**
-	 * @var int Creation date
-	 * @deprecated
-	 * @see $date_c
-	 */
-	public $datec;
-	/**
-	 * @var int Creation date
-	 */
-	public $date_c;
-	/**
-	 * @var int Modification date
-	 * @deprecated
-	 * @see $date_m
-	 */
-	public $datem;
 
-	/**
-	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'noteditable' says if field is not editable (1 or 0)
+    /**
+     * @var float Event organization: registration price
+     */
+    public $price_registration;
+
+    /**
+     * @var float Event organization: booth price
+     */
+    public $price_booth;
+
+    public $statuts_short;
+    public $statuts_long;
+
+    public $statut; // 0=draft, 1=opened, 2=closed
+    public $opp_status; // opportunity status, into table llx_c_lead_status
+    public $opp_percent; // opportunity probability
+
+    public $email_msgid;
+
+    public $oldcopy;
+
+    public $weekWorkLoad; // Used to store workload details of a projet
+    public $weekWorkLoadPerTask; // Used to store workload details of tasks of a projet
+
+    /**
+     * @var int Creation date
+     * @deprecated
+     * @see $date_c
+     */
+    public $datec;
+
+    /**
+     * @var int Creation date
+     */
+    public $date_c;
+
+    /**
+     * @var int Modification date
+     * @deprecated
+     * @see $date_m
+     */
+    public $datem;
+
+    /**
+     * @var int Modification date
+     */
+    public $date_m;
+
+    /**
+     * @var Task[]
+     */
+    public $lines;
+
+    /**
+     *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
 	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
@@ -186,61 +220,64 @@ public $weekWorkLoadPerTask;
 
 	// BEGIN MODULEBUILDER PROPERTIES
 	/**
-	 * @var int Modification date
-	 */
-	public $date_m;
-	// END MODULEBUILDER PROPERTIES
-	/**
-	 * @var Task[]
-	 */
-	public $lines;
-	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
-		'ref' =>array('type'=>'varchar(50)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'showoncombobox'=>1, 'position'=>15, 'searchall'=>1),
-		'title' =>array('type'=>'varchar(255)', 'label'=>'ProjectLabel', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>17, 'showoncombobox'=>2, 'searchall'=>1),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>3, 'notnull'=>1, 'position'=>19),
-		'fk_soc' =>array('type'=>'integer', 'label'=>'Thirdparty', 'enabled'=>1, 'visible'=>0, 'position'=>20),
-		'dateo' =>array('type'=>'date', 'label'=>'DateStart', 'enabled'=>1, 'visible'=>1, 'position'=>30),
-		'datee' =>array('type'=>'date', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>1, 'position'=>35),
-		'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>3, 'position'=>55, 'searchall'=>1),
-		'public' =>array('type'=>'integer', 'label'=>'Visibility', 'enabled'=>1, 'visible'=>1, 'position'=>65),
-		'fk_opp_status' =>array('type'=>'integer', 'label'=>'OpportunityStatusShort', 'enabled'=>1, 'visible'=>1, 'position'=>75),
-		'opp_percent' =>array('type'=>'double(5,2)', 'label'=>'OpportunityProbabilityShort', 'enabled'=>1, 'visible'=>1, 'position'=>80),
-		'note_private' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>85, 'searchall'=>1),
-		'note_public' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>90, 'searchall'=>1),
-		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'ModelPdf', 'enabled'=>1, 'visible'=>0, 'position'=>95),
-		'date_close' =>array('type'=>'datetime', 'label'=>'DateClosing', 'enabled'=>1, 'visible'=>0, 'position'=>105),
-		'fk_user_close' =>array('type'=>'integer', 'label'=>'UserClosing', 'enabled'=>1, 'visible'=>0, 'position'=>110),
-		'opp_amount' =>array('type'=>'double(24,8)', 'label'=>'OpportunityAmountShort', 'enabled'=>1, 'visible'=>1, 'position'=>115),
-		'budget_amount' =>array('type'=>'double(24,8)', 'label'=>'Budget', 'enabled'=>1, 'visible'=>1, 'position'=>119),
-		'usage_bill_time' =>array('type'=>'integer', 'label'=>'UsageBillTimeShort', 'enabled'=>1, 'visible'=>-1, 'position'=>130),
-		'usage_opportunity' =>array('type'=>'integer', 'label'=>'UsageOpportunity', 'enabled'=>1, 'visible'=>-1, 'position'=>135),
-		'usage_task' =>array('type'=>'integer', 'label'=>'UsageTasks', 'enabled'=>1, 'visible'=>-1, 'position'=>140),
-		'usage_organize_event' =>array('type'=>'integer', 'label'=>'UsageOrganizeEvent', 'enabled'=>1, 'visible'=>-1, 'position'=>145),
-		'accept_conference_suggestions' =>array('type'=>'integer', 'label'=>'AllowUnknownPeopleSuggestConf', 'enabled'=>1, 'visible'=>-1, 'position'=>146),
-		'accept_booth_suggestions' =>array('type'=>'integer', 'label'=>'AllowUnknownPeopleSuggestBooth', 'enabled'=>1, 'visible'=>-1, 'position'=>147),
-		'price_registration' =>array('type'=>'double(24,8)', 'label'=>'PriceOfRegistration', 'enabled'=>1, 'visible'=>-1, 'position'=>148),
-		'price_booth' =>array('type'=>'double(24,8)', 'label'=>'PriceOfBooth', 'enabled'=>1, 'visible'=>-1, 'position'=>149),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreationShort', 'enabled'=>1, 'visible'=>-2, 'position'=>200),
-		'tms' =>array('type'=>'timestamp', 'label'=>'DateModificationShort', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>205),
-		'fk_user_creat' =>array('type'=>'integer', 'label'=>'UserCreation', 'enabled'=>1, 'visible'=>0, 'notnull'=>1, 'position'=>210),
-		'fk_user_modif' =>array('type'=>'integer', 'label'=>'UserModification', 'enabled'=>1, 'visible'=>0, 'position'=>215),
-		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>0, 'position'=>220),
-		'email_msgid'=>array('type'=>'varchar(255)', 'label'=>'EmailMsgID', 'enabled'=>1, 'visible'=>-1, 'position'=>250, 'help'=>'EmailMsgIDWhenSourceisEmail'),
-		'fk_statut' =>array('type'=>'smallint(6)', 'label'=>'Status', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>500)
-	);
-	/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref';
+        'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
+        'ref' =>array('type'=>'varchar(50)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'showoncombobox'=>1, 'position'=>15, 'searchall'=>1),
+        'title' =>array('type'=>'varchar(255)', 'label'=>'ProjectLabel', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>17, 'showoncombobox'=>2, 'searchall'=>1),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>3, 'notnull'=>1, 'position'=>19),
+        'fk_soc' =>array('type'=>'integer', 'label'=>'Thirdparty', 'enabled'=>1, 'visible'=>0, 'position'=>20),
+        'dateo' =>array('type'=>'date', 'label'=>'DateStart', 'enabled'=>1, 'visible'=>1, 'position'=>30),
+        'datee' =>array('type'=>'date', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>1, 'position'=>35),
+        'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>3, 'position'=>55, 'searchall'=>1),
+        'public' =>array('type'=>'integer', 'label'=>'Visibility', 'enabled'=>1, 'visible'=>1, 'position'=>65),
+        'fk_opp_status' =>array('type'=>'integer', 'label'=>'OpportunityStatusShort', 'enabled'=>1, 'visible'=>1, 'position'=>75),
+        'opp_percent' =>array('type'=>'double(5,2)', 'label'=>'OpportunityProbabilityShort', 'enabled'=>1, 'visible'=>1, 'position'=>80),
+        'note_private' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>85, 'searchall'=>1),
+        'note_public' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>90, 'searchall'=>1),
+        'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'ModelPdf', 'enabled'=>1, 'visible'=>0, 'position'=>95),
+        'date_close' =>array('type'=>'datetime', 'label'=>'DateClosing', 'enabled'=>1, 'visible'=>0, 'position'=>105),
+        'fk_user_close' =>array('type'=>'integer', 'label'=>'UserClosing', 'enabled'=>1, 'visible'=>0, 'position'=>110),
+        'opp_amount' =>array('type'=>'double(24,8)', 'label'=>'OpportunityAmountShort', 'enabled'=>1, 'visible'=>1, 'position'=>115),
+        'budget_amount' =>array('type'=>'double(24,8)', 'label'=>'Budget', 'enabled'=>1, 'visible'=>1, 'position'=>119),
+        'usage_bill_time' =>array('type'=>'integer', 'label'=>'UsageBillTimeShort', 'enabled'=>1, 'visible'=>-1, 'position'=>130),
+        'usage_opportunity' =>array('type'=>'integer', 'label'=>'UsageOpportunity', 'enabled'=>1, 'visible'=>-1, 'position'=>135),
+        'usage_task' =>array('type'=>'integer', 'label'=>'UsageTasks', 'enabled'=>1, 'visible'=>-1, 'position'=>140),
+        'usage_organize_event' =>array('type'=>'integer', 'label'=>'UsageOrganizeEvent', 'enabled'=>1, 'visible'=>-1, 'position'=>145),
+        'accept_conference_suggestions' =>array('type'=>'integer', 'label'=>'AllowUnknownPeopleSuggestConf', 'enabled'=>1, 'visible'=>-1, 'position'=>146),
+        'accept_booth_suggestions' =>array('type'=>'integer', 'label'=>'AllowUnknownPeopleSuggestBooth', 'enabled'=>1, 'visible'=>-1, 'position'=>147),
+        'price_registration' => array('type' => 'double(24,8)', 'label' => 'PriceOfRegistration', 'enabled' => 1, 'visible' => -1, 'position' => 148),
+        'price_booth' => array('type' => 'double(24,8)', 'label' => 'PriceOfBooth', 'enabled' => 1, 'visible' => -1, 'position' => 149),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreationShort', 'enabled' => 1, 'visible' => -2, 'position' => 200),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModificationShort', 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'position' => 205),
+        'fk_user_creat' => array('type' => 'integer', 'label' => 'UserCreation', 'enabled' => 1, 'visible' => 0, 'notnull' => 1, 'position' => 210),
+        'fk_user_modif' => array('type' => 'integer', 'label' => 'UserModification', 'enabled' => 1, 'visible' => 0, 'position' => 215),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => 0, 'position' => 220),
+        'email_msgid' => array('type' => 'varchar(255)', 'label' => 'EmailMsgID', 'enabled' => 1, 'visible' => -1, 'position' => 250, 'help' => 'EmailMsgIDWhenSourceisEmail'),
+        'fk_statut' => array('type' => 'smallint(6)', 'label' => 'Status', 'enabled' => 1, 'visible' => 1, 'notnull' => 1, 'position' => 500),
+    );
+    // END MODULEBUILDER PROPERTIES
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB		$db      Database handler
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
+
+    /**
+     * Open/Validated status
+     */
+    const STATUS_VALIDATED = 1;
+
+    /**
+     * Closed status
+     */
+    const STATUS_CLOSED = 2;
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
 	 */
 	public function __construct($db)
 	{
@@ -276,23 +313,141 @@ public $weekWorkLoadPerTask;
 			$this->fields['price_registration']['enabled'] = 0;
 			$this->fields['price_booth']['enabled'] = 0;
 		}
-	}
+    }
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'projet'
-		);
+    /**
+     *    Create a project into database
+     *
+     * @param User $user      User making creation
+     * @param int  $notrigger Disable triggers
+     * @return   int                    <0 if KO, id of created project if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+        $error = 0;
+        $ret = 0;
+
+        $now = dol_now();
+
+        // Clean parameters
+        $this->note_private = dol_substr($this->note_private, 0, 65535);
+        $this->note_public = dol_substr($this->note_public, 0, 65535);
+
+        // Check parameters
+        if (!trim($this->ref)) {
+            $this->error = 'ErrorFieldsRequired';
+            dol_syslog(get_class($this) . "::create error -1 ref null", LOG_ERR);
+            return -1;
+        }
+        if (!empty($conf->global->PROJECT_THIRDPARTY_REQUIRED) && !($this->socid > 0)) {
+            $this->error = 'ErrorFieldsRequired';
+            dol_syslog(get_class($this) . "::create error -1 thirdparty not defined and option PROJECT_THIRDPARTY_REQUIRED is set", LOG_ERR);
+            return -1;
+        }
+
+        // Create project
+        $this->db->begin();
+
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "projet (";
+        $sql .= "ref";
+        $sql .= ", title";
+        $sql .= ", description";
+        $sql .= ", fk_soc";
+        $sql .= ", fk_user_creat";
+        $sql .= ", fk_statut";
+        $sql .= ", fk_opp_status";
+        $sql .= ", opp_percent";
+        $sql .= ", public";
+        $sql .= ", datec";
+        $sql .= ", dateo";
+        $sql .= ", datee";
+        $sql .= ", opp_amount";
+        $sql .= ", budget_amount";
+        $sql .= ", usage_opportunity";
+        $sql .= ", usage_task";
+        $sql .= ", usage_bill_time";
+        $sql .= ", usage_organize_event";
+        $sql .= ", accept_conference_suggestions";
+        $sql .= ", accept_booth_suggestions";
+        $sql .= ", price_registration";
+        $sql .= ", price_booth";
+        $sql .= ", email_msgid";
+        $sql .= ", note_private";
+        $sql .= ", note_public";
+        $sql .= ", entity";
+        $sql .= ") VALUES (";
+        $sql .= "'" . $this->db->escape($this->ref) . "'";
+        $sql .= ", '" . $this->db->escape($this->title) . "'";
+        $sql .= ", '" . $this->db->escape($this->description) . "'";
+        $sql .= ", " . ($this->socid > 0 ? $this->socid : "null");
+        $sql .= ", " . ((int) $user->id);
+        $sql .= ", " . (is_numeric($this->statut) ? ((int) $this->statut) : '0');
+        $sql .= ", " . ((is_numeric($this->opp_status) && $this->opp_status > 0) ? ((int) $this->opp_status) : 'NULL');
+        $sql .= ", " . (is_numeric($this->opp_percent) ? ((int) $this->opp_percent) : 'NULL');
+        $sql .= ", " . ($this->public ? 1 : 0);
+        $sql .= ", '" . $this->db->idate($now) . "'";
+        $sql .= ", " . ($this->date_start != '' ? "'" . $this->db->idate($this->date_start) . "'" : 'null');
+        $sql .= ", " . ($this->date_end != '' ? "'" . $this->db->idate($this->date_end) . "'" : 'null');
+        $sql .= ", " . (strcmp($this->opp_amount, '') ? price2num($this->opp_amount) : 'null');
+        $sql .= ", " . (strcmp($this->budget_amount, '') ? price2num($this->budget_amount) : 'null');
+        $sql .= ", " . ($this->usage_opportunity ? 1 : 0);
+        $sql .= ", " . ($this->usage_task ? 1 : 0);
+        $sql .= ", " . ($this->usage_bill_time ? 1 : 0);
+        $sql .= ", " . ($this->usage_organize_event ? 1 : 0);
+        $sql .= ", " . ($this->accept_conference_suggestions ? 1 : 0);
+        $sql .= ", " . ($this->accept_booth_suggestions ? 1 : 0);
+        $sql .= ", " . (strcmp($this->price_registration, '') ? price2num($this->price_registration) : 'null');
+        $sql .= ", " . (strcmp($this->price_booth, '') ? price2num($this->price_booth) : 'null');
+        $sql .= ", " . ($this->email_msgid ? "'" . $this->db->escape($this->email_msgid) . "'" : 'null');
+        $sql .= ", " . ($this->note_private ? "'" . $this->db->escape($this->note_private) . "'" : 'null');
+        $sql .= ", " . ($this->note_public ? "'" . $this->db->escape($this->note_public) . "'" : 'null');
+        $sql .= ", " . ((int) $conf->entity);
+        $sql .= ")";
+
+        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "projet");
+            $ret = $this->id;
+
+            if (!$notrigger) {
+                // Call trigger
+                $result = $this->call_trigger('PROJECT_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->errno = $this->db->lasterrno();
+            $error++;
+        }
+
+        // Update extrafield
+        if (!$error) {
+            $result = $this->insertExtraFields();
+            if ($result < 0) {
+                $error++;
+            }
+        }
+
+        if (!$error && !empty($conf->global->MAIN_DISABLEDRAFTSTATUS)) {
+            $res = $this->setValid($user);
+            if ($res < 0) {
+                $error++;
+            }
+        }
+
+        if (!$error) {
+            $this->db->commit();
+            return $ret;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
 	}
 
 	/**
@@ -406,27 +561,130 @@ public $weekWorkLoadPerTask;
 					$result = -4;
 				} else {
 					$result = -2;
-				}
-				dol_syslog(get_class($this)."::update error ".$result." ".$this->error, LOG_ERR);
-			}
-		} else {
-			dol_syslog(get_class($this)."::update ref null");
-			$result = -1;
-		}
+                }
+                dol_syslog(get_class($this) . "::update error " . $result . " " . $this->error, LOG_ERR);
+            }
+        } else {
+            dol_syslog(get_class($this) . "::update ref null");
+            $result = -1;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * 	Return list of elements for type, linked to a project
-	 *
-	 * 	@param		string		$type			'propal','order','invoice','order_supplier','invoice_supplier',...
-	 * 	@param		string		$tablename		name of table associated of the type
-	 * 	@param		string		$datefieldname	name of date field for filter
-	 *  @param		int			$dates			Start date
-	 *  @param		int			$datee			End date
-	 *	@param		string		$projectkey		Equivalent key  to fk_projet for actual type
-	 * 	@return		mixed						Array list of object ids linked to project, < 0 or string if error
+    /**
+     *    Get object from database
+     *
+     * @param int    $id          Id of object to load
+     * @param string $ref         Ref of project
+     * @param string $ref_ext     Ref ext of project
+     * @param string $email_msgid Email msgid
+     *
+     * @return     int                    >0 if OK, 0 if not found, <0 if KO
+     */
+    public function fetch($id, $ref = '', $ref_ext = '', $email_msgid = '')
+    {
+        global $conf;
+
+        if (empty($id) && empty($ref) && empty($ref_ext) && empty($email_msgid)) {
+            dol_syslog(get_class($this) . "::fetch Bad parameters", LOG_WARNING);
+            return -1;
+        }
+
+        $sql = "SELECT rowid, entity, ref, title, description, public, datec, opp_amount, budget_amount,";
+        $sql .= " tms, dateo, datee, date_close, fk_soc, fk_user_creat, fk_user_modif, fk_user_close, fk_statut as status, fk_opp_status, opp_percent,";
+        $sql .= " note_private, note_public, model_pdf, usage_opportunity, usage_task, usage_bill_time, usage_organize_event, email_msgid,";
+        $sql .= " accept_conference_suggestions, accept_booth_suggestions, price_registration, price_booth";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "projet";
+        if (!empty($id)) {
+            $sql .= " WHERE rowid = " . ((int) $id);
+        } else {
+            $sql .= " WHERE entity IN (" . getEntity('project') . ")";
+            if (!empty($ref)) {
+                $sql .= " AND ref = '" . $this->db->escape($ref) . "'";
+            } elseif (!empty($ref_ext)) {
+                $sql .= " AND ref_ext = '" . $this->db->escape($ref_ext) . "'";
+            } else {
+                $sql .= " AND email_msgid = '" . $this->db->escape($email_msgid) . "'";
+            }
+        }
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num_rows = $this->db->num_rows($resql);
+
+            if ($num_rows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->entity = $obj->entity;
+                $this->ref = $obj->ref;
+                $this->title = $obj->title;
+                $this->description = $obj->description;
+                $this->date_c = $this->db->jdate($obj->datec);
+                $this->datec = $this->db->jdate($obj->datec); // TODO deprecated
+                $this->date_m = $this->db->jdate($obj->tms);
+                $this->datem = $this->db->jdate($obj->tms); // TODO deprecated
+                $this->date_start = $this->db->jdate($obj->dateo);
+                $this->date_end = $this->db->jdate($obj->datee);
+                $this->date_close = $this->db->jdate($obj->date_close);
+                $this->note_private = $obj->note_private;
+                $this->note_public = $obj->note_public;
+                $this->socid = $obj->fk_soc;
+                $this->user_author_id = $obj->fk_user_creat;
+                $this->user_modification_id = $obj->fk_user_modif;
+                $this->user_close_id = $obj->fk_user_close;
+                $this->public = $obj->public;
+                $this->statut = $obj->status; // deprecated
+                $this->status = $obj->status;
+                $this->opp_status = $obj->fk_opp_status;
+                $this->opp_amount = $obj->opp_amount;
+                $this->opp_percent = $obj->opp_percent;
+                $this->budget_amount = $obj->budget_amount;
+                $this->model_pdf = $obj->model_pdf;
+                $this->modelpdf = $obj->model_pdf; // deprecated
+                $this->usage_opportunity = (int) $obj->usage_opportunity;
+                $this->usage_task = (int) $obj->usage_task;
+                $this->usage_bill_time = (int) $obj->usage_bill_time;
+                $this->usage_organize_event = (int) $obj->usage_organize_event;
+                $this->accept_conference_suggestions = (int) $obj->accept_conference_suggestions;
+                $this->accept_booth_suggestions = (int) $obj->accept_booth_suggestions;
+                $this->price_registration = $obj->price_registration;
+                $this->price_booth = $obj->price_booth;
+                $this->email_msgid = $obj->email_msgid;
+
+                $this->db->free($resql);
+
+                // Retrieve all extrafield
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+
+                return 1;
+            }
+
+            $this->db->free($resql);
+
+            return 0;
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->errors[] = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return list of elements for type, linked to a project
+     *
+     * @param string $type          'propal','order','invoice','order_supplier','invoice_supplier',...
+     * @param string $tablename     name of table associated of the type
+     * @param string $datefieldname name of date field for filter
+     * @param int    $dates         Start date
+     * @param int    $datee         End date
+     * @param string $projectkey    Equivalent key  to fk_projet for actual type
+     * @return        mixed                        Array list of object ids linked to project, < 0 or string if error
 	 */
 	public function get_element_list($type, $tablename, $datefieldname = '', $dates = '', $datee = '', $projectkey = 'fk_projet')
 	{
@@ -526,8 +784,6 @@ public $weekWorkLoadPerTask;
 			dol_print_error($this->db);
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Delete a project from database
@@ -677,52 +933,6 @@ public $weekWorkLoadPerTask;
 	}
 
 	/**
-	 * 	Create an array of tasks of current project
-	 *
-	 *  @param  User   $user       Object user we want project allowed to
-	 * 	@return int		           >0 if OK, <0 if KO
-	 */
-	public function getLinesArray($user)
-	{
-		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-		$taskstatic = new Task($this->db);
-
-		$this->lines = $taskstatic->getTasksArray(0, $user, $this->id, 0, 0);
-	}
-
-	/**
-	 * 		Delete tasks with no children first, then task with children recursively
-	 *
-	 *  	@param     	User		$user		User
-	 *		@return		int				<0 if KO, 1 if OK
-	 */
-	public function deleteTasks($user)
-	{
-		$countTasks = count($this->lines);
-		$deleted = false;
-		if ($countTasks) {
-			foreach ($this->lines as $task) {
-				if ($task->hasChildren() <= 0) {		// If there is no children (or error to detect them)
-					$deleted = true;
-					$ret = $task->delete($user);
-					if ($ret <= 0) {
-						$this->errors[] = $this->db->lasterror();
-						return -1;
-					}
-				}
-			}
-		}
-		$this->getLinesArray($user);
-		if ($deleted && count($this->lines) < $countTasks) {
-			if (count($this->lines)) {
-				$this->deleteTasks($this->lines);
-			}
-		}
-
-		return 1;
-	}
-
-	/**
 	 * Return the count of a type of linked elements of this project
 	 *
 	 * @param string	$type			The type of the linked elements (e.g. 'propal', 'order', 'invoice', 'order_supplier', 'invoice_supplier')
@@ -755,25 +965,117 @@ public $weekWorkLoadPerTask;
 		$result = $this->db->query($sql);
 
 		if (!$result) {
-			return 0;
-		}
+            return 0;
+        }
 
-		$obj = $this->db->fetch_object($result);
+        $obj = $this->db->fetch_object($result);
 
-		$this->db->free($result);
+        $this->db->free($result);
 
-		return $obj->nb;
-	}
+        return $obj->nb;
+    }
 
-	/**
-	 * 		Close a project
-	 *
-	 * 		@param		User	$user		User that close project
-	 * 		@return		int					<0 if KO, 0 if already closed, >0 if OK
-	 */
-	public function setClose($user)
-	{
-		global $langs, $conf;
+    /**
+     *        Delete tasks with no children first, then task with children recursively
+     *
+     * @param User $user User
+     *
+     * @return        int                <0 if KO, 1 if OK
+     */
+    public function deleteTasks($user)
+    {
+        $countTasks = count($this->lines);
+        $deleted = false;
+        if ($countTasks) {
+            foreach ($this->lines as $task) {
+                if ($task->hasChildren() <= 0) {        // If there is no children (or error to detect them)
+                    $deleted = true;
+                    $ret = $task->delete($user);
+                    if ($ret <= 0) {
+                        $this->errors[] = $this->db->lasterror();
+                        return -1;
+                    }
+                }
+            }
+        }
+        $this->getLinesArray($user);
+        if ($deleted && count($this->lines) < $countTasks) {
+            if (count($this->lines)) {
+                $this->deleteTasks($this->lines);
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     *        Validate a project
+     *
+     * @param User $user      User that validate
+     * @param int  $notrigger 1=Disable triggers
+     *
+     * @return        int                       <0 if KO, >0 if OK
+     */
+    public function setValid($user, $notrigger = 0)
+    {
+        global $langs, $conf;
+
+        $error = 0;
+
+        if ($this->statut != 1) {
+            // Check parameters
+            if (preg_match('/^' . preg_quote($langs->trans("CopyOf") . ' ') . '/', $this->title)) {
+                $this->error = $langs->trans("ErrorFieldFormat", $langs->transnoentities("Label")) . '. ' . $langs->trans('RemoveString', $langs->transnoentitiesnoconv("CopyOf"));
+                return -1;
+            }
+
+            $this->db->begin();
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "projet";
+            $sql .= " SET fk_statut = 1";
+            $sql .= " WHERE rowid = " . ((int) $this->id);
+            $sql .= " AND entity = " . ((int) $conf->entity);
+
+            dol_syslog(get_class($this) . "::setValid", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                // Call trigger
+                if (empty($notrigger)) {
+                    $result = $this->call_trigger('PROJECT_VALIDATE', $user);
+                    if ($result < 0) {
+                        $error++;
+                    }
+                    // End call triggers
+                }
+
+                if (!$error) {
+                    $this->statut = 1;
+                    $this->db->commit();
+                    return 1;
+                } else {
+                    $this->db->rollback();
+                    $this->error = join(',', $this->errors);
+                    dol_syslog(get_class($this) . "::setValid " . $this->error, LOG_ERR);
+                    return -1;
+                }
+            } else {
+                $this->db->rollback();
+                $this->error = $this->db->lasterror();
+                return -1;
+            }
+        }
+    }
+
+    /**
+     *        Close a project
+     *
+     * @param User $user User that close project
+     *
+     * @return        int                    <0 if KO, 0 if already closed, >0 if OK
+     */
+    public function setClose($user)
+    {
+        global $langs, $conf;
 
 		$now = dol_now();
 
@@ -809,27 +1111,68 @@ public $weekWorkLoadPerTask;
 					$this->db->rollback();
 					$this->error = join(',', $this->errors);
 					dol_syslog(get_class($this)."::setClose ".$this->error, LOG_ERR);
-					return -1;
-				}
-			} else {
-				$this->db->rollback();
-				$this->error = $this->db->lasterror();
-				return -1;
-			}
-		}
+                    return -1;
+                }
+            } else {
+                $this->db->rollback();
+                $this->error = $this->db->lasterror();
+                return -1;
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * 	Return clickable name (with picto eventually)
-	 *
-	 * 	@param	int		$withpicto		          0=No picto, 1=Include picto into link, 2=Only picto
-	 * 	@param	string	$option			          Variant where the link point to ('', 'nolink')
-	 * 	@param	int		$addlabel		          0=Default, 1=Add label into string, >1=Add first chars into string
-	 *  @param	string	$moreinpopup	          Text to add into popup
-	 *  @param	string	$sep			          Separator between ref and label if option addlabel is set
-	 *  @param	int   	$notooltip		          1=Disable tooltip
+    /**
+     *  Return status label of object
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     *
+     * @return string                Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut(isset($this->statut) ? $this->statut : $this->status, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoi status label for a status
+     *
+     * @param int $status id status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return string                Label
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        global $langs;
+
+        $statustrans = [
+            0 => 'status0',
+            1 => 'status4',
+            2 => 'status6',
+        ];
+
+        $statusClass = 'status0';
+        if (!empty($statustrans[$status])) {
+            $statusClass = $statustrans[$status];
+        }
+
+        return dolGetStatus($langs->trans($this->statuts_long[$status]), $langs->trans($this->statuts_short[$status]), '', $statusClass, $mode);
+    }
+
+    /**
+     *    Return clickable name (with picto eventually)
+     *
+     * @param int           $withpicto                0=No picto, 1=Include picto into link, 2=Only picto
+     * @param string        $option                   Variant where the link point to ('', 'nolink')
+     * @param int           $addlabel                 0=Default, 1=Add label into string, >1=Add first chars into string
+     * @param string        $moreinpopup              Text to add into popup
+     * @param string        $sep                      Separator between ref and label if option addlabel is set
+     * @param int           $notooltip                1=Disable tooltip
 	 *  @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *  @param	string	$morecss				  More css on a link
 	 * 	@return	string					          String with URL
@@ -942,44 +1285,6 @@ public $weekWorkLoadPerTask;
 	}
 
 	/**
-	 *  Return status label of object
-	 *
-	 *  @param  int			$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 * 	@return string      			Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut(isset($this->statut) ? $this->statut : $this->status, $mode);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	/**
-	 *  Renvoi status label for a status
-	 *
-	 *  @param	int		$status     id status
-	 *  @param  int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 * 	@return string				Label
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		global $langs;
-
-		$statustrans = array(
-			0 => 'status0',
-			1 => 'status4',
-			2 => 'status6',
-		);
-
-		$statusClass = 'status0';
-		if (!empty($statustrans[$status])) {
-			$statusClass = $statustrans[$status];
-		}
-
-		return dolGetStatus($langs->trans($this->statuts_long[$status]), $langs->trans($this->statuts_short[$status]), '', $statusClass, $mode);
-	}
-
-	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
 	 * 	id must be 0 if object instance is a specimen.
@@ -1075,26 +1380,120 @@ public $weekWorkLoadPerTask;
 				}
 			}
 			//if (empty($nblinks))	// If nobody has permission, we grant creator
-			//{
-			//	if ((!empty($this->user_author_id) && $this->user_author_id == $user->id))
-			//	{
-			//		$userAccess = 1;
-			//	}
-			//}
-		}
+            //{
+            //	if ((!empty($this->user_author_id) && $this->user_author_id == $user->id))
+            //	{
+            //		$userAccess = 1;
+            //	}
+            //}
+        }
 
-		return ($userAccess ? $userAccess : -1);
-	}
+        return ($userAccess ? $userAccess : -1);
+    }
 
-	/**
-	 * Load an object from its id and create a new one in database
-	 *
-	 *  @param	User	$user		          User making the clone
-	 *  @param	int		$fromid     	      Id of object to clone
-	 *  @param	bool	$clone_contact	      Clone contact of project
-	 *  @param	bool	$clone_task		      Clone task of project
-	 *  @param	bool	$clone_project_file	  Clone file of project
-	 *  @param	bool	$clone_task_file	  Clone file of task (if task are copied)
+    /**
+     * Return array of projects a user has permission on, is affected to, or all projects
+     *
+     * @param User   $user   User object
+     * @param int    $mode   0=All project I have permission on (assigned to me or public), 1=Projects assigned to me only, 2=Will return list of all projects with no test on contacts
+     * @param int    $list   0=Return array, 1=Return string list
+     * @param int    $socid  0=No filter on third party, id of third party
+     * @param string $filter additionnal filter on project (statut, ref, ...)
+     *
+     * @return    array or string            Array of projects id, or string with projects id separated with "," if list is 1
+     */
+    public function getProjectsAuthorizedForUser($user, $mode = 0, $list = 0, $socid = 0, $filter = '')
+    {
+        $projects = [];
+        $temp = [];
+
+        $sql = "SELECT " . (($mode == 0 || $mode == 1) ? "DISTINCT " : "") . "p.rowid, p.ref";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "projet as p";
+        if ($mode == 0) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "element_contact as ec ON ec.element_id = p.rowid";
+        } elseif ($mode == 1) {
+            $sql .= ", " . MAIN_DB_PREFIX . "element_contact as ec";
+        } elseif ($mode == 2) {
+            // No filter. Use this if user has permission to see all project
+        }
+        $sql .= " WHERE p.entity IN (" . getEntity('project') . ")";
+        // Internal users must see project he is contact to even if project linked to a third party he can't see.
+        //if ($socid || ! $user->rights->societe->client->voir)	$sql.= " AND (p.fk_soc IS NULL OR p.fk_soc = 0 OR p.fk_soc = ".((int) $socid).")";
+        if ($socid > 0) {
+            $sql .= " AND (p.fk_soc IS NULL OR p.fk_soc = 0 OR p.fk_soc = " . ((int) $socid) . ")";
+        }
+
+        // Get id of types of contacts for projects (This list never contains a lot of elements)
+        $listofprojectcontacttype = [];
+        $sql2 = "SELECT ctc.rowid, ctc.code FROM " . MAIN_DB_PREFIX . "c_type_contact as ctc";
+        $sql2 .= " WHERE ctc.element = '" . $this->db->escape($this->element) . "'";
+        $sql2 .= " AND ctc.source = 'internal'";
+        $resql = $this->db->query($sql2);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $listofprojectcontacttype[$obj->rowid] = $obj->code;
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+        if (count($listofprojectcontacttype) == 0) {
+            $listofprojectcontacttype[0] = '0'; // To avoid syntax error if not found
+        }
+
+        if ($mode == 0) {
+            $sql .= " AND ( p.public = 1";
+            $sql .= " OR ( ec.fk_c_type_contact IN (" . $this->db->sanitize(join(',', array_keys($listofprojectcontacttype))) . ")";
+            $sql .= " AND ec.fk_socpeople = " . ((int) $user->id) . ")";
+            $sql .= " )";
+        } elseif ($mode == 1) {
+            $sql .= " AND ec.element_id = p.rowid";
+            $sql .= " AND (";
+            $sql .= "  ( ec.fk_c_type_contact IN (" . $this->db->sanitize(join(',', array_keys($listofprojectcontacttype))) . ")";
+            $sql .= " AND ec.fk_socpeople = " . ((int) $user->id) . ")";
+            $sql .= " )";
+        } elseif ($mode == 2) {
+            // No filter. Use this if user has permission to see all project
+        }
+
+        $sql .= $filter;
+        //print $sql;
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $row = $this->db->fetch_row($resql);
+                $projects[$row[0]] = $row[1];
+                $temp[] = $row[0];
+                $i++;
+            }
+
+            $this->db->free($resql);
+
+            if ($list) {
+                if (empty($temp)) {
+                    return '0';
+                }
+                $result = implode(',', $temp);
+                return $result;
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+
+        return $projects;
+    }
+
+    /**
+     * Load an object from its id and create a new one in database
+     *
+     * @param User           $user                   User making the clone
+     * @param int            $fromid                 Id of object to clone
+     * @param bool           $clone_contact          Clone contact of project
+     * @param bool           $clone_task             Clone task of project
+     * @param bool           $clone_project_file     Clone file of project
+     * @param bool           $clone_task_file        Clone file of task (if task are copied)
 	 *  @param	bool	$clone_note		      Clone note of project
 	 *  @param	bool	$move_date		      Move task date on clone
 	 *  @param	integer	$notrigger		      No trigger flag
@@ -1313,300 +1712,6 @@ public $weekWorkLoadPerTask;
 		}
 	}
 
-	/**
-	 * 	Get object from database
-	 *
-	 * 	@param      int		$id       		Id of object to load
-	 * 	@param		string	$ref			Ref of project
-	 * 	@param		string	$ref_ext		Ref ext of project
-	 *  @param		string	$email_msgid	Email msgid
-	 * 	@return     int      		   		>0 if OK, 0 if not found, <0 if KO
-	 */
-	public function fetch($id, $ref = '', $ref_ext = '', $email_msgid = '')
-	{
-		global $conf;
-
-		if (empty($id) && empty($ref) && empty($ref_ext) && empty($email_msgid)) {
-			dol_syslog(get_class($this)."::fetch Bad parameters", LOG_WARNING);
-			return -1;
-		}
-
-		$sql = "SELECT rowid, entity, ref, title, description, public, datec, opp_amount, budget_amount,";
-		$sql .= " tms, dateo, datee, date_close, fk_soc, fk_user_creat, fk_user_modif, fk_user_close, fk_statut as status, fk_opp_status, opp_percent,";
-		$sql .= " note_private, note_public, model_pdf, usage_opportunity, usage_task, usage_bill_time, usage_organize_event, email_msgid,";
-		$sql .= " accept_conference_suggestions, accept_booth_suggestions, price_registration, price_booth";
-		$sql .= " FROM ".MAIN_DB_PREFIX."projet";
-		if (!empty($id)) {
-			$sql .= " WHERE rowid = ".((int) $id);
-		} else {
-			$sql .= " WHERE entity IN (".getEntity('project').")";
-			if (!empty($ref)) {
-				$sql .= " AND ref = '".$this->db->escape($ref)."'";
-			} elseif (!empty($ref_ext)) {
-				$sql .= " AND ref_ext = '".$this->db->escape($ref_ext)."'";
-			} else {
-				$sql .= " AND email_msgid = '".$this->db->escape($email_msgid)."'";
-			}
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num_rows = $this->db->num_rows($resql);
-
-			if ($num_rows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->entity = $obj->entity;
-				$this->ref = $obj->ref;
-				$this->title = $obj->title;
-				$this->description = $obj->description;
-				$this->date_c = $this->db->jdate($obj->datec);
-				$this->datec = $this->db->jdate($obj->datec); // TODO deprecated
-				$this->date_m = $this->db->jdate($obj->tms);
-				$this->datem = $this->db->jdate($obj->tms); // TODO deprecated
-				$this->date_start = $this->db->jdate($obj->dateo);
-				$this->date_end = $this->db->jdate($obj->datee);
-				$this->date_close = $this->db->jdate($obj->date_close);
-				$this->note_private = $obj->note_private;
-				$this->note_public = $obj->note_public;
-				$this->socid = $obj->fk_soc;
-				$this->user_author_id = $obj->fk_user_creat;
-				$this->user_modification_id = $obj->fk_user_modif;
-				$this->user_close_id = $obj->fk_user_close;
-				$this->public = $obj->public;
-				$this->statut = $obj->status; // deprecated
-				$this->status = $obj->status;
-				$this->opp_status = $obj->fk_opp_status;
-				$this->opp_amount	= $obj->opp_amount;
-				$this->opp_percent = $obj->opp_percent;
-				$this->budget_amount = $obj->budget_amount;
-				$this->model_pdf = $obj->model_pdf;
-				$this->modelpdf = $obj->model_pdf; // deprecated
-				$this->usage_opportunity = (int) $obj->usage_opportunity;
-				$this->usage_task = (int) $obj->usage_task;
-				$this->usage_bill_time = (int) $obj->usage_bill_time;
-				$this->usage_organize_event = (int) $obj->usage_organize_event;
-				$this->accept_conference_suggestions = (int) $obj->accept_conference_suggestions;
-				$this->accept_booth_suggestions = (int) $obj->accept_booth_suggestions;
-				$this->price_registration = $obj->price_registration;
-				$this->price_booth = $obj->price_booth;
-				$this->email_msgid = $obj->email_msgid;
-
-				$this->db->free($resql);
-
-				// Retrieve all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				return 1;
-			}
-
-			$this->db->free($resql);
-
-			return 0;
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->errors[] = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Create a project into database
-	 *
-	 *    @param    User	$user       	User making creation
-	 *    @param	int		$notrigger		Disable triggers
-	 *    @return   int         			<0 if KO, id of created project if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-
-		$error = 0;
-		$ret = 0;
-
-		$now = dol_now();
-
-		// Clean parameters
-		$this->note_private = dol_substr($this->note_private, 0, 65535);
-		$this->note_public = dol_substr($this->note_public, 0, 65535);
-
-		// Check parameters
-		if (!trim($this->ref)) {
-			$this->error = 'ErrorFieldsRequired';
-			dol_syslog(get_class($this)."::create error -1 ref null", LOG_ERR);
-			return -1;
-		}
-		if (!empty($conf->global->PROJECT_THIRDPARTY_REQUIRED) && !($this->socid > 0)) {
-			$this->error = 'ErrorFieldsRequired';
-			dol_syslog(get_class($this)."::create error -1 thirdparty not defined and option PROJECT_THIRDPARTY_REQUIRED is set", LOG_ERR);
-			return -1;
-		}
-
-		// Create project
-		$this->db->begin();
-
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."projet (";
-		$sql .= "ref";
-		$sql .= ", title";
-		$sql .= ", description";
-		$sql .= ", fk_soc";
-		$sql .= ", fk_user_creat";
-		$sql .= ", fk_statut";
-		$sql .= ", fk_opp_status";
-		$sql .= ", opp_percent";
-		$sql .= ", public";
-		$sql .= ", datec";
-		$sql .= ", dateo";
-		$sql .= ", datee";
-		$sql .= ", opp_amount";
-		$sql .= ", budget_amount";
-		$sql .= ", usage_opportunity";
-		$sql .= ", usage_task";
-		$sql .= ", usage_bill_time";
-		$sql .= ", usage_organize_event";
-		$sql .= ", accept_conference_suggestions";
-		$sql .= ", accept_booth_suggestions";
-		$sql .= ", price_registration";
-		$sql .= ", price_booth";
-		$sql .= ", email_msgid";
-		$sql .= ", note_private";
-		$sql .= ", note_public";
-		$sql .= ", entity";
-		$sql .= ") VALUES (";
-		$sql .= "'".$this->db->escape($this->ref)."'";
-		$sql .= ", '".$this->db->escape($this->title)."'";
-		$sql .= ", '".$this->db->escape($this->description)."'";
-		$sql .= ", ".($this->socid > 0 ? $this->socid : "null");
-		$sql .= ", ".((int) $user->id);
-		$sql .= ", ".(is_numeric($this->statut) ? ((int) $this->statut) : '0');
-		$sql .= ", ".((is_numeric($this->opp_status) && $this->opp_status > 0) ? ((int) $this->opp_status) : 'NULL');
-		$sql .= ", ".(is_numeric($this->opp_percent) ? ((int) $this->opp_percent) : 'NULL');
-		$sql .= ", ".($this->public ? 1 : 0);
-		$sql .= ", '".$this->db->idate($now)."'";
-		$sql .= ", ".($this->date_start != '' ? "'".$this->db->idate($this->date_start)."'" : 'null');
-		$sql .= ", ".($this->date_end != '' ? "'".$this->db->idate($this->date_end)."'" : 'null');
-		$sql .= ", ".(strcmp($this->opp_amount, '') ? price2num($this->opp_amount) : 'null');
-		$sql .= ", ".(strcmp($this->budget_amount, '') ? price2num($this->budget_amount) : 'null');
-		$sql .= ", ".($this->usage_opportunity ? 1 : 0);
-		$sql .= ", ".($this->usage_task ? 1 : 0);
-		$sql .= ", ".($this->usage_bill_time ? 1 : 0);
-		$sql .= ", ".($this->usage_organize_event ? 1 : 0);
-		$sql .= ", ".($this->accept_conference_suggestions ? 1 : 0);
-		$sql .= ", ".($this->accept_booth_suggestions ? 1 : 0);
-		$sql .= ", ".(strcmp($this->price_registration, '') ? price2num($this->price_registration) : 'null');
-		$sql .= ", ".(strcmp($this->price_booth, '') ? price2num($this->price_booth) : 'null');
-		$sql .= ", ".($this->email_msgid ? "'".$this->db->escape($this->email_msgid)."'" : 'null');
-		$sql .= ", ".($this->note_private ? "'".$this->db->escape($this->note_private)."'" : 'null');
-		$sql .= ", ".($this->note_public ? "'".$this->db->escape($this->note_public)."'" : 'null');
-		$sql .= ", ".((int) $conf->entity);
-		$sql .= ")";
-
-		dol_syslog(get_class($this)."::create", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."projet");
-			$ret = $this->id;
-
-			if (!$notrigger) {
-				// Call trigger
-				$result = $this->call_trigger('PROJECT_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->errno = $this->db->lasterrno();
-			$error++;
-		}
-
-		// Update extrafield
-		if (!$error) {
-			$result = $this->insertExtraFields();
-			if ($result < 0) {
-				$error++;
-			}
-		}
-
-		if (!$error && !empty($conf->global->MAIN_DISABLEDRAFTSTATUS)) {
-			$res = $this->setValid($user);
-			if ($res < 0) {
-				$error++;
-			}
-		}
-
-		if (!$error) {
-			$this->db->commit();
-			return $ret;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	/**
-	 * 		Validate a project
-	 *
-	 * 		@param		User	$user		   User that validate
-	 *      @param      int     $notrigger     1=Disable triggers
-	 * 		@return		int					   <0 if KO, >0 if OK
-	 */
-	public function setValid($user, $notrigger = 0)
-	{
-		global $langs, $conf;
-
-		$error = 0;
-
-		if ($this->statut != 1) {
-			// Check parameters
-			if (preg_match('/^'.preg_quote($langs->trans("CopyOf").' ').'/', $this->title)) {
-				$this->error = $langs->trans("ErrorFieldFormat", $langs->transnoentities("Label")).'. '.$langs->trans('RemoveString', $langs->transnoentitiesnoconv("CopyOf"));
-				return -1;
-			}
-
-			$this->db->begin();
-
-			$sql = "UPDATE ".MAIN_DB_PREFIX."projet";
-			$sql .= " SET fk_statut = 1";
-			$sql .= " WHERE rowid = ".((int) $this->id);
-			$sql .= " AND entity = ".((int) $conf->entity);
-
-			dol_syslog(get_class($this)."::setValid", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				// Call trigger
-				if (empty($notrigger)) {
-					$result = $this->call_trigger('PROJECT_VALIDATE', $user);
-					if ($result < 0) {
-						$error++;
-					}
-					// End call triggers
-				}
-
-				if (!$error) {
-					$this->statut = 1;
-					$this->db->commit();
-					return 1;
-				} else {
-					$this->db->rollback();
-					$this->error = join(',', $this->errors);
-					dol_syslog(get_class($this)."::setValid ".$this->error, LOG_ERR);
-					return -1;
-				}
-			} else {
-				$this->db->rollback();
-				$this->error = $this->db->lasterror();
-				return -1;
-			}
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Shift project task date from current date to delta
@@ -1669,8 +1774,8 @@ public $weekWorkLoadPerTask;
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Associate element to a project
 	 *
@@ -1701,9 +1806,10 @@ public $weekWorkLoadPerTask;
 			return -1;
 		} else {
 			return 1;
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Associate element to a project
 	 *
@@ -1766,6 +1872,7 @@ public $weekWorkLoadPerTask;
 
 		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
 	}
+
 
 	/**
 	 * Load time spent into this->weekWorkLoad and this->weekWorkLoadPerTask for all day of a week of project.
@@ -1830,9 +1937,6 @@ public $weekWorkLoadPerTask;
 		}
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Load time spent into this->weekWorkLoad and this->weekWorkLoadPerTask for all day of a week of project.
 	 * Note: array weekWorkLoad and weekWorkLoadPerTask are reset and filled at each call.
@@ -1888,27 +1992,31 @@ public $weekWorkLoadPerTask;
 					$this->monthWorkLoadPerTask[$week_number][$obj->fk_task] += $obj->task_duration;
 				}
 				$weekalreadyfound[$week_number] = 1;
-				$i++;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
+                $i++;
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . "::fetch " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
 
-	/**
-	 * Load indicators for dashboard (this->nbtodo and this->nbtodolate)
-	 *
-	 * @param	User	$user   Objet user
-	 * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
-	 */
-	public function load_board($user)
-	{
-		// phpcs:enable
-		global $conf, $langs;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Load indicators for dashboard (this->nbtodo and this->nbtodolate)
+     *
+     * @param User $user Objet user
+     *
+     * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
+     */
+    public function load_board($user)
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		// For external user, no check is done on company because readability is managed by public status of project and assignement.
 		//$socid=$user->socid;
@@ -1967,126 +2075,28 @@ public $weekWorkLoadPerTask;
 		} else {
 			$this->error = $this->db->error();
 			return -1;
-		}
-	}
+        }
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'projet',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return array of projects a user has permission on, is affected to, or all projects
-	 *
-	 * @param 	User	$user			User object
-	 * @param 	int		$mode			0=All project I have permission on (assigned to me or public), 1=Projects assigned to me only, 2=Will return list of all projects with no test on contacts
-	 * @param 	int		$list			0=Return array, 1=Return string list
-	 * @param	int		$socid			0=No filter on third party, id of third party
-	 * @param	string	$filter			additionnal filter on project (statut, ref, ...)
-	 * @return 	array or string			Array of projects id, or string with projects id separated with "," if list is 1
-	 */
-	public function getProjectsAuthorizedForUser($user, $mode = 0, $list = 0, $socid = 0, $filter = '')
-	{
-		$projects = array();
-		$temp = array();
-
-		$sql = "SELECT ".(($mode == 0 || $mode == 1) ? "DISTINCT " : "")."p.rowid, p.ref";
-		$sql .= " FROM ".MAIN_DB_PREFIX."projet as p";
-		if ($mode == 0) {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."element_contact as ec ON ec.element_id = p.rowid";
-		} elseif ($mode == 1) {
-			$sql .= ", ".MAIN_DB_PREFIX."element_contact as ec";
-		} elseif ($mode == 2) {
-			// No filter. Use this if user has permission to see all project
-		}
-		$sql .= " WHERE p.entity IN (".getEntity('project').")";
-		// Internal users must see project he is contact to even if project linked to a third party he can't see.
-		//if ($socid || ! $user->rights->societe->client->voir)	$sql.= " AND (p.fk_soc IS NULL OR p.fk_soc = 0 OR p.fk_soc = ".((int) $socid).")";
-		if ($socid > 0) {
-			$sql .= " AND (p.fk_soc IS NULL OR p.fk_soc = 0 OR p.fk_soc = ".((int) $socid).")";
-		}
-
-		// Get id of types of contacts for projects (This list never contains a lot of elements)
-		$listofprojectcontacttype = array();
-		$sql2 = "SELECT ctc.rowid, ctc.code FROM ".MAIN_DB_PREFIX."c_type_contact as ctc";
-		$sql2 .= " WHERE ctc.element = '".$this->db->escape($this->element)."'";
-		$sql2 .= " AND ctc.source = 'internal'";
-		$resql = $this->db->query($sql2);
-		if ($resql) {
-			while ($obj = $this->db->fetch_object($resql)) {
-				$listofprojectcontacttype[$obj->rowid] = $obj->code;
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-		if (count($listofprojectcontacttype) == 0) {
-			$listofprojectcontacttype[0] = '0'; // To avoid syntax error if not found
-		}
-
-		if ($mode == 0) {
-			$sql .= " AND ( p.public = 1";
-			$sql .= " OR ( ec.fk_c_type_contact IN (".$this->db->sanitize(join(',', array_keys($listofprojectcontacttype))).")";
-			$sql .= " AND ec.fk_socpeople = ".((int) $user->id).")";
-			$sql .= " )";
-		} elseif ($mode == 1) {
-			$sql .= " AND ec.element_id = p.rowid";
-			$sql .= " AND (";
-			$sql .= "  ( ec.fk_c_type_contact IN (".$this->db->sanitize(join(',', array_keys($listofprojectcontacttype))).")";
-			$sql .= " AND ec.fk_socpeople = ".((int) $user->id).")";
-			$sql .= " )";
-		} elseif ($mode == 2) {
-			// No filter. Use this if user has permission to see all project
-		}
-
-		$sql .= $filter;
-		//print $sql;
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$row = $this->db->fetch_row($resql);
-				$projects[$row[0]] = $row[1];
-				$temp[] = $row[0];
-				$i++;
-			}
-
-			$this->db->free($resql);
-
-			if ($list) {
-				if (empty($temp)) {
-					return '0';
-				}
-				$result = implode(',', $temp);
-				return $result;
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-
-		return $projects;
-	}
-
-	/**
-	 * Is the project delayed?
-	 *
-	 * @return bool
-	 */
-	public function hasDelay()
-	{
-		global $conf;
-
-		if (!($this->statut == self::STATUS_VALIDATED)) {
-			return false;
-		}
-		if (!$this->datee && !$this->date_end) {
-			return false;
-		}
-
-		$now = dol_now();
-
-		return ($this->datee ? $this->datee : $this->date_end) < ($now - $conf->projet->warning_delay);
-	}
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Charge indicateurs this->nb pour le tableau de bord
 	 *
@@ -2112,25 +2122,47 @@ public $weekWorkLoadPerTask;
 		if ($resql) {
 			while ($obj = $this->db->fetch_object($resql)) {
 				$this->nb["projects"] = $obj->nb;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Charge les informations d'ordre info dans l'objet commande
-	 *
-	 *	@param  int		$id       Id of order
-	 *	@return	void
-	 */
-	public function info($id)
-	{
-		$sql = 'SELECT c.rowid, datec as datec, tms as datem,';
+    /**
+     * Is the project delayed?
+     *
+     * @return bool
+     */
+    public function hasDelay()
+    {
+        global $conf;
+
+        if (!($this->statut == self::STATUS_VALIDATED)) {
+            return false;
+        }
+        if (!$this->datee && !$this->date_end) {
+            return false;
+        }
+
+        $now = dol_now();
+
+        return ($this->datee ? $this->datee : $this->date_end) < ($now - $conf->projet->warning_delay);
+    }
+
+    /**
+     *    Charge les informations d'ordre info dans l'objet commande
+     *
+     * @param int $id Id of order
+     *
+     * @return    void
+     */
+    public function info($id)
+    {
+        $sql = 'SELECT c.rowid, datec as datec, tms as datem,';
 		$sql .= ' date_close as datecloture,';
 		$sql .= ' fk_user_creat as fk_user_author, fk_user_close as fk_use_cloture';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'projet as c';
@@ -2168,14 +2200,29 @@ public $weekWorkLoadPerTask;
 	 *
 	 * Deletes object from existing categories not supplied.
 	 * Adds it to non existing supplied categories.
-	 * Existing categories are left untouch.
-	 *
-	 * @param int[]|int $categories Category or categories IDs
-	 * @return void
-	 */
-	public function setCategories($categories)
-	{
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-		return parent::setCategoriesCommon($categories, Categorie::TYPE_PROJECT);
-	}
+     * Existing categories are left untouch.
+     *
+     * @param int[]|int $categories Category or categories IDs
+     * @return void
+     */
+    public function setCategories($categories)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        return parent::setCategoriesCommon($categories, Categorie::TYPE_PROJECT);
+    }
+
+    /**
+     *    Create an array of tasks of current project
+     *
+     * @param User $user Object user we want project allowed to
+     *
+     * @return int                   >0 if OK, <0 if KO
+     */
+    public function getLinesArray($user)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+        $taskstatic = new Task($this->db);
+
+        $this->lines = $taskstatic->getTasksArray(0, $user, $this->id, 0, 0);
+    }
 }

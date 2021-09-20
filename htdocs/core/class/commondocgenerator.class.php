@@ -35,29 +35,32 @@
  */
 abstract class CommonDocGenerator
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
+    /**
+     * @var string Error code (or message)
+     */
+    public $error = '';
 
-	/**
-	 * @var string[]    Array of error strings
-	 */
-	public $errors = array();
-	/**
-	 * @var Extrafields object
-	 */
-	public $extrafieldsCache;
-	/**
-	 * @var int	If set to 1, save the fullname of generated file with path as the main doc when generating a doc with this template.
-	 */
-	public $update_main_doc_field;
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	protected $db;
+    /**
+     * @var string[]    Array of error strings
+     */
+    public $errors = [];
 
-	/**
+    /**
+     * @var DoliDB Database handler.
+     */
+    protected $db;
+
+    /**
+     * @var Extrafields object
+     */
+    public $extrafieldsCache;
+
+    /**
+     * @var int    If set to 1, save the fullname of generated file with path as the main doc when generating a doc with this template.
+     */
+    public $update_main_doc_field;
+
+    /**
 	 *	Constructor
 	 *
 	 *  @param		DoliDB		$db      Database handler
@@ -110,88 +113,6 @@ abstract class CommonDocGenerator
 		return $array_user;
 	}
 
-	/**
-	 *	Fill array with couple extrafield key => extrafield value
-	 *
-	 *	@param  Object			$object				Object with extrafields (must have $object->array_options filled)
-	 *	@param  array			$array_to_fill      Substitution array
-	 *  @param  Extrafields		$extrafields        Extrafields object
-	 *  @param  string			$array_key	        Prefix for name of the keys into returned array
-	 *  @param  Translate		$outputlangs        Lang object to use for output
-	 *	@return	array								Substitution array
-	 */
-	public function fill_substitutionarray_with_extrafields($object, $array_to_fill, $extrafields, $array_key, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf;
-
-		if (is_array($extrafields->attributes[$object->table_element]['label'])) {
-			foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $label) {
-				if ($extrafields->attributes[$object->table_element]['type'][$key] == 'price') {
-					$object->array_options['options_'.$key] = price2num($object->array_options['options_'.$key]);
-					$object->array_options['options_'.$key.'_currency'] = price($object->array_options['options_'.$key], 0, $outputlangs, 0, 0, -1, $conf->currency);
-					//Add value to store price with currency
-					$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key.'_currency' => $object->array_options['options_'.$key.'_currency']));
-				} elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'select') {
-					$object->array_options['options_'.$key] = $extrafields->attributes[$object->table_element]['param'][$key]['options'][$object->array_options['options_'.$key]];
-				} elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'checkbox') {
-					$valArray = explode(',', $object->array_options['options_'.$key]);
-					$output = array();
-					foreach ($extrafields->attributes[$object->table_element]['param'][$key]['options'] as $keyopt => $valopt) {
-						if (in_array($keyopt, $valArray)) {
-							$output[] = $valopt;
-						}
-					}
-					$object->array_options['options_'.$key] = implode(', ', $output);
-				} elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'date') {
-					if (strlen($object->array_options['options_'.$key]) > 0) {
-						$date = $object->array_options['options_'.$key];
-						$object->array_options['options_'.$key] = dol_print_date($date, 'day'); // using company output language
-						$object->array_options['options_'.$key.'_locale'] = dol_print_date($date, 'day', 'tzserver', $outputlangs); // using output language format
-						$object->array_options['options_'.$key.'_rfc'] = dol_print_date($date, 'dayrfc'); // international format
-					} else {
-						$object->array_options['options_'.$key] = '';
-						$object->array_options['options_'.$key.'_locale'] = '';
-						$object->array_options['options_'.$key.'_rfc'] = '';
-					}
-					$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key.'_locale' => $object->array_options['options_'.$key.'_locale']));
-					$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key.'_rfc' => $object->array_options['options_'.$key.'_rfc']));
-				} elseif ($extrafields->attributes[$object->table_element]['label'][$key] == 'datetime') {
-					$datetime = $object->array_options['options_'.$key];
-					$object->array_options['options_'.$key] = ($datetime != "0000-00-00 00:00:00" ?dol_print_date($object->array_options['options_'.$key], 'dayhour') : ''); // using company output language
-					$object->array_options['options_'.$key.'_locale'] = ($datetime != "0000-00-00 00:00:00" ?dol_print_date($object->array_options['options_'.$key], 'dayhour', 'tzserver', $outputlangs) : ''); // using output language format
-					$object->array_options['options_'.$key.'_rfc'] = ($datetime != "0000-00-00 00:00:00" ?dol_print_date($object->array_options['options_'.$key], 'dayhourrfc') : ''); // international format
-					$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key.'_locale' => $object->array_options['options_'.$key.'_locale']));
-					$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key.'_rfc' => $object->array_options['options_'.$key.'_rfc']));
-				} elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'link') {
-					$id = $object->array_options['options_'.$key];
-					if ($id != "") {
-						$param = $extrafields->attributes[$object->table_element]['param'][$key];
-						$param_list = array_keys($param['options']); // $param_list='ObjectName:classPath'
-						$InfoFieldList = explode(":", $param_list[0]);
-						$classname = $InfoFieldList[0];
-						$classpath = $InfoFieldList[1];
-						if (!empty($classpath)) {
-							dol_include_once($InfoFieldList[1]);
-							if ($classname && class_exists($classname)) {
-								$tmpobject = new $classname($this->db);
-								$tmpobject->fetch($id);
-								// completely replace the id with the linked object name
-								$object->array_options['options_'.$key] = $tmpobject->name;
-							}
-						}
-					}
-				}
-
-				$array_to_fill = array_merge($array_to_fill, array($array_key.'_options_'.$key => $object->array_options['options_'.$key]));
-			}
-		}
-
-		return $array_to_fill;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Define array with couple substitution key => substitution value
@@ -240,7 +161,6 @@ abstract class CommonDocGenerator
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -296,8 +216,8 @@ abstract class CommonDocGenerator
 		);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -362,9 +282,7 @@ abstract class CommonDocGenerator
 		return $array_thirdparty;
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -425,7 +343,6 @@ abstract class CommonDocGenerator
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -464,8 +381,8 @@ abstract class CommonDocGenerator
 		return $array_other;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -646,7 +563,6 @@ abstract class CommonDocGenerator
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Define array with couple substitution key => substitution value
 	 *
@@ -761,9 +677,7 @@ abstract class CommonDocGenerator
 		return $resarray;
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -830,7 +744,6 @@ abstract class CommonDocGenerator
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Define array with couple substitution key => substitution value
 	 *
@@ -888,7 +801,6 @@ abstract class CommonDocGenerator
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Define array with couple substitution key => substitution value
 	 *
@@ -906,28 +818,112 @@ abstract class CommonDocGenerator
 				if (!empty($value)) {
 					if (!is_array($value) && !is_object($value)) {
 						$array_other['object_'.$key] = $value;
-					}
-					if (is_array($value) && $recursive) {
-						$array_other['object_'.$key] = $this->get_substitutionarray_each_var_object($value, $outputlangs, false);
-					}
-				}
-			}
-		}
-		return $array_other;
-	}
+                    }
+                    if (is_array($value) && $recursive) {
+                        $array_other['object_' . $key] = $this->get_substitutionarray_each_var_object($value, $outputlangs, false);
+                    }
+                }
+            }
+        }
+        return $array_other;
+    }
 
-	/**
-	 * Rect pdf
-	 *
-	 * @param	TCPDF	$pdf			Object PDF
-	 * @param	float	$x				Abscissa of first point
-	 * @param	float	$y		        Ordinate of first point
-	 * @param	float	$l				??
-	 * @param	float	$h				??
-	 * @param	int		$hidetop		1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
-	 * @param	int		$hidebottom		Hide bottom
-	 * @return	void
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Fill array with couple extrafield key => extrafield value
+     *
+     * @param Object      $object        Object with extrafields (must have $object->array_options filled)
+     * @param array       $array_to_fill Substitution array
+     * @param Extrafields $extrafields   Extrafields object
+     * @param string      $array_key     Prefix for name of the keys into returned array
+     * @param Translate   $outputlangs   Lang object to use for output
+     *
+     * @return    array                                Substitution array
+     */
+    public function fill_substitutionarray_with_extrafields($object, $array_to_fill, $extrafields, $array_key, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf;
+
+        if (is_array($extrafields->attributes[$object->table_element]['label'])) {
+            foreach ($extrafields->attributes[$object->table_element]['label'] as $key => $label) {
+                if ($extrafields->attributes[$object->table_element]['type'][$key] == 'price') {
+                    $object->array_options['options_' . $key] = price2num($object->array_options['options_' . $key]);
+                    $object->array_options['options_' . $key . '_currency'] = price($object->array_options['options_' . $key], 0, $outputlangs, 0, 0, -1, $conf->currency);
+                    //Add value to store price with currency
+                    $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key . '_currency' => $object->array_options['options_' . $key . '_currency']]);
+                } elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'select') {
+                    $object->array_options['options_' . $key] = $extrafields->attributes[$object->table_element]['param'][$key]['options'][$object->array_options['options_' . $key]];
+                } elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'checkbox') {
+                    $valArray = explode(',', $object->array_options['options_' . $key]);
+                    $output = [];
+                    foreach ($extrafields->attributes[$object->table_element]['param'][$key]['options'] as $keyopt => $valopt) {
+                        if (in_array($keyopt, $valArray)) {
+                            $output[] = $valopt;
+                        }
+                    }
+                    $object->array_options['options_' . $key] = implode(', ', $output);
+                } elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'date') {
+                    if (strlen($object->array_options['options_' . $key]) > 0) {
+                        $date = $object->array_options['options_' . $key];
+                        $object->array_options['options_' . $key] = dol_print_date($date, 'day'); // using company output language
+                        $object->array_options['options_' . $key . '_locale'] = dol_print_date($date, 'day', 'tzserver', $outputlangs); // using output language format
+                        $object->array_options['options_' . $key . '_rfc'] = dol_print_date($date, 'dayrfc'); // international format
+                    } else {
+                        $object->array_options['options_' . $key] = '';
+                        $object->array_options['options_' . $key . '_locale'] = '';
+                        $object->array_options['options_' . $key . '_rfc'] = '';
+                    }
+                    $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key . '_locale' => $object->array_options['options_' . $key . '_locale']]);
+                    $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key . '_rfc' => $object->array_options['options_' . $key . '_rfc']]);
+                } elseif ($extrafields->attributes[$object->table_element]['label'][$key] == 'datetime') {
+                    $datetime = $object->array_options['options_' . $key];
+                    $object->array_options['options_' . $key] = ($datetime != "0000-00-00 00:00:00" ? dol_print_date($object->array_options['options_' . $key], 'dayhour') : ''); // using company output language
+                    $object->array_options['options_' . $key . '_locale'] = ($datetime != "0000-00-00 00:00:00" ? dol_print_date($object->array_options['options_' . $key], 'dayhour', 'tzserver', $outputlangs) : ''); // using output language format
+                    $object->array_options['options_' . $key . '_rfc'] = ($datetime != "0000-00-00 00:00:00" ? dol_print_date($object->array_options['options_' . $key], 'dayhourrfc') : ''); // international format
+                    $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key . '_locale' => $object->array_options['options_' . $key . '_locale']]);
+                    $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key . '_rfc' => $object->array_options['options_' . $key . '_rfc']]);
+                } elseif ($extrafields->attributes[$object->table_element]['type'][$key] == 'link') {
+                    $id = $object->array_options['options_' . $key];
+                    if ($id != "") {
+                        $param = $extrafields->attributes[$object->table_element]['param'][$key];
+                        $param_list = array_keys($param['options']); // $param_list='ObjectName:classPath'
+                        $InfoFieldList = explode(":", $param_list[0]);
+                        $classname = $InfoFieldList[0];
+                        $classpath = $InfoFieldList[1];
+                        if (!empty($classpath)) {
+                            dol_include_once($InfoFieldList[1]);
+                            if ($classname && class_exists($classname)) {
+                                $tmpobject = new $classname($this->db);
+                                $tmpobject->fetch($id);
+                                // completely replace the id with the linked object name
+                                $object->array_options['options_' . $key] = $tmpobject->name;
+                            }
+                        }
+                    }
+                }
+
+                $array_to_fill = array_merge($array_to_fill, [$array_key . '_options_' . $key => $object->array_options['options_' . $key]]);
+            }
+        }
+
+        return $array_to_fill;
+    }
+
+    /**
+     * Rect pdf
+     *
+     * @param TCPDF $pdf        Object PDF
+     * @param float $x          Abscissa of first point
+     * @param float $y          Ordinate of first point
+     * @param float $l          ??
+     * @param float $h          ??
+     * @param int   $hidetop    1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
+     * @param int   $hidebottom Hide bottom
+     * @return	void
+     */
 	public function printRect($pdf, $x, $y, $l, $h, $hidetop = 0, $hidebottom = 0)
 	{
 		if (empty($hidetop) || $hidetop == -1) {
@@ -1039,46 +1035,145 @@ abstract class CommonDocGenerator
 	}
 
 	/**
-	 *  get column status from column key
-	 *
-	 *  @param	string			$colKey    		the column key
-	 *  @return	float      width in mm
-	 */
-	public function getColumnStatus($colKey)
-	{
-		if (!empty($this->cols[$colKey]['status'])) {
-			return true;
-		} else {
-			return  false;
-		}
-	}
-
-	/**
 	 *  get column content width from column key
 	 *
-	 *  @param	string      $colKey     the column key
-	 *  @return	float                   width in mm
-	 */
-	public function getColumnContentWidth($colKey)
-	{
-		$colDef = $this->cols[$colKey];
-		return  $colDef['width'] - $colDef['content']['padding'][3] - $colDef['content']['padding'][1];
-	}
+	 *  @param	string      $colKey the column key
+     * @return    float                   width in mm
+     */
+    public function getColumnContentWidth($colKey)
+    {
+        $colDef = $this->cols[$colKey];
+        return $colDef['width'] - $colDef['content']['padding'][3] - $colDef['content']['padding'][1];
+    }
 
-	/**
-	 *  print description column content
-	 *
-	 *  @param	TCPDF		$pdf    	pdf object
-	 *  @param	float		$curY    	curent Y position
-	 *  @param	string		$colKey    	the column key
-	 *  @param  object      $object CommonObject
-	 *  @param  int         $i  the $object->lines array key
-	 *  @param  Translate $outputlangs    Output language
-	 *  @param  int $hideref hide ref
-	 *  @param  int $hidedesc hide desc
-	 *  @param  int $issupplierline if object need supplier product
-	 *  @return null
-	 */
+    /**
+     *  get column content X (abscissa) left position from column key
+     *
+     * @param string $colKey the column key
+     *
+     * @return    float      X position in mm
+     */
+    public function getColumnContentXStart($colKey)
+    {
+        $colDef = $this->cols[$colKey];
+        return $colDef['xStartPos'] + $colDef['content']['padding'][3];
+    }
+
+    /**
+     *    get column position rank from column key
+     *
+     * @param string $colKey the column key
+     *
+     * @return    int         rank on success and -1 on error
+     */
+    public function getColumnRank($colKey)
+    {
+        if (!isset($this->cols[$colKey]['rank'])) {
+            return -1;
+        }
+        return $this->cols[$colKey]['rank'];
+    }
+
+    /**
+     *  get column position rank from column key
+     *
+     * @param string $newColKey         the new column key
+     * @param array  $defArray          a single column definition array
+     * @param string $targetCol         target column used to place the new column beside
+     * @param bool   $insertAfterTarget insert before or after target column ?
+     *
+     * @return    int         new rank on success and -1 on error
+     */
+    public function insertNewColumnDef($newColKey, $defArray, $targetCol = false, $insertAfterTarget = false)
+    {
+        // prepare wanted rank
+        $rank = -1;
+
+        // try to get rank from target column
+        if (!empty($targetCol)) {
+            $rank = $this->getColumnRank($targetCol);
+            if ($rank >= 0 && $insertAfterTarget) {
+                $rank++;
+            }
+        }
+
+        // get rank from new column definition
+        if ($rank < 0 && !empty($defArray['rank'])) {
+            $rank = $defArray['rank'];
+        }
+
+        // error: no rank
+        if ($rank < 0) {
+            return -1;
+        }
+
+        foreach ($this->cols as $colKey => & $colDef) {
+            if ($rank <= $colDef['rank']) {
+                $colDef['rank'] = $colDef['rank'] + 1;
+            }
+        }
+
+        $defArray['rank'] = $rank;
+        $this->cols[$newColKey] = $defArray; // array_replace is used to preserve keys
+
+        return $rank;
+    }
+
+    /**
+     *  print standard column content
+     *
+     * @param TCPDF  $pdf        pdf object
+     * @param float  $curY       curent Y position
+     * @param string $colKey     the column key
+     * @param string $columnText column text
+     *
+     * @return    null
+     */
+    public function printStdColumnContent($pdf, &$curY, $colKey, $columnText = '')
+    {
+        global $hookmanager;
+
+        $parameters = [
+            'curY' => &$curY,
+            'columnText' => $columnText,
+            'colKey' => $colKey,
+            'pdf' => &$pdf,
+        ];
+        $reshook = $hookmanager->executeHooks('printStdColumnContent', $parameters, $this); // Note that $action and $object may have been modified by hook
+        if ($reshook < 0) {
+            setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+        }
+        if (!$reshook) {
+            if (empty($columnText)) {
+                return;
+            }
+            $pdf->SetXY($this->getColumnContentXStart($colKey), $curY); // Set curent position
+            $colDef = $this->cols[$colKey];
+            // save curent cell padding
+            $curentCellPaddinds = $pdf->getCellPaddings();
+            // set cell padding with column content definition
+            $pdf->setCellPaddings($colDef['content']['padding'][3], $colDef['content']['padding'][0], $colDef['content']['padding'][1], $colDef['content']['padding'][2]);
+            $pdf->writeHTMLCell($colDef['width'], 2, $colDef['xStartPos'], $curY, $columnText, 0, 1, 0, true, $colDef['content']['align']);
+
+            // restore cell padding
+            $pdf->setCellPaddings($curentCellPaddinds['L'], $curentCellPaddinds['T'], $curentCellPaddinds['R'], $curentCellPaddinds['B']);
+        }
+    }
+
+    /**
+     *  print description column content
+     *
+     * @param TCPDF     $pdf            pdf object
+     * @param float     $curY           curent Y position
+     * @param string    $colKey         the column key
+     * @param object    $object         CommonObject
+     * @param int       $i              the $object->lines array key
+     * @param Translate $outputlangs    Output language
+     * @param int       $hideref        hide ref
+     * @param  int      $hidedesc       hide desc
+     *  @param  int     $issupplierline if object need supplier product
+     *  @return null
+     */
 	public function printColDescContent($pdf, &$curY, $colKey, $object, $i, $outputlangs, $hideref = 0, $hidedesc = 0, $issupplierline = 0)
 	{
 		// load desc col params
@@ -1097,29 +1192,92 @@ abstract class CommonDocGenerator
 
 		// Display extrafield if needed
 		$params = array(
-			'display'         => 'list',
-			'printableEnable' => array(3),
-			'printableEnableNotEmpty' => array(4)
-		);
-		$extrafieldDesc = $this->getExtrafieldsInHtml($object->lines[$i], $outputlangs, $params);
-		if (!empty($extrafieldDesc)) {
-			$this->printStdColumnContent($pdf, $posYAfterDescription, $colKey, $extrafieldDesc);
-		}
-	}
+            'display'         => 'list',
+            'printableEnable' => array(3),
+            'printableEnableNotEmpty' => array(4),
+        );
+        $extrafieldDesc = $this->getExtrafieldsInHtml($object->lines[$i], $outputlangs, $params);
+        if (!empty($extrafieldDesc)) {
+            $this->printStdColumnContent($pdf, $posYAfterDescription, $colKey, $extrafieldDesc);
+        }
+    }
 
-	/**
-	 *  display extrafields columns content
-	 *
-	 *  @param	object		$object    	line of common object
-	 *  @param Translate $outputlangs    Output language
-	 *  @param array $params    array of additionals parameters
-	 *  @return	double  max y value
-	 */
-	public function getExtrafieldsInHtml($object, $outputlangs, $params = array())
-	{
-		global $hookmanager;
+    /**
+     *  get extrafield content for pdf writeHtmlCell compatibility
+     *  usage for PDF line columns and object note block
+     *
+     * @param object    $object        Common object
+     * @param string    $extrafieldKey The extrafield key
+     * @param Translate $outputlangs   The output langs (if value is __(XXX)__ we use it to translate it).
+     *
+     * @return    string
+     */
+    public function getExtrafieldContent($object, $extrafieldKey, $outputlangs = null)
+    {
+        global $hookmanager;
 
-		if (empty($object->table_element)) {
+        if (empty($object->table_element)) {
+            return;
+        }
+
+        $extrafieldsKeyPrefix = "options_";
+
+        // Cleanup extrafield key to remove prefix if present
+        $pos = strpos($extrafieldKey, $extrafieldsKeyPrefix);
+        if ($pos === 0) {
+            $extrafieldKey = substr($extrafieldKey, strlen($extrafieldsKeyPrefix));
+        }
+
+        $extrafieldOptionsKey = $extrafieldsKeyPrefix . $extrafieldKey;
+
+        // Load extrafiels if not allready does
+        if (empty($this->extrafieldsCache)) {
+            $this->extrafieldsCache = new ExtraFields($this->db);
+        }
+        if (empty($this->extrafieldsCache->attributes[$object->table_element])) {
+            $this->extrafieldsCache->fetch_name_optionals_label($object->table_element);
+        }
+        $extrafields = $this->extrafieldsCache;
+
+        $extrafieldOutputContent = $extrafields->showOutputField($extrafieldKey, $object->array_options[$extrafieldOptionsKey], '', $object->table_element);
+
+        // TODO : allow showOutputField to be pdf public friendly, ex: in a link to object, clean getNomUrl to remove link and images... like a getName methode ...
+        if ($extrafields->attributes[$object->table_element]['type'][$extrafieldKey] == 'link') {
+            // for lack of anything better we cleanup all html tags
+            $extrafieldOutputContent = dol_string_nohtmltag($extrafieldOutputContent);
+        }
+
+        $parameters = [
+            'object' => $object,
+            'extrafields' => $extrafields,
+            'extrafieldKey' => $extrafieldKey,
+            'extrafieldOutputContent' => & $extrafieldOutputContent,
+        ];
+        $reshook = $hookmanager->executeHooks('getPDFExtrafieldContent', $parameters, $this); // Note that $action and $object may have been modified by hook
+        if ($reshook < 0) {
+            setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+        }
+        if ($reshook) {
+            $extrafieldOutputContent = $hookmanager->resPrint;
+        }
+
+        return $extrafieldOutputContent;
+    }
+
+    /**
+     *  display extrafields columns content
+     *
+     * @param object    $object      line of common object
+     * @param Translate $outputlangs Output language
+     * @param array     $params      array of additionals parameters
+     *
+     * @return    double  max y value
+     */
+    public function getExtrafieldsInHtml($object, $outputlangs, $params = [])
+    {
+        global $hookmanager;
+
+        if (empty($object->table_element)) {
 			return;
 		}
 
@@ -1285,122 +1443,24 @@ abstract class CommonDocGenerator
 		return $html;
 	}
 
-	/**
-	 *  get extrafield content for pdf writeHtmlCell compatibility
-	 *  usage for PDF line columns and object note block
-	 *
-	 *  @param	object		$object     		Common object
-	 *  @param	string		$extrafieldKey    	The extrafield key
-	 *  @param	Translate	$outputlangs		The output langs (if value is __(XXX)__ we use it to translate it).
-	 *  @return	string
-	 */
-	public function getExtrafieldContent($object, $extrafieldKey, $outputlangs = null)
-	{
-		global $hookmanager;
-
-		if (empty($object->table_element)) {
-			return;
-		}
-
-		$extrafieldsKeyPrefix = "options_";
-
-		// Cleanup extrafield key to remove prefix if present
-		$pos = strpos($extrafieldKey, $extrafieldsKeyPrefix);
-		if ($pos === 0) {
-			$extrafieldKey = substr($extrafieldKey, strlen($extrafieldsKeyPrefix));
-		}
-
-		$extrafieldOptionsKey = $extrafieldsKeyPrefix.$extrafieldKey;
-
-
-		// Load extrafiels if not allready does
-		if (empty($this->extrafieldsCache)) {
-			$this->extrafieldsCache = new ExtraFields($this->db);
-		}
-		if (empty($this->extrafieldsCache->attributes[$object->table_element])) {
-			$this->extrafieldsCache->fetch_name_optionals_label($object->table_element);
-		}
-		$extrafields = $this->extrafieldsCache;
-
-		$extrafieldOutputContent = $extrafields->showOutputField($extrafieldKey, $object->array_options[$extrafieldOptionsKey], '', $object->table_element);
-
-		// TODO : allow showOutputField to be pdf public friendly, ex: in a link to object, clean getNomUrl to remove link and images... like a getName methode ...
-		if ($extrafields->attributes[$object->table_element]['type'][$extrafieldKey] == 'link') {
-			// for lack of anything better we cleanup all html tags
-			$extrafieldOutputContent = dol_string_nohtmltag($extrafieldOutputContent);
-		}
-
-		$parameters = array(
-			'object' => $object,
-			'extrafields' => $extrafields,
-			'extrafieldKey' => $extrafieldKey,
-			'extrafieldOutputContent' =>& $extrafieldOutputContent
-		);
-		$reshook = $hookmanager->executeHooks('getPDFExtrafieldContent', $parameters, $this); // Note that $action and $object may have been modified by hook
-		if ($reshook < 0) {
-			setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-		}
-		if ($reshook) {
-			$extrafieldOutputContent = $hookmanager->resPrint;
-		}
-
-		return $extrafieldOutputContent;
-	}
 
 	/**
-	 *  print standard column content
-	 *
-	 *  @param	TCPDF		    $pdf    	pdf object
-	 *  @param	float		$curY    	curent Y position
-	 *  @param	string		$colKey    	the column key
-	 *  @param	string		$columnText   column text
-	 *  @return	null
-	 */
-	public function printStdColumnContent($pdf, &$curY, $colKey, $columnText = '')
-	{
-		global $hookmanager;
+	 *  get column status from column key
+     *
+     * @param string $colKey the column key
+     * @return    float      width in mm
+     */
+    public function getColumnStatus($colKey)
+    {
+        if (!empty($this->cols[$colKey]['status'])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-		$parameters = array(
-			'curY' => &$curY,
-			'columnText' => $columnText,
-			'colKey' => $colKey,
-			'pdf' => &$pdf,
-		);
-		$reshook = $hookmanager->executeHooks('printStdColumnContent', $parameters, $this); // Note that $action and $object may have been modified by hook
-		if ($reshook < 0) {
-			setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
-		}
-		if (!$reshook) {
-			if (empty($columnText)) {
-				return;
-			}
-			$pdf->SetXY($this->getColumnContentXStart($colKey), $curY); // Set curent position
-			$colDef = $this->cols[$colKey];
-			// save curent cell padding
-			$curentCellPaddinds = $pdf->getCellPaddings();
-			// set cell padding with column content definition
-			$pdf->setCellPaddings($colDef['content']['padding'][3], $colDef['content']['padding'][0], $colDef['content']['padding'][1], $colDef['content']['padding'][2]);
-			$pdf->writeHTMLCell($colDef['width'], 2, $colDef['xStartPos'], $curY, $columnText, 0, 1, 0, true, $colDef['content']['align']);
-
-			// restore cell padding
-			$pdf->setCellPaddings($curentCellPaddinds['L'], $curentCellPaddinds['T'], $curentCellPaddinds['R'], $curentCellPaddinds['B']);
-		}
-	}
-
-	/**
-	 *  get column content X (abscissa) left position from column key
-	 *
-	 *  @param	string    $colKey    		the column key
-	 *  @return	float      X position in mm
-	 */
-	public function getColumnContentXStart($colKey)
-	{
-		$colDef = $this->cols[$colKey];
-		return  $colDef['xStartPos'] + $colDef['content']['padding'][3];
-	}
-
-	/**
-	 * Print standard column content
+    /**
+     * Print standard column content
 	 *
 	 * @param TCPDI	    $pdf            Pdf object
 	 * @param float     $tab_top        Tab top position
@@ -1476,12 +1536,15 @@ abstract class CommonDocGenerator
 		return $this->tabTitleHeight;
 	}
 
+
+
 	/**
 	 *  Define Array Column Field for extrafields
 	 *
 	 *  @param	object			$object    		common object det
 	 *  @param	Translate		$outputlangs    langs
 	 *  @param	int			   $hidedetails		Do not show line details
+	 *
 	 *  @return	null
 	 */
 	public function defineColumnExtrafield($object, $outputlangs, $hidedetails = 0)
@@ -1563,63 +1626,5 @@ abstract class CommonDocGenerator
 				$this->insertNewColumnDef("options_".$key, $def);
 			}
 		}
-	}
-
-	/**
-	 *  get column position rank from column key
-	 *
-	 *  @param	string		$newColKey    	the new column key
-	 *  @param	array		$defArray    	a single column definition array
-	 *  @param	string		$targetCol    	target column used to place the new column beside
-	 *  @param	bool		$insertAfterTarget    	insert before or after target column ?
-	 *  @return	int         new rank on success and -1 on error
-	 */
-	public function insertNewColumnDef($newColKey, $defArray, $targetCol = false, $insertAfterTarget = false)
-	{
-		// prepare wanted rank
-		$rank = -1;
-
-		// try to get rank from target column
-		if (!empty($targetCol)) {
-			$rank = $this->getColumnRank($targetCol);
-			if ($rank >= 0 && $insertAfterTarget) {
-				$rank++;
-			}
-		}
-
-		// get rank from new column definition
-		if ($rank < 0 && !empty($defArray['rank'])) {
-			$rank = $defArray['rank'];
-		}
-
-		// error: no rank
-		if ($rank < 0) {
-			return -1;
-		}
-
-		foreach ($this->cols as $colKey => & $colDef) {
-			if ($rank <= $colDef['rank']) {
-				$colDef['rank'] = $colDef['rank'] + 1;
-			}
-		}
-
-		$defArray['rank'] = $rank;
-		$this->cols[$newColKey] = $defArray; // array_replace is used to preserve keys
-
-		return $rank;
-	}
-
-	/**
-	 *   	get column position rank from column key
-	 *
-	 *   	@param	string		$colKey    		the column key
-	 *      @return	int         rank on success and -1 on error
-	 */
-	public function getColumnRank($colKey)
-	{
-		if (!isset($this->cols[$colKey]['rank'])) {
-			return -1;
-		}
-		return  $this->cols[$colKey]['rank'];
 	}
 }

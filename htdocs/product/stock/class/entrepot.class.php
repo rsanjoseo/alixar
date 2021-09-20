@@ -35,120 +35,140 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class Entrepot extends CommonObject
 {
 	/**
-	 * Warehouse closed, inactive
-	 */
-	const STATUS_CLOSED = 0;
-	/**
-	 * Warehouse open and operations for customer shipping, supplier dispatch, internal stock transfers/corrections allowed.
-	 */
-	const STATUS_OPEN_ALL = 1;
-	/**
-	 * Warehouse open and operations for stock transfers/corrections allowed (not for customer shipping and supplier dispatch).
-	 */
-	const STATUS_OPEN_INTERNAL = 2;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'stock';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'entrepot';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'stock';
+
 	/**
 	 * @var int 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var string	Label
 	 * @deprecated
 	 * @see $label
 	 */
 	public $libelle;
+
 	/**
 	 * @var string  Label
 	 */
 	public $label;
+
 	/**
 	 * @var string description
 	 */
 	public $description;
-	public $statut;
-	/**
+
+    public $statut;
+
+    /**
 	 * @var string Place
 	 */
 	public $lieu;
-	/**
+
+    /**
 	 * @var string Address
 	 */
 	public $address;
-	/**
+
+    /**
 	 * @var string Zipcode
 	 */
 	public $zip;
-	/**
+
+    /**
 	 * @var string Town
 	 */
 	public $town;
-	/**
+
+    /**
 	 * @var string Phone
 	 */
 	public $phone;
-	/**
+
+    /**
 	 * @var string Fax
 	 */
 	public $fax;
-	/**
+
+    /**
 	 * @var int ID of parent
 	 */
 	public $fk_parent;
-	/**
+
+    /**
 	 * @var int ID of project
 	 */
 	public $fk_project;
-	/**
+
+    /**
 	 * @var array List of short language codes for status
 	 */
 	public $statuts = array();
-	/**
+
+    /**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>0, 'notnull'=>1, 'position'=>10),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'default'=>1, 'notnull'=>1, 'index'=>1, 'position'=>15),
-		'ref' =>array('type'=>'varchar(255)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'showoncombobox'=>1, 'position'=>25, 'searchall'=>1),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'notnull'=>1, 'position'=>30),
-		'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>-2, 'position'=>35, 'searchall'=>1),
-		'lieu' =>array('type'=>'varchar(64)', 'label'=>'LocationSummary', 'enabled'=>1, 'visible'=>1, 'position'=>40, 'showoncombobox'=>2, 'searchall'=>1),
-		'fk_parent' =>array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:1:statut=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ParentWarehouse', 'enabled'=>1, 'visible'=>-2, 'position'=>41),
-		'fk_project' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Project', 'enabled'=>1, 'visible'=>-1, 'position'=>25),
-		'address' =>array('type'=>'varchar(255)', 'label'=>'Address', 'enabled'=>1, 'visible'=>-2, 'position'=>45, 'searchall'=>1),
-		'zip' =>array('type'=>'varchar(10)', 'label'=>'Zip', 'enabled'=>1, 'visible'=>-2, 'position'=>50, 'searchall'=>1),
-		'town' =>array('type'=>'varchar(50)', 'label'=>'Town', 'enabled'=>1, 'visible'=>-2, 'position'=>55, 'searchall'=>1),
-		'fk_departement' =>array('type'=>'sellist:c_departements:label:rowid::active=1', 'label'=>'State', 'enabled'=>1, 'visible'=>0, 'position'=>60),
-		'fk_pays' =>array('type'=>'sellist:c_country:label:rowid::active=1', 'label'=>'Country', 'enabled'=>1, 'visible'=>-2, 'position'=>65),
-		'phone' =>array('type'=>'varchar(20)', 'label'=>'Phone', 'enabled'=>1, 'visible'=>-2, 'position'=>70, 'searchall'=>1),
-		'fax' =>array('type'=>'varchar(20)', 'label'=>'Fax', 'enabled'=>1, 'visible'=>-2, 'position'=>75, 'searchall'=>1),
-		//'fk_user_author' =>array('type'=>'integer', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-2, 'position'=>82),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'position'=>300),
-		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>301),
-		//'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>1000),
-		//'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'ModelPDF', 'enabled'=>1, 'visible'=>0, 'position'=>1010),
-		'statut' =>array('type'=>'tinyint(4)', 'label'=>'Status', 'enabled'=>1, 'visible'=>1, 'position'=>500),
-	);
+        'rowid' =>array('type'=>'integer', 'label'=>'ID', 'enabled'=>1, 'visible'=>0, 'notnull'=>1, 'position'=>10),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'default'=>1, 'notnull'=>1, 'index'=>1, 'position'=>15),
+        'ref' =>array('type'=>'varchar(255)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'showoncombobox'=>1, 'position'=>25, 'searchall'=>1),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'notnull'=>1, 'position'=>30),
+        'description' =>array('type'=>'text', 'label'=>'Description', 'enabled'=>1, 'visible'=>-2, 'position'=>35, 'searchall'=>1),
+        'lieu' =>array('type'=>'varchar(64)', 'label'=>'LocationSummary', 'enabled'=>1, 'visible'=>1, 'position'=>40, 'showoncombobox'=>2, 'searchall'=>1),
+        'fk_parent' =>array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php:1:statut=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ParentWarehouse', 'enabled'=>1, 'visible'=>-2, 'position'=>41),
+        'fk_project' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Project', 'enabled'=>1, 'visible'=>-1, 'position'=>25),
+        'address' =>array('type'=>'varchar(255)', 'label'=>'Address', 'enabled'=>1, 'visible'=>-2, 'position'=>45, 'searchall'=>1),
+        'zip' =>array('type'=>'varchar(10)', 'label'=>'Zip', 'enabled'=>1, 'visible'=>-2, 'position'=>50, 'searchall'=>1),
+        'town' =>array('type'=>'varchar(50)', 'label'=>'Town', 'enabled'=>1, 'visible'=>-2, 'position'=>55, 'searchall'=>1),
+        'fk_departement' =>array('type'=>'sellist:c_departements:label:rowid::active=1', 'label'=>'State', 'enabled'=>1, 'visible'=>0, 'position'=>60),
+        'fk_pays' =>array('type'=>'sellist:c_country:label:rowid::active=1', 'label'=>'Country', 'enabled'=>1, 'visible'=>-2, 'position'=>65),
+        'phone' => array('type' => 'varchar(20)', 'label' => 'Phone', 'enabled' => 1, 'visible' => -2, 'position' => 70, 'searchall' => 1),
+        'fax' => array('type' => 'varchar(20)', 'label' => 'Fax', 'enabled' => 1, 'visible' => -2, 'position' => 75, 'searchall' => 1),
+        //'fk_user_author' =>array('type'=>'integer', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-2, 'position'=>82),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -2, 'position' => 300),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'position' => 301),
+        //'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>1000),
+        //'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'ModelPDF', 'enabled'=>1, 'visible'=>0, 'position'=>1010),
+        'statut' => array('type' => 'tinyint(4)', 'label' => 'Status', 'enabled' => 1, 'visible' => 1, 'position' => 500),
+    );
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		global $conf;
-		$this->db = $db;
+    /**
+     * Warehouse closed, inactive
+     */
+    const STATUS_CLOSED = 0;
+
+    /**
+     * Warehouse open and operations for customer shipping, supplier dispatch, internal stock transfers/corrections allowed.
+     */
+    const STATUS_OPEN_ALL = 1;
+
+    /**
+     * Warehouse open and operations for stock transfers/corrections allowed (not for customer shipping and supplier dispatch).
+     */
+    const STATUS_OPEN_INTERNAL = 2;
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        global $conf;
+        $this->db = $db;
 
 		$this->statuts[self::STATUS_CLOSED] = 'Closed2';
 		if (!empty($conf->global->ENTREPOT_EXTRA_STATUS)) {
@@ -314,31 +334,6 @@ class Entrepot extends CommonObject
 		}
 	}
 
-	/**
-	 * Return array of children warehouses ids from $id warehouse (recursive function)
-	 *
-	 * @param   int         $id					id parent warehouse
-	 * @param   integer[]	$TChildWarehouses	array which will contain all children (param by reference)
-	 * @return  integer[]   $TChildWarehouses	array which will contain all children
-	 */
-	public function get_children_warehouses($id, &$TChildWarehouses)
-	{
-		// phpcs:enable
-
-		$sql = 'SELECT rowid
-				FROM '.MAIN_DB_PREFIX.'entrepot
-				WHERE fk_parent = '.((int) $id);
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			while ($res = $this->db->fetch_object($resql)) {
-				$TChildWarehouses[] = $res->rowid;
-				$this->get_children_warehouses($res->rowid, $TChildWarehouses);
-			}
-		}
-
-		return $TChildWarehouses;
-	}
 
 	/**
 	 *	Delete a warehouse
@@ -413,24 +408,103 @@ class Entrepot extends CommonObject
 			}
 		}
 
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 * 	Load warehouse info data
-	 *
-	 *  @param	int		$id      warehouse id
-	 *  @return	void
-	 */
-	public function info($id)
-	{
-		$sql = "SELECT e.rowid, e.datec, e.tms as datem, e.fk_user_author";
+    /**
+     *    Load warehouse data
+     *
+     * @param int    $id  Warehouse id
+     * @param string $ref Warehouse label
+     *
+     * @return        int                >0 if OK, <0 if KO
+     */
+    public function fetch($id, $ref = '')
+    {
+        global $conf;
+
+        dol_syslog(get_class($this) . "::fetch id=" . $id . " ref=" . $ref);
+
+        // Check parameters
+        if (!$id && !$ref) {
+            $this->error = 'ErrorWrongParameters';
+            dol_syslog(get_class($this) . "::fetch " . $this->error);
+            return -1;
+        }
+
+        $sql = "SELECT rowid, entity, fk_parent, fk_project, ref as label, description, statut, lieu, address, zip, town, fk_pays as country_id, phone, fax,";
+        $sql .= " model_pdf, import_key";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "entrepot";
+        if ($id) {
+            $sql .= " WHERE rowid = " . ((int) $id);
+        } else {
+            $sql .= " WHERE entity = " . $conf->entity;
+            if ($ref) {
+                $sql .= " AND ref = '" . $this->db->escape($ref) . "'";
+            }
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result) > 0) {
+                $obj = $this->db->fetch_object($result);
+
+                $this->id = $obj->rowid;
+                $this->entity = $obj->entity;
+                $this->fk_parent = $obj->fk_parent;
+                $this->fk_project = $obj->fk_project;
+                $this->ref = $obj->label;
+                $this->label = $obj->label;
+                $this->libelle = $obj->label; // deprecated
+                $this->description = $obj->description;
+                $this->statut = $obj->statut;
+                $this->lieu = $obj->lieu;
+                $this->address = $obj->address;
+                $this->zip = $obj->zip;
+                $this->town = $obj->town;
+                $this->country_id = $obj->country_id;
+                $this->phone = $obj->phone;
+                $this->fax = $obj->fax;
+
+                $this->model_pdf = $obj->model_pdf;
+                $this->import_key = $obj->import_key;
+
+                // Retrieve all extrafield
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+
+                include_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+                $tmp = getCountry($this->country_id, 'all');
+                $this->country = $tmp['label'];
+                $this->country_code = $tmp['code'];
+
+                return 1;
+            } else {
+                $this->error = "Record Not Found";
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     *    Load warehouse info data
+     *
+     * @param int $id warehouse id
+     *
+     * @return    void
+     */
+    public function info($id)
+    {
+        $sql = "SELECT e.rowid, e.datec, e.tms as datem, e.fk_user_author";
 		$sql .= " FROM ".MAIN_DB_PREFIX."entrepot as e";
 		$sql .= " WHERE e.rowid = ".((int) $id);
 
@@ -565,25 +639,64 @@ class Entrepot extends CommonObject
 		if ($result) {
 			$obj = $this->db->fetch_object($result);
 			$ret['nb'] = $obj->nb;
-			$ret['value'] = $obj->value;
-			$this->db->free($result);
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
+            $ret['value'] = $obj->value;
+            $this->db->free($result);
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	/**
-	 *	Return clickable name (possibility with the pictogram)
-	 *
-	 *	@param		int		$withpicto				with pictogram
-	 *	@param		string	$option					Where the link point to
-	 *  @param      int     $showfullpath   		0=Show ref only. 1=Show full path instead of Ref (this->fk_parent must be defined)
-	 *  @param	    int   	$notooltip				1=Disable tooltip
-	 *  @param  	string  $morecss            	Add more css on link
-	 *  @param  	int     $save_lastsearch_value  -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+    /**
+     *    Return label of status of object
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     *
+     * @return     string            Label of status
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->statut, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return label of a given status
+     *
+     * @param int $status Id status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     *
+     * @return string            Label of status
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        global $langs;
+
+        $statusType = 'status5';
+        if ($status > 0) {
+            $statusType = 'status4';
+        }
+
+        $langs->load('stocks');
+        $label = $langs->trans($this->statuts[$status]);
+        $labelshort = $langs->trans($this->statuts[$status]);
+
+        return dolGetStatus($label, $labelshort, '', $statusType, $mode);
+    }
+
+    /**
+     *    Return clickable name (possibility with the pictogram)
+     *
+     * @param int    $withpicto             with pictogram
+     * @param string $option                Where the link point to
+     * @param int    $showfullpath          0=Show ref only. 1=Show full path instead of Ref (this->fk_parent must be defined)
+     * @param int    $notooltip             1=Disable tooltip
+     * @param string $morecss               Add more css on link
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *	@return		string							String with URL
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $showfullpath = 0, $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
@@ -648,62 +761,55 @@ class Entrepot extends CommonObject
 
 		global $action;
 		$hookmanager->initHooks(array('warehousedao'));
-		$parameters = array('id'=>$this->id, 'getnomurl'=>$result, 'withpicto' => $withpicto, 'option' => $option, 'showfullpath' => $showfullpath, 'notooltip'=> $notooltip);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) {
-			$result = $hookmanager->resPrint;
-		} else {
-			$result .= $hookmanager->resPrint;
-		}
+		$parameters = array('id'=>$this->id, 'getnomurl'=>$result, 'withpicto' => $withpicto, 'option' => $option, 'showfullpath' => $showfullpath, 'notooltip' => $notooltip);
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Initialise an instance with random values.
+     *  Used to build previews or test instances.
+     *    id must be 0 if object instance is a specimen.
+     *
+     * @return    void
+     */
+    public function initAsSpecimen()
+    {
+        global $user, $langs, $conf, $mysoc;
 
-	/**
-	 *	Return label of status of object
-	 *
-	 *	@param      int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 *	@return     string      		Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->statut, $mode);
-	}
+        $now = dol_now();
 
-	/**
-	 *	Return label of a given status
-	 *
-	 *	@param	int		$status     Id status
-	 *	@param  int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 *	@return string      		Label of status
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		global $langs;
+        // Initialize parameters
+        $this->id = 0;
+        $this->label = 'WAREHOUSE SPECIMEN';
+        $this->description = 'WAREHOUSE SPECIMEN ' . dol_print_date($now, 'dayhourlog');
+        $this->statut = 1;
+        $this->specimen = 1;
 
-		$statusType = 'status5';
-		if ($status > 0) {
-			$statusType = 'status4';
-		}
+        $this->lieu = 'Location test';
+        $this->address = '21 jump street';
+        $this->zip = '99999';
+        $this->town = 'MyTown';
+        $this->country_id = 1;
+        $this->country_code = 'FR';
+    }
 
-		$langs->load('stocks');
-		$label = $langs->trans($this->statuts[$status]);
-		$labelshort = $langs->trans($this->statuts[$status]);
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		return dolGetStatus($label, $labelshort, '', $statusType, $mode);
-	}
-
-	/**
-	 *	Return full path to current warehouse
-	 *
-	 *	@return		string	String full path to current warehouse separated by " >> "
-	 */
-	public function get_full_arbo()
-	{
-		// phpcs:enable
+    /**
+     *    Return full path to current warehouse
+     *
+     * @return        string    String full path to current warehouse separated by " >> "
+     */
+    public function get_full_arbo()
+    {
+        // phpcs:enable
 		global $user, $langs, $conf;
 
 		$TArbo = array(empty($this->label) ? $this->libelle : $this->label);
@@ -738,111 +844,30 @@ class Entrepot extends CommonObject
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Load warehouse data
-	 *
-	 *	@param		int		$id     Warehouse id
-	 *	@param		string	$ref	Warehouse label
-	 *	@return		int				>0 if OK, <0 if KO
-	 */
-	public function fetch($id, $ref = '')
-	{
-		global $conf;
+    /**
+     * Return array of children warehouses ids from $id warehouse (recursive function)
+     *
+     * @param int       $id               id parent warehouse
+     * @param integer[] $TChildWarehouses array which will contain all children (param by reference)
+     * @return  integer[]   $TChildWarehouses    array which will contain all children
+     */
+    public function get_children_warehouses($id, &$TChildWarehouses)
+    {
+        // phpcs:enable
 
-		dol_syslog(get_class($this)."::fetch id=".$id." ref=".$ref);
+        $sql = 'SELECT rowid
+				FROM ' . MAIN_DB_PREFIX . 'entrepot
+				WHERE fk_parent = ' . ((int) $id);
 
-		// Check parameters
-		if (!$id && !$ref) {
-			$this->error = 'ErrorWrongParameters';
-			dol_syslog(get_class($this)."::fetch ".$this->error);
-			return -1;
-		}
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            while ($res = $this->db->fetch_object($resql)) {
+                $TChildWarehouses[] = $res->rowid;
+                $this->get_children_warehouses($res->rowid, $TChildWarehouses);
+            }
+        }
 
-		$sql  = "SELECT rowid, entity, fk_parent, fk_project, ref as label, description, statut, lieu, address, zip, town, fk_pays as country_id, phone, fax,";
-		$sql .= " model_pdf, import_key";
-		$sql .= " FROM ".MAIN_DB_PREFIX."entrepot";
-		if ($id) {
-			$sql .= " WHERE rowid = ".((int) $id);
-		} else {
-			$sql .= " WHERE entity = ".$conf->entity;
-			if ($ref) {
-				$sql .= " AND ref = '".$this->db->escape($ref)."'";
-			}
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result) > 0) {
-				$obj = $this->db->fetch_object($result);
-
-				$this->id             = $obj->rowid;
-				$this->entity         = $obj->entity;
-				$this->fk_parent      = $obj->fk_parent;
-				$this->fk_project     = $obj->fk_project;
-				$this->ref            = $obj->label;
-				$this->label          = $obj->label;
-				$this->libelle        = $obj->label; // deprecated
-				$this->description    = $obj->description;
-				$this->statut         = $obj->statut;
-				$this->lieu           = $obj->lieu;
-				$this->address        = $obj->address;
-				$this->zip            = $obj->zip;
-				$this->town           = $obj->town;
-				$this->country_id     = $obj->country_id;
-				$this->phone          = $obj->phone;
-				$this->fax            = $obj->fax;
-
-				$this->model_pdf      = $obj->model_pdf;
-				$this->import_key     = $obj->import_key;
-
-				// Retrieve all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				include_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-				$tmp = getCountry($this->country_id, 'all');
-				$this->country = $tmp['label'];
-				$this->country_code = $tmp['code'];
-
-				return 1;
-			} else {
-				$this->error = "Record Not Found";
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Initialise an instance with random values.
-	 *  Used to build previews or test instances.
-	 *	id must be 0 if object instance is a specimen.
-	 *
-	 *  @return	void
-	 */
-	public function initAsSpecimen()
-	{
-		global $user, $langs, $conf, $mysoc;
-
-		$now = dol_now();
-
-		// Initialize parameters
-		$this->id = 0;
-		$this->label = 'WAREHOUSE SPECIMEN';
-		$this->description = 'WAREHOUSE SPECIMEN '.dol_print_date($now, 'dayhourlog');
-		$this->statut = 1;
-		$this->specimen = 1;
-
-		$this->lieu = 'Location test';
-		$this->address = '21 jump street';
-		$this->zip = '99999';
-		$this->town = 'MyTown';
-		$this->country_id = 1;
-		$this->country_code = 'FR';
+        return $TChildWarehouses;
 	}
 
 	/**

@@ -67,124 +67,26 @@ class pdf_tcpdflabel extends CommonStickerGenerator
 	private $_xres = 0.4;
 
 	/**
-	 *	Function to build PDF on disk, then output on HTTP strem.
-	 *
-	 *	@param	array		$arrayofrecords		Array of record informations (array('textleft'=>,'textheader'=>, ..., 'id'=>,'photo'=>)
-	 *	@param	Translate	$outputlangs		Lang object for output language
-	 *	@param	string		$srctemplatepath	Full path of source filename for generator using a template file
-	 *	@param	string		$outputdir			Output directory for pdf file
-	 *  @param  string      $filename           Short file name of PDF output file
-	 *	@return int								1=OK, 0=KO
-	 */
-	public function write_file($arrayofrecords, $outputlangs, $srctemplatepath, $outputdir = '', $filename = 'tmp_address_sheet.pdf')
-	{
-		// phpcs:enable
-		global $user, $conf, $langs, $mysoc, $_Avery_Labels;
-
-		$this->code = $srctemplatepath;
-		$this->Tformat = $_Avery_Labels[$this->code];
-		if (empty($this->Tformat)) {
-			dol_print_error('', 'ErrorBadTypeForCard'.$this->code);
-			exit;
-		}
-		$this->type = 'pdf';
-		// standard format or custom
-		if ($this->Tformat['paper-size'] != 'custom') {
-			$this->format = $this->Tformat['paper-size'];
-		} else {
-			//custom
-			$resolution = array($this->Tformat['custom_x'], $this->Tformat['custom_y']);
-			$this->format = $resolution;
-		}
-
-		if (!is_object($outputlangs)) {
-			$outputlangs = $langs;
-		}
-		// For backward compatibility with FPDF, force output charset to ISO, because FPDF expect text to be encoded in ISO
-		if (!empty($conf->global->MAIN_USE_FPDF)) {
-			$outputlangs->charset_output = 'ISO-8859-1';
-		}
-
-		// Load traductions files required by page
-		$outputlangs->loadLangs(array("main", "dict", "companies", "admin"));
-
-		$title = $outputlangs->transnoentities('Labels');
-		$keywords = $title." ".$outputlangs->convToOutputCharset($mysoc->name);
-
-		$dir = (empty($outputdir) ? $conf->adherent->dir_temp : $outputdir);
-		$file = $dir."/".$filename;
-
-		if (!file_exists($dir)) {
-			if (dol_mkdir($dir) < 0) {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		}
-
-		$pdf = pdf_getInstance($this->format, $this->Tformat['metric'], $this->Tformat['orientation']);
-
-		if (class_exists('TCPDF')) {
-			$pdf->setPrintHeader(false);
-			$pdf->setPrintFooter(false);
-		}
-		$pdf->SetFont(pdf_getPDFFont($outputlangs));
-
-		$pdf->SetTitle($title);
-		$pdf->SetSubject($title);
-		$pdf->SetCreator("Dolibarr ".DOL_VERSION);
-		$pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
-		$pdf->SetKeyWords($keywords);
-		if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
-			$pdf->SetCompression(false);
-		}
-
-		$pdf->SetMargins(0, 0);
-		$pdf->SetAutoPageBreak(false);
-
-		$this->_Metric_Doc = $this->Tformat['metric'];
-		// Permet de commencer l'impression de l'etiquette desiree dans le cas ou la page a deja servie
-		$posX = 1;
-		$posY = 1;
-		if ($posX > 0) {
-			$posX--;
-		} else {
-			$posX = 0;
-		}
-		if ($posY > 0) {
-			$posY--;
-		} else {
-			$posY = 0;
-		}
-		$this->_COUNTX = $posX;
-		$this->_COUNTY = $posY;
-		$this->_Set_Format($pdf, $this->Tformat);
-
-
-		$pdf->Open();
-		$pdf->AddPage();
-
-
-		// Add each record
-		foreach ($arrayofrecords as $val) {
-			// imprime le texte specifique sur la carte
-			$this->addSticker($pdf, $outputlangs, $val);
-		}
-
-		//$pdf->SetXY(10, 295);
-		//$pdf->Cell($this->_Width, $this->_Line_Height, 'XXX',0,1,'C');
-
-
-		// Output to file
-		$pdf->Output($file, 'F');
-
-		if (!empty($conf->global->MAIN_UMASK)) {
-			@chmod($file, octdec($conf->global->MAIN_UMASK));
-		}
-
-
-		$this->result = array('fullpath'=>$file);
-
-		return 1;
+     * write barcode to pdf
+     *
+     * @param TCPDF   $pdf      PDF reference
+     * @param string  $code     code to print
+     * @param string  $encoding type of barcode
+     * @param boolean $is2d     true if 2d barcode
+     * @param int     $x        x position in user units
+     * @param int     $y        y position in user units
+     * @param int     $w        width in user units
+     * @param int     $h        height in user units
+     *
+     * @return void
+     */
+    private function writeBarcode(&$pdf, $code, $encoding, $is2d, $x, $y, $w, $h)
+    {
+        if ($is2d) {
+            $pdf->write2DBarcode($code, $encoding, $x, $y, $w, $h, $this->_style2d, $this->_align2d);
+        } else {
+            $pdf->write1DBarcode($code, $encoding, $x, $y, $w, $h, $this->_xres, $this->_style1d);
+        }
 	}
 
 	/**
@@ -349,25 +251,120 @@ class pdf_tcpdflabel extends CommonStickerGenerator
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * write barcode to pdf
-	 *
-	 * @param TCPDF	  $pdf		   PDF reference
-	 * @param string  $code		   code to print
-	 * @param string  $encoding	   type of barcode
-	 * @param boolean $is2d		   true if 2d barcode
-	 * @param int	  $x		   x position in user units
-	 * @param int	  $y		   y position in user units
-	 * @param int	  $w		   width in user units
-	 * @param int	  $h		   height in user units
-	 * @return void
-	 */
-	private function writeBarcode(&$pdf, $code, $encoding, $is2d, $x, $y, $w, $h)
-	{
-		if ($is2d) {
-			$pdf->write2DBarcode($code, $encoding, $x, $y, $w, $h, $this->_style2d, $this->_align2d);
-		} else {
-			$pdf->write1DBarcode($code, $encoding, $x, $y, $w, $h, $this->_xres, $this->_style1d);
-		}
-	}
+    /**
+     *    Function to build PDF on disk, then output on HTTP strem.
+     *
+     * @param array     $arrayofrecords  Array of record informations (array('textleft'=>,'textheader'=>, ..., 'id'=>,'photo'=>)
+     * @param Translate $outputlangs     Lang object for output language
+     * @param string    $srctemplatepath Full path of source filename for generator using a template file
+     * @param string    $outputdir       Output directory for pdf file
+     * @param string    $filename        Short file name of PDF output file
+     * @return int                                1=OK, 0=KO
+     */
+    public function write_file($arrayofrecords, $outputlangs, $srctemplatepath, $outputdir = '', $filename = 'tmp_address_sheet.pdf')
+    {
+        // phpcs:enable
+        global $user, $conf, $langs, $mysoc, $_Avery_Labels;
+
+        $this->code = $srctemplatepath;
+        $this->Tformat = $_Avery_Labels[$this->code];
+        if (empty($this->Tformat)) {
+            dol_print_error('', 'ErrorBadTypeForCard' . $this->code);
+            exit;
+        }
+        $this->type = 'pdf';
+        // standard format or custom
+        if ($this->Tformat['paper-size'] != 'custom') {
+            $this->format = $this->Tformat['paper-size'];
+        } else {
+            //custom
+            $resolution = [$this->Tformat['custom_x'], $this->Tformat['custom_y']];
+            $this->format = $resolution;
+        }
+
+        if (!is_object($outputlangs)) {
+            $outputlangs = $langs;
+        }
+        // For backward compatibility with FPDF, force output charset to ISO, because FPDF expect text to be encoded in ISO
+        if (!empty($conf->global->MAIN_USE_FPDF)) {
+            $outputlangs->charset_output = 'ISO-8859-1';
+        }
+
+        // Load traductions files required by page
+        $outputlangs->loadLangs(["main", "dict", "companies", "admin"]);
+
+        $title = $outputlangs->transnoentities('Labels');
+        $keywords = $title . " " . $outputlangs->convToOutputCharset($mysoc->name);
+
+        $dir = (empty($outputdir) ? $conf->adherent->dir_temp : $outputdir);
+        $file = $dir . "/" . $filename;
+
+        if (!file_exists($dir)) {
+            if (dol_mkdir($dir) < 0) {
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        }
+
+        $pdf = pdf_getInstance($this->format, $this->Tformat['metric'], $this->Tformat['orientation']);
+
+        if (class_exists('TCPDF')) {
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+        }
+        $pdf->SetFont(pdf_getPDFFont($outputlangs));
+
+        $pdf->SetTitle($title);
+        $pdf->SetSubject($title);
+        $pdf->SetCreator("Dolibarr " . DOL_VERSION);
+        $pdf->SetAuthor($outputlangs->convToOutputCharset($user->getFullName($outputlangs)));
+        $pdf->SetKeyWords($keywords);
+        if (!empty($conf->global->MAIN_DISABLE_PDF_COMPRESSION)) {
+            $pdf->SetCompression(false);
+        }
+
+        $pdf->SetMargins(0, 0);
+        $pdf->SetAutoPageBreak(false);
+
+        $this->_Metric_Doc = $this->Tformat['metric'];
+        // Permet de commencer l'impression de l'etiquette desiree dans le cas ou la page a deja servie
+        $posX = 1;
+        $posY = 1;
+        if ($posX > 0) {
+            $posX--;
+        } else {
+            $posX = 0;
+        }
+        if ($posY > 0) {
+            $posY--;
+        } else {
+            $posY = 0;
+        }
+        $this->_COUNTX = $posX;
+        $this->_COUNTY = $posY;
+        $this->_Set_Format($pdf, $this->Tformat);
+
+        $pdf->Open();
+        $pdf->AddPage();
+
+        // Add each record
+        foreach ($arrayofrecords as $val) {
+            // imprime le texte specifique sur la carte
+            $this->addSticker($pdf, $outputlangs, $val);
+        }
+
+        //$pdf->SetXY(10, 295);
+        //$pdf->Cell($this->_Width, $this->_Line_Height, 'XXX',0,1,'C');
+
+        // Output to file
+        $pdf->Output($file, 'F');
+
+        if (!empty($conf->global->MAIN_UMASK)) {
+            @chmod($file, octdec($conf->global->MAIN_UMASK));
+        }
+
+        $this->result = ['fullpath' => $file];
+
+        return 1;
+    }
 }

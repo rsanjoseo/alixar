@@ -334,71 +334,46 @@ class Dolistore
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * version compare
-	 *
-	 * @param   string  $v1     version 1
-	 * @param   string  $v2     version 2
-	 * @return int              result of compare
-	 */
-	public function version_compare($v1, $v2)
-	{
-		// phpcs:enable
-		$v1       = explode('.', $v1);
-		$v2       = explode('.', $v2);
-		$ret      = 0;
-		$level    = 0;
-		$count1   = count($v1);
-		$count2   = count($v2);
-		$maxcount = max($count1, $count2);
-		while ($level < $maxcount) {
-			$operande1 = isset($v1[$level]) ? $v1[$level] : 'x';
-			$operande2 = isset($v2[$level]) ? $v2[$level] : 'x';
-			$level++;
-			if (strtoupper($operande1) == 'X' || strtoupper($operande2) == 'X' || $operande1 == '*' || $operande2 == '*') {
-				break;
-			}
-			if ($operande1 < $operande2) {
-				$ret = -$level;
-				break;
-			}
-			if ($operande1 > $operande2) {
-				$ret = $level;
-				break;
-			}
-		}
-		//print join('.',$versionarray1).'('.count($versionarray1).') / '.join('.',$versionarray2).'('.count($versionarray2).') => '.$ret.'<br>'."\n";
-		return $ret;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * get previous link
 	 *
-	 * @param   string    $text     symbol previous
-	 * @return  string              html previous link
-	 */
-	public function get_previous_link($text = '<<')
-	{
-		// phpcs:enable
-		return '<a href="'.$this->get_previous_url().'" class="button">'.dol_escape_htmltag($text).'</a>';
-	}
+     * @param string $text symbol previous
+     * @return  string              html previous link
+     */
+    public function get_previous_link($text = '<<')
+    {
+        // phpcs:enable
+        return '<a href="' . $this->get_previous_url() . '" class="button">' . dol_escape_htmltag($text) . '</a>';
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * get previous url
-	 *
-	 * @return string    previous url
-	 */
-	public function get_previous_url()
-	{
-		// phpcs:enable
-		$param_array = array();
-		if ($this->start < $this->per_page) {
-			$sub = 0;
+    /**
+     * get next link
+     *
+     * @param string $text symbol next
+     *
+     * @return  string              html next link
+     */
+    public function get_next_link($text = '>>')
+    {
+        // phpcs:enable
+        return '<a href="' . $this->get_next_url() . '" class="button">' . dol_escape_htmltag($text) . '</a>';
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * get previous url
+     *
+     * @return string    previous url
+     */
+    public function get_previous_url()
+    {
+        // phpcs:enable
+        $param_array = [];
+        if ($this->start < $this->per_page) {
+            $sub = 0;
 		} else {
 			$sub = $this->per_page;
 		}
@@ -412,21 +387,6 @@ class Dolistore
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * get next link
-	 *
-	 * @param   string    $text     symbol next
-	 * @return  string              html next link
-	 */
-	public function get_next_link($text = '>>')
-	{
-		// phpcs:enable
-		return '<a href="'.$this->get_next_url().'" class="button">'.dol_escape_htmltag($text).'</a>';
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * get next url
 	 *
@@ -439,14 +399,54 @@ class Dolistore
 		if (count($this->products) < $this->per_page) {
 			$add = 0;
 		} else {
-			$add = $this->per_page;
-		}
-		$param_array['start'] = $this->start + $add;
-		$param_array['end']   = $this->end + $add;
-		if ($this->categorie != 0) {
-			$param_array['categorie'] = $this->categorie;
-		}
-		$param = http_build_query($param_array);
-		return $this->url."&".$param;
-	}
+            $add = $this->per_page;
+        }
+        $param_array['start'] = $this->start + $add;
+        $param_array['end'] = $this->end + $add;
+        if ($this->categorie != 0) {
+            $param_array['categorie'] = $this->categorie;
+        }
+        $param = http_build_query($param_array);
+        return $this->url . "&" . $param;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * version compare
+     *
+     * @param string $v1 version 1
+     * @param string $v2 version 2
+     *
+     * @return int              result of compare
+     */
+    public function version_compare($v1, $v2)
+    {
+        // phpcs:enable
+        $v1 = explode('.', $v1);
+        $v2 = explode('.', $v2);
+        $ret = 0;
+        $level = 0;
+        $count1 = count($v1);
+        $count2 = count($v2);
+        $maxcount = max($count1, $count2);
+        while ($level < $maxcount) {
+            $operande1 = isset($v1[$level]) ? $v1[$level] : 'x';
+            $operande2 = isset($v2[$level]) ? $v2[$level] : 'x';
+            $level++;
+            if (strtoupper($operande1) == 'X' || strtoupper($operande2) == 'X' || $operande1 == '*' || $operande2 == '*') {
+                break;
+            }
+            if ($operande1 < $operande2) {
+                $ret = -$level;
+                break;
+            }
+            if ($operande1 > $operande2) {
+                $ret = $level;
+                break;
+            }
+        }
+        //print join('.',$versionarray1).'('.count($versionarray1).') / '.join('.',$versionarray2).'('.count($versionarray2).') => '.$ret.'<br>'."\n";
+        return $ret;
+    }
 }

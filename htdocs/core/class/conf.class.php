@@ -258,6 +258,7 @@ class Conf
                     }
                     $i++;
                 }
+
                 $db->free($resql);
             }
 

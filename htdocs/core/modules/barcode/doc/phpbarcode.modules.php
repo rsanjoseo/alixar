@@ -83,34 +83,43 @@ class modPhpbarcode extends ModeleBarCode
 		return true;
 	}
 
+
 	/**
-	 *	Save an image file on disk (with no output)
-	 *
-	 *	@param	string   	$code			  Value to encode
-	 *	@param	string   	$encoding		  Mode of encoding
-	 *	@param  string	 	$readable		  Code can be read
-	 *	@param	integer		$scale			  Scale
-	 *  @param  integer     $nooutputiferror  No output if error
-	 *	@return	int							  <0 if KO, >0 if OK
-	 */
-	public function writeBarCode($code, $encoding, $readable = 'Y', $scale = 1, $nooutputiferror = 0)
-	{
-		global $conf, $filebarcode;
+     *    Return true if encoding is supported
+     *
+     * @param string $encoding Encoding norm
+     *
+     * @return    int                        >0 if supported, 0 if not
+     */
+    public function encodingIsSupported($encoding)
+    {
+        global $genbarcode_loc;
+        //print 'genbarcode_loc='.$genbarcode_loc.' encoding='.$encoding;exit;
 
-		dol_mkdir($conf->barcode->dir_temp);
-		if (!is_writable($conf->barcode->dir_temp)) {
-			$this->error = "Failed to write in temp directory ".$conf->barcode->dir_temp;
-			dol_syslog('Error in write_file: '.$this->error, LOG_ERR);
-			return -1;
-		}
-
-		$file = $conf->barcode->dir_temp.'/barcode_'.$code.'_'.$encoding.'.png';
-
-		$filebarcode = $file; // global var to be used in barcode_outimage called by barcode_print in buildBarCode
-
-		$result = $this->buildBarCode($code, $encoding, $readable, $scale, $nooutputiferror);
-
-		return $result;
+        $supported = 0;
+        if ($encoding == 'EAN13') {
+            $supported = 1;
+        }
+        if ($encoding == 'ISBN') {
+            $supported = 1;
+        }
+        if ($encoding == 'UPC') {
+            $supported = 1;
+        }
+        // Formats that hangs on Windows (when genbarcode.exe for Windows is called, so they are not
+        // activated on Windows)
+        if (file_exists($genbarcode_loc) && empty($_SERVER["WINDIR"])) {
+            if ($encoding == 'EAN8') {
+                $supported = 1;
+            }
+            if ($encoding == 'C39') {
+                $supported = 1;
+            }
+            if ($encoding == 'C128') {
+                $supported = 1;
+            }
+        }
+        return $supported;
 	}
 
 	/**
@@ -161,42 +170,35 @@ class modPhpbarcode extends ModeleBarCode
 		}
 
 		return 1;
-	}
+    }
 
-	/**
-	 *	Return true if encoding is supported
-	 *
-	 *	@param	string	$encoding		Encoding norm
-	 *	@return	int						>0 if supported, 0 if not
-	 */
-	public function encodingIsSupported($encoding)
-	{
-		global $genbarcode_loc;
-		//print 'genbarcode_loc='.$genbarcode_loc.' encoding='.$encoding;exit;
+    /**
+     *    Save an image file on disk (with no output)
+     *
+     * @param string  $code            Value to encode
+     * @param string  $encoding        Mode of encoding
+     * @param string  $readable        Code can be read
+     * @param integer $scale           Scale
+     * @param integer $nooutputiferror No output if error
+     * @return    int                              <0 if KO, >0 if OK
+     */
+    public function writeBarCode($code, $encoding, $readable = 'Y', $scale = 1, $nooutputiferror = 0)
+    {
+        global $conf, $filebarcode;
 
-		$supported = 0;
-		if ($encoding == 'EAN13') {
-			$supported = 1;
-		}
-		if ($encoding == 'ISBN') {
-			$supported = 1;
-		}
-		if ($encoding == 'UPC') {
-			$supported = 1;
-		}
-		// Formats that hangs on Windows (when genbarcode.exe for Windows is called, so they are not
-		// activated on Windows)
-		if (file_exists($genbarcode_loc) && empty($_SERVER["WINDIR"])) {
-			if ($encoding == 'EAN8') {
-				$supported = 1;
-			}
-			if ($encoding == 'C39') {
-				$supported = 1;
-			}
-			if ($encoding == 'C128') {
-				$supported = 1;
-			}
-		}
-		return $supported;
+        dol_mkdir($conf->barcode->dir_temp);
+        if (!is_writable($conf->barcode->dir_temp)) {
+            $this->error = "Failed to write in temp directory " . $conf->barcode->dir_temp;
+            dol_syslog('Error in write_file: ' . $this->error, LOG_ERR);
+            return -1;
+        }
+
+        $file = $conf->barcode->dir_temp . '/barcode_' . $code . '_' . $encoding . '.png';
+
+        $filebarcode = $file; // global var to be used in barcode_outimage called by barcode_print in buildBarCode
+
+        $result = $this->buildBarCode($code, $encoding, $readable, $scale, $nooutputiferror);
+
+        return $result;
 	}
 }

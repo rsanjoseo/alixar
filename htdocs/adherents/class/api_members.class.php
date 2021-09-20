@@ -41,24 +41,58 @@ class Members extends DolibarrApi
 		'typeid'
 	);
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+    }
 
-	/**
-	 * Get properties of a member object by linked thirdparty
-	 *
-	 * Return an array with member informations
-	 *
-	 * @param     int     $thirdparty 	ID of third party
-	 *
-	 * @return Object 					Data without useless information
-	 *
+    /**
+     * Get properties of a member object
+     *
+     * Return an array with member informations
+     *
+     * @param int $id ID of member
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->adherent->lire) {
+            throw new RestException(401);
+        }
+
+        $member = new Adherent($this->db);
+        if ($id == 0) {
+            $result = $member->initAsSpecimen();
+        } else {
+            $result = $member->fetch($id);
+        }
+        if (!$result) {
+            throw new RestException(404, 'member not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('adherent', $member->id) && $id > 0) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        return $this->_cleanObjectDatas($member);
+    }
+
+    /**
+     * Get properties of a member object by linked thirdparty
+     *
+     * Return an array with member informations
+     *
+     * @param int $thirdparty ID of third party
+     *
+     * @return Object                    Data without useless information
+     *
 	 * @url GET thirdparty/{thirdparty}
 	 *
 	 * @throws RestException 401
@@ -81,34 +115,6 @@ class Members extends DolibarrApi
 		}
 
 		return $this->_cleanObjectDatas($member);
-	}
-
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object    Object to clean
-	 * @return  Object    Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		// Remove the subscriptions because they are handled as a subresource.
-		unset($object->subscriptions);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-		unset($object->fk_delivery_address);
-		unset($object->shipping_method_id);
-
-		unset($object->total_ht);
-		unset($object->total_ttc);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-
-		return $object;
 	}
 
 	/**
@@ -297,26 +303,6 @@ class Members extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before creating an object
-	 *
-	 * @param array|null    $data   Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$member = array();
-		foreach (Members::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$member[$field] = $data[$field];
-		}
-		return $member;
-	}
-
-	/**
 	 * Update member
 	 *
 	 * @param int   $id             ID of member to update
@@ -377,41 +363,6 @@ class Members extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a member object
-	 *
-	 * Return an array with member informations
-	 *
-	 * @param     int     $id ID of member
-	 * @return    array|mixed data without useless information
-	 *
-	 * @throws    RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->adherent->lire) {
-			throw new RestException(401);
-		}
-
-		$member = new Adherent($this->db);
-		if ($id == 0) {
-			$result = $member->initAsSpecimen();
-		} else {
-			$result = $member->fetch($id);
-		}
-		if (!$result) {
-			throw new RestException(404, 'member not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('adherent', $member->id) && $id > 0) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		return $this->_cleanObjectDatas($member);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete member
 	 *
 	 * @param int $id   member ID
@@ -434,28 +385,80 @@ class Members extends DolibarrApi
 
 		if (!$member->delete($member->id, DolibarrApiAccess::$user)) {
 			throw new RestException(401, 'error when deleting member');
-		}
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'member deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'member deleted',
+            ],
+        ];
+    }
 
-	/**
-	 * List subscriptions of a member
-	 *
-	 * Get a list of subscriptions
-	 *
-	 * @param int $id ID of member
-	 * @return array Array of subscription objects
-	 *
-	 * @throws RestException
-	 *
-	 * @url GET {id}/subscriptions
-	 */
+    /**
+     * Validate fields before creating an object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $member = [];
+        foreach (Members::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $member[$field] = $data[$field];
+        }
+        return $member;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object    Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        // Remove the subscriptions because they are handled as a subresource.
+        unset($object->subscriptions);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+        unset($object->fk_delivery_address);
+        unset($object->shipping_method_id);
+
+        unset($object->total_ht);
+        unset($object->total_ttc);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+
+        return $object;
+    }
+
+    /**
+     * List subscriptions of a member
+     *
+     * Get a list of subscriptions
+     *
+     * @param int $id ID of member
+     * @return array Array of subscription objects
+     *
+     * @throws RestException
+     *
+     * @url GET {id}/subscriptions
+     */
 	public function getSubscriptions($id)
 	{
 		$obj_ret = array();

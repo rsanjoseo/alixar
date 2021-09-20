@@ -51,134 +51,145 @@ class Propal extends CommonObject
 	use CommonIncoterm;
 
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Signed quote
-	 */
-	const STATUS_SIGNED = 2;
-	/**
-	 * Not signed quote
-	 */
-	const STATUS_NOTSIGNED = 3;
-/**
-	 * Billed or processed quote
-	 */
-	const STATUS_BILLED = 4;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'propal';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'propal';
+
 	/**
 	 * @var int    Name of subtable line
 	 */
 	public $table_element_line = 'propaldet';
+
 	/**
 	 * @var string Fieldname with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_propal';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'propal';
+
 	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1;
-	/**
-	 * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
-	 * @var integer
-	 */
-	public $restrictiononfksoc = 1;
-	/**
-	 * ID of the client
-	 * @var int
-	 */
-	public $socid;
-	/**
-	 * ID of the contact
-	 * @var int
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
+     *
+     * @var integer
+     */
+    public $restrictiononfksoc = 1;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    /**
+     * ID of the client
+     *
+     * @var int
+     */
+    public $socid;
+
+    /**
+     * ID of the contact
+     * @var int
 	 */
 	public $contactid;
 	public $author;
+
 	/**
 	 * Ref from thirdparty
 	 * @var string
 	 */
 	public $ref_client;
+
 	/**
 	 * Status of the quote
 	 * @var int
 	 * @see Propal::STATUS_DRAFT, Propal::STATUS_VALIDATED, Propal::STATUS_SIGNED, Propal::STATUS_NOTSIGNED, Propal::STATUS_BILLED
 	 */
 	public $statut;
+
 	/**
 	 * Status of the quote
 	 * @var int
 	 * @see Propal::STATUS_DRAFT, Propal::STATUS_VALIDATED, Propal::STATUS_SIGNED, Propal::STATUS_NOTSIGNED, Propal::STATUS_BILLED
 	 */
 	public $status;
+
 	/**
 	 * @deprecated
 	 * @see $date_creation
 	 */
 	public $datec;
+
 	/**
 	 * @var integer|string $date_creation;
 	 */
 	public $date_creation;
+
 	/**
 	 * @deprecated
 	 * @see $date_validation
-	 */
-	public $datev;
-	/**
-	 * @var integer|string $date_validation;
-	 */
-	public $date_validation;
-	/**
-	 * @var integer|string $date_signature;
-	 */
-	public $date_signature; // deprecated; Use delivery_date instead.
-	/**
-	 * @var User $user_signature
-	 */
-	public $user_signature; // Date expected of shipment (date starting shipment, not the reception that occurs some days after)
-	/**
-	 * @var integer|string date of the quote;
-	 */
-	public $date;
-	/**
-	 * @deprecated
-	 * @see $date
-	 */
-	public $datep;
-/**
-	 * @var int	Date expected for delivery
-	 * @deprecated
-	 */
-	public $date_livraison;
-/**
-	 * @var integer|string 	$delivery_date;
-	 */
-	public $delivery_date;
-	public $fin_validite;
-	public $user_author_id;
-	public $user_valid_id;
-	public $user_close_id;
-	/**
-	 * @deprecated
-	 * @see $total_ht
+     */
+    public $datev;
+
+    /**
+     * @var integer|string $date_validation ;
+     */
+    public $date_validation;
+
+    /**
+     * @var integer|string $date_signature ;
+     */
+    public $date_signature;
+
+    /**
+     * @var User $user_signature
+     */
+    public $user_signature;
+
+    /**
+     * @var integer|string date of the quote;
+     */
+    public $date;
+
+    /**
+     * @deprecated
+     * @see $date
+     */
+    public $datep;
+
+    /**
+     * @var int    Date expected for delivery
+     * @deprecated
+     */
+    public $date_livraison; // deprecated; Use delivery_date instead.
+
+    /**
+     * @var integer|string $delivery_date ;
+     */
+    public $delivery_date; // Date expected of shipment (date starting shipment, not the reception that occurs some days after)
+
+    public $fin_validite;
+
+    public $user_author_id;
+    public $user_valid_id;
+    public $user_close_id;
+
+    /**
+     * @deprecated
+     * @see $total_ht
 	 */
 	public $price;
 	/**
@@ -191,142 +202,169 @@ class Propal extends CommonObject
 	 * @see $total_ttc
 	 */
 	public $total;
+
 	public $cond_reglement_code;
 	public $mode_reglement_code;
 	public $remise = 0;
 	public $remise_percent = 0;
 	public $remise_absolue = 0;
+
 	/**
 	 * @var int ID
 	 * @deprecated
 	 */
 	public $fk_address;
+
 	public $address_type;
 	public $address;
+
 	public $availability_id;
 	public $availability_code;
+
 	public $duree_validite;
+
 	public $demand_reason_id;
 	public $demand_reason_code;
+
 	public $warehouse_id;
-	public $extraparams = array();
 
-	// Multicurrency
-	/**
-	 * @var PropaleLigne[]
-	 */
-	public $lines = array();
-	public $line;
-	public $labelStatus = array();
-	public $labelStatusShort = array();
-	/**
-	 * @var int ID
-	 */
-	public $fk_multicurrency;
-	public $multicurrency_code;
+    public $extraparams = [];
 
+    /**
+     * @var PropaleLigne[]
+     */
+    public $lines = [];
+    public $line;
 
-	/**
-	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'noteditable' says if field is not editable (1 or 0)
-	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
-	 *  'index' if we want an index in database.
-	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
-	 *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
-	 *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
-	 *  'css' is the CSS style to use on field. For example: 'maxwidth200'
-	 *  'help' is a string visible as a tooltip on field
-	 *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
-	 *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
-	 *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
-	 *  'comment' is not used. You can store here any text of your choice. It is not used by application.
-	 *
-	 *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
-	 */
+    public $labelStatus = [];
+    public $labelStatusShort = [];
+
+    // Multicurrency
+    /**
+     * @var int ID
+     */
+    public $fk_multicurrency;
+
+    public $multicurrency_code;
+    public $multicurrency_tx;
+    public $multicurrency_total_ht;
+    public $multicurrency_total_tva;
+    public $multicurrency_total_ttc;
+
+    /**
+     *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'noteditable' says if field is not editable (1 or 0)
+     *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
+     *  'index' if we want an index in database.
+     *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
+     *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
+     *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
+     *  'css' is the CSS style to use on field. For example: 'maxwidth200'
+     *  'help' is a string visible as a tooltip on field
+     *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
+     *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
+     *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
+     *  'comment' is not used. You can store here any text of your choice. It is not used by application.
+     *
+     *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
+     */
 
 	// BEGIN MODULEBUILDER PROPERTIES
-	public $multicurrency_tx;
-	// END MODULEBUILDER PROPERTIES
-	public $multicurrency_total_ht;
-	public $multicurrency_total_tva;
-	public $multicurrency_total_ttc;
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>15, 'index'=>1),
-		'ref' =>array('type'=>'varchar(30)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>20),
-		'ref_client' =>array('type'=>'varchar(255)', 'label'=>'RefCustomer', 'enabled'=>1, 'visible'=>-1, 'position'=>22),
-		'ref_ext' =>array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>1, 'visible'=>0, 'position'=>40),
-		'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'position'=>23),
-		'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Fk projet', 'enabled'=>1, 'visible'=>-1, 'position'=>24),
-		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>25),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
-		'datep' =>array('type'=>'date', 'label'=>'Date', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
-		'fin_validite' =>array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>-1, 'position'=>65),
-		'date_valid' =>array('type'=>'datetime', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>70),
-		'date_cloture' =>array('type'=>'datetime', 'label'=>'DateClosing', 'enabled'=>1, 'visible'=>-1, 'position'=>75),
-		'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-1, 'position'=>80),
-		'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>85),
-		'fk_user_valid' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
-		'fk_user_cloture' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user cloture', 'enabled'=>1, 'visible'=>-1, 'position'=>95),
-		'price' =>array('type'=>'double', 'label'=>'Price', 'enabled'=>1, 'visible'=>-1, 'position'=>105),
-		'remise_percent' =>array('type'=>'double', 'label'=>'RelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>110),
-		'remise_absolue' =>array('type'=>'double', 'label'=>'CustomerRelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>115),
-		//'remise' =>array('type'=>'double', 'label'=>'Remise', 'enabled'=>1, 'visible'=>-1, 'position'=>120),
-		'total_ht' =>array('type'=>'double(24,8)', 'label'=>'TotalHT', 'enabled'=>1, 'visible'=>-1, 'position'=>125, 'isameasure'=>1),
-		'total_tva' =>array('type'=>'double(24,8)', 'label'=>'VAT', 'enabled'=>1, 'visible'=>-1, 'position'=>130, 'isameasure'=>1),
-		'localtax1' =>array('type'=>'double(24,8)', 'label'=>'LocalTax1', 'enabled'=>1, 'visible'=>-1, 'position'=>135, 'isameasure'=>1),
-		'localtax2' =>array('type'=>'double(24,8)', 'label'=>'LocalTax2', 'enabled'=>1, 'visible'=>-1, 'position'=>140, 'isameasure'=>1),
-		'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'TotalTTC', 'enabled'=>1, 'visible'=>-1, 'position'=>145, 'isameasure'=>1),
-		'fk_account' =>array('type'=>'integer', 'label'=>'BankAccount', 'enabled'=>1, 'visible'=>-1, 'position'=>150),
-		'fk_currency' =>array('type'=>'varchar(3)', 'label'=>'Currency', 'enabled'=>1, 'visible'=>-1, 'position'=>155),
-		'fk_cond_reglement' =>array('type'=>'integer', 'label'=>'PaymentTerm', 'enabled'=>1, 'visible'=>-1, 'position'=>160),
-		'fk_mode_reglement' =>array('type'=>'integer', 'label'=>'PaymentMode', 'enabled'=>1, 'visible'=>-1, 'position'=>165),
-		'note_private' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>170),
-		'note_public' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>175),
-		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'PDFTemplate', 'enabled'=>1, 'visible'=>0, 'position'=>180),
-		'date_livraison' =>array('type'=>'date', 'label'=>'DateDeliveryPlanned', 'enabled'=>1, 'visible'=>-1, 'position'=>185),
-		'fk_shipping_method' =>array('type'=>'integer', 'label'=>'ShippingMethod', 'enabled'=>1, 'visible'=>-1, 'position'=>190),
-		'fk_warehouse' =>array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php', 'label'=>'Fk warehouse', 'enabled'=>1, 'visible'=>-1, 'position'=>191),
-		'fk_availability' =>array('type'=>'integer', 'label'=>'Availability', 'enabled'=>1, 'visible'=>-1, 'position'=>195),
-		'fk_delivery_address' =>array('type'=>'integer', 'label'=>'DeliveryAddress', 'enabled'=>1, 'visible'=>0, 'position'=>200), // deprecated
-		'fk_input_reason' =>array('type'=>'integer', 'label'=>'InputReason', 'enabled'=>1, 'visible'=>-1, 'position'=>205),
-		'extraparams' =>array('type'=>'varchar(255)', 'label'=>'Extraparams', 'enabled'=>1, 'visible'=>-1, 'position'=>215),
-		'fk_incoterms' =>array('type'=>'integer', 'label'=>'IncotermCode', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>220),
-		'location_incoterms' =>array('type'=>'varchar(255)', 'label'=>'IncotermLabel', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>225),
-		'fk_multicurrency' =>array('type'=>'integer', 'label'=>'MulticurrencyID', 'enabled'=>1, 'visible'=>-1, 'position'=>230),
-		'multicurrency_code' =>array('type'=>'varchar(255)', 'label'=>'MulticurrencyCurrency', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>235),
-		'multicurrency_tx' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyRate', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>240, 'isameasure'=>1),
-		'multicurrency_total_ht' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountHT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>245, 'isameasure'=>1),
-		'multicurrency_total_tva' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountVAT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>250, 'isameasure'=>1),
-		'multicurrency_total_ttc' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountTTC', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>255, 'isameasure'=>1),
-		'last_main_doc' =>array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>1, 'visible'=>-1, 'position'=>260),
-		'fk_statut' =>array('type'=>'smallint(6)', 'label'=>'Status', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>500),
-		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>900),
-	);
-		/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref'; // Todo rename into STATUS_CLOSE ?
+        'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>15, 'index'=>1),
+        'ref' =>array('type'=>'varchar(30)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>20),
+        'ref_client' =>array('type'=>'varchar(255)', 'label'=>'RefCustomer', 'enabled'=>1, 'visible'=>-1, 'position'=>22),
+        'ref_ext' =>array('type'=>'varchar(255)', 'label'=>'RefExt', 'enabled'=>1, 'visible'=>0, 'position'=>40),
+        'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'position'=>23),
+        'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Fk projet', 'enabled'=>1, 'visible'=>-1, 'position'=>24),
+        'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>25),
+        'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
+        'datep' =>array('type'=>'date', 'label'=>'Date', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
+        'fin_validite' =>array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>1, 'visible'=>-1, 'position'=>65),
+        'date_valid' =>array('type'=>'datetime', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>70),
+        'date_cloture' =>array('type'=>'datetime', 'label'=>'DateClosing', 'enabled'=>1, 'visible'=>-1, 'position'=>75),
+        'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-1, 'position'=>80),
+        'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>85),
+        'fk_user_valid' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
+        'fk_user_cloture' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user cloture', 'enabled'=>1, 'visible'=>-1, 'position'=>95),
+        'price' =>array('type'=>'double', 'label'=>'Price', 'enabled'=>1, 'visible'=>-1, 'position'=>105),
+        'remise_percent' =>array('type'=>'double', 'label'=>'RelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>110),
+        'remise_absolue' =>array('type'=>'double', 'label'=>'CustomerRelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>115),
+        //'remise' =>array('type'=>'double', 'label'=>'Remise', 'enabled'=>1, 'visible'=>-1, 'position'=>120),
+        'total_ht' =>array('type'=>'double(24,8)', 'label'=>'TotalHT', 'enabled'=>1, 'visible'=>-1, 'position'=>125, 'isameasure'=>1),
+        'total_tva' =>array('type'=>'double(24,8)', 'label'=>'VAT', 'enabled'=>1, 'visible'=>-1, 'position'=>130, 'isameasure'=>1),
+        'localtax1' =>array('type'=>'double(24,8)', 'label'=>'LocalTax1', 'enabled'=>1, 'visible'=>-1, 'position'=>135, 'isameasure'=>1),
+        'localtax2' =>array('type'=>'double(24,8)', 'label'=>'LocalTax2', 'enabled'=>1, 'visible'=>-1, 'position'=>140, 'isameasure'=>1),
+        'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'TotalTTC', 'enabled'=>1, 'visible'=>-1, 'position'=>145, 'isameasure'=>1),
+        'fk_account' =>array('type'=>'integer', 'label'=>'BankAccount', 'enabled'=>1, 'visible'=>-1, 'position'=>150),
+        'fk_currency' =>array('type'=>'varchar(3)', 'label'=>'Currency', 'enabled'=>1, 'visible'=>-1, 'position'=>155),
+        'fk_cond_reglement' =>array('type'=>'integer', 'label'=>'PaymentTerm', 'enabled'=>1, 'visible'=>-1, 'position'=>160),
+        'fk_mode_reglement' =>array('type'=>'integer', 'label'=>'PaymentMode', 'enabled'=>1, 'visible'=>-1, 'position'=>165),
+        'note_private' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>170),
+        'note_public' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>175),
+        'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'PDFTemplate', 'enabled'=>1, 'visible'=>0, 'position'=>180),
+        'date_livraison' =>array('type'=>'date', 'label'=>'DateDeliveryPlanned', 'enabled'=>1, 'visible'=>-1, 'position'=>185),
+        'fk_shipping_method' =>array('type'=>'integer', 'label'=>'ShippingMethod', 'enabled'=>1, 'visible'=>-1, 'position'=>190),
+        'fk_warehouse' =>array('type'=>'integer:Entrepot:product/stock/class/entrepot.class.php', 'label'=>'Fk warehouse', 'enabled'=>1, 'visible'=>-1, 'position'=>191),
+        'fk_availability' =>array('type'=>'integer', 'label'=>'Availability', 'enabled'=>1, 'visible'=>-1, 'position'=>195),
+        'fk_delivery_address' =>array('type'=>'integer', 'label'=>'DeliveryAddress', 'enabled'=>1, 'visible'=>0, 'position'=>200), // deprecated
+        'fk_input_reason' =>array('type'=>'integer', 'label'=>'InputReason', 'enabled'=>1, 'visible'=>-1, 'position'=>205),
+        'extraparams' =>array('type'=>'varchar(255)', 'label'=>'Extraparams', 'enabled'=>1, 'visible'=>-1, 'position'=>215),
+        'fk_incoterms' =>array('type'=>'integer', 'label'=>'IncotermCode', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>220),
+        'location_incoterms' =>array('type'=>'varchar(255)', 'label'=>'IncotermLabel', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>225),
+        'fk_multicurrency' => array('type' => 'integer', 'label' => 'MulticurrencyID', 'enabled' => 1, 'visible' => -1, 'position' => 230),
+        'multicurrency_code' => array('type' => 'varchar(255)', 'label' => 'MulticurrencyCurrency', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 235),
+        'multicurrency_tx' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyRate', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 240, 'isameasure' => 1),
+        'multicurrency_total_ht' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyAmountHT', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 245, 'isameasure' => 1),
+        'multicurrency_total_tva' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyAmountVAT', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 250, 'isameasure' => 1),
+        'multicurrency_total_ttc' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyAmountTTC', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 255, 'isameasure' => 1),
+        'last_main_doc' => array('type' => 'varchar(255)', 'label' => 'LastMainDoc', 'enabled' => 1, 'visible' => -1, 'position' => 260),
+        'fk_statut' => array('type' => 'smallint(6)', 'label' => 'Status', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 500),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'position' => 900),
+    );
+    // END MODULEBUILDER PROPERTIES
 
-	/**
-	 *	Constructor
-	 *
-	 *	@param      DoliDB	$db         Database handler
-	 *	@param      int		$socid		Id third party
-	 *	@param      int		$propalid   Id proposal
-	 */
-	public function __construct($db, $socid = 0, $propalid = 0)
-	{
-		global $conf, $langs;
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 1;
+    /**
+     * Signed quote
+     */
+    const STATUS_SIGNED = 2;
+    /**
+     * Not signed quote
+     */
+    const STATUS_NOTSIGNED = 3;
+    /**
+     * Billed or processed quote
+     */
+    const STATUS_BILLED = 4; // Todo rename into STATUS_CLOSE ?
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db       Database handler
+     * @param int    $socid    Id third party
+     * @param int    $propalid Id proposal
+     */
+    public function __construct($db, $socid = 0, $propalid = 0)
+    {
+        global $conf, $langs;
 
 		$this->db = $db;
 
@@ -338,26 +376,6 @@ class Propal extends CommonObject
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'propal'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Add line into array ->lines
 	 *  $this->thirdparty should be loaded
@@ -420,12 +438,14 @@ class Propal extends CommonObject
 		}
 	}
 
-	/**
-	 *	Adding line of fixed discount in the proposal in DB
-	 *
-	 *	@param     int		$idremise			Id of fixed discount
-	 *  @return    int          				>0 if OK, <0 if KO
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Adding line of fixed discount in the proposal in DB
+     *
+     *	@param     int		$idremise			Id of fixed discount
+     *  @return    int          				>0 if OK, <0 if KO
+     */
 	public function insert_discount($idremise)
 	{
 		// phpcs:enable
@@ -483,43 +503,291 @@ class Propal extends CommonObject
 			} else {
 				$this->error = $line->error;
 				$this->errors = $line->errors;
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$this->db->rollback();
-			return -2;
-		}
-	}
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            $this->db->rollback();
+            return -2;
+        }
+    }
 
-	/**
-	 *  Update a proposal line
-	 *
-	 *  @param      int			$rowid           	Id of line
-	 *  @param      float		$pu		     	  	Unit price (HT or TTC depending on price_base_type)
-	 *  @param      float		$qty            	Quantity
-	 *  @param      float		$remise_percent  	Discount on line
-	 *  @param      float		$txtva	          	VAT Rate (Can be '1.23' or '1.23 (ABC)')
-	 * 	@param	  	float		$txlocaltax1		Local tax 1 rate
-	 *  @param	  	float		$txlocaltax2		Local tax 2 rate
-	 *  @param      string		$desc            	Description
-	 *	@param	  	string		$price_base_type	HT or TTC
-	 *	@param      int			$info_bits        	Miscellaneous informations
-	 *	@param		int			$special_code		Special code (also used by externals modules!)
-	 * 	@param		int			$fk_parent_line		Id of parent line (0 in most cases, used by modules adding sublevels into lines).
-	 * 	@param		int			$skip_update_total	Keep fields total_xxx to 0 (used for special lines by some modules)
-	 *  @param		int			$fk_fournprice		Id of origin supplier price
-	 *  @param		int			$pa_ht				Price (without tax) of product when it was bought
-	 *  @param		string		$label				???
-	 *  @param		int			$type				0/1=Product/service
-	 *	@param      int			$date_start       	Start date of the line
-	 *	@param      int			$date_end         	End date of the line
-	 *  @param		array		$array_options		extrafields array
-	 * 	@param 		string		$fk_unit 			Code of the unit to use. Null to use the default one
-	 * 	@param		double		$pu_ht_devise		Unit price in currency
-	 * 	@param		int			$notrigger			disable line update trigger
-	 *  @return     int     		        		0 if OK, <0 if KO
-	 */
+    /**
+     *        Add a proposal line into database (linked to product/service or not)
+     *      The parameters are already supposed to be appropriate and with final values to the call
+     *      of this method. Also, for the VAT rate, it must have already been defined
+     *      by whose calling the method get_default_tva (societe_vendeuse, societe_acheteuse, '' product)
+     *      and desc must already have the right value (it's up to the caller to manage multilanguage)
+     *
+     * @param string $desc             Description of line
+     * @param float  $pu_ht            Unit price
+     * @param float  $qty              Quantity
+     * @param float  $txtva            Force Vat rate, -1 for auto (Can contain the vat_src_code too with syntax '9.9 (CODE)')
+     * @param float  $txlocaltax1      Local tax 1 rate (deprecated, use instead txtva with code inside)
+     * @param float  $txlocaltax2      Local tax 2 rate (deprecated, use instead txtva with code inside)
+     * @param int    $fk_product       Product/Service ID predefined
+     * @param float  $remise_percent   Pourcentage de remise de la ligne
+     * @param string $price_base_type  HT or TTC
+     * @param float  $pu_ttc           Prix unitaire TTC
+     * @param int    $info_bits        Bits for type of lines
+     * @param int    $type             Type of line (0=product, 1=service). Not used if fk_product is defined, the type of product is used.
+     * @param int    $rang             Position of line
+     * @param int    $special_code     Special code (also used by externals modules!)
+     * @param int    $fk_parent_line   Id of parent line
+     * @param int    $fk_fournprice    Id supplier price
+     * @param int    $pa_ht            Buying price without tax
+     * @param string $label            ???
+     * @param int    $date_start       Start date of the line
+     * @param int    $date_end         End date of the line
+     * @param array  $array_options    extrafields array
+     * @param string $fk_unit          Code of the unit to use. Null to use the default one
+     * @param string $origin           Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be 'orderdet', 'propaldet'..., else 'order','propal,'....
+     * @param int    $origin_id        Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
+     * @param double $pu_ht_devise     Unit price in currency
+     * @param int    $fk_remise_except Id discount if line is from a discount
+     *
+     * @return        int                            >0 if OK, <0 if KO
+     * @see        add_product()
+     */
+    public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0)
+    {
+        global $mysoc, $conf, $langs;
+
+        dol_syslog(get_class($this) . "::addline propalid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_except=$remise_percent, price_base_type=$price_base_type, pu_ttc=$pu_ttc, info_bits=$info_bits, type=$type, fk_remise_except=" . $fk_remise_except);
+
+        if ($this->statut == self::STATUS_DRAFT) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/price.lib.php';
+
+            // Clean parameters
+            if (empty($remise_percent)) {
+                $remise_percent = 0;
+            }
+            if (empty($qty)) {
+                $qty = 0;
+            }
+            if (empty($info_bits)) {
+                $info_bits = 0;
+            }
+            if (empty($rang)) {
+                $rang = 0;
+            }
+            if (empty($fk_parent_line) || $fk_parent_line < 0) {
+                $fk_parent_line = 0;
+            }
+
+            $remise_percent = price2num($remise_percent);
+            $qty = price2num($qty);
+            $pu_ht = price2num($pu_ht);
+            $pu_ht_devise = price2num($pu_ht_devise);
+            $pu_ttc = price2num($pu_ttc);
+            if (!preg_match('/\((.*)\)/', $txtva)) {
+                $txtva = price2num($txtva); // $txtva can have format '5,1' or '5.1' or '5.1(XXX)', we must clean only if '5,1'
+            }
+            $txlocaltax1 = price2num($txlocaltax1);
+            $txlocaltax2 = price2num($txlocaltax2);
+            $pa_ht = price2num($pa_ht);
+            if ($price_base_type == 'HT') {
+                $pu = $pu_ht;
+            } else {
+                $pu = $pu_ttc;
+            }
+
+            // Check parameters
+            if ($type < 0) {
+                return -1;
+            }
+
+            if ($date_start && $date_end && $date_start > $date_end) {
+                $langs->load("errors");
+                $this->error = $langs->trans('ErrorStartDateGreaterEnd');
+                return -1;
+            }
+
+            $this->db->begin();
+
+            $product_type = $type;
+            if (!empty($fk_product) && $fk_product > 0) {
+                $product = new Product($this->db);
+                $result = $product->fetch($fk_product);
+                $product_type = $product->type;
+
+                if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_PROPOSAL) && $product_type == 0 && $product->stock_reel < $qty) {
+                    $langs->load("errors");
+                    $this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnProposal', $product->ref);
+                    $this->db->rollback();
+                    return -3;
+                }
+            }
+
+            // Calcul du total TTC et de la TVA pour la ligne a partir de
+            // qty, pu, remise_percent et txtva
+            // TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
+            // la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
+
+            $localtaxes_type = getLocalTaxesFromRate($txtva, 0, $this->thirdparty, $mysoc);
+
+            // Clean vat code
+            $reg = [];
+            $vat_src_code = '';
+            $reg = [];
+            if (preg_match('/\((.*)\)/', $txtva, $reg)) {
+                $vat_src_code = $reg[1];
+                $txtva = preg_replace('/\s*\(.*\)/', '', $txtva); // Remove code into vatrate.
+            }
+
+            $tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, $txlocaltax1, $txlocaltax2, 0, $price_base_type, $info_bits, $product_type, $mysoc, $localtaxes_type, 100, $this->multicurrency_tx, $pu_ht_devise);
+
+            $total_ht = $tabprice[0];
+            $total_tva = $tabprice[1];
+            $total_ttc = $tabprice[2];
+            $total_localtax1 = $tabprice[9];
+            $total_localtax2 = $tabprice[10];
+            $pu_ht = $tabprice[3];
+            $pu_tva = $tabprice[4];
+            $pu_ttc = $tabprice[5];
+
+            // MultiCurrency
+            $multicurrency_total_ht = $tabprice[16];
+            $multicurrency_total_tva = $tabprice[17];
+            $multicurrency_total_ttc = $tabprice[18];
+            $pu_ht_devise = $tabprice[19];
+
+            // Rang to use
+            $ranktouse = $rang;
+            if ($ranktouse == -1) {
+                $rangmax = $this->line_max($fk_parent_line);
+                $ranktouse = $rangmax + 1;
+            }
+
+            // TODO A virer
+            // Anciens indicateurs: $price, $remise (a ne plus utiliser)
+            $price = $pu;
+            $remise = 0;
+            if ($remise_percent > 0) {
+                $remise = round(($pu * $remise_percent / 100), 2);
+                $price = $pu - $remise;
+            }
+
+            // Insert line
+            $this->line = new PropaleLigne($this->db);
+
+            $this->line->context = $this->context;
+
+            $this->line->fk_propal = $this->id;
+            $this->line->label = $label;
+            $this->line->desc = $desc;
+            $this->line->qty = $qty;
+
+            $this->line->vat_src_code = $vat_src_code;
+            $this->line->tva_tx = $txtva;
+            $this->line->localtax1_tx = ($total_localtax1 ? $localtaxes_type[1] : 0);
+            $this->line->localtax2_tx = ($total_localtax2 ? $localtaxes_type[3] : 0);
+            $this->line->localtax1_type = empty($localtaxes_type[0]) ? '' : $localtaxes_type[0];
+            $this->line->localtax2_type = empty($localtaxes_type[2]) ? '' : $localtaxes_type[2];
+            $this->line->fk_product = $fk_product;
+            $this->line->product_type = $type;
+            $this->line->fk_remise_except = $fk_remise_except;
+            $this->line->remise_percent = $remise_percent;
+            $this->line->subprice = $pu_ht;
+            $this->line->rang = $ranktouse;
+            $this->line->info_bits = $info_bits;
+            $this->line->total_ht = $total_ht;
+            $this->line->total_tva = $total_tva;
+            $this->line->total_localtax1 = $total_localtax1;
+            $this->line->total_localtax2 = $total_localtax2;
+            $this->line->total_ttc = $total_ttc;
+            $this->line->special_code = $special_code;
+            $this->line->fk_parent_line = $fk_parent_line;
+            $this->line->fk_unit = $fk_unit;
+
+            $this->line->date_start = $date_start;
+            $this->line->date_end = $date_end;
+
+            $this->line->fk_fournprice = $fk_fournprice;
+            $this->line->pa_ht = $pa_ht;
+
+            $this->line->origin_id = $origin_id;
+            $this->line->origin = $origin;
+
+            // Multicurrency
+            $this->line->fk_multicurrency = $this->fk_multicurrency;
+            $this->line->multicurrency_code = $this->multicurrency_code;
+            $this->line->multicurrency_subprice = $pu_ht_devise;
+            $this->line->multicurrency_total_ht = $multicurrency_total_ht;
+            $this->line->multicurrency_total_tva = $multicurrency_total_tva;
+            $this->line->multicurrency_total_ttc = $multicurrency_total_ttc;
+
+            // Mise en option de la ligne
+            if (empty($qty) && empty($special_code)) {
+                $this->line->special_code = 3;
+            }
+
+            // TODO deprecated
+            $this->line->price = $price;
+            $this->line->remise = $remise;
+
+            if (is_array($array_options) && count($array_options) > 0) {
+                $this->line->array_options = $array_options;
+            }
+
+            $result = $this->line->insert();
+            if ($result > 0) {
+                // Reorder if child line
+                if (!empty($fk_parent_line)) {
+                    $this->line_order(true, 'DESC');
+                }
+
+                // Mise a jour informations denormalisees au niveau de la propale meme
+                $result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+
+                if ($result > 0) {
+                    $this->db->commit();
+                    return $this->line->id;
+                } else {
+                    $this->error = $this->db->error();
+                    $this->db->rollback();
+                    return -1;
+                }
+            } else {
+                $this->error = $this->line->error;
+                $this->errors = $this->line->errors;
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::addline status of proposal must be Draft to allow use of ->addline()", LOG_ERR);
+            return -3;
+        }
+    }
+
+    /**
+     *  Update a proposal line
+     *
+     * @param int              $rowid             Id of line
+     * @param float            $pu                Unit price (HT or TTC depending on price_base_type)
+     * @param float            $qty               Quantity
+     * @param float            $remise_percent    Discount on line
+     * @param float            $txtva             VAT Rate (Can be '1.23' or '1.23 (ABC)')
+     * @param float            $txlocaltax1       Local tax 1 rate
+     * @param float            $txlocaltax2       Local tax 2 rate
+     *  @param      string     $desc              Description
+     *	@param	  	string $price_base_type   HT or TTC
+     *	@param      int      $info_bits         Miscellaneous informations
+     *	@param		int    $special_code      Special code (also used by externals modules!)
+     * 	@param		int    $fk_parent_line    Id of parent line (0 in most cases, used by modules adding sublevels into lines).
+     * 	@param		int    $skip_update_total Keep fields total_xxx to 0 (used for special lines by some modules)
+     *  @param		int      $fk_fournprice     Id of origin supplier price
+     *  @param		int      $pa_ht             Price (without tax) of product when it was bought
+     *  @param		string   $label             ???
+     *  @param		int      $type              0/1=Product/service
+     *	@param      int			$date_start       	Start date of the line
+     *	@param      int			$date_end         	End date of the line
+     *  @param		array		$array_options		extrafields array
+     * 	@param 		string		$fk_unit 			Code of the unit to use. Null to use the default one
+     * 	@param		double		$pu_ht_devise		Unit price in currency
+     * 	@param		int			$notrigger			disable line update trigger
+     *  @return     int     		        		0 if OK, <0 if KO
+     */
 	public function updateline($rowid, $pu, $qty, $remise_percent, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $desc = '', $price_base_type = 'HT', $info_bits = 0, $special_code = 0, $fk_parent_line = 0, $skip_update_total = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $type = 0, $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $pu_ht_devise = 0, $notrigger = 0)
 	{
 		global $mysoc, $langs;
@@ -721,426 +989,6 @@ class Propal extends CommonObject
 		}
 	}
 
-	/**
-	 *		Load an object from its id and create a new one in database
-	 *
-	 *      @param	    User	$user		    User making the clone
-	 *		@param		int		$socid			Id of thirdparty
-	 *		@param		int		$forceentity	Entity id to force
-	 * 	 	@return		int						New id of clone
-	 */
-	public function createFromClone(User $user, $socid = 0, $forceentity = null)
-	{
-		global $conf, $hookmanager;
-
-		dol_include_once('/projet/class/project.class.php');
-
-		$error = 0;
-		$now = dol_now();
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$object = new self($this->db);
-
-		$this->db->begin();
-
-		// Load source object
-		$object->fetch($this->id);
-
-		$objsoc = new Societe($this->db);
-
-		// Change socid if needed
-		if (!empty($socid) && $socid != $object->socid) {
-			if ($objsoc->fetch($socid) > 0) {
-				$object->socid = $objsoc->id;
-				$object->cond_reglement_id	= (!empty($objsoc->cond_reglement_id) ? $objsoc->cond_reglement_id : 0);
-				$object->mode_reglement_id	= (!empty($objsoc->mode_reglement_id) ? $objsoc->mode_reglement_id : 0);
-				$object->fk_delivery_address = '';
-
-				/*if (!empty($conf->projet->enabled))
-				{
-					$project = new Project($db);
-					if ($this->fk_project > 0 && $project->fetch($this->fk_project)) {
-						if ($project->socid <= 0) $clonedObj->fk_project = $this->fk_project;
-						else $clonedObj->fk_project = '';
-					} else {
-						$clonedObj->fk_project = '';
-					}
-				}*/
-				$object->fk_project = ''; // A cloned proposal is set by default to no project.
-			}
-
-			// reset ref_client
-			$object->ref_client = '';
-
-			// TODO Change product price if multi-prices
-		} else {
-			$objsoc->fetch($object->socid);
-		}
-
-		$object->id = 0;
-		$object->ref = '';
-		$object->entity = (!empty($forceentity) ? $forceentity : $object->entity);
-		$object->statut = self::STATUS_DRAFT;
-
-		// Clear fields
-		$object->user_author = $user->id;
-		$object->user_valid = '';
-		$object->date = $now;
-		$object->datep = $now; // deprecated
-		$object->fin_validite = $object->date + ($object->duree_validite * 24 * 3600);
-		if (empty($conf->global->MAIN_KEEP_REF_CUSTOMER_ON_CLONING)) {
-			$object->ref_client = '';
-		}
-		if ($conf->global->MAIN_DONT_KEEP_NOTE_ON_CLONING == 1) {
-			$object->note_private = '';
-			$object->note_public = '';
-		}
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$result = $object->create($user);
-		if ($result < 0) {
-			$this->error = $object->error;
-			$this->errors = array_merge($this->errors, $object->errors);
-			$error++;
-		}
-
-		if (!$error) {
-			// copy internal contacts
-			if ($object->copy_linked_contact($this, 'internal') < 0) {
-				$error++;
-			}
-		}
-
-		if (!$error) {
-			// copy external contacts if same company
-			if ($this->socid == $object->socid) {
-				if ($object->copy_linked_contact($this, 'external') < 0) {
-					$error++;
-				}
-			}
-		}
-
-		if (!$error) {
-			// Hook of thirdparty module
-			if (is_object($hookmanager)) {
-				$parameters = array('objFrom'=>$this, 'clonedObj'=>$object);
-				$action = '';
-				$reshook = $hookmanager->executeHooks('createFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
-				if ($reshook < 0) {
-					$error++;
-				}
-			}
-		}
-
-		unset($object->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $object->id;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	/**
-	 *	Load a proposal from database. Get also lines.
-	 *
-	 *	@param      int			$rowid		id of object to load
-	 *	@param		string		$ref		Ref of proposal
-	 *	@param		string		$ref_ext	Ref ext of proposal
-	 *	@return     int         			>0 if OK, <0 if KO
-	 */
-	public function fetch($rowid, $ref = '', $ref_ext = '')
-	{
-		$sql = "SELECT p.rowid, p.ref, p.entity, p.remise, p.remise_percent, p.remise_absolue, p.fk_soc";
-		$sql .= ", p.total_ttc, p.total_tva, p.localtax1, p.localtax2, p.total_ht";
-		$sql .= ", p.datec";
-		$sql .= ", p.date_valid as datev";
-		$sql .= ", p.datep as dp";
-		$sql .= ", p.fin_validite as dfv";
-		$sql .= ", p.date_livraison as delivery_date";
-		$sql .= ", p.model_pdf, p.last_main_doc, p.ref_client, p.extraparams";
-		$sql .= ", p.note_private, p.note_public";
-		$sql .= ", p.fk_projet as fk_project, p.fk_statut";
-		$sql .= ", p.fk_user_author, p.fk_user_valid, p.fk_user_cloture";
-		$sql .= ", p.fk_delivery_address";
-		$sql .= ", p.fk_availability";
-		$sql .= ", p.fk_input_reason";
-		$sql .= ", p.fk_cond_reglement";
-		$sql .= ", p.fk_mode_reglement";
-		$sql .= ', p.fk_account';
-		$sql .= ", p.fk_shipping_method";
-		$sql .= ", p.fk_warehouse";
-		$sql .= ", p.fk_incoterms, p.location_incoterms";
-		$sql .= ", p.fk_multicurrency, p.multicurrency_code, p.multicurrency_tx, p.multicurrency_total_ht, p.multicurrency_total_tva, p.multicurrency_total_ttc";
-		$sql .= ", p.tms as date_modification";
-		$sql .= ", i.libelle as label_incoterms";
-		$sql .= ", c.label as statut_label";
-		$sql .= ", ca.code as availability_code, ca.label as availability";
-		$sql .= ", dr.code as demand_reason_code, dr.label as demand_reason";
-		$sql .= ", cr.code as cond_reglement_code, cr.libelle as cond_reglement, cr.libelle_facture as cond_reglement_libelle_doc";
-		$sql .= ", cp.code as mode_reglement_code, cp.libelle as mode_reglement";
-		$sql .= " FROM ".MAIN_DB_PREFIX."propal as p";
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_propalst as c ON p.fk_statut = c.id';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_paiement as cp ON p.fk_mode_reglement = cp.id AND cp.entity IN ('.getEntity('c_paiement').')';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_payment_term as cr ON p.fk_cond_reglement = cr.rowid AND cr.entity IN ('.getEntity('c_payment_term').')';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_availability as ca ON p.fk_availability = ca.rowid';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_input_reason as dr ON p.fk_input_reason = dr.rowid';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'c_incoterms as i ON p.fk_incoterms = i.rowid';
-
-		if ($ref) {
-			$sql .= " WHERE p.entity IN (".getEntity('propal').")"; // Dont't use entity if you use rowid
-			$sql .= " AND p.ref='".$this->db->escape($ref)."'";
-		} else {
-			$sql .= " WHERE p.rowid = ".((int) $rowid);
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id                   = $obj->rowid;
-				$this->entity               = $obj->entity;
-
-				$this->ref                  = $obj->ref;
-				$this->ref_client           = $obj->ref_client;
-				$this->remise               = $obj->remise;
-				$this->remise_percent       = $obj->remise_percent;
-				$this->remise_absolue       = $obj->remise_absolue;
-				$this->total                = $obj->total_ttc; // TODO deprecated
-				$this->total_ttc            = $obj->total_ttc;
-				$this->total_ht             = $obj->total_ht;
-				$this->total_tva            = $obj->total_tva;
-				$this->total_localtax1		= $obj->localtax1;
-				$this->total_localtax2		= $obj->localtax2;
-
-				$this->socid = $obj->fk_soc;
-				$this->thirdparty = null; // Clear if another value was already set by fetch_thirdparty
-
-				$this->fk_project = $obj->fk_project;
-				$this->project = null; // Clear if another value was already set by fetch_projet
-
-				$this->model_pdf            = $obj->model_pdf;
-				$this->modelpdf             = $obj->model_pdf; // deprecated
-				$this->last_main_doc = $obj->last_main_doc;
-				$this->note                 = $obj->note_private; // TODO deprecated
-				$this->note_private         = $obj->note_private;
-				$this->note_public          = $obj->note_public;
-
-				$this->status               = (int) $obj->fk_statut;
-				$this->statut               = $this->status; // deprecated
-				$this->statut_libelle       = $obj->statut_label;
-
-				$this->datec                = $this->db->jdate($obj->datec); // TODO deprecated
-				$this->datev                = $this->db->jdate($obj->datev); // TODO deprecated
-				$this->date_creation = $this->db->jdate($obj->datec); //Creation date
-				$this->date_validation = $this->db->jdate($obj->datev); //Validation date
-				$this->date_modification = $this->db->jdate($obj->date_modification); // tms
-				$this->date                 = $this->db->jdate($obj->dp); // Proposal date
-				$this->datep                = $this->db->jdate($obj->dp); // deprecated
-				$this->fin_validite         = $this->db->jdate($obj->dfv);
-				$this->date_livraison       = $this->db->jdate($obj->delivery_date); // deprecated
-				$this->delivery_date        = $this->db->jdate($obj->delivery_date);
-				$this->shipping_method_id   = ($obj->fk_shipping_method > 0) ? $obj->fk_shipping_method : null;
-				$this->warehouse_id         = ($obj->fk_warehouse > 0) ? $obj->fk_warehouse : null;
-				$this->availability_id      = $obj->fk_availability;
-				$this->availability_code    = $obj->availability_code;
-				$this->availability         = $obj->availability;
-				$this->demand_reason_id     = $obj->fk_input_reason;
-				$this->demand_reason_code   = $obj->demand_reason_code;
-				$this->demand_reason        = $obj->demand_reason;
-				$this->fk_address = $obj->fk_delivery_address;
-
-				$this->mode_reglement_id    = $obj->fk_mode_reglement;
-				$this->mode_reglement_code  = $obj->mode_reglement_code;
-				$this->mode_reglement       = $obj->mode_reglement;
-				$this->fk_account           = ($obj->fk_account > 0) ? $obj->fk_account : null;
-				$this->cond_reglement_id    = $obj->fk_cond_reglement;
-				$this->cond_reglement_code  = $obj->cond_reglement_code;
-				$this->cond_reglement       = $obj->cond_reglement;
-				$this->cond_reglement_doc   = $obj->cond_reglement_libelle_doc;
-
-				$this->extraparams = (array) json_decode($obj->extraparams, true);
-
-				$this->user_author_id = $obj->fk_user_author;
-				$this->user_valid_id = $obj->fk_user_valid;
-				$this->user_close_id = $obj->fk_user_cloture;
-
-				//Incoterms
-				$this->fk_incoterms = $obj->fk_incoterms;
-				$this->location_incoterms = $obj->location_incoterms;
-				$this->label_incoterms = $obj->label_incoterms;
-
-				// Multicurrency
-				$this->fk_multicurrency 		= $obj->fk_multicurrency;
-				$this->multicurrency_code = $obj->multicurrency_code;
-				$this->multicurrency_tx 		= $obj->multicurrency_tx;
-				$this->multicurrency_total_ht = $obj->multicurrency_total_ht;
-				$this->multicurrency_total_tva = $obj->multicurrency_total_tva;
-				$this->multicurrency_total_ttc = $obj->multicurrency_total_ttc;
-
-				if ($obj->fk_statut == self::STATUS_DRAFT) {
-					$this->brouillon = 1;
-				}
-
-				// Retrieve all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				$this->db->free($resql);
-
-				$this->lines = array();
-
-				// Lines
-				$result = $this->fetch_lines();
-				if ($result < 0) {
-					return -3;
-				}
-
-				return 1;
-			}
-
-			$this->error = "Record Not Found";
-			return 0;
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 * Load array lines
-	 *
-	 *	@param		int		$only_product	Return only physical products
-	 *	@param		int		$loadalsotranslation	Return translation for products
-	 *
-	 * @return		int						<0 if KO, >0 if OK
-	 */
-	public function fetch_lines($only_product = 0, $loadalsotranslation = 0)
-	{
-		global $langs, $conf;
-		// phpcs:enable
-		$this->lines = array();
-
-		$sql = 'SELECT d.rowid, d.fk_propal, d.fk_parent_line, d.label as custom_label, d.description, d.price, d.vat_src_code, d.tva_tx, d.localtax1_tx, d.localtax2_tx, d.localtax1_type, d.localtax2_type, d.qty, d.fk_remise_except, d.remise_percent, d.subprice, d.fk_product,';
-		$sql .= ' d.info_bits, d.total_ht, d.total_tva, d.total_localtax1, d.total_localtax2, d.total_ttc, d.fk_product_fournisseur_price as fk_fournprice, d.buy_price_ht as pa_ht, d.special_code, d.rang, d.product_type,';
-		$sql .= ' d.fk_unit,';
-		$sql .= ' p.ref as product_ref, p.description as product_desc, p.fk_product_type, p.label as product_label, p.tobatch as product_tobatch, p.barcode as product_barcode,';
-		$sql .= ' p.weight, p.weight_units, p.volume, p.volume_units,';
-		$sql .= ' d.date_start, d.date_end,';
-		$sql .= ' d.fk_multicurrency, d.multicurrency_code, d.multicurrency_subprice, d.multicurrency_total_ht, d.multicurrency_total_tva, d.multicurrency_total_ttc';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'propaldet as d';
-		$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'product as p ON (d.fk_product = p.rowid)';
-		$sql .= ' WHERE d.fk_propal = '.((int) $this->id);
-		if ($only_product) {
-			$sql .= ' AND p.fk_product_type = 0';
-		}
-		$sql .= ' ORDER by d.rang';
-
-		dol_syslog(get_class($this)."::fetch_lines", LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-
-			$num = $this->db->num_rows($result);
-
-			$i = 0;
-			while ($i < $num) {
-				$objp                   = $this->db->fetch_object($result);
-
-				$line                   = new PropaleLigne($this->db);
-
-				$line->rowid = $objp->rowid; //Deprecated
-				$line->id = $objp->rowid;
-				$line->fk_propal = $objp->fk_propal;
-				$line->fk_parent_line = $objp->fk_parent_line;
-				$line->product_type     = $objp->product_type;
-				$line->label            = $objp->custom_label;
-				$line->desc             = $objp->description; // Description ligne
-				$line->description      = $objp->description; // Description ligne
-				$line->qty              = $objp->qty;
-				$line->vat_src_code     = $objp->vat_src_code;
-				$line->tva_tx           = $objp->tva_tx;
-				$line->localtax1_tx		= $objp->localtax1_tx;
-				$line->localtax2_tx		= $objp->localtax2_tx;
-				$line->localtax1_type	= $objp->localtax1_type;
-				$line->localtax2_type	= $objp->localtax2_type;
-				$line->subprice         = $objp->subprice;
-				$line->fk_remise_except = $objp->fk_remise_except;
-				$line->remise_percent   = $objp->remise_percent;
-				$line->price            = $objp->price; // TODO deprecated
-
-				$line->info_bits        = $objp->info_bits;
-				$line->total_ht         = $objp->total_ht;
-				$line->total_tva        = $objp->total_tva;
-				$line->total_localtax1	= $objp->total_localtax1;
-				$line->total_localtax2	= $objp->total_localtax2;
-				$line->total_ttc        = $objp->total_ttc;
-				$line->fk_fournprice = $objp->fk_fournprice;
-				$marginInfos = getMarginInfos($objp->subprice, $objp->remise_percent, $objp->tva_tx, $objp->localtax1_tx, $objp->localtax2_tx, $line->fk_fournprice, $objp->pa_ht);
-				$line->pa_ht = $marginInfos[0];
-				$line->marge_tx			= $marginInfos[1];
-				$line->marque_tx		= $marginInfos[2];
-				$line->special_code     = $objp->special_code;
-				$line->rang             = $objp->rang;
-
-				$line->fk_product       = $objp->fk_product;
-
-				$line->ref = $objp->product_ref; // deprecated
-				$line->libelle = $objp->product_label; // deprecated
-
-				$line->product_ref = $objp->product_ref;
-				$line->product_label = $objp->product_label;
-				$line->product_desc     = $objp->product_desc; // Description produit
-				$line->product_tobatch  = $objp->product_tobatch;
-				$line->product_barcode  = $objp->product_barcode;
-
-				$line->fk_product_type  = $objp->fk_product_type; // deprecated
-				$line->fk_unit          = $objp->fk_unit;
-				$line->weight = $objp->weight;
-				$line->weight_units = $objp->weight_units;
-				$line->volume = $objp->volume;
-				$line->volume_units = $objp->volume_units;
-
-				$line->date_start = $this->db->jdate($objp->date_start);
-				$line->date_end = $this->db->jdate($objp->date_end);
-
-				// Multicurrency
-				$line->fk_multicurrency = $objp->fk_multicurrency;
-				$line->multicurrency_code = $objp->multicurrency_code;
-				$line->multicurrency_subprice 	= $objp->multicurrency_subprice;
-				$line->multicurrency_total_ht 	= $objp->multicurrency_total_ht;
-				$line->multicurrency_total_tva 	= $objp->multicurrency_total_tva;
-				$line->multicurrency_total_ttc 	= $objp->multicurrency_total_ttc;
-
-				$line->fetch_optionals();
-
-				// multilangs
-				if (!empty($conf->global->MAIN_MULTILANGS) && !empty($objp->fk_product) && !empty($loadalsotranslation)) {
-					$line = new Product($this->db);
-					$line->fetch($objp->fk_product);
-					$line->getMultiLangs();
-				}
-
-				$this->lines[$i] = $line;
-				//dol_syslog("1 ".$line->fk_product);
-				//print "xx $i ".$this->lines[$i]->fk_product;
-				$i++;
-			}
-
-			$this->db->free($result);
-
-			return $num;
-		} else {
-			$this->error = $this->db->lasterror();
-			return -3;
-		}
-	}
 
 	/**
 	 *  Create commercial proposal into database
@@ -1171,7 +1019,7 @@ class Propal extends CommonObject
 
 		// Multicurrency (test on $this->multicurrency_tx because we should take the default rate only if not using origin rate)
 		if (!empty($this->multicurrency_code) && empty($this->multicurrency_tx)) {
-			list($this->fk_multicurrency, $this->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($this->db, $this->multicurrency_code, $this->date);
+			[$this->fk_multicurrency, $this->multicurrency_tx] = MultiCurrency::getIdAndTxFromCode($this->db, $this->multicurrency_code, $this->date);
 		} else {
 			$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
 		}
@@ -1446,268 +1294,311 @@ class Propal extends CommonObject
 				return $this->id;
 			} else {
 				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                return -2;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
+    /**
+     *        Load an object from its id and create a new one in database
+     *
+     * @param User $user        User making the clone
+     * @param int  $socid       Id of thirdparty
+     * @param int  $forceentity Entity id to force
+     *
+     * @return        int                        New id of clone
+     */
+    public function createFromClone(User $user, $socid = 0, $forceentity = null)
+    {
+        global $conf, $hookmanager;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        dol_include_once('/projet/class/project.class.php');
 
-	/**
-	 *    	Add a proposal line into database (linked to product/service or not)
-	 *      The parameters are already supposed to be appropriate and with final values to the call
-	 *      of this method. Also, for the VAT rate, it must have already been defined
-	 *      by whose calling the method get_default_tva (societe_vendeuse, societe_acheteuse, '' product)
-	 *      and desc must already have the right value (it's up to the caller to manage multilanguage)
-	 *
-	 * 		@param    	string		$desc				Description of line
-	 * 		@param    	float		$pu_ht				Unit price
-	 * 		@param    	float		$qty             	Quantity
-	 * 		@param    	float		$txtva           	Force Vat rate, -1 for auto (Can contain the vat_src_code too with syntax '9.9 (CODE)')
-	 * 		@param		float		$txlocaltax1		Local tax 1 rate (deprecated, use instead txtva with code inside)
-	 *  	@param		float		$txlocaltax2		Local tax 2 rate (deprecated, use instead txtva with code inside)
-	 *		@param    	int			$fk_product      	Product/Service ID predefined
-	 * 		@param    	float		$remise_percent  	Pourcentage de remise de la ligne
-	 * 		@param    	string		$price_base_type	HT or TTC
-	 * 		@param    	float		$pu_ttc             Prix unitaire TTC
-	 * 		@param    	int			$info_bits			Bits for type of lines
-	 *      @param      int			$type               Type of line (0=product, 1=service). Not used if fk_product is defined, the type of product is used.
-	 *      @param      int			$rang               Position of line
-	 *      @param		int			$special_code		Special code (also used by externals modules!)
-	 *      @param		int			$fk_parent_line		Id of parent line
-	 *      @param		int			$fk_fournprice		Id supplier price
-	 *      @param		int			$pa_ht				Buying price without tax
-	 *      @param		string		$label				???
-	 *		@param      int			$date_start       	Start date of the line
-	 *		@param      int			$date_end         	End date of the line
-	 *      @param		array		$array_options		extrafields array
-	 * 		@param 		string		$fk_unit 			Code of the unit to use. Null to use the default one
-	 *      @param		string		$origin				Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be 'orderdet', 'propaldet'..., else 'order','propal,'....
-	 *      @param		int			$origin_id			Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
-	 * 		@param		double		$pu_ht_devise		Unit price in currency
-	 * 		@param		int    		$fk_remise_except	Id discount if line is from a discount
-	 *    	@return    	int         	    			>0 if OK, <0 if KO
-	 *    	@see       	add_product()
-	 */
-	public function addline($desc, $pu_ht, $qty, $txtva, $txlocaltax1 = 0.0, $txlocaltax2 = 0.0, $fk_product = 0, $remise_percent = 0.0, $price_base_type = 'HT', $pu_ttc = 0.0, $info_bits = 0, $type = 0, $rang = -1, $special_code = 0, $fk_parent_line = 0, $fk_fournprice = 0, $pa_ht = 0, $label = '', $date_start = '', $date_end = '', $array_options = 0, $fk_unit = null, $origin = '', $origin_id = 0, $pu_ht_devise = 0, $fk_remise_except = 0)
-	{
-		global $mysoc, $conf, $langs;
+        $error = 0;
+        $now = dol_now();
 
-		dol_syslog(get_class($this)."::addline propalid=$this->id, desc=$desc, pu_ht=$pu_ht, qty=$qty, txtva=$txtva, fk_product=$fk_product, remise_except=$remise_percent, price_base_type=$price_base_type, pu_ttc=$pu_ttc, info_bits=$info_bits, type=$type, fk_remise_except=".$fk_remise_except);
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-		if ($this->statut == self::STATUS_DRAFT) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
+        $object = new self($this->db);
 
-			// Clean parameters
-			if (empty($remise_percent)) {
-				$remise_percent = 0;
-			}
-			if (empty($qty)) {
-				$qty = 0;
-			}
-			if (empty($info_bits)) {
-				$info_bits = 0;
-			}
-			if (empty($rang)) {
-				$rang = 0;
-			}
-			if (empty($fk_parent_line) || $fk_parent_line < 0) {
-				$fk_parent_line = 0;
-			}
+        $this->db->begin();
 
-			$remise_percent = price2num($remise_percent);
-			$qty = price2num($qty);
-			$pu_ht = price2num($pu_ht);
-			$pu_ht_devise = price2num($pu_ht_devise);
-			$pu_ttc = price2num($pu_ttc);
-			if (!preg_match('/\((.*)\)/', $txtva)) {
-				$txtva = price2num($txtva); // $txtva can have format '5,1' or '5.1' or '5.1(XXX)', we must clean only if '5,1'
-			}
-			$txlocaltax1 = price2num($txlocaltax1);
-			$txlocaltax2 = price2num($txlocaltax2);
-			$pa_ht = price2num($pa_ht);
-			if ($price_base_type == 'HT') {
-				$pu = $pu_ht;
-			} else {
-				$pu = $pu_ttc;
-			}
+        // Load source object
+        $object->fetch($this->id);
 
-			// Check parameters
-			if ($type < 0) {
-				return -1;
-			}
+        $objsoc = new Societe($this->db);
 
-			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
-				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
-				return -1;
-			}
+        // Change socid if needed
+        if (!empty($socid) && $socid != $object->socid) {
+            if ($objsoc->fetch($socid) > 0) {
+                $object->socid = $objsoc->id;
+                $object->cond_reglement_id = (!empty($objsoc->cond_reglement_id) ? $objsoc->cond_reglement_id : 0);
+                $object->mode_reglement_id = (!empty($objsoc->mode_reglement_id) ? $objsoc->mode_reglement_id : 0);
+                $object->fk_delivery_address = '';
 
-			$this->db->begin();
+                /*if (!empty($conf->projet->enabled))
+                {
+                    $project = new Project($db);
+                    if ($this->fk_project > 0 && $project->fetch($this->fk_project)) {
+                        if ($project->socid <= 0) $clonedObj->fk_project = $this->fk_project;
+                        else $clonedObj->fk_project = '';
+                    } else {
+                        $clonedObj->fk_project = '';
+                    }
+                }*/
+                $object->fk_project = ''; // A cloned proposal is set by default to no project.
+            }
 
-			$product_type = $type;
-			if (!empty($fk_product) && $fk_product > 0) {
-				$product = new Product($this->db);
-				$result = $product->fetch($fk_product);
-				$product_type = $product->type;
+            // reset ref_client
+            $object->ref_client = '';
+            // TODO Change product price if multi-prices
+        } else {
+            $objsoc->fetch($object->socid);
+        }
 
-				if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_PROPOSAL) && $product_type == 0 && $product->stock_reel < $qty) {
-					$langs->load("errors");
-					$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnProposal', $product->ref);
-					$this->db->rollback();
-					return -3;
-				}
-			}
+        $object->id = 0;
+        $object->ref = '';
+        $object->entity = (!empty($forceentity) ? $forceentity : $object->entity);
+        $object->statut = self::STATUS_DRAFT;
 
-			// Calcul du total TTC et de la TVA pour la ligne a partir de
-			// qty, pu, remise_percent et txtva
-			// TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
-			// la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
+        // Clear fields
+        $object->user_author = $user->id;
+        $object->user_valid = '';
+        $object->date = $now;
+        $object->datep = $now; // deprecated
+        $object->fin_validite = $object->date + ($object->duree_validite * 24 * 3600);
+        if (empty($conf->global->MAIN_KEEP_REF_CUSTOMER_ON_CLONING)) {
+            $object->ref_client = '';
+        }
+        if ($conf->global->MAIN_DONT_KEEP_NOTE_ON_CLONING == 1) {
+            $object->note_private = '';
+            $object->note_public = '';
+        }
+        // Create clone
+        $object->context['createfromclone'] = 'createfromclone';
+        $result = $object->create($user);
+        if ($result < 0) {
+            $this->error = $object->error;
+            $this->errors = array_merge($this->errors, $object->errors);
+            $error++;
+        }
 
-			$localtaxes_type = getLocalTaxesFromRate($txtva, 0, $this->thirdparty, $mysoc);
+        if (!$error) {
+            // copy internal contacts
+            if ($object->copy_linked_contact($this, 'internal') < 0) {
+                $error++;
+            }
+        }
 
-			// Clean vat code
-			$reg = array();
-			$vat_src_code = '';
-			$reg = array();
-			if (preg_match('/\((.*)\)/', $txtva, $reg)) {
-				$vat_src_code = $reg[1];
-				$txtva = preg_replace('/\s*\(.*\)/', '', $txtva); // Remove code into vatrate.
-			}
+        if (!$error) {
+            // copy external contacts if same company
+            if ($this->socid == $object->socid) {
+                if ($object->copy_linked_contact($this, 'external') < 0) {
+                    $error++;
+                }
+            }
+        }
 
-			$tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, $txlocaltax1, $txlocaltax2, 0, $price_base_type, $info_bits, $product_type, $mysoc, $localtaxes_type, 100, $this->multicurrency_tx, $pu_ht_devise);
+        if (!$error) {
+            // Hook of thirdparty module
+            if (is_object($hookmanager)) {
+                $parameters = ['objFrom' => $this, 'clonedObj' => $object];
+                $action = '';
+                $reshook = $hookmanager->executeHooks('createFrom', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
+                if ($reshook < 0) {
+                    $error++;
+                }
+            }
+        }
 
-			$total_ht  = $tabprice[0];
-			$total_tva = $tabprice[1];
-			$total_ttc = $tabprice[2];
-			$total_localtax1 = $tabprice[9];
-			$total_localtax2 = $tabprice[10];
-			$pu_ht  = $tabprice[3];
-			$pu_tva = $tabprice[4];
-			$pu_ttc = $tabprice[5];
+        unset($object->context['createfromclone']);
 
-			// MultiCurrency
-			$multicurrency_total_ht  = $tabprice[16];
-			$multicurrency_total_tva = $tabprice[17];
-			$multicurrency_total_ttc = $tabprice[18];
-			$pu_ht_devise = $tabprice[19];
+        // End
+        if (!$error) {
+            $this->db->commit();
+            return $object->id;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-			// Rang to use
-			$ranktouse = $rang;
-			if ($ranktouse == -1) {
-				$rangmax = $this->line_max($fk_parent_line);
-				$ranktouse = $rangmax + 1;
-			}
+    /**
+     *    Load a proposal from database. Get also lines.
+     *
+     * @param int    $rowid   id of object to load
+     * @param string $ref     Ref of proposal
+     * @param string $ref_ext Ref ext of proposal
+     *
+     * @return     int                    >0 if OK, <0 if KO
+     */
+    public function fetch($rowid, $ref = '', $ref_ext = '')
+    {
+        $sql = "SELECT p.rowid, p.ref, p.entity, p.remise, p.remise_percent, p.remise_absolue, p.fk_soc";
+        $sql .= ", p.total_ttc, p.total_tva, p.localtax1, p.localtax2, p.total_ht";
+        $sql .= ", p.datec";
+        $sql .= ", p.date_valid as datev";
+        $sql .= ", p.datep as dp";
+        $sql .= ", p.fin_validite as dfv";
+        $sql .= ", p.date_livraison as delivery_date";
+        $sql .= ", p.model_pdf, p.last_main_doc, p.ref_client, p.extraparams";
+        $sql .= ", p.note_private, p.note_public";
+        $sql .= ", p.fk_projet as fk_project, p.fk_statut";
+        $sql .= ", p.fk_user_author, p.fk_user_valid, p.fk_user_cloture";
+        $sql .= ", p.fk_delivery_address";
+        $sql .= ", p.fk_availability";
+        $sql .= ", p.fk_input_reason";
+        $sql .= ", p.fk_cond_reglement";
+        $sql .= ", p.fk_mode_reglement";
+        $sql .= ', p.fk_account';
+        $sql .= ", p.fk_shipping_method";
+        $sql .= ", p.fk_warehouse";
+        $sql .= ", p.fk_incoterms, p.location_incoterms";
+        $sql .= ", p.fk_multicurrency, p.multicurrency_code, p.multicurrency_tx, p.multicurrency_total_ht, p.multicurrency_total_tva, p.multicurrency_total_ttc";
+        $sql .= ", p.tms as date_modification";
+        $sql .= ", i.libelle as label_incoterms";
+        $sql .= ", c.label as statut_label";
+        $sql .= ", ca.code as availability_code, ca.label as availability";
+        $sql .= ", dr.code as demand_reason_code, dr.label as demand_reason";
+        $sql .= ", cr.code as cond_reglement_code, cr.libelle as cond_reglement, cr.libelle_facture as cond_reglement_libelle_doc";
+        $sql .= ", cp.code as mode_reglement_code, cp.libelle as mode_reglement";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "propal as p";
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_propalst as c ON p.fk_statut = c.id';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_paiement as cp ON p.fk_mode_reglement = cp.id AND cp.entity IN (' . getEntity('c_paiement') . ')';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_payment_term as cr ON p.fk_cond_reglement = cr.rowid AND cr.entity IN (' . getEntity('c_payment_term') . ')';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_availability as ca ON p.fk_availability = ca.rowid';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_input_reason as dr ON p.fk_input_reason = dr.rowid';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_incoterms as i ON p.fk_incoterms = i.rowid';
 
-			// TODO A virer
-			// Anciens indicateurs: $price, $remise (a ne plus utiliser)
-			$price = $pu;
-			$remise = 0;
-			if ($remise_percent > 0) {
-				$remise = round(($pu * $remise_percent / 100), 2);
-				$price = $pu - $remise;
-			}
+        if ($ref) {
+            $sql .= " WHERE p.entity IN (" . getEntity('propal') . ")"; // Dont't use entity if you use rowid
+            $sql .= " AND p.ref='" . $this->db->escape($ref) . "'";
+        } else {
+            $sql .= " WHERE p.rowid = " . ((int) $rowid);
+        }
 
-			// Insert line
-			$this->line = new PropaleLigne($this->db);
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
 
-			$this->line->context = $this->context;
+                $this->id = $obj->rowid;
+                $this->entity = $obj->entity;
 
-			$this->line->fk_propal = $this->id;
-			$this->line->label = $label;
-			$this->line->desc = $desc;
-			$this->line->qty = $qty;
+                $this->ref = $obj->ref;
+                $this->ref_client = $obj->ref_client;
+                $this->remise = $obj->remise;
+                $this->remise_percent = $obj->remise_percent;
+                $this->remise_absolue = $obj->remise_absolue;
+                $this->total = $obj->total_ttc; // TODO deprecated
+                $this->total_ttc = $obj->total_ttc;
+                $this->total_ht = $obj->total_ht;
+                $this->total_tva = $obj->total_tva;
+                $this->total_localtax1 = $obj->localtax1;
+                $this->total_localtax2 = $obj->localtax2;
 
-			$this->line->vat_src_code = $vat_src_code;
-			$this->line->tva_tx = $txtva;
-			$this->line->localtax1_tx = ($total_localtax1 ? $localtaxes_type[1] : 0);
-			$this->line->localtax2_tx = ($total_localtax2 ? $localtaxes_type[3] : 0);
-			$this->line->localtax1_type = empty($localtaxes_type[0]) ? '' : $localtaxes_type[0];
-			$this->line->localtax2_type = empty($localtaxes_type[2]) ? '' : $localtaxes_type[2];
-			$this->line->fk_product = $fk_product;
-			$this->line->product_type = $type;
-			$this->line->fk_remise_except = $fk_remise_except;
-			$this->line->remise_percent = $remise_percent;
-			$this->line->subprice = $pu_ht;
-			$this->line->rang = $ranktouse;
-			$this->line->info_bits = $info_bits;
-			$this->line->total_ht = $total_ht;
-			$this->line->total_tva = $total_tva;
-			$this->line->total_localtax1 = $total_localtax1;
-			$this->line->total_localtax2 = $total_localtax2;
-			$this->line->total_ttc = $total_ttc;
-			$this->line->special_code = $special_code;
-			$this->line->fk_parent_line = $fk_parent_line;
-			$this->line->fk_unit = $fk_unit;
+                $this->socid = $obj->fk_soc;
+                $this->thirdparty = null; // Clear if another value was already set by fetch_thirdparty
 
-			$this->line->date_start = $date_start;
-			$this->line->date_end = $date_end;
+                $this->fk_project = $obj->fk_project;
+                $this->project = null; // Clear if another value was already set by fetch_projet
 
-			$this->line->fk_fournprice = $fk_fournprice;
-			$this->line->pa_ht = $pa_ht;
+                $this->model_pdf = $obj->model_pdf;
+                $this->modelpdf = $obj->model_pdf; // deprecated
+                $this->last_main_doc = $obj->last_main_doc;
+                $this->note = $obj->note_private; // TODO deprecated
+                $this->note_private = $obj->note_private;
+                $this->note_public = $obj->note_public;
 
-			$this->line->origin_id = $origin_id;
-			$this->line->origin = $origin;
+                $this->status = (int) $obj->fk_statut;
+                $this->statut = $this->status; // deprecated
+                $this->statut_libelle = $obj->statut_label;
 
-			// Multicurrency
-			$this->line->fk_multicurrency = $this->fk_multicurrency;
-			$this->line->multicurrency_code = $this->multicurrency_code;
-			$this->line->multicurrency_subprice		= $pu_ht_devise;
-			$this->line->multicurrency_total_ht 	= $multicurrency_total_ht;
-			$this->line->multicurrency_total_tva 	= $multicurrency_total_tva;
-			$this->line->multicurrency_total_ttc 	= $multicurrency_total_ttc;
+                $this->datec = $this->db->jdate($obj->datec); // TODO deprecated
+                $this->datev = $this->db->jdate($obj->datev); // TODO deprecated
+                $this->date_creation = $this->db->jdate($obj->datec); //Creation date
+                $this->date_validation = $this->db->jdate($obj->datev); //Validation date
+                $this->date_modification = $this->db->jdate($obj->date_modification); // tms
+                $this->date = $this->db->jdate($obj->dp); // Proposal date
+                $this->datep = $this->db->jdate($obj->dp); // deprecated
+                $this->fin_validite = $this->db->jdate($obj->dfv);
+                $this->date_livraison = $this->db->jdate($obj->delivery_date); // deprecated
+                $this->delivery_date = $this->db->jdate($obj->delivery_date);
+                $this->shipping_method_id = ($obj->fk_shipping_method > 0) ? $obj->fk_shipping_method : null;
+                $this->warehouse_id = ($obj->fk_warehouse > 0) ? $obj->fk_warehouse : null;
+                $this->availability_id = $obj->fk_availability;
+                $this->availability_code = $obj->availability_code;
+                $this->availability = $obj->availability;
+                $this->demand_reason_id = $obj->fk_input_reason;
+                $this->demand_reason_code = $obj->demand_reason_code;
+                $this->demand_reason = $obj->demand_reason;
+                $this->fk_address = $obj->fk_delivery_address;
 
-			// Mise en option de la ligne
-			if (empty($qty) && empty($special_code)) {
-				$this->line->special_code = 3;
-			}
+                $this->mode_reglement_id = $obj->fk_mode_reglement;
+                $this->mode_reglement_code = $obj->mode_reglement_code;
+                $this->mode_reglement = $obj->mode_reglement;
+                $this->fk_account = ($obj->fk_account > 0) ? $obj->fk_account : null;
+                $this->cond_reglement_id = $obj->fk_cond_reglement;
+                $this->cond_reglement_code = $obj->cond_reglement_code;
+                $this->cond_reglement = $obj->cond_reglement;
+                $this->cond_reglement_doc = $obj->cond_reglement_libelle_doc;
 
-			// TODO deprecated
-			$this->line->price = $price;
-			$this->line->remise = $remise;
+                $this->extraparams = (array) json_decode($obj->extraparams, true);
 
-			if (is_array($array_options) && count($array_options) > 0) {
-				$this->line->array_options = $array_options;
-			}
+                $this->user_author_id = $obj->fk_user_author;
+                $this->user_valid_id = $obj->fk_user_valid;
+                $this->user_close_id = $obj->fk_user_cloture;
 
-			$result = $this->line->insert();
-			if ($result > 0) {
-				// Reorder if child line
-				if (!empty($fk_parent_line)) {
-					$this->line_order(true, 'DESC');
-				}
+                //Incoterms
+                $this->fk_incoterms = $obj->fk_incoterms;
+                $this->location_incoterms = $obj->location_incoterms;
+                $this->label_incoterms = $obj->label_incoterms;
 
-				// Mise a jour informations denormalisees au niveau de la propale meme
-				$result = $this->update_price(1, 'auto', 0, $mysoc); // This method is designed to add line from user input so total calculation must be done using 'auto' mode.
+                // Multicurrency
+                $this->fk_multicurrency = $obj->fk_multicurrency;
+                $this->multicurrency_code = $obj->multicurrency_code;
+                $this->multicurrency_tx = $obj->multicurrency_tx;
+                $this->multicurrency_total_ht = $obj->multicurrency_total_ht;
+                $this->multicurrency_total_tva = $obj->multicurrency_total_tva;
+                $this->multicurrency_total_ttc = $obj->multicurrency_total_ttc;
 
-				if ($result > 0) {
-					$this->db->commit();
-					return $this->line->id;
-				} else {
-					$this->error = $this->db->error();
-					$this->db->rollback();
-					return -1;
-				}
-			} else {
-				$this->error = $this->line->error;
-				$this->errors = $this->line->errors;
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			dol_syslog(get_class($this)."::addline status of proposal must be Draft to allow use of ->addline()", LOG_ERR);
-			return -3;
-		}
-	}
+                if ($obj->fk_statut == self::STATUS_DRAFT) {
+                    $this->brouillon = 1;
+                }
 
-	/**
-	 *      Update database
-	 *
+                // Retrieve all extrafield
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+
+                $this->db->free($resql);
+
+                $this->lines = [];
+
+                // Lines
+                $result = $this->fetch_lines();
+                if ($result < 0) {
+                    return -3;
+                }
+
+                return 1;
+            }
+
+            $this->error = "Record Not Found";
+            return 0;
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     *      Update database
+     *
 	 *      @param      User	$user        	User that modify
 	 *      @param      int		$notrigger	    0=launch triggers after, 1=disable triggers
 	 *      @return     int      			   	<0 if KO, >0 if OK
@@ -1805,28 +1696,158 @@ class Propal extends CommonObject
 				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
 			}
 			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Set status to validated
-	 *
-	 *  @param	User	$user       Object user that validate
-	 *  @param	int		$notrigger	1=Does not execute triggers, 0=execute triggers
-	 *  @return int         		<0 if KO, 0=Nothing done, >=0 if OK
-	 */
-	public function valid($user, $notrigger = 0)
-	{
-		global $conf;
+    /**
+     * Load array lines
+     *
+     * @param int $only_product        Return only physical products
+     * @param int $loadalsotranslation Return translation for products
+     *
+     * @return        int                        <0 if KO, >0 if OK
+     */
+    public function fetch_lines($only_product = 0, $loadalsotranslation = 0)
+    {
+        global $langs, $conf;
+        // phpcs:enable
+        $this->lines = [];
 
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
+        $sql = 'SELECT d.rowid, d.fk_propal, d.fk_parent_line, d.label as custom_label, d.description, d.price, d.vat_src_code, d.tva_tx, d.localtax1_tx, d.localtax2_tx, d.localtax1_type, d.localtax2_type, d.qty, d.fk_remise_except, d.remise_percent, d.subprice, d.fk_product,';
+        $sql .= ' d.info_bits, d.total_ht, d.total_tva, d.total_localtax1, d.total_localtax2, d.total_ttc, d.fk_product_fournisseur_price as fk_fournprice, d.buy_price_ht as pa_ht, d.special_code, d.rang, d.product_type,';
+        $sql .= ' d.fk_unit,';
+        $sql .= ' p.ref as product_ref, p.description as product_desc, p.fk_product_type, p.label as product_label, p.tobatch as product_tobatch, p.barcode as product_barcode,';
+        $sql .= ' p.weight, p.weight_units, p.volume, p.volume_units,';
+        $sql .= ' d.date_start, d.date_end,';
+        $sql .= ' d.fk_multicurrency, d.multicurrency_code, d.multicurrency_subprice, d.multicurrency_total_ht, d.multicurrency_total_tva, d.multicurrency_total_ttc';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'propaldet as d';
+        $sql .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product as p ON (d.fk_product = p.rowid)';
+        $sql .= ' WHERE d.fk_propal = ' . ((int) $this->id);
+        if ($only_product) {
+            $sql .= ' AND p.fk_product_type = 0';
+        }
+        $sql .= ' ORDER by d.rang';
+
+        dol_syslog(get_class($this) . "::fetch_lines", LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
+
+            $num = $this->db->num_rows($result);
+
+            $i = 0;
+            while ($i < $num) {
+                $objp = $this->db->fetch_object($result);
+
+                $line = new PropaleLigne($this->db);
+
+                $line->rowid = $objp->rowid; //Deprecated
+                $line->id = $objp->rowid;
+                $line->fk_propal = $objp->fk_propal;
+                $line->fk_parent_line = $objp->fk_parent_line;
+                $line->product_type = $objp->product_type;
+                $line->label = $objp->custom_label;
+                $line->desc = $objp->description; // Description ligne
+                $line->description = $objp->description; // Description ligne
+                $line->qty = $objp->qty;
+                $line->vat_src_code = $objp->vat_src_code;
+                $line->tva_tx = $objp->tva_tx;
+                $line->localtax1_tx = $objp->localtax1_tx;
+                $line->localtax2_tx = $objp->localtax2_tx;
+                $line->localtax1_type = $objp->localtax1_type;
+                $line->localtax2_type = $objp->localtax2_type;
+                $line->subprice = $objp->subprice;
+                $line->fk_remise_except = $objp->fk_remise_except;
+                $line->remise_percent = $objp->remise_percent;
+                $line->price = $objp->price; // TODO deprecated
+
+                $line->info_bits = $objp->info_bits;
+                $line->total_ht = $objp->total_ht;
+                $line->total_tva = $objp->total_tva;
+                $line->total_localtax1 = $objp->total_localtax1;
+                $line->total_localtax2 = $objp->total_localtax2;
+                $line->total_ttc = $objp->total_ttc;
+                $line->fk_fournprice = $objp->fk_fournprice;
+                $marginInfos = getMarginInfos($objp->subprice, $objp->remise_percent, $objp->tva_tx, $objp->localtax1_tx, $objp->localtax2_tx, $line->fk_fournprice, $objp->pa_ht);
+                $line->pa_ht = $marginInfos[0];
+                $line->marge_tx = $marginInfos[1];
+                $line->marque_tx = $marginInfos[2];
+                $line->special_code = $objp->special_code;
+                $line->rang = $objp->rang;
+
+                $line->fk_product = $objp->fk_product;
+
+                $line->ref = $objp->product_ref; // deprecated
+                $line->libelle = $objp->product_label; // deprecated
+
+                $line->product_ref = $objp->product_ref;
+                $line->product_label = $objp->product_label;
+                $line->product_desc = $objp->product_desc; // Description produit
+                $line->product_tobatch = $objp->product_tobatch;
+                $line->product_barcode = $objp->product_barcode;
+
+                $line->fk_product_type = $objp->fk_product_type; // deprecated
+                $line->fk_unit = $objp->fk_unit;
+                $line->weight = $objp->weight;
+                $line->weight_units = $objp->weight_units;
+                $line->volume = $objp->volume;
+                $line->volume_units = $objp->volume_units;
+
+                $line->date_start = $this->db->jdate($objp->date_start);
+                $line->date_end = $this->db->jdate($objp->date_end);
+
+                // Multicurrency
+                $line->fk_multicurrency = $objp->fk_multicurrency;
+                $line->multicurrency_code = $objp->multicurrency_code;
+                $line->multicurrency_subprice = $objp->multicurrency_subprice;
+                $line->multicurrency_total_ht = $objp->multicurrency_total_ht;
+                $line->multicurrency_total_tva = $objp->multicurrency_total_tva;
+                $line->multicurrency_total_ttc = $objp->multicurrency_total_ttc;
+
+                $line->fetch_optionals();
+
+                // multilangs
+                if (!empty($conf->global->MAIN_MULTILANGS) && !empty($objp->fk_product) && !empty($loadalsotranslation)) {
+                    $line = new Product($this->db);
+                    $line->fetch($objp->fk_product);
+                    $line->getMultiLangs();
+                }
+
+                $this->lines[$i] = $line;
+                //dol_syslog("1 ".$line->fk_product);
+                //print "xx $i ".$this->lines[$i]->fk_product;
+                $i++;
+            }
+
+            $this->db->free($result);
+
+            return $num;
+        } else {
+            $this->error = $this->db->lasterror();
+            return -3;
+        }
+    }
+
+    /**
+     *  Set status to validated
+     *
+     * @param User $user      Object user that validate
+     * @param int  $notrigger 1=Does not execute triggers, 0=execute triggers
+     *
+     * @return int                <0 if KO, 0=Nothing done, >=0 if OK
+     */
+    public function valid($user, $notrigger = 0)
+    {
+        global $conf;
+
+        require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 		$error = 0;
 
@@ -1931,61 +1952,8 @@ class Propal extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Returns the reference to the following non used Proposal used depending on the active numbering module
-	 *  defined into PROPALE_ADDON
-	 *
-	 *  @param	Societe		$soc  	Object thirdparty
-	 *  @return string      		Reference libre pour la propale
-	 */
-	public function getNextNumRef($soc)
-	{
-		global $conf, $langs;
-		$langs->load("propal");
-
-		$classname = $conf->global->PROPALE_ADDON;
-
-		if (!empty($classname)) {
-			$mybool = false;
-
-			$file = $classname.".php";
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/propale/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if (!$mybool) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				$this->error = $obj->error;
-				//dol_print_error($db,"Propale::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			$langs->load("errors");
-			print $langs->trans("Error")." ".$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Proposal"));
-			return "";
-		}
-	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Define proposal date
 	 *
@@ -2047,14 +2015,16 @@ class Propal extends CommonObject
 		}
 	}
 
-	/**
-	 *	Define end validity date
-	 *
-	 *	@param		User	$user        		Object user that modify
-	 *	@param      int		$date_fin_validite	End of validity date
-	 *  @param  	int		$notrigger			1=Does not execute triggers, 0= execute triggers
-	 *	@return     int         				<0 if KO, >0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Define end validity date
+     *
+     *	@param		User	$user        		Object user that modify
+     *	@param      int		$date_fin_validite	End of validity date
+     *  @param  	int		$notrigger			1=Does not execute triggers, 0= execute triggers
+     *	@return     int         				<0 if KO, >0 if OK
+     */
 	public function set_echeance($user, $date_fin_validite, $notrigger = 0)
 	{
 		// phpcs:enable
@@ -2103,7 +2073,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set delivery date
 	 *
@@ -2118,8 +2087,6 @@ class Propal extends CommonObject
 		// phpcs:enable
 		return $this->setDeliveryDate($user, $delivery_date, $notrigger);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Set delivery date
@@ -2177,7 +2144,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Set delivery
 	 *
@@ -2241,7 +2207,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Set source of demand
 	 *
@@ -2306,9 +2271,7 @@ class Propal extends CommonObject
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Set customer reference number
 	 *
@@ -2365,14 +2328,16 @@ class Propal extends CommonObject
 		}
 	}
 
-	/**
-	 *	Set an overall discount on the proposal
-	 *
-	 *	@param      User	$user       Object user that modify
-	 *	@param      double	$remise     Amount discount
-	 *  @param  	int		$notrigger	1=Does not execute triggers, 0= execute triggers
-	 *	@return     int         		<0 if ko, >0 if ok
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Set an overall discount on the proposal
+     *
+     *	@param      User	$user       Object user that modify
+     *	@param      double	$remise     Amount discount
+     *  @param  	int		$notrigger	1=Does not execute triggers, 0= execute triggers
+     *	@return     int         		<0 if ko, >0 if ok
+     */
 	public function set_remise_percent($user, $remise, $notrigger = 0)
 	{
 		// phpcs:enable
@@ -2415,27 +2380,31 @@ class Propal extends CommonObject
 				return 1;
 			} else {
 				foreach ($this->errors as $errmsg) {
-					dol_syslog(__METHOD__.' Error: '.$errmsg, LOG_ERR);
-					$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-				}
-				$this->db->rollback();
-				return -1 * $error;
-			}
-		}
-	}
+                    dol_syslog(__METHOD__ . ' Error: ' . $errmsg, LOG_ERR);
+                    $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+                }
+                $this->db->rollback();
+                return -1 * $error;
+            }
+        }
+    }
 
-	/**
-	 *	Set an absolute overall discount on the proposal
-	 *
-	 *	@param      User	$user       Object user that modify
-	 *	@param      double	$remise     Amount discount
-	 *  @param  	int		$notrigger	1=Does not execute triggers, 0= execute triggers
-	 *	@return     int         		<0 if ko, >0 if ok
-	 */
-	public function set_remise_absolue($user, $remise, $notrigger = 0)
-	{
-		// phpcs:enable
-		if (empty($remise)) {
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Set an absolute overall discount on the proposal
+     *
+     * @param User   $user      Object user that modify
+     * @param double $remise    Amount discount
+     * @param int    $notrigger 1=Does not execute triggers, 0= execute triggers
+     *
+     * @return     int                <0 if ko, >0 if ok
+     */
+    public function set_remise_absolue($user, $remise, $notrigger = 0)
+    {
+        // phpcs:enable
+        if (empty($remise)) {
 			$remise = 0;
 		}
 		$remise = price2num($remise);
@@ -2485,6 +2454,8 @@ class Propal extends CommonObject
 		}
 	}
 
+
+
 	/**
 	 *	Reopen the commercial proposal
 	 *
@@ -2492,6 +2463,7 @@ class Propal extends CommonObject
 	 *	@param      int		$status		Status
 	 *	@param      string	$note		Comment
 	 *  @param		int		$notrigger	1=Does not execute triggers, 0= execute triggers
+	 *
 	 *	@return     int         		<0 if KO, >0 if OK
 	 */
 	public function reopen($user, $status, $note = '', $notrigger = 0)
@@ -2543,8 +2515,6 @@ class Propal extends CommonObject
 			return 1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Close/set the commercial proposal to status signed or refused (fill also date signature)
@@ -2641,42 +2611,6 @@ class Propal extends CommonObject
 		}
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Create a document onto disk according to template module.
-	 *
-	 * 	@param	    string		$modele			Force model to use ('' to not force)
-	 * 	@param		Translate	$outputlangs	Object langs to use for output
-	 *  @param      int			$hidedetails    Hide details of lines
-	 *  @param      int			$hidedesc       Hide description
-	 *  @param      int			$hideref        Hide ref
-	 *  @param   null|array  $moreparams     Array to provide more information
-	 * 	@return     int         				0 if KO, 1 if OK
-	 */
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
-	{
-		global $conf, $langs;
-
-		$langs->load("propale");
-		$outputlangs->load("products");
-
-		if (!dol_strlen($modele)) {
-			$modele = 'azur';
-
-			if ($this->model_pdf) {
-				$modele = $this->model_pdf;
-			} elseif (!empty($conf->global->PROPALE_ADDON_PDF)) {
-				$modele = $conf->global->PROPALE_ADDON_PDF;
-			}
-		}
-
-		$modelpath = "core/modules/propale/doc/";
-
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-	}
-
 	/**
 	 *	Classify the proposal to status Billed
 	 *
@@ -2758,7 +2692,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set draft status
 	 *
@@ -2811,27 +2744,30 @@ class Propal extends CommonObject
 			return 1;
 		} else {
 			foreach ($this->errors as $errmsg) {
-				dol_syslog(__METHOD__.' Error: '.$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		}
-	}
+                dol_syslog(__METHOD__ . ' Error: ' . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        }
+    }
 
-	/**
-	 *    Return list of proposal (eventually filtered on user) into an array
-	 *
-	 *    @param	int		$shortlist			0=Return array[id]=ref, 1=Return array[](id=>id,ref=>ref,name=>name)
-	 *    @param	int		$draft				0=not draft, 1=draft
-	 *    @param	int		$notcurrentuser		0=all user, 1=not current user
-	 *    @param    int		$socid				Id third pary
-	 *    @param    int		$limit				For pagination
-	 *    @param    int		$offset				For pagination
-	 *    @param    string	$sortfield			Sort criteria
-	 *    @param    string	$sortorder			Sort order
-	 *    @return	int		       				-1 if KO, array with result if OK
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return list of proposal (eventually filtered on user) into an array
+     *
+     * @param int    $shortlist      0=Return array[id]=ref, 1=Return array[](id=>id,ref=>ref,name=>name)
+     * @param int    $draft          0=not draft, 1=draft
+     * @param int    $notcurrentuser 0=all user, 1=not current user
+     * @param int    $socid          Id third pary
+     * @param int    $limit          For pagination
+     * @param int    $offset         For pagination
+     * @param string $sortfield      Sort criteria
+     * @param string $sortorder      Sort order
+     *    @return	int		       				-1 if KO, array with result if OK
+     */
 	public function liste_array($shortlist = 0, $draft = 0, $notcurrentuser = 0, $socid = 0, $limit = 0, $offset = 0, $sortfield = 'p.datep', $sortorder = 'DESC')
 	{
 		// phpcs:enable
@@ -2906,7 +2842,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Returns an array with id and ref of related invoices
 	 *
@@ -3163,7 +3098,6 @@ class Propal extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Change source demand
 	 *
@@ -3228,8 +3162,6 @@ class Propal extends CommonObject
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Object Proposal Information
 	 *
@@ -3276,26 +3208,89 @@ class Propal extends CommonObject
 				if ($obj->fk_user_cloture) {
 					$cluser = new User($this->db);
 					$cluser->fetch($obj->fk_user_cloture);
-					$this->user_cloture = $cluser;
-				}
-			}
-			$this->db->free($result);
-		} else {
-			dol_print_error($this->db);
-		}
-	}
+                    $this->user_cloture = $cluser;
+                }
+            }
+            $this->db->free($result);
+        } else {
+            dol_print_error($this->db);
+        }
+    }
 
-	/**
-	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
-	 *
-	 *      @param          User	$user   Object user
-	 *      @param          int		$mode   "opened" for proposal to close, "signed" for proposal to invoice
-	 *      @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
-	 */
-	public function load_board($user, $mode)
-	{
-		// phpcs:enable
-		global $conf, $langs;
+    /**
+     *        Return label of status of proposal (draft, validated, ...)
+     *
+     * @param int $mode 0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return     string        Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->statut, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *        Return label of a status (draft, validated, ...)
+     *
+     * @param int $status Id status
+     * @param int $mode   0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return     string        Label
+     */
+    public function LibStatut($status, $mode = 1)
+    {
+        // phpcs:enable
+        global $conf;
+
+        // Init/load array of translation of status
+        if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+            global $langs;
+            $langs->load("propal");
+            $this->labelStatus[0] = $langs->transnoentitiesnoconv("PropalStatusDraft");
+            $this->labelStatus[1] = $langs->transnoentitiesnoconv("PropalStatusValidated");
+            $this->labelStatus[2] = $langs->transnoentitiesnoconv("PropalStatusSigned");
+            $this->labelStatus[3] = $langs->transnoentitiesnoconv("PropalStatusNotSigned");
+            $this->labelStatus[4] = $langs->transnoentitiesnoconv("PropalStatusBilled");
+            $this->labelStatusShort[0] = $langs->transnoentitiesnoconv("PropalStatusDraftShort");
+            $this->labelStatusShort[1] = $langs->transnoentitiesnoconv("PropalStatusValidatedShort");
+            $this->labelStatusShort[2] = $langs->transnoentitiesnoconv("PropalStatusSignedShort");
+            $this->labelStatusShort[3] = $langs->transnoentitiesnoconv("PropalStatusNotSignedShort");
+            $this->labelStatusShort[4] = $langs->transnoentitiesnoconv("PropalStatusBilledShort");
+        }
+
+        $statusType = '';
+        if ($status == self::STATUS_DRAFT) {
+            $statusType = 'status0';
+        } elseif ($status == self::STATUS_VALIDATED) {
+            $statusType = 'status1';
+        } elseif ($status == self::STATUS_SIGNED) {
+            $statusType = 'status4';
+        } elseif ($status == self::STATUS_NOTSIGNED) {
+            $statusType = 'status9';
+        } elseif ($status == self::STATUS_BILLED) {
+            $statusType = 'status6';
+        }
+
+        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
+     *
+     * @param User $user Object user
+     * @param int  $mode "opened" for proposal to close, "signed" for proposal to invoice
+     *
+     * @return WorkboardResponse|int <0 if KO, WorkboardResponse if OK
+     */
+    public function load_board($user, $mode)
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		$clause = " WHERE";
 
@@ -3368,7 +3363,6 @@ class Propal extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Initialise an instance with random values.
@@ -3462,11 +3456,13 @@ class Propal extends CommonObject
 		}
 	}
 
-	/**
-	 *      Charge indicateurs this->nb de tableau de bord
-	 *
-	 *      @return     int         <0 if ko, >0 if ok
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Charge indicateurs this->nb de tableau de bord
+     *
+     *      @return     int         <0 if ko, >0 if ok
+     */
 	public function load_state_board()
 	{
 		// phpcs:enable
@@ -3491,26 +3487,78 @@ class Propal extends CommonObject
 			while ($obj = $this->db->fetch_object($resql)) {
 				$this->nb["proposals"] = $obj->nb;
 			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            $this->db->free($resql);
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Return clicable link of object (with eventually picto)
-	 *
-	 *	@param      int		$withpicto		          Add picto into link
-	 *	@param      string	$option			          Where point the link ('expedition', 'document', ...)
-	 *	@param      string	$get_params    	          Parametres added to url
-	 *  @param	    int   	$notooltip		          1=Disable tooltip
-	 *  @param      int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *  @param      int     $addlinktonotes           -1=Disable, 0=Just add label show notes, 1=Add private note (only internal user), 2=Add public note (internal or external user), 3=Add private (internal user) and public note (internal and external user)
-	 *	@return     string          		          String with URL
-	 */
+    /**
+     *  Returns the reference to the following non used Proposal used depending on the active numbering module
+     *  defined into PROPALE_ADDON
+     *
+     * @param Societe $soc Object thirdparty
+     *
+     * @return string            Reference libre pour la propale
+     */
+    public function getNextNumRef($soc)
+    {
+        global $conf, $langs;
+        $langs->load("propal");
+
+        $classname = $conf->global->PROPALE_ADDON;
+
+        if (!empty($classname)) {
+            $mybool = false;
+
+            $file = $classname . ".php";
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/propale/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if (!$mybool) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                $this->error = $obj->error;
+                //dol_print_error($db,"Propale::getNextNumRef ".$obj->error);
+                return "";
+            }
+        } else {
+            $langs->load("errors");
+            print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Proposal"));
+            return "";
+        }
+    }
+
+    /**
+     *    Return clicable link of object (with eventually picto)
+     *
+     * @param int    $withpicto             Add picto into link
+     * @param string $option                Where point the link ('expedition', 'document', ...)
+     * @param string $get_params            Parametres added to url
+     * @param int    $notooltip             1=Disable tooltip
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     * @param int    $addlinktonotes        -1=Disable, 0=Just add label show notes, 1=Add private note (only internal user), 2=Add public note (internal or external user), 3=Add private (internal user) and public note (internal and external user)
+     * @return     string          		          String with URL
+     */
 	public function getNomUrl($withpicto = 0, $option = '', $get_params = '', $notooltip = 0, $save_lastsearch_value = -1, $addlinktonotes = -1)
 	{
 		global $langs, $conf, $user;
@@ -3638,74 +3686,70 @@ class Propal extends CommonObject
 	}
 
 	/**
-	 *    	Return label of status of proposal (draft, validated, ...)
-	 *
-	 *    	@param      int			$mode        0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
-	 *    	@return     string		Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->statut, $mode);
-	}
+     *    Retrieve an array of proposal lines
+     *
+     * @return int        >0 if OK, <0 if KO
+     */
+    public function getLinesArray()
+    {
+        return $this->fetch_lines();
+    }
 
-	/**
-	 *    	Return label of a status (draft, validated, ...)
-	 *
-	 *    	@param      int			$status		Id status
-	 *    	@param      int			$mode      	0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto, 6=Long label + Picto
-	 *    	@return     string		Label
-	 */
-	public function LibStatut($status, $mode = 1)
-	{
-		// phpcs:enable
-		global $conf;
+    /**
+     *  Create a document onto disk according to template module.
+     *
+     * @param string     $modele      Force model to use ('' to not force)
+     * @param Translate  $outputlangs Object langs to use for output
+     * @param int        $hidedetails Hide details of lines
+     * @param int        $hidedesc    Hide description
+     * @param int        $hideref     Hide ref
+     * @param null|array $moreparams  Array to provide more information
+     *
+     * @return     int                        0 if KO, 1 if OK
+     */
+    public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
+    {
+        global $conf, $langs;
 
-		// Init/load array of translation of status
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-			$langs->load("propal");
-			$this->labelStatus[0] = $langs->transnoentitiesnoconv("PropalStatusDraft");
-			$this->labelStatus[1] = $langs->transnoentitiesnoconv("PropalStatusValidated");
-			$this->labelStatus[2] = $langs->transnoentitiesnoconv("PropalStatusSigned");
-			$this->labelStatus[3] = $langs->transnoentitiesnoconv("PropalStatusNotSigned");
-			$this->labelStatus[4] = $langs->transnoentitiesnoconv("PropalStatusBilled");
-			$this->labelStatusShort[0] = $langs->transnoentitiesnoconv("PropalStatusDraftShort");
-			$this->labelStatusShort[1] = $langs->transnoentitiesnoconv("PropalStatusValidatedShort");
-			$this->labelStatusShort[2] = $langs->transnoentitiesnoconv("PropalStatusSignedShort");
-			$this->labelStatusShort[3] = $langs->transnoentitiesnoconv("PropalStatusNotSignedShort");
-			$this->labelStatusShort[4] = $langs->transnoentitiesnoconv("PropalStatusBilledShort");
-		}
+        $langs->load("propale");
+        $outputlangs->load("products");
 
-		$statusType = '';
-		if ($status == self::STATUS_DRAFT) {
-			$statusType = 'status0';
-		} elseif ($status == self::STATUS_VALIDATED) {
-			$statusType = 'status1';
-		} elseif ($status == self::STATUS_SIGNED) {
-			$statusType = 'status4';
-		} elseif ($status == self::STATUS_NOTSIGNED) {
-			$statusType = 'status9';
-		} elseif ($status == self::STATUS_BILLED) {
-			$statusType = 'status6';
-		}
+        if (!dol_strlen($modele)) {
+            $modele = 'azur';
 
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
+            if ($this->model_pdf) {
+                $modele = $this->model_pdf;
+            } elseif (!empty($conf->global->PROPALE_ADDON_PDF)) {
+                $modele = $conf->global->PROPALE_ADDON_PDF;
+            }
+        }
 
-	/**
-	 * 	Retrieve an array of proposal lines
-	 *
-	 * 	@return int		>0 if OK, <0 if KO
-	 */
-	public function getLinesArray()
-	{
-		return $this->fetch_lines();
-	}
+        $modelpath = "core/modules/propale/doc/";
+
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'propal',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
 
-
 /**
- *	Class to manage commercial proposal lines
+ *    Class to manage commercial proposal lines
  */
 class PropaleLigne extends CommonObjectLine
 {

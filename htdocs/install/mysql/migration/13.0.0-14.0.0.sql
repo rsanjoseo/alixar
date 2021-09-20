@@ -398,39 +398,51 @@ ALTER TABLE llx_societe_perentity ADD INDEX idx_societe_perentity_fk_soc (fk_soc
 ALTER TABLE llx_societe_perentity ADD UNIQUE INDEX uk_societe_perentity (fk_soc, entity);
 
 CREATE TABLE llx_eventorganization_conferenceorboothattendee(
-    rowid integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    ref varchar(128) NOT NULL,
-    fk_soc integer,
-    fk_actioncomm integer,
-    fk_project integer NOT NULL,
-    email varchar(100),
-    date_subscription datetime,
-    amount double DEFAULT NULL,
-    note_public text,
-    note_private text,
-    date_creation datetime NOT NULL,
-    tms timestamp,
-    fk_user_creat integer,
-    fk_user_modif integer,
-    last_main_doc varchar(255),
-    import_key varchar(14),
-    model_pdf varchar(255),
-    status smallint NOT NULL
+                                                                rowid             integer AUTO_INCREMENT PRIMARY KEY NOT NULL,
+                                                                ref               varchar(128) NOT NULL,
+                                                                fk_soc            integer,
+                                                                fk_actioncomm     integer,
+                                                                fk_project        integer      NOT NULL,
+                                                                fk_invoice        integer NULL,
+                                                                email             varchar(100),
+                                                                date_subscription datetime,
+                                                                amount            double DEFAULT NULL,
+                                                                note_public       text,
+                                                                note_private      text,
+                                                                date_creation     datetime     NOT NULL,
+                                                                tms               timestamp,
+                                                                fk_user_creat     integer,
+                                                                fk_user_modif     integer,
+                                                                last_main_doc     varchar(255),
+                                                                import_key        varchar(14),
+                                                                model_pdf         varchar(255),
+                                                                status            smallint     NOT NULL
 ) ENGINE=innodb;
 
 -- VMYSQL4.3 ALTER TABLE llx_eventorganization_conferenceorboothattendee MODIFY COLUMN fk_actioncomm integer NULL;
 -- VPGSQL8.2 ALTER TABLE llx_eventorganization_conferenceorboothattendee ALTER COLUMN fk_actioncomm DROP NOT NULL;
 
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD COLUMN fk_project integer NOT NULL;
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD COLUMN fk_project integer NOT NULL;
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD COLUMN fk_invoice integer NULL;
 
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_rowid (rowid);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_ref (ref);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_fk_soc (fk_soc);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_fk_actioncomm (fk_actioncomm);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD CONSTRAINT fx_eventorganization_conferenceorboothattendee_fk_actioncomm FOREIGN KEY (fk_actioncomm) REFERENCES llx_actioncomm(id);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_email (email);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD INDEX idx_eventorganization_conferenceorboothattendee_status (status);
-ALTER TABLE llx_eventorganization_conferenceorboothattendee ADD UNIQUE INDEX uk_eventorganization_conferenceorboothattendee(fk_soc, fk_actioncomm, email);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_rowid (rowid);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_ref (ref);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_fk_soc (fk_soc);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_fk_actioncomm (fk_actioncomm);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD CONSTRAINT fx_eventorganization_conferenceorboothattendee_fk_actioncomm FOREIGN KEY (fk_actioncomm) REFERENCES llx_actioncomm (id);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_email (email);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD INDEX idx_eventorganization_conferenceorboothattendee_status (status);
+ALTER TABLE llx_eventorganization_conferenceorboothattendee
+    ADD UNIQUE INDEX uk_eventorganization_conferenceorboothattendee(fk_soc, fk_actioncomm, email);
 
 create table llx_eventorganization_conferenceorboothattendee_extrafields
 (

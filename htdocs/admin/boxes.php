@@ -413,24 +413,24 @@ foreach ($boxactivated as $key => $box) {
 	print '<td>';
 	if ($box->note == '(WarningUsingThisBoxSlowDown)') {
 		$langs->load("errors");
-		print img_warning('', 0).' '.$langs->trans("WarningUsingThisBoxSlowDown");
-	} else {
-		print ($box->note ? $box->note : '&nbsp;');
-	}
-	print '</td>';
-	print '<td class="center">'.(empty($arrayofhomepages[$box->position]) ? '' : $langs->trans($arrayofhomepages[$box->position])).'</td>';
-	$hasnext = ($key < (count($boxactivated) - 1));
-	$hasprevious = ($key != 0);
-	print '<td class="center">'.($key + 1).'</td>';
-	print '<td class="center nowraponall">';
-	print ($hasnext ? '<a class="reposition" href="boxes.php?action=switch&amp;switchfrom='.$box->rowid.'&amp;switchto='.$boxactivated[$key + 1]->rowid.'">'.img_down().'</a>&nbsp;' : '');
-	print ($hasprevious ? '<a class="reposition" href="boxes.php?action=switch&amp;switchfrom='.$box->rowid.'&amp;switchto='.$boxactivated[$key - 1]->rowid.'">'.img_up().'</a>' : '');
-	print '</td>';
-	print '<td class="center">';
-	print '<a class="reposition" href="boxes.php?rowid='.$box->rowid.'&action=delete&token='.newToken().'">'.img_delete().'</a>';
-	print '</td>';
+        print img_warning('', 0) . ' ' . $langs->trans("WarningUsingThisBoxSlowDown");
+    } else {
+        print ($box->note ? $box->note : '&nbsp;');
+    }
+    print '</td>';
+    print '<td class="center">' . (empty($arrayofhomepages[$box->position]) ? '' : $langs->trans($arrayofhomepages[$box->position])) . '</td>';
+    $hasnext = ($key < (count($boxactivated) - 1));
+    $hasprevious = ($key != 0);
+    print '<td class="center">' . ($key + 1) . '</td>';
+    print '<td class="center nowraponall">';
+    print ($hasnext ? '<a class="reposition" href="boxes.php?action=switch&token=' . newToken() . '&switchfrom=' . $box->rowid . '&switchto=' . $boxactivated[$key + 1]->rowid . '">' . img_down() . '</a>&nbsp;' : '');
+    print ($hasprevious ? '<a class="reposition" href="boxes.php?action=switch&token=' . newToken() . '&switchfrom=' . $box->rowid . '&switchto=' . $boxactivated[$key - 1]->rowid . '">' . img_up() . '</a>' : '');
+    print '</td>';
+    print '<td class="center">';
+    print '<a class="reposition" href="boxes.php?rowid=' . $box->rowid . '&action=delete&token=' . newToken() . '">' . img_delete() . '</a>';
+    print '</td>';
 
-	print '</tr>'."\n";
+    print '</tr>' . "\n";
 }
 
 print '</table>';

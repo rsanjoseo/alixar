@@ -119,19 +119,27 @@ class BankAccounts extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
+     * Get account by ID.
+     *
+     * @param int $id ID of account
+     *
+     * @return array Account object
+     *
+     * @throws RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->banque->lire) {
+            throw new RestException(401);
+        }
 
-		unset($object->rowid);
+        $account = new Account($this->db);
+        $result = $account->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'account not found');
+        }
 
-		return $object;
+        return $this->_cleanObjectDatas($account);
 	}
 
 	/**
@@ -162,26 +170,6 @@ class BankAccounts extends DolibarrApi
 			throw new RestException(500, 'Error creating bank account', array_merge(array($account->error), $account->errors));
 		}
 		return $account->id;
-	}
-
-	/**
-	 * Validate fields before creating an object
-	 *
-	 * @param array|null    $data    Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$account = array();
-		foreach (BankAccounts::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$account[$field] = $data[$field];
-		}
-		return $account;
 	}
 
 	/**
@@ -356,31 +344,6 @@ class BankAccounts extends DolibarrApi
 	}
 
 	/**
-	 * Get account by ID.
-	 *
-	 * @param int    $id    ID of account
-	 * @return array Account object
-	 *
-	 * @throws RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->banque->lire) {
-			throw new RestException(401);
-		}
-
-		$account = new Account($this->db);
-		$result = $account->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'account not found');
-		}
-
-		return $this->_cleanObjectDatas($account);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete account
 	 *
 	 * @param int    $id    ID of account
@@ -399,27 +362,67 @@ class BankAccounts extends DolibarrApi
 
 		if ($account->delete(DolibarrApiAccess::$user) < 0) {
 			throw new RestException(401, 'error when deleting account');
-		}
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'account deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'account deleted',
+            ],
+        ];
+    }
 
-	/**
-	 * Get the list of lines of the account.
-	 *
-	 * @param int $id ID of account
-	 * @return array Array of AccountLine objects
-	 *
-	 * @throws RestException
-	 *
-	 * @url GET {id}/lines
-	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.import_key:<:'20160101')"
-	 */
+    /**
+     * Validate fields before creating an object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $account = [];
+        foreach (BankAccounts::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $account[$field] = $data[$field];
+        }
+        return $account;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->rowid);
+
+        return $object;
+    }
+
+    /**
+     * Get the list of lines of the account.
+     *
+     * @param int    $id         ID of account
+     * @return array Array of AccountLine objects
+     *
+     * @throws RestException
+     *
+     * @url GET {id}/lines
+     * @param string $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.import_key:<:'20160101')"
+     */
 	public function getLines($id, $sqlfilters = '')
 	{
 		$list = array();

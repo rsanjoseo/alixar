@@ -59,29 +59,133 @@ class MailmanSpip
 	public $mlremoved_ok;
 	public $mlremoved_ko;
 
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 *	Constructor
-	 *
-	 *	@param 		DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * Function used to check if SPIP is enabled on the system
+     *
+     * @return boolean
+     */
+    public function isSpipEnabled()
+    {
+        if (defined("ADHERENT_USE_SPIP") && (ADHERENT_USE_SPIP == 1)) {
+            return true;
+        }
 
-	/**
-	 *  Fonction qui donne les droits redacteurs dans spip
-	 *
-	 *	@param	Adherent	$object		Object with data (->firstname, ->lastname, ->email and ->login)
-	 *  @return	int					=0 if KO, >0 if OK
-	 */
-	public function add_to_spip($object)
-	{
-		// phpcs:enable
-		dol_syslog(get_class($this)."::add_to_spip");
+        return false;
+    }
 
-		if ($this->isSpipEnabled()) {
+    /**
+     * Function used to check if the SPIP config is correct
+     *
+     * @return boolean
+     */
+    public function checkSpipConfig()
+    {
+        if (defined('ADHERENT_SPIP_SERVEUR') && defined('ADHERENT_SPIP_USER') && defined('ADHERENT_SPIP_PASS') && defined('ADHERENT_SPIP_DB')) {
+            if (ADHERENT_SPIP_SERVEUR != '' && ADHERENT_SPIP_USER != '' && ADHERENT_SPIP_PASS != '' && ADHERENT_SPIP_DB != '') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Function used to connect to SPIP
+     *
+     * @return boolean|DoliDB        Boolean of DoliDB
+     */
+    public function connectSpip()
+    {
+        $resource = getDoliDBInstance('mysql', ADHERENT_SPIP_SERVEUR, ADHERENT_SPIP_USER, ADHERENT_SPIP_PASS, ADHERENT_SPIP_DB, ADHERENT_SPIP_PORT);
+
+        if ($resource->ok) {
+            return $resource;
+        }
+
+        dol_syslog('Error when connecting to SPIP ' . ADHERENT_SPIP_SERVEUR . ' ' . ADHERENT_SPIP_USER . ' ' . ADHERENT_SPIP_PASS . ' ' . ADHERENT_SPIP_DB, LOG_ERR);
+
+        return false;
+    }
+
+    /**
+     * Function used to connect to Mailman
+     *
+     * @param Adherent $object Object with the data
+     * @param string   $url    Mailman URL to be called with patterns
+     * @param string   $list   Name of mailing-list
+     *
+     * @return    mixed                Boolean or string
+     */
+    private function callMailman($object, $url, $list)
+    {
+        global $conf;
+
+        //Patterns that are going to be replaced with their original value
+        $patterns = [
+            '%LISTE%',
+            '%EMAIL%',
+            '%PASSWORD%',
+            '%MAILMAN_ADMINPW%',
+        ];
+        $replace = [
+            $list,
+            $object->email,
+            $object->pass,
+            $conf->global->ADHERENT_MAILMAN_ADMINPW,
+        ];
+
+        $curl_url = str_replace($patterns, $replace, $url);
+        dol_syslog('Calling Mailman: ' . $curl_url);
+
+        $ch = curl_init($curl_url);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FAILONERROR, true);
+        @curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, empty($conf->global->MAIN_USE_CONNECT_TIMEOUT) ? 5 : $conf->global->MAIN_USE_CONNECT_TIMEOUT);
+        curl_setopt($ch, CURLOPT_TIMEOUT, empty($conf->global->MAIN_USE_RESPONSE_TIMEOUT) ? 30 : $conf->global->MAIN_USE_RESPONSE_TIMEOUT);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+        $result = curl_exec($ch);
+        dol_syslog('result curl_exec=' . $result);
+
+        //An error was found, we store it in $this->error for later
+        if ($result === false || curl_errno($ch) > 0) {
+            $this->error = curl_errno($ch) . ' ' . curl_error($ch);
+            dol_syslog('Error using curl ' . $this->error, LOG_ERR);
+        }
+
+        curl_close($ch);
+
+        return $result;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Fonction qui donne les droits redacteurs dans spip
+     *
+     * @param Adherent $object Object with data (->firstname, ->lastname, ->email and ->login)
+     *
+     * @return    int                    =0 if KO, >0 if OK
+     */
+    public function add_to_spip($object)
+    {
+        // phpcs:enable
+        dol_syslog(get_class($this) . "::add_to_spip");
+
+        if ($this->isSpipEnabled()) {
 			if ($this->checkSpipConfig()) {
 				$mydb = $this->connectSpip();
 
@@ -113,56 +217,7 @@ class MailmanSpip
 		return 0;
 	}
 
-	/**
-	 * Function used to check if SPIP is enabled on the system
-	 *
-	 * @return boolean
-	 */
-	public function isSpipEnabled()
-	{
-		if (defined("ADHERENT_USE_SPIP") && (ADHERENT_USE_SPIP == 1)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Function used to check if the SPIP config is correct
-	 *
-	 * @return boolean
-	 */
-	public function checkSpipConfig()
-	{
-		if (defined('ADHERENT_SPIP_SERVEUR') && defined('ADHERENT_SPIP_USER') && defined('ADHERENT_SPIP_PASS') && defined('ADHERENT_SPIP_DB')) {
-			if (ADHERENT_SPIP_SERVEUR != '' && ADHERENT_SPIP_USER != '' && ADHERENT_SPIP_PASS != '' && ADHERENT_SPIP_DB != '') {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Function used to connect to SPIP
-	 *
-	 * @return boolean|DoliDB		Boolean of DoliDB
-	 */
-	public function connectSpip()
-	{
-		$resource = getDoliDBInstance('mysql', ADHERENT_SPIP_SERVEUR, ADHERENT_SPIP_USER, ADHERENT_SPIP_PASS, ADHERENT_SPIP_DB, ADHERENT_SPIP_PORT);
-
-		if ($resource->ok) {
-			return $resource;
-		}
-
-		dol_syslog('Error when connecting to SPIP '.ADHERENT_SPIP_SERVEUR.' '.ADHERENT_SPIP_USER.' '.ADHERENT_SPIP_PASS.' '.ADHERENT_SPIP_DB, LOG_ERR);
-
-		return false;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Fonction qui enleve les droits redacteurs dans spip
 	 *
@@ -204,7 +259,6 @@ class MailmanSpip
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Fonction qui dit si cet utilisateur est un redacteur existant dans spip
 	 *
@@ -251,7 +305,6 @@ class MailmanSpip
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Subscribe an email to all mailing-lists
 	 *
@@ -319,62 +372,6 @@ class MailmanSpip
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Function used to connect to Mailman
-	 *
-	 * @param	Adherent 	$object 	Object with the data
-	 * @param	string 	$url    	Mailman URL to be called with patterns
-	 * @param	string	$list		Name of mailing-list
-	 * @return 	mixed				Boolean or string
-	 */
-	private function callMailman($object, $url, $list)
-	{
-		global $conf;
-
-		//Patterns that are going to be replaced with their original value
-		$patterns = array(
-			'%LISTE%',
-			'%EMAIL%',
-			'%PASSWORD%',
-			'%MAILMAN_ADMINPW%'
-		);
-		$replace = array(
-			$list,
-			$object->email,
-			$object->pass,
-			$conf->global->ADHERENT_MAILMAN_ADMINPW
-		);
-
-		$curl_url = str_replace($patterns, $replace, $url);
-		dol_syslog('Calling Mailman: '.$curl_url);
-
-		$ch = curl_init($curl_url);
-
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_FAILONERROR, true);
-		@curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, empty($conf->global->MAIN_USE_CONNECT_TIMEOUT) ? 5 : $conf->global->MAIN_USE_CONNECT_TIMEOUT);
-		curl_setopt($ch, CURLOPT_TIMEOUT, empty($conf->global->MAIN_USE_RESPONSE_TIMEOUT) ? 30 : $conf->global->MAIN_USE_RESPONSE_TIMEOUT);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-		$result = curl_exec($ch);
-		dol_syslog('result curl_exec='.$result);
-
-		//An error was found, we store it in $this->error for later
-		if ($result === false || curl_errno($ch) > 0) {
-			$this->error = curl_errno($ch).' '.curl_error($ch);
-			dol_syslog('Error using curl '.$this->error, LOG_ERR);
-		}
-
-		curl_close($ch);
-
-		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Unsubscribe an email from all mailing-lists
 	 *  Used when a user is resiliated

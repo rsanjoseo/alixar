@@ -26,9 +26,9 @@
  *        \brief        Page to set permission of a user record
  */
 
-//if (!defined('CSRFCHECK_WITH_TOKEN')) {
-//	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
-//}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
+}
 
 require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
@@ -43,7 +43,7 @@ $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
 $module = GETPOST('module', 'alpha');
 $rights = GETPOST('rights', 'int');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'userperms'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'userperms'; // To manage different context of search
 
 if (!isset($id) || empty($id)) {
 	accessforbidden();
@@ -279,12 +279,12 @@ print '<td>'.$langs->trans("Module").'</td>';
 if (($caneditperms && empty($objMod->rights_admin_allowed)) || empty($object->admin)) {
 	if ($caneditperms) {
 		print '<td class="center nowrap">';
-		print '<a class="reposition commonlink" title="'.dol_escape_htmltag($langs->trans("All")).'" alt="'.dol_escape_htmltag($langs->trans("All")).'" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addrights&amp;entity='.$entity.'&amp;module=allmodules&amp;confirm=yes&amp;token='.newToken().'">'.$langs->trans("All")."</a>";
-		print ' / ';
-		print '<a class="reposition commonlink" title="'.dol_escape_htmltag($langs->trans("None")).'" alt="'.dol_escape_htmltag($langs->trans("None")).'" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delrights&amp;entity='.$entity.'&amp;module=allmodules&amp;confirm=yes&amp;token='.newToken().'">'.$langs->trans("None")."</a>";
-		print '</td>';
-	}
-	print '<td class="center" width="24">&nbsp;</td>';
+        print '<a class="reposition commonlink" title="' . dol_escape_htmltag($langs->trans("All")) . '" alt="' . dol_escape_htmltag($langs->trans("All")) . '" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=addrights&token=' . newToken() . '&entity=' . $entity . '&module=allmodules&confirm=yes">' . $langs->trans("All") . "</a>";
+        print ' / ';
+        print '<a class="reposition commonlink" title="' . dol_escape_htmltag($langs->trans("None")) . '" alt="' . dol_escape_htmltag($langs->trans("None")) . '" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delrights&token=' . newToken() . '&entity=' . $entity . '&module=allmodules&confirm=yes">' . $langs->trans("None") . "</a>";
+        print '</td>';
+    }
+    print '<td class="center" width="24">&nbsp;</td>';
 }
 print '<td>'.$langs->trans("Permissions").'</td>';
 if ($user->admin) {
@@ -359,11 +359,11 @@ if ($result) {
 			if (($caneditperms && empty($objMod->rights_admin_allowed)) || empty($object->admin)) {
 				if ($caneditperms) {
 					print '<td class="center nowrap">';
-					print '<a class="reposition" title="'.dol_escape_htmltag($langs->trans("All")).'" alt="'.dol_escape_htmltag($langs->trans("All")).'" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addrights&amp;entity='.$entity.'&amp;module='.$obj->module.'&amp;confirm=yes&amp;token='.newToken().'">'.$langs->trans("All")."</a>";
-					print ' / ';
-					print '<a class="reposition" title="'.dol_escape_htmltag($langs->trans("None")).'" alt="'.dol_escape_htmltag($langs->trans("None")).'" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delrights&amp;entity='.$entity.'&amp;module='.$obj->module.'&amp;confirm=yes&amp;token='.newToken().'">'.$langs->trans("None")."</a>";
-					print '</td>';
-				}
+                    print '<a class="reposition" title="' . dol_escape_htmltag($langs->trans("All")) . '" alt="' . dol_escape_htmltag($langs->trans("All")) . '" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=addrights&token=' . newToken() . '&entity=' . $entity . '&module=' . $obj->module . '&confirm=yes">' . $langs->trans("All") . "</a>";
+                    print ' / ';
+                    print '<a class="reposition" title="' . dol_escape_htmltag($langs->trans("None")) . '" alt="' . dol_escape_htmltag($langs->trans("None")) . '" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delrights&token=' . newToken() . '&entity=' . $entity . '&module=' . $obj->module . '&confirm=yes">' . $langs->trans("None") . "</a>";
+                    print '</td>';
+                }
 				print '<td>&nbsp;</td>';
 			} else {
 				if ($caneditperms) {
@@ -399,8 +399,8 @@ if ($result) {
 			print '</td>';
 		} elseif (in_array($obj->id, $permsuser)) {					// Permission granted by user
 			if ($caneditperms) {
-				print '<td class="center"><a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delrights&amp;entity='.$entity.'&amp;rights='.$obj->id.'&amp;confirm=yes&amp;token='.newToken().'">';
-				//print img_edit_remove($langs->trans("Remove"));
+				print '<td class="center"><a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&amp;action=delrights&token=' . newToken() . '&entity=' . $entity . '&rights=' . $obj->id . '&confirm=yes">';
+                //print img_edit_remove($langs->trans("Remove"));
 				print img_picto($langs->trans("Remove"), 'switch_on');
 				print '</a></td>';
 			}

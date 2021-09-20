@@ -44,25 +44,55 @@ class Projects extends DolibarrApi
 	public $project;
 
 	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->project = new Project($this->db);
-		$this->task = new Task($this->db);
-	}
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->project = new Project($this->db);
+        $this->task = new Task($this->db);
+    }
 
-	/**
-	 * List projects
-	 *
-	 * Get a list of projects
-	 *
-	 * @param string	       $sortfield	        Sort field
-	 * @param string	       $sortorder	        Sort order
-	 * @param int		       $limit		        Limit for list
-	 * @param int		       $page		        Page number
+    /**
+     * Get properties of a project object
+     *
+     * Return an array with project informations
+     *
+     * @param int $id ID of project
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->projet->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->project->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Project not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('project', $this->project->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $this->project->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->project);
+    }
+
+    /**
+     * List projects
+     *
+     * Get a list of projects
+     *
+     * @param string           $sortfield             Sort field
+     * @param string           $sortorder             Sort order
+     * @param int              $limit                 Limit for list
+     * @param int              $page                  Page number
 	 * @param string   	       $thirdparty_ids	    Thirdparty ids to filter projects of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param  int    $category   Use this param to filter list by category
 	 * @param string           $sqlfilters          Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
@@ -161,57 +191,6 @@ class Projects extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->datec);
-		unset($object->datem);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-		unset($object->cond_reglement_id);
-		unset($object->cond_reglement);
-		unset($object->fk_delivery_address);
-		unset($object->shipping_method_id);
-		unset($object->fk_account);
-		unset($object->note);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->mode_reglement_id);
-		unset($object->country);
-		unset($object->country_id);
-		unset($object->country_code);
-
-		unset($object->weekWorkLoad);
-		unset($object->weekWorkLoad);
-
-		//unset($object->lines);            // for task we use timespent_lines, but for project we use lines
-
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-
-		unset($object->comments);
-
-		return $object;
-	}
-
-	/**
 	 * Create project object
 	 *
 	 * @param   array   $request_data   Request data
@@ -243,25 +222,6 @@ class Projects extends DolibarrApi
 	}
 
 	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$object = array();
-		foreach (self::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$object[$field] = $data[$field];
-		}
-		return $object;
-	}
-
-	/**
 	 * Get tasks of a project.
 	 * See also API /tasks
 	 *
@@ -290,27 +250,69 @@ class Projects extends DolibarrApi
 		foreach ($this->project->lines as $line) {      // $line is a task
 			if ($includetimespent == 1) {
 				$timespent = $line->getSummaryOfTimeSpent(0);
-			}
-			if ($includetimespent == 1) {
-				// TODO
-				// Add class for timespent records and loop and fill $line->lines with records of timespent
-			}
-			array_push($result, $this->_cleanObjectDatas($line));
-		}
-		return $result;
-	}
+            }
+            if ($includetimespent == 1) {
+                // TODO
+                // Add class for timespent records and loop and fill $line->lines with records of timespent
+            }
+            array_push($result, $this->_cleanObjectDatas($line));
+        }
+        return $result;
+    }
+
+    /**
+     * Get roles a user is assigned to a project with
+     *
+     * @param int $id     Id of project
+     * @param int $userid Id of user (0 = connected user)
+     *
+     * @url    GET {id}/roles
+     *
+     * @return int
+     */
+    public function getRoles($id, $userid = 0)
+    {
+        global $db;
+
+        if (!DolibarrApiAccess::$user->rights->projet->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->project->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Project not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('project', $this->project->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+        $taskstatic = new Task($this->db);
+        $userp = DolibarrApiAccess::$user;
+        if ($userid > 0) {
+            $userp = new User($this->db);
+            $userp->fetch($userid);
+        }
+        $this->project->roles = $taskstatic->getUserRolesForProjectsOrTasks($userp, 0, $id, 0);
+        $result = [];
+        foreach ($this->project->roles as $line) {
+            array_push($result, $this->_cleanObjectDatas($line));
+        }
+        return $result;
+    }
 
 
-	/**
-	 * Add a task to given project
-	 *
-	 * @param int   $id             Id of project to update
-	 * @param array $request_data   Projectline data
-	 *
-	 * @url	POST {id}/tasks
-	 *
-	 * @return int
-	 */
+    /**
+     * Add a task to given project
+     *
+     * @param int   $id           Id of project to update
+     * @param array $request_data Projectline data
+     *
+     * @url    POST {id}/tasks
+     *
+     * @return int
+     */
 	/*
 	public function postLine($id, $request_data = null)
 	{
@@ -430,47 +432,7 @@ class Projects extends DolibarrApi
 		return false;
 	}*/
 
-	/**
-	 * Get roles a user is assigned to a project with
-	 *
-	 * @param   int   $id             Id of project
-	 * @param   int   $userid         Id of user (0 = connected user)
-	 *
-	 * @url	GET {id}/roles
-	 *
-	 * @return int
-	 */
-	public function getRoles($id, $userid = 0)
-	{
-		global $db;
 
-		if (!DolibarrApiAccess::$user->rights->projet->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->project->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Project not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('project', $this->project->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-		$taskstatic = new Task($this->db);
-		$userp = DolibarrApiAccess::$user;
-		if ($userid > 0) {
-			$userp = new User($this->db);
-			$userp->fetch($userid);
-		}
-		$this->project->roles = $taskstatic->getUserRolesForProjectsOrTasks($userp, 0, $id, 0);
-		$result = array();
-		foreach ($this->project->roles as $line) {
-			array_push($result, $this->_cleanObjectDatas($line));
-		}
-		return $result;
-	}
 
 	/**
 	 * Update project general fields (won't touch lines of project)
@@ -507,38 +469,6 @@ class Projects extends DolibarrApi
 			throw new RestException(500, $this->project->error);
 		}
 	}
-
-	/**
-	 * Get properties of a project object
-	 *
-	 * Return an array with project informations
-	 *
-	 * @param       int         $id         ID of project
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->projet->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->project->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Project not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('project', $this->project->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$this->project->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->project);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 * Delete project
@@ -613,15 +543,90 @@ class Projects extends DolibarrApi
 			throw new RestException(500, 'Error when validating Project: '.$this->project->error);
 		}
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Project validated'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Project validated',
+            ],
+        ];
+    }
 
 
-	// TODO
-	// getSummaryOfTimeSpent
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->datec);
+        unset($object->datem);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+        unset($object->cond_reglement_id);
+        unset($object->cond_reglement);
+        unset($object->fk_delivery_address);
+        unset($object->shipping_method_id);
+        unset($object->fk_account);
+        unset($object->note);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->mode_reglement_id);
+        unset($object->country);
+        unset($object->country_id);
+        unset($object->country_code);
+
+        unset($object->weekWorkLoad);
+        unset($object->weekWorkLoad);
+
+        //unset($object->lines);            // for task we use timespent_lines, but for project we use lines
+
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+
+        unset($object->comments);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $object = [];
+        foreach (self::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $object[$field] = $data[$field];
+        }
+        return $object;
+    }
+
+
+    // TODO
+    // getSummaryOfTimeSpent
 }

@@ -41,25 +41,57 @@ class Donations extends DolibarrApi
 	 */
 	public $don;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->don = new Don($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->don = new Don($this->db);
+    }
 
-	/**
-	 * List donations
-	 *
-	 * Get a list of donations
-	 *
-	 * @param string    $sortfield          Sort field
-	 * @param string    $sortorder          Sort order
-	 * @param int       $limit              Limit for list
-	 * @param int       $page               Page number
+    /**
+     * Get properties of an donation object
+     *
+     * Return an array with donation informations
+     *
+     * @param int $id ID of order
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->don->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->don->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Donation not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('don', $this->don->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        // Add external contacts ids
+        //$this->don->contacts_ids = $this->don->liste_contact(-1,'external',1);
+        //$this->don->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->don);
+    }
+
+    /**
+     * List donations
+     *
+     * Get a list of donations
+     *
+     * @param string    $sortfield          Sort field
+     * @param string    $sortorder          Sort order
+     * @param int       $limit              Limit for list
+     * @param int       $page               Page number
 	 * @param string    $thirdparty_ids     Thirdparty ids to filter orders of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string    $sqlfilters         Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
 	 * @return  array                       Array of order objects
@@ -140,27 +172,6 @@ class Donations extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->note);
-		unset($object->address);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		return $object;
-	}
-
-	/**
 	 * Create donation object
 	 *
 	 * @param   array   $request_data   Request data
@@ -191,25 +202,6 @@ class Donations extends DolibarrApi
 		}
 
 		return $this->don->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$don = array();
-		foreach (Donations::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, $field." field missing");
-			}
-			$don[$field] = $data[$field];
-		}
-		return $don;
 	}
 
 	/**
@@ -247,39 +239,6 @@ class Donations extends DolibarrApi
 			throw new RestException(500, $this->don->error);
 		}
 	}
-
-	/**
-	 * Get properties of an donation object
-	 *
-	 * Return an array with donation informations
-	 *
-	 * @param       int         $id         ID of order
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->don->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->don->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Donation not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('don', $this->don->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		// Add external contacts ids
-		//$this->don->contacts_ids = $this->don->liste_contact(-1,'external',1);
-		//$this->don->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->don);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 * Delete donation
@@ -361,14 +320,58 @@ class Donations extends DolibarrApi
 		$result = $this->don->fetch($id);
 		if (!$result) {
 			throw new RestException(404, 'Order not found');
-		}
+        }
 
-		if (!DolibarrApi::_checkAccessToResource('don', $this->don->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+        if (!DolibarrApi::_checkAccessToResource('don', $this->don->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
 
-		$this->don->fetchObjectLinked();
+        $this->don->fetchObjectLinked();
 
-		return $this->_cleanObjectDatas($this->don);
-	}
+        return $this->_cleanObjectDatas($this->don);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->note);
+        unset($object->address);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $don = [];
+        foreach (Donations::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, $field . " field missing");
+            }
+            $don[$field] = $data[$field];
+        }
+        return $don;
+    }
 }

@@ -20,65 +20,78 @@
  */
 abstract class DolibarrTriggers
 {
-	/**
-	 * @var string module is in development
-	 */
-	const VERSION_DEVELOPMENT = 'development';
-	/**
-	 * @var string module is experimental
-	 */
-	const VERSION_EXPERIMENTAL = 'experimental';
-	/**
-	 * @var string module is dolibarr ready
-	 */
-	const VERSION_DOLIBARR = 'dolibarr';
-	/**
-	 * Name of the trigger
-	 * @var mixed|string
-	 */
-	public $name = '';
-	/**
-	 * Description of the trigger
-	 * @var string
+    /**
+     * Database handler
+     *
+     * @var DoliDB
+     */
+    protected $db;
+
+    /**
+     * Name of the trigger
+     *
+     * @var mixed|string
+     */
+    public $name = '';
+
+    /**
+     * Description of the trigger
+     * @var string
 	 */
 	public $description = '';
+
 	/**
 	 * Version of the trigger
 	 * @var string
 	 */
 	public $version = self::VERSION_DEVELOPMENT;
+
 	/**
 	 * Image of the trigger
 	 * @var string
 	 */
 	public $picto = 'technic';
+
 	/**
 	 * Category of the trigger
 	 * @var string
 	 */
 	public $family = '';
+
 	/**
 	 * Error reported by the trigger
 	 * @var string
-	 * @deprecated Use $this->errors
-	 * @see $errors
-	 */
-	public $error = '';
-	/**
-	 * Errors reported by the trigger
-	 * @var array
-	 */
-	public $errors = array();
-	/**
-	 * Database handler
-	 * @var DoliDB
-	 */
-	protected $db;
+     * @deprecated Use $this->errors
+     * @see        $errors
+     */
+    public $error = '';
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDB $db Database handler
+    /**
+     * Errors reported by the trigger
+     *
+     * @var array
+     */
+    public $errors = [];
+
+    /**
+     * @var string module is in development
+     */
+    const VERSION_DEVELOPMENT = 'development';
+
+    /**
+     * @var string module is experimental
+     */
+    const VERSION_EXPERIMENTAL = 'experimental';
+
+    /**
+     * @var string module is dolibarr ready
+     */
+    const VERSION_DOLIBARR = 'dolibarr';
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
 	 */
 	public function __construct(DoliDB $db)
 	{

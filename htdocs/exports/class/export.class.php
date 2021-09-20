@@ -209,28 +209,206 @@ class Export
 							}
 						}
 					}
-				}
-				closedir($handle);
-			}
-		}
+                }
+                closedir($handle);
+            }
+        }
 
-		return 1;
-	}
+        return 1;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *      Build an input field used to filter the query
-	 *
-	 *      @param		string	$TypeField		Type of Field to filter. Example: Text, Date, List:c_country:label:rowid, List:c_stcom:label:code, Numeric or Number, Boolean
-	 *      @param		string	$NameField		Name of the field to filter
-	 *      @param		string	$ValueField		Initial value of the field to filter
-	 *      @return		string					html string of the input field ex : "<input type=text name=... value=...>"
-	 */
-	public function build_filterField($TypeField, $NameField, $ValueField)
-	{
-		// phpcs:enable
+    /**
+     *      Build the sql export request.
+     *      Arrays this->array_export_xxx are already loaded for required datatoexport
+     *
+     * @param int   $indice            Indice of export
+     * @param array $array_selected    Filter fields on array of fields to export
+     * @param array $array_filterValue Filter records on array of value for fields
+     *
+     * @return        string                        SQL String. Example "select s.rowid as r_rowid, s.status as s_status from ..."
+     */
+    public function build_sql($indice, $array_selected, $array_filterValue)
+    {
+        // phpcs:enable
+        // Build the sql request
+        $sql = $this->array_export_sql_start[$indice];
+        $i = 0;
+
+        //print_r($array_selected);
+        foreach ($this->array_export_fields[$indice] as $key => $value) {
+            if (!array_key_exists($key, $array_selected)) {
+                continue; // Field not selected
+            }
+            if (preg_match('/^none\./', $key)) {
+                continue; // A field that must not appears into SQL
+            }
+            if ($i > 0) {
+                $sql .= ', ';
+            } else {
+                $i++;
+            }
+
+            if (strpos($key, ' as ') === false) {
+                $newfield = $key . ' as ' . str_replace(['.', '-', '(', ')'], '_', $key);
+            } else {
+                $newfield = $key;
+            }
+
+            $sql .= $newfield;
+        }
+        $sql .= $this->array_export_sql_end[$indice];
+
+        // Add the WHERE part. Filtering into sql if a filtering array is provided
+        if (is_array($array_filterValue) && !empty($array_filterValue)) {
+            $sqlWhere = '';
+            // Loop on each condition to add
+            foreach ($array_filterValue as $key => $value) {
+                if (preg_match('/GROUP_CONCAT/i', $key)) {
+                    continue;
+                }
+                if ($value != '') {
+                    $sqlWhere .= " and " . $this->build_filterQuery($this->array_export_TypeFields[$indice][$key], $key, $array_filterValue[$key]);
+                }
+            }
+            $sql .= $sqlWhere;
+        }
+
+        // Add the order
+        $sql .= $this->array_export_sql_order[$indice];
+
+        // Add the HAVING part.
+        if (is_array($array_filterValue) && !empty($array_filterValue)) {
+            // Loop on each condition to add
+            foreach ($array_filterValue as $key => $value) {
+                if (preg_match('/GROUP_CONCAT/i', $key) and $value != '') {
+                    $sql .= " HAVING " . $this->build_filterQuery($this->array_export_TypeFields[$indice][$key], $key, $array_filterValue[$key]);
+                }
+            }
+        }
+
+        return $sql;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Build the conditionnal string from filter the query
+     *
+     * @param string $TypeField  Type of Field to filter
+     * @param string $NameField  Name of the field to filter
+     * @param string $ValueField Value of the field for filter. Must not be ''
+     *
+     * @return        string                    SQL string of then field ex : "field='xxx'"
+     */
+    public function build_filterQuery($TypeField, $NameField, $ValueField)
+    {
+        // phpcs:enable
+        $NameField = checkVal($NameField, 'aZ09');
+        $szFilterQuery = '';
+
+        //print $TypeField." ".$NameField." ".$ValueField;
+        $InfoFieldList = explode(":", $TypeField);
+        // build the input field on depend of the type of file
+        switch ($InfoFieldList[0]) {
+            case 'Text':
+                if (!(strpos($ValueField, '%') === false)) {
+                    $szFilterQuery = " " . $NameField . " LIKE '" . $this->db->escape($ValueField) . "'";
+                } else {
+                    $szFilterQuery = " " . $NameField . " = '" . $this->db->escape($ValueField) . "'";
+                }
+                break;
+            case 'Date':
+                if (strpos($ValueField, "+") > 0) {
+                    // mode plage
+                    $ValueArray = explode("+", $ValueField);
+                    $szFilterQuery = "(" . $this->conditionDate($NameField, trim($ValueArray[0]), ">=");
+                    $szFilterQuery .= " AND " . $this->conditionDate($NameField, trim($ValueArray[1]), "<=") . ")";
+                } else {
+                    if (is_numeric(substr($ValueField, 0, 1))) {
+                        $szFilterQuery = $this->conditionDate($NameField, trim($ValueField), "=");
+                    } else {
+                        $szFilterQuery = $this->conditionDate($NameField, trim(substr($ValueField, 1)), substr($ValueField, 0, 1));
+                    }
+                }
+                break;
+            case 'Duree':
+                break;
+            case 'Numeric':
+                // if there is a signe +
+                if (strpos($ValueField, "+") > 0) {
+                    // mode plage
+                    $ValueArray = explode("+", $ValueField);
+                    $szFilterQuery = "(" . $NameField . " >= " . ((float) $ValueArray[0]);
+                    $szFilterQuery .= " AND " . $NameField . " <= " . ((float) $ValueArray[1]) . ")";
+                } else {
+                    if (is_numeric(substr($ValueField, 0, 1))) {
+                        $szFilterQuery = " " . $NameField . " = " . ((float) $ValueField);
+                    } else {
+                        $szFilterQuery = " " . $NameField . substr($ValueField, 0, 1) . ((float) substr($ValueField, 1));
+                    }
+                }
+                break;
+            case 'Boolean':
+                $szFilterQuery = " " . $NameField . "=" . (is_numeric($ValueField) ? $ValueField : ($ValueField == 'yes' ? 1 : 0));
+                break;
+            case 'Status':
+            case 'List':
+                if (is_numeric($ValueField)) {
+                    $szFilterQuery = " " . $NameField . " = " . ((float) $ValueField);
+                } else {
+                    if (!(strpos($ValueField, '%') === false)) {
+                        $szFilterQuery = " " . $NameField . " LIKE '" . $this->db->escape($ValueField) . "'";
+                    } else {
+                        $szFilterQuery = " " . $NameField . " = '" . $this->db->escape($ValueField) . "'";
+                    }
+                }
+                break;
+            default:
+                dol_syslog("Error we try to forge an sql export request with a condition on a field with type " . $InfoFieldList[0] . " (defined into module descriptor) but this type is unknown/not supported. It looks like a bug into module descriptor.", LOG_ERR);
+        }
+
+        return $szFilterQuery;
+    }
+
+    /**
+     *  conditionDate
+     *
+     * @param string $Field Field operand 1
+     * @param string $Value Value operand 2
+     * @param string $Sens  Comparison operator
+     *
+     * @return string
+     */
+    public function conditionDate($Field, $Value, $Sens)
+    {
+        // TODO date_format is forbidden, not performant and not portable. Use instead BETWEEN
+        if (strlen($Value) == 4) {
+            $Condition = " date_format(" . $Field . ",'%Y') " . $Sens . " '" . $Value . "'";
+        } elseif (strlen($Value) == 6) {
+            $Condition = " date_format(" . $Field . ",'%Y%m') " . $Sens . " '" . $Value . "'";
+        } else {
+            $Condition = " date_format(" . $Field . ",'%Y%m%d') " . $Sens . " " . $Value;
+        }
+        return $Condition;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Build an input field used to filter the query
+     *
+     * @param string $TypeField  Type of Field to filter. Example: Text, Date, List:c_country:label:rowid, List:c_stcom:label:code, Numeric or Number, Boolean
+     * @param string $NameField  Name of the field to filter
+     * @param string $ValueField Initial value of the field to filter
+     *
+     * @return        string                    html string of the input field ex : "<input type=text name=... value=...>"
+     */
+    public function build_filterField($TypeField, $NameField, $ValueField)
+    {
+        // phpcs:enable
 		global $conf, $langs;
 
 		$szFilterField = '';
@@ -342,8 +520,6 @@ class Export
 		return $szFilterField;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Build an input field used to filter the query
 	 *
@@ -375,8 +551,9 @@ class Export
 				break;
 		}
 		return $szMsg;
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *      Build export file.
 	 *      File is built into directory $conf->export->dir_temp.'/'.$user->id
@@ -538,180 +715,6 @@ class Export
 			$this->error = $this->db->error()." - sql=".$sql;
 			return -1;
 		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *      Build the sql export request.
-	 *      Arrays this->array_export_xxx are already loaded for required datatoexport
-	 *
-	 *      @param      int		$indice				Indice of export
-	 *      @param      array	$array_selected     Filter fields on array of fields to export
-	 *      @param      array	$array_filterValue  Filter records on array of value for fields
-	 *      @return		string						SQL String. Example "select s.rowid as r_rowid, s.status as s_status from ..."
-	 */
-	public function build_sql($indice, $array_selected, $array_filterValue)
-	{
-		// phpcs:enable
-		// Build the sql request
-		$sql = $this->array_export_sql_start[$indice];
-		$i = 0;
-
-		//print_r($array_selected);
-		foreach ($this->array_export_fields[$indice] as $key => $value) {
-			if (!array_key_exists($key, $array_selected)) {
-				continue; // Field not selected
-			}
-			if (preg_match('/^none\./', $key)) {
-				continue; // A field that must not appears into SQL
-			}
-			if ($i > 0) {
-				$sql .= ', ';
-			} else {
-				$i++;
-			}
-
-			if (strpos($key, ' as ') === false) {
-				$newfield = $key.' as '.str_replace(array('.', '-', '(', ')'), '_', $key);
-			} else {
-				$newfield = $key;
-			}
-
-			$sql .= $newfield;
-		}
-		$sql .= $this->array_export_sql_end[$indice];
-
-		// Add the WHERE part. Filtering into sql if a filtering array is provided
-		if (is_array($array_filterValue) && !empty($array_filterValue)) {
-			$sqlWhere = '';
-			// Loop on each condition to add
-			foreach ($array_filterValue as $key => $value) {
-				if (preg_match('/GROUP_CONCAT/i', $key)) {
-					continue;
-				}
-				if ($value != '') {
-					$sqlWhere .= " and ".$this->build_filterQuery($this->array_export_TypeFields[$indice][$key], $key, $array_filterValue[$key]);
-				}
-			}
-			$sql .= $sqlWhere;
-		}
-
-		// Add the order
-		$sql .= $this->array_export_sql_order[$indice];
-
-		// Add the HAVING part.
-		if (is_array($array_filterValue) && !empty($array_filterValue)) {
-			// Loop on each condition to add
-			foreach ($array_filterValue as $key => $value) {
-				if (preg_match('/GROUP_CONCAT/i', $key) and $value != '') {
-					$sql .= " HAVING ".$this->build_filterQuery($this->array_export_TypeFields[$indice][$key], $key, $array_filterValue[$key]);
-				}
-			}
-		}
-
-		return $sql;
-	}
-
-	/**
-	 *      Build the conditionnal string from filter the query
-	 *
-	 *      @param		string	$TypeField		Type of Field to filter
-	 *      @param		string	$NameField		Name of the field to filter
-	 *      @param		string	$ValueField		Value of the field for filter. Must not be ''
-	 *      @return		string					SQL string of then field ex : "field='xxx'"
-	 */
-	public function build_filterQuery($TypeField, $NameField, $ValueField)
-	{
-		// phpcs:enable
-		$NameField = checkVal($NameField, 'aZ09');
-		$szFilterQuery = '';
-
-		//print $TypeField." ".$NameField." ".$ValueField;
-		$InfoFieldList = explode(":", $TypeField);
-		// build the input field on depend of the type of file
-		switch ($InfoFieldList[0]) {
-			case 'Text':
-				if (!(strpos($ValueField, '%') === false)) {
-					$szFilterQuery = " ".$NameField." LIKE '".$this->db->escape($ValueField)."'";
-				} else {
-					$szFilterQuery = " ".$NameField." = '".$this->db->escape($ValueField)."'";
-				}
-				break;
-			case 'Date':
-				if (strpos($ValueField, "+") > 0) {
-					// mode plage
-					$ValueArray = explode("+", $ValueField);
-					$szFilterQuery = "(".$this->conditionDate($NameField, trim($ValueArray[0]), ">=");
-					$szFilterQuery .= " AND ".$this->conditionDate($NameField, trim($ValueArray[1]), "<=").")";
-				} else {
-					if (is_numeric(substr($ValueField, 0, 1))) {
-						$szFilterQuery = $this->conditionDate($NameField, trim($ValueField), "=");
-					} else {
-						$szFilterQuery = $this->conditionDate($NameField, trim(substr($ValueField, 1)), substr($ValueField, 0, 1));
-					}
-				}
-				break;
-			case 'Duree':
-				break;
-			case 'Numeric':
-				// if there is a signe +
-				if (strpos($ValueField, "+") > 0) {
-					// mode plage
-					$ValueArray = explode("+", $ValueField);
-					$szFilterQuery = "(".$NameField." >= ".((float) $ValueArray[0]);
-					$szFilterQuery .= " AND ".$NameField." <= ".((float) $ValueArray[1]).")";
-				} else {
-					if (is_numeric(substr($ValueField, 0, 1))) {
-						$szFilterQuery = " ".$NameField." = ".((float) $ValueField);
-					} else {
-						$szFilterQuery = " ".$NameField.substr($ValueField, 0, 1).((float) substr($ValueField, 1));
-					}
-				}
-				break;
-			case 'Boolean':
-				$szFilterQuery = " ".$NameField."=".(is_numeric($ValueField) ? $ValueField : ($ValueField == 'yes' ? 1 : 0));
-				break;
-			case 'Status':
-			case 'List':
-				if (is_numeric($ValueField)) {
-					$szFilterQuery = " ".$NameField." = ".((float) $ValueField);
-				} else {
-					if (!(strpos($ValueField, '%') === false)) {
-						$szFilterQuery = " ".$NameField." LIKE '".$this->db->escape($ValueField)."'";
-					} else {
-						$szFilterQuery = " ".$NameField." = '".$this->db->escape($ValueField)."'";
-					}
-				}
-				break;
-			default:
-				dol_syslog("Error we try to forge an sql export request with a condition on a field with type ".$InfoFieldList[0]." (defined into module descriptor) but this type is unknown/not supported. It looks like a bug into module descriptor.", LOG_ERR);
-		}
-
-		return $szFilterQuery;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  conditionDate
-	 *
-	 *  @param 	string	$Field		Field operand 1
-	 *  @param 	string	$Value		Value operand 2
-	 *  @param 	string	$Sens		Comparison operator
-	 *  @return string
-	 */
-	public function conditionDate($Field, $Value, $Sens)
-	{
-		// TODO date_format is forbidden, not performant and not portable. Use instead BETWEEN
-		if (strlen($Value) == 4) {
-			$Condition = " date_format(".$Field.",'%Y') ".$Sens." '".$Value."'";
-		} elseif (strlen($Value) == 6) {
-			$Condition = " date_format(".$Field.",'%Y%m') ".$Sens." '".$Value."'";
-		} else {
-			$Condition = " date_format(".$Field.",'%Y%m%d') ".$Sens." ".$Value;
-		}
-		return $Condition;
 	}
 
 	/**

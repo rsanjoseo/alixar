@@ -48,7 +48,7 @@ $backtopageforcancel = GETPOST('backtopageforcancel', 'alpha');
 
 $conf_or_booth_id = GETPOST('conforboothid', 'int');
 $fk_project = GETPOST('fk_project', 'int');
-$withproject = GETPOST('withproject', 'int');
+$withproject = 1;
 
 // Initialize technical objects
 $object = new ConferenceOrBoothAttendee($db);
@@ -64,7 +64,8 @@ if ($conf_or_booth_id > 0) {
 		setEventMessages(null, $confOrBooth->errors, 'errors');
 	} else {
 		$object->fk_actioncomm = $confOrBooth->id;
-		$object->fk_project = $confOrBooth->fk_project;
+        $object->fk_project = $confOrBooth->fk_project;
+        $fk_project = $object->fk_project;
 	}
 }
 
@@ -74,21 +75,32 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 $search_array_options = $extrafields->getOptionalsFromPost($object->table_element, '', 'search_');
 
 // Initialize array of search criterias
-$search_all = GETPOST("search_all", 'alpha');
-$search = array();
+$search_all = GETPOST('search_all', 'alphanohtml');
+$search = [];
 foreach ($object->fields as $key => $val) {
-	if (GETPOST('search_'.$key, 'alpha')) {
-		$search[$key] = GETPOST('search_'.$key, 'alpha');
-	}
+    if (GETPOST('search_' . $key, 'alpha') !== '') {
+        $search[$key] = GETPOST('search_' . $key, 'alpha');
+    }
+    if (preg_match('/^(date|timestamp|datetime)/', $val['type'])) {
+        $search[$key . '_dtstart'] = dol_mktime(0, 0, 0, GETPOST('search_' . $key . '_dtstartmonth', 'int'), GETPOST('search_' . $key . '_dtstartday', 'int'), GETPOST('search_' . $key . '_dtstartyear', 'int'));
+        $search[$key . '_dtend'] = dol_mktime(23, 59, 59, GETPOST('search_' . $key . '_dtendmonth', 'int'), GETPOST('search_' . $key . '_dtendday', 'int'), GETPOST('search_' . $key . '_dtendyear', 'int'));
+    }
+}
+
+// List of fields to search into when doing a "search in all"
+$fieldstosearchall = [];
+foreach ($object->fields as $key => $val) {
+    if (!empty($val['searchall'])) {
+        $fieldstosearchall['t.' . $key] = $val['label'];
+    }
 }
 
 if (empty($action) && empty($id) && empty($ref)) {
-	$action = 'view';
+    $action = 'view';
 }
 
 // Load object
-include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
-
+include DOL_DOCUMENT_ROOT . '/core/actions_fetchobject.inc.php'; // Must be include, not include_once.
 
 $permissiontoread = $user->rights->eventorganization->read;
 $permissiontoadd = $user->rights->eventorganization->write; // Used by the include of actions_addupdatedelete.inc.php and actions_lineupdown.inc.php
@@ -174,8 +186,6 @@ if (empty($reshook)) {
 
 /*
  * View
- *
- * Put here all code to build page
  */
 
 $form = new Form($db);
@@ -305,9 +315,9 @@ if (!empty($withproject)) {
 	print '<div class="ficheaddleft">';
 	print '<div class="underbanner clearboth"></div>';
 
-	print '<table class="border centpercent">';
+	print '<table class="border tableforfield centpercent">';
 
-	// Description
+    // Description
 	print '<td class="titlefield tdtop">'.$langs->trans("Description").'</td><td>';
 	print nl2br($projectstatic->description);
 	print '</td></tr>';
@@ -319,9 +329,9 @@ if (!empty($withproject)) {
 		print "</td></tr>";
 	}
 
-	print '<tr><td>';
-	$typeofdata = 'checkbox:'.($projectstatic->accept_conference_suggestions ? ' checked="checked"' : '');
-	$htmltext = $langs->trans("AllowUnknownPeopleSuggestConfHelp");
+	print '<tr><td class="nowrap">';
+    $typeofdata = 'checkbox:' . ($projectstatic->accept_conference_suggestions ? ' checked="checked"' : '');
+    $htmltext = $langs->trans("AllowUnknownPeopleSuggestConfHelp");
 	print $form->editfieldkey('AllowUnknownPeopleSuggestConf', 'accept_conference_suggestions', '', $projectstatic, 0, $typeofdata, '', 0, 0, 'projectid', $htmltext);
 	print '</td><td>';
 	print $form->editfieldval('AllowUnknownPeopleSuggestConf', 'accept_conference_suggestions', '1', $projectstatic, 0, $typeofdata, '', 0, 0, '', 0, '', 'projectid');
@@ -336,26 +346,26 @@ if (!empty($withproject)) {
 	print "</td></tr>";
 
 	print '<tr><td>';
-	print $form->editfieldkey('PriceOfRegistration', 'price_registration', '', $projectstatic, 0, 'amount', '', 0, 0, 'projectid');
-	print '</td><td>';
-	print $form->editfieldval('PriceOfRegistration', 'price_registration', $projectstatic->price_registration, $projectstatic, 0, 'amount', '', 0, 0, '', 0, '', 'projectid');
-	print "</td></tr>";
+    print $form->editfieldkey($form->textwithpicto($langs->trans('PriceOfBooth'), $langs->trans("PriceOfBoothHelp")), 'price_booth', '', $projectstatic, 0, 'amount', '', 0, 0, 'projectid');
+    print '</td><td>';
+    print $form->editfieldval($form->textwithpicto($langs->trans('PriceOfBooth'), $langs->trans("PriceOfBoothHelp")), 'price_booth', $projectstatic->price_booth, $projectstatic, 0, 'amount', '', 0, 0, '', 0, '', 'projectid');
+    print "</td></tr>";
 
-	print '<tr><td>';
-	print $form->editfieldkey('PriceOfBooth', 'price_booth', '', $projectstatic, 0, 'amount', '', 0, 0, 'projectid');
-	print '</td><td>';
-	print $form->editfieldval('PriceOfBooth', 'price_booth', $projectstatic->price_booth, $projectstatic, 0, 'amount', '', 0, 0, '', 0, '', 'projectid');
-	print "</td></tr>";
+    print '<tr><td>';
+    print $form->editfieldkey($form->textwithpicto($langs->trans('PriceOfRegistration'), $langs->trans("PriceOfRegistrationHelp")), 'price_registration', '', $projectstatic, 0, 'amount', '', 0, 0, 'projectid');
+    print '</td><td>';
+    print $form->editfieldval($form->textwithpicto($langs->trans('PriceOfRegistration'), $langs->trans("PriceOfRegistrationHelp")), 'price_registration', $projectstatic->price_registration, $projectstatic, 0, 'amount', '', 0, 0, '', 0, '', 'projectid');
+    print "</td></tr>";
 
-	print '<tr><td valign="middle">'.$langs->trans("EventOrganizationICSLink").'</td><td>';
+    print '<tr><td valign="middle">'.$langs->trans("EventOrganizationICSLink").'</td><td>';
 	// Define $urlwithroot
 	$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));
 	$urlwithroot = $urlwithouturlroot.DOL_URL_ROOT;
 
 	// Show message
-	$message = '<a href="'.$urlwithroot.'/public/agenda/agendaexport.php?format=ical'.($conf->entity > 1 ? "&entity=".$conf->entity : "");
-	$message .= '&exportkey='.($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY ?urlencode($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY) : '...');
-	$message .= "&project=".$projectstatic->id.'&module='.urlencode('@eventorganization').'&status='.ConferenceOrBooth::STATUS_CONFIRMED.'">'.$langs->trans('DownloadICSLink').img_picto('', 'download', 'class="paddingleft"').'</a>';
+	$message = '<a target="_blank" href="' . $urlwithroot . '/public/agenda/agendaexport.php?format=ical' . ($conf->entity > 1 ? "&entity=" . $conf->entity : "");
+    $message .= '&exportkey=' . ($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY ? urlencode($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY) : '...');
+    $message .= "&project=".$projectstatic->id.'&module='.urlencode('@eventorganization').'&status='.ConferenceOrBooth::STATUS_CONFIRMED.'">'.$langs->trans('DownloadICSLink').img_picto('', 'download', 'class="paddingleft"').'</a>';
 	print $message;
 	print "</td></tr>";
 
@@ -365,10 +375,10 @@ if (!empty($withproject)) {
 	print $form->textwithpicto($langs->trans("SuggestOrVoteForConfOrBooth"), $langs->trans("EvntOrgRegistrationHelpMessage"));
 	//print '</span>';
 	print '</td><td>';
-	$linksuggest = $dolibarr_main_url_root.'/public/project/index.php?id='.$projectstatic->id;
-	$encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY.'conferenceorbooth'.$projectstatic->id, 2);
-	$linksuggest .= '&securekey='.urlencode($encodedsecurekey);
-	//print '<div class="urllink">';
+	$linksuggest = $dolibarr_main_url_root . '/public/project/index.php?id=' . $projectstatic->id;
+    $encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY . 'conferenceorbooth' . $projectstatic->id, 'md5');
+    $linksuggest .= '&securekey=' . urlencode($encodedsecurekey);
+    //print '<div class="urllink">';
 	//print '<input type="text" value="'.$linksuggest.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
 	print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="'.$linksuggest.'" class="quatrevingtpercent">'.$linksuggest.'</a></div>';
 	print '<a target="_blank" href="'.$linksuggest.'">'.img_picto('', 'globe').'</a>';
@@ -382,10 +392,10 @@ if (!empty($withproject)) {
 	print $langs->trans("PublicAttendeeSubscriptionGlobalPage");
 	//print '</span>';
 	print '</td><td>';
-	$link_subscription = $dolibarr_main_url_root.'/public/eventorganization/attendee_register.php?id='.$projectstatic->id.'&type=global';
-	$encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY.'conferenceorbooth'.$projectstatic->id, 2);
-	$link_subscription .= '&securekey='.urlencode($encodedsecurekey);
-	//print '<div class="urllink">';
+	$link_subscription = $dolibarr_main_url_root . '/public/eventorganization/attendee_register.php?id=' . $projectstatic->id . '&type=global';
+    $encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY . 'conferenceorbooth' . $projectstatic->id, 'md5');
+    $link_subscription .= '&securekey=' . urlencode($encodedsecurekey);
+    //print '<div class="urllink">';
 	//print '<input type="text" value="'.$linkregister.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
 	print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="'.$link_subscription.'" class="quatrevingtpercent">'.$link_subscription.'</a></div>';
 	print '<a target="_blank" href="'.$link_subscription.'">'.img_picto('', 'globe').'</a>';
@@ -552,24 +562,26 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 
 	$morehtmlref .= '</div>';
 
-	dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref, $moreparam);
+    dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref, $moreparam);
 
-	print '<div class="fichecenter">';
-	print '<div class="fichehalfleft">';
-	print '<div class="underbanner clearboth"></div>';
-	print '<table class="border centpercent tableforfield">'."\n";
+    print '<div class="fichecenter">';
+    print '<div class="fichehalfleft">';
+    print '<div class="underbanner clearboth"></div>';
+    print '<table class="border centpercent tableforfield">' . "\n";
 
-	// Common attributes
-	include DOL_DOCUMENT_ROOT.'/core/tpl/commonfields_view.tpl.php';
+    $keyforbreak = 'note_public';
 
-	// Other attributes. Fields from hook formObjectOptions and Extrafields.
-	include DOL_DOCUMENT_ROOT.'/core/tpl/extrafields_view.tpl.php';
+    // Common attributes
+    include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_view.tpl.php';
 
-	print '</table>';
-	print '</div>';
-	print '</div>';
+    // Other attributes. Fields from hook formObjectOptions and Extrafields.
+    include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_view.tpl.php';
 
-	print '<div class="clearboth"></div>';
+    print '</table>';
+    print '</div>';
+    print '</div>';
+
+    print '<div class="clearboth"></div>';
 
 	print dol_get_fiche_end();
 
@@ -643,13 +655,12 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 			print dolGetButtonAction($langs->trans('Modify'), '', 'default', $_SERVER["PHP_SELF"].'?id='.$object->id.(!empty($confOrBooth->id)?'&conforboothid='.$confOrBooth->id:'').(!empty($projectstatic->id)?'&fk_project='.$projectstatic->id:'').'&action=edit', '', $permissiontoadd);
 
 			// Clone
-			print dolGetButtonAction($langs->trans('ToClone'), '', 'default', $_SERVER['PHP_SELF'].'?id='.$object->id.'&socid='.$object->socid.'&action=clone&object=scrumsprint', '', $permissiontoadd);
+			print dolGetButtonAction($langs->trans('ToClone'), '', 'default', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&socid=' . $object->socid . '&action=clone&token=' . newToken() . '&object=scrumsprint', '', $permissiontoadd);
 
-
-			// Delete (need delete permission, or if draft, just need create/modify permission)
-			print dolGetButtonAction($langs->trans('Delete'), '', 'delete', $_SERVER['PHP_SELF'].'?id='.$object->id.'&action=delete', '', $permissiontodelete || ($object->status == $object::STATUS_DRAFT && $permissiontoadd));
-		}
-		print '</div>'."\n";
+            // Delete (need delete permission, or if draft, just need create/modify permission)
+			print dolGetButtonAction($langs->trans('Delete'), '', 'delete', $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&action=delete&token=' . newToken() . '', '', $permissiontodelete || ($object->status == $object::STATUS_DRAFT && $permissiontoadd));
+        }
+        print '</div>'."\n";
 	}
 
 

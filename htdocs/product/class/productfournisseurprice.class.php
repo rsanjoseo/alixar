@@ -30,41 +30,45 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class ProductFournisseurPrice extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_CANCELED = 9;
 	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'productfournisseurprice';
+
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 	public $table_element = 'product_fournisseur_price';
+
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
 	public $ismultientitymanaged = 1;
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for productfournisseurprice. Must be the part after the 'object_' into object_productfournisseurprice.png
-	 */
-	public $picto = 'productfournisseurprice@buypricehistory';
-
 
 	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 1;
+
+    /**
+     * @var string String with name of icon for productfournisseurprice. Must be the part after the 'object_' into object_productfournisseurprice.png
+     */
+    public $picto = 'productfournisseurprice@buypricehistory';
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_CANCELED = 9;
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
@@ -500,60 +504,6 @@ class ProductFournisseurPrice extends CommonObject
 		}
 	}
 
-	/**
-	 *  Returns the reference to the following non used object depending on the active numbering module.
-	 *
-	 *  @return string      		Object free reference
-	 */
-	public function getNextNumRef()
-	{
-		global $langs, $conf;
-		$langs->load("buypricehistory@buypricehistory");
-
-		if (empty($conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON)) {
-			$conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON = 'mod_productfournisseurprice_standard';
-		}
-
-		if (!empty($conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON.".php";
-			$classname = $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/buypricehistory/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			if (class_exists($classname)) {
-				$obj = new $classname();
-				$numref = $obj->getNextValue($this);
-
-				if ($numref != '' && $numref != '-1') {
-					return $numref;
-				} else {
-					$this->error = $obj->error;
-					//dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
-					return "";
-				}
-			} else {
-				print $langs->trans("Error")." ".$langs->trans("ClassNotFound").' '.$classname;
-				return "";
-			}
-		} else {
-			print $langs->trans("ErrorNumberingModuleNotSetup", $this->element);
-			return "";
-		}
-	}
 
 	/**
 	 *	Set draft status
@@ -662,7 +612,7 @@ class ProductFournisseurPrice extends CommonObject
 			if ($withpicto) {
 				require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-				list($class, $module) = explode('@', $this->picto);
+				[$class, $module] = explode('@', $this->picto);
 				$upload_dir = $conf->$module->multidir_output[$conf->entity]."/$class/".dol_sanitizeFileName($this->ref);
 				$filearray = dol_dir_list($upload_dir, "files");
 				$filename = $filearray[0]['name'];
@@ -698,8 +648,6 @@ class ProductFournisseurPrice extends CommonObject
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return the label of the status
 	 *
@@ -711,13 +659,15 @@ class ProductFournisseurPrice extends CommonObject
 		return $this->LibStatut($this->status, $mode);
 	}
 
-	/**
-	 *  Return the status
-	 *
-	 *  @param	int		$status        Id status
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string 			       Label of status
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return the status
+     *
+     *  @param	int		$status        Id status
+     *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *  @return string 			       Label of status
+     */
 	public function LibStatut($status, $mode = 0)
 	{
 		// phpcs:enable
@@ -787,26 +737,81 @@ class ProductFournisseurPrice extends CommonObject
 
 	/**
 	 * Initialise object with example values
-	 * Id must be 0 if object instance is a specimen
-	 *
-	 * @return void
-	 */
-	public function initAsSpecimen()
-	{
-		$this->initAsSpecimenCommon();
-	}
+     * Id must be 0 if object instance is a specimen
+     *
+     * @return void
+     */
+    public function initAsSpecimen()
+    {
+        $this->initAsSpecimenCommon();
+    }
 
-	/**
-	 *  Create a document onto disk according to template module.
-	 *
-	 *  @param	    string		$modele			Force template to use ('' to not force)
-	 *  @param		Translate	$outputlangs	objet lang a utiliser pour traduction
-	 *  @param      int			$hidedetails    Hide details of lines
-	 *  @param      int			$hidedesc       Hide description
-	 *  @param      int			$hideref        Hide ref
-	 *  @param      null|array  $moreparams     Array to provide more information
-	 *  @return     int         				0 if KO, 1 if OK
-	 */
+    /**
+     *  Returns the reference to the following non used object depending on the active numbering module.
+     *
+     * @return string            Object free reference
+     */
+    public function getNextNumRef()
+    {
+        global $langs, $conf;
+        $langs->load("buypricehistory@buypricehistory");
+
+        if (empty($conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON)) {
+            $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON = 'mod_productfournisseurprice_standard';
+        }
+
+        if (!empty($conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON . ".php";
+            $classname = $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/buypricehistory/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            if (class_exists($classname)) {
+                $obj = new $classname();
+                $numref = $obj->getNextValue($this);
+
+                if ($numref != '' && $numref != '-1') {
+                    return $numref;
+                } else {
+                    $this->error = $obj->error;
+                    //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                    return "";
+                }
+            } else {
+                print $langs->trans("Error") . " " . $langs->trans("ClassNotFound") . ' ' . $classname;
+                return "";
+            }
+        } else {
+            print $langs->trans("ErrorNumberingModuleNotSetup", $this->element);
+            return "";
+        }
+    }
+
+    /**
+     *  Create a document onto disk according to template module.
+     *
+     * @param string     $modele      Force template to use ('' to not force)
+     * @param Translate  $outputlangs objet lang a utiliser pour traduction
+     * @param int        $hidedetails Hide details of lines
+     * @param int        $hidedesc    Hide description
+     * @param int        $hideref     Hide ref
+     * @param null|array $moreparams  Array to provide more information
+     * @return     int         				0 if KO, 1 if OK
+     */
 	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0, $moreparams = null)
 	{
 		global $conf, $langs;

@@ -49,60 +49,6 @@ class CdavLib
 	}
 
 	/**
-	 * getFullCalendarObjects
-	 *
-	 * @param int	 	$calendarId			Calendar id
-	 * @param int		$bCalendarData		Add calendar data
-	 * @return array|string[][]
-	 */
-	public function getFullCalendarObjects($calendarId, $bCalendarData)
-	{
-		$calid = ($calendarId * 1);
-		$calevents = array();
-
-		if (!$this->user->rights->agenda->myactions->read) {
-			return $calevents;
-		}
-
-		if ($calid != $this->user->id && (!isset($this->user->rights->agenda->allactions->read) || !$this->user->rights->agenda->allactions->read)) {
-			return $calevents;
-		}
-
-		$sql = $this->getSqlCalEvents($calid);
-
-		$result = $this->db->query($sql);
-
-		if ($result) {
-			while ($obj = $this->db->fetch_object($result)) {
-				$calendardata = $this->toVCalendar($calid, $obj);
-
-				if ($bCalendarData) {
-					$calevents[] = array(
-						'calendardata' => $calendardata,
-						'uri' => $obj->id.'-ev-'.constant('CDAV_URI_KEY'),
-						'lastmodified' => strtotime($obj->lastupd),
-						'etag' => '"'.md5($calendardata).'"',
-						'calendarid'   => $calendarId,
-						'size' => strlen($calendardata),
-						'component' => strpos($calendardata, 'BEGIN:VEVENT') > 0 ? 'vevent' : 'vtodo',
-					);
-				} else {
-					$calevents[] = array(
-						// 'calendardata' => $calendardata,  not necessary because etag+size are present
-						'uri' => $obj->id.'-ev-'.constant('CDAV_URI_KEY'),
-						'lastmodified' => strtotime($obj->lastupd),
-						'etag' => '"'.md5($calendardata).'"',
-						'calendarid'   => $calendarId,
-						'size' => strlen($calendardata),
-						'component' => strpos($calendardata, 'BEGIN:VEVENT') > 0 ? 'vevent' : 'vtodo',
-					);
-				}
-			}
-		}
-		return $calevents;
-	}
-
-	/**
 	 * Base sql request for calendar events
 	 *
 	 * @param 	int 		$calid 			Calendard id
@@ -283,14 +229,69 @@ class CdavLib
 		if (!empty($obj->phone) || !empty($obj->phone_perso) || !empty($obj->phone_mobile)) {
 			$caldata .= "\\n*DOLIBARR-CTC-TEL: ".trim($obj->phone.' '.$obj->phone_perso.' '.$obj->phone_mobile);
 		}
-		if (strpos($obj->other_users, ',')) { // several
-			$caldata .= "\\n*DOLIBARR-USR: ".$obj->other_users;
-		}
-		$caldata .= "\n";
+        if (strpos($obj->other_users, ',')) { // several
+            $caldata .= "\\n*DOLIBARR-USR: " . $obj->other_users;
+        }
+        $caldata .= "\n";
 
-		$caldata .= "END:".$type."\n";
-		$caldata .= "END:VCALENDAR\n";
+        $caldata .= "END:" . $type . "\n";
+        $caldata .= "END:VCALENDAR\n";
 
-		return $caldata;
-	}
+        return $caldata;
+    }
+
+    /**
+     * getFullCalendarObjects
+     *
+     * @param int $calendarId    Calendar id
+     * @param int $bCalendarData Add calendar data
+     *
+     * @return array|string[][]
+     */
+    public function getFullCalendarObjects($calendarId, $bCalendarData)
+    {
+        $calid = ($calendarId * 1);
+        $calevents = [];
+
+        if (!$this->user->rights->agenda->myactions->read) {
+            return $calevents;
+        }
+
+        if ($calid != $this->user->id && (!isset($this->user->rights->agenda->allactions->read) || !$this->user->rights->agenda->allactions->read)) {
+            return $calevents;
+        }
+
+        $sql = $this->getSqlCalEvents($calid);
+
+        $result = $this->db->query($sql);
+
+        if ($result) {
+            while ($obj = $this->db->fetch_object($result)) {
+                $calendardata = $this->toVCalendar($calid, $obj);
+
+                if ($bCalendarData) {
+                    $calevents[] = [
+                        'calendardata' => $calendardata,
+                        'uri' => $obj->id . '-ev-' . constant('CDAV_URI_KEY'),
+                        'lastmodified' => strtotime($obj->lastupd),
+                        'etag' => '"' . md5($calendardata) . '"',
+                        'calendarid' => $calendarId,
+                        'size' => strlen($calendardata),
+                        'component' => strpos($calendardata, 'BEGIN:VEVENT') > 0 ? 'vevent' : 'vtodo',
+                    ];
+                } else {
+                    $calevents[] = [
+                        // 'calendardata' => $calendardata,  not necessary because etag+size are present
+                        'uri' => $obj->id . '-ev-' . constant('CDAV_URI_KEY'),
+                        'lastmodified' => strtotime($obj->lastupd),
+                        'etag' => '"' . md5($calendardata) . '"',
+                        'calendarid' => $calendarId,
+                        'size' => strlen($calendardata),
+                        'component' => strpos($calendardata, 'BEGIN:VEVENT') > 0 ? 'vevent' : 'vtodo',
+                    ];
+                }
+            }
+        }
+        return $calevents;
+    }
 }

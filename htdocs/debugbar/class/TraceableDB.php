@@ -9,60 +9,46 @@ require_once DOL_DOCUMENT_ROOT.'/core/db/DoliDB.class.php';
  */
 class TraceableDB extends DoliDB
 {
-	/**
-	 * @const Database label
-	 */
-	const LABEL = ''; // cannot be protected because of parent declaration
-/**
-	 * @const Version min database
-	 */
-	const VERSIONMIN = '';
-/**
-	 * @var DoliDb Database handler
-	 */
-	public $db;
-	/**
-	 * @var array Queries array
-	 */
-	public $queries;
-	/**
-	 * @var string type
-	 */
-	public $type;
-		/**
-	 * @var int Request start time
-	 */
-	protected $startTime; // TODO: the right value should be $this->db::LABEL (but this is a constant? o_O)
-		/**
-	 * @var int Request start memory
-	 */
-	protected $startMemory; // TODO: the same thing here, $this->db::VERSIONMIN is the right value
+    /**
+     * @var DoliDb Database handler
+     */
+    public $db; // cannot be protected because of parent declaration
+    /**
+     * @var array Queries array
+     */
+    public $queries;
+    /**
+     * @var int Request start time
+     */
+    protected $startTime;
+    /**
+     * @var int Request start memory
+     */
+    protected $startMemory;
+    /**
+     * @var string type
+     */
+    public $type;
+    /**
+     * @const Database label
+     */
+    const LABEL = ''; // TODO: the right value should be $this->db::LABEL (but this is a constant? o_O)
+    /**
+     * @const Version min database
+     */
+    const VERSIONMIN = ''; // TODO: the same thing here, $this->db::VERSIONMIN is the right value
 
-	/**
-	 * Constructor
-	 *
-	 * @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db      = $db;
-		$this->type    = $this->db->type;
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->type = $this->db->type;
 		$this->queries = array();
 	}
-
-	/**
-	 *  Convert a SQL request in Mysql syntax to native syntax
-	 *
-	 * @param   string $line   SQL request line to convert
-	 * @param   string $type   Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
-	 * @return  string         SQL request line converted
-	 */
-	public static function convertSQLFromMysql($line, $type = 'ddl')
-	{
-		return self::$db->convertSQLFromMysql($line);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Format a SQL IF
@@ -77,6 +63,7 @@ class TraceableDB extends DoliDB
 		return $this->db->ifsql($test, $resok, $resko);
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return datas as an array
 	 *
@@ -138,26 +125,40 @@ class TraceableDB extends DoliDB
 		return $this->db->DDLCreateDb($database, $charset, $collation, $owner);
 	}
 
-	/**
-	 * Return version of database server into an array
-	 *
-	 * @return	array        Version array
-	 */
-	public function getVersionArray()
-	{
-		return $this->db->getVersionArray();
-	}
+    /**
+     * Return version of database server into an array
+     *
+     * @return    array        Version array
+     */
+    public function getVersionArray()
+    {
+        return $this->db->getVersionArray();
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Convert a SQL request in Mysql syntax to native syntax
+     *
+     * @param string $line SQL request line to convert
+     * @param string $type Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
+     *
+     * @return  string         SQL request line converted
+     */
+    public static function convertSQLFromMysql($line, $type = 'ddl')
+    {
+        return self::$db->convertSQLFromMysql($line);
+    }
 
-	/**
-	 * Return the number o flines into the result of a request INSERT, DELETE or UPDATE
-	 *
-	 * @param   resource $resultset    Curseur de la requete voulue
-	 * @return 	int                    Number of lines
-	 * @see    	num_rows()
-	 */
-	public function affected_rows($resultset)
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return the number o flines into the result of a request INSERT, DELETE or UPDATE
+     *
+     * @param resource $resultset Curseur de la requete voulue
+     *
+     * @return    int                    Number of lines
+     * @see        num_rows()
+     */
+    public function affected_rows($resultset)
 	{
 		// phpcs:enable
 		return $this->db->affected_rows($resultset);

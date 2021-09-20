@@ -64,23 +64,6 @@ class LignePrelevement
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'prelevement_lignes'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	/**
 	 *  Recupere l'objet prelevement
 	 *
 	 *  @param	int		$rowid      Id de la facture a recuperer
@@ -126,8 +109,6 @@ class LignePrelevement
 		return $error;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return status label of object
 	 *
@@ -139,6 +120,7 @@ class LignePrelevement
 		return $this->LibStatut($this->statut, $mode);
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Return status label for a status
 	 *
@@ -169,14 +151,32 @@ class LignePrelevement
 			} elseif ($status == 3) {
 				return img_picto($langs->trans($this->statuts[$status]), 'statut8');
 			}
-		} elseif ($mode == 3) {
-			if ($status == 0) {
-				return $langs->trans($this->statuts[$status]).' '.img_picto($langs->trans($this->statuts[$status]), 'statut1');
-			} elseif ($status == 2) {
-				return $langs->trans($this->statuts[$status]).' '.img_picto($langs->trans($this->statuts[$status]), 'statut6');
-			} elseif ($status == 3) {
-				return $langs->trans($this->statuts[$status]).' '.img_picto($langs->trans($this->statuts[$status]), 'statut8');
-			}
-		}
-	}
+        } elseif ($mode == 3) {
+            if ($status == 0) {
+                return $langs->trans($this->statuts[$status]) . ' ' . img_picto($langs->trans($this->statuts[$status]), 'statut1');
+            } elseif ($status == 2) {
+                return $langs->trans($this->statuts[$status]) . ' ' . img_picto($langs->trans($this->statuts[$status]), 'statut6');
+            } elseif ($status == 3) {
+                return $langs->trans($this->statuts[$status]) . ' ' . img_picto($langs->trans($this->statuts[$status]), 'statut8');
+            }
+        }
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'prelevement_lignes',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }

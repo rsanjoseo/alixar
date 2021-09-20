@@ -56,25 +56,57 @@ class ProductAttributeValue extends CommonObject
 	/**
 	 * Constructor
 	 *
-	 * @param   DoliDB $db     Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf;
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        global $conf;
 
-		$this->db = $db;
-		$this->entity = $conf->entity;
-	}
+        $this->db = $db;
+        $this->entity = $conf->entity;
+    }
 
-	/**
-	 * Returns all product attribute values of a product attribute
-	 *
-	 * @param int $prodattr_id Product attribute id
-	 * @param bool $only_used Fetch only used attribute values
-	 * @return ProductAttributeValue[]
-	 */
-	public function fetchAllByProductAttribute($prodattr_id, $only_used = false)
-	{
+    /**
+     * Gets a product attribute value
+     *
+     * @param int $valueid Product attribute value id
+     *
+     * @return int <0 KO, >0 OK
+     */
+    public function fetch($valueid)
+    {
+        $sql = "SELECT rowid, fk_product_attribute, ref, value FROM " . MAIN_DB_PREFIX . "product_attribute_value WHERE rowid = " . (int) $valueid . " AND entity IN (" . getEntity('product') . ")";
+
+        $query = $this->db->query($sql);
+
+        if (!$query) {
+            return -1;
+        }
+
+        if (!$this->db->num_rows($query)) {
+            return -1;
+        }
+
+        $obj = $this->db->fetch_object($query);
+
+        $this->id = $obj->rowid;
+        $this->fk_product_attribute = $obj->fk_product_attribute;
+        $this->ref = $obj->ref;
+        $this->value = $obj->value;
+
+        return 1;
+    }
+
+    /**
+     * Returns all product attribute values of a product attribute
+     *
+     * @param int  $prodattr_id Product attribute id
+     * @param bool $only_used   Fetch only used attribute values
+     *
+     * @return ProductAttributeValue[]
+     */
+    public function fetchAllByProductAttribute($prodattr_id, $only_used = false)
+    {
 		$return = array();
 
 		$sql = 'SELECT ';
@@ -167,25 +199,52 @@ class ProductAttributeValue extends CommonObject
 				return -1;
 			}
 			// End call triggers
-		}
+        }
 
-		//Ref must be uppercase
-		$this->ref = trim(strtoupper($this->ref));
-		$this->value = trim($this->value);
+        //Ref must be uppercase
+        $this->ref = trim(strtoupper($this->ref));
+        $this->value = trim($this->value);
 
-		$sql = "UPDATE ".MAIN_DB_PREFIX."product_attribute_value
-		SET fk_product_attribute = '".(int) $this->fk_product_attribute."', ref = '".$this->db->escape($this->ref)."',
-		value = '".$this->db->escape($this->value)."' WHERE rowid = ".(int) $this->id;
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "product_attribute_value
+		SET fk_product_attribute = '" . (int) $this->fk_product_attribute . "', ref = '" . $this->db->escape($this->ref) . "',
+		value = '" . $this->db->escape($this->value) . "' WHERE rowid = " . (int) $this->id;
 
-		if ($this->db->query($sql)) {
-			return 1;
-		}
+        if ($this->db->query($sql)) {
+            return 1;
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
-	/**
-	 * Deletes all product attribute values by a product attribute id
+    /**
+     * Deletes a product attribute value
+     *
+     * @param User $user      Object user
+     * @param int  $notrigger Do not execute trigger
+     *
+     * @return int <0 KO, >0 OK
+     */
+    public function delete(User $user, $notrigger = 0)
+    {
+
+        if (empty($notrigger)) {
+            // Call trigger
+            $result = $this->call_trigger('PRODUCT_ATTRIBUTE_VALUE_DELETE', $user);
+            if ($result < 0) {
+                return -1;
+            }
+            // End call triggers
+        }
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "product_attribute_value WHERE rowid = " . (int) $this->id;
+        if ($this->db->query($sql)) {
+            return 1;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Deletes all product attribute values by a product attribute id
 	 *
 	 * @param int  $fk_attribute Product attribute id
 	 * @param User $user         Object user
@@ -218,61 +277,5 @@ class ProductAttributeValue extends CommonObject
 		}
 
 		return 1;
-	}
-
-	/**
-	 * Gets a product attribute value
-	 *
-	 * @param int $valueid Product attribute value id
-	 * @return int <0 KO, >0 OK
-	 */
-	public function fetch($valueid)
-	{
-		$sql = "SELECT rowid, fk_product_attribute, ref, value FROM ".MAIN_DB_PREFIX."product_attribute_value WHERE rowid = ".(int) $valueid." AND entity IN (".getEntity('product').")";
-
-		$query = $this->db->query($sql);
-
-		if (!$query) {
-			return -1;
-		}
-
-		if (!$this->db->num_rows($query)) {
-			return -1;
-		}
-
-		$obj = $this->db->fetch_object($query);
-
-		$this->id = $obj->rowid;
-		$this->fk_product_attribute = $obj->fk_product_attribute;
-		$this->ref = $obj->ref;
-		$this->value = $obj->value;
-
-		return 1;
-	}
-
-	/**
-	 * Deletes a product attribute value
-	 *
-	 * @param  User $user      Object user
-	 * @param  int  $notrigger Do not execute trigger
-	 * @return int <0 KO, >0 OK
-	 */
-	public function delete(User $user, $notrigger = 0)
-	{
-
-		if (empty($notrigger)) {
-			// Call trigger
-			$result = $this->call_trigger('PRODUCT_ATTRIBUTE_VALUE_DELETE', $user);
-			if ($result < 0) {
-				return -1;
-			}
-			// End call triggers
-		}
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."product_attribute_value WHERE rowid = ".(int) $this->id;
-		if ($this->db->query($sql)) {
-			return 1;
-		}
-
-		return -1;
 	}
 }

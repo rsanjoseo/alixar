@@ -207,59 +207,6 @@ class RejetPrelevement
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Retrieve the list of invoices
-	 *
-	 * @param 	int		$amounts 	If you want to get the amount of the order for each invoice
-	 * @return	array				Array List of invoices related to the withdrawal line
-	 * @todo	A withdrawal line is today linked to one and only one invoice. So the function should return only one object ?
-	 */
-	private function getListInvoices($amounts = 0)
-	{
-		global $conf;
-
-		$arr = array();
-
-		 //Returns all invoices of a withdrawal
-		$sql = "SELECT f.rowid as facid, pl.amount";
-		$sql .= " FROM ".MAIN_DB_PREFIX."prelevement_facture as pf";
-		if ($this->type == 'bank-transfer') {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."facture_fourn as f ON (pf.fk_facture_fourn = f.rowid)";
-		} else {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."facture as f ON (pf.fk_facture = f.rowid)";
-		}
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."prelevement_lignes as pl ON (pf.fk_prelevement_lignes = pl.rowid)";
-		$sql .= " WHERE pf.fk_prelevement_lignes = ".((int) $this->id);
-		$sql .= " AND f.entity IN  (".getEntity('invoice').")";
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-
-			if ($num) {
-				$i = 0;
-				while ($i < $num) {
-					$row = $this->db->fetch_row($resql);
-					if (!$amounts) {
-						$arr[$i] = $row[0];
-					} else {
-						$arr[$i] = array(
-							$row[0],
-							$row[1]
-						);
-					}
-					$i++;
-				}
-			}
-			$this->db->free($resql);
-		} else {
-			dol_syslog("getListInvoices", LOG_ERR);
-		}
-
-		return $arr;
-	}
-
 	/**
 	 *  Send email to all users that has asked the withdraw request
 	 *
@@ -317,26 +264,80 @@ class RejetPrelevement
 			$mailfile = new CMailFile($subject, $sendto, $from, $message, $arr_file, $arr_mime, $arr_name, '', '', 0, $msgishtml, $this->user->email, '', $trackid);
 
 			$result = $mailfile->sendfile();
-			if ($result) {
-				dol_syslog("RejetPrelevement::_send_email email envoye");
-			} else {
-				dol_syslog("RejetPrelevement::_send_email Erreur envoi email");
-			}
-		} else {
-			dol_syslog("RejetPrelevement::_send_email Userid invalide");
-		}
-	}
+            if ($result) {
+                dol_syslog("RejetPrelevement::_send_email email envoye");
+            } else {
+                dol_syslog("RejetPrelevement::_send_email Erreur envoi email");
+            }
+        } else {
+            dol_syslog("RejetPrelevement::_send_email Userid invalide");
+        }
+    }
 
-	/**
-	 *    Retrieve withdrawal object
-	 *
-	 *    @param    int		$rowid       id of invoice to retrieve
-	 *    @return	int
-	 */
-	public function fetch($rowid)
-	{
+    /**
+     * Retrieve the list of invoices
+     *
+     * @param int $amounts If you want to get the amount of the order for each invoice
+     *
+     * @return    array                Array List of invoices related to the withdrawal line
+     * @todo    A withdrawal line is today linked to one and only one invoice. So the function should return only one object ?
+     */
+    private function getListInvoices($amounts = 0)
+    {
+        global $conf;
 
-		$sql = "SELECT pr.date_rejet as dr, motif, afacturer";
+        $arr = [];
+
+        //Returns all invoices of a withdrawal
+        $sql = "SELECT f.rowid as facid, pl.amount";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "prelevement_facture as pf";
+        if ($this->type == 'bank-transfer') {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "facture_fourn as f ON (pf.fk_facture_fourn = f.rowid)";
+        } else {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "facture as f ON (pf.fk_facture = f.rowid)";
+        }
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "prelevement_lignes as pl ON (pf.fk_prelevement_lignes = pl.rowid)";
+        $sql .= " WHERE pf.fk_prelevement_lignes = " . ((int) $this->id);
+        $sql .= " AND f.entity IN  (" . getEntity('invoice') . ")";
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+
+            if ($num) {
+                $i = 0;
+                while ($i < $num) {
+                    $row = $this->db->fetch_row($resql);
+                    if (!$amounts) {
+                        $arr[$i] = $row[0];
+                    } else {
+                        $arr[$i] = [
+                            $row[0],
+                            $row[1],
+                        ];
+                    }
+                    $i++;
+                }
+            }
+            $this->db->free($resql);
+        } else {
+            dol_syslog("getListInvoices", LOG_ERR);
+        }
+
+        return $arr;
+    }
+
+    /**
+     *    Retrieve withdrawal object
+     *
+     * @param int $rowid id of invoice to retrieve
+     *
+     * @return    int
+     */
+    public function fetch($rowid)
+    {
+
+        $sql = "SELECT pr.date_rejet as dr, motif, afacturer";
 		$sql .= " FROM ".MAIN_DB_PREFIX."prelevement_rejet as pr";
 		$sql .= " WHERE pr.fk_prelevement_lignes =".((int) $rowid);
 

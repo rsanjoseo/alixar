@@ -304,26 +304,42 @@ class mailing_contacts1 extends MailingTargets
 					$i++;
 				}
 			} else {
-				$s .= '<option value="-1" disabled="disabled">'.$langs->trans("NoContactLinkedToThirdpartieWithCategoryFound").'</option>';
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-		$s .= '</select>';
+                $s .= '<option value="-1" disabled="disabled">' . $langs->trans("NoContactLinkedToThirdpartieWithCategoryFound") . '</option>';
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+        $s .= '</select>';
 
-		return $s;
-	}
+        return $s;
+    }
 
-	/**
-	 *  Ajoute destinataires dans table des cibles
-	 *
-	 *  @param  int		$mailing_id    	Id of emailing
-	 *  @return int           			<0 si erreur, nb ajout si ok
-	 */
-	public function add_to_target($mailing_id)
-	{
-		// phpcs:enable
-		global $conf, $langs;
+    /**
+     *  Renvoie url lien vers fiche de la source du destinataire du mailing
+     *
+     * @param int $id ID
+     *
+     * @return string        Url lien
+     */
+    public function url($id)
+    {
+        return '<a href="' . DOL_URL_ROOT . '/contact/card.php?id=' . $id . '">' . img_object('', "contact") . '</a>';
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Ajoute destinataires dans table des cibles
+     *
+     * @param int $mailing_id Id of emailing
+     *
+     * @return int                    <0 si erreur, nb ajout si ok
+     */
+    public function add_to_target($mailing_id)
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		$filter = GETPOST('filter', 'alpha');
 		$filter_jobposition = GETPOST('filter_jobposition', 'alpha');
@@ -467,19 +483,5 @@ class mailing_contacts1 extends MailingTargets
 		}
 
 			return parent::addTargetsToDatabase($mailing_id, $cibles);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Renvoie url lien vers fiche de la source du destinataire du mailing
-	 *
-	 *  @param	int		$id		ID
-	 *  @return string      	Url lien
-	 */
-	public function url($id)
-	{
-		return '<a href="'.DOL_URL_ROOT.'/contact/card.php?id='.$id.'">'.img_object('', "contact").'</a>';
 	}
 }

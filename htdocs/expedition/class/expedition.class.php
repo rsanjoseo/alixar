@@ -56,131 +56,159 @@ class Expedition extends CommonObject
 	use CommonIncoterm;
 
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Closed status
-	 */
-	const STATUS_CLOSED = 2;
-	/**
-	 * Canceled status
-	 */
-	const STATUS_CANCELED = -1;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = "shipping";
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = "fk_expedition";
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = "expedition";
+
 	/**
 	 * @var string    Name of subtable line
 	 */
 	public $table_element_line = "expeditiondet";
+
 	/**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'dolly';
+
 	public $socid;
+
 	/**
 	 * @var string Customer ref
 	 * @deprecated
 	 * @see $ref_customer
 	 */
 	public $ref_client;
+
 	/**
 	 * @var string Customer ref
 	 */
 	public $ref_customer;
+
 	/**
 	 * @var string internal ref
 	 * @deprecated
 	 */
 	public $ref_int;
+
 	public $brouillon;
+
 	/**
 	 * @var int warehouse id
 	 */
 	public $entrepot_id;
+
 	/**
 	 * @var string Tracking number
 	 */
 	public $tracking_number;
-	/**
+
+    /**
 	 * @var string Tracking url
 	 */
 	public $tracking_url;
 	public $billed;
-	/**
+
+    /**
 	 * @var string name of pdf model
 	 */
 	public $model_pdf;
-	public $trueWeight;
+
+    public $trueWeight;
 	public $weight_units;
 	public $trueWidth;
 	public $width_units;
-	// A denormalized value
 	public $trueHeight;
 	public $height_units;
 	public $trueDepth;
 	public $depth_units;
+    // A denormalized value
 	public $trueSize;
-	/**
+
+    /**
 	 * @var integer|string Date delivery planed
 	 */
 	public $date_delivery;
-	/**
-	 * @deprecated
-	 * @see $date_shipping
-	 */
-	public $date;
-	/**
-	 * @deprecated
-	 * @see $date_shipping
-	 */
-	public $date_expedition;
-		/**
-	 * Effective delivery date
-	 * @var integer|string
-	 */
-	public $date_shipping; // List of carriers
-	/**
-	 * @var integer|string date_creation
-	 */
-	public $date_creation;
-	/**
-	 * @var integer|string date_valid
-	 */
-	public $date_valid;
-	public $meths;
-public $listmeths;
-	public $lines = array();
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		global $conf;
+    /**
+     * @deprecated
+     * @see $date_shipping
+     */
+    public $date;
 
-		$this->db = $db;
+    /**
+     * @deprecated
+     * @see $date_shipping
+     */
+    public $date_expedition;
+
+    /**
+     * Effective delivery date
+     *
+     * @var integer|string
+     */
+    public $date_shipping;
+
+    /**
+     * @var integer|string date_creation
+     */
+    public $date_creation;
+
+    /**
+     * @var integer|string date_valid
+     */
+    public $date_valid;
+
+    public $meths;
+    public $listmeths; // List of carriers
+
+    public $lines = [];
+
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
+
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 1;
+
+    /**
+     * Closed status
+     */
+    const STATUS_CLOSED = 2;
+
+    /**
+     * Canceled status
+     */
+    const STATUS_CANCELED = -1;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        global $conf;
+
+        $this->db = $db;
 
 		// List of long language codes for status
 		$this->statuts = array();
@@ -198,23 +226,54 @@ public $listmeths;
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'expedition'
-		);
+     *    Return next contract ref
+     *
+     * @param Societe $soc Thirdparty object
+     * @return string                Free reference for contract
+     */
+    public function getNextNumRef($soc)
+    {
+        global $langs, $conf;
+        $langs->load("sendings");
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+        if (!empty($conf->global->EXPEDITION_ADDON_NUMBER)) {
+            $mybool = false;
 
-	/**
+            $file = $conf->global->EXPEDITION_ADDON_NUMBER . ".php";
+            $classname = $conf->global->EXPEDITION_ADDON_NUMBER;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/expedition/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if (!$mybool) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                dol_print_error($this->db, get_class($this) . "::getNextNumRef " . $obj->error);
+                return "";
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("Error_EXPEDITION_ADDON_NUMBER_NotDefined");
+            return "";
+        }
+    }
+
+    /**
 	 *  Create expedition en base
 	 *
 	 *  @param	User	$user       Objet du user qui cree
@@ -596,212 +655,6 @@ public $listmeths;
 	}
 
 	/**
-	 * Forge an set tracking url
-	 *
-	 * @param	string	$value		Value
-	 * @return	void
-	 */
-	public function getUrlTrackingStatus($value = '')
-	{
-		if (!empty($this->shipping_method_id)) {
-			$sql = "SELECT em.code, em.tracking";
-			$sql .= " FROM ".MAIN_DB_PREFIX."c_shipment_mode as em";
-			$sql .= " WHERE em.rowid = ".((int) $this->shipping_method_id);
-
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				if ($obj = $this->db->fetch_object($resql)) {
-					$tracking = $obj->tracking;
-				}
-			}
-		}
-
-		if (!empty($tracking) && !empty($value)) {
-			$url = str_replace('{TRACKID}', $value, $tracking);
-			$this->tracking_url = sprintf('<a target="_blank" href="%s">'.($value ? $value : 'url').'</a>', $url, $url);
-		} else {
-			$this->tracking_url = $value;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Load lines
-	 *
-	 *	@return	int		>0 if OK, Otherwise if KO
-	 */
-	public function fetch_lines()
-	{
-		// phpcs:enable
-		global $conf, $mysoc;
-		// TODO: recuperer les champs du document associe a part
-		$this->lines = array();
-
-		$sql = "SELECT cd.rowid, cd.fk_product, cd.label as custom_label, cd.description, cd.qty as qty_asked, cd.product_type, cd.fk_unit";
-		$sql .= ", cd.total_ht, cd.total_localtax1, cd.total_localtax2, cd.total_ttc, cd.total_tva";
-		$sql .= ", cd.vat_src_code, cd.tva_tx, cd.localtax1_tx, cd.localtax2_tx, cd.localtax1_type, cd.localtax2_type, cd.info_bits, cd.price, cd.subprice, cd.remise_percent,cd.buy_price_ht as pa_ht";
-		$sql .= ", cd.fk_multicurrency, cd.multicurrency_code, cd.multicurrency_subprice, cd.multicurrency_total_ht, cd.multicurrency_total_tva, cd.multicurrency_total_ttc, cd.rang";
-		$sql .= ", ed.rowid as line_id, ed.qty as qty_shipped, ed.fk_origin_line, ed.fk_entrepot";
-		$sql .= ", p.ref as product_ref, p.label as product_label, p.fk_product_type";
-		$sql .= ", p.weight, p.weight_units, p.length, p.length_units, p.surface, p.surface_units, p.volume, p.volume_units, p.tosell as product_tosell, p.tobuy as product_tobuy, p.tobatch as product_tobatch";
-		$sql .= " FROM ".MAIN_DB_PREFIX."expeditiondet as ed, ".MAIN_DB_PREFIX."commandedet as cd";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."product as p ON p.rowid = cd.fk_product";
-		$sql .= " WHERE ed.fk_expedition = ".((int) $this->id);
-		$sql .= " AND ed.fk_origin_line = cd.rowid";
-		$sql .= " ORDER BY cd.rang, ed.fk_origin_line";
-
-		dol_syslog(get_class($this)."::fetch_lines", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
-
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			$lineindex = 0;
-			$originline = 0;
-
-			$this->total_ht = 0;
-			$this->total_tva = 0;
-			$this->total_ttc = 0;
-			$this->total_localtax1 = 0;
-			$this->total_localtax2 = 0;
-
-			$line = new ExpeditionLigne($this->db);
-
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-
-				if ($originline == $obj->fk_origin_line) {
-					$line->entrepot_id = 0; // entrepod_id in details_entrepot
-					$line->qty_shipped += $obj->qty_shipped;
-				} else {
-					$line = new ExpeditionLigne($this->db);
-					$line->entrepot_id    	= $obj->fk_entrepot;
-					$line->qty_shipped    	= $obj->qty_shipped;
-				}
-
-				$detail_entrepot              = new stdClass;
-				$detail_entrepot->entrepot_id = $obj->fk_entrepot;
-				$detail_entrepot->qty_shipped = $obj->qty_shipped;
-				$detail_entrepot->line_id     = $obj->line_id;
-				$line->details_entrepot[]     = $detail_entrepot;
-
-				$line->line_id          = $obj->line_id;
-				$line->rowid            = $obj->line_id; // TODO deprecated
-				$line->id               = $obj->line_id;
-
-				$line->fk_origin = 'orderline';
-				$line->fk_origin_line 	= $obj->fk_origin_line;
-				$line->origin_line_id 	= $obj->fk_origin_line; // TODO deprecated
-
-				$line->fk_expedition    = $this->id; // id of parent
-
-				$line->product_type     = $obj->product_type;
-				$line->fk_product     	= $obj->fk_product;
-				$line->fk_product_type	= $obj->fk_product_type;
-				$line->ref = $obj->product_ref; // TODO deprecated
-				$line->product_ref = $obj->product_ref;
-				$line->product_label = $obj->product_label;
-				$line->libelle        	= $obj->product_label; // TODO deprecated
-				$line->product_tosell = $obj->product_tosell;
-				$line->product_tobuy = $obj->product_tobuy;
-				$line->product_tobatch = $obj->product_tobatch;
-				$line->label = $obj->custom_label;
-				$line->description    	= $obj->description;
-				$line->qty_asked      	= $obj->qty_asked;
-				$line->rang = $obj->rang;
-				$line->weight         	= $obj->weight;
-				$line->weight_units   	= $obj->weight_units;
-				$line->length         	= $obj->length;
-				$line->length_units   	= $obj->length_units;
-				$line->surface        	= $obj->surface;
-				$line->surface_units = $obj->surface_units;
-				$line->volume         	= $obj->volume;
-				$line->volume_units   	= $obj->volume_units;
-				$line->fk_unit = $obj->fk_unit;
-
-				$line->pa_ht = $obj->pa_ht;
-
-				// Local taxes
-				$localtax_array = array(0=>$obj->localtax1_type, 1=>$obj->localtax1_tx, 2=>$obj->localtax2_type, 3=>$obj->localtax2_tx);
-				$localtax1_tx = get_localtax($obj->tva_tx, 1, $this->thirdparty);
-				$localtax2_tx = get_localtax($obj->tva_tx, 2, $this->thirdparty);
-
-				// For invoicing
-				$tabprice = calcul_price_total($obj->qty_shipped, $obj->subprice, $obj->remise_percent, $obj->tva_tx, $localtax1_tx, $localtax2_tx, 0, 'HT', $obj->info_bits, $obj->fk_product_type, $mysoc, $localtax_array); // We force type to 0
-				$line->desc = $obj->description; // We need ->desc because some code into CommonObject use desc (property defined for other elements)
-				$line->qty = $line->qty_shipped;
-				$line->total_ht = $tabprice[0];
-				$line->total_localtax1 	= $tabprice[9];
-				$line->total_localtax2 	= $tabprice[10];
-				$line->total_ttc	 	= $tabprice[2];
-				$line->total_tva	 	= $tabprice[1];
-				$line->vat_src_code = $obj->vat_src_code;
-				$line->tva_tx = $obj->tva_tx;
-				$line->localtax1_tx 	= $obj->localtax1_tx;
-				$line->localtax2_tx 	= $obj->localtax2_tx;
-				$line->info_bits = $obj->info_bits;
-				$line->price = $obj->price;
-				$line->subprice = $obj->subprice;
-				$line->remise_percent = $obj->remise_percent;
-
-				$this->total_ht += $tabprice[0];
-				$this->total_tva += $tabprice[1];
-				$this->total_ttc += $tabprice[2];
-				$this->total_localtax1 += $tabprice[9];
-				$this->total_localtax2 += $tabprice[10];
-
-				// Multicurrency
-				$this->fk_multicurrency = $obj->fk_multicurrency;
-				$this->multicurrency_code = $obj->multicurrency_code;
-				$this->multicurrency_subprice 	= $obj->multicurrency_subprice;
-				$this->multicurrency_total_ht 	= $obj->multicurrency_total_ht;
-				$this->multicurrency_total_tva 	= $obj->multicurrency_total_tva;
-				$this->multicurrency_total_ttc 	= $obj->multicurrency_total_ttc;
-
-				if ($originline != $obj->fk_origin_line) {
-					$line->detail_batch = array();
-				}
-
-				// Detail of batch
-				if (!empty($conf->productbatch->enabled) && $obj->line_id > 0 && $obj->product_tobatch > 0) {
-					require_once DOL_DOCUMENT_ROOT.'/expedition/class/expeditionbatch.class.php';
-
-					$newdetailbatch = ExpeditionLineBatch::fetchAll($this->db, $obj->line_id, $obj->fk_product);
-					if (is_array($newdetailbatch)) {
-						if ($originline != $obj->fk_origin_line) {
-							$line->detail_batch = $newdetailbatch;
-						} else {
-							$line->detail_batch = array_merge($line->detail_batch, $newdetailbatch);
-						}
-					}
-				}
-
-				if ($originline != $obj->fk_origin_line) {
-					$this->lines[$lineindex] = $line;
-					$lineindex++;
-				} else {
-					$line->total_ht += $tabprice[0];
-					$line->total_localtax1 	+= $tabprice[9];
-					$line->total_localtax2 	+= $tabprice[10];
-					$line->total_ttc	 	+= $tabprice[2];
-					$line->total_tva	 	+= $tabprice[1];
-				}
-				$line->fetch_optionals();
-				$i++;
-				$originline = $obj->fk_origin_line;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -3;
-		}
-	}
-
-	/**
 	 *  Validate object and update stock if option enabled
 	 *
 	 *  @param      User		$user       Object user that validate
@@ -1001,56 +854,8 @@ public $listmeths;
 		}
 	}
 
+
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return next contract ref
-	 *
-	 *	@param	Societe		$soc	Thirdparty object
-	 *	@return string				Free reference for contract
-	 */
-	public function getNextNumRef($soc)
-	{
-		global $langs, $conf;
-		$langs->load("sendings");
-
-		if (!empty($conf->global->EXPEDITION_ADDON_NUMBER)) {
-			$mybool = false;
-
-			$file = $conf->global->EXPEDITION_ADDON_NUMBER.".php";
-			$classname = $conf->global->EXPEDITION_ADDON_NUMBER;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/expedition/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if (!$mybool) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				dol_print_error($this->db, get_class($this)."::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("Error_EXPEDITION_ADDON_NUMBER_NotDefined");
-			return "";
-		}
-	}
-
 	/**
 	 *	Create a delivery receipt from a shipment
 	 *
@@ -1164,13 +969,15 @@ public $listmeths;
 		$this->lines[$num] = $line;
 	}
 
-	/**
-	 * Add a shipment line with batch record
-	 *
-	 * @param 	array		$dbatch		Array of value (key 'detail' -> Array, key 'qty' total quantity for line, key ix_l : original line index)
-	 * @param	array		$array_options		extrafields array
-	 * @return	int						<0 if KO, >0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Add a shipment line with batch record
+     *
+     * @param 	array		$dbatch		Array of value (key 'detail' -> Array, key 'qty' total quantity for line, key ix_l : original line index)
+     * @param	array		$array_options		extrafields array
+     * @return	int						<0 if KO, >0 if OK
+     */
 	public function addline_batch($dbatch, $array_options = 0)
 	{
 		// phpcs:enable
@@ -1228,8 +1035,6 @@ public $listmeths;
 			return 1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Update database
@@ -1370,11 +1175,13 @@ public $listmeths;
 		}
 	}
 
+
 	/**
-	 * 	Cancel shipment.
+     *    Cancel shipment.
 	 *
 	 *  @param  int  $notrigger 			Disable triggers
 	 *  @param  bool $also_update_stock  	true if the stock should be increased back (false by default)
+	 *
 	 * 	@return	int							>0 if OK, 0 if deletion done but failed to delete files, <0 if KO
 	 */
 	public function cancel($notrigger = 0, $also_update_stock = false)
@@ -1738,28 +1545,205 @@ public $listmeths;
 					return -2;
 				}
 			} else {
-				$this->error = $this->db->lasterror()." - sql=$sql";
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                $this->error = $this->db->lasterror() . " - sql=$sql";
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *  Delete detail line
-	 *
-	 *  @param		User	$user			User making deletion
-	 *  @param		int		$lineid			Id of line to delete
-	 *  @return     int         			>0 if OK, <0 if KO
-	 */
-	public function deleteline($user, $lineid)
-	{
-		global $user;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		if ($this->statut == self::STATUS_DRAFT) {
+    /**
+     *    Load lines
+     *
+     * @return    int        >0 if OK, Otherwise if KO
+     */
+    public function fetch_lines()
+    {
+        // phpcs:enable
+        global $conf, $mysoc;
+        // TODO: recuperer les champs du document associe a part
+        $this->lines = [];
+
+        $sql = "SELECT cd.rowid, cd.fk_product, cd.label as custom_label, cd.description, cd.qty as qty_asked, cd.product_type, cd.fk_unit";
+        $sql .= ", cd.total_ht, cd.total_localtax1, cd.total_localtax2, cd.total_ttc, cd.total_tva";
+        $sql .= ", cd.vat_src_code, cd.tva_tx, cd.localtax1_tx, cd.localtax2_tx, cd.localtax1_type, cd.localtax2_type, cd.info_bits, cd.price, cd.subprice, cd.remise_percent,cd.buy_price_ht as pa_ht";
+        $sql .= ", cd.fk_multicurrency, cd.multicurrency_code, cd.multicurrency_subprice, cd.multicurrency_total_ht, cd.multicurrency_total_tva, cd.multicurrency_total_ttc, cd.rang";
+        $sql .= ", ed.rowid as line_id, ed.qty as qty_shipped, ed.fk_origin_line, ed.fk_entrepot";
+        $sql .= ", p.ref as product_ref, p.label as product_label, p.fk_product_type";
+        $sql .= ", p.weight, p.weight_units, p.length, p.length_units, p.surface, p.surface_units, p.volume, p.volume_units, p.tosell as product_tosell, p.tobuy as product_tobuy, p.tobatch as product_tobatch";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "expeditiondet as ed, " . MAIN_DB_PREFIX . "commandedet as cd";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product as p ON p.rowid = cd.fk_product";
+        $sql .= " WHERE ed.fk_expedition = " . ((int) $this->id);
+        $sql .= " AND ed.fk_origin_line = cd.rowid";
+        $sql .= " ORDER BY cd.rang, ed.fk_origin_line";
+
+        dol_syslog(get_class($this) . "::fetch_lines", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/price.lib.php';
+
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            $lineindex = 0;
+            $originline = 0;
+
+            $this->total_ht = 0;
+            $this->total_tva = 0;
+            $this->total_ttc = 0;
+            $this->total_localtax1 = 0;
+            $this->total_localtax2 = 0;
+
+            $line = new ExpeditionLigne($this->db);
+
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+
+                if ($originline == $obj->fk_origin_line) {
+                    $line->entrepot_id = 0; // entrepod_id in details_entrepot
+                    $line->qty_shipped += $obj->qty_shipped;
+                } else {
+                    $line = new ExpeditionLigne($this->db);
+                    $line->entrepot_id = $obj->fk_entrepot;
+                    $line->qty_shipped = $obj->qty_shipped;
+                }
+
+                $detail_entrepot = new stdClass;
+                $detail_entrepot->entrepot_id = $obj->fk_entrepot;
+                $detail_entrepot->qty_shipped = $obj->qty_shipped;
+                $detail_entrepot->line_id = $obj->line_id;
+                $line->details_entrepot[] = $detail_entrepot;
+
+                $line->line_id = $obj->line_id;
+                $line->rowid = $obj->line_id; // TODO deprecated
+                $line->id = $obj->line_id;
+
+                $line->fk_origin = 'orderline';
+                $line->fk_origin_line = $obj->fk_origin_line;
+                $line->origin_line_id = $obj->fk_origin_line; // TODO deprecated
+
+                $line->fk_expedition = $this->id; // id of parent
+
+                $line->product_type = $obj->product_type;
+                $line->fk_product = $obj->fk_product;
+                $line->fk_product_type = $obj->fk_product_type;
+                $line->ref = $obj->product_ref; // TODO deprecated
+                $line->product_ref = $obj->product_ref;
+                $line->product_label = $obj->product_label;
+                $line->libelle = $obj->product_label; // TODO deprecated
+                $line->product_tosell = $obj->product_tosell;
+                $line->product_tobuy = $obj->product_tobuy;
+                $line->product_tobatch = $obj->product_tobatch;
+                $line->label = $obj->custom_label;
+                $line->description = $obj->description;
+                $line->qty_asked = $obj->qty_asked;
+                $line->rang = $obj->rang;
+                $line->weight = $obj->weight;
+                $line->weight_units = $obj->weight_units;
+                $line->length = $obj->length;
+                $line->length_units = $obj->length_units;
+                $line->surface = $obj->surface;
+                $line->surface_units = $obj->surface_units;
+                $line->volume = $obj->volume;
+                $line->volume_units = $obj->volume_units;
+                $line->fk_unit = $obj->fk_unit;
+
+                $line->pa_ht = $obj->pa_ht;
+
+                // Local taxes
+                $localtax_array = [0 => $obj->localtax1_type, 1 => $obj->localtax1_tx, 2 => $obj->localtax2_type, 3 => $obj->localtax2_tx];
+                $localtax1_tx = get_localtax($obj->tva_tx, 1, $this->thirdparty);
+                $localtax2_tx = get_localtax($obj->tva_tx, 2, $this->thirdparty);
+
+                // For invoicing
+                $tabprice = calcul_price_total($obj->qty_shipped, $obj->subprice, $obj->remise_percent, $obj->tva_tx, $localtax1_tx, $localtax2_tx, 0, 'HT', $obj->info_bits, $obj->fk_product_type, $mysoc, $localtax_array); // We force type to 0
+                $line->desc = $obj->description; // We need ->desc because some code into CommonObject use desc (property defined for other elements)
+                $line->qty = $line->qty_shipped;
+                $line->total_ht = $tabprice[0];
+                $line->total_localtax1 = $tabprice[9];
+                $line->total_localtax2 = $tabprice[10];
+                $line->total_ttc = $tabprice[2];
+                $line->total_tva = $tabprice[1];
+                $line->vat_src_code = $obj->vat_src_code;
+                $line->tva_tx = $obj->tva_tx;
+                $line->localtax1_tx = $obj->localtax1_tx;
+                $line->localtax2_tx = $obj->localtax2_tx;
+                $line->info_bits = $obj->info_bits;
+                $line->price = $obj->price;
+                $line->subprice = $obj->subprice;
+                $line->remise_percent = $obj->remise_percent;
+
+                $this->total_ht += $tabprice[0];
+                $this->total_tva += $tabprice[1];
+                $this->total_ttc += $tabprice[2];
+                $this->total_localtax1 += $tabprice[9];
+                $this->total_localtax2 += $tabprice[10];
+
+                // Multicurrency
+                $this->fk_multicurrency = $obj->fk_multicurrency;
+                $this->multicurrency_code = $obj->multicurrency_code;
+                $this->multicurrency_subprice = $obj->multicurrency_subprice;
+                $this->multicurrency_total_ht = $obj->multicurrency_total_ht;
+                $this->multicurrency_total_tva = $obj->multicurrency_total_tva;
+                $this->multicurrency_total_ttc = $obj->multicurrency_total_ttc;
+
+                if ($originline != $obj->fk_origin_line) {
+                    $line->detail_batch = [];
+                }
+
+                // Detail of batch
+                if (!empty($conf->productbatch->enabled) && $obj->line_id > 0 && $obj->product_tobatch > 0) {
+                    require_once DOL_DOCUMENT_ROOT . '/expedition/class/expeditionbatch.class.php';
+
+                    $newdetailbatch = ExpeditionLineBatch::fetchAll($this->db, $obj->line_id, $obj->fk_product);
+                    if (is_array($newdetailbatch)) {
+                        if ($originline != $obj->fk_origin_line) {
+                            $line->detail_batch = $newdetailbatch;
+                        } else {
+                            $line->detail_batch = array_merge($line->detail_batch, $newdetailbatch);
+                        }
+                    }
+                }
+
+                if ($originline != $obj->fk_origin_line) {
+                    $this->lines[$lineindex] = $line;
+                    $lineindex++;
+                } else {
+                    $line->total_ht += $tabprice[0];
+                    $line->total_localtax1 += $tabprice[9];
+                    $line->total_localtax2 += $tabprice[10];
+                    $line->total_ttc += $tabprice[2];
+                    $line->total_tva += $tabprice[1];
+                }
+                $line->fetch_optionals();
+                $i++;
+                $originline = $obj->fk_origin_line;
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -3;
+        }
+    }
+
+    /**
+     *  Delete detail line
+     *
+     * @param User $user   User making deletion
+     * @param int  $lineid Id of line to delete
+     *
+     * @return     int                    >0 if OK, <0 if KO
+     */
+    public function deleteline($user, $lineid)
+    {
+        global $user;
+
+        if ($this->statut == self::STATUS_DRAFT) {
 			$this->db->begin();
 
 			$line = new ExpeditionLigne($this->db);
@@ -1782,7 +1766,6 @@ public $listmeths;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Return clicable link of object (with eventually picto)
@@ -1859,7 +1842,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return label of a status
 	 *
@@ -1967,7 +1949,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set delivery date
 	 *
@@ -1981,8 +1962,6 @@ public $listmeths;
 		// phpcs:enable
 		return $this->setDeliveryDate($user, $delivery_date);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Set the planned delivery date
@@ -2013,7 +1992,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Fetch deliveries method and return an array. Load array this->meths(rowid=>label).
 	 *
@@ -2040,7 +2018,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Fetch all deliveries method and return an array. Load array this->listmeths.
 	 *
@@ -2077,7 +2054,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Update/create delivery method.
 	 *
@@ -2106,12 +2082,14 @@ public $listmeths;
 		}
 	}
 
-	/**
-	 *  Activate delivery method.
-	 *
-	 *  @param      int      $id     id method to activate
-	 *  @return void
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Activate delivery method.
+     *
+     *  @param      int      $id     id method to activate
+     *  @return void
+     */
 	public function activ_delivery_method($id)
 	{
 		// phpcs:enable
@@ -2121,34 +2099,64 @@ public $listmeths;
 		$resql = $this->db->query($sql);
 	}
 
-	/**
-	 *  DesActivate delivery method.
-	 *
-	 *  @param      int      $id     id method to desactivate
-	 *
-	 *  @return void
-	 */
-	public function disable_delivery_method($id)
-	{
-		// phpcs:enable
-		$sql = 'UPDATE '.MAIN_DB_PREFIX.'c_shipment_mode SET active=0';
-		$sql .= ' WHERE rowid='.$id;
-
-		$resql = $this->db->query($sql);
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Classify the shipping as closed.
-	 *
-	 *	@return     int     <0 if KO, >0 if OK
-	 */
-	public function setClosed()
-	{
-		global $conf, $langs, $user;
+    /**
+     *  DesActivate delivery method.
+     *
+     *  @param      int $id id method to desactivate
+     *
+     *  @return void
+     */
+	public function disable_delivery_method($id)
+    {
+        // phpcs:enable
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . 'c_shipment_mode SET active=0';
+        $sql .= ' WHERE rowid=' . $id;
 
-		$error = 0;
+        $resql = $this->db->query($sql);
+    }
+
+    /**
+     * Forge an set tracking url
+     *
+     * @param string $value Value
+     *
+     * @return    void
+     */
+    public function getUrlTrackingStatus($value = '')
+    {
+        if (!empty($this->shipping_method_id)) {
+            $sql = "SELECT em.code, em.tracking";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "c_shipment_mode as em";
+            $sql .= " WHERE em.rowid = " . ((int) $this->shipping_method_id);
+
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                if ($obj = $this->db->fetch_object($resql)) {
+                    $tracking = $obj->tracking;
+                }
+            }
+        }
+
+        if (!empty($tracking) && !empty($value)) {
+            $url = str_replace('{TRACKID}', $value, $tracking);
+            $this->tracking_url = sprintf('<a target="_blank" href="%s">' . ($value ? $value : 'url') . '</a>', $url, $url);
+        } else {
+            $this->tracking_url = $value;
+        }
+    }
+
+    /**
+     *    Classify the shipping as closed.
+     *
+     * @return     int     <0 if KO, >0 if OK
+     */
+    public function setClosed()
+    {
+        global $conf, $langs, $user;
+
+        $error = 0;
 
 		// Protection. This avoid to move stock later when we should not
 		if ($this->statut == self::STATUS_CLOSED) {
@@ -2266,26 +2274,42 @@ public $listmeths;
 		}
 
 		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->statut = self::STATUS_VALIDATED;
-			$this->db->rollback();
-			return -1;
-		}
-	}
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->statut = self::STATUS_VALIDATED;
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Classify the shipping as invoiced (used when WORKFLOW_BILL_ON_SHIPMENT is on)
-	 *
-	 *	@return     int     <0 if ko, >0 if ok
-	 */
-	public function setBilled()
-	{
-		global $user;
-		$error = 0;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$this->db->begin();
+    /**
+     *    Classify the shipping as invoiced (used when WORKFLOW_BILL_ON_SHIPMENT is on)
+     *
+     * @return     int     <0 if ko, >0 if ok
+     * @see setBilled()
+     * @deprecated
+     */
+    public function set_billed()
+    {
+        // phpcs:enable
+        dol_syslog(get_class($this) . "::set_billed is deprecated, use setBilled instead", LOG_NOTICE);
+        return $this->setBilled();
+    }
+
+    /**
+     *    Classify the shipping as invoiced (used when WORKFLOW_BILL_ON_SHIPMENT is on)
+     *
+     * @return     int     <0 if ko, >0 if ok
+     */
+    public function setBilled()
+    {
+        global $user;
+        $error = 0;
+
+        $this->db->begin();
 
 		$sql = 'UPDATE '.MAIN_DB_PREFIX.'expedition SET fk_statut=2, billed=1'; // TODO Update only billed
 		$sql .= " WHERE rowid = ".((int) $this->id).' AND fk_statut > 0';
@@ -2314,20 +2338,6 @@ public $listmeths;
 			$this->db->rollback();
 			return -1;
 		}
-	}
-
-	/**
-	 *	Classify the shipping as invoiced (used when WORKFLOW_BILL_ON_SHIPMENT is on)
-	 *
-	 *	@deprecated
-	 *  @see setBilled()
-	 *	@return     int     <0 if ko, >0 if ok
-	 */
-	public function set_billed()
-	{
-		// phpcs:enable
-		dol_syslog(get_class($this)."::set_billed is deprecated, use setBilled instead", LOG_NOTICE);
-		return $this->setBilled();
 	}
 
 	/**
@@ -2472,17 +2482,34 @@ public $listmeths;
 				$modele = $this->modelpdf;
 			} elseif (!empty($conf->global->EXPEDITION_ADDON_PDF)) {
 				$modele = $conf->global->EXPEDITION_ADDON_PDF;
-			}
-		}
+            }
+        }
 
-		$modelpath = "core/modules/expedition/doc/";
+        $modelpath = "core/modules/expedition/doc/";
 
-		$this->fetch_origin();
+        $this->fetch_origin();
 
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-	}
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'expedition',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
-
 
 /**
  * Classe to manage lines of shipment

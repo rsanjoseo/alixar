@@ -38,33 +38,62 @@ class ActionsCardIndividual extends ActionsCardCommon
 	 *    @param	string	$targetmodule	Name of directory of module where canvas is stored
 	 *    @param	string	$canvas			Name of canvas
 	 *    @param	string	$card			Name of tab (sub-canvas)
-	 */
-	public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
-	{
-		$this->db = $db;
-		$this->dirmodule = $dirmodule;
-		$this->targetmodule = $targetmodule;
-		$this->canvas = $canvas;
-		$this->card = $card;
-	}
+     */
+    public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
+    {
+        $this->db = $db;
+        $this->dirmodule = $dirmodule;
+        $this->targetmodule = $targetmodule;
+        $this->canvas = $canvas;
+        $this->card = $card;
+    }
 
-	/**
-	 * Execute actions
-	 * @deprecated Use the doActions of hooks instead of this.
-	 *
-	 * @param	string	$action	Action
-	 * @param	int		$id			Id of object (may be empty for creation)
-	 * @return	int					<0 if KO, >0 if OK
-	 */
-	public function doActions(&$action, $id)
+    /**
+     *  Return the title of card
+     *
+     * @param string $action Action code
+     *
+     * @return    string                Title
+     */
+    private function getTitle($action)
+    {
+        global $langs;
+
+        $out = '';
+
+        if ($action == 'view') {
+            $out .= $langs->trans("Individual");
+        }
+        if ($action == 'edit') {
+            $out .= $langs->trans("EditCompany");
+        }
+        if ($action == 'create') {
+            $out .= $langs->trans("NewCompany");
+        }
+
+        return $out;
+    }
+
+    /**
+     * Execute actions
+     *
+     * @param string $action Action
+     * @param int    $id     Id of object (may be empty for creation)
+     *
+     * @return    int                    <0 if KO, >0 if OK
+     * @deprecated Use the doActions of hooks instead of this.
+     *
+     */
+    public function doActions(&$action, $id)
 	{
 		$ret = $this->getObject($id);
 
 		$return = parent::doActions($action);
 
 		return $return;
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Assign custom values for canvas (for example into this->tpl to be used by templates)
 	 *
@@ -93,33 +122,6 @@ class ActionsCardIndividual extends ActionsCardCommon
 				$this->tpl['action_delete'] = $form->formconfirm($_SERVER["PHP_SELF"]."?socid=".$this->object->id, $langs->trans("DeleteAnIndividual"), $langs->trans("ConfirmDeleteIndividual"), "confirm_delete", '', 0, "1,action-delete");
 			}
 		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return the title of card
-	 *
-	 *  @param	string	$action		Action code
-	 *  @return	string				Title
-	 */
-	private function getTitle($action)
-	{
-		global $langs;
-
-		$out = '';
-
-		if ($action == 'view') {
-			$out .= $langs->trans("Individual");
-		}
-		if ($action == 'edit') {
-			$out .= $langs->trans("EditCompany");
-		}
-		if ($action == 'create') {
-			$out .= $langs->trans("NewCompany");
-		}
-
-		return $out;
 	}
 
 	/**

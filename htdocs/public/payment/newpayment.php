@@ -114,33 +114,49 @@ if (!$action) {
 }
 
 if ($source == 'organizedeventregistration') {
-	// Finding the Attendee
-	$invoiceid = GETPOST('ref', 'int');
-	$invoice = new Facture($db);
+    // Finding the Attendee
+    $attendee = new ConferenceOrBoothAttendee($db);
 
-	$resultinvoice = $invoice->fetch($invoiceid);
+    $invoiceid = GETPOST('ref', 'int');
+    $invoice = new Facture($db);
 
-	if ($resultinvoice <= 0) {
-		setEventMessages(null, $invoice->errors, "errors");
-	} else {
-		$invoice->fetchObjectLinked();
-		$linkedAttendees = $invoice->linkedObjectsIds['conferenceorboothattendee'];
+    $resultinvoice = $invoice->fetch($invoiceid);
 
-		if (is_array($linkedAttendees)) {
-			$linkedAttendees = array_values($linkedAttendees);
+    if ($resultinvoice <= 0) {
+        setEventMessages(null, $invoice->errors, "errors");
+    } else {
+        /*
+        $attendeeid = 0;
 
-			$attendee = new ConferenceOrBoothAttendee($db);
-			$resultattendee = $attendee->fetch($linkedAttendees[0]);
+        $invoice->fetchObjectLinked();
+        $linkedAttendees = $invoice->linkedObjectsIds['conferenceorboothattendee'];
 
-			if ($resultattendee <= 0) {
-				setEventMessages(null, $attendee->errors, "errors");
-			} else {
-				$attendee->fetch_projet();
+        if (is_array($linkedAttendees)) {
+            $linkedAttendees = array_values($linkedAttendees);
+            $attendeeid = $linkedAttendees[0];
+        }*/
+        $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "eventorganization_conferenceorboothattendee";
+        $sql .= " WHERE fk_invoice = " . ((int) $invoiceid);
+        $resql = $db->query($sql);
+        if ($resql) {
+            $obj = $db->fetch_object($resql);
+            if ($obj) {
+                $attendeeid = $obj->rowid;
+            }
+        }
 
-				$amount = price2num($invoice->total_ttc);
-				// Finding the associated thirdparty
-				$thirdparty = new Societe($db);
-				$resultthirdparty = $thirdparty->fetch($invoice->socid);
+        if ($attendeeid > 0) {
+            $resultattendee = $attendee->fetch($attendeeid);
+
+            if ($resultattendee <= 0) {
+                setEventMessages(null, $attendee->errors, "errors");
+            } else {
+                $attendee->fetch_projet();
+
+                $amount = price2num($invoice->total_ttc);
+                // Finding the associated thirdparty
+                $thirdparty = new Societe($db);
+                $resultthirdparty = $thirdparty->fetch($invoice->socid);
 				if ($resultthirdparty <= 0) {
 					setEventMessages(null, $thirdparty->errors, "errors");
 				}
@@ -1840,7 +1856,7 @@ if ($source == 'organizedeventregistration') {
 	print '</td></tr>'."\n";
 
 	if (! is_object($attendee->project)) {
-		$text = 'ErrorProjectotFound';
+        $text = 'ErrorProjectNotFound';
 	} else {
 		$text = $langs->trans("PaymentEvent").' - '.$attendee->project->title;
 	}

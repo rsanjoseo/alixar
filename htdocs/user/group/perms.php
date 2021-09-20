@@ -25,9 +25,9 @@
  *        \brief        Page to set permissions of a user group record
  */
 
-//if (!defined('CSRFCHECK_WITH_TOKEN')) {
-//	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
-//}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
+}
 
 require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/user/class/usergroup.class.php';
@@ -43,7 +43,7 @@ $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');
 $module = GETPOST('module', 'alpha');
 $rights = GETPOST('rights', 'int');
-$contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'groupperms'; // To manage different context of search
+$contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'groupperms'; // To manage different context of search
 
 if (!isset($id) || empty($id)) {
 	accessforbidden();
@@ -332,8 +332,8 @@ if ($object->id > 0) {
 				if (in_array($obj->id, $permsgroupbyentity[$entity])) {
 					// Own permission by group
 					if ($caneditperms) {
-						print '<td class="center"><a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=delrights&amp;entity='.$entity.'&amp;rights='.$obj->id.'&amp;confirm=yes&amp;token='.newToken().'">';
-						//print img_edit_remove($langs->trans("Remove"));
+						print '<td class="center"><a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=delrights&token=' . newToken() . '&entity=' . $entity . '&rights=' . $obj->id . '&confirm=yes">';
+                        //print img_edit_remove($langs->trans("Remove"));
 						print img_picto($langs->trans("Remove"), 'switch_on');
 						print '</a></td>';
 					}
@@ -343,8 +343,8 @@ if ($object->id > 0) {
 				} else {
 					// Do not own permission
 					if ($caneditperms) {
-						print '<td class="center"><a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=addrights&amp;entity='.$entity.'&amp;rights='.$obj->id.'&amp;confirm=yes&amp;token='.newToken().'">';
-						//print img_edit_add($langs->trans("Add"));
+						print '<td class="center"><a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=addrights&token=' . newToken() . '&entity=' . $entity . '&rights=' . $obj->id . '&confirm=yes">';
+                        //print img_edit_add($langs->trans("Add"));
 						print img_picto($langs->trans("Add"), 'switch_off');
 						print '</a></td>';
 					}

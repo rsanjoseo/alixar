@@ -35,17 +35,17 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 /**
  *	Class to build documents using ODF templates generator
  */
-class pdf_stdandard extends ModelePDFMovement
+class pdf_standard extends ModelePDFMovement
 {
-	/**
-	 * @var DoliDb Database handler
-	 */
-	public $db;
+    /**
+     * @var DoliDb Database handler
+     */
+    public $db;
 
-	/**
-	 * @var string model name
-	 */
-	public $name;
+    /**
+     * @var string model name
+     */
+    public $name;
 
 	/**
 	 * @var string model description (short text)
@@ -831,28 +831,155 @@ class pdf_stdandard extends ModelePDFMovement
 
 				return 1; // No error
 			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Object		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @param	string		$titlekey		Translation key to show as title of document
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $titlekey = "")
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y (not used)
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
+     * @param int       $hidebottom  Hide bottom bar of array
+     * @param string    $currency    Currency code
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $currency = !empty($currency) ? $currency : $conf->currency;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        if (empty($hidetop)) {
+            $titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency" . $currency));
+            $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
+            $pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
+
+            //$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
+            if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+                $pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+            }
+        }
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', 'B', $default_font_size - 3);
+
+        // Output Rect
+        //$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
+
+        $pdf->SetLineStyle(['dash' => '0', 'color' => [220, 26, 26]]);
+        $pdf->SetDrawColor(220, 26, 26);
+        $pdf->line($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite, $tab_top);
+        $pdf->SetLineStyle(['dash' => 0]);
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetTextColor(0, 0, 120);
+
+        //Ref mouv
+        if (empty($hidetop)) {
+            //$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line takes a position y in 2nd parameter and 4th parameter
+            $pdf->SetXY($this->posxidref, $tab_top + 1);
+            $pdf->MultiCell($this->posxdatemouv - $this->posxdatemouv - 0.8, 3, $outputlangs->transnoentities("Ref"), '', 'L');
+        }
+
+        //Date mouv
+        //$pdf->line($this->posxlabel-1, $tab_top, $this->posxlabel-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxdatemouv, $tab_top + 1);
+            $pdf->MultiCell($this->posxdesc - $this->posxdatemouv, 2, $outputlangs->transnoentities("Date"), '', 'C');
+        }
+
+        //Ref Product
+        //$pdf->line($this->posxqty-1, $tab_top, $this->posxqty-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxlabel - $this->posxdesc, 2, $outputlangs->transnoentities("Ref. Product"), '', 'C');
+        }
+
+        //Label Product
+        //$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxlabel - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxqty - $this->posxlabel, 2, $outputlangs->transnoentities("Label"), '', 'C');
+        }
+
+        //Lot/serie Product
+        //$pdf->line($this->posxqty - 1, $tab_top, $this->posxqty - 1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxqty, $tab_top + 1);
+            $pdf->MultiCell($this->posxup - $this->posxqty, 2, $outputlangs->transnoentities("Lot/Série"), '', 'C');
+        }
+
+        //Code Inv
+        //$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxup - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxunit - $this->posxup, 2, $outputlangs->transnoentities("Inventory Code"), '', 'C');
+        }
+
+        //Label mouvement
+        //$pdf->line($this->posxunit, $tab_top, $this->posxunit, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxunit, $tab_top + 1);
+            $pdf->MultiCell($this->posxdiscount - $this->posxunit, 2, $outputlangs->transnoentities("Label Mouvement"), '', 'C');
+        }
+
+        //Origin
+        //$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxdiscount + 2, $tab_top + 1);
+            $pdf->MultiCell($this->postotalht - $this->posxdiscount - 0.8, 2, $outputlangs->transnoentities("Origin"), '', 'C');
+        }
+
+        //Qty
+        //$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->postotalht + 2, $tab_top + 1);
+            $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 2, $outputlangs->transnoentities("Qty"), '', 'C');
+        }
+
+        $pdf->SetDrawColor(220, 26, 26);
+        $pdf->SetLineStyle(['dash' => '0', 'color' => [220, 26, 26]]);
+        $pdf->line($this->marge_gauche, $tab_top + 11, $this->page_largeur - $this->marge_droite, $tab_top + 11);
+        $pdf->SetLineStyle(['dash' => 0]);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Object    $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     * @param string    $titlekey    Translation key to show as title of document
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $titlekey = "")
 	{
 		global $conf, $langs, $db, $hookmanager;
 
@@ -1058,132 +1185,6 @@ class pdf_stdandard extends ModelePDFMovement
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y (not used)
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @param		string		$currency		Currency code
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$currency = !empty($currency) ? $currency : $conf->currency;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		if (empty($hidetop)) {
-			$titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency".$currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
-			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
-			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
-			if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
-				$pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
-			}
-		}
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', 'B', $default_font_size - 3);
-
-		// Output Rect
-		//$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
-
-		$pdf->SetLineStyle(array('dash'=>'0', 'color'=>array(220, 26, 26)));
-		$pdf->SetDrawColor(220, 26, 26);
-		$pdf->line($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite, $tab_top);
-		$pdf->SetLineStyle(array('dash'=>0));
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetTextColor(0, 0, 120);
-
-		//Ref mouv
-		if (empty($hidetop)) {
-			//$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line takes a position y in 2nd parameter and 4th parameter
-			$pdf->SetXY($this->posxidref, $tab_top + 1);
-			$pdf->MultiCell($this->posxdatemouv - $this->posxdatemouv - 0.8, 3, $outputlangs->transnoentities("Ref"), '', 'L');
-		}
-
-		//Date mouv
-		//$pdf->line($this->posxlabel-1, $tab_top, $this->posxlabel-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxdatemouv, $tab_top + 1);
-			$pdf->MultiCell($this->posxdesc - $this->posxdatemouv, 2, $outputlangs->transnoentities("Date"), '', 'C');
-		}
-
-		//Ref Product
-		//$pdf->line($this->posxqty-1, $tab_top, $this->posxqty-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxlabel - $this->posxdesc, 2, $outputlangs->transnoentities("Ref. Product"), '', 'C');
-		}
-
-		//Label Product
-		//$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxlabel - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxqty - $this->posxlabel, 2, $outputlangs->transnoentities("Label"), '', 'C');
-		}
-
-		//Lot/serie Product
-		//$pdf->line($this->posxqty - 1, $tab_top, $this->posxqty - 1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxqty, $tab_top + 1);
-			$pdf->MultiCell($this->posxup - $this->posxqty, 2, $outputlangs->transnoentities("Lot/Série"), '', 'C');
-		}
-
-		//Code Inv
-		//$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxup - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxunit - $this->posxup, 2, $outputlangs->transnoentities("Inventory Code"), '', 'C');
-		}
-
-		//Label mouvement
-		//$pdf->line($this->posxunit, $tab_top, $this->posxunit, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxunit, $tab_top + 1);
-			$pdf->MultiCell($this->posxdiscount - $this->posxunit, 2, $outputlangs->transnoentities("Label Mouvement"), '', 'C');
-		}
-
-		//Origin
-		//$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxdiscount + 2, $tab_top + 1);
-			$pdf->MultiCell($this->postotalht - $this->posxdiscount - 0.8, 2, $outputlangs->transnoentities("Origin"), '', 'C');
-		}
-
-		//Qty
-		//$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->postotalht + 2, $tab_top + 1);
-			$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 2, $outputlangs->transnoentities("Qty"), '', 'C');
-		}
-
-		$pdf->SetDrawColor(220, 26, 26);
-		$pdf->SetLineStyle(array('dash'=>'0', 'color'=>array(220, 26, 26)));
-		$pdf->line($this->marge_gauche, $tab_top + 11, $this->page_largeur - $this->marge_droite, $tab_top + 11);
-		$pdf->SetLineStyle(array('dash'=>0));
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *  Show footer of page. Need this->emetteur object
 	 *

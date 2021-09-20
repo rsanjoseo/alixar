@@ -37,22 +37,6 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobjectline.class.php';
 class Fichinter extends CommonObject
 {
 
-	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Billed
-	 */
-	const STATUS_BILLED = 2;
-	/**
-	 * Closed
-	 */
-	const STATUS_CLOSED = 3;
 	public $fields = array(
 	'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
 	'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>15),
@@ -85,105 +69,124 @@ class Fichinter extends CommonObject
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'fichinter';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'fichinter';
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_fichinter';
-	/**
-	 * @var int    Name of subtable line
-	 */
-	public $table_element_line = 'fichinterdet';
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'intervention';
-	/**
-	 * @var int Thirdparty Id
-	 */
-	public $socid;
-	public $author;
-	/**
-	 * Date creation record (datec)
-	 *
-	 * @var integer
-	 */
-	public $datec;
-	public $datev;
-	public $dateo;
-	public $datee;
-	public $datet; // 0=draft, 1=validated, 2=invoiced, 3=Terminate
-	/**
-	 * Date modification record (tms)
-	 *
-	 * @var integer
-	 */
-	public $datem;
-	/**
-	 * @var int duration
-	 */
-	public $duration;
-/**
-	 * @var int status
-	 */
-	public $statut = 0;
-	/**
-	 * @var string description
-	 */
-	public $description;
-	/**
-	 * @var int Contract ID
-	 */
-	public $fk_contrat = 0;
+
+    /**
+     * @var int    Name of subtable line
+     */
+    public $table_element_line = 'fichinterdet';
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'intervention';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    /**
+     * @var int Thirdparty Id
+     */
+    public $socid;
+
+    public $author;
+
+    /**
+     * Date creation record (datec)
+     *
+     * @var integer
+     */
+    public $datec;
+
+    public $datev;
+    public $dateo;
+    public $datee;
+    public $datet;
+
+    /**
+     * Date modification record (tms)
+     *
+     * @var integer
+     */
+    public $datem;
+
+    /**
+     * @var int duration
+     */
+    public $duration;
+
+    /**
+     * @var int status
+     */
+    public $statut = 0; // 0=draft, 1=validated, 2=invoiced, 3=Terminate
+
+    /**
+     * @var string description
+     */
+    public $description;
+
+    /**
+     * @var int Contract ID
+     */
+    public $fk_contrat = 0;
+
 	/**
 	 * @var int Project ID
 	 */
 	public $fk_project = 0;
-	/**
-	 * @var array extraparams
-	 */
-	public $extraparams = array();
-	/**
-	 * @var array lines
-	 */
-	public $lines = array();
-	/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref';
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param	DoliDB	$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * @var array extraparams
+     */
+    public $extraparams = [];
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * @var array lines
+     */
+    public $lines = [];
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'fichinter'
-		);
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 1;
 
+    /**
+     * Billed
+     */
+    const STATUS_BILLED = 2;
+
+    /**
+     * Closed
+     */
+    const STATUS_CLOSED = 3;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Load indicators into this->nb for board
 	 *
@@ -210,27 +213,158 @@ class Fichinter extends CommonObject
 		$resql = $this->db->query($sql);
 		if ($resql) {
 			while ($obj = $this->db->fetch_object($resql)) {
-				$this->nb["interventions"] = $obj->nb;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+                $this->nb["interventions"] = $obj->nb;
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Update an intervention
-	 *
-	 *	@param		User	$user 		Objet user that make creation
-	 *	@param		int		$notrigger	Disable all triggers
-	 *	@return		int		<0 if KO, >0 if OK
-	 */
-	public function update($user, $notrigger = 0)
-	{
-		global $conf;
+    /**
+     *    Create an intervention into data base
+     *
+     * @param User $user      Objet user that make creation
+     * @param int  $notrigger Disable all triggers
+     *
+     * @return        int        <0 if KO, >0 if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs;
+
+        $error = 0;
+
+        dol_syslog(get_class($this) . "::create ref=" . $this->ref);
+
+        // Check parameters
+        if (!empty($this->ref)) {    // We check that ref is not already used
+            $result = self::isExistingObject($this->element, 0, $this->ref); // Check ref is not yet used
+            if ($result > 0) {
+                $this->error = 'ErrorRefAlreadyExists';
+                dol_syslog(get_class($this) . "::create " . $this->error, LOG_WARNING);
+                $this->db->rollback();
+                return -1;
+            }
+        }
+        if (!is_numeric($this->duration)) {
+            $this->duration = 0;
+        }
+
+        if ($this->socid <= 0) {
+            $this->error = 'ErrorBadParameterForFunc';
+            dol_syslog(get_class($this) . "::create " . $this->error, LOG_ERR);
+            return -1;
+        }
+
+        $soc = new Societe($this->db);
+        $result = $soc->fetch($this->socid);
+
+        $now = dol_now();
+
+        $this->db->begin();
+
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "fichinter (";
+        $sql .= "fk_soc";
+        $sql .= ", datec";
+        $sql .= ", ref";
+        $sql .= ", entity";
+        $sql .= ", fk_user_author";
+        $sql .= ", fk_user_modif";
+        $sql .= ", description";
+        $sql .= ", model_pdf";
+        $sql .= ", fk_projet";
+        $sql .= ", fk_contrat";
+        $sql .= ", fk_statut";
+        $sql .= ", note_private";
+        $sql .= ", note_public";
+        $sql .= ") ";
+        $sql .= " VALUES (";
+        $sql .= $this->socid;
+        $sql .= ", '" . $this->db->idate($now) . "'";
+        $sql .= ", '" . $this->db->escape($this->ref) . "'";
+        $sql .= ", " . ((int) $conf->entity);
+        $sql .= ", " . ((int) $user->id);
+        $sql .= ", " . ((int) $user->id);
+        $sql .= ", " . ($this->description ? "'" . $this->db->escape($this->description) . "'" : "null");
+        $sql .= ", '" . $this->db->escape($this->model_pdf) . "'";
+        $sql .= ", " . ($this->fk_project ? ((int) $this->fk_project) : 0);
+        $sql .= ", " . ($this->fk_contrat ? ((int) $this->fk_contrat) : 0);
+        $sql .= ", " . ((int) $this->statut);
+        $sql .= ", " . ($this->note_private ? "'" . $this->db->escape($this->note_private) . "'" : "null");
+        $sql .= ", " . ($this->note_public ? "'" . $this->db->escape($this->note_public) . "'" : "null");
+        $sql .= ")";
+
+        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "fichinter");
+
+            if ($this->id) {
+                $this->ref = '(PROV' . $this->id . ')';
+                $sql = 'UPDATE ' . MAIN_DB_PREFIX . "fichinter SET ref='" . $this->db->escape($this->ref) . "' WHERE rowid=" . ((int) $this->id);
+
+                dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $error++;
+                }
+            }
+
+            if (!$error) {
+                $result = $this->insertExtraFields();
+                if ($result < 0) {
+                    $error++;
+                }
+            }
+
+            // Add linked object
+            if (!$error && $this->origin && $this->origin_id) {
+                $ret = $this->add_object_linked();
+                if (!$ret) {
+                    dol_print_error($this->db);
+                }
+            }
+
+            if (!$error && !$notrigger) {
+                // Call trigger
+                $result = $this->call_trigger('FICHINTER_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+
+            if (!$error) {
+                $this->db->commit();
+                return $this->id;
+            } else {
+                $this->db->rollback();
+                $this->error = join(',', $this->errors);
+                dol_syslog(get_class($this) . "::create " . $this->error, LOG_ERR);
+                return -1;
+            }
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *    Update an intervention
+     *
+     * @param User $user      Objet user that make creation
+     * @param int  $notrigger Disable all triggers
+     *
+     * @return        int        <0 if KO, >0 if OK
+     */
+    public function update($user, $notrigger = 0)
+    {
+        global $conf;
 
 		if (!is_numeric($this->duration)) {
 			$this->duration = 0;
@@ -349,54 +483,6 @@ class Fichinter extends CommonObject
 			}
 		} else {
 			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *	Load array lines ->lines
-	 *
-	 *	@return		int		<0 if KO, >0 if OK
-	 */
-	public function fetch_lines()
-	{
-		// phpcs:enable
-		$this->lines = array();
-
-		$sql = 'SELECT rowid, fk_fichinter, description, duree, date, rang';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'fichinterdet';
-		$sql .= ' WHERE fk_fichinter = '.((int) $this->id).' ORDER BY rang ASC, date ASC';
-
-		dol_syslog(get_class($this)."::fetch_lines", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$objp = $this->db->fetch_object($resql);
-
-				$line = new FichinterLigne($this->db);
-				$line->id = $objp->rowid;
-				$line->fk_fichinter = $objp->fk_fichinter;
-				$line->desc = $objp->description;
-				$line->duration = $objp->duree;
-				//For invoicing we calculing hours
-				$line->qty = round($objp->duree / 3600, 2);
-				$line->date	= $this->db->jdate($objp->date);
-				$line->datei = $this->db->jdate($objp->date);
-				$line->rang	= $objp->rang;
-				$line->product_type = 1;
-				$line->fetch_optionals();
-
-				$this->lines[$i] = $line;
-
-				$i++;
-			}
-			$this->db->free($resql);
-
-			return 1;
-		} else {
-			$this->error = $this->db->error();
 			return -1;
 		}
 	}
@@ -563,56 +649,6 @@ class Fichinter extends CommonObject
 	}
 
 	/**
-	 *	Returns the next non used reference of intervention
-	 *	depending on the module numbering assets within FICHEINTER_ADDON
-	 *
-	 *	@param	    Societe		$soc		Thirdparty object
-	 *	@return     string					Free reference for intervention
-	 */
-	public function getNextNumRef($soc)
-	{
-		global $conf, $db, $langs;
-		$langs->load("interventions");
-
-		if (!empty($conf->global->FICHEINTER_ADDON)) {
-			$mybool = false;
-
-			$file = "mod_".$conf->global->FICHEINTER_ADDON.".php";
-			$classname = "mod_".$conf->global->FICHEINTER_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/fichinter/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				dol_print_error($db, "Fichinter::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			$langs->load("errors");
-			print $langs->trans("Error")." ".$langs->trans("Error_FICHEINTER_ADDON_NotDefined");
-			return "";
-		}
-	}
-
-	/**
 	 *	Returns amount based on user thm
 	 *
 	 *	@return     float 		Amount
@@ -635,7 +671,6 @@ class Fichinter extends CommonObject
 		return price2num($amount, 'MT');
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -661,26 +696,74 @@ class Fichinter extends CommonObject
 				$modele = $this->model_pdf;
 			} elseif (!empty($this->modelpdf)) {	// deprecated
 				$modele = $this->modelpdf;
-			} elseif (!empty($conf->global->FICHEINTER_ADDON_PDF)) {
-				$modele = $conf->global->FICHEINTER_ADDON_PDF;
-			}
-		}
+            } elseif (!empty($conf->global->FICHEINTER_ADDON_PDF)) {
+                $modele = $conf->global->FICHEINTER_ADDON_PDF;
+            }
+        }
 
-		$modelpath = "core/modules/fichinter/doc/";
+        $modelpath = "core/modules/fichinter/doc/";
 
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
-	}
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
+    }
 
-	/**
-	 *	Return clicable name (with picto eventually)
-	 *
-	 *	@param		int		$withpicto					0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
-	 *	@param		string	$option						Options
-	 *  @param	    int   	$notooltip					1=Disable tooltip
-	 *  @param      int     $save_lastsearch_value		-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *	@return		string								String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $save_lastsearch_value = -1)
+    /**
+     *    Returns the label status
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     *
+     * @return     string            Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut((isset($this->statut) ? $this->statut : $this->status), $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Returns the label of a status
+     *
+     * @param int $status Id status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return     string            Label
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        // Init/load array of translation of status
+        if (empty($this->statuts) || empty($this->statuts_short) || empty($this->statuts_logo)) {
+            global $langs;
+            $langs->load("fichinter");
+
+            $this->statuts[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
+            $this->statuts[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->statuts[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('StatusInterInvoiced');
+            $this->statuts[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('Done');
+            $this->statuts_short[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
+            $this->statuts_short[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
+            $this->statuts_short[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('StatusInterInvoiced');
+            $this->statuts_short[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('Done');
+            $this->statuts_logo[self::STATUS_DRAFT] = 'status0';
+            $this->statuts_logo[self::STATUS_VALIDATED] = 'status1';
+            $this->statuts_logo[self::STATUS_BILLED] = 'status6';
+            $this->statuts_logo[self::STATUS_CLOSED] = 'status6';
+        }
+
+        return dolGetStatus($this->statuts[$status], $this->statuts_short[$status], '', $this->statuts_logo[$status], $mode);
+    }
+
+    /**
+     *    Return clicable name (with picto eventually)
+     *
+     * @param int    $withpicto             0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
+     * @param string $option                Options
+     * @param int    $notooltip             1=Disable tooltip
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     *
+     * @return        string                                String with URL
+     */
+    public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $save_lastsearch_value = -1)
 	{
 		global $conf, $langs, $hookmanager;
 
@@ -746,49 +829,56 @@ class Fichinter extends CommonObject
 		}
 
 		return $result;
-	}
+    }
 
-	/**
-	 *	Returns the label status
-	 *
-	 *	@param      int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 *	@return     string      		Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut((isset($this->statut) ? $this->statut : $this->status), $mode);
-	}
+    /**
+     *    Returns the next non used reference of intervention
+     *    depending on the module numbering assets within FICHEINTER_ADDON
+     *
+     * @param Societe $soc Thirdparty object
+     * @return     string                    Free reference for intervention
+     */
+    public function getNextNumRef($soc)
+    {
+        global $conf, $db, $langs;
+        $langs->load("interventions");
 
-	/**
-	 *	Returns the label of a status
-	 *
-	 *	@param      int		$status     Id status
-	 *	@param      int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *	@return     string      		Label
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		// Init/load array of translation of status
-		if (empty($this->statuts) || empty($this->statuts_short) || empty($this->statuts_logo)) {
-			global $langs;
-			$langs->load("fichinter");
+        if (!empty($conf->global->FICHEINTER_ADDON)) {
+            $mybool = false;
 
-			$this->statuts[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->statuts[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->statuts[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('StatusInterInvoiced');
-			$this->statuts[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('Done');
-			$this->statuts_short[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
-			$this->statuts_short[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
-			$this->statuts_short[self::STATUS_BILLED] = $langs->transnoentitiesnoconv('StatusInterInvoiced');
-			$this->statuts_short[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('Done');
-			$this->statuts_logo[self::STATUS_DRAFT] = 'status0';
-			$this->statuts_logo[self::STATUS_VALIDATED] = 'status1';
-			$this->statuts_logo[self::STATUS_BILLED] = 'status6';
-			$this->statuts_logo[self::STATUS_CLOSED] = 'status6';
+            $file = "mod_" . $conf->global->FICHEINTER_ADDON . ".php";
+            $classname = "mod_" . $conf->global->FICHEINTER_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/fichinter/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                dol_print_error($db, "Fichinter::getNextNumRef " . $obj->error);
+                return "";
+            }
+        } else {
+            $langs->load("errors");
+            print $langs->trans("Error") . " " . $langs->trans("Error_FICHEINTER_ADDON_NotDefined");
+            return "";
 		}
-
-		return dolGetStatus($this->statuts[$status], $this->statuts_short[$status], '', $this->statuts_logo[$status], $mode);
 	}
 
 	/**
@@ -842,8 +932,6 @@ class Fichinter extends CommonObject
 			dol_print_error($this->db);
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Delete intervetnion
@@ -966,7 +1054,6 @@ class Fichinter extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Defines a delivery date of intervention
 	 *
@@ -996,9 +1083,7 @@ class Fichinter extends CommonObject
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Define the label of the intervention
 	 *
@@ -1018,26 +1103,30 @@ class Fichinter extends CommonObject
 			$sql .= " WHERE rowid = ".((int) $this->id);
 
 			if ($this->db->query($sql)) {
-				$this->description = $description;
-				return 1;
-			} else {
-				$this->error = $this->db->error();
-				dol_syslog("Fichinter::set_description Erreur SQL");
-				return -1;
-			}
-		}
-	}
+                $this->description = $description;
+                return 1;
+            } else {
+                $this->error = $this->db->error();
+                dol_syslog("Fichinter::set_description Erreur SQL");
+                return -1;
+            }
+        }
+    }
 
-	/**
-	 *	Link intervention to a contract
-	 *
-	 *	@param      User	$user			Object user who modify
-	 *	@param      int		$contractid		Description
-	 *	@return     int						<0 if ko, >0 if ok
-	 */
-	public function set_contrat($user, $contractid)
-	{
-		// phpcs:enable
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Link intervention to a contract
+     *
+     * @param User $user       Object user who modify
+     * @param int  $contractid Description
+     *
+     * @return     int                        <0 if ko, >0 if ok
+     */
+    public function set_contrat($user, $contractid)
+    {
+        // phpcs:enable
 		global $conf;
 
 		if ($user->rights->ficheinter->creer) {
@@ -1055,6 +1144,8 @@ class Fichinter extends CommonObject
 		}
 		return -2;
 	}
+
+
 
 	/**
 	 *	Load an object from its id and create a new one in database
@@ -1141,137 +1232,6 @@ class Fichinter extends CommonObject
 		}
 	}
 
-	/**
-	 *	Create an intervention into data base
-	 *
-	 *  @param		User	$user 		Objet user that make creation
-	 *	@param		int		$notrigger	Disable all triggers
-	 *	@return		int		<0 if KO, >0 if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-
-		$error = 0;
-
-		dol_syslog(get_class($this)."::create ref=".$this->ref);
-
-		// Check parameters
-		if (!empty($this->ref)) {	// We check that ref is not already used
-			$result = self::isExistingObject($this->element, 0, $this->ref); // Check ref is not yet used
-			if ($result > 0) {
-				$this->error = 'ErrorRefAlreadyExists';
-				dol_syslog(get_class($this)."::create ".$this->error, LOG_WARNING);
-				$this->db->rollback();
-				return -1;
-			}
-		}
-		if (!is_numeric($this->duration)) {
-			$this->duration = 0;
-		}
-
-		if ($this->socid <= 0) {
-			$this->error = 'ErrorBadParameterForFunc';
-			dol_syslog(get_class($this)."::create ".$this->error, LOG_ERR);
-			return -1;
-		}
-
-		$soc = new Societe($this->db);
-		$result = $soc->fetch($this->socid);
-
-		$now = dol_now();
-
-		$this->db->begin();
-
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."fichinter (";
-		$sql .= "fk_soc";
-		$sql .= ", datec";
-		$sql .= ", ref";
-		$sql .= ", entity";
-		$sql .= ", fk_user_author";
-		$sql .= ", fk_user_modif";
-		$sql .= ", description";
-		$sql .= ", model_pdf";
-		$sql .= ", fk_projet";
-		$sql .= ", fk_contrat";
-		$sql .= ", fk_statut";
-		$sql .= ", note_private";
-		$sql .= ", note_public";
-		$sql .= ") ";
-		$sql .= " VALUES (";
-		$sql .= $this->socid;
-		$sql .= ", '".$this->db->idate($now)."'";
-		$sql .= ", '".$this->db->escape($this->ref)."'";
-		$sql .= ", ".((int) $conf->entity);
-		$sql .= ", ".((int) $user->id);
-		$sql .= ", ".((int) $user->id);
-		$sql .= ", ".($this->description ? "'".$this->db->escape($this->description)."'" : "null");
-		$sql .= ", '".$this->db->escape($this->model_pdf)."'";
-		$sql .= ", ".($this->fk_project ? ((int) $this->fk_project) : 0);
-		$sql .= ", ".($this->fk_contrat ? ((int) $this->fk_contrat) : 0);
-		$sql .= ", ".((int) $this->statut);
-		$sql .= ", ".($this->note_private ? "'".$this->db->escape($this->note_private)."'" : "null");
-		$sql .= ", ".($this->note_public ? "'".$this->db->escape($this->note_public)."'" : "null");
-		$sql .= ")";
-
-		dol_syslog(get_class($this)."::create", LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."fichinter");
-
-			if ($this->id) {
-				$this->ref = '(PROV'.$this->id.')';
-				$sql = 'UPDATE '.MAIN_DB_PREFIX."fichinter SET ref='".$this->db->escape($this->ref)."' WHERE rowid=".((int) $this->id);
-
-				dol_syslog(get_class($this)."::create", LOG_DEBUG);
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					$error++;
-				}
-			}
-
-			if (!$error) {
-				$result = $this->insertExtraFields();
-				if ($result < 0) {
-					$error++;
-				}
-			}
-
-			// Add linked object
-			if (!$error && $this->origin && $this->origin_id) {
-				$ret = $this->add_object_linked();
-				if (!$ret) {
-					dol_print_error($this->db);
-				}
-			}
-
-
-			if (!$error && !$notrigger) {
-				// Call trigger
-				$result = $this->call_trigger('FICHINTER_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-
-			if (!$error) {
-				$this->db->commit();
-				return $this->id;
-			} else {
-				$this->db->rollback();
-				$this->error = join(',', $this->errors);
-				dol_syslog(get_class($this)."::create ".$this->error, LOG_ERR);
-				return -1;
-			}
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Adding a line of intervention into data base
@@ -1316,6 +1276,7 @@ class Fichinter extends CommonObject
 		}
 	}
 
+
 	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
@@ -1342,16 +1303,84 @@ class Fichinter extends CommonObject
 		$xnbp = 0;
 		while ($xnbp < $nbp) {
 			$line = new FichinterLigne($this->db);
-			$line->desc = $langs->trans("Description")." ".$xnbp;
-			$line->datei = ($now - 3600 * (1 + $xnbp));
-			$line->duration = 600;
-			$line->fk_fichinter = 0;
-			$this->lines[$xnbp] = $line;
-			$xnbp++;
+            $line->desc = $langs->trans("Description") . " " . $xnbp;
+            $line->datei = ($now - 3600 * (1 + $xnbp));
+            $line->duration = 600;
+            $line->fk_fichinter = 0;
+            $this->lines[$xnbp] = $line;
+            $xnbp++;
 
-			$this->duration += $line->duration;
-		}
-	}
+            $this->duration += $line->duration;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Load array lines ->lines
+     *
+     * @return        int        <0 if KO, >0 if OK
+     */
+    public function fetch_lines()
+    {
+        // phpcs:enable
+        $this->lines = [];
+
+        $sql = 'SELECT rowid, fk_fichinter, description, duree, date, rang';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'fichinterdet';
+        $sql .= ' WHERE fk_fichinter = ' . ((int) $this->id) . ' ORDER BY rang ASC, date ASC';
+
+        dol_syslog(get_class($this) . "::fetch_lines", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $objp = $this->db->fetch_object($resql);
+
+                $line = new FichinterLigne($this->db);
+                $line->id = $objp->rowid;
+                $line->fk_fichinter = $objp->fk_fichinter;
+                $line->desc = $objp->description;
+                $line->duration = $objp->duree;
+                //For invoicing we calculing hours
+                $line->qty = round($objp->duree / 3600, 2);
+                $line->date = $this->db->jdate($objp->date);
+                $line->datei = $this->db->jdate($objp->date);
+                $line->rang = $objp->rang;
+                $line->product_type = 1;
+                $line->fetch_optionals();
+
+                $this->lines[$i] = $line;
+
+                $i++;
+            }
+            $this->db->free($resql);
+
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'fichinter',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
 
 /**
@@ -1524,57 +1553,7 @@ class FichinterLigne extends CommonObjectLine
 		}
 	}
 
-/**
-	 *	Update total duration into llx_fichinter
-	 *
-	 *	@return		int		<0 si ko, >0 si ok
-	 */
-	public function update_total()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$this->db->begin();
-
-		$sql = "SELECT SUM(duree) as total_duration, min(date) as dateo, max(date) as datee ";
-		$sql .= " FROM ".MAIN_DB_PREFIX."fichinterdet";
-		$sql .= " WHERE fk_fichinter=".((int) $this->fk_fichinter);
-
-		dol_syslog("FichinterLigne::update_total", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_object($resql);
-			$total_duration = 0;
-			if (!empty($obj->total_duration)) {
-				$total_duration = $obj->total_duration;
-			}
-
-			$sql = "UPDATE ".MAIN_DB_PREFIX."fichinter";
-			$sql .= " SET duree = ".((int) $total_duration);
-			$sql .= " , dateo = ".(!empty($obj->dateo) ? "'".$this->db->idate($obj->dateo)."'" : "null");
-			$sql .= " , datee = ".(!empty($obj->datee) ? "'".$this->db->idate($obj->datee)."'" : "null");
-			$sql .= " WHERE rowid = ".((int) $this->fk_fichinter);
-
-			dol_syslog("FichinterLigne::update_total", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$this->db->commit();
-				return 1;
-			} else {
-				$this->error = $this->db->error();
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-/**
+    /**
 	 *	Update intervention into database
 	 *
 	 *	@param		User	$user 		Objet user that make creation
@@ -1624,24 +1603,75 @@ class FichinterLigne extends CommonObjectLine
 				return $result;
 			} else {
 				$this->error = $this->db->lasterror();
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Delete a intervention line
-	 *
-	 *	@param		User	$user 		Objet user that make creation
-	 *	@param		int		$notrigger	Disable all triggers
-	 *	@return     int		>0 if ok, <0 if ko
-	 */
-	public function deleteline($user, $notrigger = 0)
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Update total duration into llx_fichinter
+     *
+     * @return        int        <0 si ko, >0 si ok
+     */
+    public function update_total()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $this->db->begin();
+
+        $sql = "SELECT SUM(duree) as total_duration, min(date) as dateo, max(date) as datee ";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "fichinterdet";
+        $sql .= " WHERE fk_fichinter=" . ((int) $this->fk_fichinter);
+
+        dol_syslog("FichinterLigne::update_total", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $obj = $this->db->fetch_object($resql);
+            $total_duration = 0;
+            if (!empty($obj->total_duration)) {
+                $total_duration = $obj->total_duration;
+            }
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "fichinter";
+            $sql .= " SET duree = " . ((int) $total_duration);
+            $sql .= " , dateo = " . (!empty($obj->dateo) ? "'" . $this->db->idate($obj->dateo) . "'" : "null");
+            $sql .= " , datee = " . (!empty($obj->datee) ? "'" . $this->db->idate($obj->datee) . "'" : "null");
+            $sql .= " WHERE rowid = " . ((int) $this->fk_fichinter);
+
+            dol_syslog("FichinterLigne::update_total", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $this->db->commit();
+                return 1;
+            } else {
+                $this->error = $this->db->error();
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *    Delete a intervention line
+     *
+     * @param User $user      Objet user that make creation
+     * @param int  $notrigger Disable all triggers
+     *
+     * @return     int        >0 if ok, <0 if ko
+     */
+    public function deleteline($user, $notrigger = 0)
 	{
 		global $langs, $conf;
 

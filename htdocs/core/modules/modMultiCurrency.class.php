@@ -265,27 +265,43 @@ class modMultiCurrency extends DolibarrModules
 	{
 		$sql = array();
 
-		//$this->_load_tables('/multicurrency/sql/');
-		$res = $this->_init($sql, $options);
+        //$this->_load_tables('/multicurrency/sql/');
+        $res = $this->_init($sql, $options);
 
-		if ($res) {
-			$this->createFirstCurrency();
-		}
+        if ($res) {
+            $this->createFirstCurrency();
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 * Function called when module is enabled
-	 * Create the currency from general setting
-	 *
-	 * @return 	int		1 if OK, 0 if KO
-	 */
-	private function createFirstCurrency()
-	{
-		global $conf, $user, $langs;
+    /**
+     * Function called when module is disabled.
+     * Remove from database constants, boxes and permissions from Dolibarr database.
+     * Data directories are not deleted
+     *
+     * @param string $options Options when enabling module ('', 'noboxes')
+     *
+     * @return     int                1 if OK, 0 if KO
+     */
+    public function remove($options = '')
+    {
+        $sql = [];
 
-		if (!MultiCurrency::checkCodeAlreadyExists($conf->currency)) {
+        return $this->_remove($sql, $options);
+    }
+
+    /**
+     * Function called when module is enabled
+     * Create the currency from general setting
+     *
+     * @return    int        1 if OK, 0 if KO
+     */
+    private function createFirstCurrency()
+    {
+        global $conf, $user, $langs;
+
+        if (!MultiCurrency::checkCodeAlreadyExists($conf->currency)) {
 			$langs->loadCacheCurrencies('');
 
 			$multicurrency = new MultiCurrency($this->db);
@@ -297,20 +313,5 @@ class modMultiCurrency extends DolibarrModules
 				$multicurrency->addRate(1);
 			}
 		}
-	}
-
-	/**
-	 * Function called when module is disabled.
-	 * Remove from database constants, boxes and permissions from Dolibarr database.
-	 * Data directories are not deleted
-	 *
-	 * @param      string	$options    Options when enabling module ('', 'noboxes')
-	 * @return     int             	1 if OK, 0 if KO
-	 */
-	public function remove($options = '')
-	{
-		$sql = array();
-
-		return $this->_remove($sql, $options);
 	}
 }

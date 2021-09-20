@@ -53,31 +53,32 @@ class FormBank
 	}
 
 	/**
-	 * Returns the name of the Iban label. India uses 'IFSC' and the rest of the world 'IBAN' name.
-	 *
-	 * @param Account $account Account object
-	 * @return string
-	 */
-	public static function getIBANLabel(Account $account)
-	{
-		if ($account->getCountryCode() == 'IN') {
-			return 'IFSC';
-		}
-
-		return 'IBANNumber';
-	}
-
-	/**
 	 *  Retourne la liste des types de comptes financiers
 	 *
-	 *  @param	integer	$selected        Type pre-selectionne
-	 *  @param  string	$htmlname        Nom champ formulaire
-	 *  @return	void
-	 */
-	public function selectTypeOfBankAccount($selected = Account::TYPE_CURRENT, $htmlname = 'type')
-	{
-		$account = new Account($this->db);
+     * @param integer $selected Type pre-selectionne
+     * @param string  $htmlname Nom champ formulaire
+     * @return    void
+     */
+    public function selectTypeOfBankAccount($selected = Account::TYPE_CURRENT, $htmlname = 'type')
+    {
+        $account = new Account($this->db);
 
-		print Form::selectarray($htmlname, $account->type_lib, $selected);
-	}
+        print Form::selectarray($htmlname, $account->type_lib, $selected);
+    }
+
+    /**
+     * Returns the name of the Iban label. India uses 'IFSC' and the rest of the world 'IBAN' name.
+     *
+     * @param Account $account Account object
+     *
+     * @return string
+     */
+    public static function getIBANLabel(Account $account)
+    {
+        if ($account->getCountryCode() == 'IN') {
+            return 'IFSC';
+        }
+
+        return 'IBANNumber';
+    }
 }

@@ -132,26 +132,6 @@ class PriceGlobalVariable
 		}
 	}
 
-	/**
-	 *	Checks if all parameters are in order
-	 *
-	 *	@return	void
-	 */
-	public function checkParameters()
-	{
-		// Clean parameters
-		if (isset($this->code)) {
-			$this->code = trim($this->code);
-		}
-		if (isset($this->description)) {
-			$this->description = trim($this->description);
-		}
-
-		// Check parameters
-		if (empty($this->value) || !is_numeric($this->value)) {
-			$this->value = 0;
-		}
-	}
 
 	/**
 	 *  Load object in memory from the database
@@ -241,6 +221,7 @@ class PriceGlobalVariable
 		}
 	}
 
+
 	/**
 	 *  Delete object in database
 	 *
@@ -296,25 +277,46 @@ class PriceGlobalVariable
 	 *	Initialise object with example values
 	 *	Id must be 0 if object instance is a specimen
 	 *
-	 *	@return	void
-	 */
-	public function initAsSpecimen()
-	{
-		$this->id = 0;
-		$this->code = '';
-		$this->description = '';
-		$this->value = '';
-	}
+     * @return    void
+     */
+    public function initAsSpecimen()
+    {
+        $this->id = 0;
+        $this->code = '';
+        $this->description = '';
+        $this->value = '';
+    }
 
-	/**
-	 *    List all price global variables
-	 *
-	 *    @return	array				Array of price global variables
-	 */
-	public function listGlobalVariables()
-	{
-		$sql = "SELECT rowid, code, description, value";
-		$sql .= " FROM ".MAIN_DB_PREFIX.$this->table_element;
+    /**
+     *    Checks if all parameters are in order
+     *
+     * @return    void
+     */
+    public function checkParameters()
+    {
+        // Clean parameters
+        if (isset($this->code)) {
+            $this->code = trim($this->code);
+        }
+        if (isset($this->description)) {
+            $this->description = trim($this->description);
+        }
+
+        // Check parameters
+        if (empty($this->value) || !is_numeric($this->value)) {
+            $this->value = 0;
+        }
+    }
+
+    /**
+     *    List all price global variables
+     *
+     * @return    array                Array of price global variables
+     */
+    public function listGlobalVariables()
+    {
+        $sql = "SELECT rowid, code, description, value";
+        $sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element;
 		$sql .= " ORDER BY code";
 
 		dol_syslog(__METHOD__, LOG_DEBUG);

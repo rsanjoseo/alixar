@@ -56,25 +56,48 @@ class Validate
 		global $langs;
 
 		if ($outputLang) {
-			$this->outputLang = $langs;
-		} else {
-			$this->outputLang = $outputLang;
-		}
+            $this->outputLang = $langs;
+        } else {
+            $this->outputLang = $outputLang;
+        }
 
-		$outputLang->load('validate');
+        $outputLang->load('validate');
 
-		$this->db = $db;
-	}
+        $this->db = $db;
+    }
 
-	/**
-	 * Check for e-mail validity
-	 *
-	 * @param string $email e-mail address to validate
-	 * @param int   $maxLength string max length
-	 * @return boolean Validity is ok or not
-	 */
-	public function isEmail($email, $maxLength = false)
-	{
+    /**
+     * Use to clear errors msg or other ghost vars
+     *
+     * @return null
+     */
+    protected function clear()
+    {
+        $this->error = '';
+    }
+
+    /**
+     * Use to clear errors msg or other ghost vars
+     *
+     * @param string $errMsg your error message
+     *
+     * @return null
+     */
+    protected function setError($errMsg)
+    {
+        $this->error = $errMsg;
+    }
+
+    /**
+     * Check for e-mail validity
+     *
+     * @param string $email     e-mail address to validate
+     * @param int    $maxLength string max length
+     *
+     * @return boolean Validity is ok or not
+     */
+    public function isEmail($email, $maxLength = false)
+    {
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 			$this->error = $this->outputLang->trans('RequireValidEmail');
 			return false;
@@ -284,25 +307,5 @@ class Validate
 			} else { $this->error = $this->outputLang->trans('BadSetupOfFieldFileNotFound'); }
 		} else { $this->error = $this->outputLang->trans('BadSetupOfField'); }
 		return false;
-	}
-
-	/**
-	 * Use to clear errors msg or other ghost vars
-	 * @return null
-	 */
-	protected function clear()
-	{
-		$this->error = '';
-	}
-
-	/**
-	 * Use to clear errors msg or other ghost vars
-	 *
-	 * @param string $errMsg your error message
-	 * @return null
-	 */
-	protected function setError($errMsg)
-	{
-		$this->error = $errMsg;
 	}
 }

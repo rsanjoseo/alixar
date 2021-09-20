@@ -45,8 +45,8 @@ foreach ($linkedObjectBlock as $key => $objectlink) {
 	}
 	echo '</td>';
 	echo '<td class="right"></td>';
-	echo '<td class="right"><a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=dellink&dellinkid='.$key.'">'.img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink').'</a></td>';
-	echo '</tr>';
+    echo '<td class="right"><a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=dellink&token=' . newToken() . '&dellinkid=' . $key . '">' . img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink') . '</a></td>';
+    echo '</tr>';
 }
 
 echo "<!-- END PHP TEMPLATE -->\n";

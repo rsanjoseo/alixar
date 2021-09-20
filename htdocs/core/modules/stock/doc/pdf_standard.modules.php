@@ -208,8 +208,6 @@ class pdf_standard extends ModelePDFStock
 		// Load traductions files required by page
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills", "stocks", "orders", "deliveries"));
 
-		$nblines = count($object->lines);
-
 		if ($conf->stock->dir_output) {
 			// Definition of $dir and $file
 			if ($object->specimen) {
@@ -626,28 +624,134 @@ class pdf_standard extends ModelePDFStock
 
 				return 1; // No error
 			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "PRODUCT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Object		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @param	string		$titlekey		Translation key to show as title of document
-	 *  @return	int                         Return topshift value
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $titlekey = "")
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y (not used)
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
+     * @param int       $hidebottom  Hide bottom bar of array
+     * @param string    $currency    Currency code
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $currency = !empty($currency) ? $currency : $conf->currency;
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        if (empty($hidetop)) {
+            $titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency" . $currency));
+            $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
+            $pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
+
+            //$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
+            if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
+                $pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
+            }
+        }
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', 'B', $default_font_size - 3);
+
+        // Output Rect
+        //$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
+
+        $pdf->SetLineStyle(['dash' => '0', 'color' => [200, 200, 200]]);
+        $pdf->SetDrawColor(200, 200, 200);
+        $pdf->line($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite, $tab_top);
+        $pdf->SetLineStyle(['dash' => 0]);
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetTextColor(0, 0, 120);
+
+        if (empty($hidetop)) {
+            //$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line takes a position y in 2nd parameter and 4th parameter
+            $pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
+            $pdf->MultiCell($this->wref, 3, $outputlangs->transnoentities("Ref"), '', 'L');
+        }
+
+        //$pdf->line($this->posxlabel-1, $tab_top, $this->posxlabel-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxlabel - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxqty - $this->posxlabel - 1, 2, $outputlangs->transnoentities("Label"), '', 'L');
+        }
+
+        //$pdf->line($this->posxqty-1, $tab_top, $this->posxqty-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxqty - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxup - $this->posxqty - 1, 2, $outputlangs->transnoentities("Units"), '', 'R');
+        }
+
+        //$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxup - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxunit - $this->posxup - 1, 2, $outputlangs->transnoentities("AverageUnitPricePMPShort"), '', 'R');
+        }
+
+        //$pdf->line($this->posxunit - 1, $tab_top, $this->posxunit - 1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxunit - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxdiscount - $this->posxunit - 1, 2, $outputlangs->transnoentities("EstimatedStockValueShort"), '', 'R');
+        }
+
+        //$pdf->line($this->posxdiscount-1, $tab_top, $this->posxdiscount-1, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->posxdiscount - 1, $tab_top + 1);
+            $pdf->MultiCell($this->postotalht - $this->posxdiscount + 1, 2, $outputlangs->transnoentities("SellPriceMin"), '', 'R');
+        }
+
+        //$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
+        if (empty($hidetop)) {
+            $pdf->SetXY($this->postotalht - 1, $tab_top + 1);
+            $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 2, $outputlangs->transnoentities("EstimatedStockValueSellShort"), '', 'R');
+        }
+
+        $pdf->SetDrawColor(200, 200, 200);
+        $pdf->SetLineStyle(['dash' => '0', 'color' => [200, 200, 200]]);
+        $pdf->line($this->marge_gauche, $tab_top + 11, $this->page_largeur - $this->marge_droite, $tab_top + 11);
+        $pdf->SetLineStyle(['dash' => 0]);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Object    $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     * @param string    $titlekey    Translation key to show as title of document
+     *
+     * @return    int                         Return topshift value
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs, $titlekey = "")
 	{
 		global $conf, $langs, $db, $hookmanager;
 
@@ -795,111 +899,6 @@ class pdf_standard extends ModelePDFStock
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param     TCPDF		$pdf     		Object PDF
-	 *   @param     string		$tab_top		Top position of table
-	 *   @param     string		$tab_height		Height of table (rectangle)
-	 *   @param     int			$nexY			Y (not used)
-	 *   @param     Translate	$outputlangs	Langs object
-	 *   @param     int			$hidetop		1=Hide top bar of array and title, 0=Hide nothing, -1=Hide only title
-	 *   @param     int			$hidebottom		Hide bottom bar of array
-	 *   @param     string		$currency		Currency code
-	 *   @return    void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0, $currency = '')
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$currency = !empty($currency) ? $currency : $conf->currency;
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		if (empty($hidetop)) {
-			$titre = $outputlangs->transnoentities("AmountInCurrency", $outputlangs->transnoentitiesnoconv("Currency".$currency));
-			$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $tab_top - 4);
-			$pdf->MultiCell(($pdf->GetStringWidth($titre) + 3), 2, $titre);
-
-			//$conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR='230,230,230';
-			if (!empty($conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR)) {
-				$pdf->Rect($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite - $this->marge_gauche, 5, 'F', null, explode(',', $conf->global->MAIN_PDF_TITLE_BACKGROUND_COLOR));
-			}
-		}
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', 'B', $default_font_size - 3);
-
-		// Output Rect
-		//$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect takes a length in 3rd parameter and 4th parameter
-
-		$pdf->SetLineStyle(array('dash'=>'0', 'color'=>array(200, 200, 200)));
-		$pdf->SetDrawColor(200, 200, 200);
-		$pdf->line($this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_droite, $tab_top);
-		$pdf->SetLineStyle(array('dash'=>0));
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetTextColor(0, 0, 120);
-
-		if (empty($hidetop)) {
-			//$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line takes a position y in 2nd parameter and 4th parameter
-			$pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
-			$pdf->MultiCell($this->wref, 3, $outputlangs->transnoentities("Ref"), '', 'L');
-		}
-
-		//$pdf->line($this->posxlabel-1, $tab_top, $this->posxlabel-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxlabel - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxqty - $this->posxlabel - 1, 2, $outputlangs->transnoentities("Label"), '', 'L');
-		}
-
-		//$pdf->line($this->posxqty-1, $tab_top, $this->posxqty-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxqty - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxup - $this->posxqty - 1, 2, $outputlangs->transnoentities("Units"), '', 'R');
-		}
-
-		//$pdf->line($this->posxup-1, $tab_top, $this->posxup-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxup - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxunit - $this->posxup - 1, 2, $outputlangs->transnoentities("AverageUnitPricePMPShort"), '', 'R');
-		}
-
-		//$pdf->line($this->posxunit - 1, $tab_top, $this->posxunit - 1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxunit - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxdiscount - $this->posxunit - 1, 2, $outputlangs->transnoentities("EstimatedStockValueShort"), '', 'R');
-		}
-
-		//$pdf->line($this->posxdiscount-1, $tab_top, $this->posxdiscount-1, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->posxdiscount - 1, $tab_top + 1);
-			$pdf->MultiCell($this->postotalht - $this->posxdiscount + 1, 2, $outputlangs->transnoentities("SellPriceMin"), '', 'R');
-		}
-
-		//$pdf->line($this->postotalht, $tab_top, $this->postotalht, $tab_top + $tab_height);
-		if (empty($hidetop)) {
-			$pdf->SetXY($this->postotalht - 1, $tab_top + 1);
-			$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalht, 2, $outputlangs->transnoentities("EstimatedStockValueSellShort"), '', 'R');
-		}
-
-		$pdf->SetDrawColor(200, 200, 200);
-		$pdf->SetLineStyle(array('dash'=>'0', 'color'=>array(200, 200, 200)));
-		$pdf->line($this->marge_gauche, $tab_top + 11, $this->page_largeur - $this->marge_droite, $tab_top + 11);
-		$pdf->SetLineStyle(array('dash'=>0));
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   	Show footer of page. Need this->emetteur object
 	 *

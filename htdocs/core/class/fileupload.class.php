@@ -189,30 +189,46 @@ class FileUpload
 			$object,
 			$action,
 			$hookmanager
-		);
+        );
 
-		if ($options) {
-			$this->options = array_replace_recursive($this->options, $options);
-		}
-	}
+        if ($options) {
+            $this->options = array_replace_recursive($this->options, $options);
+        }
+    }
 
-	/**
-	 * Output data
-	 *
-	 * @return	void
-	 */
-	public function get()
-	{
-		$file_name = isset($_REQUEST['file']) ?
-		basename(stripslashes($_REQUEST['file'])) : null;
-		if ($file_name) {
-			$info = $this->getFileObject($file_name);
-		} else {
-			$info = $this->getFileObjects();
-		}
-		header('Content-type: application/json');
-		echo json_encode($info);
-	}
+    /**
+     *    Return full URL
+     *
+     * @return    string            URL
+     */
+    protected function getFullUrl()
+    {
+        $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        return
+            ($https ? 'https://' : 'http://') .
+            (!empty($_SERVER['REMOTE_USER']) ? $_SERVER['REMOTE_USER'] . '@' : '') .
+            (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : ($_SERVER['SERVER_NAME'] .
+                ($https && $_SERVER['SERVER_PORT'] === 443 ||
+                $_SERVER['SERVER_PORT'] === 80 ? '' : ':' . $_SERVER['SERVER_PORT']))) .
+            substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
+    }
+
+    /**
+     * Set delete url
+     *
+     * @param string $file Filename
+     *
+     * @return    void
+     */
+    protected function setFileDeleteUrl($file)
+    {
+        $file->delete_url = $this->options['script_url']
+            . '?file=' . rawurlencode($file->name) . '&fk_element=' . $this->fk_element . '&element=' . $this->element;
+        $file->delete_type = $this->options['delete_type'];
+        if ($file->delete_type !== 'DELETE') {
+            $file->delete_url .= '&_method=DELETE';
+        }
+    }
 
 	/**
 	 * getFileObject
@@ -239,45 +255,249 @@ class FileUpload
 			return $file;
 		}
 		return null;
-	}
+    }
 
-	/**
-	 * Set delete url
-	 *
-	 * @param 	string	$file		Filename
-	 * @return	void
-	 */
-	protected function setFileDeleteUrl($file)
-	{
-		$file->delete_url = $this->options['script_url']
-		.'?file='.rawurlencode($file->name).'&fk_element='.$this->fk_element.'&element='.$this->element;
-		$file->delete_type = $this->options['delete_type'];
-		if ($file->delete_type !== 'DELETE') {
-			$file->delete_url .= '&_method=DELETE';
-		}
-	}
+    /**
+     * getFileObjects
+     *
+     * @return    void
+     */
+    protected function getFileObjects()
+    {
+        return array_values(array_filter(array_map([$this, 'getFileObject'], scandir($this->options['upload_dir']))));
+    }
 
-	/**
-	 * getFileObjects
-	 *
-	 * @return	void
-	 */
-	protected function getFileObjects()
-	{
-		return array_values(array_filter(array_map(array($this, 'getFileObject'), scandir($this->options['upload_dir']))));
-	}
+    /**
+     *  Create thumbs of a file uploaded. Only the "mini" thumb is generated.
+     *
+     * @param string $file_name Filename
+     * @param string $options   is array('max_width', 'max_height')
+     *
+     * @return    boolean
+     */
+    protected function createScaledImage($file_name, $options)
+    {
+        global $maxwidthmini, $maxheightmini;
 
-	/**
-	 * Output data
-	 *
-	 * @return	void
-	 */
-	public function post()
-	{
-		if (isset($_REQUEST['_method']) && $_REQUEST['_method'] === 'DELETE') {
-			return $this->delete();
-		}
-		$upload = isset($_FILES[$this->options['param_name']]) ?
+        $file_path = $this->options['upload_dir'] . $file_name;
+        $new_file_path = $options['upload_dir'] . $file_name;
+
+        if (dol_mkdir($options['upload_dir']) >= 0) {
+            [$img_width, $img_height] = @getimagesize($file_path);
+            if (!$img_width || !$img_height) {
+                return false;
+            }
+
+            $res = vignette($file_path, $maxwidthmini, $maxheightmini, '_mini'); // We don't use ->addThumbs here because there is no object and we don't need all thumbs, only the "mini".
+
+            if (preg_match('/error/i', $res)) {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Enter description here ...
+     *
+     * @param string $uploaded_file Uploade file
+     * @param string $file          File
+     * @param string $error         Error
+     * @param string $index         Index
+     *
+     * @return  boolean                     True if OK, False if KO
+     */
+    protected function validate($uploaded_file, $file, $error, $index)
+    {
+        if ($error) {
+            $file->error = $error;
+            return false;
+        }
+        if (!$file->name) {
+            $file->error = 'missingFileName';
+            return false;
+        }
+        if (!preg_match($this->options['accept_file_types'], $file->name)) {
+            $file->error = 'acceptFileTypes';
+            return false;
+        }
+        if ($uploaded_file && is_uploaded_file($uploaded_file)) {
+            $file_size = filesize($uploaded_file);
+        } else {
+            $file_size = $_SERVER['CONTENT_LENGTH'];
+        }
+        if ($this->options['max_file_size'] && (
+                $file_size > $this->options['max_file_size'] ||
+                $file->size > $this->options['max_file_size'])
+        ) {
+            $file->error = 'maxFileSize';
+            return false;
+        }
+        if ($this->options['min_file_size'] &&
+            $file_size < $this->options['min_file_size']) {
+            $file->error = 'minFileSize';
+            return false;
+        }
+        if (is_numeric($this->options['max_number_of_files']) && (
+                count($this->getFileObjects()) >= $this->options['max_number_of_files'])
+        ) {
+            $file->error = 'maxNumberOfFiles';
+            return false;
+        }
+        [$img_width, $img_height] = @getimagesize($uploaded_file);
+        if (is_numeric($img_width)) {
+            if ($this->options['max_width'] && $img_width > $this->options['max_width'] ||
+                $this->options['max_height'] && $img_height > $this->options['max_height']) {
+                $file->error = 'maxResolution';
+                return false;
+            }
+            if ($this->options['min_width'] && $img_width < $this->options['min_width'] ||
+                $this->options['min_height'] && $img_height < $this->options['min_height']) {
+                $file->error = 'minResolution';
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Enter description here ...
+     *
+     * @param int $matches ???
+     *
+     * @return    string                    ???
+     */
+    protected function upcountNameCallback($matches)
+    {
+        $index = isset($matches[1]) ? intval($matches[1]) + 1 : 1;
+        $ext = isset($matches[2]) ? $matches[2] : '';
+        return ' (' . $index . ')' . $ext;
+    }
+
+    /**
+     * Enter description here ...
+     *
+     * @param string $name ???
+     *
+     * @return    string                    ???
+     */
+    protected function upcountName($name)
+    {
+        return preg_replace_callback('/(?:(?: \(([\d]+)\))?(\.[^.]+))?$/', [$this, 'upcountNameCallback'], $name, 1);
+    }
+
+    /**
+     * trimFileName
+     *
+     * @param string $name  Filename
+     * @param string $type  ???
+     * @param string $index ???
+     *
+     * @return    string
+     */
+    protected function trimFileName($name, $type, $index)
+    {
+        // Remove path information and dots around the filename, to prevent uploading
+        // into different directories or replacing hidden system files.
+        // Also remove control characters and spaces (\x00..\x20) around the filename:
+        $file_name = trim(basename(stripslashes($name)), ".\x00..\x20");
+        // Add missing file extension for known image types:
+        if (strpos($file_name, '.') === false &&
+            preg_match('/^image\/(gif|jpe?g|png)/', $type, $matches)) {
+            $file_name .= '.' . $matches[1];
+        }
+        if ($this->options['discard_aborted_uploads']) {
+            while (is_file($this->options['upload_dir'] . $file_name)) {
+                $file_name = $this->upcountName($file_name);
+            }
+        }
+        return $file_name;
+    }
+
+    /**
+     * handleFileUpload
+     *
+     * @param string $uploaded_file Uploade file
+     * @param string $name          Name
+     * @param int    $size          Size
+     * @param string $type          Type
+     * @param string $error         Error
+     * @param string $index         Index
+     *
+     * @return stdClass
+     */
+    protected function handleFileUpload($uploaded_file, $name, $size, $type, $error, $index)
+    {
+        $file = new stdClass();
+        $file->name = $this->trimFileName($name, $type, $index);
+        $file->mime = dol_mimetype($file->name, '', 2);
+        $file->size = intval($size);
+        $file->type = $type;
+        if ($this->validate($uploaded_file, $file, $error, $index) && dol_mkdir($this->options['upload_dir']) >= 0) {
+            $file_path = $this->options['upload_dir'] . $file->name;
+            $append_file = !$this->options['discard_aborted_uploads'] && is_file($file_path) && $file->size > filesize($file_path);
+            clearstatcache();
+            if ($uploaded_file && is_uploaded_file($uploaded_file)) {
+                // multipart/formdata uploads (POST method uploads)
+                if ($append_file) {
+                    file_put_contents($file_path, fopen($uploaded_file, 'r'), FILE_APPEND);
+                } else {
+                    dol_move_uploaded_file($uploaded_file, $file_path, 1, 0, 0, 0, 'userfile');
+                }
+            } else {
+                // Non-multipart uploads (PUT method support)
+                file_put_contents($file_path, fopen('php://input', 'r'), $append_file ? FILE_APPEND : 0);
+            }
+            $file_size = filesize($file_path);
+            if ($file_size === $file->size) {
+                $file->url = $this->options['upload_url'] . rawurlencode($file->name);
+                foreach ($this->options['image_versions'] as $version => $options) {
+                    if ($this->createScaledImage($file->name, $options)) {
+                        $tmp = explode('.', $file->name);
+                        $file->{$version . '_url'} = $options['upload_url'] . rawurlencode($tmp[0] . '_mini.' . $tmp[1]);
+                    }
+                }
+            } elseif ($this->options['discard_aborted_uploads']) {
+                unlink($file_path);
+                $file->error = 'abort';
+            }
+            $file->size = $file_size;
+            $this->setFileDeleteUrl($file);
+        }
+        return $file;
+    }
+
+    /**
+     * Output data
+     *
+     * @return    void
+     */
+    public function get()
+    {
+        $file_name = isset($_REQUEST['file']) ?
+            basename(stripslashes($_REQUEST['file'])) : null;
+        if ($file_name) {
+            $info = $this->getFileObject($file_name);
+        } else {
+            $info = $this->getFileObjects();
+        }
+        header('Content-type: application/json');
+        echo json_encode($info);
+    }
+
+    /**
+     * Output data
+     *
+     * @return    void
+     */
+    public function post()
+    {
+        if (isset($_REQUEST['_method']) && $_REQUEST['_method'] === 'DELETE') {
+            return $this->delete();
+        }
+        $upload = isset($_FILES[$this->options['param_name']]) ?
 		$_FILES[$this->options['param_name']] : null;
 		$info = array();
 		if ($upload && is_array($upload['tmp_name'])) {
@@ -343,218 +563,5 @@ class FileUpload
 		}
 		header('Content-type: application/json');
 		echo json_encode($success);
-	}
-
-	/**
-	 * handleFileUpload
-	 *
-	 * @param 	string		$uploaded_file		Uploade file
-	 * @param 	string		$name				Name
-	 * @param 	int			$size				Size
-	 * @param 	string		$type				Type
-	 * @param 	string		$error				Error
-	 * @param	string		$index				Index
-	 * @return stdClass
-	 */
-	protected function handleFileUpload($uploaded_file, $name, $size, $type, $error, $index)
-	{
-		$file = new stdClass();
-		$file->name = $this->trimFileName($name, $type, $index);
-		$file->mime = dol_mimetype($file->name, '', 2);
-		$file->size = intval($size);
-		$file->type = $type;
-		if ($this->validate($uploaded_file, $file, $error, $index) && dol_mkdir($this->options['upload_dir']) >= 0) {
-			$file_path = $this->options['upload_dir'].$file->name;
-			$append_file = !$this->options['discard_aborted_uploads'] && is_file($file_path) && $file->size > filesize($file_path);
-			clearstatcache();
-			if ($uploaded_file && is_uploaded_file($uploaded_file)) {
-				// multipart/formdata uploads (POST method uploads)
-				if ($append_file) {
-					file_put_contents($file_path, fopen($uploaded_file, 'r'), FILE_APPEND);
-				} else {
-					dol_move_uploaded_file($uploaded_file, $file_path, 1, 0, 0, 0, 'userfile');
-				}
-			} else {
-				// Non-multipart uploads (PUT method support)
-				file_put_contents($file_path, fopen('php://input', 'r'), $append_file ? FILE_APPEND : 0);
-			}
-			$file_size = filesize($file_path);
-			if ($file_size === $file->size) {
-				$file->url = $this->options['upload_url'].rawurlencode($file->name);
-				foreach ($this->options['image_versions'] as $version => $options) {
-					if ($this->createScaledImage($file->name, $options)) {
-						$tmp = explode('.', $file->name);
-						$file->{$version.'_url'} = $options['upload_url'].rawurlencode($tmp[0].'_mini.'.$tmp[1]);
-					}
-				}
-			} elseif ($this->options['discard_aborted_uploads']) {
-				unlink($file_path);
-				$file->error = 'abort';
-			}
-			$file->size = $file_size;
-			$this->setFileDeleteUrl($file);
-		}
-		return $file;
-	}
-
-	/**
-	 * trimFileName
-	 *
-	 * @param 	string $name		Filename
-	 * @param 	string $type		???
-	 * @param 	string $index		???
-	 * @return	string
-	 */
-	protected function trimFileName($name, $type, $index)
-	{
-		// Remove path information and dots around the filename, to prevent uploading
-		// into different directories or replacing hidden system files.
-		// Also remove control characters and spaces (\x00..\x20) around the filename:
-		$file_name = trim(basename(stripslashes($name)), ".\x00..\x20");
-		// Add missing file extension for known image types:
-		if (strpos($file_name, '.') === false &&
-				preg_match('/^image\/(gif|jpe?g|png)/', $type, $matches)) {
-			$file_name .= '.'.$matches[1];
-		}
-		if ($this->options['discard_aborted_uploads']) {
-			while (is_file($this->options['upload_dir'].$file_name)) {
-				$file_name = $this->upcountName($file_name);
-			}
-		}
-		return $file_name;
-	}
-
-	/**
-	 * Enter description here ...
-	 *
-	 * @param 	string		$name		???
-	 * @return	string					???
-	 */
-	protected function upcountName($name)
-	{
-		return preg_replace_callback('/(?:(?: \(([\d]+)\))?(\.[^.]+))?$/', array($this, 'upcountNameCallback'), $name, 1);
-	}
-
-	/**
-	 * Enter description here ...
-	 *
-	 * @param 	string	$uploaded_file		Uploade file
-	 * @param 	string	$file				File
-	 * @param 	string	$error				Error
-	 * @param	string	$index				Index
-	 * @return  boolean                     True if OK, False if KO
-	 */
-	protected function validate($uploaded_file, $file, $error, $index)
-	{
-		if ($error) {
-			$file->error = $error;
-			return false;
-		}
-		if (!$file->name) {
-			$file->error = 'missingFileName';
-			return false;
-		}
-		if (!preg_match($this->options['accept_file_types'], $file->name)) {
-			$file->error = 'acceptFileTypes';
-			return false;
-		}
-		if ($uploaded_file && is_uploaded_file($uploaded_file)) {
-			$file_size = filesize($uploaded_file);
-		} else {
-			$file_size = $_SERVER['CONTENT_LENGTH'];
-		}
-		if ($this->options['max_file_size'] && (
-				$file_size > $this->options['max_file_size'] ||
-				$file->size > $this->options['max_file_size'])
-		) {
-			$file->error = 'maxFileSize';
-			return false;
-		}
-		if ($this->options['min_file_size'] &&
-				$file_size < $this->options['min_file_size']) {
-			$file->error = 'minFileSize';
-			return false;
-		}
-		if (is_numeric($this->options['max_number_of_files']) && (
-				count($this->getFileObjects()) >= $this->options['max_number_of_files'])
-		) {
-			$file->error = 'maxNumberOfFiles';
-			return false;
-		}
-		list($img_width, $img_height) = @getimagesize($uploaded_file);
-		if (is_numeric($img_width)) {
-			if ($this->options['max_width'] && $img_width > $this->options['max_width'] ||
-					$this->options['max_height'] && $img_height > $this->options['max_height']) {
-				$file->error = 'maxResolution';
-				return false;
-			}
-			if ($this->options['min_width'] && $img_width < $this->options['min_width'] ||
-					$this->options['min_height'] && $img_height < $this->options['min_height']) {
-				$file->error = 'minResolution';
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 *  Create thumbs of a file uploaded. Only the "mini" thumb is generated.
-	 *
-	 *  @param	string	$file_name		Filename
-	 *  @param	string	$options 		is array('max_width', 'max_height')
-	 *  @return	boolean
-	 */
-	protected function createScaledImage($file_name, $options)
-	{
-		global $maxwidthmini, $maxheightmini;
-
-		$file_path = $this->options['upload_dir'].$file_name;
-		$new_file_path = $options['upload_dir'].$file_name;
-
-		if (dol_mkdir($options['upload_dir']) >= 0) {
-			list($img_width, $img_height) = @getimagesize($file_path);
-			if (!$img_width || !$img_height) {
-				return false;
-			}
-
-			$res = vignette($file_path, $maxwidthmini, $maxheightmini, '_mini'); // We don't use ->addThumbs here because there is no object and we don't need all thumbs, only the "mini".
-
-			if (preg_match('/error/i', $res)) {
-				return false;
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 *	Return full URL
-	 *
-	 *	@return	string			URL
-	 */
-	protected function getFullUrl()
-	{
-		$https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-		return
-		($https ? 'https://' : 'http://').
-		(!empty($_SERVER['REMOTE_USER']) ? $_SERVER['REMOTE_USER'].'@' : '').
-		(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : ($_SERVER['SERVER_NAME'].
-				($https && $_SERVER['SERVER_PORT'] === 443 ||
-						$_SERVER['SERVER_PORT'] === 80 ? '' : ':'.$_SERVER['SERVER_PORT']))).
-						substr($_SERVER['SCRIPT_NAME'], 0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
-	}
-
-	/**
-	 * Enter description here ...
-	 *
-	 * @param 	int		$matches		???
-	 * @return	string					???
-	 */
-	protected function upcountNameCallback($matches)
-	{
-		$index = isset($matches[1]) ? intval($matches[1]) + 1 : 1;
-		$ext = isset($matches[2]) ? $matches[2] : '';
-		return ' ('.$index.')'.$ext;
 	}
 }

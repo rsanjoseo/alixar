@@ -71,40 +71,40 @@ abstract class CommonStickerGenerator
 	// phpcs:disable PEAR.NamingConventions.ValidVariableName.PublicUnderscore
 	// protected
 	// Nom du format de l'etiquette
-	public $Tformat;
-	// Marge de gauche de l'etiquette
 	protected $_Avery_Name = '';
-	// marge en haut de la page avant la premiere etiquette
+	// Marge de gauche de l'etiquette
 	protected $_Margin_Left = 0;
-	// Espace horizontal entre 2 bandes d'etiquettes
+    // marge en haut de la page avant la premiere etiquette
 	protected $_Margin_Top = 0;
-	// Espace vertical entre 2 bandes d'etiquettes
+    // Espace horizontal entre 2 bandes d'etiquettes
 	protected $_X_Space = 0;
-	// NX Nombre d'etiquettes sur la largeur de la page
+    // Espace vertical entre 2 bandes d'etiquettes
 	protected $_Y_Space = 0;
-	// NY Nombre d'etiquettes sur la hauteur de la page
+    // NX Nombre d'etiquettes sur la largeur de la page
 	protected $_X_Number = 0;
-	// Largeur de chaque etiquette
-	protected $_Y_Number = 0;
-	// Hauteur de chaque etiquette
-	protected $_Width = 0;
-	// Hauteur des caracteres
-	protected $_Height = 0;
-	// Hauteur par defaut d'une ligne
-	protected $_Char_Size = 10;
-	// Type of metric.. Will help to calculate good values
-	protected $_Line_Height = 10;
-	// Type of metric for the doc..
-	protected $_Metric = 'mm';
-	protected $_Metric_Doc = 'mm';
-	protected $_COUNTX = 1;
-	protected $_COUNTY = 1;
-	protected $_First = 1;
-	// phpcs:enable
+    // NY Nombre d'etiquettes sur la hauteur de la page
+    protected $_Y_Number = 0;
+    // Largeur de chaque etiquette
+    protected $_Width = 0;
+    // Hauteur de chaque etiquette
+    protected $_Height = 0;
+    // Hauteur des caracteres
+    protected $_Char_Size = 10;
+    // Hauteur par defaut d'une ligne
+    protected $_Line_Height = 10;
+    // Type of metric.. Will help to calculate good values
+    protected $_Metric = 'mm';
+    // Type of metric for the doc..
+    protected $_Metric_Doc = 'mm';
+    protected $_COUNTX = 1;
+    protected $_COUNTY = 1;
+    protected $_First = 1;
+    public $Tformat;
+    // phpcs:enable
 
-	/**
-	 *	Constructor
-	 *
+    /**
+     *    Constructor
+     *
 	 *  @param		DoliDB		$db      Database handler
 	 */
 	public function __construct($db)
@@ -126,27 +126,48 @@ abstract class CommonStickerGenerator
 	// phpcs:enable
 
 	/**
-	 * Output a sticker on page at position _COUNTX, _COUNTY (_COUNTX and _COUNTY start from 0)
-	 *
-	 * @param   TCPDF         $pdf            PDF reference
-	 * @param   Translate  	$outputlangs    Output langs
-	 * @param   array     	$param          Associative array containing label content and optional parameters
-	 * @return  void
-	 */
-	abstract public function addSticker(&$pdf, $outputlangs, $param);
+     * Output a sticker on page at position _COUNTX, _COUNTY (_COUNTX and _COUNTY start from 0)
+     *
+     * @param TCPDF     $pdf         PDF reference
+     * @param Translate $outputlangs Output langs
+     * @param array     $param       Associative array containing label content and optional parameters
+     * @return  void
+     */
+    abstract public function addSticker(&$pdf, $outputlangs, $param);
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * protected Print dot line
-	 *
-	 * @param	TCPDF   $pdf                PDF reference
-	 * @param 	int		$x1					X1
-	 * @param 	int		$y1					Y1
-	 * @param 	int		$x2					X2
-	 * @param 	int		$y2					Y2
-	 * @param 	int		$epaisseur			Epaisseur
-	 * @param 	int		$nbPointilles		Nb pointilles
+    /**
+     * Methode qui permet de modifier la taille des caracteres
+     * Cela modiera aussi l'espace entre chaque ligne
+     *
+     * @param TCPDF $pdf PDF reference
+     * @param int   $pt  point
+     *
+     * @return   void
+     */
+    public function Set_Char_Size(&$pdf, $pt)
+    {
+        // phpcs:enable
+        if ($pt > 3) {
+            $this->_Char_Size = $pt;
+            $this->_Line_Height = $this->_Get_Height_Chars($pt);
+            $pdf->SetFont('', '', $pt);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * protected Print dot line
+     *
+     * @param TCPDF $pdf          PDF reference
+     * @param int   $x1           X1
+     * @param int   $y1           Y1
+     * @param int   $x2           X2
+     * @param int   $y2           Y2
+     * @param int   $epaisseur    Epaisseur
+     * @param int   $nbPointilles Nb pointilles
 	 * @return	void
 	 */
 	protected function _Pointille(&$pdf, $x1 = 0, $y1 = 0, $x2 = 210, $y2 = 297, $epaisseur = 1, $nbPointilles = 15)
@@ -176,11 +197,10 @@ abstract class CommonStickerGenerator
 				}
 			}
 		}
-	}
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 	/**
 	 * protected Function realisant une croix aux 4 coins des cartes
 	 *
@@ -216,33 +236,6 @@ abstract class CommonStickerGenerator
 		$pdf->SetDrawColor(0, 0, 0);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * protected Set format
-	 *
-	 * @param    TCPDF     $pdf     PDF reference
-	 * @param    string    $format  Format
-	 * @return   void
-	 */
-	protected function _Set_Format(&$pdf, $format)
-	{
-		// phpcs:enable
-		$this->_Metric = $format['metric'];
-		$this->_Avery_Name = $format['name'];
-		$this->_Avery_Code = $format['code'];
-		$this->_Margin_Left = $this->convertMetric($format['marginLeft'], $this->_Metric, $this->_Metric_Doc);
-		$this->_Margin_Top = $this->convertMetric($format['marginTop'], $this->_Metric, $this->_Metric_Doc);
-		$this->_X_Space = $this->convertMetric($format['SpaceX'], $this->_Metric, $this->_Metric_Doc);
-		$this->_Y_Space = $this->convertMetric($format['SpaceY'], $this->_Metric, $this->_Metric_Doc);
-		$this->_X_Number = $format['NX'];
-		$this->_Y_Number = $format['NY'];
-		$this->_Width = $this->convertMetric($format['width'], $this->_Metric, $this->_Metric_Doc);
-		$this->_Height = $this->convertMetric($format['height'], $this->_Metric, $this->_Metric_Doc);
-		$this->Set_Char_Size($pdf, $format['font-size']);
-	}
-
 	/**
 	 * Convert units (in to mm, mm to in)
 	 * $src and $dest must be 'in' or 'mm'
@@ -267,28 +260,6 @@ abstract class CommonStickerGenerator
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Methode qui permet de modifier la taille des caracteres
-	 * Cela modiera aussi l'espace entre chaque ligne
-	 *
-	 * @param    TCPDF        $pdf   PDF reference
-	 * @param    int        $pt    point
-	 * @return   void
-	 */
-	public function Set_Char_Size(&$pdf, $pt)
-	{
-		// phpcs:enable
-		if ($pt > 3) {
-			$this->_Char_Size = $pt;
-			$this->_Line_Height = $this->_Get_Height_Chars($pt);
-			$pdf->SetFont('', '', $pt);
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * protected Give the height for a char size given.
 	 *
@@ -296,14 +267,41 @@ abstract class CommonStickerGenerator
 	 * @return int           Height chars
 	 */
 	protected function _Get_Height_Chars($pt)
-	{
-		// phpcs:enable
-		// Array for link between height of characters and space between lines
-		$_Table_Hauteur_Chars = array(6=>2, 7=>2.5, 8=>3, 9=>3.5, 10=>4, 11=>6, 12=>7, 13=>8, 14=>9, 15=>10);
-		if (in_array($pt, array_keys($_Table_Hauteur_Chars))) {
-			return $_Table_Hauteur_Chars[$pt];
-		} else {
-			return 100; // There is a prob..
-		}
-	}
+    {
+        // phpcs:enable
+        // Array for link between height of characters and space between lines
+        $_Table_Hauteur_Chars = [6 => 2, 7 => 2.5, 8 => 3, 9 => 3.5, 10 => 4, 11 => 6, 12 => 7, 13 => 8, 14 => 9, 15 => 10];
+        if (in_array($pt, array_keys($_Table_Hauteur_Chars))) {
+            return $_Table_Hauteur_Chars[$pt];
+        } else {
+            return 100; // There is a prob..
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     * protected Set format
+     *
+     * @param TCPDF  $pdf    PDF reference
+     * @param string $format Format
+     *
+     * @return   void
+     */
+    protected function _Set_Format(&$pdf, $format)
+    {
+        // phpcs:enable
+        $this->_Metric = $format['metric'];
+        $this->_Avery_Name = $format['name'];
+        $this->_Avery_Code = $format['code'];
+        $this->_Margin_Left = $this->convertMetric($format['marginLeft'], $this->_Metric, $this->_Metric_Doc);
+        $this->_Margin_Top = $this->convertMetric($format['marginTop'], $this->_Metric, $this->_Metric_Doc);
+        $this->_X_Space = $this->convertMetric($format['SpaceX'], $this->_Metric, $this->_Metric_Doc);
+        $this->_Y_Space = $this->convertMetric($format['SpaceY'], $this->_Metric, $this->_Metric_Doc);
+        $this->_X_Number = $format['NX'];
+        $this->_Y_Number = $format['NY'];
+        $this->_Width = $this->convertMetric($format['width'], $this->_Metric, $this->_Metric_Doc);
+        $this->_Height = $this->convertMetric($format['height'], $this->_Metric, $this->_Metric_Doc);
+        $this->Set_Char_Size($pdf, $format['font-size']);
+    }
 }

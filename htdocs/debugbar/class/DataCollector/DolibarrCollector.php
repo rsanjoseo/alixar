@@ -32,47 +32,6 @@ class DolibarrCollector extends DataCollector implements Renderable, AssetProvid
 	}
 
 	/**
-	 *	Return widget settings
-	 *
-	 * @return array       Array
-	 */
-	public function getWidgets()
-	{
-		return array(
-			"database_info" => array(
-				"icon" => "database",
-				"indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
-				"tooltip" => array(
-					"html" => $this->getDatabaseInfo(),
-					"class" => "tooltip-wide"
-				),
-				"map" => "",
-				"default" => ""
-			),
-			"dolibarr_info" => array(
-				"icon" => "desktop",
-				"indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
-				"tooltip" => array(
-					"html" => $this->getDolibarrInfo(),
-					"class" => "tooltip-wide"
-				),
-				"map" => "",
-				"default" => ""
-			),
-			"mail_info" => array(
-				"icon" => "envelope",
-				"indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
-				"tooltip" => array(
-					"html" => $this->getMailInfo(),
-					"class" => "tooltip-extra-wide"
-				),
-				"map" => "",
-				"default" => ""
-			)
-		);
-	}
-
-	/**
 	 *	Return database info as an HTML string
 	 *
 	 *  @return string         HTML string
@@ -129,26 +88,67 @@ class DolibarrCollector extends DataCollector implements Renderable, AssetProvid
 
 		$info  = $langs->trans('Method').': <strong>'.$conf->global->MAIN_MAIL_SENDMODE.'</strong><br>';
 		$info .= $langs->trans('Server').': <strong>'.$conf->global->MAIN_MAIL_SMTP_SERVER.'</strong><br>';
-		$info .= $langs->trans('Port').': <strong>'.$conf->global->MAIN_MAIL_SMTP_PORT.'</strong><br>';
-		$info .= $langs->trans('ID').': <strong>'.$conf->global->MAIN_MAIL_SMTPS_ID.'</strong><br>';
-		$info .= $langs->trans('Pwd').': <strong>'.preg_replace('/./', '*', $conf->global->MAIN_MAIL_SMTPS_PW).'</strong><br>';
-		$info .= $langs->trans('TLS/STARTTLS').': <strong>'.(empty($conf->global->MAIN_MAIL_EMAIL_TLS) ? '' : $conf->global->MAIN_MAIL_EMAIL_TLS).'</strong> / <strong>'.(empty($conf->global->MAIN_MAIL_EMAIL_STARTTLS) ? '' : $conf->global->MAIN_MAIL_EMAIL_STARTTLS).'</strong><br>';
-		$info .= $langs->trans('MAIN_DISABLE_ALL_MAILS').': <strong>'.(empty($conf->global->MAIN_DISABLE_ALL_MAILS) ? $langs->trans('No') : $langs->trans('Yes')).'</strong><br>';
-		$info .= 'dolibarr_mailing_limit_sendbyweb = <strong>'.$dolibarr_mailing_limit_sendbyweb.'</strong><br>';
+        $info .= $langs->trans('Port') . ': <strong>' . $conf->global->MAIN_MAIL_SMTP_PORT . '</strong><br>';
+        $info .= $langs->trans('ID') . ': <strong>' . $conf->global->MAIN_MAIL_SMTPS_ID . '</strong><br>';
+        $info .= $langs->trans('Pwd') . ': <strong>' . preg_replace('/./', '*', $conf->global->MAIN_MAIL_SMTPS_PW) . '</strong><br>';
+        $info .= $langs->trans('TLS/STARTTLS') . ': <strong>' . (empty($conf->global->MAIN_MAIL_EMAIL_TLS) ? '' : $conf->global->MAIN_MAIL_EMAIL_TLS) . '</strong> / <strong>' . (empty($conf->global->MAIN_MAIL_EMAIL_STARTTLS) ? '' : $conf->global->MAIN_MAIL_EMAIL_STARTTLS) . '</strong><br>';
+        $info .= $langs->trans('MAIN_DISABLE_ALL_MAILS') . ': <strong>' . (empty($conf->global->MAIN_DISABLE_ALL_MAILS) ? $langs->trans('No') : $langs->trans('Yes')) . '</strong><br>';
+        $info .= 'dolibarr_mailing_limit_sendbyweb = <strong>' . $dolibarr_mailing_limit_sendbyweb . '</strong><br>';
 
-		return $info;
-	}
+        return $info;
+    }
 
-	/**
-	 *	Return collector assests
-	 *
-	 * @return array       Array
-	 */
-	public function getAssets()
-	{
-		return array(
-			'base_url' => dol_buildpath('/debugbar', 1),
-			'js' => 'js/widgets.js'
-		);
-	}
+    /**
+     *    Return widget settings
+     *
+     * @return array       Array
+     */
+    public function getWidgets()
+    {
+        return [
+            "database_info" => [
+                "icon" => "database",
+                "indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
+                "tooltip" => [
+                    "html" => $this->getDatabaseInfo(),
+                    "class" => "tooltip-wide",
+                ],
+                "map" => "",
+                "default" => "",
+            ],
+            "dolibarr_info" => [
+                "icon" => "desktop",
+                "indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
+                "tooltip" => [
+                    "html" => $this->getDolibarrInfo(),
+                    "class" => "tooltip-wide",
+                ],
+                "map" => "",
+                "default" => "",
+            ],
+            "mail_info" => [
+                "icon" => "envelope",
+                "indicator" => "PhpDebugBar.DebugBar.TooltipIndicator",
+                "tooltip" => [
+                    "html" => $this->getMailInfo(),
+                    "class" => "tooltip-extra-wide",
+                ],
+                "map" => "",
+                "default" => "",
+            ],
+        ];
+    }
+
+    /**
+     *    Return collector assests
+     *
+     * @return array       Array
+     */
+    public function getAssets()
+    {
+        return array(
+            'base_url' => dol_buildpath('/debugbar', 1),
+            'js' => 'js/widgets.js'
+        );
+    }
 }

@@ -80,40 +80,41 @@ class ActionsTicket
 	 */
 	public $fk_soc;
 
-	/**
-	 *    Constructor
-	 *
-	 *    @param DoliDB $db Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Fetch object
-	 *
-	 * @param	int		$id				ID of ticket
-	 * @param	string	$ref			Reference of ticket
-	 * @param	string	$track_id		Track ID of ticket (for public area)
-	 * @return 	void
-	 */
-	public function fetch($id = 0, $ref = '', $track_id = '')
+    /**
+     * Instantiation of DAO class
+     *
+     * @return void
+     */
+    public function getInstanceDao()
+    {
+        if (!is_object($this->dao)) {
+            $this->dao = new Ticket($this->db);
+        }
+    }
+
+    /**
+     * Fetch object
+     *
+     * @param int    $id       ID of ticket
+     * @param string $ref      Reference of ticket
+     * @param string $track_id Track ID of ticket (for public area)
+     *
+     * @return    void
+     */
+    public function fetch($id = 0, $ref = '', $track_id = '')
 	{
 		$this->getInstanceDao();
 		return $this->dao->fetch($id, $ref, $track_id);
-	}
-
-	/**
-	 * Instantiation of DAO class
-	 *
-	 * @return void
-	 */
-	public function getInstanceDao()
-	{
-		if (!is_object($this->dao)) {
-			$this->dao = new Ticket($this->db);
-		}
 	}
 
 	/**
@@ -164,81 +165,6 @@ class ActionsTicket
 			return $langs->trans("AddMessage");
 		} else {
 			return $langs->trans("TicketsManagement");
-		}
-	}
-
-	/**
-	 * View html list of message for ticket
-	 *
-	 * @param 	boolean 	$show_private 	Show private messages
-	 * @param 	boolean 	$show_user    	Show user who make action
-	 * @param	Ticket		$object			Object ticket
-	 * @return 	void
-	 */
-	public function viewTicketMessages($show_private, $show_user, $object)
-	{
-		global $conf, $langs, $user;
-
-		// Load logs in cache
-		$ret = $this->dao->loadCacheMsgsTicket();
-		if ($ret < 0) {
-			dol_print_error($this->dao->db);
-		}
-
-		$action = GETPOST('action', 'aZ09');
-
-		$this->viewTicketOriginalMessage($user, $action, $object);
-
-		if (is_array($this->dao->cache_msgs_ticket) && count($this->dao->cache_msgs_ticket) > 0) {
-			print '<table class="border" style="width:100%;">';
-
-			print '<tr class="liste_titre">';
-
-			print '<td>';
-			print $langs->trans('TicketMessagesList');
-			print '</td>';
-
-			if ($show_user) {
-				print '<td>';
-				print $langs->trans('User');
-				print '</td>';
-			}
-			print '</tr>';
-
-			foreach ($this->dao->cache_msgs_ticket as $id => $arraymsgs) {
-				if (!$arraymsgs['private']
-					|| ($arraymsgs['private'] == "1" && $show_private)
-				) {
-					//print '<tr>';
-					print '<tr class="oddeven">';
-					print '<td><strong>';
-					print img_picto('', 'object_action', 'class="paddingright"').dol_print_date($arraymsgs['datec'], 'dayhour');
-					print '<strong></td>';
-					if ($show_user) {
-						print '<td>';
-						if ($arraymsgs['fk_user_author'] > 0) {
-							$userstat = new User($this->db);
-							$res = $userstat->fetch($arraymsgs['fk_user_author']);
-							if ($res) {
-								print $userstat->getNomUrl(0);
-							}
-						} else {
-							print $langs->trans('Customer');
-						}
-						print '</td>';
-					}
-					print '</td>';
-					print '<tr class="oddeven">';
-					print '<td colspan="2">';
-					print $arraymsgs['message'];
-					print '</td>';
-					print '</tr>';
-				}
-			}
-
-			print '</table>';
-		} else {
-			print '<div class="info">'.$langs->trans('NoMsgForThisTicket').'</div>';
 		}
 	}
 
@@ -313,25 +239,102 @@ class ActionsTicket
 			print '</div>';
 		}
 		print '</td>';
-		print '</tr>';
-		print '</table>';
-		print '</div>';
+        print '</tr>';
+        print '</table>';
+        print '</div>';
 
-		if (!empty($user->rights->ticket->manage) && $action == 'edit_message_init') {
-			// MESSAGE
-			print '</form>';
-		}
-	}
+        if (!empty($user->rights->ticket->manage) && $action == 'edit_message_init') {
+            // MESSAGE
+            print '</form>';
+        }
+    }
 
-	/**
-	 * View list of message for ticket with timeline display
-	 *
-	 * @param 	boolean 	$show_private Show private messages
-	 * @param 	boolean 	$show_user    Show user who make action
-	 * @param	Ticket	$object		 Object ticket
-	 * @return void
-	 */
-	public function viewTicketTimelineMessages($show_private, $show_user, Ticket $object)
+    /**
+     * View html list of message for ticket
+     *
+     * @param boolean $show_private Show private messages
+     * @param boolean $show_user    Show user who make action
+     * @param Ticket  $object       Object ticket
+     *
+     * @return    void
+     */
+    public function viewTicketMessages($show_private, $show_user, $object)
+    {
+        global $conf, $langs, $user;
+
+        // Load logs in cache
+        $ret = $this->dao->loadCacheMsgsTicket();
+        if ($ret < 0) {
+            dol_print_error($this->dao->db);
+        }
+
+        $action = GETPOST('action', 'aZ09');
+
+        $this->viewTicketOriginalMessage($user, $action, $object);
+
+        if (is_array($this->dao->cache_msgs_ticket) && count($this->dao->cache_msgs_ticket) > 0) {
+            print '<table class="border" style="width:100%;">';
+
+            print '<tr class="liste_titre">';
+
+            print '<td>';
+            print $langs->trans('TicketMessagesList');
+            print '</td>';
+
+            if ($show_user) {
+                print '<td>';
+                print $langs->trans('User');
+                print '</td>';
+            }
+            print '</tr>';
+
+            foreach ($this->dao->cache_msgs_ticket as $id => $arraymsgs) {
+                if (!$arraymsgs['private']
+                    || ($arraymsgs['private'] == "1" && $show_private)
+                ) {
+                    //print '<tr>';
+                    print '<tr class="oddeven">';
+                    print '<td><strong>';
+                    print img_picto('', 'object_action', 'class="paddingright"') . dol_print_date($arraymsgs['datec'], 'dayhour');
+                    print '<strong></td>';
+                    if ($show_user) {
+                        print '<td>';
+                        if ($arraymsgs['fk_user_author'] > 0) {
+                            $userstat = new User($this->db);
+                            $res = $userstat->fetch($arraymsgs['fk_user_author']);
+                            if ($res) {
+                                print $userstat->getNomUrl(0);
+                            }
+                        } else {
+                            print $langs->trans('Customer');
+                        }
+                        print '</td>';
+                    }
+                    print '</td>';
+                    print '<tr class="oddeven">';
+                    print '<td colspan="2">';
+                    print $arraymsgs['message'];
+                    print '</td>';
+                    print '</tr>';
+                }
+            }
+
+            print '</table>';
+        } else {
+            print '<div class="info">' . $langs->trans('NoMsgForThisTicket') . '</div>';
+        }
+    }
+
+    /**
+     * View list of message for ticket with timeline display
+     *
+     * @param boolean $show_private Show private messages
+     * @param boolean $show_user    Show user who make action
+     * @param Ticket  $object       Object ticket
+     *
+     * @return void
+     */
+    public function viewTicketTimelineMessages($show_private, $show_user, Ticket $object)
 	{
 		global $conf, $langs, $user;
 

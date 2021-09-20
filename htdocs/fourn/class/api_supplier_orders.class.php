@@ -41,25 +41,55 @@ class SupplierOrders extends DolibarrApi
 	 */
 	public $order;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->order = new CommandeFournisseur($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->order = new CommandeFournisseur($this->db);
+    }
 
-	/**
-	 * List orders
-	 *
-	 * Get a list of supplier orders
-	 *
-	 * @param string	$sortfield	      Sort field
-	 * @param string	$sortorder	      Sort order
-	 * @param int		$limit		      Limit for list
-	 * @param int		$page		      Page number
+    /**
+     * Get properties of a supplier order object
+     *
+     * Return an array with supplier order information
+     *
+     * @param int $id ID of supplier order
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->fournisseur->commande->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->order->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Supplier order not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('fournisseur', $this->order->id, 'commande_fournisseur', 'commande')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $this->order->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->order);
+    }
+
+    /**
+     * List orders
+     *
+     * Get a list of supplier orders
+     *
+     * @param string    $sortfield           Sort field
+     * @param string    $sortorder           Sort order
+     * @param int       $limit               Limit for list
+     * @param int       $page                Page number
 	 * @param string   	$thirdparty_ids	  Thirdparty ids to filter orders of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string   	$product_ids	  Product ids to filter orders of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string	$status		      Filter by order status : draft | validated | approved | running | received_start | received_end | cancelled | refused
@@ -186,26 +216,6 @@ class SupplierOrders extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->rowid);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		return $object;
-	}
-
-	/**
 	 * Create supplier order object
 	 *
 	 * Example: {"ref": "auto", "ref_supplier": "1234", "socid": "1", "multicurrency_code": "SEK", "multicurrency_tx": 1, "tva_tx": 25, "note": "Imported via the REST API"}
@@ -240,26 +250,6 @@ class SupplierOrders extends DolibarrApi
 			throw new RestException(500, "Error creating order", array_merge(array($this->order->error), $this->order->errors));
 		}
 		return $this->order->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Datas to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$order = array();
-		foreach (SupplierOrders::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$order[$field] = $data[$field];
-		}
-		return $order;
 	}
 
 	/**
@@ -299,37 +289,6 @@ class SupplierOrders extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a supplier order object
-	 *
-	 * Return an array with supplier order information
-	 *
-	 * @param 	int 	$id ID of supplier order
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->fournisseur->commande->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->order->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Supplier order not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('fournisseur', $this->order->id, 'commande_fournisseur', 'commande')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$this->order->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->order);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete supplier order
 	 *
 	 * @param int   	$id 	Supplier order ID
@@ -359,7 +318,8 @@ class SupplierOrders extends DolibarrApi
 				'message' => 'Supplier order deleted'
 			)
 		);
-	}
+    }
+
 
 	/**
 	 * Validate an order
@@ -398,14 +358,58 @@ class SupplierOrders extends DolibarrApi
 			throw new RestException(304, 'Error nothing done. May be object is already validated');
 		}
 		if ($result < 0) {
-			throw new RestException(500, 'Error when validating Order: '.$this->order->error);
-		}
+            throw new RestException(500, 'Error when validating Order: ' . $this->order->error);
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Order validated (Ref='.$this->order->ref.')'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Order validated (Ref=' . $this->order->ref . ')',
+            ],
+        ];
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->rowid);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Datas to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $order = [];
+        foreach (SupplierOrders::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $order[$field] = $data[$field];
+        }
+        return $order;
+    }
 }

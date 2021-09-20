@@ -57,442 +57,382 @@ if (!empty($conf->accounting->enabled)) {
  */
 class Facture extends CommonInvoice
 {
-	/**
-	 * Standard invoice
-	 */
-	const TYPE_STANDARD = 0;
-	/**
-	 * Replacement invoice
-	 */
-	const TYPE_REPLACEMENT = 1;
-	/**
-	 * Credit note invoice
-	 */
-	const TYPE_CREDIT_NOTE = 2;
-	/**
-	 * Deposit invoice
-	 */
-	const TYPE_DEPOSIT = 3;
-	/**
-	 * Proforma invoice (should not be used. a proforma is an order)
-	 */
-	const TYPE_PROFORMA = 4;
-	/**
-	 * Situation invoice
-	 */
-	const TYPE_SITUATION = 5;
-	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated (need to be paid)
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Classified paid.
-	 * If paid partially, $this->close_code can be:
-	 * - CLOSECODE_DISCOUNTVAT
-	 * - CLOSECODE_BADDEBT
-	 * If paid completely, this->close_code will be null
-	 */
-	const STATUS_CLOSED = 2;
-	/**
-	 * Classified abandoned and no payment done.
-	 * $this->close_code can be:
-	 * - CLOSECODE_BADDEBT
-	 * - CLOSECODE_ABANDONED
-	 * - CLOSECODE_REPLACED
-	 */
-	const STATUS_ABANDONED = 3;
-const CLOSECODE_DISCOUNTVAT = 'discount_vat';
-const CLOSECODE_BADDEBT = 'badcustomer';
-const CLOSECODE_ABANDONED = 'abandon';
-const CLOSECODE_REPLACED = 'replaced'; // Date invoice
-	/**
-	 * @var string ID to identify managed object
-	 */
-	public $element = 'facture';
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'facture'; // deprecated; Use delivery_date instead.
-	/**
-	 * @var string    Name of subtable line
-	 */
-	public $table_element_line = 'facturedet'; // Date expected of shipment (date starting shipment, not the reception that occurs some days after)
-	/**
-	 * @var string Fieldname with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_facture';
-	/**
-	 * @var string String with name of icon for myobject.
-	 */
-	public $picto = 'bill'; // deprecated
+    /**
+     * @var string ID to identify managed object
+     */
+    public $element = 'facture';
 
-	//Check constants for types
-	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1;
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'facture';
 
-	//var $amount;
+    /**
+     * @var string    Name of subtable line
+     */
+    public $table_element_line = 'facturedet';
+
+    /**
+     * @var string Fieldname with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_facture';
+
+    /**
+     * @var string String with name of icon for myobject.
+     */
+    public $picto = 'bill';
+
 	/**
-	 * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
-	 * @var integer
-	 */
-	public $restrictiononfksoc = 1;
-	/**
-	 * @var int 1 if status is draft
-	 * @deprecated
-	 */
-	public $brouillon;
-	/**
-	 * @var int thirdparty ID
-	 */
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
+     *
+     * @var integer
+     */
+    public $restrictiononfksoc = 1;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    /**
+     * @var int 1 if status is draft
+     * @deprecated
+     */
+    public $brouillon;
+
+    /**
+     * @var int thirdparty ID
+     */
 	public $socid;
+
 	public $author;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_author;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_valid;
-public $date;
-	public $datem;
-/**
-	 * @var int	Date expected for delivery
-	 * @deprecated
-	 */
-	public $date_livraison;
-public $delivery_date;
-	/**
-	 * @var string customer ref
-	 */
-	public $ref_client;
 
-	//! key of module source when invoice generated from a dedicated module ('cashdesk', 'takepos', ...)
-/**
-	 * @var int Ref Int
-	 * @deprecated
-	 */
-	public $ref_int;
-	//! key of pos source ('0', '1', ...)
-	public $type = self::TYPE_STANDARD;
-	//! id of template invoice when generated from a template invoice
-	public $remise_absolue;
-	//! id of source invoice if replacement invoice or credit note
-	public $remise_percent;
-	public $total_ht = 0;
-	public $total_tva = 0;
-		public $total_localtax1 = 0; // Code in llx_c_paiement
-		public $total_localtax2 = 0; // Code in llx_c_paiement
-	public $total_ttc = 0;
-	public $revenuestamp;
-	/**
-	 * ! Closing after partial payment: discount_vat, badsupplier, abandon
-	 * ! Closing when no payment: replaced, abandoned
-	 * @var string Close code
-	 */
-	public $close_code;
-	/**
-	 * ! Comment if paid without full payment
-	 * @var string Close note
-	 */
-	public $close_note;
-	/**
-	 * 1 if invoice paid COMPLETELY, 0 otherwise (do not use it anymore, use statut and close_code)
-	 */
-	public $paye;
-	public $module_source;
+    /**
+     * @var int ID
+     */
+    public $fk_user_author;
 
-	// Multicurrency
-	public $pos_source;
-	public $fk_fac_rec_source;
-	public $fk_facture_source;
-	public $linked_objects = array();
-	public $date_lim_reglement;
-public $cond_reglement_code;
-public $mode_reglement_code;
-	/**
-	 * @var int ID Field to store bank id to use when payment mode is withdraw
-	 */
-	public $fk_bank;
-	/**
-	 * @var FactureLigne[]
-	 */
-	public $lines = array();
-	public $line;
-	public $extraparams = array();
-	public $fac_rec;
-	public $date_pointoftax;
-	/**
-	 * @var int ID
-	 */
-	public $fk_multicurrency;
-	public $multicurrency_code;
+    /**
+     * @var int ID
+     */
+    public $fk_user_valid;
 
+    public $date; // Date invoice
+    public $datem;
 
-	/**
-	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'noteditable' says if field is not editable (1 or 0)
-	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
-	 *  'index' if we want an index in database.
-	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
-	 *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
-	 *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
-	 *  'css' is the CSS style to use on field. For example: 'maxwidth200'
-	 *  'help' is a string visible as a tooltip on field
-	 *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
-	 *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
-	 *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
-	 *  'comment' is not used. You can store here any text of your choice. It is not used by application.
-	 *
-	 *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
-	 */
+    /**
+     * @var int    Date expected for delivery
+     * @deprecated
+     */
+    public $date_livraison; // deprecated; Use delivery_date instead.
+
+    public $delivery_date; // Date expected of shipment (date starting shipment, not the reception that occurs some days after)
+
+    /**
+     * @var string customer ref
+     */
+    public $ref_client;
+
+    /**
+     * @var int Ref Int
+     * @deprecated
+     */
+    public $ref_int; // deprecated
+
+    //Check constants for types
+    public $type = self::TYPE_STANDARD;
+
+    //var $amount;
+    public $remise_absolue;
+    public $remise_percent;
+    public $total_ht = 0;
+    public $total_tva = 0;
+    public $total_localtax1 = 0;
+    public $total_localtax2 = 0;
+    public $total_ttc = 0;
+    public $revenuestamp;
+
+    /**
+     * ! Closing after partial payment: discount_vat, badsupplier, abandon
+     * ! Closing when no payment: replaced, abandoned
+     *
+     * @var string Close code
+     */
+    public $close_code;
+
+    /**
+     * ! Comment if paid without full payment
+     *
+     * @var string Close note
+     */
+    public $close_note;
+
+    /**
+     * 1 if invoice paid COMPLETELY, 0 otherwise (do not use it anymore, use statut and close_code)
+     */
+    public $paye;
+
+    //! key of module source when invoice generated from a dedicated module ('cashdesk', 'takepos', ...)
+    public $module_source;
+    //! key of pos source ('0', '1', ...)
+    public $pos_source;
+    //! id of template invoice when generated from a template invoice
+    public $fk_fac_rec_source;
+    //! id of source invoice if replacement invoice or credit note
+    public $fk_facture_source;
+    public $linked_objects = [];
+
+    public $date_lim_reglement;
+    public $cond_reglement_code; // Code in llx_c_paiement
+    public $mode_reglement_code; // Code in llx_c_paiement
+
+    /**
+     * @var int ID Field to store bank id to use when payment mode is withdraw
+     */
+    public $fk_bank;
+
+    /**
+     * @var FactureLigne[]
+     */
+    public $lines = [];
+
+    public $line;
+    public $extraparams = [];
+
+    public $fac_rec;
+
+    public $date_pointoftax;
+
+    // Multicurrency
+    /**
+     * @var int ID
+     */
+    public $fk_multicurrency;
+
+    public $multicurrency_code;
+    public $multicurrency_tx;
+    public $multicurrency_total_ht;
+    public $multicurrency_total_tva;
+    public $multicurrency_total_ttc;
+
+    /**
+     * @var int Situation cycle reference number
+     */
+    public $situation_cycle_ref;
+
+    /**
+     * @var int Situation counter inside the cycle
+     */
+    public $situation_counter;
+
+    /**
+     * @var int Final situation flag
+     */
+    public $situation_final;
+
+    /**
+     * @var array Table of previous situations
+     */
+    public $tab_previous_situation_invoice = [];
+
+    /**
+     * @var array Table of next situations
+     */
+    public $tab_next_situation_invoice = [];
+
+    public $oldcopy;
+
+    /**
+     * @var double percentage of retainage
+     */
+    public $retained_warranty;
+
+    /**
+     * @var int timestamp of date limit of retainage
+     */
+    public $retained_warranty_date_limit;
+
+    /**
+     * @var int Code in llx_c_paiement
+     */
+    public $retained_warranty_fk_cond_reglement;
+
+    /**
+     *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'noteditable' says if field is not editable (1 or 0)
+     *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
+     *  'index' if we want an index in database.
+     *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
+     *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
+     *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
+     *  'css' is the CSS style to use on field. For example: 'maxwidth200'
+     *  'help' is a string visible as a tooltip on field
+     *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
+     *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
+     *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
+     *  'comment' is not used. You can store here any text of your choice. It is not used by application.
+     *
+     *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
+     */
 
 	// BEGIN MODULEBUILDER PROPERTIES
-	public $multicurrency_tx;
-	// END MODULEBUILDER PROPERTIES
-	public $multicurrency_total_ht;
-	public $multicurrency_total_tva;
-	public $multicurrency_total_ttc;
 	/**
-	 * @var int Situation cycle reference number
-	 */
-	public $situation_cycle_ref;
-	/**
-	 * @var int Situation counter inside the cycle
-	 */
-	public $situation_counter;
-	/**
-	 * @var int Final situation flag
-	 */
-	public $situation_final;
-	/**
-	 * @var array Table of previous situations
-	 */
-	public $tab_previous_situation_invoice = array();
-	/**
-	 * @var array Table of next situations
-	 */
-	public $tab_next_situation_invoice = array();
-	public $oldcopy;
-	/**
-	 * @var double percentage of retainage
-	 */
-	public $retained_warranty;
-	/**
-	 * @var int timestamp of date limit of retainage
-	 */
-	public $retained_warranty_date_limit; // Abandonned remain - escompte
-		/**
-	 * @var int Code in llx_c_paiement
-	 */
-	public $retained_warranty_fk_cond_reglement; // Abandonned - bad
-		/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>1),
-		'ref' =>array('type'=>'varchar(30)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>5),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>20, 'index'=>1),
-		'ref_client' =>array('type'=>'varchar(255)', 'label'=>'RefCustomer', 'enabled'=>1, 'visible'=>-1, 'position'=>10),
-		'ref_ext' =>array('type'=>'varchar(255)', 'label'=>'Ref ext', 'enabled'=>1, 'visible'=>0, 'position'=>12),
-		//'ref_int' =>array('type'=>'varchar(255)', 'label'=>'Ref int', 'enabled'=>1, 'visible'=>0, 'position'=>30), // deprecated
-		'type' =>array('type'=>'smallint(6)', 'label'=>'Type', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>15),
-		//'increment' =>array('type'=>'varchar(10)', 'label'=>'Increment', 'enabled'=>1, 'visible'=>-1, 'position'=>45),
-		'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>50),
-		'datef' =>array('type'=>'date', 'label'=>'DateInvoice', 'enabled'=>1, 'visible'=>1, 'position'=>20),
-		'date_valid' =>array('type'=>'date', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>22),
-		'date_lim_reglement' =>array('type'=>'date', 'label'=>'DateDue', 'enabled'=>1, 'visible'=>1, 'position'=>25),
-		'date_closing' =>array('type'=>'datetime', 'label'=>'Date closing', 'enabled'=>1, 'visible'=>-1, 'position'=>30),
-		'paye' =>array('type'=>'smallint(6)', 'label'=>'InvoicePaidCompletely', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>80),
-		//'amount' =>array('type'=>'double(24,8)', 'label'=>'Amount', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>85),
-		'remise_percent' =>array('type'=>'double', 'label'=>'RelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
-		'remise_absolue' =>array('type'=>'double', 'label'=>'CustomerRelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>91),
-		//'remise' =>array('type'=>'double', 'label'=>'Remise', 'enabled'=>1, 'visible'=>-1, 'position'=>100),
-		'close_code' =>array('type'=>'varchar(16)', 'label'=>'EarlyClosingReason', 'enabled'=>1, 'visible'=>-1, 'position'=>92),
-		'close_note' =>array('type'=>'varchar(128)', 'label'=>'EarlyClosingComment', 'enabled'=>1, 'visible'=>-1, 'position'=>93),
-		'total_ht' =>array('type'=>'double(24,8)', 'label'=>'AmountHT', 'enabled'=>1, 'visible'=>1, 'position'=>95, 'isameasure'=>1),
-		'total_tva' =>array('type'=>'double(24,8)', 'label'=>'AmountVAT', 'enabled'=>1, 'visible'=>-1, 'position'=>100, 'isameasure'=>1),
-		'localtax1' =>array('type'=>'double(24,8)', 'label'=>'LT1', 'enabled'=>1, 'visible'=>-1, 'position'=>110, 'isameasure'=>1),
-		'localtax2' =>array('type'=>'double(24,8)', 'label'=>'LT2', 'enabled'=>1, 'visible'=>-1, 'position'=>120, 'isameasure'=>1),
-		'revenuestamp' =>array('type'=>'double(24,8)', 'label'=>'RevenueStamp', 'enabled'=>1, 'visible'=>-1, 'position'=>115, 'isameasure'=>1),
-		'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'AmountTTC', 'enabled'=>1, 'visible'=>1, 'position'=>130, 'isameasure'=>1),
-		'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>1, 'visible'=>-1, 'position'=>165),
-		'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>166),
-		'fk_user_valid' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>167),
-		'fk_user_closing' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserClosing', 'enabled'=>1, 'visible'=>-1, 'position'=>168),
-		'fk_facture_source' =>array('type'=>'integer', 'label'=>'SourceInvoice', 'enabled'=>1, 'visible'=>-1, 'position'=>170),
-		'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Project', 'enabled'=>1, 'visible'=>-1, 'position'=>175),
-		'fk_account' =>array('type'=>'integer', 'label'=>'Fk account', 'enabled'=>1, 'visible'=>-1, 'position'=>180),
-		'fk_currency' =>array('type'=>'varchar(3)', 'label'=>'CurrencyCode', 'enabled'=>1, 'visible'=>-1, 'position'=>185),
-		'fk_cond_reglement' =>array('type'=>'integer', 'label'=>'PaymentTerm', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>190),
-		'fk_mode_reglement' =>array('type'=>'integer', 'label'=>'PaymentMode', 'enabled'=>1, 'visible'=>-1, 'position'=>195),
-		'note_private' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>205),
-		'note_public' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>210),
-		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>1, 'visible'=>0, 'position'=>215),
-		'extraparams' =>array('type'=>'varchar(255)', 'label'=>'Extraparams', 'enabled'=>1, 'visible'=>-1, 'position'=>225),
-		'situation_cycle_ref' =>array('type'=>'smallint(6)', 'label'=>'Situation cycle ref', 'enabled'=>'$conf->global->INVOICE_USE_SITUATION', 'visible'=>-1, 'position'=>230),
-		'situation_counter' =>array('type'=>'smallint(6)', 'label'=>'Situation counter', 'enabled'=>'$conf->global->INVOICE_USE_SITUATION', 'visible'=>-1, 'position'=>235),
-		'situation_final' =>array('type'=>'smallint(6)', 'label'=>'Situation final', 'enabled'=>'empty($conf->global->INVOICE_USE_SITUATION) ? 0 : 1', 'visible'=>-1, 'position'=>240),
-		'retained_warranty' =>array('type'=>'double', 'label'=>'Retained warranty', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>245),
-		'retained_warranty_date_limit' =>array('type'=>'date', 'label'=>'Retained warranty date limit', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>250),
-		'retained_warranty_fk_cond_reglement' =>array('type'=>'integer', 'label'=>'Retained warranty fk cond reglement', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>255),
-		'fk_incoterms' =>array('type'=>'integer', 'label'=>'IncotermCode', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>260),
-		'location_incoterms' =>array('type'=>'varchar(255)', 'label'=>'IncotermLabel', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>265),
-		'date_pointoftax' =>array('type'=>'date', 'label'=>'DatePointOfTax', 'enabled'=>'$conf->global->INVOICE_POINTOFTAX_DATE', 'visible'=>-1, 'position'=>270),
-		'fk_multicurrency' =>array('type'=>'integer', 'label'=>'MulticurrencyID', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>275),
-		'multicurrency_code' =>array('type'=>'varchar(255)', 'label'=>'Currency', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>280),
-		'multicurrency_tx' =>array('type'=>'double(24,8)', 'label'=>'CurrencyRate', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>285, 'isameasure'=>1),
-		'multicurrency_total_ht' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountHT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>290, 'isameasure'=>1),
-		'multicurrency_total_tva' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountVAT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>291, 'isameasure'=>1),
-		'multicurrency_total_ttc' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountTTC', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>292, 'isameasure'=>1),
-		'fk_fac_rec_source' =>array('type'=>'integer', 'label'=>'RecurringInvoiceSource', 'enabled'=>1, 'visible'=>-1, 'position'=>305),
-		'last_main_doc' =>array('type'=>'varchar(255)', 'label'=>'LastMainDoc', 'enabled'=>1, 'visible'=>-1, 'position'=>310),
-		'module_source' =>array('type'=>'varchar(32)', 'label'=>'POSModule', 'enabled'=>1, 'visible'=>-1, 'position'=>315),
-		'pos_source' =>array('type'=>'varchar(32)', 'label'=>'POSTerminal', 'enabled'=>1, 'visible'=>-1, 'position'=>320),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>500),
-		'tms' =>array('type'=>'timestamp', 'label'=>'DateModificationShort', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>500),
-		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>900),
-		'fk_statut' =>array('type'=>'smallint(6)', 'label'=>'Status', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'position'=>1000, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Validated', 2=>'Paid', 3=>'Abandonned')),
-	); // Abandonned - other
-		/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref'; // Closed after doing a replacement invoice
+        'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>1),
+        'ref' =>array('type'=>'varchar(30)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>5),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>20, 'index'=>1),
+        'ref_client' =>array('type'=>'varchar(255)', 'label'=>'RefCustomer', 'enabled'=>1, 'visible'=>-1, 'position'=>10),
+        'ref_ext' =>array('type'=>'varchar(255)', 'label'=>'Ref ext', 'enabled'=>1, 'visible'=>0, 'position'=>12),
+        //'ref_int' =>array('type'=>'varchar(255)', 'label'=>'Ref int', 'enabled'=>1, 'visible'=>0, 'position'=>30), // deprecated
+        'type' =>array('type'=>'smallint(6)', 'label'=>'Type', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>15),
+        //'increment' =>array('type'=>'varchar(10)', 'label'=>'Increment', 'enabled'=>1, 'visible'=>-1, 'position'=>45),
+        'fk_soc' =>array('type'=>'integer:Societe:societe/class/societe.class.php', 'label'=>'ThirdParty', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>50),
+        'datef' =>array('type'=>'date', 'label'=>'DateInvoice', 'enabled'=>1, 'visible'=>1, 'position'=>20),
+        'date_valid' =>array('type'=>'date', 'label'=>'DateValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>22),
+        'date_lim_reglement' =>array('type'=>'date', 'label'=>'DateDue', 'enabled'=>1, 'visible'=>1, 'position'=>25),
+        'date_closing' =>array('type'=>'datetime', 'label'=>'Date closing', 'enabled'=>1, 'visible'=>-1, 'position'=>30),
+        'paye' =>array('type'=>'smallint(6)', 'label'=>'InvoicePaidCompletely', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>80),
+        //'amount' =>array('type'=>'double(24,8)', 'label'=>'Amount', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>85),
+        'remise_percent' =>array('type'=>'double', 'label'=>'RelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
+        'remise_absolue' =>array('type'=>'double', 'label'=>'CustomerRelativeDiscount', 'enabled'=>1, 'visible'=>-1, 'position'=>91),
+        //'remise' =>array('type'=>'double', 'label'=>'Remise', 'enabled'=>1, 'visible'=>-1, 'position'=>100),
+        'close_code' =>array('type'=>'varchar(16)', 'label'=>'EarlyClosingReason', 'enabled'=>1, 'visible'=>-1, 'position'=>92),
+        'close_note' =>array('type'=>'varchar(128)', 'label'=>'EarlyClosingComment', 'enabled'=>1, 'visible'=>-1, 'position'=>93),
+        'total_ht' =>array('type'=>'double(24,8)', 'label'=>'AmountHT', 'enabled'=>1, 'visible'=>1, 'position'=>95, 'isameasure'=>1),
+        'total_tva' =>array('type'=>'double(24,8)', 'label'=>'AmountVAT', 'enabled'=>1, 'visible'=>-1, 'position'=>100, 'isameasure'=>1),
+        'localtax1' =>array('type'=>'double(24,8)', 'label'=>'LT1', 'enabled'=>1, 'visible'=>-1, 'position'=>110, 'isameasure'=>1),
+        'localtax2' =>array('type'=>'double(24,8)', 'label'=>'LT2', 'enabled'=>1, 'visible'=>-1, 'position'=>120, 'isameasure'=>1),
+        'revenuestamp' =>array('type'=>'double(24,8)', 'label'=>'RevenueStamp', 'enabled'=>1, 'visible'=>-1, 'position'=>115, 'isameasure'=>1),
+        'total_ttc' =>array('type'=>'double(24,8)', 'label'=>'AmountTTC', 'enabled'=>1, 'visible'=>1, 'position'=>130, 'isameasure'=>1),
+        'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>1, 'visible'=>-1, 'position'=>165),
+        'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>166),
+        'fk_user_valid' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserValidation', 'enabled'=>1, 'visible'=>-1, 'position'=>167),
+        'fk_user_closing' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserClosing', 'enabled'=>1, 'visible'=>-1, 'position'=>168),
+        'fk_facture_source' =>array('type'=>'integer', 'label'=>'SourceInvoice', 'enabled'=>1, 'visible'=>-1, 'position'=>170),
+        'fk_projet' =>array('type'=>'integer:Project:projet/class/project.class.php:1:fk_statut=1', 'label'=>'Project', 'enabled'=>1, 'visible'=>-1, 'position'=>175),
+        'fk_account' =>array('type'=>'integer', 'label'=>'Fk account', 'enabled'=>1, 'visible'=>-1, 'position'=>180),
+        'fk_currency' =>array('type'=>'varchar(3)', 'label'=>'CurrencyCode', 'enabled'=>1, 'visible'=>-1, 'position'=>185),
+        'fk_cond_reglement' =>array('type'=>'integer', 'label'=>'PaymentTerm', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>190),
+        'fk_mode_reglement' =>array('type'=>'integer', 'label'=>'PaymentMode', 'enabled'=>1, 'visible'=>-1, 'position'=>195),
+        'note_private' =>array('type'=>'text', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>205),
+        'note_public' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>210),
+        'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>1, 'visible'=>0, 'position'=>215),
+        'extraparams' =>array('type'=>'varchar(255)', 'label'=>'Extraparams', 'enabled'=>1, 'visible'=>-1, 'position'=>225),
+        'situation_cycle_ref' =>array('type'=>'smallint(6)', 'label'=>'Situation cycle ref', 'enabled'=>'$conf->global->INVOICE_USE_SITUATION', 'visible'=>-1, 'position'=>230),
+        'situation_counter' =>array('type'=>'smallint(6)', 'label'=>'Situation counter', 'enabled'=>'$conf->global->INVOICE_USE_SITUATION', 'visible'=>-1, 'position'=>235),
+        'situation_final' =>array('type'=>'smallint(6)', 'label'=>'Situation final', 'enabled'=>'empty($conf->global->INVOICE_USE_SITUATION) ? 0 : 1', 'visible'=>-1, 'position'=>240),
+        'retained_warranty' =>array('type'=>'double', 'label'=>'Retained warranty', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>245),
+        'retained_warranty_date_limit' =>array('type'=>'date', 'label'=>'Retained warranty date limit', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>250),
+        'retained_warranty_fk_cond_reglement' =>array('type'=>'integer', 'label'=>'Retained warranty fk cond reglement', 'enabled'=>'$conf->global->INVOICE_USE_RETAINED_WARRANTY', 'visible'=>-1, 'position'=>255),
+        'fk_incoterms' =>array('type'=>'integer', 'label'=>'IncotermCode', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>260),
+        'location_incoterms' =>array('type'=>'varchar(255)', 'label'=>'IncotermLabel', 'enabled'=>'$conf->incoterm->enabled', 'visible'=>-1, 'position'=>265),
+        'date_pointoftax' =>array('type'=>'date', 'label'=>'DatePointOfTax', 'enabled'=>'$conf->global->INVOICE_POINTOFTAX_DATE', 'visible'=>-1, 'position'=>270),
+        'fk_multicurrency' =>array('type'=>'integer', 'label'=>'MulticurrencyID', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>275),
+        'multicurrency_code' =>array('type'=>'varchar(255)', 'label'=>'Currency', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>280),
+        'multicurrency_tx' =>array('type'=>'double(24,8)', 'label'=>'CurrencyRate', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>285, 'isameasure'=>1),
+        'multicurrency_total_ht' =>array('type'=>'double(24,8)', 'label'=>'MulticurrencyAmountHT', 'enabled'=>'$conf->multicurrency->enabled', 'visible'=>-1, 'position'=>290, 'isameasure'=>1),
+        'multicurrency_total_tva' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyAmountVAT', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 291, 'isameasure' => 1),
+        'multicurrency_total_ttc' => array('type' => 'double(24,8)', 'label' => 'MulticurrencyAmountTTC', 'enabled' => '$conf->multicurrency->enabled', 'visible' => -1, 'position' => 292, 'isameasure' => 1),
+        'fk_fac_rec_source' => array('type' => 'integer', 'label' => 'RecurringInvoiceSource', 'enabled' => 1, 'visible' => -1, 'position' => 305),
+        'last_main_doc' => array('type' => 'varchar(255)', 'label' => 'LastMainDoc', 'enabled' => 1, 'visible' => -1, 'position' => 310),
+        'module_source' => array('type' => 'varchar(32)', 'label' => 'POSModule', 'enabled' => 1, 'visible' => -1, 'position' => 315),
+        'pos_source' => array('type' => 'varchar(32)', 'label' => 'POSTerminal', 'enabled' => 1, 'visible' => -1, 'position' => 320),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -1, 'position' => 500),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModificationShort', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 500),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'position' => 900),
+        'fk_statut' => array('type' => 'smallint(6)', 'label' => 'Status', 'enabled' => 1, 'visible' => 1, 'notnull' => 1, 'position' => 1000, 'arrayofkeyval' => array(0 => 'Draft', 1 => 'Validated', 2 => 'Paid', 3 => 'Abandonned')),
+    );
+    // END MODULEBUILDER PROPERTIES
 
-	/**
-	 * 	Constructor
-	 *
-	 * 	@param	DoliDB		$db			Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * Standard invoice
+     */
+    const TYPE_STANDARD = 0;
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param  DoliDB  $db             Database handler
-	 * @param  int     $origin_id      Old third-party id
-	 * @param  int     $dest_id        New third-party id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'facture'
-		);
+    /**
+     * Replacement invoice
+     */
+    const TYPE_REPLACEMENT = 1;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+    /**
+     * Credit note invoice
+     */
+    const TYPE_CREDIT_NOTE = 2;
 
-	/**
-	 *	Create a new invoice in database from current invoice
-	 *
-	 *	@param      User	$user    		Object user that ask creation
-	 *	@param		int		$invertdetail	Reverse sign of amounts for lines
-	 *	@return		int						<0 if KO, >0 if OK
-	 */
-	public function createFromCurrent(User $user, $invertdetail = 0)
-	{
-		global $conf;
+    /**
+     * Deposit invoice
+     */
+    const TYPE_DEPOSIT = 3;
 
-		// Charge facture source
-		$facture = new Facture($this->db);
+    /**
+     * Proforma invoice (should not be used. a proforma is an order)
+     */
+    const TYPE_PROFORMA = 4;
 
-		// Retrieve all extrafield
-		// fetch optionals attributes and labels
-		$this->fetch_optionals();
+    /**
+     * Situation invoice
+     */
+    const TYPE_SITUATION = 5;
 
-		if (!empty($this->array_options)) {
-					$facture->array_options = $this->array_options;
-		}
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
 
-		foreach ($this->lines as &$line) {
-					$line->fetch_optionals(); //fetch extrafields
-		}
+    /**
+     * Validated (need to be paid)
+     */
+    const STATUS_VALIDATED = 1;
 
-		$facture->fk_facture_source = $this->fk_facture_source;
-		$facture->type 			    = $this->type;
-		$facture->socid 		    = $this->socid;
-		$facture->date              = $this->date;
-		$facture->date_pointoftax   = $this->date_pointoftax;
-		$facture->note_public       = $this->note_public;
-		$facture->note_private      = $this->note_private;
-		$facture->ref_client        = $this->ref_client;
-		$facture->modelpdf          = $this->model_pdf; // deprecated
-		$facture->model_pdf         = $this->model_pdf;
-		$facture->fk_project        = $this->fk_project;
-		$facture->cond_reglement_id = $this->cond_reglement_id;
-		$facture->mode_reglement_id = $this->mode_reglement_id;
-		$facture->remise_absolue    = $this->remise_absolue;
-		$facture->remise_percent    = $this->remise_percent;
+    /**
+     * Classified paid.
+     * If paid partially, $this->close_code can be:
+     * - CLOSECODE_DISCOUNTVAT
+     * - CLOSECODE_BADDEBT
+     * If paid completely, this->close_code will be null
+     */
+    const STATUS_CLOSED = 2;
 
-		$facture->origin            = $this->origin;
-		$facture->origin_id         = $this->origin_id;
+    /**
+     * Classified abandoned and no payment done.
+     * $this->close_code can be:
+     * - CLOSECODE_BADDEBT
+     * - CLOSECODE_ABANDONED
+     * - CLOSECODE_REPLACED
+     */
+    const STATUS_ABANDONED = 3;
 
-		$facture->lines = $this->lines; // Array of lines of invoice
-		$facture->situation_counter = $this->situation_counter;
-		$facture->situation_cycle_ref = $this->situation_cycle_ref;
-		$facture->situation_final = $this->situation_final;
+    const CLOSECODE_DISCOUNTVAT = 'discount_vat'; // Abandonned remain - escompte
+    const CLOSECODE_BADDEBT = 'badcustomer'; // Abandonned - bad
+    const CLOSECODE_ABANDONED = 'abandon'; // Abandonned - other
+    const CLOSECODE_REPLACED = 'replaced'; // Closed after doing a replacement invoice
 
-		$facture->retained_warranty = $this->retained_warranty;
-		$facture->retained_warranty_fk_cond_reglement = $this->retained_warranty_fk_cond_reglement;
-		$facture->retained_warranty_date_limit = $this->retained_warranty_date_limit;
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
-		$facture->fk_user_author = $user->id;
-
-
-		// Loop on each line of new invoice
-		foreach ($facture->lines as $i => $tmpline) {
-			$facture->lines[$i]->fk_prev_id = $this->lines[$i]->rowid;
-			if ($invertdetail) {
-				$facture->lines[$i]->subprice  = -$facture->lines[$i]->subprice;
-				$facture->lines[$i]->total_ht  = -$facture->lines[$i]->total_ht;
-				$facture->lines[$i]->total_tva = -$facture->lines[$i]->total_tva;
-				$facture->lines[$i]->total_localtax1 = -$facture->lines[$i]->total_localtax1;
-				$facture->lines[$i]->total_localtax2 = -$facture->lines[$i]->total_localtax2;
-				$facture->lines[$i]->total_ttc = -$facture->lines[$i]->total_ttc;
-				$facture->lines[$i]->ref_ext = '';
-			}
-		}
-
-		dol_syslog(get_class($this)."::createFromCurrent invertdetail=".$invertdetail." socid=".$this->socid." nboflines=".count($facture->lines));
-
-		$facid = $facture->create($user);
-		if ($facid <= 0) {
-			$this->error = $facture->error;
-			$this->errors = $facture->errors;
-		} elseif ($this->type == self::TYPE_SITUATION && !empty($conf->global->INVOICE_USE_SITUATION)) {
-			$this->fetchObjectLinked('', '', $this->id, 'facture');
-
-			foreach ($this->linkedObjectsIds as $typeObject => $Tfk_object) {
-				foreach ($Tfk_object as $fk_object) {
-					$facture->add_object_linked($typeObject, $fk_object);
-				}
-			}
-
-			$facture->add_object_linked('facture', $this->fk_facture_source);
-		}
-
-		return $facid;
-	}
-
-	/**
-	 *	Create invoice in database.
+    /**
+     *	Create invoice in database.
 	 *  Note: this->ref can be set or empty. If empty, we will use "(PROV999)"
 	 *  Note: this->fac_rec must be set to create invoice from a recurring invoice
 	 *
@@ -526,7 +466,7 @@ public $mode_reglement_code;
 
 		// Multicurrency (test on $this->multicurrency_tx because we should take the default rate only if not using origin rate)
 		if (!empty($this->multicurrency_code) && empty($this->multicurrency_tx)) {
-			list($this->fk_multicurrency, $this->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($this->db, $this->multicurrency_code, $this->date);
+			[$this->fk_multicurrency, $this->multicurrency_tx] = MultiCurrency::getIdAndTxFromCode($this->db, $this->multicurrency_code, $this->date);
 		} else {
 			$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
 		}
@@ -1098,319 +1038,118 @@ public $mode_reglement_code;
 			} else {
 				dol_syslog(get_class($this)."::create error ".$this->error, LOG_ERR);
 				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                return -2;
+            }
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *  Add an invoice line into database (linked to product/service or not).
-	 *  Les parametres sont deja cense etre juste et avec valeurs finales a l'appel
-	 *  de cette methode. Aussi, pour le taux tva, il doit deja avoir ete defini
-	 *  par l'appelant par la methode get_default_tva(societe_vendeuse,societe_acheteuse,produit)
-	 *  et le desc doit deja avoir la bonne valeur (a l'appelant de gerer le multilangue)
-	 *
-	 *  @param    	string		$desc            	Description of line
-	 *  @param    	double		$pu_ht              Unit price without tax (> 0 even for credit note)
-	 *  @param    	double		$qty             	Quantity
-	 *  @param    	double		$txtva           	Force Vat rate, -1 for auto (Can contain the vat_src_code too with syntax '9.9 (CODE)')
-	 *  @param		double		$txlocaltax1		Local tax 1 rate (deprecated, use instead txtva with code inside)
-	 *  @param		double		$txlocaltax2		Local tax 2 rate (deprecated, use instead txtva with code inside)
-	 *  @param    	int			$fk_product      	Id of predefined product/service
-	 *  @param    	double		$remise_percent  	Percent of discount on line
-	 *  @param    	int			$date_start      	Date start of service
-	 *  @param    	int			$date_end        	Date end of service
-	 *  @param    	int			$ventil          	Code of dispatching into accountancy
-	 *  @param    	int			$info_bits			Bits of type of lines
-	 *  @param    	int			$fk_remise_except	Id discount used
-	 *  @param		string		$price_base_type	'HT' or 'TTC'
-	 *  @param    	double		$pu_ttc             Unit price with tax (> 0 even for credit note)
-	 *  @param		int			$type				Type of line (0=product, 1=service). Not used if fk_product is defined, the type of product is used.
-	 *  @param      int			$rang               Position of line
-	 *  @param		int			$special_code		Special code (also used by externals modules!)
-	 *  @param		string		$origin				Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be 'orderdet', 'propaldet'..., else 'order','propal,'....
-	 *  @param		int			$origin_id			Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
-	 *  @param		int			$fk_parent_line		Id of parent line
-	 *  @param		int			$fk_fournprice		Supplier price id (to calculate margin) or ''
-	 *  @param		int			$pa_ht				Buying price of line (to calculate margin) or ''
-	 *  @param		string		$label				Label of the line (deprecated, do not use)
-	 *  @param		array		$array_options		extrafields array
-	 *  @param      int         $situation_percent  Situation advance percentage
-	 *  @param      int         $fk_prev_id         Previous situation line id reference
-	 *  @param 		string		$fk_unit 			Code of the unit to use. Null to use the default one
-	 *  @param		double		$pu_ht_devise		Unit price in foreign currency
-	 *  @param		string		$ref_ext		    External reference of the line
-	 *  @return    	int             				<0 if KO, Id of line if OK
-	 */
-	public function addline(
-		$desc,
-		$pu_ht,
-		$qty,
-		$txtva,
-		$txlocaltax1 = 0,
-		$txlocaltax2 = 0,
-		$fk_product = 0,
-		$remise_percent = 0,
-		$date_start = '',
-		$date_end = '',
-		$ventil = 0,
-		$info_bits = 0,
-		$fk_remise_except = '',
-		$price_base_type = 'HT',
-		$pu_ttc = 0,
-		$type = self::TYPE_STANDARD,
-		$rang = -1,
-		$special_code = 0,
-		$origin = '',
-		$origin_id = 0,
-		$fk_parent_line = 0,
-		$fk_fournprice = null,
-		$pa_ht = 0,
-		$label = '',
-		$array_options = 0,
-		$situation_percent = 100,
-		$fk_prev_id = 0,
-		$fk_unit = null,
-		$pu_ht_devise = 0,
-		$ref_ext = ''
-	) {
-		// Deprecation warning
-		if ($label) {
-			dol_syslog(__METHOD__.": using line label is deprecated", LOG_WARNING);
-			//var_dump(debug_backtrace(false));exit;
-		}
+    /**
+     *    Create a new invoice in database from current invoice
+     *
+     * @param User $user         Object user that ask creation
+     * @param int  $invertdetail Reverse sign of amounts for lines
+     *
+     * @return        int                        <0 if KO, >0 if OK
+     */
+    public function createFromCurrent(User $user, $invertdetail = 0)
+    {
+        global $conf;
 
-		global $mysoc, $conf, $langs;
+        // Charge facture source
+        $facture = new Facture($this->db);
 
-		dol_syslog(get_class($this)."::addline id=$this->id,desc=$desc,pu_ht=$pu_ht,qty=$qty,txtva=$txtva, txlocaltax1=$txlocaltax1, txlocaltax2=$txlocaltax2, fk_product=$fk_product,remise_percent=$remise_percent,date_start=$date_start,date_end=$date_end,ventil=$ventil,info_bits=$info_bits,fk_remise_except=$fk_remise_except,price_base_type=$price_base_type,pu_ttc=$pu_ttc,type=$type, fk_unit=$fk_unit", LOG_DEBUG);
+        // Retrieve all extrafield
+        // fetch optionals attributes and labels
+        $this->fetch_optionals();
 
-		if ($this->statut == self::STATUS_DRAFT) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
+        if (!empty($this->array_options)) {
+            $facture->array_options = $this->array_options;
+        }
 
-			// Clean parameters
-			if (empty($remise_percent)) {
-				$remise_percent = 0;
-			}
-			if (empty($qty)) {
-				$qty = 0;
-			}
-			if (empty($info_bits)) {
-				$info_bits = 0;
-			}
-			if (empty($rang)) {
-				$rang = 0;
-			}
-			if (empty($ventil)) {
-				$ventil = 0;
-			}
-			if (empty($txtva)) {
-				$txtva = 0;
-			}
-			if (empty($txlocaltax1)) {
-				$txlocaltax1 = 0;
-			}
-			if (empty($txlocaltax2)) {
-				$txlocaltax2 = 0;
-			}
-			if (empty($fk_parent_line) || $fk_parent_line < 0) {
-				$fk_parent_line = 0;
-			}
-			if (empty($fk_prev_id)) {
-				$fk_prev_id = 'null';
-			}
-			if (!isset($situation_percent) || $situation_percent > 100 || (string) $situation_percent == '') {
-				$situation_percent = 100;
-			}
-			if (empty($ref_ext)) {
-				$ref_ext = '';
-			}
+        foreach ($this->lines as &$line) {
+            $line->fetch_optionals(); //fetch extrafields
+        }
 
-			$remise_percent = price2num($remise_percent);
-			$qty = price2num($qty);
-			$pu_ht = price2num($pu_ht);
-			$pu_ht_devise = price2num($pu_ht_devise);
-			$pu_ttc = price2num($pu_ttc);
-			$pa_ht = price2num($pa_ht);
-			if (!preg_match('/\((.*)\)/', $txtva)) {
-				$txtva = price2num($txtva); // $txtva can have format '5.0(XXX)' or '5'
-			}
-			$txlocaltax1 = price2num($txlocaltax1);
-			$txlocaltax2 = price2num($txlocaltax2);
+        $facture->fk_facture_source = $this->fk_facture_source;
+        $facture->type = $this->type;
+        $facture->socid = $this->socid;
+        $facture->date = $this->date;
+        $facture->date_pointoftax = $this->date_pointoftax;
+        $facture->note_public = $this->note_public;
+        $facture->note_private = $this->note_private;
+        $facture->ref_client = $this->ref_client;
+        $facture->modelpdf = $this->model_pdf; // deprecated
+        $facture->model_pdf = $this->model_pdf;
+        $facture->fk_project = $this->fk_project;
+        $facture->cond_reglement_id = $this->cond_reglement_id;
+        $facture->mode_reglement_id = $this->mode_reglement_id;
+        $facture->remise_absolue = $this->remise_absolue;
+        $facture->remise_percent = $this->remise_percent;
 
-			if ($price_base_type == 'HT') {
-				$pu = $pu_ht;
-			} else {
-				$pu = $pu_ttc;
-			}
+        $facture->origin = $this->origin;
+        $facture->origin_id = $this->origin_id;
 
-			// Check parameters
-			if ($type < 0) {
-				return -1;
-			}
+        $facture->lines = $this->lines; // Array of lines of invoice
+        $facture->situation_counter = $this->situation_counter;
+        $facture->situation_cycle_ref = $this->situation_cycle_ref;
+        $facture->situation_final = $this->situation_final;
 
-			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
-				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
-				return -1;
-			}
+        $facture->retained_warranty = $this->retained_warranty;
+        $facture->retained_warranty_fk_cond_reglement = $this->retained_warranty_fk_cond_reglement;
+        $facture->retained_warranty_date_limit = $this->retained_warranty_date_limit;
 
-			$this->db->begin();
+        $facture->fk_user_author = $user->id;
 
-			$product_type = $type;
-			if (!empty($fk_product) && $fk_product > 0) {
-				$product = new Product($this->db);
-				$result = $product->fetch($fk_product);
-				$product_type = $product->type;
+        // Loop on each line of new invoice
+        foreach ($facture->lines as $i => $tmpline) {
+            $facture->lines[$i]->fk_prev_id = $this->lines[$i]->rowid;
+            if ($invertdetail) {
+                $facture->lines[$i]->subprice = -$facture->lines[$i]->subprice;
+                $facture->lines[$i]->total_ht = -$facture->lines[$i]->total_ht;
+                $facture->lines[$i]->total_tva = -$facture->lines[$i]->total_tva;
+                $facture->lines[$i]->total_localtax1 = -$facture->lines[$i]->total_localtax1;
+                $facture->lines[$i]->total_localtax2 = -$facture->lines[$i]->total_localtax2;
+                $facture->lines[$i]->total_ttc = -$facture->lines[$i]->total_ttc;
+                $facture->lines[$i]->ref_ext = '';
+            }
+        }
 
-				if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_INVOICE) && $product_type == 0 && $product->stock_reel < $qty) {
-					$langs->load("errors");
-					$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnInvoice', $product->ref);
-					$this->db->rollback();
-					return -3;
-				}
-			}
+        dol_syslog(get_class($this) . "::createFromCurrent invertdetail=" . $invertdetail . " socid=" . $this->socid . " nboflines=" . count($facture->lines));
 
-			$localtaxes_type = getLocalTaxesFromRate($txtva, 0, $this->thirdparty, $mysoc);
+        $facid = $facture->create($user);
+        if ($facid <= 0) {
+            $this->error = $facture->error;
+            $this->errors = $facture->errors;
+        } elseif ($this->type == self::TYPE_SITUATION && !empty($conf->global->INVOICE_USE_SITUATION)) {
+            $this->fetchObjectLinked('', '', $this->id, 'facture');
 
-			// Clean vat code
-			$reg = array();
-			$vat_src_code = '';
-			if (preg_match('/\((.*)\)/', $txtva, $reg)) {
-				$vat_src_code = $reg[1];
-				$txtva = preg_replace('/\s*\(.*\)/', '', $txtva); // Remove code into vatrate.
-			}
+            foreach ($this->linkedObjectsIds as $typeObject => $Tfk_object) {
+                foreach ($Tfk_object as $fk_object) {
+                    $facture->add_object_linked($typeObject, $fk_object);
+                }
+            }
 
-			// Calcul du total TTC et de la TVA pour la ligne a partir de
-			// qty, pu, remise_percent et txtva
-			// TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
-			// la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
+            $facture->add_object_linked('facture', $this->fk_facture_source);
+        }
 
-			$tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, $txlocaltax1, $txlocaltax2, 0, $price_base_type, $info_bits, $product_type, $mysoc, $localtaxes_type, $situation_percent, $this->multicurrency_tx, $pu_ht_devise);
+        return $facid;
+    }
 
-			$total_ht  = $tabprice[0];
-			$total_tva = $tabprice[1];
-			$total_ttc = $tabprice[2];
-			$total_localtax1 = $tabprice[9];
-			$total_localtax2 = $tabprice[10];
-			$pu_ht = $tabprice[3];
-
-			// MultiCurrency
-			$multicurrency_total_ht = $tabprice[16];
-			$multicurrency_total_tva = $tabprice[17];
-			$multicurrency_total_ttc = $tabprice[18];
-			$pu_ht_devise = $tabprice[19];
-
-			// Rank to use
-			$ranktouse = $rang;
-			if ($ranktouse == -1) {
-				$rangmax = $this->line_max($fk_parent_line);
-				$ranktouse = $rangmax + 1;
-			}
-
-			// Insert line
-			$this->line = new FactureLigne($this->db);
-
-			$this->line->context = $this->context;
-
-			$this->line->fk_facture = $this->id;
-			$this->line->label = $label; // deprecated
-			$this->line->desc = $desc;
-			$this->line->ref_ext = $ref_ext;
-
-			$this->line->qty = ($this->type == self::TYPE_CREDIT_NOTE ?abs($qty) : $qty); // For credit note, quantity is always positive and unit price negative
-			$this->line->subprice = ($this->type == self::TYPE_CREDIT_NOTE ?-abs($pu_ht) : $pu_ht); // For credit note, unit price always negative, always positive otherwise
-
-			$this->line->vat_src_code = $vat_src_code;
-			$this->line->tva_tx = $txtva;
-			$this->line->localtax1_tx = ($total_localtax1 ? $localtaxes_type[1] : 0);
-			$this->line->localtax2_tx = ($total_localtax2 ? $localtaxes_type[3] : 0);
-			$this->line->localtax1_type = empty($localtaxes_type[0]) ? '' : $localtaxes_type[0];
-			$this->line->localtax2_type = empty($localtaxes_type[2]) ? '' : $localtaxes_type[2];
-
-			$this->line->total_ht = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ?-abs($total_ht) : $total_ht); // For credit note and if qty is negative, total is negative
-			$this->line->total_ttc = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ?-abs($total_ttc) : $total_ttc); // For credit note and if qty is negative, total is negative
-			$this->line->total_tva = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ?-abs($total_tva) : $total_tva); // For credit note and if qty is negative, total is negative
-			$this->line->total_localtax1 = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ?-abs($total_localtax1) : $total_localtax1); // For credit note and if qty is negative, total is negative
-			$this->line->total_localtax2 = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ?-abs($total_localtax2) : $total_localtax2); // For credit note and if qty is negative, total is negative
-
-			$this->line->fk_product = $fk_product;
-			$this->line->product_type = $product_type;
-			$this->line->remise_percent = $remise_percent;
-			$this->line->date_start = $date_start;
-			$this->line->date_end = $date_end;
-			$this->line->ventil = $ventil;
-			$this->line->rang = $ranktouse;
-			$this->line->info_bits = $info_bits;
-			$this->line->fk_remise_except = $fk_remise_except;
-
-			$this->line->special_code = $special_code;
-			$this->line->fk_parent_line = $fk_parent_line;
-			$this->line->origin = $origin;
-			$this->line->origin_id = $origin_id;
-			$this->line->situation_percent = $situation_percent;
-			$this->line->fk_prev_id = $fk_prev_id;
-			$this->line->fk_unit = $fk_unit;
-
-			// infos marge
-			$this->line->fk_fournprice = $fk_fournprice;
-			$this->line->pa_ht = $pa_ht;
-
-			// Multicurrency
-			$this->line->fk_multicurrency = $this->fk_multicurrency;
-			$this->line->multicurrency_code = $this->multicurrency_code;
-			$this->line->multicurrency_subprice		= $pu_ht_devise;
-			$this->line->multicurrency_total_ht 	= $multicurrency_total_ht;
-			$this->line->multicurrency_total_tva 	= $multicurrency_total_tva;
-			$this->line->multicurrency_total_ttc 	= $multicurrency_total_ttc;
-
-			if (is_array($array_options) && count($array_options) > 0) {
-				$this->line->array_options = $array_options;
-			}
-
-			$result = $this->line->insert();
-			if ($result > 0) {
-				// Reorder if child line
-				if (!empty($fk_parent_line)) {
-					$this->line_order(true, 'DESC');
-				}
-
-				// Mise a jour informations denormalisees au niveau de la facture meme
-				$result = $this->update_price(1, 'auto', 0, $mysoc); // The addline method is designed to add line from user input so total calculation with update_price must be done using 'auto' mode.
-
-				if ($result > 0) {
-					$this->db->commit();
-					return $this->line->id;
-				} else {
-					$this->error = $this->db->lasterror();
-					$this->db->rollback();
-					return -1;
-				}
-			} else {
-				$this->error = $this->line->error;
-				$this->errors = $this->line->errors;
-				$this->db->rollback();
-				return -2;
-			}
-		} else {
-			dol_syslog(get_class($this)."::addline status of invoice must be Draft to allow use of ->addline()", LOG_ERR);
-			return -3;
-		}
-	}
-
-	/**
-	 *	Load an object from its id and create a new one in database
-	 *
-	 *	@param      User	$user        	User that clone
-	 *  @param  	int 	$fromid         Id of object to clone
-	 * 	@return		int					    New id of clone
-	 */
-	public function createFromClone(User $user, $fromid = 0)
-	{
-		global $conf, $hookmanager;
+    /**
+     *    Load an object from its id and create a new one in database
+     *
+     * @param User $user   User that clone
+     * @param int  $fromid Id of object to clone
+     *
+     * @return        int                        New id of clone
+     */
+    public function createFromClone(User $user, $fromid = 0)
+    {
+        global $conf, $hookmanager;
 
 		$error = 0;
 
@@ -1529,26 +1268,321 @@ public $mode_reglement_code;
 		unset($object->context['createfromclone']);
 
 		// End
-		if (!$error) {
-			$this->db->commit();
-			return $object->id;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        if (!$error) {
+            $this->db->commit();
+            return $object->id;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Get object from database. Get also lines.
-	 *
-	 *	@param      int		$rowid       		Id of object to load
-	 * 	@param		string	$ref				Reference of invoice
-	 * 	@param		string	$ref_ext			External reference of invoice
-	 * 	@param		int		$notused			Not used
-	 *  @param		bool	$fetch_situation	Load also the previous and next situation invoice into $tab_previous_situation_invoice and $tab_next_situation_invoice
-	 *	@return     int         				>0 if OK, <0 if KO, 0 if not found
-	 */
-	public function fetch($rowid, $ref = '', $ref_ext = '', $notused = '', $fetch_situation = false)
+    /**
+     *  Load an object from an order and create a new invoice into database
+     *
+     * @param Object $object Object source
+     * @param User   $user   Object user
+     *
+     * @return     int                                <0 if KO, 0 if nothing done, 1 if OK
+     */
+    public function createFromOrder($object, User $user)
+    {
+        global $conf, $hookmanager;
+
+        $error = 0;
+
+        // Closed order
+        $this->date = dol_now();
+        $this->source = 0;
+
+        $num = count($object->lines);
+        for ($i = 0; $i < $num; $i++) {
+            $line = new FactureLigne($this->db);
+
+            $line->libelle = $object->lines[$i]->libelle; // deprecated
+            $line->label = $object->lines[$i]->label;
+            $line->desc = $object->lines[$i]->desc;
+            $line->subprice = $object->lines[$i]->subprice;
+            $line->total_ht = $object->lines[$i]->total_ht;
+            $line->total_tva = $object->lines[$i]->total_tva;
+            $line->total_localtax1 = $object->lines[$i]->total_localtax1;
+            $line->total_localtax2 = $object->lines[$i]->total_localtax2;
+            $line->total_ttc = $object->lines[$i]->total_ttc;
+            $line->vat_src_code = $object->lines[$i]->vat_src_code;
+            $line->tva_tx = $object->lines[$i]->tva_tx;
+            $line->localtax1_tx = $object->lines[$i]->localtax1_tx;
+            $line->localtax2_tx = $object->lines[$i]->localtax2_tx;
+            $line->qty = $object->lines[$i]->qty;
+            $line->fk_remise_except = $object->lines[$i]->fk_remise_except;
+            $line->remise_percent = $object->lines[$i]->remise_percent;
+            $line->fk_product = $object->lines[$i]->fk_product;
+            $line->info_bits = $object->lines[$i]->info_bits;
+            $line->product_type = $object->lines[$i]->product_type;
+            $line->rang = $object->lines[$i]->rang;
+            $line->special_code = $object->lines[$i]->special_code;
+            $line->fk_parent_line = $object->lines[$i]->fk_parent_line;
+            $line->fk_unit = $object->lines[$i]->fk_unit;
+            $line->date_start = $object->lines[$i]->date_start;
+            $line->date_end = $object->lines[$i]->date_end;
+
+            // Multicurrency
+            $line->fk_multicurrency = $object->lines[$i]->fk_multicurrency;
+            $line->multicurrency_code = $object->lines[$i]->multicurrency_code;
+            $line->multicurrency_subprice = $object->lines[$i]->multicurrency_subprice;
+            $line->multicurrency_total_ht = $object->lines[$i]->multicurrency_total_ht;
+            $line->multicurrency_total_tva = $object->lines[$i]->multicurrency_total_tva;
+            $line->multicurrency_total_ttc = $object->lines[$i]->multicurrency_total_ttc;
+
+            $line->fk_fournprice = $object->lines[$i]->fk_fournprice;
+            $marginInfos = getMarginInfos($object->lines[$i]->subprice, $object->lines[$i]->remise_percent, $object->lines[$i]->tva_tx, $object->lines[$i]->localtax1_tx, $object->lines[$i]->localtax2_tx, $object->lines[$i]->fk_fournprice, $object->lines[$i]->pa_ht);
+            $line->pa_ht = $marginInfos[0];
+
+            // get extrafields from original line
+            $object->lines[$i]->fetch_optionals();
+            foreach ($object->lines[$i]->array_options as $options_key => $value) {
+                $line->array_options[$options_key] = $value;
+            }
+
+            $this->lines[$i] = $line;
+        }
+
+        $this->socid = $object->socid;
+        $this->fk_project = $object->fk_project;
+        $this->fk_account = $object->fk_account;
+        $this->cond_reglement_id = $object->cond_reglement_id;
+        $this->mode_reglement_id = $object->mode_reglement_id;
+        $this->availability_id = $object->availability_id;
+        $this->demand_reason_id = $object->demand_reason_id;
+        $this->delivery_date = (empty($object->delivery_date) ? $object->date_livraison : $object->delivery_date);
+        $this->date_livraison = $object->delivery_date; // deprecated
+        $this->fk_delivery_address = $object->fk_delivery_address; // deprecated
+        $this->contact_id = $object->contact_id;
+        $this->ref_client = $object->ref_client;
+
+        if (empty($conf->global->MAIN_DISABLE_PROPAGATE_NOTES_FROM_ORIGIN)) {
+            $this->note_private = $object->note_private;
+            $this->note_public = $object->note_public;
+        }
+
+        $this->module_source = $object->module_source;
+        $this->pos_source = $object->pos_source;
+
+        $this->origin = $object->element;
+        $this->origin_id = $object->id;
+
+        $this->fk_user_author = $user->id;
+
+        // get extrafields from original line
+        $object->fetch_optionals();
+        foreach ($object->array_options as $options_key => $value) {
+            $this->array_options[$options_key] = $value;
+        }
+
+        // Possibility to add external linked objects with hooks
+        $this->linked_objects[$this->origin] = $this->origin_id;
+        if (!empty($object->other_linked_objects) && is_array($object->other_linked_objects)) {
+            $this->linked_objects = array_merge($this->linked_objects, $object->other_linked_objects);
+        }
+
+        $ret = $this->create($user);
+
+        if ($ret > 0) {
+            // Actions hooked (by external module)
+            $hookmanager->initHooks(['invoicedao']);
+
+            $parameters = ['objFrom' => $object];
+            $action = '';
+            $reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+            if ($reshook < 0) {
+                $error++;
+            }
+
+            if (!$error) {
+                return 1;
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     *  Return clicable link of object (with eventually picto)
+     *
+     * @param int    $withpicto             Add picto into link
+     * @param string $option                Where point the link
+     * @param int    $max                   Maxlength of ref
+     * @param int    $short                 1=Return just URL
+     * @param string $moretitle             Add more text to title tooltip
+     * @param int    $notooltip             1=Disable tooltip
+     * @param int    $addlinktonotes        1=Add link to notes
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     * @param string $target                Target of link ('', '_self', '_blank', '_parent', '_backoffice', ...)
+     *
+     * @return string                                String with URL
+     */
+    public function getNomUrl($withpicto = 0, $option = '', $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $addlinktonotes = 0, $save_lastsearch_value = -1, $target = '')
+    {
+        global $langs, $conf, $user, $mysoc;
+
+        if (!empty($conf->dol_no_mouse_hover)) {
+            $notooltip = 1; // Force disable tooltips
+        }
+
+        $result = '';
+
+        if ($option == 'withdraw') {
+            $url = DOL_URL_ROOT . '/compta/facture/prelevement.php?facid=' . $this->id;
+        } else {
+            $url = DOL_URL_ROOT . '/compta/facture/card.php?facid=' . $this->id;
+        }
+
+        if (!$user->rights->facture->lire) {
+            $option = 'nolink';
+        }
+
+        if ($option !== 'nolink') {
+            // Add param to save lastsearch_values or not
+            $add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+            if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
+                $add_save_lastsearch_values = 1;
+            }
+            if ($add_save_lastsearch_values) {
+                $url .= '&save_lastsearch_values=1';
+            }
+        }
+
+        if ($short) {
+            return $url;
+        }
+
+        $picto = $this->picto;
+        if ($this->type == self::TYPE_REPLACEMENT) {
+            $picto .= 'r'; // Replacement invoice
+        }
+        if ($this->type == self::TYPE_CREDIT_NOTE) {
+            $picto .= 'a'; // Credit note
+        }
+        if ($this->type == self::TYPE_DEPOSIT) {
+            $picto .= 'd'; // Deposit invoice
+        }
+        $label = '';
+
+        if ($user->rights->facture->lire) {
+            $label = img_picto('', $picto) . ' <u class="paddingrightonly">' . $langs->trans("Invoice") . '</u>';
+            if ($this->type == self::TYPE_REPLACEMENT) {
+                $label = img_picto('', $picto) . ' <u class="paddingrightonly">' . $langs->transnoentitiesnoconv("ReplacementInvoice") . '</u>';
+            }
+            if ($this->type == self::TYPE_CREDIT_NOTE) {
+                $label = img_picto('', $picto) . ' <u class="paddingrightonly">' . $langs->transnoentitiesnoconv("CreditNote") . '</u>';
+            }
+            if ($this->type == self::TYPE_DEPOSIT) {
+                $label = img_picto('', $picto) . ' <u class="paddingrightonly">' . $langs->transnoentitiesnoconv("Deposit") . '</u>';
+            }
+            if ($this->type == self::TYPE_SITUATION) {
+                $label = img_picto('', $picto) . ' <u class="paddingrightonly">' . $langs->transnoentitiesnoconv("InvoiceSituation") . '</u>';
+            }
+            if (isset($this->statut) && isset($this->alreadypaid)) {
+                $label .= ' ' . $this->getLibStatut(5, $this->alreadypaid);
+            }
+            if (!empty($this->ref)) {
+                $label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
+            }
+            if (!empty($this->ref_client)) {
+                $label .= '<br><b>' . $langs->trans('RefCustomer') . ':</b> ' . $this->ref_client;
+            }
+            if (!empty($this->date)) {
+                $label .= '<br><b>' . $langs->trans('Date') . ':</b> ' . dol_print_date($this->date, 'day');
+            }
+            if (!empty($this->total_ht)) {
+                $label .= '<br><b>' . $langs->trans('AmountHT') . ':</b> ' . price($this->total_ht, 0, $langs, 0, -1, -1, $conf->currency);
+            }
+            if (!empty($this->total_tva)) {
+                $label .= '<br><b>' . $langs->trans('AmountVAT') . ':</b> ' . price($this->total_tva, 0, $langs, 0, -1, -1, $conf->currency);
+            }
+            if (!empty($this->total_localtax1) && $this->total_localtax1 != 0) {        // We keep test != 0 because $this->total_localtax1 can be '0.00000000'
+                $label .= '<br><b>' . $langs->transcountry('AmountLT1', $mysoc->country_code) . ':</b> ' . price($this->total_localtax1, 0, $langs, 0, -1, -1, $conf->currency);
+            }
+            if (!empty($this->total_localtax2) && $this->total_localtax2 != 0) {
+                $label .= '<br><b>' . $langs->transcountry('AmountLT2', $mysoc->country_code) . ':</b> ' . price($this->total_localtax2, 0, $langs, 0, -1, -1, $conf->currency);
+            }
+            if (!empty($this->total_ttc)) {
+                $label .= '<br><b>' . $langs->trans('AmountTTC') . ':</b> ' . price($this->total_ttc, 0, $langs, 0, -1, -1, $conf->currency);
+            }
+            if ($moretitle) {
+                $label .= ' - ' . $moretitle;
+            }
+        }
+
+        $linkclose = ($target ? ' target="' . $target . '"' : '');
+        if (empty($notooltip) && $user->rights->facture->lire) {
+            if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+                $label = $langs->trans("Invoice");
+                $linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+            }
+            $linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+            $linkclose .= ' class="classfortooltip"';
+        }
+
+        $linkstart = '<a href="' . $url . '"';
+        $linkstart .= $linkclose . '>';
+        $linkend = '</a>';
+
+        if ($option == 'nolink') {
+            $linkstart = '';
+            $linkend = '';
+        }
+
+        $result .= $linkstart;
+        if ($withpicto) {
+            $result .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+        }
+        if ($withpicto != 2) {
+            $result .= ($max ? dol_trunc($this->ref, $max) : $this->ref);
+        }
+        $result .= $linkend;
+
+        if ($addlinktonotes) {
+            $txttoshow = ($user->socid > 0 ? $this->note_public : $this->note_private);
+            if ($txttoshow) {
+                //$notetoshow = $langs->trans("ViewPrivateNote").':<br>'.dol_string_nohtmltag($txttoshow, 1);
+                $notetoshow = $langs->trans("ViewPrivateNote") . ':<br>' . $txttoshow;
+                $result .= ' <span class="note inline-block">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/compta/facture/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow, 1, 1) . '">';
+                $result .= img_picto('', 'note');
+                $result .= '</a>';
+                //$result.=img_picto($langs->trans("ViewNote"),'object_generic');
+                //$result.='</a>';
+                $result .= '</span>';
+            }
+        }
+
+        global $action, $hookmanager;
+        $hookmanager->initHooks(['invoicedao']);
+        $parameters = ['id' => $this->id, 'getnomurl' => $result, 'notooltip' => $notooltip, 'addlinktonotes' => $addlinktonotes, 'save_lastsearch_value' => $save_lastsearch_value, 'target' => $target];
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
+
+        return $result;
+    }
+
+    /**
+     *    Get object from database. Get also lines.
+     *
+     * @param int    $rowid           Id of object to load
+     * @param string $ref             Reference of invoice
+     * @param string $ref_ext         External reference of invoice
+     * @param int    $notused         Not used
+     * @param bool   $fetch_situation Load also the previous and next situation invoice into $tab_previous_situation_invoice and $tab_next_situation_invoice
+     *
+     * @return     int                        >0 if OK, <0 if KO, 0 if not found
+     */
+    public function fetch($rowid, $ref = '', $ref_ext = '', $notused = '', $fetch_situation = false)
 	{
 		global $conf;
 
@@ -1720,44 +1754,6 @@ public $mode_reglement_code;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Fetch previous and next situations invoices.
-	 * Return all previous and next invoices (both standard and credit notes).
-	 *
-	 * @return	void
-	 */
-	public function fetchPreviousNextSituationInvoice()
-	{
-		global $conf;
-
-		$this->tab_previous_situation_invoice = array();
-		$this->tab_next_situation_invoice = array();
-
-		$sql = 'SELECT rowid, type, situation_cycle_ref, situation_counter FROM '.MAIN_DB_PREFIX.'facture';
-		$sql .= " WHERE rowid <> ".((int) $this->id);
-		$sql .= ' AND entity = '.((int) $this->entity);
-		$sql .= ' AND situation_cycle_ref = '.(int) $this->situation_cycle_ref;
-		$sql .= ' ORDER BY situation_counter ASC';
-
-		dol_syslog(get_class($this).'::fetchPreviousNextSituationInvoice ', LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result && $this->db->num_rows($result) > 0) {
-			while ($objp = $this->db->fetch_object($result)) {
-				$invoice = new Facture($this->db);
-				if ($invoice->fetch($objp->rowid) > 0) {
-					if ($objp->situation_counter < $this->situation_counter
-						|| ($objp->situation_counter == $this->situation_counter && $objp->rowid < $this->id) // This case appear when there are credit notes
-					   ) {
-						$this->tab_previous_situation_invoice[] = $invoice;
-					} else {
-						$this->tab_next_situation_invoice[] = $invoice;
-					}
-				}
-			}
-		}
-	}
-
 	/**
 	 *	Load all detailed lines into this->lines
 	 *
@@ -1877,301 +1873,44 @@ public $mode_reglement_code;
 	}
 
 	/**
-	 *  Load an object from an order and create a new invoice into database
-	 *
-	 *  @param      Object			$object         	Object source
-	 *  @param		User			$user				Object user
-	 *  @return     int             					<0 if KO, 0 if nothing done, 1 if OK
-	 */
-	public function createFromOrder($object, User $user)
-	{
-		global $conf, $hookmanager;
+	 * Fetch previous and next situations invoices.
+     * Return all previous and next invoices (both standard and credit notes).
+     *
+     * @return    void
+     */
+    public function fetchPreviousNextSituationInvoice()
+    {
+        global $conf;
 
-		$error = 0;
+        $this->tab_previous_situation_invoice = [];
+        $this->tab_next_situation_invoice = [];
 
-		// Closed order
-		$this->date = dol_now();
-		$this->source = 0;
+        $sql = 'SELECT rowid, type, situation_cycle_ref, situation_counter FROM ' . MAIN_DB_PREFIX . 'facture';
+        $sql .= " WHERE rowid <> " . ((int) $this->id);
+        $sql .= ' AND entity = ' . ((int) $this->entity);
+        $sql .= ' AND situation_cycle_ref = ' . (int) $this->situation_cycle_ref;
+        $sql .= ' ORDER BY situation_counter ASC';
 
-		$num = count($object->lines);
-		for ($i = 0; $i < $num; $i++) {
-			$line = new FactureLigne($this->db);
+        dol_syslog(get_class($this) . '::fetchPreviousNextSituationInvoice ', LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result && $this->db->num_rows($result) > 0) {
+            while ($objp = $this->db->fetch_object($result)) {
+                $invoice = new Facture($this->db);
+                if ($invoice->fetch($objp->rowid) > 0) {
+                    if ($objp->situation_counter < $this->situation_counter
+                        || ($objp->situation_counter == $this->situation_counter && $objp->rowid < $this->id) // This case appear when there are credit notes
+                    ) {
+                        $this->tab_previous_situation_invoice[] = $invoice;
+                    } else {
+                        $this->tab_next_situation_invoice[] = $invoice;
+                    }
+                }
+            }
+        }
+    }
 
-			$line->libelle = $object->lines[$i]->libelle; // deprecated
-			$line->label			= $object->lines[$i]->label;
-			$line->desc				= $object->lines[$i]->desc;
-			$line->subprice			= $object->lines[$i]->subprice;
-			$line->total_ht			= $object->lines[$i]->total_ht;
-			$line->total_tva		= $object->lines[$i]->total_tva;
-			$line->total_localtax1	= $object->lines[$i]->total_localtax1;
-			$line->total_localtax2	= $object->lines[$i]->total_localtax2;
-			$line->total_ttc		= $object->lines[$i]->total_ttc;
-			$line->vat_src_code = $object->lines[$i]->vat_src_code;
-			$line->tva_tx = $object->lines[$i]->tva_tx;
-			$line->localtax1_tx		= $object->lines[$i]->localtax1_tx;
-			$line->localtax2_tx		= $object->lines[$i]->localtax2_tx;
-			$line->qty = $object->lines[$i]->qty;
-			$line->fk_remise_except = $object->lines[$i]->fk_remise_except;
-			$line->remise_percent = $object->lines[$i]->remise_percent;
-			$line->fk_product = $object->lines[$i]->fk_product;
-			$line->info_bits = $object->lines[$i]->info_bits;
-			$line->product_type		= $object->lines[$i]->product_type;
-			$line->rang = $object->lines[$i]->rang;
-			$line->special_code		= $object->lines[$i]->special_code;
-			$line->fk_parent_line = $object->lines[$i]->fk_parent_line;
-			$line->fk_unit = $object->lines[$i]->fk_unit;
-			$line->date_start = $object->lines[$i]->date_start;
-			$line->date_end = $object->lines[$i]->date_end;
-
-			// Multicurrency
-			$line->fk_multicurrency = $object->lines[$i]->fk_multicurrency;
-			$line->multicurrency_code = $object->lines[$i]->multicurrency_code;
-			$line->multicurrency_subprice = $object->lines[$i]->multicurrency_subprice;
-			$line->multicurrency_total_ht = $object->lines[$i]->multicurrency_total_ht;
-			$line->multicurrency_total_tva = $object->lines[$i]->multicurrency_total_tva;
-			$line->multicurrency_total_ttc = $object->lines[$i]->multicurrency_total_ttc;
-
-			$line->fk_fournprice = $object->lines[$i]->fk_fournprice;
-			$marginInfos			= getMarginInfos($object->lines[$i]->subprice, $object->lines[$i]->remise_percent, $object->lines[$i]->tva_tx, $object->lines[$i]->localtax1_tx, $object->lines[$i]->localtax2_tx, $object->lines[$i]->fk_fournprice, $object->lines[$i]->pa_ht);
-			$line->pa_ht			= $marginInfos[0];
-
-			// get extrafields from original line
-			$object->lines[$i]->fetch_optionals();
-			foreach ($object->lines[$i]->array_options as $options_key => $value) {
-				$line->array_options[$options_key] = $value;
-			}
-
-			$this->lines[$i] = $line;
-		}
-
-		$this->socid                = $object->socid;
-		$this->fk_project           = $object->fk_project;
-		$this->fk_account = $object->fk_account;
-		$this->cond_reglement_id    = $object->cond_reglement_id;
-		$this->mode_reglement_id    = $object->mode_reglement_id;
-		$this->availability_id      = $object->availability_id;
-		$this->demand_reason_id     = $object->demand_reason_id;
-		$this->delivery_date        = (empty($object->delivery_date) ? $object->date_livraison : $object->delivery_date);
-		$this->date_livraison       = $object->delivery_date; // deprecated
-		$this->fk_delivery_address  = $object->fk_delivery_address; // deprecated
-		$this->contact_id           = $object->contact_id;
-		$this->ref_client           = $object->ref_client;
-
-		if (empty($conf->global->MAIN_DISABLE_PROPAGATE_NOTES_FROM_ORIGIN)) {
-			$this->note_private = $object->note_private;
-			$this->note_public = $object->note_public;
-		}
-
-		$this->module_source = $object->module_source;
-		$this->pos_source = $object->pos_source;
-
-		$this->origin = $object->element;
-		$this->origin_id = $object->id;
-
-		$this->fk_user_author = $user->id;
-
-		// get extrafields from original line
-		$object->fetch_optionals();
-		foreach ($object->array_options as $options_key => $value) {
-			$this->array_options[$options_key] = $value;
-		}
-
-		// Possibility to add external linked objects with hooks
-		$this->linked_objects[$this->origin] = $this->origin_id;
-		if (!empty($object->other_linked_objects) && is_array($object->other_linked_objects)) {
-			$this->linked_objects = array_merge($this->linked_objects, $object->other_linked_objects);
-		}
-
-		$ret = $this->create($user);
-
-		if ($ret > 0) {
-			// Actions hooked (by external module)
-			$hookmanager->initHooks(array('invoicedao'));
-
-			$parameters = array('objFrom'=>$object);
-			$action = '';
-			$reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-			if ($reshook < 0) {
-				$error++;
-			}
-
-			if (!$error) {
-				return 1;
-			} else {
-				return -1;
-			}
-		} else {
-			return -1;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return clicable link of object (with eventually picto)
-	 *
-	 *  @param	int		$withpicto       			Add picto into link
-	 *  @param  string	$option          			Where point the link
-	 *  @param  int		$max             			Maxlength of ref
-	 *  @param  int		$short           			1=Return just URL
-	 *  @param  string  $moretitle       			Add more text to title tooltip
-	 *  @param	int  	$notooltip		 			1=Disable tooltip
-	 *  @param  int     $addlinktonotes  			1=Add link to notes
-	 *  @param  int     $save_lastsearch_value		-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *  @param  string  $target                     Target of link ('', '_self', '_blank', '_parent', '_backoffice', ...)
-	 *  @return string 			         			String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $max = 0, $short = 0, $moretitle = '', $notooltip = 0, $addlinktonotes = 0, $save_lastsearch_value = -1, $target = '')
-	{
-		global $langs, $conf, $user, $mysoc;
-
-		if (!empty($conf->dol_no_mouse_hover)) {
-			$notooltip = 1; // Force disable tooltips
-		}
-
-		$result = '';
-
-		if ($option == 'withdraw') {
-			$url = DOL_URL_ROOT.'/compta/facture/prelevement.php?facid='.$this->id;
-		} else {
-			$url = DOL_URL_ROOT.'/compta/facture/card.php?facid='.$this->id;
-		}
-
-		if (!$user->rights->facture->lire) {
-			$option = 'nolink';
-		}
-
-		if ($option !== 'nolink') {
-			// Add param to save lastsearch_values or not
-			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
-			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
-				$add_save_lastsearch_values = 1;
-			}
-			if ($add_save_lastsearch_values) {
-				$url .= '&save_lastsearch_values=1';
-			}
-		}
-
-		if ($short) {
-			return $url;
-		}
-
-		$picto = $this->picto;
-		if ($this->type == self::TYPE_REPLACEMENT) {
-			$picto .= 'r'; // Replacement invoice
-		}
-		if ($this->type == self::TYPE_CREDIT_NOTE) {
-			$picto .= 'a'; // Credit note
-		}
-		if ($this->type == self::TYPE_DEPOSIT) {
-			$picto .= 'd'; // Deposit invoice
-		}
-		$label = '';
-
-		if ($user->rights->facture->lire) {
-			$label = img_picto('', $picto).' <u class="paddingrightonly">'.$langs->trans("Invoice").'</u>';
-			if ($this->type == self::TYPE_REPLACEMENT) {
-				$label = img_picto('', $picto).' <u class="paddingrightonly">'.$langs->transnoentitiesnoconv("ReplacementInvoice").'</u>';
-			}
-			if ($this->type == self::TYPE_CREDIT_NOTE) {
-				$label = img_picto('', $picto).' <u class="paddingrightonly">'.$langs->transnoentitiesnoconv("CreditNote").'</u>';
-			}
-			if ($this->type == self::TYPE_DEPOSIT) {
-				$label = img_picto('', $picto).' <u class="paddingrightonly">'.$langs->transnoentitiesnoconv("Deposit").'</u>';
-			}
-			if ($this->type == self::TYPE_SITUATION) {
-				$label = img_picto('', $picto).' <u class="paddingrightonly">'.$langs->transnoentitiesnoconv("InvoiceSituation").'</u>';
-			}
-			if (isset($this->statut) && isset($this->alreadypaid)) {
-				$label .= ' '.$this->getLibStatut(5, $this->alreadypaid);
-			}
-			if (!empty($this->ref)) {
-				$label .= '<br><b>'.$langs->trans('Ref').':</b> '.$this->ref;
-			}
-			if (!empty($this->ref_client)) {
-				$label .= '<br><b>'.$langs->trans('RefCustomer').':</b> '.$this->ref_client;
-			}
-			if (!empty($this->date)) {
-				$label .= '<br><b>'.$langs->trans('Date').':</b> '.dol_print_date($this->date, 'day');
-			}
-			if (!empty($this->total_ht)) {
-				$label .= '<br><b>'.$langs->trans('AmountHT').':</b> '.price($this->total_ht, 0, $langs, 0, -1, -1, $conf->currency);
-			}
-			if (!empty($this->total_tva)) {
-				$label .= '<br><b>'.$langs->trans('AmountVAT').':</b> '.price($this->total_tva, 0, $langs, 0, -1, -1, $conf->currency);
-			}
-			if (!empty($this->total_localtax1) && $this->total_localtax1 != 0) {		// We keep test != 0 because $this->total_localtax1 can be '0.00000000'
-				$label .= '<br><b>'.$langs->transcountry('AmountLT1', $mysoc->country_code).':</b> '.price($this->total_localtax1, 0, $langs, 0, -1, -1, $conf->currency);
-			}
-			if (!empty($this->total_localtax2) && $this->total_localtax2 != 0) {
-				$label .= '<br><b>'.$langs->transcountry('AmountLT2', $mysoc->country_code).':</b> '.price($this->total_localtax2, 0, $langs, 0, -1, -1, $conf->currency);
-			}
-			if (!empty($this->total_ttc)) {
-				$label .= '<br><b>'.$langs->trans('AmountTTC').':</b> '.price($this->total_ttc, 0, $langs, 0, -1, -1, $conf->currency);
-			}
-			if ($moretitle) {
-				$label .= ' - '.$moretitle;
-			}
-		}
-
-		$linkclose = ($target ? ' target="'.$target.'"' : '');
-		if (empty($notooltip) && $user->rights->facture->lire) {
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label = $langs->trans("Invoice");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
-			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
-			$linkclose .= ' class="classfortooltip"';
-		}
-
-		$linkstart = '<a href="'.$url.'"';
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
-
-		if ($option == 'nolink') {
-			$linkstart = '';
-			$linkend = '';
-		}
-
-		$result .= $linkstart;
-		if ($withpicto) {
-			$result .= img_object(($notooltip ? '' : $label), $picto, ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		}
-		if ($withpicto != 2) {
-			$result .= ($max ?dol_trunc($this->ref, $max) : $this->ref);
-		}
-		$result .= $linkend;
-
-		if ($addlinktonotes) {
-			$txttoshow = ($user->socid > 0 ? $this->note_public : $this->note_private);
-			if ($txttoshow) {
-				//$notetoshow = $langs->trans("ViewPrivateNote").':<br>'.dol_string_nohtmltag($txttoshow, 1);
-				$notetoshow = $langs->trans("ViewPrivateNote").':<br>'.$txttoshow;
-				$result .= ' <span class="note inline-block">';
-				$result .= '<a href="'.DOL_URL_ROOT.'/compta/facture/note.php?id='.$this->id.'" class="classfortooltip" title="'.dol_escape_htmltag($notetoshow, 1, 1).'">';
-				$result .= img_picto('', 'note');
-				$result .= '</a>';
-				//$result.=img_picto($langs->trans("ViewNote"),'object_generic');
-				//$result.='</a>';
-				$result .= '</span>';
-			}
-		}
-
-		global $action, $hookmanager;
-		$hookmanager->initHooks(array('invoicedao'));
-		$parameters = array('id'=>$this->id, 'getnomurl'=>$result, 'notooltip' => $notooltip, 'addlinktonotes' => $addlinktonotes, 'save_lastsearch_value'=> $save_lastsearch_value, 'target' => $target);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) $result = $hookmanager->resPrint;
-		else $result .= $hookmanager->resPrint;
-
-		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *      Update database
+    /**
+     *      Update database
 	 *
 	 *      @param      User	$user        	User that modify
 	 *      @param      int		$notrigger	    0=launch triggers after, 1=disable triggers
@@ -2300,28 +2039,32 @@ public $mode_reglement_code;
 		if ($error) {
 			foreach ($this->errors as $errmsg) {
 				dol_syslog(get_class($this)."::update ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
+				$this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
 
-	/**
-	 *    Add a discount line into an invoice (as an invoice line) using an existing absolute discount (Consume the discount)
-	 *
-	 *    @param     int	$idremise	Id of absolute discount
-	 *    @return    int          		>0 if OK, <0 if KO
-	 */
-	public function insert_discount($idremise)
-	{
-		// phpcs:enable
-		global $langs;
 
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Add a discount line into an invoice (as an invoice line) using an existing absolute discount (Consume the discount)
+     *
+     * @param int $idremise Id of absolute discount
+     *
+     * @return    int                >0 if OK, <0 if KO
+     */
+    public function insert_discount($idremise)
+    {
+        // phpcs:enable
+        global $langs;
+
+        include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
 		include_once DOL_DOCUMENT_ROOT.'/core/class/discount.class.php';
 
 		$this->db->begin();
@@ -2399,7 +2142,6 @@ public $mode_reglement_code;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set customer ref
 	 *
@@ -2628,9 +2370,7 @@ public $mode_reglement_code;
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Tag the invoice as paid completely (if close_code is filled) => this->fk_statut=2, this->paye=1
 	 *  or partialy (if close_code filled) + appel trigger BILL_PAYED => this->fk_statut=2, this->paye stay 0
@@ -2711,7 +2451,6 @@ public $mode_reglement_code;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Tag la facture comme non payee completement + appel trigger BILL_UNPAYED
 	 *	Fonction utilisee quand un paiement prelevement est refuse,
@@ -2765,26 +2504,29 @@ public $mode_reglement_code;
 		}
 
 		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Tag invoice as canceled, with no payment on it (example for replacement invoice or payment never received) + call trigger BILL_CANCEL
-	 *	Warning, if option to decrease stock on invoice was set, this function does not change stock (it might be a cancel because
-	 *  of no payment even if merchandises were sent).
-	 *
-	 *	@deprecated
-	 *  @see setCanceled()
-	 *	@param	User	$user        	Object user making change
-	 *	@param	string	$close_code		Code of closing invoice (CLOSECODE_REPLACED, CLOSECODE_...)
-	 *	@param	string	$close_note		Comment
-	 *	@return int         			<0 if KO, >0 if OK
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Tag invoice as canceled, with no payment on it (example for replacement invoice or payment never received) + call trigger BILL_CANCEL
+     *    Warning, if option to decrease stock on invoice was set, this function does not change stock (it might be a cancel because
+     *  of no payment even if merchandises were sent).
+     *
+     * @deprecated
+     * @see setCanceled()
+     * @param User   $user       Object user making change
+     * @param string $close_code Code of closing invoice (CLOSECODE_REPLACED, CLOSECODE_...)
+     * @param string $close_note Comment
+     * @return int                    <0 if KO, >0 if OK
+     */
 	public function set_canceled($user, $close_code = '', $close_note = '')
 	{
 		// phpcs:enable
@@ -3187,143 +2929,6 @@ public $mode_reglement_code;
 	}
 
 	/**
-	 *      Return next reference of customer invoice not already used (or last reference)
-	 *      according to numbering module defined into constant FACTURE_ADDON
-	 *
-	 *      @param	   Societe		$soc		object company
-	 *      @param     string		$mode		'next' for next value or 'last' for last value
-	 *      @return    string					free ref or last ref
-	 */
-	public function getNextNumRef($soc, $mode = 'next')
-	{
-		global $conf, $langs;
-
-		if ($this->module_source == 'takepos') {
-			$langs->load('cashdesk');
-
-			$moduleName = 'takepos';
-			$moduleSourceName = 'Takepos';
-			$addonConstName = 'TAKEPOS_REF_ADDON';
-
-			// Clean parameters (if not defined or using deprecated value)
-			if (empty($conf->global->TAKEPOS_REF_ADDON)) {
-				$conf->global->TAKEPOS_REF_ADDON = 'mod_takepos_ref_simple';
-			}
-
-			$addon = $conf->global->TAKEPOS_REF_ADDON;
-		} else {
-			$langs->load('bills');
-
-			$moduleName = 'facture';
-			$moduleSourceName = 'Invoice';
-			$addonConstName = 'FACTURE_ADDON';
-
-			// Clean parameters (if not defined or using deprecated value)
-			if (empty($conf->global->FACTURE_ADDON)) {
-				$conf->global->FACTURE_ADDON = 'mod_facture_terre';
-			} elseif ($conf->global->FACTURE_ADDON == 'terre') {
-				$conf->global->FACTURE_ADDON = 'mod_facture_terre';
-			} elseif ($conf->global->FACTURE_ADDON == 'mercure') {
-				$conf->global->FACTURE_ADDON = 'mod_facture_mercure';
-			}
-
-			$addon = $conf->global->FACTURE_ADDON;
-		}
-
-		if (!empty($addon)) {
-			dol_syslog("Call getNextNumRef with ".$addonConstName." = ".$conf->global->FACTURE_ADDON.", thirdparty=".$soc->name.", type=".$soc->typent_code, LOG_DEBUG);
-
-			$mybool = false;
-
-
-			$file = $addon.'.php';
-			$classname = $addon;
-
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir.'core/modules/'.$moduleName.'/');
-
-				// Load file with numbering class (if found)
-				if (is_file($dir.$file) && is_readable($dir.$file)) {
-					$mybool |= include_once $dir.$file;
-				}
-			}
-
-			// For compatibility
-			if (!$mybool) {
-				$file = $addon.'/'.$addon.'.modules.php';
-				$classname = 'mod_'.$moduleName.'_'.$addon;
-				$classname = preg_replace('/\-.*$/', '', $classname);
-				// Include file with class
-				foreach ($conf->file->dol_document_root as $dirroot) {
-					$dir = $dirroot.'/core/modules/'.$moduleName.'/';
-
-					// Load file with numbering class (if found)
-					if (is_file($dir.$file) && is_readable($dir.$file)) {
-						$mybool |= include_once $dir.$file;
-					}
-				}
-			}
-
-			if (!$mybool) {
-				dol_print_error('', 'Failed to include file '.$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = $obj->getNextValue($soc, $this, $mode);
-
-			/**
-			 * $numref can be empty in case we ask for the last value because if there is no invoice created with the
-			 * set up mask.
-			 */
-			if ($mode != 'last' && !$numref) {
-				$this->error = $obj->error;
-				return '';
-			}
-
-			return $numref;
-		} else {
-			$langs->load('errors');
-			print $langs->trans('Error').' '.$langs->trans('ErrorModuleSetupNotComplete', $langs->transnoentitiesnoconv($moduleSourceName));
-			return '';
-		}
-	}
-
-	/**
-	 * Checks if the invoice is the last in its cycle
-	 *
-	 * @return bool Last of the cycle status
-	 */
-	public function is_last_in_cycle()
-	{
-		// phpcs:enable
-		global $conf;
-
-		if (!empty($this->situation_cycle_ref)) {
-			// No point in testing anything if we're not inside a cycle
-			$sql = 'SELECT max(situation_counter) FROM '.MAIN_DB_PREFIX.'facture';
-			$sql .= ' WHERE situation_cycle_ref = '.((int) $this->situation_cycle_ref);
-			$sql .= ' AND entity = '.($this->entity > 0 ? $this->entity : $conf->entity);
-			$resql = $this->db->query($sql);
-
-			if ($resql && $resql->num_rows > 0) {
-				$res = $this->db->fetch_array($resql);
-				$last = $res['max(situation_counter)'];
-				return ($last == $this->situation_counter);
-			} else {
-				$this->error = $this->db->lasterror();
-				dol_syslog(get_class($this)."::select Error ".$this->error, LOG_ERR);
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-
-	/**
 	 * Update price of next invoice
 	 *
 	 * @param	Translate	$langs	Translate object
@@ -3377,52 +2982,6 @@ public $mode_reglement_code;
 		}
 
 		return true;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Sets the invoice as a final situation
-	 *
-	 *  @param  	User	$user    	Object user
-	 *  @param     	int		$notrigger	1=Does not execute triggers, 0= execute triggers
-	 *	@return		int 				<0 if KO, >0 if OK
-	 */
-	public function setFinal(User $user, $notrigger = 0)
-	{
-		$error = 0;
-
-		$this->db->begin();
-
-		$sql = 'UPDATE '.MAIN_DB_PREFIX.'facture SET situation_final = '.((int) $this->situation_final).' WHERE rowid = '.((int) $this->id);
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$this->errors[] = $this->db->error();
-			$error++;
-		}
-
-		if (!$notrigger && empty($error)) {
-			// Call trigger
-			$result = $this->call_trigger('BILL_MODIFY', $user);
-			if ($result < 0) {
-				$error++;
-			}
-			// End call triggers
-		}
-
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(__METHOD__.' Error: '.$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		}
 	}
 
 	/**
@@ -3503,27 +3062,320 @@ public $mode_reglement_code;
 				return 1;
 			} else {
 				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                return -1;
+            }
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Add an invoice line into database (linked to product/service or not).
+     *  Les parametres sont deja cense etre juste et avec valeurs finales a l'appel
+     *  de cette methode. Aussi, pour le taux tva, il doit deja avoir ete defini
+     *  par l'appelant par la methode get_default_tva(societe_vendeuse,societe_acheteuse,produit)
+     *  et le desc doit deja avoir la bonne valeur (a l'appelant de gerer le multilangue)
+     *
+     * @param string $desc              Description of line
+     * @param double $pu_ht             Unit price without tax (> 0 even for credit note)
+     * @param double $qty               Quantity
+     * @param double $txtva             Force Vat rate, -1 for auto (Can contain the vat_src_code too with syntax '9.9 (CODE)')
+     * @param double $txlocaltax1       Local tax 1 rate (deprecated, use instead txtva with code inside)
+     * @param double $txlocaltax2       Local tax 2 rate (deprecated, use instead txtva with code inside)
+     * @param int    $fk_product        Id of predefined product/service
+     * @param double $remise_percent    Percent of discount on line
+     * @param int    $date_start        Date start of service
+     * @param int    $date_end          Date end of service
+     * @param int    $ventil            Code of dispatching into accountancy
+     * @param int    $info_bits         Bits of type of lines
+     * @param int    $fk_remise_except  Id discount used
+     * @param string $price_base_type   'HT' or 'TTC'
+     * @param double $pu_ttc            Unit price with tax (> 0 even for credit note)
+     * @param int    $type              Type of line (0=product, 1=service). Not used if fk_product is defined, the type of product is used.
+     * @param int    $rang              Position of line
+     * @param int    $special_code      Special code (also used by externals modules!)
+     * @param string $origin            Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be 'orderdet', 'propaldet'..., else 'order','propal,'....
+     * @param int    $origin_id         Depend on global conf MAIN_CREATEFROM_KEEP_LINE_ORIGIN_INFORMATION can be Id of origin object (aka line id), else object id
+     * @param int    $fk_parent_line    Id of parent line
+     * @param int    $fk_fournprice     Supplier price id (to calculate margin) or ''
+     * @param int    $pa_ht             Buying price of line (to calculate margin) or ''
+     * @param string $label             Label of the line (deprecated, do not use)
+     * @param array  $array_options     extrafields array
+     * @param int    $situation_percent Situation advance percentage
+     * @param int    $fk_prev_id        Previous situation line id reference
+     * @param string $fk_unit           Code of the unit to use. Null to use the default one
+     * @param double $pu_ht_devise      Unit price in foreign currency
+     * @param string $ref_ext           External reference of the line
+     *
+     * @return        int                            <0 if KO, Id of line if OK
+     */
+    public function addline(
+        $desc,
+        $pu_ht,
+        $qty,
+        $txtva,
+        $txlocaltax1 = 0,
+        $txlocaltax2 = 0,
+        $fk_product = 0,
+        $remise_percent = 0,
+        $date_start = '',
+        $date_end = '',
+        $ventil = 0,
+        $info_bits = 0,
+        $fk_remise_except = '',
+        $price_base_type = 'HT',
+        $pu_ttc = 0,
+        $type = self::TYPE_STANDARD,
+        $rang = -1,
+        $special_code = 0,
+        $origin = '',
+        $origin_id = 0,
+        $fk_parent_line = 0,
+        $fk_fournprice = null,
+        $pa_ht = 0,
+        $label = '',
+        $array_options = 0,
+        $situation_percent = 100,
+        $fk_prev_id = 0,
+        $fk_unit = null,
+        $pu_ht_devise = 0,
+        $ref_ext = ''
+    ) {
+        // Deprecation warning
+        if ($label) {
+            dol_syslog(__METHOD__ . ": using line label is deprecated", LOG_WARNING);
+            //var_dump(debug_backtrace(false));exit;
+        }
 
-	/**
-	 *  Update a detail line
-	 *
-	 *  @param     	int			$rowid           	Id of line to update
-	 *  @param     	string		$desc            	Description of line
-	 *  @param     	double		$pu              	Prix unitaire (HT ou TTC selon price_base_type) (> 0 even for credit note lines)
-	 *  @param     	double		$qty             	Quantity
-	 *  @param     	double		$remise_percent  	Percentage discount of the line
-	 *  @param     	int		    $date_start      	Date de debut de validite du service
-	 *  @param     	int		    $date_end        	Date de fin de validite du service
+        global $mysoc, $conf, $langs;
+
+        dol_syslog(get_class($this) . "::addline id=$this->id,desc=$desc,pu_ht=$pu_ht,qty=$qty,txtva=$txtva, txlocaltax1=$txlocaltax1, txlocaltax2=$txlocaltax2, fk_product=$fk_product,remise_percent=$remise_percent,date_start=$date_start,date_end=$date_end,ventil=$ventil,info_bits=$info_bits,fk_remise_except=$fk_remise_except,price_base_type=$price_base_type,pu_ttc=$pu_ttc,type=$type, fk_unit=$fk_unit", LOG_DEBUG);
+
+        if ($this->statut == self::STATUS_DRAFT) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/price.lib.php';
+
+            // Clean parameters
+            if (empty($remise_percent)) {
+                $remise_percent = 0;
+            }
+            if (empty($qty)) {
+                $qty = 0;
+            }
+            if (empty($info_bits)) {
+                $info_bits = 0;
+            }
+            if (empty($rang)) {
+                $rang = 0;
+            }
+            if (empty($ventil)) {
+                $ventil = 0;
+            }
+            if (empty($txtva)) {
+                $txtva = 0;
+            }
+            if (empty($txlocaltax1)) {
+                $txlocaltax1 = 0;
+            }
+            if (empty($txlocaltax2)) {
+                $txlocaltax2 = 0;
+            }
+            if (empty($fk_parent_line) || $fk_parent_line < 0) {
+                $fk_parent_line = 0;
+            }
+            if (empty($fk_prev_id)) {
+                $fk_prev_id = 'null';
+            }
+            if (!isset($situation_percent) || $situation_percent > 100 || (string) $situation_percent == '') {
+                $situation_percent = 100;
+            }
+            if (empty($ref_ext)) {
+                $ref_ext = '';
+            }
+
+            $remise_percent = price2num($remise_percent);
+            $qty = price2num($qty);
+            $pu_ht = price2num($pu_ht);
+            $pu_ht_devise = price2num($pu_ht_devise);
+            $pu_ttc = price2num($pu_ttc);
+            $pa_ht = price2num($pa_ht);
+            if (!preg_match('/\((.*)\)/', $txtva)) {
+                $txtva = price2num($txtva); // $txtva can have format '5.0(XXX)' or '5'
+            }
+            $txlocaltax1 = price2num($txlocaltax1);
+            $txlocaltax2 = price2num($txlocaltax2);
+
+            if ($price_base_type == 'HT') {
+                $pu = $pu_ht;
+            } else {
+                $pu = $pu_ttc;
+            }
+
+            // Check parameters
+            if ($type < 0) {
+                return -1;
+            }
+
+            if ($date_start && $date_end && $date_start > $date_end) {
+                $langs->load("errors");
+                $this->error = $langs->trans('ErrorStartDateGreaterEnd');
+                return -1;
+            }
+
+            $this->db->begin();
+
+            $product_type = $type;
+            if (!empty($fk_product) && $fk_product > 0) {
+                $product = new Product($this->db);
+                $result = $product->fetch($fk_product);
+                $product_type = $product->type;
+
+                if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_INVOICE) && $product_type == 0 && $product->stock_reel < $qty) {
+                    $langs->load("errors");
+                    $this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnInvoice', $product->ref);
+                    $this->db->rollback();
+                    return -3;
+                }
+            }
+
+            $localtaxes_type = getLocalTaxesFromRate($txtva, 0, $this->thirdparty, $mysoc);
+
+            // Clean vat code
+            $reg = [];
+            $vat_src_code = '';
+            if (preg_match('/\((.*)\)/', $txtva, $reg)) {
+                $vat_src_code = $reg[1];
+                $txtva = preg_replace('/\s*\(.*\)/', '', $txtva); // Remove code into vatrate.
+            }
+
+            // Calcul du total TTC et de la TVA pour la ligne a partir de
+            // qty, pu, remise_percent et txtva
+            // TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
+            // la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
+
+            $tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, $txlocaltax1, $txlocaltax2, 0, $price_base_type, $info_bits, $product_type, $mysoc, $localtaxes_type, $situation_percent, $this->multicurrency_tx, $pu_ht_devise);
+
+            $total_ht = $tabprice[0];
+            $total_tva = $tabprice[1];
+            $total_ttc = $tabprice[2];
+            $total_localtax1 = $tabprice[9];
+            $total_localtax2 = $tabprice[10];
+            $pu_ht = $tabprice[3];
+
+            // MultiCurrency
+            $multicurrency_total_ht = $tabprice[16];
+            $multicurrency_total_tva = $tabprice[17];
+            $multicurrency_total_ttc = $tabprice[18];
+            $pu_ht_devise = $tabprice[19];
+
+            // Rank to use
+            $ranktouse = $rang;
+            if ($ranktouse == -1) {
+                $rangmax = $this->line_max($fk_parent_line);
+                $ranktouse = $rangmax + 1;
+            }
+
+            // Insert line
+            $this->line = new FactureLigne($this->db);
+
+            $this->line->context = $this->context;
+
+            $this->line->fk_facture = $this->id;
+            $this->line->label = $label; // deprecated
+            $this->line->desc = $desc;
+            $this->line->ref_ext = $ref_ext;
+
+            $this->line->qty = ($this->type == self::TYPE_CREDIT_NOTE ? abs($qty) : $qty); // For credit note, quantity is always positive and unit price negative
+            $this->line->subprice = ($this->type == self::TYPE_CREDIT_NOTE ? -abs($pu_ht) : $pu_ht); // For credit note, unit price always negative, always positive otherwise
+
+            $this->line->vat_src_code = $vat_src_code;
+            $this->line->tva_tx = $txtva;
+            $this->line->localtax1_tx = ($total_localtax1 ? $localtaxes_type[1] : 0);
+            $this->line->localtax2_tx = ($total_localtax2 ? $localtaxes_type[3] : 0);
+            $this->line->localtax1_type = empty($localtaxes_type[0]) ? '' : $localtaxes_type[0];
+            $this->line->localtax2_type = empty($localtaxes_type[2]) ? '' : $localtaxes_type[2];
+
+            $this->line->total_ht = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ? -abs($total_ht) : $total_ht); // For credit note and if qty is negative, total is negative
+            $this->line->total_ttc = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ? -abs($total_ttc) : $total_ttc); // For credit note and if qty is negative, total is negative
+            $this->line->total_tva = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ? -abs($total_tva) : $total_tva); // For credit note and if qty is negative, total is negative
+            $this->line->total_localtax1 = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ? -abs($total_localtax1) : $total_localtax1); // For credit note and if qty is negative, total is negative
+            $this->line->total_localtax2 = (($this->type == self::TYPE_CREDIT_NOTE || $qty < 0) ? -abs($total_localtax2) : $total_localtax2); // For credit note and if qty is negative, total is negative
+
+            $this->line->fk_product = $fk_product;
+            $this->line->product_type = $product_type;
+            $this->line->remise_percent = $remise_percent;
+            $this->line->date_start = $date_start;
+            $this->line->date_end = $date_end;
+            $this->line->ventil = $ventil;
+            $this->line->rang = $ranktouse;
+            $this->line->info_bits = $info_bits;
+            $this->line->fk_remise_except = $fk_remise_except;
+
+            $this->line->special_code = $special_code;
+            $this->line->fk_parent_line = $fk_parent_line;
+            $this->line->origin = $origin;
+            $this->line->origin_id = $origin_id;
+            $this->line->situation_percent = $situation_percent;
+            $this->line->fk_prev_id = $fk_prev_id;
+            $this->line->fk_unit = $fk_unit;
+
+            // infos marge
+            $this->line->fk_fournprice = $fk_fournprice;
+            $this->line->pa_ht = $pa_ht;
+
+            // Multicurrency
+            $this->line->fk_multicurrency = $this->fk_multicurrency;
+            $this->line->multicurrency_code = $this->multicurrency_code;
+            $this->line->multicurrency_subprice = $pu_ht_devise;
+            $this->line->multicurrency_total_ht = $multicurrency_total_ht;
+            $this->line->multicurrency_total_tva = $multicurrency_total_tva;
+            $this->line->multicurrency_total_ttc = $multicurrency_total_ttc;
+
+            if (is_array($array_options) && count($array_options) > 0) {
+                $this->line->array_options = $array_options;
+            }
+
+            $result = $this->line->insert();
+            if ($result > 0) {
+                // Reorder if child line
+                if (!empty($fk_parent_line)) {
+                    $this->line_order(true, 'DESC');
+                }
+
+                // Mise a jour informations denormalisees au niveau de la facture meme
+                $result = $this->update_price(1, 'auto', 0, $mysoc); // The addline method is designed to add line from user input so total calculation with update_price must be done using 'auto' mode.
+
+                if ($result > 0) {
+                    $this->db->commit();
+                    return $this->line->id;
+                } else {
+                    $this->error = $this->db->lasterror();
+                    $this->db->rollback();
+                    return -1;
+                }
+            } else {
+                $this->error = $this->line->error;
+                $this->errors = $this->line->errors;
+                $this->db->rollback();
+                return -2;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::addline status of invoice must be Draft to allow use of ->addline()", LOG_ERR);
+            return -3;
+        }
+    }
+
+    /**
+     *  Update a detail line
+     *
+     * @param int                      $rowid                 Id of line to update
+     * @param string                   $desc                  Description of line
+     * @param double                   $pu                    Prix unitaire (HT ou TTC selon price_base_type) (> 0 even for credit note lines)
+     * @param double                   $qty                   Quantity
+     * @param double                   $remise_percent        Percentage discount of the line
+     * @param int                      $date_start            Date de debut de validite du service
+     * @param int                      $date_end        	Date de fin de validite du service
 	 *  @param     	double		$txtva          	VAT Rate (Can be '8.5', '8.5 (ABC)')
 	 * 	@param		double		$txlocaltax1		Local tax 1 rate
 	 *  @param		double		$txlocaltax2		Local tax 2 rate
@@ -3776,9 +3628,7 @@ public $mode_reglement_code;
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Update invoice line with percentage
 	 *
@@ -3876,25 +3726,24 @@ public $mode_reglement_code;
 		}
 	}
 
-	/**
-	 *	Set percent discount
-	 *
-	 *  @deprecated
-	 *  @see setDiscount()
-	 *	@param     	User	$user		User that set discount
-	 *	@param     	double	$remise		Discount
-	 *  @param     	int		$notrigger	1=Does not execute triggers, 0= execute triggers
-	 *	@return		int 		<0 if ko, >0 if ok
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Set percent discount
+     *
+     *  @deprecated
+     *  @see setDiscount()
+     *	@param     	User	$user		User that set discount
+     *	@param     	double	$remise		Discount
+     *  @param     	int		$notrigger	1=Does not execute triggers, 0= execute triggers
+     *	@return		int 		<0 if ko, >0 if ok
+     */
 	public function set_remise($user, $remise, $notrigger = 0)
 	{
 		// phpcs:enable
 		dol_syslog(get_class($this)."::set_remise is deprecated, use setDiscount instead", LOG_NOTICE);
 		return $this->setDiscount($user, $remise, $notrigger);
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Set percent discount
@@ -3958,7 +3807,6 @@ public $mode_reglement_code;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set absolute discount
 	 *
@@ -4013,20 +3861,122 @@ public $mode_reglement_code;
 				return 1;
 			} else {
 				foreach ($this->errors as $errmsg) {
-					dol_syslog(__METHOD__.' Error: '.$errmsg, LOG_ERR);
-					$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-				}
-				$this->db->rollback();
-				return -1 * $error;
-			}
-		}
-	}
+                    dol_syslog(__METHOD__ . ' Error: ' . $errmsg, LOG_ERR);
+                    $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+                }
+                $this->db->rollback();
+                return -1 * $error;
+            }
+        }
+    }
 
+    /**
+     *      Return next reference of customer invoice not already used (or last reference)
+     *      according to numbering module defined into constant FACTURE_ADDON
+     *
+     * @param Societe $soc  object company
+     * @param string  $mode 'next' for next value or 'last' for last value
+     *
+     * @return    string                    free ref or last ref
+     */
+    public function getNextNumRef($soc, $mode = 'next')
+    {
+        global $conf, $langs;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        if ($this->module_source == 'takepos') {
+            $langs->load('cashdesk');
 
-	/**
-	 *	Load miscellaneous information for tab "Info"
+            $moduleName = 'takepos';
+            $moduleSourceName = 'Takepos';
+            $addonConstName = 'TAKEPOS_REF_ADDON';
+
+            // Clean parameters (if not defined or using deprecated value)
+            if (empty($conf->global->TAKEPOS_REF_ADDON)) {
+                $conf->global->TAKEPOS_REF_ADDON = 'mod_takepos_ref_simple';
+            }
+
+            $addon = $conf->global->TAKEPOS_REF_ADDON;
+        } else {
+            $langs->load('bills');
+
+            $moduleName = 'facture';
+            $moduleSourceName = 'Invoice';
+            $addonConstName = 'FACTURE_ADDON';
+
+            // Clean parameters (if not defined or using deprecated value)
+            if (empty($conf->global->FACTURE_ADDON)) {
+                $conf->global->FACTURE_ADDON = 'mod_facture_terre';
+            } elseif ($conf->global->FACTURE_ADDON == 'terre') {
+                $conf->global->FACTURE_ADDON = 'mod_facture_terre';
+            } elseif ($conf->global->FACTURE_ADDON == 'mercure') {
+                $conf->global->FACTURE_ADDON = 'mod_facture_mercure';
+            }
+
+            $addon = $conf->global->FACTURE_ADDON;
+        }
+
+        if (!empty($addon)) {
+            dol_syslog("Call getNextNumRef with " . $addonConstName . " = " . $conf->global->FACTURE_ADDON . ", thirdparty=" . $soc->name . ", type=" . $soc->typent_code, LOG_DEBUG);
+
+            $mybool = false;
+
+            $file = $addon . '.php';
+            $classname = $addon;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . 'core/modules/' . $moduleName . '/');
+
+                // Load file with numbering class (if found)
+                if (is_file($dir . $file) && is_readable($dir . $file)) {
+                    $mybool |= include_once $dir . $file;
+                }
+            }
+
+            // For compatibility
+            if (!$mybool) {
+                $file = $addon . '/' . $addon . '.modules.php';
+                $classname = 'mod_' . $moduleName . '_' . $addon;
+                $classname = preg_replace('/\-.*$/', '', $classname);
+                // Include file with class
+                foreach ($conf->file->dol_document_root as $dirroot) {
+                    $dir = $dirroot . '/core/modules/' . $moduleName . '/';
+
+                    // Load file with numbering class (if found)
+                    if (is_file($dir . $file) && is_readable($dir . $file)) {
+                        $mybool |= include_once $dir . $file;
+                    }
+                }
+            }
+
+            if (!$mybool) {
+                dol_print_error('', 'Failed to include file ' . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = $obj->getNextValue($soc, $this, $mode);
+
+            /**
+             * $numref can be empty in case we ask for the last value because if there is no invoice created with the
+             * set up mask.
+             */
+            if ($mode != 'last' && !$numref) {
+                $this->error = $obj->error;
+                return '';
+            }
+
+            return $numref;
+        } else {
+            $langs->load('errors');
+            print $langs->trans('Error') . ' ' . $langs->trans('ErrorModuleSetupNotComplete', $langs->transnoentitiesnoconv($moduleSourceName));
+            return '';
+        }
+    }
+
+    /**
+     *    Load miscellaneous information for tab "Info"
 	 *
 	 *	@param  int		$id		Id of object to load
 	 *	@return	void
@@ -4073,7 +4023,6 @@ public $mode_reglement_code;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return list of invoices (eventually filtered on a user) into an array
 	 *
@@ -4148,10 +4097,10 @@ public $mode_reglement_code;
 	}
 
 
-	/* gestion des contacts d'une facture */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return list of invoices qualified to be replaced by another invoice.
+    /**
+     *    Return list of invoices qualified to be replaced by another invoice.
 	 *	Invoices matching the following rules are returned:
 	 *	(Status validated or abandonned for a reason 'other') + not payed + no payment at all + not already replaced
 	 *
@@ -4195,25 +4144,29 @@ public $mode_reglement_code;
 				);
 			}
 			//print_r($return);
-			return $return;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            return $return;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Return list of invoices qualified to be corrected by a credit note.
-	 *	Invoices matching the following rules are returned:
-	 *	(validated + payment on process) or classified (payed completely or payed partiely) + not already replaced + not already a credit note
-	 *
-	 *	@param		int		$socid		Id thirdparty
-	 *	@return    	array				Array of invoices ($id => array('ref'=>,'paymentornot'=>,'status'=>,'paye'=>)
-	 */
-	public function list_qualified_avoir_invoices($socid = 0)
-	{
-		// phpcs:enable
-		global $conf;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return list of invoices qualified to be corrected by a credit note.
+     *    Invoices matching the following rules are returned:
+     *    (validated + payment on process) or classified (payed completely or payed partiely) + not already replaced + not already a credit note
+     *
+     * @param int $socid Id thirdparty
+     *
+     * @return        array                Array of invoices ($id => array('ref'=>,'paymentornot'=>,'status'=>,'paye'=>)
+     */
+    public function list_qualified_avoir_invoices($socid = 0)
+    {
+        // phpcs:enable
+        global $conf;
 
 		$return = array();
 
@@ -4271,24 +4224,28 @@ public $mode_reglement_code;
 			}
 
 			return $return;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Load indicators for dashboard (this->nbtodo and this->nbtodolate)
-	 *
-	 *	@param  User		$user    	Object user
-	 *	@return WorkboardResponse|int 	<0 if KO, WorkboardResponse if OK
-	 */
-	public function load_board($user)
-	{
-		// phpcs:enable
-		global $conf, $langs;
 
-		$clause = " WHERE";
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Load indicators for dashboard (this->nbtodo and this->nbtodolate)
+     *
+     * @param User $user Object user
+     *
+     * @return WorkboardResponse|int    <0 if KO, WorkboardResponse if OK
+     */
+    public function load_board($user)
+    {
+        // phpcs:enable
+        global $conf, $langs;
+
+        $clause = " WHERE";
 
 		$sql = "SELECT f.rowid, f.date_lim_reglement as datefin,f.fk_statut, f.total_ht";
 		$sql .= " FROM ".MAIN_DB_PREFIX."facture as f";
@@ -4339,101 +4296,11 @@ public $mode_reglement_code;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Is the customer invoice delayed?
-	 *
-	 * @return bool
-	 */
-	public function hasDelay()
-	{
-		global $conf;
+	/* gestion des contacts d'une facture */
 
-		$now = dol_now();
-
-		// Paid invoices have status STATUS_CLOSED
-		if ($this->statut != Facture::STATUS_VALIDATED) {
-			return false;
-		}
-
-		$hasDelay = $this->date_lim_reglement < ($now - $conf->facture->client->warning_delay);
-		if ($hasDelay && !empty($this->retained_warranty) && !empty($this->retained_warranty_date_limit)) {
-			$totalpaye = $this->getSommePaiement();
-			$totalpaye = floatval($totalpaye);
-			$RetainedWarrantyAmount = $this->getRetainedWarrantyAmount();
-			if ($totalpaye >= 0 && $RetainedWarrantyAmount >= 0) {
-				if (($totalpaye < $this->total_ttc - $RetainedWarrantyAmount) && $this->date_lim_reglement < ($now - $conf->facture->client->warning_delay)) {
-					$hasDelay = 1;
-				} elseif ($totalpaye < $this->total_ttc && $this->retained_warranty_date_limit < ($now - $conf->facture->client->warning_delay)) {
-					$hasDelay = 1;
-				} else {
-					$hasDelay = 0;
-				}
-			}
-		}
-
-		return $hasDelay;
-	}
-
-	/**
-	 * @param	int			$rounding		Minimum number of decimal to show. If 0, no change, if -1, we use min($conf->global->MAIN_MAX_DECIMALS_UNIT,$conf->global->MAIN_MAX_DECIMALS_TOT)
-	 * @return number or -1 if not available
-	 */
-	public function getRetainedWarrantyAmount($rounding = -1)
-	{
-		global $conf;
-		if (empty($this->retained_warranty)) {
-			return -1;
-		}
-
-		$retainedWarrantyAmount = 0;
-
-		// Billed - retained warranty
-		if ($this->type == Facture::TYPE_SITUATION && !empty($conf->global->INVOICE_RETAINED_WARRANTY_LIMITED_TO_FINAL_SITUATION)) {
-			$displayWarranty = true;
-			// Check if this situation invoice is 100% for real
-			if (!empty($this->lines)) {
-				foreach ($this->lines as $i => $line) {
-					if ($line->product_type < 2 && $line->situation_percent < 100) {
-						$displayWarranty = false;
-						break;
-					}
-				}
-			}
-
-			if ($displayWarranty && !empty($this->situation_final)) {
-				$this->fetchPreviousNextSituationInvoice();
-				$TPreviousIncoice = $this->tab_previous_situation_invoice;
-
-				$total2BillWT = 0;
-				foreach ($TPreviousIncoice as &$fac) {
-					$total2BillWT += $fac->total_ttc;
-				}
-				$total2BillWT += $this->total_ttc;
-
-				$retainedWarrantyAmount = $total2BillWT * $this->retained_warranty / 100;
-			} else {
-				return -1;
-			}
-		} else {
-			// Because one day retained warranty could be used on standard invoices
-			$retainedWarrantyAmount = $this->total_ttc * $this->retained_warranty / 100;
-		}
-
-		if ($rounding < 0) {
-			$rounding = min($conf->global->MAIN_MAX_DECIMALS_UNIT, $conf->global->MAIN_MAX_DECIMALS_TOT);
-		}
-
-		if ($rounding > 0) {
-			return round($retainedWarrantyAmount, $rounding);
-		}
-
-		return $retainedWarrantyAmount;
-	}
-
-	/**
-	 *	Retourne id des contacts clients de facturation
+    /**
+     *    Retourne id des contacts clients de facturation
 	 *
 	 *	@return     array       Liste des id contacts facturation
 	 */
@@ -4452,7 +4319,6 @@ public $mode_reglement_code;
 		return $this->getIdContact('external', 'SHIPPING');
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Initialise an instance with random values.
@@ -4613,7 +4479,6 @@ public $mode_reglement_code;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
 	 *
@@ -4661,8 +4526,6 @@ public $mode_reglement_code;
 	{
 		return $this->fetch_lines();
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -4728,22 +4591,26 @@ public $mode_reglement_code;
 		}
 	}
 
-	/**
-	 * Checks if the invoice is the first of a cycle
-	 *
-	 * @return boolean
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Checks if the invoice is the first of a cycle
+     *
+     * @return boolean
+     */
 	public function is_first()
 	{
 		// phpcs:enable
 		return ($this->situation_counter == 1);
 	}
 
-	/**
-	 * Returns an array containing the previous situations as Facture objects
-	 *
-	 * @return mixed -1 if error, array of previous situations
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Returns an array containing the previous situations as Facture objects
+     *
+     * @return mixed -1 if error, array of previous situations
+     */
 	public function get_prev_sits()
 	{
 		// phpcs:enable
@@ -4763,25 +4630,157 @@ public $mode_reglement_code;
 				$res[] = $situation;
 			}
 		} else {
-			$this->error = $this->db->error();
-			dol_syslog("Error sql=".$sql.", error=".$this->error, LOG_ERR);
-			return -1;
-		}
+            $this->error = $this->db->error();
+            dol_syslog("Error sql=" . $sql . ", error=" . $this->error, LOG_ERR);
+            return -1;
+        }
 
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 * Currently used for documents generation : to know if retained warranty need to be displayed
-	 * @return bool
-	 */
-	public function displayRetainedWarranty()
-	{
-		global $conf;
+    /**
+     * Sets the invoice as a final situation
+     *
+     * @param User $user      Object user
+     * @param int  $notrigger 1=Does not execute triggers, 0= execute triggers
+     *
+     * @return        int                <0 if KO, >0 if OK
+     */
+    public function setFinal(User $user, $notrigger = 0)
+    {
+        $error = 0;
 
-		// TODO : add a flag on invoices to store this conf : INVOICE_RETAINED_WARRANTY_LIMITED_TO_FINAL_SITUATION
+        $this->db->begin();
 
-		// note : we dont need to test INVOICE_USE_RETAINED_WARRANTY because if $this->retained_warranty is not empty it's because it was set when this conf was active
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . 'facture SET situation_final = ' . ((int) $this->situation_final) . ' WHERE rowid = ' . ((int) $this->id);
+
+        dol_syslog(__METHOD__, LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->errors[] = $this->db->error();
+            $error++;
+        }
+
+        if (!$notrigger && empty($error)) {
+            // Call trigger
+            $result = $this->call_trigger('BILL_MODIFY', $user);
+            if ($result < 0) {
+                $error++;
+            }
+            // End call triggers
+        }
+
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(__METHOD__ . ' Error: ' . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Checks if the invoice is the last in its cycle
+     *
+     * @return bool Last of the cycle status
+     */
+    public function is_last_in_cycle()
+    {
+        // phpcs:enable
+        global $conf;
+
+        if (!empty($this->situation_cycle_ref)) {
+            // No point in testing anything if we're not inside a cycle
+            $sql = 'SELECT max(situation_counter) FROM ' . MAIN_DB_PREFIX . 'facture';
+            $sql .= ' WHERE situation_cycle_ref = ' . ((int) $this->situation_cycle_ref);
+            $sql .= ' AND entity = ' . ($this->entity > 0 ? $this->entity : $conf->entity);
+            $resql = $this->db->query($sql);
+
+            if ($resql && $resql->num_rows > 0) {
+                $res = $this->db->fetch_array($resql);
+                $last = $res['max(situation_counter)'];
+                return ($last == $this->situation_counter);
+            } else {
+                $this->error = $this->db->lasterror();
+                dol_syslog(get_class($this) . "::select Error " . $this->error, LOG_ERR);
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old third-party id
+     * @param int    $dest_id   New third-party id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'facture',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Is the customer invoice delayed?
+     *
+     * @return bool
+     */
+    public function hasDelay()
+    {
+        global $conf;
+
+        $now = dol_now();
+
+        // Paid invoices have status STATUS_CLOSED
+        if ($this->statut != Facture::STATUS_VALIDATED) {
+            return false;
+        }
+
+        $hasDelay = $this->date_lim_reglement < ($now - $conf->facture->client->warning_delay);
+        if ($hasDelay && !empty($this->retained_warranty) && !empty($this->retained_warranty_date_limit)) {
+            $totalpaye = $this->getSommePaiement();
+            $totalpaye = floatval($totalpaye);
+            $RetainedWarrantyAmount = $this->getRetainedWarrantyAmount();
+            if ($totalpaye >= 0 && $RetainedWarrantyAmount >= 0) {
+                if (($totalpaye < $this->total_ttc - $RetainedWarrantyAmount) && $this->date_lim_reglement < ($now - $conf->facture->client->warning_delay)) {
+                    $hasDelay = 1;
+                } elseif ($totalpaye < $this->total_ttc && $this->retained_warranty_date_limit < ($now - $conf->facture->client->warning_delay)) {
+                    $hasDelay = 1;
+                } else {
+                    $hasDelay = 0;
+                }
+            }
+        }
+
+        return $hasDelay;
+    }
+
+    /**
+     * Currently used for documents generation : to know if retained warranty need to be displayed
+     *
+     * @return bool
+     */
+    public function displayRetainedWarranty()
+    {
+        global $conf;
+
+        // TODO : add a flag on invoices to store this conf : INVOICE_RETAINED_WARRANTY_LIMITED_TO_FINAL_SITUATION
+
+        // note : we dont need to test INVOICE_USE_RETAINED_WARRANTY because if $this->retained_warranty is not empty it's because it was set when this conf was active
 
 		$displayWarranty = false;
 		if (!empty($this->retained_warranty)) {
@@ -4799,27 +4798,85 @@ public $mode_reglement_code;
 					foreach ($this->lines as $i => $line) {
 						if ($line->product_type < 2 && $line->situation_percent < 100) {
 							$displayWarranty = false;
-							break;
-						}
-					}
-				}
-			}
-		}
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-		return $displayWarranty;
-	}
+        return $displayWarranty;
+    }
 
-	/**
-	 *  Change the retained warranty
-	 *
-	 *  @param		float		$value		value of retained warranty
-	 *  @return		int				>0 if OK, <0 if KO
-	 */
-	public function setRetainedWarranty($value)
-	{
-		dol_syslog(get_class($this).'::setRetainedWarranty('.$value.')');
+    /**
+     * @param int $rounding Minimum number of decimal to show. If 0, no change, if -1, we use min($conf->global->MAIN_MAX_DECIMALS_UNIT,$conf->global->MAIN_MAX_DECIMALS_TOT)
+     *
+     * @return number or -1 if not available
+     */
+    public function getRetainedWarrantyAmount($rounding = -1)
+    {
+        global $conf;
+        if (empty($this->retained_warranty)) {
+            return -1;
+        }
 
-		if ($this->statut >= 0) {
+        $retainedWarrantyAmount = 0;
+
+        // Billed - retained warranty
+        if ($this->type == Facture::TYPE_SITUATION && !empty($conf->global->INVOICE_RETAINED_WARRANTY_LIMITED_TO_FINAL_SITUATION)) {
+            $displayWarranty = true;
+            // Check if this situation invoice is 100% for real
+            if (!empty($this->lines)) {
+                foreach ($this->lines as $i => $line) {
+                    if ($line->product_type < 2 && $line->situation_percent < 100) {
+                        $displayWarranty = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($displayWarranty && !empty($this->situation_final)) {
+                $this->fetchPreviousNextSituationInvoice();
+                $TPreviousIncoice = $this->tab_previous_situation_invoice;
+
+                $total2BillWT = 0;
+                foreach ($TPreviousIncoice as &$fac) {
+                    $total2BillWT += $fac->total_ttc;
+                }
+                $total2BillWT += $this->total_ttc;
+
+                $retainedWarrantyAmount = $total2BillWT * $this->retained_warranty / 100;
+            } else {
+                return -1;
+            }
+        } else {
+            // Because one day retained warranty could be used on standard invoices
+            $retainedWarrantyAmount = $this->total_ttc * $this->retained_warranty / 100;
+        }
+
+        if ($rounding < 0) {
+            $rounding = min($conf->global->MAIN_MAX_DECIMALS_UNIT, $conf->global->MAIN_MAX_DECIMALS_TOT);
+        }
+
+        if ($rounding > 0) {
+            return round($retainedWarrantyAmount, $rounding);
+        }
+
+        return $retainedWarrantyAmount;
+    }
+
+    /**
+     *  Change the retained warranty
+     *
+     * @param float $value value of retained warranty
+     *
+     * @return        int                >0 if OK, <0 if KO
+     */
+    public function setRetainedWarranty($value)
+    {
+        dol_syslog(get_class($this) . '::setRetainedWarranty(' . $value . ')');
+
+        if ($this->statut >= 0) {
 			$fieldname = 'retained_warranty';
 			$sql = 'UPDATE '.MAIN_DB_PREFIX.$this->table_element;
 			$sql .= " SET ".$fieldname." = ".((float) $value);

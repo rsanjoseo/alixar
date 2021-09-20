@@ -74,31 +74,35 @@ class ProductAttribute extends CommonObject
 	}
 
 	/**
-	 * Updates the order of all variants. Used by AJAX page for drag&drop
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param array $order Array with row id ordered in ascendent mode
-	 * @return int <0 KO >0 OK
-	 */
-	public static function bulkUpdateOrder(DoliDB $db, array $order)
-	{
-		global $user;
+     * Fetches the properties of a product attribute
+     *
+     * @param int $id Attribute id
+     *
+     * @return int <1 KO, >1 OK
+     */
+    public function fetch($id)
+    {
+        if (!$id) {
+            return -1;
+        }
 
-		$tmp = new ProductAttribute($db);
+        $sql = "SELECT rowid, ref, ref_ext, label, rang FROM " . MAIN_DB_PREFIX . "product_attribute WHERE rowid = " . ((int) $id) . " AND entity IN (" . getEntity('product') . ")";
 
-		foreach ($order as $key => $attrid) {
-			if ($tmp->fetch($attrid) < 0) {
-				return -1;
-			}
+        $query = $this->db->query($sql);
 
-			$tmp->rang = $key;
+        if (!$this->db->num_rows($query)) {
+            return -1;
+        }
 
-			if ($tmp->update($user) < 0) {
-				return -1;
-			}
-		}
+        $obj = $this->db->fetch_object($query);
 
-		return 1;
+        $this->id = $obj->rowid;
+        $this->ref = $obj->ref;
+        $this->ref_ext = $obj->ref_ext;
+        $this->label = $obj->label;
+        $this->rang = $obj->rang;
+
+        return 1;
 	}
 
 	/**
@@ -155,24 +159,57 @@ class ProductAttribute extends CommonObject
 		$sql = "INSERT INTO ".MAIN_DB_PREFIX."product_attribute (ref, ref_ext, label, entity, rang)
 		VALUES ('".$this->db->escape($this->ref)."', '".$this->db->escape($this->ref_ext)."', '".$this->db->escape($this->label)."', ".(int) $this->entity.", ".(int) $this->rang.")";
 
-		$query = $this->db->query($sql);
-		if ($query) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.'product_attribute');
+        $query = $this->db->query($sql);
+        if ($query) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . 'product_attribute');
 
-			return $this->id;
-		}
+            return $this->id;
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
-	/**
-	 * Deletes a product attribute
-	 *
-	 * @param   User    $user      Object user
-	 * @param   int     $notrigger Do not execute trigger
-	 * @return 	int <0 KO, >0 OK
-	 */
-	public function delete(User $user, $notrigger = 0)
+    /**
+     * Updates a product attribute
+     *
+     * @param User $user      Object user
+     * @param int  $notrigger Do not execute trigger
+     *
+     * @return    int                <0 KO, >0 OK
+     */
+    public function update(User $user, $notrigger = 0)
+    {
+        if (empty($notrigger)) {
+            // Call trigger
+            $result = $this->call_trigger('PRODUCT_ATTRIBUTE_MODIFY', $user);
+            if ($result < 0) {
+                return -1;
+            }
+            // End call triggers
+        }
+
+        //Ref must be uppercase
+        $this->ref = trim(strtoupper($this->ref));
+        $this->label = trim($this->label);
+
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "product_attribute SET ref = '" . $this->db->escape($this->ref) . "', ref_ext = '" . $this->db->escape($this->ref_ext) . "', label = '" . $this->db->escape($this->label) . "', rang = " . (int) $this->rang . " WHERE rowid = " . (int) $this->id;
+
+        if ($this->db->query($sql)) {
+            return 1;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Deletes a product attribute
+     *
+     * @param User $user      Object user
+     * @param int  $notrigger Do not execute trigger
+     *
+     * @return    int <0 KO, >0 OK
+     */
+    public function delete(User $user, $notrigger = 0)
 	{
 		if (empty($notrigger)) {
 			// Call trigger
@@ -222,16 +259,44 @@ class ProductAttribute extends CommonObject
 		$result = $this->db->fetch_object($query);
 
 		return $result->count;
-	}
+    }
 
-	/**
-	 * Shows this attribute before others
-	 *
-	 * @return int <0 KO >0 OK
-	 */
-	public function moveUp()
-	{
-		return $this->moveLine('up');
+    /**
+     * Reorders the order of the variants.
+     * This is an internal function used by moveLine function
+     *
+     * @return int <0 KO >0 OK
+     */
+    protected function reorderLines()
+    {
+        global $user;
+
+        $tmp_order = [];
+
+        $sql = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'product_attribute WHERE rang = 0';
+        $sql .= $this->db->order('rang, rowid', 'asc');
+
+        $query = $this->db->query($sql);
+
+        if (!$query) {
+            return -1;
+        }
+
+        while ($result = $this->db->fetch_object($query)) {
+            $tmp_order[] = $result->rowid;
+        }
+
+        foreach ($tmp_order as $order => $rowid) {
+            $tmp = new ProductAttribute($this->db);
+            $tmp->fetch($rowid);
+            $tmp->rang = $order + 1;
+
+            if ($tmp->update($user) < 0) {
+                return -1;
+            }
+        }
+
+        return 1;
 	}
 
 	/**
@@ -268,119 +333,58 @@ class ProductAttribute extends CommonObject
 		if ($this->update($user) < 0) {
 			$this->db->rollback();
 			return -1;
-		}
+        }
 
-		$this->db->commit();
-		return 1;
-	}
+        $this->db->commit();
+        return 1;
+    }
 
-	/**
-	 * Reorders the order of the variants.
-	 * This is an internal function used by moveLine function
-	 *
-	 * @return int <0 KO >0 OK
-	 */
-	protected function reorderLines()
-	{
-		global $user;
+    /**
+     * Shows this attribute before others
+     *
+     * @return int <0 KO >0 OK
+     */
+    public function moveUp()
+    {
+        return $this->moveLine('up');
+    }
 
-		$tmp_order = array();
+    /**
+     * Shows this attribute after others
+     *
+     * @return int <0 KO >0 OK
+     */
+    public function moveDown()
+    {
+        return $this->moveLine('down');
+    }
 
-		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'product_attribute WHERE rang = 0';
-		$sql .= $this->db->order('rang, rowid', 'asc');
+    /**
+     * Updates the order of all variants. Used by AJAX page for drag&drop
+     *
+     * @param DoliDB $db    Database handler
+     * @param array  $order Array with row id ordered in ascendent mode
+     *
+     * @return int <0 KO >0 OK
+     */
+    public static function bulkUpdateOrder(DoliDB $db, array $order)
+    {
+        global $user;
 
-		$query = $this->db->query($sql);
+        $tmp = new ProductAttribute($db);
 
-		if (!$query) {
-			return -1;
-		}
+        foreach ($order as $key => $attrid) {
+            if ($tmp->fetch($attrid) < 0) {
+                return -1;
+            }
 
-		while ($result = $this->db->fetch_object($query)) {
-			$tmp_order[] = $result->rowid;
-		}
+            $tmp->rang = $key;
 
-		foreach ($tmp_order as $order => $rowid) {
-			$tmp = new ProductAttribute($this->db);
-			$tmp->fetch($rowid);
-			$tmp->rang = $order + 1;
+            if ($tmp->update($user) < 0) {
+                return -1;
+            }
+        }
 
-			if ($tmp->update($user) < 0) {
-				return -1;
-			}
-		}
-
-		return 1;
-	}
-
-	/**
-	 * Fetches the properties of a product attribute
-	 *
-	 * @param int $id Attribute id
-	 * @return int <1 KO, >1 OK
-	 */
-	public function fetch($id)
-	{
-		if (!$id) {
-			return -1;
-		}
-
-		$sql = "SELECT rowid, ref, ref_ext, label, rang FROM ".MAIN_DB_PREFIX."product_attribute WHERE rowid = ".((int) $id)." AND entity IN (".getEntity('product').")";
-
-		$query = $this->db->query($sql);
-
-		if (!$this->db->num_rows($query)) {
-			return -1;
-		}
-
-		$obj = $this->db->fetch_object($query);
-
-		$this->id = $obj->rowid;
-		$this->ref = $obj->ref;
-		$this->ref_ext = $obj->ref_ext;
-		$this->label = $obj->label;
-		$this->rang = $obj->rang;
-
-		return 1;
-	}
-
-	/**
-	 * Updates a product attribute
-	 *
-	 * @param   User    $user      Object user
-	 * @param   int     $notrigger Do not execute trigger
-	 * @return 	int 				<0 KO, >0 OK
-	 */
-	public function update(User $user, $notrigger = 0)
-	{
-		if (empty($notrigger)) {
-			// Call trigger
-			$result = $this->call_trigger('PRODUCT_ATTRIBUTE_MODIFY', $user);
-			if ($result < 0) {
-				return -1;
-			}
-			// End call triggers
-		}
-
-		//Ref must be uppercase
-		$this->ref = trim(strtoupper($this->ref));
-		$this->label = trim($this->label);
-
-		$sql = "UPDATE ".MAIN_DB_PREFIX."product_attribute SET ref = '".$this->db->escape($this->ref)."', ref_ext = '".$this->db->escape($this->ref_ext)."', label = '".$this->db->escape($this->label)."', rang = ".(int) $this->rang." WHERE rowid = ".(int) $this->id;
-
-		if ($this->db->query($sql)) {
-			return 1;
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Shows this attribute after others
-	 *
-	 * @return int <0 KO >0 OK
-	 */
-	public function moveDown()
-	{
-		return $this->moveLine('down');
+        return 1;
 	}
 }

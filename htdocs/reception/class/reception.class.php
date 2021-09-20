@@ -48,76 +48,89 @@ if (!empty($conf->commande->enabled)) {
  */
 class Reception extends CommonObject
 {
-	use CommonIncoterm;
+    use CommonIncoterm;
 
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
-	const STATUS_CLOSED = 2;
-	/**
-	 * @var string element name
-	 */
-	public $element = "reception";
-		/**
-	 * @var string Fieldname with ID of parent key if this field has a parent
-	 */
-	public $fk_element = "fk_reception"; // 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	public $table_element = "reception";
-	public $table_element_line = "commande_fournisseur_dispatch";
-public $ismultientitymanaged = 1;
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'dollyrevert';
-	public $socid;
-	public $ref_supplier;
-	/**
+    /**
+     * @var string element name
+     */
+    public $element = "reception";
+
+    /**
+     * @var string Fieldname with ID of parent key if this field has a parent
+     */
+    public $fk_element = "fk_reception";
+    public $table_element = "reception";
+    public $table_element_line = "commande_fournisseur_dispatch";
+    public $ismultientitymanaged = 1; // 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'dollyrevert';
+
+    public $socid;
+    public $ref_supplier;
+
+    /**
 	 * @var int		Ref int
 	 * @deprecated
 	 */
 	public $ref_int;
+
 	public $brouillon;
 	public $entrepot_id;
 	public $tracking_number;
 	public $tracking_url;
 	public $billed;
 	public $model_pdf;
-	public $trueWeight;
-	public $weight_units;
-	public $trueWidth;
-	public $width_units;
-	public $trueHeight;
-	// A denormalized value
-	public $height_units;
-	public $trueDepth; // Date delivery planed
-	public $depth_units;
-	public $trueSize;
-public $date_delivery;
-	/**
-	 * @var integer|string Effective delivery date
-	 */
-	public $date_reception;
-		/**
-	 * @var integer|string date_creation
-	 */
-	public $date_creation; // List of carriers
-	/**
-	 * @var integer|string date_validation
-	 */
-	public $date_valid;
-	public $meths;
-public $listmeths;
-	public $lines = array();
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    public $trueWeight;
+    public $weight_units;
+    public $trueWidth;
+    public $width_units;
+    public $trueHeight;
+    public $height_units;
+    public $trueDepth;
+    public $depth_units;
+    // A denormalized value
+    public $trueSize;
 
-		// List of long language codes for status
+    public $date_delivery; // Date delivery planed
+
+    /**
+     * @var integer|string Effective delivery date
+     */
+    public $date_reception;
+
+    /**
+     * @var integer|string date_creation
+     */
+    public $date_creation;
+
+    /**
+     * @var integer|string date_validation
+     */
+    public $date_valid;
+
+    public $meths;
+    public $listmeths; // List of carriers
+
+    public $lines = [];
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_CLOSED = 2;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+
+        // List of long language codes for status
 		$this->statuts = array();
 		$this->statuts[-1] = 'StatusReceptionCanceled';
 		$this->statuts[0]  = 'StatusReceptionDraft';
@@ -133,22 +146,56 @@ public $listmeths;
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array('reception');
+     *    Return next contract ref
+     *
+     * @param Societe $soc Thirdparty object
+     * @return string                Free reference for contract
+     */
+    public function getNextNumRef($soc)
+    {
+        global $langs, $conf;
+        $langs->load("receptions");
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+        if (!empty($conf->global->RECEPTION_ADDON_NUMBER)) {
+            $mybool = false;
 
-	/**
-	 *  Create reception en base
+            $file = $conf->global->RECEPTION_ADDON_NUMBER . ".php";
+            $classname = $conf->global->RECEPTION_ADDON_NUMBER;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/reception/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if (!$mybool) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+
+            $numref = "";
+            $numref = $obj->getNextValue($soc, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                dol_print_error($this->db, get_class($this) . "::getNextNumRef " . $obj->error);
+                return "";
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("Error_RECEPTION_ADDON_NUMBER_NotDefined");
+            return "";
+        }
+    }
+
+    /**
+     *  Create reception en base
 	 *
 	 *  @param	User	$user       Objet du user qui cree
 	 *  @param	int		$notrigger	1=Does not execute triggers, 0= execute triggers
@@ -439,93 +486,6 @@ public $listmeths;
 	}
 
 	/**
-	 * Forge an set tracking url
-	 *
-	 * @param	string	$value		Value
-	 * @return	void
-	 */
-	public function getUrlTrackingStatus($value = '')
-	{
-		if (!empty($this->shipping_method_id)) {
-			$sql = "SELECT em.code, em.tracking";
-			$sql .= " FROM ".MAIN_DB_PREFIX."c_shipment_mode as em";
-			$sql .= " WHERE em.rowid = ".((int) $this->shipping_method_id);
-
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				if ($obj = $this->db->fetch_object($resql)) {
-					$tracking = $obj->tracking;
-				}
-			}
-		}
-
-		if (!empty($tracking) && !empty($value)) {
-			$url = str_replace('{TRACKID}', $value, $tracking);
-			$this->tracking_url = sprintf('<a target="_blank" href="%s">'.($value ? $value : 'url').'</a>', $url, $url);
-		} else {
-			$this->tracking_url = $value;
-		}
-	}
-
-	/**
-	 *	Load lines
-	 *
-	 *	@return	int		>0 if OK, Otherwise if KO
-	 */
-	public function fetch_lines()
-	{
-		// phpcs:enable
-		dol_include_once('/fourn/class/fournisseur.commande.dispatch.class.php');
-		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'commande_fournisseur_dispatch WHERE fk_reception='.((int) $this->id);
-		$resql = $this->db->query($sql);
-
-		if (!empty($resql)) {
-			$this->lines = array();
-			while ($obj = $this->db->fetch_object($resql)) {
-				$line = new CommandeFournisseurDispatch($this->db);
-				$line->fetch($obj->rowid);
-				$line->fetch_product();
-				$sql_commfourndet = 'SELECT qty, ref,  label, description, tva_tx, vat_src_code, subprice, multicurrency_subprice, remise_percent';
-				$sql_commfourndet .= ' FROM '.MAIN_DB_PREFIX.'commande_fournisseurdet';
-				$sql_commfourndet .= ' WHERE rowid = '.((int) $line->fk_commandefourndet);
-				$resql_commfourndet = $this->db->query($sql_commfourndet);
-				if (!empty($resql_commfourndet)) {
-					$obj = $this->db->fetch_object($resql_commfourndet);
-					$line->qty_asked = $obj->qty;
-					$line->description = $obj->description;
-					$line->desc = $obj->description;
-					$line->tva_tx = $obj->tva_tx;
-					$line->vat_src_code = $obj->vat_src_code;
-					$line->subprice = $obj->subprice;
-					$line->multicurrency_subprice = $obj->multicurrency_subprice;
-					$line->remise_percent = $obj->remise_percent;
-					$line->label = !empty($obj->label) ? $obj->label : $line->product->label;
-					$line->ref_supplier = $obj->ref;
-				} else {
-					$line->qty_asked = 0;
-					$line->description = '';
-					$line->desc = '';
-					$line->label = $obj->label;
-				}
-
-				$pu_ht = ($line->subprice * $line->qty) * (100 - $line->remise_percent) / 100;
-				$tva = $pu_ht * $line->tva_tx / 100;
-				$this->total_ht += $pu_ht;
-				$this->total_tva += $pu_ht * $line->tva_tx / 100;
-
-				$this->total_ttc += $pu_ht + $tva;
-
-
-				$this->lines[] = $line;
-			}
-
-			return 1;
-		} else {
-			return -1;
-		}
-	}
-
-	/**
 	 *  Validate object and update stock if option enabled
 	 *
 	 *  @param      User		$user       Object user that validate
@@ -725,56 +685,7 @@ public $listmeths;
 		}
 	}
 
-	/**
-	 *	Return next contract ref
-	 *
-	 *	@param	Societe		$soc	Thirdparty object
-	 *	@return string				Free reference for contract
-	 */
-	public function getNextNumRef($soc)
-	{
-		global $langs, $conf;
-		$langs->load("receptions");
 
-		if (!empty($conf->global->RECEPTION_ADDON_NUMBER)) {
-			$mybool = false;
-
-			$file = $conf->global->RECEPTION_ADDON_NUMBER.".php";
-			$classname = $conf->global->RECEPTION_ADDON_NUMBER;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/reception/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if (!$mybool) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-
-			$numref = "";
-			$numref = $obj->getNextValue($soc, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				dol_print_error($this->db, get_class($this)."::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("Error_RECEPTION_ADDON_NUMBER_NotDefined");
-			return "";
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Add an reception line.
@@ -838,11 +749,13 @@ public $listmeths;
 		return $num;
 	}
 
+
 	/**
 	 *  Update database
 	 *
 	 *  @param	User	$user        	User that modify
 	 *  @param  int		$notrigger	    0=launch triggers after, 1=disable triggers
+	 *
 	 *  @return int 			       	<0 if KO, >0 if OK
 	 */
 	public function update($user = null, $notrigger = 0)
@@ -1100,27 +1013,85 @@ public $listmeths;
 			} else {
 				$this->error = $this->db->lasterror()." - sql=$sql";
 				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+                return -1;
+            }
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return clicable link of object (with eventually picto)
-	 *
-	 *	@param      int			$withpicto      Add picto into link
-	 *	@param      int			$option         Where point the link
-	 *	@param      int			$max          	Max length to show
-	 *	@param      int			$short			Use short labels
-	 *  @param      int         $notooltip      1=No tooltip
-	 *	@return     string          			String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = 0, $max = 0, $short = 0, $notooltip = 0)
+    /**
+     *    Load lines
+     *
+     * @return    int        >0 if OK, Otherwise if KO
+     */
+    public function fetch_lines()
+    {
+        // phpcs:enable
+        dol_include_once('/fourn/class/fournisseur.commande.dispatch.class.php');
+        $sql = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'commande_fournisseur_dispatch WHERE fk_reception=' . ((int) $this->id);
+        $resql = $this->db->query($sql);
+
+        if (!empty($resql)) {
+            $this->lines = [];
+            while ($obj = $this->db->fetch_object($resql)) {
+                $line = new CommandeFournisseurDispatch($this->db);
+                $line->fetch($obj->rowid);
+                $line->fetch_product();
+                $sql_commfourndet = 'SELECT qty, ref,  label, description, tva_tx, vat_src_code, subprice, multicurrency_subprice, remise_percent';
+                $sql_commfourndet .= ' FROM ' . MAIN_DB_PREFIX . 'commande_fournisseurdet';
+                $sql_commfourndet .= ' WHERE rowid = ' . ((int) $line->fk_commandefourndet);
+                $resql_commfourndet = $this->db->query($sql_commfourndet);
+                if (!empty($resql_commfourndet)) {
+                    $obj = $this->db->fetch_object($resql_commfourndet);
+                    $line->qty_asked = $obj->qty;
+                    $line->description = $obj->description;
+                    $line->desc = $obj->description;
+                    $line->tva_tx = $obj->tva_tx;
+                    $line->vat_src_code = $obj->vat_src_code;
+                    $line->subprice = $obj->subprice;
+                    $line->multicurrency_subprice = $obj->multicurrency_subprice;
+                    $line->remise_percent = $obj->remise_percent;
+                    $line->label = !empty($obj->label) ? $obj->label : $line->product->label;
+                    $line->ref_supplier = $obj->ref;
+                } else {
+                    $line->qty_asked = 0;
+                    $line->description = '';
+                    $line->desc = '';
+                    $line->label = $obj->label;
+                }
+
+                $pu_ht = ($line->subprice * $line->qty) * (100 - $line->remise_percent) / 100;
+                $tva = $pu_ht * $line->tva_tx / 100;
+                $this->total_ht += $pu_ht;
+                $this->total_tva += $pu_ht * $line->tva_tx / 100;
+
+                $this->total_ttc += $pu_ht + $tva;
+
+                $this->lines[] = $line;
+            }
+
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     *    Return clicable link of object (with eventually picto)
+     *
+     * @param int $withpicto Add picto into link
+     * @param int $option    Where point the link
+     * @param int $max       Max length to show
+     * @param int $short     Use short labels
+     * @param int $notooltip 1=No tooltip
+     *
+     * @return     string                    String with URL
+     */
+    public function getNomUrl($withpicto = 0, $option = 0, $max = 0, $short = 0, $notooltip = 0)
 	{
 		global $conf, $langs;
 		$result = '';
@@ -1169,13 +1140,15 @@ public $listmeths;
 		return $this->LibStatut($this->statut, $mode);
 	}
 
-	/**
-	 * Return label of a status
-	 *
-	 * @param      int		$status		Id status
-	 * @param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto
-	 * @return     string				Label of status
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return label of a status
+     *
+     * @param      int		$status		Id status
+     * @param      int		$mode       0=Long label, 1=Short label, 2=Picto + Short label, 3=Picto, 4=Picto + Long label, 5=Short label + Picto
+     * @return     string				Label of status
+     */
 	public function LibStatut($status, $mode)
 	{
 		// phpcs:enable
@@ -1194,8 +1167,6 @@ public $listmeths;
 
 		return dolGetStatus($labelStatus, $labelStatusShort, '', $statusType, $mode);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Initialise an instance with random values.
@@ -1275,8 +1246,6 @@ public $listmeths;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set the planned delivery date
 	 *
@@ -1307,7 +1276,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Fetch deliveries method and return an array. Load array this->meths(rowid=>label).
 	 *
@@ -1334,7 +1302,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Fetch all deliveries method and return an array. Load array this->listmeths.
 	 *
@@ -1371,7 +1338,6 @@ public $listmeths;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Update/create delivery method.
 	 *
@@ -1400,13 +1366,15 @@ public $listmeths;
 		}
 	}
 
-	/**
-	 *  Activate delivery method.
-	 *
-	 *  @param      int      $id     id method to activate
-	 *
-	 *  @return void
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Activate delivery method.
+     *
+     *  @param      int      $id     id method to activate
+     *
+     *  @return void
+     */
 	public function activ_delivery_method($id)
 	{
 		// phpcs:enable
@@ -1416,34 +1384,64 @@ public $listmeths;
 		$resql = $this->db->query($sql);
 	}
 
-	/**
-	 *  DesActivate delivery method.
-	 *
-	 *  @param      int      $id     id method to desactivate
-	 *
-	 *  @return void
-	 */
-	public function disable_delivery_method($id)
-	{
-		// phpcs:enable
-		$sql = 'UPDATE '.MAIN_DB_PREFIX.'c_shipment_mode SET active=0';
-		$sql .= ' WHERE rowid='.$id;
-
-		$resql = $this->db->query($sql);
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Classify the reception as closed.
-	 *
-	 *	@return     int     <0 if KO, >0 if OK
-	 */
-	public function setClosed()
-	{
-		global $conf, $langs, $user;
+    /**
+     *  DesActivate delivery method.
+     *
+     *  @param      int $id id method to desactivate
+     *
+     *  @return void
+     */
+	public function disable_delivery_method($id)
+    {
+        // phpcs:enable
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . 'c_shipment_mode SET active=0';
+        $sql .= ' WHERE rowid=' . $id;
 
-		$error = 0;
+        $resql = $this->db->query($sql);
+    }
+
+    /**
+     * Forge an set tracking url
+     *
+     * @param string $value Value
+     *
+     * @return    void
+     */
+    public function getUrlTrackingStatus($value = '')
+    {
+        if (!empty($this->shipping_method_id)) {
+            $sql = "SELECT em.code, em.tracking";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "c_shipment_mode as em";
+            $sql .= " WHERE em.rowid = " . ((int) $this->shipping_method_id);
+
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                if ($obj = $this->db->fetch_object($resql)) {
+                    $tracking = $obj->tracking;
+                }
+            }
+        }
+
+        if (!empty($tracking) && !empty($value)) {
+            $url = str_replace('{TRACKID}', $value, $tracking);
+            $this->tracking_url = sprintf('<a target="_blank" href="%s">' . ($value ? $value : 'url') . '</a>', $url, $url);
+        } else {
+            $this->tracking_url = $value;
+        }
+    }
+
+    /**
+     *    Classify the reception as closed.
+     *
+     * @return     int     <0 if KO, >0 if OK
+     */
+    public function setClosed()
+    {
+        global $conf, $langs, $user;
+
+        $error = 0;
 
 		$this->db->begin();
 
@@ -1563,13 +1561,15 @@ public $listmeths;
 		}
 	}
 
-	/**
-	 *	Classify the reception as invoiced (used when WORKFLOW_BILL_ON_RECEPTION is on)
-	 *
-	 *	@deprecated
-	 *  @see setBilled()
-	 *	@return     int     <0 if ko, >0 if ok
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *	Classify the reception as invoiced (used when WORKFLOW_BILL_ON_RECEPTION is on)
+     *
+     *	@deprecated
+     *  @see setBilled()
+     *	@return     int     <0 if ko, >0 if ok
+     */
 	public function set_billed()
 	{
 		// phpcs:enable
@@ -1893,14 +1893,30 @@ public $listmeths;
 			if ($this->model_pdf) {
 				$modele = $this->model_pdf;
 			} elseif (!empty($conf->global->RECEPTION_ADDON_PDF)) {
-				$modele = $conf->global->RECEPTION_ADDON_PDF;
-			}
-		}
+                $modele = $conf->global->RECEPTION_ADDON_PDF;
+            }
+        }
 
-		$modelpath = "core/modules/reception/doc/";
+        $modelpath = "core/modules/reception/doc/";
 
-		$this->fetch_origin();
+        $this->fetch_origin();
 
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
-	}
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = ['reception'];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }

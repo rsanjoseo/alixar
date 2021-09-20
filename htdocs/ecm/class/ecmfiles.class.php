@@ -155,27 +155,346 @@ class EcmFiles extends CommonObject
 	 */
 	public $section_id;
 
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
+    /**
+     * Create object into database
+     *
+     * @param User $user      User that creates
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int                <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = false)
+    {
+        global $conf;
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param string $sortorder Sort Order
-	 * @param string $sortfield Sort field
-	 * @param int    $limit     offset limit
-	 * @param int    $offset    offset limit
-	 * @param array  $filter    filter array
-	 * @param string $filtermode filter mode (AND or OR)
+        $error = 0;
+
+        // Clean parameters
+        if (isset($this->ref)) {
+            $this->ref = trim($this->ref);
+        }
+        if (isset($this->label)) {
+            $this->label = trim($this->label);
+        }
+        if (isset($this->share)) {
+            $this->share = trim($this->share);
+        }
+        if (isset($this->entity)) {
+            $this->entity = (int) $this->entity;
+        }
+        if (isset($this->filename)) {
+            $this->filename = preg_replace('/\.noexe$/', '', trim($this->filename));
+        }
+        if (isset($this->filepath)) {
+            $this->filepath = trim($this->filepath);
+            $this->filepath = preg_replace('/[\\/]+$/', '', $this->filepath); // Remove last /
+        }
+        if (isset($this->fullpath_orig)) {
+            $this->fullpath_orig = trim($this->fullpath_orig);
+        }
+        if (isset($this->description)) {
+            $this->description = trim($this->description);
+        }
+        if (isset($this->keywords)) {
+            $this->keywords = trim($this->keywords);
+        }
+        if (isset($this->cover)) {
+            $this->cover = trim($this->cover);
+        }
+        if (isset($this->gen_or_uploaded)) {
+            $this->gen_or_uploaded = trim($this->gen_or_uploaded);
+        }
+        if (isset($this->extraparams)) {
+            $this->extraparams = trim($this->extraparams);
+        }
+        if (isset($this->fk_user_c)) {
+            $this->fk_user_c = (int) $this->fk_user_c;
+        }
+        if (isset($this->fk_user_m)) {
+            $this->fk_user_m = (int) $this->fk_user_m;
+        }
+        if (isset($this->acl)) {
+            $this->acl = trim($this->acl);
+        }
+        if (isset($this->src_object_type)) {
+            $this->src_object_type = trim($this->src_object_type);
+        }
+        if (empty($this->date_c)) {
+            $this->date_c = dol_now();
+        }
+        if (empty($this->date_m)) {
+            $this->date_m = dol_now();
+        }
+
+        // If ref not defined
+        $ref = '';
+        if (!empty($this->ref)) {
+            $ref = $this->ref;
+        } else {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/security.lib.php';
+            $ref = dol_hash($this->filepath . '/' . $this->filename, 3);
+        }
+
+        $maxposition = 0;
+        if (empty($this->position)) {
+            // Get max used
+            $sql = "SELECT MAX(position) as maxposition FROM " . MAIN_DB_PREFIX . $this->table_element;
+            $sql .= " WHERE filepath ='" . $this->db->escape($this->filepath) . "'";
+
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $obj = $this->db->fetch_object($resql);
+                $maxposition = (int) $obj->maxposition;
+            } else {
+                $this->errors[] = 'Error ' . $this->db->lasterror();
+                return --$error;
+            }
+            $maxposition = $maxposition + 1;
+        } else {
+            $maxposition = $this->position;
+        }
+
+        // Check parameters
+        if (empty($this->filename) || empty($this->filepath)) {
+            $this->errors[] = 'Bad property filename or filepath';
+            return --$error;
+        }
+        if (!isset($this->entity)) {
+            $this->entity = $conf->entity;
+        }
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
+        $sql .= 'ref,';
+        $sql .= 'label,';
+        $sql .= 'share,';
+        $sql .= 'entity,';
+        $sql .= 'filename,';
+        $sql .= 'filepath,';
+        $sql .= 'fullpath_orig,';
+        $sql .= 'description,';
+        $sql .= 'keywords,';
+        $sql .= 'cover,';
+        $sql .= 'position,';
+        $sql .= 'gen_or_uploaded,';
+        $sql .= 'extraparams,';
+        $sql .= 'date_c,';
+        $sql .= 'tms,';
+        $sql .= 'fk_user_c,';
+        $sql .= 'fk_user_m,';
+        $sql .= 'acl,';
+        $sql .= 'src_object_type,';
+        $sql .= 'src_object_id';
+        $sql .= ') VALUES (';
+        $sql .= " '" . $this->db->escape($ref) . "', ";
+        $sql .= ' ' . (!isset($this->label) ? 'NULL' : "'" . $this->db->escape($this->label) . "'") . ',';
+        $sql .= ' ' . (!isset($this->share) ? 'NULL' : "'" . $this->db->escape($this->share) . "'") . ',';
+        $sql .= ' ' . ((int) $this->entity) . ',';
+        $sql .= ' ' . (!isset($this->filename) ? 'NULL' : "'" . $this->db->escape($this->filename) . "'") . ',';
+        $sql .= ' ' . (!isset($this->filepath) ? 'NULL' : "'" . $this->db->escape($this->filepath) . "'") . ',';
+        $sql .= ' ' . (!isset($this->fullpath_orig) ? 'NULL' : "'" . $this->db->escape($this->fullpath_orig) . "'") . ',';
+        $sql .= ' ' . (!isset($this->description) ? 'NULL' : "'" . $this->db->escape($this->description) . "'") . ',';
+        $sql .= ' ' . (!isset($this->keywords) ? 'NULL' : "'" . $this->db->escape($this->keywords) . "'") . ',';
+        $sql .= ' ' . (!isset($this->cover) ? 'NULL' : "'" . $this->db->escape($this->cover) . "'") . ',';
+        $sql .= ' ' . ((int) $maxposition) . ',';
+        $sql .= ' ' . (!isset($this->gen_or_uploaded) ? 'NULL' : "'" . $this->db->escape($this->gen_or_uploaded) . "'") . ',';
+        $sql .= ' ' . (!isset($this->extraparams) ? 'NULL' : "'" . $this->db->escape($this->extraparams) . "'") . ',';
+        $sql .= " '" . $this->db->idate($this->date_c) . "',";
+        $sql .= ' ' . (!isset($this->date_m) || dol_strlen($this->date_m) == 0 ? 'NULL' : "'" . $this->db->idate($this->date_m) . "'") . ',';
+        $sql .= ' ' . (!isset($this->fk_user_c) ? $user->id : $this->fk_user_c) . ',';
+        $sql .= ' ' . (!isset($this->fk_user_m) ? 'NULL' : $this->fk_user_m) . ',';
+        $sql .= ' ' . (!isset($this->acl) ? 'NULL' : "'" . $this->db->escape($this->acl) . "'") . ',';
+        $sql .= ' ' . (!isset($this->src_object_type) ? 'NULL' : "'" . $this->db->escape($this->src_object_type) . "'") . ',';
+        $sql .= ' ' . (!isset($this->src_object_id) ? 'NULL' : $this->src_object_id);
+        $sql .= ')';
+
+        $this->db->begin();
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
+            $this->position = $maxposition;
+
+            // Triggers
+            if (!$notrigger) {
+                // Call triggers
+                $result = $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+
+            return $this->id;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int    $id              Id object
+     * @param string $ref             Hash of file name (filename+filepath). Not always defined on some version.
+     * @param string $relativepath    Relative path of file from document directory. Example: 'path/path2/file' or 'path/path2/*'
+     * @param string $hashoffile      Hash of file content. Take the first one found if same file is at different places. This hash will also change if file content is changed.
+     * @param string $hashforshare    Hash of file sharing.
+     * @param string $src_object_type src_object_type to search (value of object->table_element)
+     * @param string $src_object_id   src_object_id to search
+     *
+     * @return int                        <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id, $ref = '', $relativepath = '', $hashoffile = '', $hashforshare = '', $src_object_type = '', $src_object_id = 0)
+    {
+        global $conf;
+
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $sql = 'SELECT';
+        $sql .= ' t.rowid,';
+        $sql .= " t.ref,";
+        $sql .= " t.label,";
+        $sql .= " t.share,";
+        $sql .= " t.entity,";
+        $sql .= " t.filename,";
+        $sql .= " t.filepath,";
+        $sql .= " t.fullpath_orig,";
+        $sql .= " t.description,";
+        $sql .= " t.keywords,";
+        $sql .= " t.cover,";
+        $sql .= " t.position,";
+        $sql .= " t.gen_or_uploaded,";
+        $sql .= " t.extraparams,";
+        $sql .= " t.date_c,";
+        $sql .= " t.tms as date_m,";
+        $sql .= " t.fk_user_c,";
+        $sql .= " t.fk_user_m,";
+        $sql .= ' t.note_private,';
+        $sql .= ' t.note_public,';
+        $sql .= " t.acl,";
+        $sql .= " t.src_object_type,";
+        $sql .= " t.src_object_id";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        $sql .= ' WHERE 1 = 1';
+        /* Fetching this table depends on filepath+filename, it must not depends on entity because filesystem on disk does not know what is Dolibarr entities
+         if (! empty($conf->multicompany->enabled)) {
+         $sql .= " AND entity IN (" . getEntity('ecmfiles') . ")";
+         }*/
+        if ($relativepath) {
+            $relativepathwithnoexe = preg_replace('/\.noexe$/', '', $relativepath); // We must never have the .noexe into the database
+            $sql .= " AND t.filepath = '" . $this->db->escape(dirname($relativepath)) . "'";
+            $filename = basename($relativepathwithnoexe);
+            if ($filename != '*') {
+                $sql .= " AND t.filename = '" . $this->db->escape($filename) . "'";
+            }
+            $sql .= " AND t.entity = " . $conf->entity; // unique key include the entity so each company has its own index
+        } elseif (!empty($ref)) {        // hash of file path
+            $sql .= " AND t.ref = '" . $this->db->escape($ref) . "'";
+            $sql .= " AND t.entity = " . $conf->entity; // unique key include the entity so each company has its own index
+        } elseif (!empty($hashoffile)) {    // hash of content
+            $sql .= " AND t.label = '" . $this->db->escape($hashoffile) . "'";
+            $sql .= " AND t.entity = " . $conf->entity; // unique key include the entity so each company has its own index
+        } elseif (!empty($hashforshare)) {
+            $sql .= " AND t.share = '" . $this->db->escape($hashforshare) . "'";
+            //$sql .= " AND t.entity = ".$conf->entity;							// hashforshare already unique
+        } elseif ($src_object_type && $src_object_id) {
+            // Warning: May return several record, and only first one is returned !
+            $sql .= " AND t.src_object_type = '" . $this->db->escape($src_object_type) . "' AND t.src_object_id = " . ((int) $src_object_id);
+            $sql .= " AND t.entity = " . $conf->entity;
+        } else {
+            $sql .= ' AND t.rowid = ' . ((int) $id); // rowid already unique
+        }
+
+        $this->db->plimit(1); // When we search on src or on hash of content (hashforfile) to solve hash conflict when several files has same content, we take first one only
+        $this->db->order('t.rowid', 'ASC');
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $numrows = $this->db->num_rows($resql);
+            if ($numrows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->ref = $obj->ref;
+                $this->label = $obj->label;
+                $this->share = $obj->share;
+                $this->entity = $obj->entity;
+                $this->filename = $obj->filename;
+                $this->filepath = $obj->filepath;
+                $this->fullpath_orig = $obj->fullpath_orig;
+                $this->description = $obj->description;
+                $this->keywords = $obj->keywords;
+                $this->cover = $obj->cover;
+                $this->position = $obj->position;
+                $this->gen_or_uploaded = $obj->gen_or_uploaded;
+                $this->extraparams = $obj->extraparams;
+                $this->date_c = $this->db->jdate($obj->date_c);
+                $this->date_m = $this->db->jdate($obj->date_m);
+                $this->fk_user_c = $obj->fk_user_c;
+                $this->fk_user_m = $obj->fk_user_m;
+                $this->note_private = $obj->note_private;
+                $this->note_public = $obj->note_public;
+                $this->acl = $obj->acl;
+                $this->src_object_type = $obj->src_object_type;
+                $this->src_object_id = $obj->src_object_id;
+            }
+
+            // Retrieve all extrafields for ecm_files
+            // fetch optionals attributes and labels
+            $this->fetch_optionals();
+
+            // $this->fetch_lines();
+
+            $this->db->free($resql);
+
+            if ($numrows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return -1;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param string $sortorder  Sort Order
+     * @param string $sortfield  Sort field
+     * @param int    $limit      offset limit
+     * @param int    $offset     offset limit
+     * @param array  $filter     filter array
+     * @param string $filtermode filter mode (AND or OR)
 	 *
 	 * @return int <0 if KO, >0 if OK
 	 */
@@ -495,325 +814,6 @@ class EcmFiles extends CommonObject
 			$this->db->rollback();
 
 			return -1;
-		}
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param  int    $id          	   	Id object
-	 * @param  string $ref         	   	Hash of file name (filename+filepath). Not always defined on some version.
-	 * @param  string $relativepath    	Relative path of file from document directory. Example: 'path/path2/file' or 'path/path2/*'
-	 * @param  string $hashoffile      	Hash of file content. Take the first one found if same file is at different places. This hash will also change if file content is changed.
-	 * @param  string $hashforshare    	Hash of file sharing.
-	 * @param  string $src_object_type 	src_object_type to search (value of object->table_element)
-	 * @param  string $src_object_id 	src_object_id to search
-	 * @return int                 	   	<0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = '', $relativepath = '', $hashoffile = '', $hashforshare = '', $src_object_type = '', $src_object_id = 0)
-	{
-		global $conf;
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql = 'SELECT';
-		$sql .= ' t.rowid,';
-		$sql .= " t.ref,";
-		$sql .= " t.label,";
-		$sql .= " t.share,";
-		$sql .= " t.entity,";
-		$sql .= " t.filename,";
-		$sql .= " t.filepath,";
-		$sql .= " t.fullpath_orig,";
-		$sql .= " t.description,";
-		$sql .= " t.keywords,";
-		$sql .= " t.cover,";
-		$sql .= " t.position,";
-		$sql .= " t.gen_or_uploaded,";
-		$sql .= " t.extraparams,";
-		$sql .= " t.date_c,";
-		$sql .= " t.tms as date_m,";
-		$sql .= " t.fk_user_c,";
-		$sql .= " t.fk_user_m,";
-		$sql .= ' t.note_private,';
-		$sql .= ' t.note_public,';
-		$sql .= " t.acl,";
-		$sql .= " t.src_object_type,";
-		$sql .= " t.src_object_id";
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		$sql .= ' WHERE 1 = 1';
-		/* Fetching this table depends on filepath+filename, it must not depends on entity because filesystem on disk does not know what is Dolibarr entities
-		 if (! empty($conf->multicompany->enabled)) {
-		 $sql .= " AND entity IN (" . getEntity('ecmfiles') . ")";
-		 }*/
-		if ($relativepath) {
-			$relativepathwithnoexe = preg_replace('/\.noexe$/', '', $relativepath); // We must never have the .noexe into the database
-			$sql .= " AND t.filepath = '".$this->db->escape(dirname($relativepath))."'";
-			$filename = basename($relativepathwithnoexe);
-			if ($filename != '*') {
-				$sql .= " AND t.filename = '".$this->db->escape($filename)."'";
-			}
-			$sql .= " AND t.entity = ".$conf->entity; // unique key include the entity so each company has its own index
-		} elseif (!empty($ref)) {		// hash of file path
-			$sql .= " AND t.ref = '".$this->db->escape($ref)."'";
-			$sql .= " AND t.entity = ".$conf->entity; // unique key include the entity so each company has its own index
-		} elseif (!empty($hashoffile)) {	// hash of content
-			$sql .= " AND t.label = '".$this->db->escape($hashoffile)."'";
-			$sql .= " AND t.entity = ".$conf->entity; // unique key include the entity so each company has its own index
-		} elseif (!empty($hashforshare)) {
-			$sql .= " AND t.share = '".$this->db->escape($hashforshare)."'";
-			//$sql .= " AND t.entity = ".$conf->entity;							// hashforshare already unique
-		} elseif ($src_object_type && $src_object_id) {
-			// Warning: May return several record, and only first one is returned !
-			$sql .= " AND t.src_object_type = '".$this->db->escape($src_object_type)."' AND t.src_object_id = ".((int) $src_object_id);
-			$sql .= " AND t.entity = ".$conf->entity;
-		} else {
-			$sql .= ' AND t.rowid = '.((int) $id); // rowid already unique
-		}
-
-		$this->db->plimit(1); // When we search on src or on hash of content (hashforfile) to solve hash conflict when several files has same content, we take first one only
-		$this->db->order('t.rowid', 'ASC');
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numrows = $this->db->num_rows($resql);
-			if ($numrows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->ref = $obj->ref;
-				$this->label = $obj->label;
-				$this->share = $obj->share;
-				$this->entity = $obj->entity;
-				$this->filename = $obj->filename;
-				$this->filepath = $obj->filepath;
-				$this->fullpath_orig = $obj->fullpath_orig;
-				$this->description = $obj->description;
-				$this->keywords = $obj->keywords;
-				$this->cover = $obj->cover;
-				$this->position = $obj->position;
-				$this->gen_or_uploaded = $obj->gen_or_uploaded;
-				$this->extraparams = $obj->extraparams;
-				$this->date_c = $this->db->jdate($obj->date_c);
-				$this->date_m = $this->db->jdate($obj->date_m);
-				$this->fk_user_c = $obj->fk_user_c;
-				$this->fk_user_m = $obj->fk_user_m;
-				$this->note_private = $obj->note_private;
-				$this->note_public = $obj->note_public;
-				$this->acl = $obj->acl;
-				$this->src_object_type = $obj->src_object_type;
-				$this->src_object_id = $obj->src_object_id;
-			}
-
-			// Retrieve all extrafields for ecm_files
-			// fetch optionals attributes and labels
-			$this->fetch_optionals();
-
-			// $this->fetch_lines();
-
-			$this->db->free($resql);
-
-			if ($numrows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      	User that creates
-	 * @param  bool $notrigger 	false=launch triggers after, true=disable triggers
-	 * @return int 				<0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		global $conf;
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$error = 0;
-
-		// Clean parameters
-		if (isset($this->ref)) {
-			$this->ref = trim($this->ref);
-		}
-		if (isset($this->label)) {
-			$this->label = trim($this->label);
-		}
-		if (isset($this->share)) {
-			$this->share = trim($this->share);
-		}
-		if (isset($this->entity)) {
-			$this->entity = (int) $this->entity;
-		}
-		if (isset($this->filename)) {
-			$this->filename = preg_replace('/\.noexe$/', '', trim($this->filename));
-		}
-		if (isset($this->filepath)) {
-			$this->filepath = trim($this->filepath);
-			$this->filepath = preg_replace('/[\\/]+$/', '', $this->filepath); // Remove last /
-		}
-		if (isset($this->fullpath_orig)) {
-			$this->fullpath_orig = trim($this->fullpath_orig);
-		}
-		if (isset($this->description)) {
-			$this->description = trim($this->description);
-		}
-		if (isset($this->keywords)) {
-			$this->keywords = trim($this->keywords);
-		}
-		if (isset($this->cover)) {
-			$this->cover = trim($this->cover);
-		}
-		if (isset($this->gen_or_uploaded)) {
-			$this->gen_or_uploaded = trim($this->gen_or_uploaded);
-		}
-		if (isset($this->extraparams)) {
-			$this->extraparams = trim($this->extraparams);
-		}
-		if (isset($this->fk_user_c)) {
-			$this->fk_user_c = (int) $this->fk_user_c;
-		}
-		if (isset($this->fk_user_m)) {
-			$this->fk_user_m = (int) $this->fk_user_m;
-		}
-		if (isset($this->acl)) {
-			$this->acl = trim($this->acl);
-		}
-		if (isset($this->src_object_type)) {
-			$this->src_object_type = trim($this->src_object_type);
-		}
-		if (empty($this->date_c)) {
-			$this->date_c = dol_now();
-		}
-		if (empty($this->date_m)) {
-			$this->date_m = dol_now();
-		}
-
-		// If ref not defined
-		$ref = '';
-		if (!empty($this->ref)) {
-			$ref = $this->ref;
-		} else {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/security.lib.php';
-			$ref = dol_hash($this->filepath.'/'.$this->filename, 3);
-		}
-
-		$maxposition = 0;
-		if (empty($this->position)) {
-			// Get max used
-			$sql = "SELECT MAX(position) as maxposition FROM ".MAIN_DB_PREFIX.$this->table_element;
-			$sql .= " WHERE filepath ='".$this->db->escape($this->filepath)."'";
-
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$obj = $this->db->fetch_object($resql);
-				$maxposition = (int) $obj->maxposition;
-			} else {
-				$this->errors[] = 'Error '.$this->db->lasterror();
-				return --$error;
-			}
-			$maxposition = $maxposition + 1;
-		} else {
-			$maxposition = $this->position;
-		}
-
-		// Check parameters
-		if (empty($this->filename) || empty($this->filepath)) {
-			$this->errors[] = 'Bad property filename or filepath';
-			return --$error;
-		}
-		if (!isset($this->entity)) {
-			$this->entity = $conf->entity;
-		}
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element.'(';
-		$sql .= 'ref,';
-		$sql .= 'label,';
-		$sql .= 'share,';
-		$sql .= 'entity,';
-		$sql .= 'filename,';
-		$sql .= 'filepath,';
-		$sql .= 'fullpath_orig,';
-		$sql .= 'description,';
-		$sql .= 'keywords,';
-		$sql .= 'cover,';
-		$sql .= 'position,';
-		$sql .= 'gen_or_uploaded,';
-		$sql .= 'extraparams,';
-		$sql .= 'date_c,';
-		$sql .= 'tms,';
-		$sql .= 'fk_user_c,';
-		$sql .= 'fk_user_m,';
-		$sql .= 'acl,';
-		$sql .= 'src_object_type,';
-		$sql .= 'src_object_id';
-		$sql .= ') VALUES (';
-		$sql .= " '".$this->db->escape($ref)."', ";
-		$sql .= ' '.(!isset($this->label) ? 'NULL' : "'".$this->db->escape($this->label)."'").',';
-		$sql .= ' '.(!isset($this->share) ? 'NULL' : "'".$this->db->escape($this->share)."'").',';
-		$sql .= ' '.((int) $this->entity).',';
-		$sql .= ' '.(!isset($this->filename) ? 'NULL' : "'".$this->db->escape($this->filename)."'").',';
-		$sql .= ' '.(!isset($this->filepath) ? 'NULL' : "'".$this->db->escape($this->filepath)."'").',';
-		$sql .= ' '.(!isset($this->fullpath_orig) ? 'NULL' : "'".$this->db->escape($this->fullpath_orig)."'").',';
-		$sql .= ' '.(!isset($this->description) ? 'NULL' : "'".$this->db->escape($this->description)."'").',';
-		$sql .= ' '.(!isset($this->keywords) ? 'NULL' : "'".$this->db->escape($this->keywords)."'").',';
-		$sql .= ' '.(!isset($this->cover) ? 'NULL' : "'".$this->db->escape($this->cover)."'").',';
-		$sql .= ' '.((int) $maxposition).',';
-		$sql .= ' '.(!isset($this->gen_or_uploaded) ? 'NULL' : "'".$this->db->escape($this->gen_or_uploaded)."'").',';
-		$sql .= ' '.(!isset($this->extraparams) ? 'NULL' : "'".$this->db->escape($this->extraparams)."'").',';
-		$sql .= " '".$this->db->idate($this->date_c)."',";
-		$sql .= ' '.(!isset($this->date_m) || dol_strlen($this->date_m) == 0 ? 'NULL' : "'".$this->db->idate($this->date_m)."'").',';
-		$sql .= ' '.(!isset($this->fk_user_c) ? $user->id : $this->fk_user_c).',';
-		$sql .= ' '.(!isset($this->fk_user_m) ? 'NULL' : $this->fk_user_m).',';
-		$sql .= ' '.(!isset($this->acl) ? 'NULL' : "'".$this->db->escape($this->acl)."'").',';
-		$sql .= ' '.(!isset($this->src_object_type) ? 'NULL' : "'".$this->db->escape($this->src_object_type)."'").',';
-		$sql .= ' '.(!isset($this->src_object_id) ? 'NULL' : $this->src_object_id);
-		$sql .= ')';
-
-		$this->db->begin();
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
-			$this->position = $maxposition;
-
-			// Triggers
-			if (!$notrigger) {
-				// Call triggers
-				$result = $this->call_trigger(strtoupper(get_class($this)).'_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-
-			return $this->id;
 		}
 	}
 

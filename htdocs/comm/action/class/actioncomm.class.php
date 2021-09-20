@@ -38,260 +38,302 @@ require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncommreminder.class.php'
 class ActionComm extends CommonObject
 {
 	/**
-	 * Typical value for a event that is in a todo state
-	 */
-	const EVENT_TODO = 0;
-	/**
-	 * Typical value for a event that is in a progress state
-	 */
-	const EVENT_IN_PROGRESS = 50;
-	/**
-	 * Typical value for a event that is in a finished state
-	 */
-	const EVENT_FINISHED = 100;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'action';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'actioncomm';
+
 	/**
 	 * @var string Name of id column
 	 */
 	public $table_rowid = 'id';
+
 	/**
 	 * @var string Name of icon for actioncomm object. Filename of icon is object_action.png
 	 */
 	public $picto = 'action';
+
 	/**
 	 * @var int 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var integer 0=Default
 	 *              1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
 	 *              2=Same than 1 but accept record if fksoc is empty
 	 */
 	public $restrictiononfksoc = 2;
+
 	/**
 	 * @var int Id of the event
 	 */
 	public $id;
+
 	/**
 	 * @var int Id of the event. Use $id as possible
 	 */
 	public $ref;
-	/**
+
+    /**
 	 * @var int Id into parent table llx_c_actioncomm (used only if option to use type is set)
 	 * 			This field is stored info fk_action. It contains the id into table llx_ac_actioncomm.
 	 */
 	public $type_id;
-	/**
+
+    /**
 	 * @var string Calendar of event (Type of type of event). 'system'=Default calendar, 'systemauto'=Auto calendar, 'birthdate', 'holiday', 'module'=Calendar specific to a module
 	 *             This field contains the type into table llx_ac_actioncomm ('system', 'systemauto', ...). It should be named 'type_type'.
 	 */
 	public $type;
-	/**
+
+    /**
 	 * @var string Code into parent table llx_c_actioncomm (used only if option to use type is set). With default setup, should be AC_OTH_AUTO or AC_OTH.
 	 *             This field contains the code into table llx_ac_actioncomm.
 	 */
 	public $type_code;
-	/**
+
+    /**
 	 * @var string Type label
 	 */
 	public $type_label;
-	/**
+
+    /**
 	 * @var string Color into parent table llx_c_actioncomm (used only if option to use type is set)
 	 */
 	public $type_color;
-	/**
+
+    /**
 	 * @var string Picto for type of event (used only if option to use type is set)
 	 */
 	public $type_picto;
-	/**
+
+    /**
 	 * @var string Free code to identify action. Ie: Agenda trigger add here AC_TRIGGERNAME ('AC_COMPANY_CREATE', 'AC_PROPAL_VALIDATE', ...)
 	 * 			   This field is stored into field 'code' into llx_actioncomm.
 	 */
 	public $code;
-	/**
+
+    /**
 	 * @var string Agenda event label
 	 */
 	public $label;
-	/**
+
+    /**
 	 * @var integer Date creation record (datec)
 	 */
 	public $datec;
-	/**
+
+    /**
 	 * @var integer Date end record (datef)
 	 */
 	public $datef;
-	/**
+
+    /**
 	 * @var integer Duration (duree)
 	 */
 	public $duree;
-	/**
+
+    /**
 	 * @var integer Date modification record (tms)
 	 */
 	public $datem;
-	/**
+
+    /**
 	 * @var User Object user that create action
 	 * @deprecated
 	 * @see $authorid
 	 */
 	public $author;
-	/**
+
+    /**
 	 * @var User Object user that modified action
 	 * @deprecated
 	 * @see $usermodid
 	 */
 	public $usermod;
-	/**
+
+    /**
 	 * @var int Id user that create action
 	 */
 	public $authorid;
-	/**
+
+    /**
 	 * @var int Id user that modified action
 	 */
 	public $usermodid;
-	/**
+
+    /**
 	 * @var integer Date action start (datep)
 	 */
 	public $datep;
-	/**
+
+    /**
 	 * @var integer Date action end (datep2)
 	 */
 	public $datep2;
-	/**
+
+    /**
 	 * @var int -1=Unkown duration
 	 * @deprecated
 	 */
 	public $durationp = -1;
-	/**
+
+    /**
 	 * @var int 1=Event on full day
 	 */
 	public $fulldayevent = 0;
-	/**
+
+    /**
 	 * @var integer Percentage
 	 */
 	public $percentage;
-	/**
+
+    /**
 	 * @var string Location
 	 */
 	public $location;
-	/**
+
+    /**
 	 * @var int Transparency (ical standard). Used to say if people assigned to event are busy or not by event. 0=available, 1=busy, 2=busy (refused events)
 	 */
 	public $transparency;
-	/**
+
+    /**
 	 * @var int (0 By default)
 	 */
 	public $priority;
-	/**
+
+    /**
 	 * @var int[] Array of user ids
 	 */
 	public $userassigned = array();
-	/**
+
+    /**
 	 * @var int Id of user owner = fk_user_action into table
 	 */
 	public $userownerid;
-	/**
+
+    /**
 	 * @var int Id of user done (deprecated)
 	 * @deprecated
 	 */
 	public $userdoneid;
-	/**
+
+    /**
 	 * @var int[] Array of contact ids
 	 */
 	public $socpeopleassigned = array();
-	/**
+
+    /**
 	 * @var int[] Array of other contact emails (not user, not contact)
 	 */
 	public $otherassigned = array();
-	/**
+
+    /**
 	 * @var array	Array of reminders
 	 */
 	public $reminders = array();
-	/**
+
+    /**
 	 * @var User Object user of owner
 	 * @deprecated
 	 * @see $userownerid
 	 */
 	public $usertodo;
-	/**
+
+    /**
 	 * @var User Object user that did action
 	 * @deprecated
 	 * @see $userdoneid
 	 */
-	public $userdone;
-	/**
-	 * @var int thirdparty id linked to action
-	 */
-	public $socid;
+    public $userdone;
 
-	// Properties for links to other objects
-		/**
-	 * @var int socpeople id linked to action
-	 */
-	public $contact_id; // Id of record
-	/**
-	 * @var Societe|null Company linked to action (optional)
-	 * @deprecated
-	 * @see $socid
-	 */
-	public $societe;
-	/**
-	 * @var Contact|null Contact linked to action (optional)
-	 * @deprecated
-	 * @see $contact_id
-	 */
-	public $contact;
-/**
-	 * @var int Id of linked object
-	 */
-	public $fk_element;
-	/**
-	 * @var int Id of record alternative for API
-	 */
-	public $elementid;
-	/**
-	 * @var string Type of record. This if property ->element of object linked to.
-	 */
-	public $elementtype;
-	/**
+    /**
+     * @var int thirdparty id linked to action
+     */
+    public $socid;
+
+    /**
+     * @var int socpeople id linked to action
+     */
+    public $contact_id;
+
+    /**
+     * @var Societe|null Company linked to action (optional)
+     * @deprecated
+     * @see $socid
+     */
+    public $societe;
+
+    /**
+     * @var Contact|null Contact linked to action (optional)
+     * @deprecated
+     * @see $contact_id
+     */
+    public $contact;
+
+    // Properties for links to other objects
+    /**
+     * @var int Id of linked object
+     */
+    public $fk_element; // Id of record
+
+    /**
+     * @var int Id of record alternative for API
+     */
+    public $elementid;
+
+    /**
+     * @var string Type of record. This if property ->element of object linked to.
+     */
+    public $elementtype;
+
+    /**
 	 * @var string Ical name
 	 */
 	public $icalname;
-	/**
+
+    /**
 	 * @var string Ical color
 	 */
 	public $icalcolor;
-	/**
+
+    /**
 	 * @var string Extraparam
 	 */
 	public $extraparams;
-	/**
+
+    /**
 	 * @var array Actions
 	 */
 	public $actions = array();
-	/**
+
+    /**
 	 * @var string Email msgid
 	 */
 	public $email_msgid;
-	/**
+
+    /**
 	 * @var string Email from
 	 */
 	public $email_from;
-	/**
+
+    /**
 	 * @var string Email sender
 	 */
 	public $email_sender;
-	/**
+
+    /**
 	 * @var string Email to
 	 */
 	public $email_to;
-	/**
+
+    /**
 	 * @var string Email tocc
 	 */
 	public $email_tocc;
@@ -299,368 +341,56 @@ class ActionComm extends CommonObject
 	 * @var string Email tobcc
 	 */
 	public $email_tobcc;
-	/**
+
+    /**
 	 * @var string Email subject
 	 */
 	public $email_subject;
-	/**
+
+    /**
 	 * @var string Email errors to
 	 */
 	public $errors_to;
-	/**
+
+    /**
 	 * @var int number of vote for an event
 	 */
 	public $num_vote;
-	/**
-	 * @var int if event is paid
-	 */
-	public $event_paid;
-	/**
-	 * @var int status use but Event organisation module
-	 */
-	public $status;
 
-	/**
-	 *      Constructor
-	 *
-	 *      @param      DoliDB		$db      Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * @var int if event is paid
+     */
+    public $event_paid;
 
-	/**
-	 *  Load all objects with filters.
-	 *  @todo WARNING: This make a fetch on all records instead of making one request with a join.
-	 *
-	 *  @param		DoliDb	$db				Not used
-	 *  @param		int		$socid			Filter by thirdparty
-	 *  @param		int		$fk_element		Id of element action is linked to
-	 *  @param		string	$elementtype	Type of element action is linked to
-	 *  @param		string	$filter			Other filter
-	 *  @param		string	$sortfield		Sort on this field
-	 *  @param		string	$sortorder		ASC or DESC
-	 *  @param		string	$limit			Limit number of answers
-	 *  @return		array|string			Error string if KO, array with actions if OK
-	 */
-	public static function getActions($db, $socid = 0, $fk_element = 0, $elementtype = '', $filter = '', $sortfield = 'a.datep', $sortorder = 'DESC', $limit = 0)
-	{
-		global $conf, $langs;
+    /**
+     * @var int status use but Event organisation module
+     */
+    public $status;
 
-		$resarray = array();
+    /**
+     * Typical value for a event that is in a todo state
+     */
+    const EVENT_TODO = 0;
 
-		dol_syslog(get_class()."::getActions", LOG_DEBUG);
+    /**
+     * Typical value for a event that is in a progress state
+     */
+    const EVENT_IN_PROGRESS = 50;
 
-		$sql = "SELECT a.id";
-		$sql .= " FROM ".MAIN_DB_PREFIX."actioncomm as a";
-		$sql .= " WHERE a.entity IN (".getEntity('agenda').")";
-		if (!empty($socid)) {
-			$sql .= " AND a.fk_soc = ".((int) $socid);
-		}
-		if (!empty($elementtype)) {
-			if ($elementtype == 'project') {
-				$sql .= ' AND a.fk_project = '.((int) $fk_element);
-			} elseif ($elementtype == 'contact') {
-				$sql .= ' AND a.id IN';
-				$sql .= " (SELECT fk_actioncomm FROM ".MAIN_DB_PREFIX."actioncomm_resources WHERE";
-				$sql .= " element_type = 'socpeople' AND fk_element = ".((int) $fk_element).')';
-			} else {
-				$sql .= " AND a.fk_element = ".((int) $fk_element)." AND a.elementtype = '".$db->escape($elementtype)."'";
-			}
-		}
-		if (!empty($filter)) {
-			$sql .= $filter;
-		}
-		if ($sortorder && $sortfield) {
-			$sql .= $db->order($sortfield, $sortorder);
-		}
-		$sql .= $db->plimit($limit, 0);
+    /**
+     * Typical value for a event that is in a finished state
+     */
+    const EVENT_FINISHED = 100;
 
-		$resql = $db->query($sql);
-		if ($resql) {
-			$num = $db->num_rows($resql);
-
-			if ($num) {
-				for ($i = 0; $i < $num; $i++) {
-					$obj = $db->fetch_object($resql);
-					$actioncommstatic = new ActionComm($db);
-					$actioncommstatic->fetch($obj->id);
-					$resarray[$i] = $actioncommstatic;
-				}
-			}
-			$db->free($resql);
-			return $resarray;
-		} else {
-			return $db->lasterror();
-		}
-	}
-
-	/**
-	 *  Load object from database
-	 *
-	 *  @param  int		$id     		Id of action to get
-	 *  @param  string	$ref    		Ref of action to get
-	 *  @param  string	$ref_ext		Ref ext to get
-	 *  @param	string	$email_msgid	Email msgid
-	 *  @return	int						<0 if KO, >0 if OK
-	 */
-	public function fetch($id, $ref = '', $ref_ext = '', $email_msgid = '')
-	{
-		global $langs;
-
-		if (empty($id) && empty($ref) && empty($ref_ext) && empty($email_msgid)) {
-			dol_syslog(get_class($this)."::fetch Bad parameters", LOG_WARNING);
-			return -1;
-		}
-
-		$sql = "SELECT a.id,";
-		$sql .= " a.ref as ref,";
-		$sql .= " a.entity,";
-		$sql .= " a.ref_ext,";
-		$sql .= " a.datep,";
-		$sql .= " a.datep2,";
-		$sql .= " a.durationp,"; // deprecated
-		$sql .= " a.datec,";
-		$sql .= " a.tms as datem,";
-		$sql .= " a.code, a.label, a.note as note_private,";
-		$sql .= " a.fk_soc,";
-		$sql .= " a.fk_project,";
-		$sql .= " a.fk_user_author, a.fk_user_mod,";
-		$sql .= " a.fk_user_action, a.fk_user_done,";
-		$sql .= " a.fk_contact, a.percent as percentage,";
-		$sql .= " a.fk_element as elementid, a.elementtype,";
-		$sql .= " a.priority, a.fulldayevent, a.location, a.transparency,";
-		$sql .= " a.email_msgid, a.email_subject, a.email_from, a.email_to, a.email_tocc, a.email_tobcc, a.errors_to,";
-		$sql .= " c.id as type_id, c.type as type_type, c.code as type_code, c.libelle as type_label, c.color as type_color, c.picto as type_picto,";
-		$sql .= " s.nom as socname,";
-		$sql .= " u.firstname, u.lastname as lastname,";
-		$sql .= " num_vote, event_paid, a.status";
-		$sql .= " FROM ".MAIN_DB_PREFIX."actioncomm as a ";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_actioncomm as c ON a.fk_action=c.id ";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."user as u on u.rowid = a.fk_user_author";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s on s.rowid = a.fk_soc";
-		$sql .= " WHERE ";
-		if ($ref) {
-			$sql .= " a.ref = '".$this->db->escape($ref)."'";
-		} elseif ($ref_ext) {
-			$sql .= " a.ref_ext = '".$this->db->escape($ref_ext)."'";
-		} elseif ($email_msgid) {
-			$sql .= " a.email_msgid = '".$this->db->escape($email_msgid)."'";
-		} else {
-			$sql .= " a.id = ".((int) $id);
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			if ($num) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id         = $obj->id;
-				$this->entity = $obj->entity;
-				$this->ref        = $obj->ref;
-				$this->ref_ext    = $obj->ref_ext;
-
-				// Properties of parent table llx_c_actioncomm
-				$this->type_id    = $obj->type_id;
-				$this->type_code  = $obj->type_code;
-				$this->type_color = $obj->type_color;
-				$this->type_picto = $obj->type_picto;
-				$this->type       = $obj->type_type;
-				/*$transcode = $langs->trans("Action".$obj->type_code);
-				$this->type       = (($transcode != "Action".$obj->type_code) ? $transcode : $obj->type_label); */
-				$transcode = $langs->trans("Action".$obj->type_code.'Short');
-				$this->type_short = (($transcode != "Action".$obj->type_code.'Short') ? $transcode : '');
-
-				$this->code = $obj->code;
-				$this->label = $obj->label;
-				$this->datep = $this->db->jdate($obj->datep);
-				$this->datef = $this->db->jdate($obj->datep2);
-
-				$this->datec = $this->db->jdate($obj->datec);
-				$this->datem = $this->db->jdate($obj->datem);
-
-				$this->note = $obj->note_private; // deprecated
-				$this->note_private = $obj->note_private;
-				$this->percentage = $obj->percentage;
-
-				$this->authorid = $obj->fk_user_author;
-				$this->usermodid = $obj->fk_user_mod;
-
-				if (!is_object($this->author)) {
-					$this->author = new stdClass(); // To avoid warning
-				}
-				$this->author->id = $obj->fk_user_author; // deprecated
-				$this->author->firstname = $obj->firstname; // deprecated
-				$this->author->lastname = $obj->lastname; // deprecated
-				if (!is_object($this->usermod)) {
-					$this->usermod = new stdClass(); // To avoid warning
-				}
-				$this->usermod->id = $obj->fk_user_mod; // deprecated
-
-				$this->userownerid = $obj->fk_user_action;
-				$this->userdoneid = $obj->fk_user_done;
-				$this->priority				= $obj->priority;
-				$this->fulldayevent			= $obj->fulldayevent;
-				$this->location				= $obj->location;
-				$this->transparency			= $obj->transparency;
-
-				$this->socid = $obj->fk_soc; // To have fetch_thirdparty method working
-				$this->contact_id = $obj->fk_contact; // To have fetch_contact method working
-				$this->fk_project = $obj->fk_project; // To have fetch_projet method working
-
-				//$this->societe->id			= $obj->fk_soc;			// deprecated
-				//$this->contact->id			= $obj->fk_contact;		// deprecated
-
-				$this->fk_element = $obj->elementid;
-				$this->elementid = $obj->elementid;
-				$this->elementtype = $obj->elementtype;
-
-				$this->num_vote = $obj->num_vote;
-				$this->event_paid = $obj->event_paid;
-				$this->status = $obj->status;
-
-				$this->fetchResources();
-			}
-			$this->db->free($resql);
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-
-		return $num;
-	}
-
-	/**
-	 *    Initialize $this->userassigned & this->socpeopleassigned array with list of id of user and contact assigned to event
-	 *
-	 *    @return   int				<0 if KO, >0 if OK
-	 */
-	public function fetchResources()
-	{
-		$this->userassigned = array();
-		$this->socpeopleassigned = array();
-
-		$sql = 'SELECT fk_actioncomm, element_type, fk_element, answer_status, mandatory, transparency';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'actioncomm_resources';
-		$sql .= ' WHERE fk_actioncomm = '.((int) $this->id);
-		$sql .= " AND element_type IN ('user', 'socpeople')";
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			// If owner is known, we must but id first into list
-			if ($this->userownerid > 0) {
-				$this->userassigned[$this->userownerid] = array('id'=>$this->userownerid); // Set first so will be first into list.
-			}
-
-			while ($obj = $this->db->fetch_object($resql)) {
-				if ($obj->fk_element > 0) {
-					switch ($obj->element_type) {
-						case 'user':
-							$this->userassigned[$obj->fk_element] = array('id'=>$obj->fk_element, 'mandatory'=>$obj->mandatory, 'answer_status'=>$obj->answer_status, 'transparency'=>$obj->transparency);
-							if (empty($this->userownerid)) {
-								$this->userownerid = $obj->fk_element; // If not defined (should not happened, we fix this)
-							}
-							break;
-						case 'socpeople':
-							$this->socpeopleassigned[$obj->fk_element] = array('id'=>$obj->fk_element, 'mandatory'=>$obj->mandatory, 'answer_status'=>$obj->answer_status, 'transparency'=>$obj->transparency);
-							break;
-					}
-				}
-			}
-
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
-
-	/**
-	 *  Function used to replace a thirdparty id with another one.
-	 *
-	 *  @param DoliDB $db Database handler
-	 *  @param int $origin_id Old thirdparty id
-	 *  @param int $dest_id New thirdparty id
-	 *  @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'actioncomm'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Load an object from its id and create a new one in database
-	 *
-	 *  @param	    User	        $fuser      	Object user making action
-	 *  @param		int				$socid			Id of thirdparty
-	 *  @return		int								New id of clone
-	 */
-	public function createFromClone(User $fuser, $socid)
-	{
-		global $db, $conf, $hookmanager;
-
-		$error = 0;
-		$now = dol_now();
-
-		$this->db->begin();
-
-		// Load source object
-		$objFrom = clone $this;
-
-		// Retrieve all extrafield
-		// fetch optionals attributes and labels
-		$this->fetch_optionals();
-
-		//$this->fetch_userassigned();
-		$this->fetchResources();
-
-		$this->id = 0;
-
-		// Create clone
-		$this->context['createfromclone'] = 'createfromclone';
-		$result = $this->create($fuser);
-		if ($result < 0) {
-			$error++;
-		}
-
-		if (!$error) {
-			// Hook of thirdparty module
-			if (is_object($hookmanager)) {
-				$parameters = array('objFrom'=>$objFrom);
-				$action = '';
-				$reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-				if ($reshook < 0) {
-					$error++;
-				}
-			}
-
-			// Call trigger
-			$result = $this->call_trigger('ACTION_CLONE', $fuser);
-			if ($result < 0) {
-				$error++;
-			}
-			// End call triggers
-		}
-
-		unset($this->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $this->id;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+    /**
+     *      Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
 	/**
 	 *    Add an action/event into database.
@@ -925,29 +655,335 @@ class ActionComm extends CommonObject
 				$this->db->commit();
 				return $this->id;
 			} else {
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->db->rollback();
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            $this->db->rollback();
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *    Delete event from database
-	 *
-	 *    @param    int		$notrigger		1 = disable triggers, 0 = enable triggers
-	 *    @return   int 					<0 if KO, >0 if OK
-	 */
-	public function delete($notrigger = 0)
-	{
-		global $user;
+    /**
+     *  Load an object from its id and create a new one in database
+     *
+     * @param User $fuser Object user making action
+     * @param int  $socid Id of thirdparty
+     *
+     * @return        int                                New id of clone
+     */
+    public function createFromClone(User $fuser, $socid)
+    {
+        global $db, $conf, $hookmanager;
 
-		$error = 0;
+        $error = 0;
+        $now = dol_now();
 
-		dol_syslog(get_class($this)."::delete", LOG_DEBUG);
+        $this->db->begin();
+
+        // Load source object
+        $objFrom = clone $this;
+
+        // Retrieve all extrafield
+        // fetch optionals attributes and labels
+        $this->fetch_optionals();
+
+        //$this->fetch_userassigned();
+        $this->fetchResources();
+
+        $this->id = 0;
+
+        // Create clone
+        $this->context['createfromclone'] = 'createfromclone';
+        $result = $this->create($fuser);
+        if ($result < 0) {
+            $error++;
+        }
+
+        if (!$error) {
+            // Hook of thirdparty module
+            if (is_object($hookmanager)) {
+                $parameters = ['objFrom' => $objFrom];
+                $action = '';
+                $reshook = $hookmanager->executeHooks('createFrom', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+                if ($reshook < 0) {
+                    $error++;
+                }
+            }
+
+            // Call trigger
+            $result = $this->call_trigger('ACTION_CLONE', $fuser);
+            if ($result < 0) {
+                $error++;
+            }
+            // End call triggers
+        }
+
+        unset($this->context['createfromclone']);
+
+        // End
+        if (!$error) {
+            $this->db->commit();
+            return $this->id;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *  Load object from database
+     *
+     * @param int    $id            Id of action to get
+     * @param string $ref           Ref of action to get
+     * @param string $ref_ext       Ref ext to get
+     * @param string $email_msgid   Email msgid
+     * @param string $loadresources 1=Load also resources
+     *
+     * @return    int                            <0 if KO, >0 if OK
+     */
+    public function fetch($id, $ref = '', $ref_ext = '', $email_msgid = '', $loadresources = 1)
+    {
+        global $langs;
+
+        if (empty($id) && empty($ref) && empty($ref_ext) && empty($email_msgid)) {
+            dol_syslog(get_class($this) . "::fetch Bad parameters", LOG_WARNING);
+            return -1;
+        }
+
+        $sql = "SELECT a.id,";
+        $sql .= " a.ref as ref,";
+        $sql .= " a.entity,";
+        $sql .= " a.ref_ext,";
+        $sql .= " a.datep,";
+        $sql .= " a.datep2,";
+        $sql .= " a.durationp,"; // deprecated
+        $sql .= " a.datec,";
+        $sql .= " a.tms as datem,";
+        $sql .= " a.code, a.label, a.note as note_private,";
+        $sql .= " a.fk_soc,";
+        $sql .= " a.fk_project,";
+        $sql .= " a.fk_user_author, a.fk_user_mod,";
+        $sql .= " a.fk_user_action, a.fk_user_done,";
+        $sql .= " a.fk_contact, a.percent as percentage,";
+        $sql .= " a.fk_element as elementid, a.elementtype,";
+        $sql .= " a.priority, a.fulldayevent, a.location, a.transparency,";
+        $sql .= " a.email_msgid, a.email_subject, a.email_from, a.email_to, a.email_tocc, a.email_tobcc, a.errors_to,";
+        $sql .= " c.id as type_id, c.type as type_type, c.code as type_code, c.libelle as type_label, c.color as type_color, c.picto as type_picto,";
+        $sql .= " s.nom as socname,";
+        $sql .= " u.firstname, u.lastname as lastname,";
+        $sql .= " num_vote, event_paid, a.status";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "actioncomm as a ";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_actioncomm as c ON a.fk_action=c.id ";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "user as u on u.rowid = a.fk_user_author";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s on s.rowid = a.fk_soc";
+        $sql .= " WHERE ";
+        if ($ref) {
+            $sql .= " a.ref = '" . $this->db->escape($ref) . "'";
+        } elseif ($ref_ext) {
+            $sql .= " a.ref_ext = '" . $this->db->escape($ref_ext) . "'";
+        } elseif ($email_msgid) {
+            $sql .= " a.email_msgid = '" . $this->db->escape($email_msgid) . "'";
+        } else {
+            $sql .= " a.id = " . ((int) $id);
+        }
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            if ($num) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->id;
+                $this->entity = $obj->entity;
+                $this->ref = $obj->ref;
+                $this->ref_ext = $obj->ref_ext;
+
+                // Properties of parent table llx_c_actioncomm
+                $this->type_id = $obj->type_id;
+                $this->type_code = $obj->type_code;
+                $this->type_color = $obj->type_color;
+                $this->type_picto = $obj->type_picto;
+                $this->type = $obj->type_type;
+                /*$transcode = $langs->trans("Action".$obj->type_code);
+                $this->type       = (($transcode != "Action".$obj->type_code) ? $transcode : $obj->type_label); */
+                $transcode = $langs->trans("Action" . $obj->type_code . 'Short');
+                $this->type_short = (($transcode != "Action" . $obj->type_code . 'Short') ? $transcode : '');
+
+                $this->code = $obj->code;
+                $this->label = $obj->label;
+                $this->datep = $this->db->jdate($obj->datep);
+                $this->datef = $this->db->jdate($obj->datep2);
+
+                $this->datec = $this->db->jdate($obj->datec);
+                $this->datem = $this->db->jdate($obj->datem);
+
+                $this->note = $obj->note_private; // deprecated
+                $this->note_private = $obj->note_private;
+                $this->percentage = $obj->percentage;
+
+                $this->authorid = $obj->fk_user_author;
+                $this->usermodid = $obj->fk_user_mod;
+
+                if (!is_object($this->author)) {
+                    $this->author = new stdClass(); // To avoid warning
+                }
+                $this->author->id = $obj->fk_user_author; // deprecated
+                $this->author->firstname = $obj->firstname; // deprecated
+                $this->author->lastname = $obj->lastname; // deprecated
+                if (!is_object($this->usermod)) {
+                    $this->usermod = new stdClass(); // To avoid warning
+                }
+                $this->usermod->id = $obj->fk_user_mod; // deprecated
+
+                $this->userownerid = $obj->fk_user_action;
+                $this->userdoneid = $obj->fk_user_done;
+                $this->priority = $obj->priority;
+                $this->fulldayevent = $obj->fulldayevent;
+                $this->location = $obj->location;
+                $this->transparency = $obj->transparency;
+
+                $this->socid = $obj->fk_soc; // To have fetch_thirdparty method working
+                $this->contact_id = $obj->fk_contact; // To have fetch_contact method working
+                $this->fk_project = $obj->fk_project; // To have fetch_projet method working
+
+                //$this->societe->id			= $obj->fk_soc;			// deprecated
+                //$this->contact->id			= $obj->fk_contact;		// deprecated
+
+                $this->fk_element = $obj->elementid;
+                $this->elementid = $obj->elementid;
+                $this->elementtype = $obj->elementtype;
+
+                $this->num_vote = $obj->num_vote;
+                $this->event_paid = $obj->event_paid;
+                $this->status = $obj->status;
+
+                $this->fetch_optionals();
+
+                if ($loadresources) {
+                    $this->fetchResources();
+                }
+            }
+            $this->db->free($resql);
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+
+        return $num;
+    }
+
+    /**
+     *    Initialize $this->userassigned & this->socpeopleassigned array with list of id of user and contact assigned to event
+     *
+     * @return   int                <0 if KO, >0 if OK
+     */
+    public function fetchResources()
+    {
+        $this->userassigned = [];
+        $this->socpeopleassigned = [];
+
+        $sql = 'SELECT fk_actioncomm, element_type, fk_element, answer_status, mandatory, transparency';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'actioncomm_resources';
+        $sql .= ' WHERE fk_actioncomm = ' . ((int) $this->id);
+        $sql .= " AND element_type IN ('user', 'socpeople')";
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            // If owner is known, we must but id first into list
+            if ($this->userownerid > 0) {
+                $this->userassigned[$this->userownerid] = ['id' => $this->userownerid]; // Set first so will be first into list.
+            }
+
+            while ($obj = $this->db->fetch_object($resql)) {
+                if ($obj->fk_element > 0) {
+                    switch ($obj->element_type) {
+                        case 'user':
+                            $this->userassigned[$obj->fk_element] = ['id' => $obj->fk_element, 'mandatory' => $obj->mandatory, 'answer_status' => $obj->answer_status, 'transparency' => $obj->transparency];
+                            if (empty($this->userownerid)) {
+                                $this->userownerid = $obj->fk_element; // If not defined (should not happened, we fix this)
+                            }
+                            break;
+                        case 'socpeople':
+                            $this->socpeopleassigned[$obj->fk_element] = ['id' => $obj->fk_element, 'mandatory' => $obj->mandatory, 'answer_status' => $obj->answer_status, 'transparency' => $obj->transparency];
+                            break;
+                    }
+                }
+            }
+
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Initialize this->userassigned array with list of id of user assigned to event
+     *
+     * @param bool $override Override $this->userownerid when empty. TODO This should be false by default. True is here to fix corrupted data.
+     *
+     * @return   int                 <0 if KO, >0 if OK
+     */
+    public function fetch_userassigned($override = true)
+    {
+        // phpcs:enable
+        $sql = "SELECT fk_actioncomm, element_type, fk_element, answer_status, mandatory, transparency";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "actioncomm_resources";
+        $sql .= " WHERE element_type = 'user' AND fk_actioncomm = " . ((int) $this->id);
+
+        $resql2 = $this->db->query($sql);
+        if ($resql2) {
+            $this->userassigned = [];
+
+            // If owner is known, we must but id first into list
+            if ($this->userownerid > 0) {
+                // Set first so will be first into list.
+                $this->userassigned[$this->userownerid] = ['id' => $this->userownerid];
+            }
+
+            while ($obj = $this->db->fetch_object($resql2)) {
+                if ($obj->fk_element > 0) {
+                    $this->userassigned[$obj->fk_element] = [
+                        'id' => $obj->fk_element,
+                        'mandatory' => $obj->mandatory,
+                        'answer_status' => $obj->answer_status,
+                        'transparency' => $obj->transparency,
+                    ];
+                }
+
+                if ($override === true) {
+                    // If not defined (should not happened, we fix this)
+                    if (empty($this->userownerid)) {
+                        $this->userownerid = $obj->fk_element;
+                    }
+                }
+            }
+
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     *    Delete event from database
+     *
+     * @param int $notrigger 1 = disable triggers, 0 = enable triggers
+     *
+     * @return   int                    <0 if KO, >0 if OK
+     */
+    public function delete($notrigger = 0)
+    {
+        global $user;
+
+        $error = 0;
+
+        dol_syslog(get_class($this)."::delete", LOG_DEBUG);
 
 		$this->db->begin();
 
@@ -1201,29 +1237,98 @@ class ActionComm extends CommonObject
 				return 1;
 			} else {
 				$this->db->rollback();
-				dol_syslog(get_class($this)."::update ".join(',', $this->errors), LOG_ERR);
-				return -2;
-			}
-		} else {
-			$this->db->rollback();
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+				dol_syslog(get_class($this) . "::update " . join(',', $this->errors), LOG_ERR);
+                return -2;
+            }
+        } else {
+            $this->db->rollback();
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Load all objects with filters.
+     *
+     * @param DoliDb $db          Not used
+     * @param int    $socid       Filter by thirdparty
+     * @param int    $fk_element  Id of element action is linked to
+     * @param string $elementtype Type of element action is linked to
+     * @param string $filter      Other filter
+     * @param string $sortfield   Sort on this field
+     * @param string $sortorder   ASC or DESC
+     * @param string $limit       Limit number of answers
+     *
+     * @return        array|string            Error string if KO, array with actions if OK
+     * @todo WARNING: This make a fetch on all records instead of making one request with a join.
+     *
+     */
+    public static function getActions($db, $socid = 0, $fk_element = 0, $elementtype = '', $filter = '', $sortfield = 'a.datep', $sortorder = 'DESC', $limit = 0)
+    {
+        global $conf, $langs;
 
-	/**
-	 * Load indicators for dashboard (this->nbtodo and this->nbtodolate)
-	 *
-	 * @param	User	$user   			Objet user
-	 * @param	int		$load_state_board	Load indicator array this->nb
-	 * @return WorkboardResponse|int 		<0 if KO, WorkboardResponse if OK
-	 */
-	public function load_board($user, $load_state_board = 0)
-	{
-		// phpcs:enable
-		global $conf, $langs;
+        $resarray = [];
+
+        dol_syslog(get_class() . "::getActions", LOG_DEBUG);
+
+        $sql = "SELECT a.id";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "actioncomm as a";
+        $sql .= " WHERE a.entity IN (" . getEntity('agenda') . ")";
+        if (!empty($socid)) {
+            $sql .= " AND a.fk_soc = " . ((int) $socid);
+        }
+        if (!empty($elementtype)) {
+            if ($elementtype == 'project') {
+                $sql .= ' AND a.fk_project = ' . ((int) $fk_element);
+            } elseif ($elementtype == 'contact') {
+                $sql .= ' AND a.id IN';
+                $sql .= " (SELECT fk_actioncomm FROM " . MAIN_DB_PREFIX . "actioncomm_resources WHERE";
+                $sql .= " element_type = 'socpeople' AND fk_element = " . ((int) $fk_element) . ')';
+            } else {
+                $sql .= " AND a.fk_element = " . ((int) $fk_element) . " AND a.elementtype = '" . $db->escape($elementtype) . "'";
+            }
+        }
+        if (!empty($filter)) {
+            $sql .= $filter;
+        }
+        if ($sortorder && $sortfield) {
+            $sql .= $db->order($sortfield, $sortorder);
+        }
+        $sql .= $db->plimit($limit, 0);
+
+        $resql = $db->query($sql);
+        if ($resql) {
+            $num = $db->num_rows($resql);
+
+            if ($num) {
+                for ($i = 0; $i < $num; $i++) {
+                    $obj = $db->fetch_object($resql);
+                    $actioncommstatic = new ActionComm($db);
+                    $actioncommstatic->fetch($obj->id);
+                    $resarray[$i] = $actioncommstatic;
+                }
+            }
+            $db->free($resql);
+            return $resarray;
+        } else {
+            return $db->lasterror();
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Load indicators for dashboard (this->nbtodo and this->nbtodolate)
+     *
+     * @param User $user             Objet user
+     * @param int  $load_state_board Load indicator array this->nb
+     *
+     * @return WorkboardResponse|int        <0 if KO, WorkboardResponse if OK
+     */
+    public function load_board($user, $load_state_board = 0)
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		if (empty($load_state_board)) {
 			$sql = "SELECT a.id, a.datep as dp";
@@ -1296,19 +1401,6 @@ class ActionComm extends CommonObject
 		}
 	}
 
-	/**
-	 *  Is the action delayed?
-	 *
-	 *  @return bool
-	 */
-	public function hasDelay()
-	{
-		global $conf;
-
-		$now = dol_now();
-
-		return $this->datep && ($this->datep < ($now - $conf->agenda->warning_delay));
-	}
 
 	/**
 	 *  Charge les informations d'ordre info dans l'objet facture
@@ -1355,7 +1447,6 @@ class ActionComm extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return label of status
@@ -1369,15 +1460,17 @@ class ActionComm extends CommonObject
 		return $this->LibStatut($this->percentage, $mode, $hidenastatus, $this->datep);
 	}
 
-	/**
-	 *  Return label of action status
-	 *
-	 *  @param  int     $percent        Percent
-	 *  @param  int		$mode           0=Long label, 1=Short label, 2=Picto+Short label, 3=Picto, 4=Picto+Short label, 5=Short label+Picto, 6=Picto+Long label, 7=Very short label+Picto
-	 *  @param  int		$hidenastatus   1=Show nothing if status is "Not applicable"
-	 *  @param  int     $datestart      Date start of event
-	 *  @return string		    		Label
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return label of action status
+     *
+     *  @param  int     $percent        Percent
+     *  @param  int		$mode           0=Long label, 1=Short label, 2=Picto+Short label, 3=Picto, 4=Picto+Short label, 5=Short label+Picto, 6=Picto+Long label, 7=Very short label+Picto
+     *  @param  int		$hidenastatus   1=Show nothing if status is "Not applicable"
+     *  @param  int     $datestart      Date start of event
+     *  @return string		    		Label
+     */
 	public function LibStatut($percent, $mode, $hidenastatus = 0, $datestart = '')
 	{
 		// phpcs:enable
@@ -1638,7 +1731,6 @@ class ActionComm extends CommonObject
 		return $imgpicto;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Sets object to supplied categories.
@@ -1685,17 +1777,19 @@ class ActionComm extends CommonObject
 		return;
 	}
 
-	/**
-	 * Export events from database into a cal file.
-	 *
-	 * @param string    $format         The format of the export 'vcal', 'ical/ics' or 'rss'
-	 * @param string    $type           The type of the export 'event' or 'journal'
-	 * @param integer   $cachedelay     Do not rebuild file if date older than cachedelay seconds
-	 * @param string    $filename       The name for the exported file.
-	 * @param array     $filters        Array of filters. Example array('notolderthan'=>99, 'year'=>..., 'idfrom'=>..., 'notactiontype'=>'systemauto', 'project'=>123, ...)
-	 * @param integer   $exportholiday  0 = don't integrate holidays into the export, 1 = integrate holidays into the export
-	 * @return integer                  -1 = error on build export file, 0 = export okay
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Export events from database into a cal file.
+     *
+     * @param string    $format         The format of the export 'vcal', 'ical/ics' or 'rss'
+     * @param string    $type           The type of the export 'event' or 'journal'
+     * @param integer   $cachedelay     Do not rebuild file if date older than cachedelay seconds
+     * @param string    $filename       The name for the exported file.
+     * @param array     $filters        Array of filters. Example array('notolderthan'=>99, 'year'=>..., 'idfrom'=>..., 'notactiontype'=>'systemauto', 'project'=>123, ...)
+     * @param integer   $exportholiday  0 = don't integrate holidays into the export, 1 = integrate holidays into the export
+     * @return integer                  -1 = error on build export file, 0 = export okay
+     */
 	public function build_exportfile($format, $type, $cachedelay, $filename, $filters, $exportholiday = 0)
 	{
 		global $hookmanager;
@@ -2067,52 +2161,6 @@ class ActionComm extends CommonObject
 	}
 
 	/**
-	 *    Initialize this->userassigned array with list of id of user assigned to event
-	 *
-	 *    @param    bool    $override   Override $this->userownerid when empty. TODO This should be false by default. True is here to fix corrupted data.
-	 *    @return   int                 <0 if KO, >0 if OK
-	 */
-	public function fetch_userassigned($override = true)
-	{
-		// phpcs:enable
-		$sql = "SELECT fk_actioncomm, element_type, fk_element, answer_status, mandatory, transparency";
-		$sql .= " FROM ".MAIN_DB_PREFIX."actioncomm_resources";
-		$sql .= " WHERE element_type = 'user' AND fk_actioncomm = ".((int) $this->id);
-
-		$resql2 = $this->db->query($sql);
-		if ($resql2) {
-			$this->userassigned = array();
-
-			// If owner is known, we must but id first into list
-			if ($this->userownerid > 0) {
-				// Set first so will be first into list.
-				$this->userassigned[$this->userownerid] = array('id'=>$this->userownerid);
-			}
-
-			while ($obj = $this->db->fetch_object($resql2)) {
-				if ($obj->fk_element > 0) {
-					$this->userassigned[$obj->fk_element] = array('id'=>$obj->fk_element,
-																  'mandatory'=>$obj->mandatory,
-																  'answer_status'=>$obj->answer_status,
-																  'transparency'=>$obj->transparency);
-				}
-
-				if ($override === true) {
-					// If not defined (should not happened, we fix this)
-					if (empty($this->userownerid)) {
-						$this->userownerid = $obj->fk_element;
-					}
-				}
-			}
-
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
-
-	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
 	 *  id must be 0 if object instance is a specimen.
@@ -2141,26 +2189,59 @@ class ActionComm extends CommonObject
 		$this->status = 0;
 		$this->location = 'Location';
 		$this->transparency = 1; // 1 means opaque
-		$this->priority = 1;
-		//$this->note_public = "This is a 'public' note.";
-		$this->note_private = "This is a 'private' note.";
+        $this->priority = 1;
+        //$this->note_public = "This is a 'public' note.";
+        $this->note_private = "This is a 'private' note.";
 
-		$this->userownerid = $user->id;
-		$this->userassigned[$user->id] = array('id'=>$user->id, 'transparency'=> 1);
-		return 1;
-	}
+        $this->userownerid = $user->id;
+        $this->userassigned[$user->id] = ['id' => $user->id, 'transparency' => 1];
+        return 1;
+    }
 
-	/**
-	 *  Load event reminder of events
-	 *
-	 *  @param	string	$type		Type of reminder 'browser' or 'email'
-	 *  @param	int		$fk_user	Id of user
-	 *  @param	bool	$onlypast	true = get only past reminder, false = get all reminders linked to this
-	 *  @return int         		0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
-	 */
-	public function loadReminders($type = '', $fk_user = 0, $onlypast = true)
-	{
-		global $conf, $langs, $user;
+    /**
+     *  Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'actioncomm',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     *  Is the action delayed?
+     *
+     * @return bool
+     */
+    public function hasDelay()
+    {
+        global $conf;
+
+        $now = dol_now();
+
+        return $this->datep && ($this->datep < ($now - $conf->agenda->warning_delay));
+    }
+
+    /**
+     *  Load event reminder of events
+     *
+     * @param string $type     Type of reminder 'browser' or 'email'
+     * @param int    $fk_user  Id of user
+     * @param bool   $onlypast true = get only past reminder, false = get all reminders linked to this
+     *
+     * @return int                0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
+     */
+    public function loadReminders($type = '', $fk_user = 0, $onlypast = true)
+    {
+        global $conf, $langs, $user;
 
 		$error = 0;
 

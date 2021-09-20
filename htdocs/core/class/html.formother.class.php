@@ -38,275 +38,22 @@
  */
 class FormOther
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error;
-	private $db;
+    private $db;
 
-	/**
-	 *	Constructor
-	 *
+    /**
+     * @var string Error code (or message)
+     */
+    public $error;
+
+    /**
+     *    Constructor
+     *
 	 *	@param	DoliDB		$db      Database handler
 	 */
 	public function __construct($db)
 	{
 		$this->db = $db;
 	}
-
-	/**
-	 *  Output a HTML thumb of color or a text if not defined.
-	 *
-	 *  @param	string		$color				String with hex (FFFFFF) or comma RGB ('255,255,255')
-	 *  @param	string		$textifnotdefined	Text to show if color not defined
-	 *  @return	string							HTML code for color thumb
-	 *  @see selectColor()
-	 */
-	public static function showColor($color, $textifnotdefined = '')
-	{
-		$textcolor = 'FFF';
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-		if (colorIsLight($color)) {
-			$textcolor = '000';
-		}
-
-		$color = colorArrayToHex(colorStringToArray($color, array()), '');
-
-		if ($color) {
-			print '<input type="text" class="colorthumb" disabled style="padding: 1px; margin-top: 0; margin-bottom: 0; color: #'.$textcolor.'; background-color: #'.$color.'" value="'.$color.'">';
-		} else {
-			print $textifnotdefined;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	Get array with HTML tabs with boxes of a particular area including personalized choices of user.
-	 *  Class 'Form' must be known.
-	 *
-	 * 	@param	   User         $user		 Object User
-	 * 	@param	   String       $areacode    Code of area for pages - 0 = Home page ... See getListOfPagesForBoxes()
-	 *	@return    array                     array('selectboxlist'=>, 'boxactivated'=>, 'boxlista'=>, 'boxlistb'=>)
-	 */
-	public static function getBoxesArea($user, $areacode)
-	{
-		global $conf, $langs, $db;
-
-		include_once DOL_DOCUMENT_ROOT.'/core/class/infobox.class.php';
-
-		$confuserzone = 'MAIN_BOXES_'.$areacode;
-
-		// $boxactivated will be array of boxes enabled into global setup
-		// $boxidactivatedforuser will be array of boxes choosed by user
-
-		$selectboxlist = '';
-		$boxactivated = InfoBox::listBoxes($db, 'activated', $areacode, (empty($user->conf->$confuserzone) ?null:$user), array(), 0); // Search boxes of common+user (or common only if user has no specific setup)
-
-		$boxidactivatedforuser = array();
-		foreach ($boxactivated as $box) {
-			if (empty($user->conf->$confuserzone) || $box->fk_user == $user->id) {
-				$boxidactivatedforuser[$box->id] = $box->id; // We keep only boxes to show for user
-			}
-		}
-
-		// Define selectboxlist
-		$arrayboxtoactivatelabel = array();
-		if (!empty($user->conf->$confuserzone)) {
-			$boxorder = '';
-			$langs->load("boxes"); // Load label of boxes
-			foreach ($boxactivated as $box) {
-				if (!empty($boxidactivatedforuser[$box->id])) {
-					continue; // Already visible for user
-				}
-				$label = $langs->transnoentitiesnoconv($box->boxlabel);
-				//if (preg_match('/graph/',$box->class)) $label.=' ('.$langs->trans("Graph").')';
-				if (preg_match('/graph/', $box->class) && $conf->browser->layout != 'phone') {
-					$label = $label.' <span class="fa fa-bar-chart"></span>';
-				}
-				$arrayboxtoactivatelabel[$box->id] = $label; // We keep only boxes not shown for user, to show into combo list
-			}
-			foreach ($boxidactivatedforuser as $boxid) {
-				if (empty($boxorder)) {
-					$boxorder .= 'A:';
-				}
-				$boxorder .= $boxid.',';
-			}
-
-			//var_dump($boxidactivatedforuser);
-
-			// Class Form must have been already loaded
-			$selectboxlist .= '<!-- Form with select box list -->'."\n";
-			$selectboxlist .= '<form id="addbox" name="addbox" method="POST" action="'.$_SERVER["PHP_SELF"].'">';
-			$selectboxlist .= '<input type="hidden" name="token" value="'.newToken().'">';
-			$selectboxlist .= '<input type="hidden" name="addbox" value="addbox">';
-			$selectboxlist .= '<input type="hidden" name="userid" value="'.$user->id.'">';
-			$selectboxlist .= '<input type="hidden" name="areacode" value="'.$areacode.'">';
-			$selectboxlist .= '<input type="hidden" name="boxorder" value="'.$boxorder.'">';
-			$selectboxlist .= Form::selectarray('boxcombo', $arrayboxtoactivatelabel, -1, $langs->trans("ChooseBoxToAdd").'...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint', 0, 'hidden selected', 0, 1);
-			if (empty($conf->use_javascript_ajax)) {
-				$selectboxlist .= ' <input type="submit" class="button" value="'.$langs->trans("AddBox").'">';
-			}
-			$selectboxlist .= '</form>';
-			if (!empty($conf->use_javascript_ajax)) {
-				include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
-				$selectboxlist .= ajax_combobox("boxcombo");
-			}
-		}
-
-		// Javascript code for dynamic actions
-		if (!empty($conf->use_javascript_ajax)) {
-			$selectboxlist .= '<script type="text/javascript" language="javascript">
-
-	        // To update list of activated boxes
-	        function updateBoxOrder(closing) {
-	        	var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
-	        	var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
-	        	var boxorder = \'A:\' + left_list + \'-B:\' + right_list;
-	        	if (boxorder==\'A:A-B:B\' && closing == 1)	// There is no more boxes on screen, and we are after a delete of a box so we must hide title
-	        	{
-	        		jQuery.ajax({
-	        			url: \''.DOL_URL_ROOT.'/core/ajax/box.php?closing=1&boxorder=\'+boxorder+\'&zone='.$areacode.'&userid=\'+'.$user->id.',
-	        			async: false
-	        		});
-	        		// We force reload to be sure to get all boxes into list
-	        		window.location.search=\'mainmenu='.GETPOST("mainmenu", "aZ09").'&leftmenu='.GETPOST('leftmenu', "aZ09").'&action=delbox&token='.newToken().'\';
-	        	}
-	        	else
-	        	{
-	        		jQuery.ajax({
-	        			url: \''.DOL_URL_ROOT.'/core/ajax/box.php?closing=\'+closing+\'&boxorder=\'+boxorder+\'&zone='.$areacode.'&userid=\'+'.$user->id.',
-	        			async: true
-	        		});
-	        	}
-	        }
-
-	        jQuery(document).ready(function() {
-	        	jQuery("#boxcombo").change(function() {
-	        	var boxid=jQuery("#boxcombo").val();
-	        		if (boxid > 0) {
-						console.log("A box widget has been selected for addition, we call ajax page to add it.")
-	            		var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
-	            		var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
-	            		var boxorder = \'A:\' + left_list + \'-B:\' + right_list;
-	    				jQuery.ajax({
-	    					url: \''.DOL_URL_ROOT.'/core/ajax/box.php?boxorder=\'+boxorder+\'&boxid=\'+boxid+\'&zone='.$areacode.'&userid='.$user->id.'\'
-	    		        }).done(function() {
-	        				window.location.search=\'mainmenu='.GETPOST("mainmenu", "aZ09").'&leftmenu='.GETPOST('leftmenu', "aZ09").'\';
-						});
-	                }
-	        	});';
-			if (!count($arrayboxtoactivatelabel)) {
-				$selectboxlist .= 'jQuery("#boxcombo").hide();';
-			}
-				$selectboxlist .= '
-
-	        	jQuery("#boxhalfleft, #boxhalfright").sortable({
-	    	    	handle: \'.boxhandle\',
-	    	    	revert: \'invalid\',
-	       			items: \'.boxdraggable\',
-					containment: \'document\',
-	        		connectWith: \'#boxhalfleft, #boxhalfright\',
-	        		stop: function(event, ui) {
-	        			updateBoxOrder(1);  /* 1 to avoid message after a move */
-	        		}
-	    		});
-
-	        	jQuery(".boxclose").click(function() {
-	        		var self = this;	// because JQuery can modify this
-	        		var boxid=self.id.substring(8);
-	        		var label=jQuery(\'#boxlabelentry\'+boxid).val();
-	        		console.log("We close box "+boxid);
-	        		jQuery(\'#boxto_\'+boxid).remove();
-	        		if (boxid > 0) jQuery(\'#boxcombo\').append(new Option(label, boxid));
-	        		updateBoxOrder(1);  /* 1 to avoid message after a remove */
-	        	});
-
-        	});'."\n";
-
-			$selectboxlist .= '</script>'."\n";
-		}
-
-		// Define boxlista and boxlistb
-		$boxlista = '';
-		$boxlistb = '';
-		$nbboxactivated = count($boxidactivatedforuser);
-
-		if ($nbboxactivated) {
-			// Load translation files required by the page
-			$langs->loadLangs(array("boxes", "projects"));
-
-			$emptybox = new ModeleBoxes($db);
-
-			$boxlista .= "\n<!-- Box left container -->\n";
-
-			// Define $box_max_lines
-			$box_max_lines = 5;
-			if (!empty($conf->global->MAIN_BOXES_MAXLINES)) {
-				$box_max_lines = $conf->global->MAIN_BOXES_MAXLINES;
-			}
-
-			$ii = 0;
-			foreach ($boxactivated as $key => $box) {
-				if ((!empty($user->conf->$confuserzone) && $box->fk_user == 0) || (empty($user->conf->$confuserzone) && $box->fk_user != 0)) {
-					continue;
-				}
-				if (empty($box->box_order) && $ii < ($nbboxactivated / 2)) {
-					$box->box_order = 'A'.sprintf("%02d", ($ii + 1)); // When box_order was not yet set to Axx or Bxx and is still 0
-				}
-				if (preg_match('/^A/i', $box->box_order)) { // column A
-					$ii++;
-					//print 'box_id '.$boxactivated[$ii]->box_id.' ';
-					//print 'box_order '.$boxactivated[$ii]->box_order.'<br>';
-					// Show box
-					$box->loadBox($box_max_lines);
-					$boxlista .= $box->showBox(null, null, 1);
-				}
-			}
-
-			if ($conf->browser->layout != 'phone') {
-				$emptybox->box_id = 'A';
-				$emptybox->info_box_head = array();
-				$emptybox->info_box_contents = array();
-				$boxlista .= $emptybox->showBox(array(), array(), 1);
-			}
-			$boxlista .= "<!-- End box left container -->\n";
-
-			$boxlistb .= "\n<!-- Box right container -->\n";
-
-			$ii = 0;
-			foreach ($boxactivated as $key => $box) {
-				if ((!empty($user->conf->$confuserzone) && $box->fk_user == 0) || (empty($user->conf->$confuserzone) && $box->fk_user != 0)) {
-					continue;
-				}
-				if (empty($box->box_order) && $ii < ($nbboxactivated / 2)) {
-					$box->box_order = 'B'.sprintf("%02d", ($ii + 1)); // When box_order was not yet set to Axx or Bxx and is still 0
-				}
-				if (preg_match('/^B/i', $box->box_order)) { // colonne B
-					$ii++;
-					//print 'box_id '.$boxactivated[$ii]->box_id.' ';
-					//print 'box_order '.$boxactivated[$ii]->box_order.'<br>';
-					// Show box
-					$box->loadBox($box_max_lines);
-					$boxlistb .= $box->showBox(null, null, 1);
-				}
-			}
-
-			if ($conf->browser->layout != 'phone') {
-				$emptybox->box_id = 'B';
-				$emptybox->info_box_head = array();
-				$emptybox->info_box_contents = array();
-				$boxlistb .= $emptybox->showBox(array(), array(), 1);
-			}
-
-			$boxlistb .= "<!-- End box right container -->\n";
-		}
-
-		return array('selectboxlist'=>count($boxactivated) ? $selectboxlist : '', 'boxactivated'=>$boxactivated, 'boxlista'=>$boxlista, 'boxlistb'=>$boxlistb);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Return HTML code for scanner tool.
@@ -357,9 +104,7 @@ class FormOther
 		return $out;
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return HTML select list of export models
 	 *
@@ -422,7 +167,6 @@ class FormOther
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return list of export models
 	 *
@@ -485,7 +229,6 @@ class FormOther
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return list of ecotaxes with label
 	 *
@@ -534,8 +277,8 @@ class FormOther
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Return list of revenue stamp for country
 	 *
@@ -587,7 +330,6 @@ class FormOther
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return a HTML select list to select a percent
 	 *
@@ -623,6 +365,7 @@ class FormOther
 		return $return;
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return select list for categories (to use in form search selectors)
 	 *
@@ -680,26 +423,29 @@ class FormOther
 				}
 				$moreforfilter .= '>'.dol_trunc($categ['fulllabel'], 50, 'middle').'</option>';
 			}
-		}
-		if ($nocateg) {
-			$langs->load("categories");
-			$moreforfilter .= '<option value="-2"'.($selected == -2 ? ' selected' : '').'>- '.$langs->trans("NotCategorized").' -</option>';
-		}
-		$moreforfilter .= '</select>';
+        }
+        if ($nocateg) {
+            $langs->load("categories");
+            $moreforfilter .= '<option value="-2"' . ($selected == -2 ? ' selected' : '') . '>- ' . $langs->trans("NotCategorized") . ' -</option>';
+        }
+        $moreforfilter .= '</select>';
 
-		return $moreforfilter;
-	}
+        return $moreforfilter;
+    }
 
-	/**
-	 *  Return select list for categories (to use in form search selectors)
-	 *
-	 *  @param	string		$selected     		Preselected value
-	 *  @param  string		$htmlname      		Name of combo list (example: 'search_sale')
-	 *  @param  User		$user           	Object user
-	 *  @param	int			$showstatus			0=show user status only if status is disabled, 1=always show user status into label, -1=never show user status
-	 *  @param	int|string	$showempty			1=show also an empty value
-	 *  @param	string		$morecss			More CSS
-	 *  @param	int			$norepresentative	Show also an entry "Not categorized"
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return select list for categories (to use in form search selectors)
+     *
+     * @param string     $selected         Preselected value
+     * @param string     $htmlname         Name of combo list (example: 'search_sale')
+     * @param User       $user             Object user
+     * @param int        $showstatus       0=show user status only if status is disabled, 1=always show user status into label, -1=never show user status
+     * @param int|string $showempty        1=show also an empty value
+     * @param string     $morecss          More CSS
+     * @param int        $norepresentative Show also an entry "Not categorized"
 	 *  @return string							Html combo list code
 	 */
 	public function select_salesrepresentatives($selected, $htmlname, $user, $showstatus = 0, $showempty = 1, $morecss = '', $norepresentative = 0)
@@ -903,8 +649,6 @@ class FormOther
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Write lines of a project (all lines of a project if parent = 0)
 	 *
@@ -999,34 +743,60 @@ class FormOther
 					$inc++;
 				}
 
-				$level++;
-				if ($lines[$i]->id) {
-					$this->_pLineSelect($inc, $lines[$i]->id, $lines, $level, $selectedtask, $selectedproject, $newdisablechildoftaskid);
-				}
-				$level--;
-			}
-		}
-	}
+                $level++;
+                if ($lines[$i]->id) {
+                    $this->_pLineSelect($inc, $lines[$i]->id, $lines, $level, $selectedtask, $selectedproject, $newdisablechildoftaskid);
+                }
+                $level--;
+            }
+        }
+    }
 
-	/**
-	 *  Output a HTML code to select a color
-	 *
-	 *  @param	string		$set_color		Pre-selected color
-	 *  @param	string		$prefix			Name of HTML field
-	 *  @param	string		$form_name		Deprecated. Not used.
-	 *  @param	int			$showcolorbox	1=Show color code and color box, 0=Show only color code
-	 *  @param 	array		$arrayofcolors	Array of colors. Example: array('29527A','5229A3','A32929','7A367A','B1365F','0D7813')
-	 *  @return	void
-	 *  @deprecated Use instead selectColor
-	 *  @see selectColor()
+    /**
+     *  Output a HTML thumb of color or a text if not defined.
+     *
+     * @param string $color            String with hex (FFFFFF) or comma RGB ('255,255,255')
+     * @param string $textifnotdefined Text to show if color not defined
+     *
+     * @return    string                            HTML code for color thumb
+     * @see selectColor()
+     */
+    public static function showColor($color, $textifnotdefined = '')
+    {
+        $textcolor = 'FFF';
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+        if (colorIsLight($color)) {
+            $textcolor = '000';
+        }
+
+        $color = colorArrayToHex(colorStringToArray($color, []), '');
+
+        if ($color) {
+            print '<input type="text" class="colorthumb" disabled style="padding: 1px; margin-top: 0; margin-bottom: 0; color: #' . $textcolor . '; background-color: #' . $color . '" value="' . $color . '">';
+        } else {
+            print $textifnotdefined;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Output a HTML code to select a color
+     *
+     * @param string $set_color     Pre-selected color
+     * @param string $prefix        Name of HTML field
+     * @param string $form_name     Deprecated. Not used.
+     * @param int    $showcolorbox  1=Show color code and color box, 0=Show only color code
+     * @param array  $arrayofcolors Array of colors. Example: array('29527A','5229A3','A32929','7A367A','B1365F','0D7813')
+     * @return    void
+     * @deprecated Use instead selectColor
+     * @see selectColor()
 	 */
 	public function select_color($set_color = '', $prefix = 'f_color', $form_name = '', $showcolorbox = 1, $arrayofcolors = '')
 	{
 		// phpcs:enable
 		print $this->selectColor($set_color, $prefix, $form_name, $showcolorbox, $arrayofcolors);
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Output a HTML code to select a color. Field will return an hexa color like '334455'.
@@ -1136,7 +906,6 @@ class FormOther
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Creation d'un icone de couleur
 	 *
@@ -1177,7 +946,6 @@ class FormOther
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    	Return HTML combo list of week
 	 *
@@ -1219,7 +987,6 @@ class FormOther
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *      Return HTML combo list of month
 	 *
@@ -1269,7 +1036,9 @@ class FormOther
 		return $select_month;
 	}
 
-	/**
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
 	 *	Return HTML combo list of years
 	 *
 	 *  @param  string		$selected       Preselected value (''=current year, -1=none, year otherwise)
@@ -1343,27 +1112,252 @@ class FormOther
 		$out .= "</select>\n";
 
 		// Add code for jquery to use multiselect
-		if ($addjscombo) {
-			// Enhance with select2
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
-			$out .= ajax_combobox($htmlname);
-		}
+        if ($addjscombo) {
+            // Enhance with select2
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+            $out .= ajax_combobox($htmlname);
+        }
 
-		return $out;
-	}
+        return $out;
+    }
+
+    /**
+     *    Get array with HTML tabs with boxes of a particular area including personalized choices of user.
+     *  Class 'Form' must be known.
+     *
+     * @param User   $user     Object User
+     * @param String $areacode Code of area for pages - 0 = Home page ... See getListOfPagesForBoxes()
+     *
+     * @return    array                     array('selectboxlist'=>, 'boxactivated'=>, 'boxlista'=>, 'boxlistb'=>)
+     */
+    public static function getBoxesArea($user, $areacode)
+    {
+        global $conf, $langs, $db;
+
+        include_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
+
+        $confuserzone = 'MAIN_BOXES_' . $areacode;
+
+        // $boxactivated will be array of boxes enabled into global setup
+        // $boxidactivatedforuser will be array of boxes choosed by user
+
+        $selectboxlist = '';
+        $boxactivated = InfoBox::listBoxes($db, 'activated', $areacode, (empty($user->conf->$confuserzone) ? null : $user), [], 0); // Search boxes of common+user (or common only if user has no specific setup)
+
+        $boxidactivatedforuser = [];
+        foreach ($boxactivated as $box) {
+            if (empty($user->conf->$confuserzone) || $box->fk_user == $user->id) {
+                $boxidactivatedforuser[$box->id] = $box->id; // We keep only boxes to show for user
+            }
+        }
+
+        // Define selectboxlist
+        $arrayboxtoactivatelabel = [];
+        if (!empty($user->conf->$confuserzone)) {
+            $boxorder = '';
+            $langs->load("boxes"); // Load label of boxes
+            foreach ($boxactivated as $box) {
+                if (!empty($boxidactivatedforuser[$box->id])) {
+                    continue; // Already visible for user
+                }
+                $label = $langs->transnoentitiesnoconv($box->boxlabel);
+                //if (preg_match('/graph/',$box->class)) $label.=' ('.$langs->trans("Graph").')';
+                if (preg_match('/graph/', $box->class) && $conf->browser->layout != 'phone') {
+                    $label = $label . ' <span class="fa fa-bar-chart"></span>';
+                }
+                $arrayboxtoactivatelabel[$box->id] = $label; // We keep only boxes not shown for user, to show into combo list
+            }
+            foreach ($boxidactivatedforuser as $boxid) {
+                if (empty($boxorder)) {
+                    $boxorder .= 'A:';
+                }
+                $boxorder .= $boxid . ',';
+            }
+
+            //var_dump($boxidactivatedforuser);
+
+            // Class Form must have been already loaded
+            $selectboxlist .= '<!-- Form with select box list -->' . "\n";
+            $selectboxlist .= '<form id="addbox" name="addbox" method="POST" action="' . $_SERVER["PHP_SELF"] . '">';
+            $selectboxlist .= '<input type="hidden" name="token" value="' . newToken() . '">';
+            $selectboxlist .= '<input type="hidden" name="addbox" value="addbox">';
+            $selectboxlist .= '<input type="hidden" name="userid" value="' . $user->id . '">';
+            $selectboxlist .= '<input type="hidden" name="areacode" value="' . $areacode . '">';
+            $selectboxlist .= '<input type="hidden" name="boxorder" value="' . $boxorder . '">';
+            $selectboxlist .= Form::selectarray('boxcombo', $arrayboxtoactivatelabel, -1, $langs->trans("ChooseBoxToAdd") . '...', 0, 0, '', 0, 0, 0, 'ASC', 'maxwidth150onsmartphone hideonprint', 0, 'hidden selected', 0, 1);
+            if (empty($conf->use_javascript_ajax)) {
+                $selectboxlist .= ' <input type="submit" class="button" value="' . $langs->trans("AddBox") . '">';
+            }
+            $selectboxlist .= '</form>';
+            if (!empty($conf->use_javascript_ajax)) {
+                include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+                $selectboxlist .= ajax_combobox("boxcombo");
+            }
+        }
+
+        // Javascript code for dynamic actions
+        if (!empty($conf->use_javascript_ajax)) {
+            $selectboxlist .= '<script type="text/javascript" language="javascript">
+
+	        // To update list of activated boxes
+	        function updateBoxOrder(closing) {
+	        	var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
+	        	var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
+	        	var boxorder = \'A:\' + left_list + \'-B:\' + right_list;
+	        	if (boxorder==\'A:A-B:B\' && closing == 1)	// There is no more boxes on screen, and we are after a delete of a box so we must hide title
+	        	{
+	        		jQuery.ajax({
+	        			url: \'' . DOL_URL_ROOT . '/core/ajax/box.php?closing=1&boxorder=\'+boxorder+\'&zone=' . $areacode . '&userid=\'+' . $user->id . ',
+	        			async: false
+	        		});
+	        		// We force reload to be sure to get all boxes into list
+	        		window.location.search=\'mainmenu=' . GETPOST("mainmenu", "aZ09") . '&leftmenu=' . GETPOST('leftmenu', "aZ09") . '&action=delbox&token=' . newToken() . '\';
+	        	}
+	        	else
+	        	{
+	        		jQuery.ajax({
+	        			url: \'' . DOL_URL_ROOT . '/core/ajax/box.php?closing=\'+closing+\'&boxorder=\'+boxorder+\'&zone=' . $areacode . '&userid=\'+' . $user->id . ',
+	        			async: true
+	        		});
+	        	}
+	        }
+
+	        jQuery(document).ready(function() {
+	        	jQuery("#boxcombo").change(function() {
+	        	var boxid=jQuery("#boxcombo").val();
+	        		if (boxid > 0) {
+						console.log("A box widget has been selected for addition, we call ajax page to add it.")
+	            		var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
+	            		var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
+	            		var boxorder = \'A:\' + left_list + \'-B:\' + right_list;
+	    				jQuery.ajax({
+	    					url: \'' . DOL_URL_ROOT . '/core/ajax/box.php?boxorder=\'+boxorder+\'&boxid=\'+boxid+\'&zone=' . $areacode . '&userid=' . $user->id . '\'
+	    		        }).done(function() {
+	        				window.location.search=\'mainmenu=' . GETPOST("mainmenu", "aZ09") . '&leftmenu=' . GETPOST('leftmenu', "aZ09") . '\';
+						});
+	                }
+	        	});';
+            if (!count($arrayboxtoactivatelabel)) {
+                $selectboxlist .= 'jQuery("#boxcombo").hide();';
+            }
+            $selectboxlist .= '
+
+	        	jQuery("#boxhalfleft, #boxhalfright").sortable({
+	    	    	handle: \'.boxhandle\',
+	    	    	revert: \'invalid\',
+	       			items: \'.boxdraggable\',
+					containment: \'document\',
+	        		connectWith: \'#boxhalfleft, #boxhalfright\',
+	        		stop: function(event, ui) {
+	        			updateBoxOrder(1);  /* 1 to avoid message after a move */
+	        		}
+	    		});
+
+	        	jQuery(".boxclose").click(function() {
+	        		var self = this;	// because JQuery can modify this
+	        		var boxid=self.id.substring(8);
+	        		var label=jQuery(\'#boxlabelentry\'+boxid).val();
+	        		console.log("We close box "+boxid);
+	        		jQuery(\'#boxto_\'+boxid).remove();
+	        		if (boxid > 0) jQuery(\'#boxcombo\').append(new Option(label, boxid));
+	        		updateBoxOrder(1);  /* 1 to avoid message after a remove */
+	        	});
+
+        	});' . "\n";
+
+            $selectboxlist .= '</script>' . "\n";
+        }
+
+        // Define boxlista and boxlistb
+        $boxlista = '';
+        $boxlistb = '';
+        $nbboxactivated = count($boxidactivatedforuser);
+
+        if ($nbboxactivated) {
+            // Load translation files required by the page
+            $langs->loadLangs(["boxes", "projects"]);
+
+            $emptybox = new ModeleBoxes($db);
+
+            $boxlista .= "\n<!-- Box left container -->\n";
+
+            // Define $box_max_lines
+            $box_max_lines = 5;
+            if (!empty($conf->global->MAIN_BOXES_MAXLINES)) {
+                $box_max_lines = $conf->global->MAIN_BOXES_MAXLINES;
+            }
+
+            $ii = 0;
+            foreach ($boxactivated as $key => $box) {
+                if ((!empty($user->conf->$confuserzone) && $box->fk_user == 0) || (empty($user->conf->$confuserzone) && $box->fk_user != 0)) {
+                    continue;
+                }
+                if (empty($box->box_order) && $ii < ($nbboxactivated / 2)) {
+                    $box->box_order = 'A' . sprintf("%02d", ($ii + 1)); // When box_order was not yet set to Axx or Bxx and is still 0
+                }
+                if (preg_match('/^A/i', $box->box_order)) { // column A
+                    $ii++;
+                    //print 'box_id '.$boxactivated[$ii]->box_id.' ';
+                    //print 'box_order '.$boxactivated[$ii]->box_order.'<br>';
+                    // Show box
+                    $box->loadBox($box_max_lines);
+                    $boxlista .= $box->showBox(null, null, 1);
+                }
+            }
+
+            if ($conf->browser->layout != 'phone') {
+                $emptybox->box_id = 'A';
+                $emptybox->info_box_head = [];
+                $emptybox->info_box_contents = [];
+                $boxlista .= $emptybox->showBox([], [], 1);
+            }
+            $boxlista .= "<!-- End box left container -->\n";
+
+            $boxlistb .= "\n<!-- Box right container -->\n";
+
+            $ii = 0;
+            foreach ($boxactivated as $key => $box) {
+                if ((!empty($user->conf->$confuserzone) && $box->fk_user == 0) || (empty($user->conf->$confuserzone) && $box->fk_user != 0)) {
+                    continue;
+                }
+                if (empty($box->box_order) && $ii < ($nbboxactivated / 2)) {
+                    $box->box_order = 'B' . sprintf("%02d", ($ii + 1)); // When box_order was not yet set to Axx or Bxx and is still 0
+                }
+                if (preg_match('/^B/i', $box->box_order)) { // colonne B
+                    $ii++;
+                    //print 'box_id '.$boxactivated[$ii]->box_id.' ';
+                    //print 'box_order '.$boxactivated[$ii]->box_order.'<br>';
+                    // Show box
+                    $box->loadBox($box_max_lines);
+                    $boxlistb .= $box->showBox(null, null, 1);
+                }
+            }
+
+            if ($conf->browser->layout != 'phone') {
+                $emptybox->box_id = 'B';
+                $emptybox->info_box_head = [];
+                $emptybox->info_box_contents = [];
+                $boxlistb .= $emptybox->showBox([], [], 1);
+            }
+
+            $boxlistb .= "<!-- End box right container -->\n";
+        }
+
+        return ['selectboxlist' => count($boxactivated) ? $selectboxlist : '', 'boxactivated' => $boxactivated, 'boxlista' => $boxlista, 'boxlistb' => $boxlistb];
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Return a HTML select list of a dictionary
-	 *
-	 *  @param  string	$htmlname          	Name of select zone
-	 *  @param	string	$dictionarytable	Dictionary table
-	 *  @param	string	$keyfield			Field for key
-	 *  @param	string	$labelfield			Label field
-	 *  @param	string	$selected			Selected value
-	 *  @param  int		$useempty          	1=Add an empty value in list, 2=Add an empty value in list only if there is more than 2 entries.
+    /**
+     *  Return a HTML select list of a dictionary
+     *
+     * @param string    $htmlname           Name of select zone
+     * @param string    $dictionarytable    Dictionary table
+     * @param string    $keyfield           Field for key
+     * @param string    $labelfield         Label field
+     * @param string    $selected           Selected value
+     * @param int       $useempty           1=Add an empty value in list, 2=Add an empty value in list only if there is more than 2 entries.
 	 *  @param  string  $moreattrib         More attributes on HTML select tag
 	 * 	@return	void
 	 */

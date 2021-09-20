@@ -135,8 +135,8 @@ if (!$sortorder) {
 }
 
 // Initialize array of search criterias
-$search_all = GETPOST('search_all', 'alphanohtml') ? GETPOST('search_all', 'alphanohtml') : GETPOST('sall', 'alphanohtml');
-$search = array();
+$search_all = GETPOST('search_all', 'alphanohtml');
+$search = [];
 foreach ($object->fields as $key => $val) {
 	if (GETPOST('search_'.$key, 'alpha') !== '') {
 		$search[$key] = GETPOST('search_'.$key, 'alpha');
@@ -431,12 +431,14 @@ if ($limit > 0 && $limit != $conf->liste_limit) {
 }
 foreach ($search as $key => $val) {
 	if (is_array($search[$key]) && count($search[$key])) {
-		foreach ($search[$key] as $skey) {
-			$param .= '&search_'.$key.'[]='.urlencode($skey);
-		}
-	} else {
-		$param .= '&search_'.$key.'='.urlencode($search[$key]);
-	}
+        foreach ($search[$key] as $skey) {
+            if ($skey != '') {
+                $param .= '&search_' . $key . '[]=' . urlencode($skey);
+            }
+        }
+    } elseif ($search[$key] != '') {
+        $param .= '&search_' . $key . '=' . urlencode($search[$key]);
+    }
 }
 if ($optioncss != '') {
 	$param .= '&optioncss='.urlencode($optioncss);

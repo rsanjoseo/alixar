@@ -24,10 +24,10 @@ include_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
  */
 class TaskStats extends Stats
 {
-	public $userid;
+	private $project;
+    public $userid;
 	public $socid;
 	public $year;
-	private $project;
 
 	/**
 	 * Constructor of the class
@@ -93,27 +93,52 @@ class TaskStats extends Stats
 						$other
 				);
 			}
-			$this->db->free($resql);
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this).'::'.__METHOD__.' '.$this->error, LOG_ERR);
-			return -1;
-		}
+            $this->db->free($resql);
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . '::' . __METHOD__ . ' ' . $this->error, LOG_ERR);
+            return -1;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Build the where part
-	 *
-	 * @return string
-	 */
-	public function buildWhere()
-	{
-		$sqlwhere_str = '';
-		$sqlwhere = array();
+    /**
+     * Return count, and sum of products
+     *
+     * @return array of values
+     */
+    public function getAllByYear()
+    {
+        global $conf, $user, $langs;
 
-		$sqlwhere[] = ' t.entity IN ('.getEntity('project').')';
+        $datay = [];
+
+        $wonlostfilter = 0; // No filter on status WON/LOST
+
+        $sql = "SELECT date_format(t.datec,'%Y') as year, COUNT(t.rowid) as nb";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "projet_task as t INNER JOIN " . MAIN_DB_PREFIX . "projet as p ON p.rowid = t.fk_projet";
+        if (!$user->rights->societe->client->voir && !$user->soc_id) {
+            $sql .= " INNER JOIN " . MAIN_DB_PREFIX . "societe_commerciaux as sc ON sc.fk_soc=p.fk_soc AND sc.fk_user=" . ((int) $user->id);
+        }
+        $sql .= $this->buildWhere();
+        $sql .= " GROUP BY year";
+        $sql .= $this->db->order('year', 'DESC');
+
+        return $this->_getAllByYear($sql);
+    }
+
+    /**
+     * Build the where part
+     *
+     * @return string
+     */
+    public function buildWhere()
+    {
+        $sqlwhere_str = '';
+        $sqlwhere = [];
+
+        $sqlwhere[] = ' t.entity IN ('.getEntity('project').')';
 
 		if (!empty($this->userid)) {
 			$sqlwhere[] = ' t.fk_user_resp = '.((int) $this->userid);
@@ -137,31 +162,6 @@ class TaskStats extends Stats
 		}
 
 		return $sqlwhere_str;
-	}
-
-	/**
-	 * Return count, and sum of products
-	 *
-	 * @return array of values
-	 */
-	public function getAllByYear()
-	{
-		global $conf, $user, $langs;
-
-		$datay = array();
-
-		$wonlostfilter = 0; // No filter on status WON/LOST
-
-		$sql = "SELECT date_format(t.datec,'%Y') as year, COUNT(t.rowid) as nb";
-		$sql .= " FROM ".MAIN_DB_PREFIX."projet_task as t INNER JOIN ".MAIN_DB_PREFIX."projet as p ON p.rowid = t.fk_projet";
-		if (!$user->rights->societe->client->voir && !$user->soc_id) {
-			$sql .= " INNER JOIN ".MAIN_DB_PREFIX."societe_commerciaux as sc ON sc.fk_soc=p.fk_soc AND sc.fk_user=".((int) $user->id);
-		}
-		$sql .= $this->buildWhere();
-		$sql .= " GROUP BY year";
-		$sql .= $this->db->order('year', 'DESC');
-
-		return $this->_getAllByYear($sql);
 	}
 
 	/**

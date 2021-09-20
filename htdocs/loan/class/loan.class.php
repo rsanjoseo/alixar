@@ -29,78 +29,94 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Loan extends CommonObject
 {
-	const STATUS_UNPAID = 0;
-	const STATUS_PAID = 1;
-	const STATUS_STARTED = 2;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'loan';
+
 	public $table = 'loan';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'loan';
-	/**
+
+    /**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'money-bill-alt';
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $rowid;
-	public $datestart;
+
+    public $datestart;
 	public $dateend;
-	/**
+
+    /**
 	 * @var string Loan label
 	 */
 	public $label;
-	public $capital;
+
+    public $capital;
 	public $nbterm;
 	public $rate;
 	public $paid;
 	public $account_capital;
 	public $account_insurance;
 	public $account_interest;
-	/**
+
+    /**
 	 * @var integer|string date_creation
 	 */
 	public $date_creation;
-	/**
+
+    /**
 	 * @var integer|string date_modification
 	 */
 	public $date_modification;
-	/**
+
+    /**
 	 * @var integer|string date_validation
 	 */
 	public $date_validation;
-	public $insurance_amount;
-	/**
+
+    public $insurance_amount;
+
+    /**
 	 * @var int Bank ID
 	 */
 	public $fk_bank;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_user_creat;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_modif;
-	/**
-	 * @var int ID
-	 */
-	public $fk_project;
 
-	/**
-	 * Constructor
-	 *
-	 * @param	DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * @var int ID
+     */
+    public $fk_user_modif;
+
+    /**
+     * @var int ID
+     */
+    public $fk_project;
+
+    const STATUS_UNPAID = 0;
+    const STATUS_PAID = 1;
+    const STATUS_STARTED = 2;
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
 
 	/**
 	 *  Load object in memory from database
@@ -351,26 +367,43 @@ class Loan extends CommonObject
 		dol_syslog(get_class($this)."::update", LOG_DEBUG);
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Tag loan as paid completely
-	 *
-	 *  @param	User	$user	Object user making change
-	 *  @return	int				<0 if KO, >0 if OK
-	 */
-	public function setPaid($user)
-	{
-		$sql = "UPDATE ".MAIN_DB_PREFIX."loan SET";
+    /**
+     *  Tag loan as paid completely
+     *
+     * @param User $user Object user making change
+     *
+     * @return    int                <0 if KO, >0 if OK
+     * @deprecated
+     * @see setPaid()
+     */
+    public function set_paid($user)
+    {
+        // phpcs:enable
+        dol_syslog(get_class($this) . "::set_paid is deprecated, use setPaid instead", LOG_NOTICE);
+        return $this->setPaid($user);
+    }
+
+    /**
+     *  Tag loan as paid completely
+     *
+     * @param User $user Object user making change
+     *
+     * @return    int                <0 if KO, >0 if OK
+     */
+    public function setPaid($user)
+    {
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "loan SET";
 		$sql .= " paid = ".$this::STATUS_PAID;
 		$sql .= " WHERE rowid = ".((int) $this->id);
 		$return = $this->db->query($sql);
@@ -382,23 +415,7 @@ class Loan extends CommonObject
 		}
 	}
 
-	/**
-	 *  Tag loan as paid completely
-	 *
-	 *	@deprecated
-	 *  @see setPaid()
-	 *  @param	User	$user	Object user making change
-	 *  @return	int				<0 if KO, >0 if OK
-	 */
-	public function set_paid($user)
-	{
-		// phpcs:enable
-		dol_syslog(get_class($this)."::set_paid is deprecated, use setPaid instead", LOG_NOTICE);
-		return $this->setPaid($user);
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Tag loan as payment started
 	 *

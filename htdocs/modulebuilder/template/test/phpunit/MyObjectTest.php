@@ -77,30 +77,56 @@ class MyObjectTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * Global test setup
 	 *
-	 * @return void
-	 */
-	public static function setUpBeforeClass()
-	{
-		global $conf, $user, $langs, $db;
-		$db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
+     * @return void
+     */
+    public static function setUpBeforeClass()
+    {
+        global $conf, $user, $langs, $db;
+        $db->begin(); // This is to have all actions inside a transaction even if test launched without suite.
+
+        print __METHOD__ . "\n";
+    }
+
+    /**
+     * Unit test setup
+     *
+     * @return void
+     */
+    protected function setUp()
+    {
+        global $conf, $user, $langs, $db;
+        $conf = $this->savconf;
+        $user = $this->savuser;
+        $langs = $this->savlangs;
+        $db = $this->savdb;
+
+        print __METHOD__ . "\n";
+    }
+
+    /**
+     * Unit test teardown
+     *
+     * @return void
+     */
+    protected function tearDown()
+    {
+        print __METHOD__ . "\n";
+    }
+
+    /**
+     * Global test teardown
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass()
+    {
+        global $conf, $user, $langs, $db;
+        $db->rollback();
 
 		print __METHOD__."\n";
 	}
 
-	/**
-	 * Global test teardown
-	 *
-	 * @return void
-	 */
-	public static function tearDownAfterClass()
-	{
-		global $conf, $user, $langs, $db;
-		$db->rollback();
-
-		print __METHOD__."\n";
-	}
-
-	/**
+    /**
 	 * A sample test
 	 *
 	 * @return bool
@@ -168,31 +194,5 @@ class MyObjectTest extends \PHPUnit_Framework_TestCase
 		print __METHOD__." id=".$id." result=".$result."\n";
 		$this->assertLessThan($result, 0);
 		return $result;
-	}
-
-	/**
-	 * Unit test setup
-	 *
-	 * @return void
-	 */
-	protected function setUp()
-	{
-		global $conf, $user, $langs, $db;
-		$conf = $this->savconf;
-		$user = $this->savuser;
-		$langs = $this->savlangs;
-		$db = $this->savdb;
-
-		print __METHOD__."\n";
-	}
-
-	/**
-	 * Unit test teardown
-	 *
-	 * @return void
-	 */
-	protected function tearDown()
-	{
-		print __METHOD__."\n";
 	}
 }

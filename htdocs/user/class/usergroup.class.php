@@ -90,65 +90,107 @@ class UserGroup extends CommonObject
 	 *
 	 * @var integer
 	 */
-	public $datem;
+    public $datem;
 
-	/**
-	 * @var string Description
-	 */
-	public $note;
+    /**
+     * @var string Description
+     */
+    public $note;
 
-	public $members = array(); // Array of users
+    public $members = []; // Array of users
 
-	public $nb_rights; // Number of rights granted to the user
-public $oldcopy; // Array of cache of already loaded permissions
-	public $fields = array(
-		'rowid'=>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'index'=>1, 'position'=>1, 'comment'=>'Id'),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'notnull'=> 1, 'default'=>1, 'index'=>1, 'position'=>5),
-		'nom'=>array('type'=>'varchar(180)', 'label'=>'Name', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'index'=>1, 'position'=>10, 'searchall'=>1, 'comment'=>'Group name'),
-		'note' => array('type'=>'html', 'label'=>'Description', 'enabled'=>1, 'visible'=>1, 'position'=>20, 'notnull'=>-1,),
-		'datec' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'position'=>50, 'notnull'=>1,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-2, 'position'=>60, 'notnull'=>1,),
-		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'ModelPDF', 'enabled'=>1, 'visible'=>0, 'position'=>100),
-	); // To contains a clone of this when we need to save old properties of object
-	/**
-	 * @var string    Field with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_usergroup';
-	/**
-	 * @var array	List of child tables. To test if we can delete object.
-	 */
-	protected $childtables = array();
-	/**
-	 * @var array	List of child tables. To know object to delete on cascade.
+    public $nb_rights; // Number of rights granted to the user
+
+    private $_tab_loaded = []; // Array of cache of already loaded permissions
+
+    public $oldcopy; // To contains a clone of this when we need to save old properties of object
+
+    public $fields = [
+        'rowid' => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'index' => 1, 'position' => 1, 'comment' => 'Id'],
+        'entity' => ['type' => 'integer', 'label' => 'Entity', 'enabled' => 1, 'visible' => 0, 'notnull' => 1, 'default' => 1, 'index' => 1, 'position' => 5],
+        'nom' => ['type' => 'varchar(180)', 'label' => 'Name', 'enabled' => 1, 'visible' => 1, 'notnull' => 1, 'showoncombobox' => 1, 'index' => 1, 'position' => 10, 'searchall' => 1, 'comment' => 'Group name'],
+        'note' => ['type' => 'html', 'label' => 'Description', 'enabled' => 1, 'visible' => 1, 'position' => 20, 'notnull' => -1,],
+        'datec' => ['type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -2, 'position' => 50, 'notnull' => 1,],
+        'tms' => ['type' => 'timestamp', 'label' => 'DateModification', 'enabled' => 1, 'visible' => -2, 'position' => 60, 'notnull' => 1,],
+        'model_pdf' => ['type' => 'varchar(255)', 'label' => 'ModelPDF', 'enabled' => 1, 'visible' => 0, 'position' => 100],
+    ];
+
+    /**
+     * @var string    Field with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_usergroup';
+
+    /**
+     * @var array    List of child tables. To test if we can delete object.
+     */
+    protected $childtables = [];
+
+    /**
+     * @var array    List of child tables. To know object to delete on cascade.
 	 */
 	protected $childtablesoncascade = array('usergroup_rights', 'usergroup_user');
-private $_tab_loaded = array();
+
 
 	/**
 	 *    Constructor de la classe
 	 *
-	 *    @param   DoliDb  $db     Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->nb_rights = 0;
-	}
+	 *    @param   DoliDb $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->nb_rights = 0;
+    }
 
-	/**
-	 *  Return array of groups objects for a particular user
-	 *
-	 *  @param		int		$userid 		User id to search
-	 *  @param		boolean	$load_members	Load all members of the group
-	 *  @return		array     				Array of groups objects
-	 */
-	public function listGroupsForUser($userid, $load_members = true)
-	{
-		global $conf, $user;
+    /**
+     *  Charge un objet group avec toutes ses caracteristiques (except ->members array)
+     *
+     * @param int     $id           Id of group to load
+     * @param string  $groupname    Name of group to load
+     * @param boolean $load_members Load all members of the group
+     *
+     * @return        int                        <0 if KO, >0 if OK
+     */
+    public function fetch($id = '', $groupname = '', $load_members = true)
+    {
+        global $conf;
 
-		$ret = array();
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        if (!empty($groupname)) {
+            $result = $this->fetchCommon(0, '', ' AND nom = \'' . $this->db->escape($groupname) . '\'');
+        } else {
+            $result = $this->fetchCommon($id);
+        }
 
-		$sql = "SELECT g.rowid, ug.entity as usergroup_entity";
+        $this->name = $this->nom; // For compatibility with field name
+
+        if ($result) {
+            if ($load_members) {
+                $this->members = $this->listUsersForGroup();
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     *  Return array of groups objects for a particular user
+     *
+     * @param int     $userid       User id to search
+     * @param boolean $load_members Load all members of the group
+     *
+     * @return        array                    Array of groups objects
+     */
+    public function listGroupsForUser($userid, $load_members = true)
+    {
+        global $conf, $user;
+
+        $ret = [];
+
+        $sql = "SELECT g.rowid, ug.entity as usergroup_entity";
 		$sql .= " FROM ".MAIN_DB_PREFIX."usergroup as g,";
 		$sql .= " ".MAIN_DB_PREFIX."usergroup_user as ug";
 		$sql .= " WHERE ug.fk_usergroup = g.rowid";
@@ -176,39 +218,6 @@ private $_tab_loaded = array();
 			$this->db->free($result);
 
 			return $ret;
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Charge un objet group avec toutes ses caracteristiques (except ->members array)
-	 *
-	 *	@param      int		$id				Id of group to load
-	 *	@param      string	$groupname		Name of group to load
-	 *  @param		boolean	$load_members	Load all members of the group
-	 *	@return		int						<0 if KO, >0 if OK
-	 */
-	public function fetch($id = '', $groupname = '', $load_members = true)
-	{
-		global $conf;
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		if (!empty($groupname)) {
-			$result = $this->fetchCommon(0, '', ' AND nom = \''.$this->db->escape($groupname).'\'');
-		} else {
-			$result = $this->fetchCommon($id);
-		}
-
-		$this->name = $this->nom; // For compatibility with field name
-
-		if ($result) {
-			if ($load_members) {
-				$this->members = $this->listUsersForGroup();
-			}
-
-			return 1;
 		} else {
 			$this->error = $this->db->lasterror();
 			return -1;

@@ -453,25 +453,27 @@ if ($mode == 'searchkey') {
 	$nbtotalofrecords = count($recordtoshow);
 	$num = $limit + 1;
 	if (($offset + $num) > $nbtotalofrecords) {
-		$num = $limit;
-	}
+        $num = $limit;
+    }
 
-	//print 'param='.$param.' $_SERVER["PHP_SELF"]='.$_SERVER["PHP_SELF"].' num='.$num.' page='.$page.' nbtotalofrecords='.$nbtotalofrecords." sortfield=".$sortfield." sortorder=".$sortorder;
-	$title = $langs->trans("TranslationKeySearch");
-	if ($nbtotalofrecords > 0) {
-		$title .= ' <span class="opacitymedium colorblack paddingleft">('.$nbtotalofrecords.' / '.$nbtotalofrecordswithoutfilters.' - '.$nbtotaloffiles.' '.$langs->trans("Files").')</span>';
-	}
-	print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, '', $num, -1 * $nbtotalofrecords, '', 0, '', '', $limit, 0, 0, 1);
+    //print 'param='.$param.' $_SERVER["PHP_SELF"]='.$_SERVER["PHP_SELF"].' num='.$num.' page='.$page.' nbtotalofrecords='.$nbtotalofrecords." sortfield=".$sortfield." sortorder=".$sortorder;
+    $title = $langs->trans("TranslationKeySearch");
+    if ($nbtotalofrecords > 0) {
+        $title .= ' <span class="opacitymedium colorblack paddingleft">(' . $nbtotalofrecords . ' / ' . $nbtotalofrecordswithoutfilters . ' - ' . $nbtotaloffiles . ' ' . $langs->trans("Files") . ')</span>';
+    }
+    print_barre_liste($title, $page, $_SERVER["PHP_SELF"], $param, $sortfield, $sortorder, '', $num, -1 * $nbtotalofrecords, '', 0, '', '', $limit, 0, 0, 1);
 
-	print '<input type="hidden" id="action" name="action" value="search">';
-	print '<input type="hidden" id="mode" name="mode" value="'.$mode.'">';
+    $massactionbutton = '';
 
-	print '<div class="div-table-responsive-no-min">';
-	print '<table class="noborder centpercent">';
-	print '<tr class="liste_titre">';
-	print_liste_field_titre("Language_en_US_es_MX_etc", $_SERVER["PHP_SELF"], 'lang,transkey', '', $param, '', $sortfield, $sortorder);
-	print_liste_field_titre("Key", $_SERVER["PHP_SELF"], 'transkey', '', $param, '', $sortfield, $sortorder);
-	print_liste_field_titre("CurrentTranslationString", $_SERVER["PHP_SELF"], 'transvalue', '', $param, '', $sortfield, $sortorder);
+    print '<input type="hidden" id="action" name="action" value="search">';
+    print '<input type="hidden" id="mode" name="mode" value="' . $mode . '">';
+
+    print '<div class="div-table-responsive-no-min">';
+    print '<table class="noborder centpercent">';
+    print '<tr class="liste_titre">';
+    print_liste_field_titre("Language_en_US_es_MX_etc", $_SERVER["PHP_SELF"], 'lang,transkey', '', $param, '', $sortfield, $sortorder);
+    print_liste_field_titre("Key", $_SERVER["PHP_SELF"], 'transkey', '', $param, '', $sortfield, $sortorder);
+    print_liste_field_titre("CurrentTranslationString", $_SERVER["PHP_SELF"], 'transvalue', '', $param, '', $sortfield, $sortorder);
 	//if (! empty($conf->multicompany->enabled) && !$user->entity) print_liste_field_titre("Entity", $_SERVER["PHP_SELF"], 'entity,transkey', '', $param, '', $sortfield, $sortorder);
 	print '<td align="center"></td>';
 	print "</tr>\n";
@@ -499,8 +501,8 @@ if ($mode == 'searchkey') {
 	//}
 	print '</td>';
 	// Action column
-	print '<td class="nowraponall">';
-	$searchpicto = $form->showFilterAndCheckAddButtons(!empty($massactionbutton) ? 1 : 0, 'checkforselect', 1);
+    print '<td class="right nowraponall">';
+    $searchpicto = $form->showFilterAndCheckAddButtons(!empty($massactionbutton) ? 1 : 0, 'checkforselect', 1);
 	print $searchpicto;
 	print '</td>';
 	print '</tr>';

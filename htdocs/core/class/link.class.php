@@ -65,33 +65,6 @@ class Link extends CommonObject
 		$this->db = $db;
 	}
 
-	/**
-	 *  Return nb of links
-	 *
-	 *  @param  DoliDb  $db         Database handler
-	 *  @param  string  $objecttype Type of the associated object in dolibarr
-	 *  @param  int     $objectid   Id of the associated object in dolibarr
-	 *  @return int                 Nb of links, -1 if error
-	 **/
-	public static function count($db, $objecttype, $objectid)
-	{
-		global $conf;
-
-		$sql = "SELECT COUNT(rowid) as nb FROM ".MAIN_DB_PREFIX."links";
-		$sql .= " WHERE objecttype = '".$db->escape($objecttype)."' AND objectid = ".((int) $objectid);
-		if ($conf->entity != 0) {
-			$sql .= " AND entity = ".$conf->entity;
-		}
-
-		$resql = $db->query($sql);
-		if ($resql) {
-			$obj = $db->fetch_object($resql);
-			if ($obj) {
-				return $obj->nb;
-			}
-		}
-		return -1;
-	}
 
 	/**
 	 *    Create link in database
@@ -287,26 +260,56 @@ class Link extends CommonObject
 					$link->label = $obj->label;
 					$link->objecttype = $obj->objecttype;
 					$link->objectid = $obj->objectid;
-					$links[] = $link;
-				}
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			return -1;
-		}
-	}
+                    $links[] = $link;
+                }
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return -1;
+        }
+    }
 
-	/**
-	 *  Loads a link from database
-	 *
-	 *  @param 	int		$rowid 		Id of link to load
-	 *  @return int 				1 if ok, 0 if no record found, -1 if error
-	 **/
-	public function fetch($rowid = null)
-	{
-		global $conf;
+    /**
+     *  Return nb of links
+     *
+     * @param DoliDb $db         Database handler
+     * @param string $objecttype Type of the associated object in dolibarr
+     * @param int    $objectid   Id of the associated object in dolibarr
+     *
+     * @return int                 Nb of links, -1 if error
+     **/
+    public static function count($db, $objecttype, $objectid)
+    {
+        global $conf;
+
+        $sql = "SELECT COUNT(rowid) as nb FROM " . MAIN_DB_PREFIX . "links";
+        $sql .= " WHERE objecttype = '" . $db->escape($objecttype) . "' AND objectid = " . ((int) $objectid);
+        if ($conf->entity != 0) {
+            $sql .= " AND entity = " . $conf->entity;
+        }
+
+        $resql = $db->query($sql);
+        if ($resql) {
+            $obj = $db->fetch_object($resql);
+            if ($obj) {
+                return $obj->nb;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     *  Loads a link from database
+     *
+     * @param int $rowid Id of link to load
+     *
+     * @return int                1 if ok, 0 if no record found, -1 if error
+     **/
+    public function fetch($rowid = null)
+    {
+        global $conf;
 
 		if (empty($rowid)) {
 			$rowid = $this->id;

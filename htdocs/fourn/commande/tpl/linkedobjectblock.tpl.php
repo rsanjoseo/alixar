@@ -45,19 +45,23 @@ foreach ($linkedObjectBlock as $key => $objectlink) {
 	}
 	?>
 	<tr class="<?php echo $trclass; ?>">
-		<td><?php echo $langs->trans("SupplierOrder"); ?></td>
-		<td><a href="<?php echo DOL_URL_ROOT.'/fourn/commande/card.php?id='.$objectlink->id ?>"><?php echo img_object($langs->trans("ShowOrder"), "order").' '.$objectlink->ref; ?></a></td>
-		<td class="left"><?php echo $objectlink->ref_supplier; ?></td>
-		<td class="center"><?php echo dol_print_date($objectlink->date, 'day'); ?></td>
-		<td class="right"><?php
-		if ($user->rights->fournisseur->commande->lire) {
-			$total = $total + $objectlink->total_ht;
-			echo price($objectlink->total_ht);
-		} ?></td>
-		<td class="right"><?php echo $objectlink->getLibStatut(3); ?></td>
-		<td class="right"><a class="reposition" href="<?php echo $_SERVER["PHP_SELF"].'?id='.$object->id.'&action=dellink&dellinkid='.$key; ?>"><?php echo img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink'); ?></a></td>
-	</tr>
-	<?php
+        <td><?php echo $langs->trans("SupplierOrder"); ?></td>
+        <td>
+            <a href="<?php echo DOL_URL_ROOT . '/fourn/commande/card.php?id=' . $objectlink->id ?>"><?php echo img_object($langs->trans("ShowOrder"), "order") . ' ' . $objectlink->ref; ?></a>
+        </td>
+        <td class="left"><?php echo $objectlink->ref_supplier; ?></td>
+        <td class="center"><?php echo dol_print_date($objectlink->date, 'day'); ?></td>
+        <td class="right"><?php
+            if ($user->rights->fournisseur->commande->lire) {
+                $total = $total + $objectlink->total_ht;
+                echo price($objectlink->total_ht);
+            } ?></td>
+        <td class="right"><?php echo $objectlink->getLibStatut(3); ?></td>
+        <td class="right"><a class="reposition"
+                             href="<?php echo $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=dellink&token=' . newToken() . '&dellinkid=' . $key; ?>"><?php echo img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink'); ?></a>
+        </td>
+    </tr>
+    <?php
 }
 if (count($linkedObjectBlock) > 1) {
 	?>

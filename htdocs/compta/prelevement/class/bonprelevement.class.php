@@ -42,51 +42,59 @@ require_once DOL_DOCUMENT_ROOT.'/fourn/class/paiementfourn.class.php';
  */
 class BonPrelevement extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_TRANSFERED = 1;
-const STATUS_CREDITED = 2;
-const STATUS_DEBITED = 2;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'widthdraw';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'prelevement_bons';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'payment';
+
 	public $date_echeance;
-	public $raison_sociale;
-	public $reference_remise;
-	public $emetteur_code_guichet;
-	public $emetteur_numero_compte;
-	public $emetteur_code_banque;
-	public $emetteur_number_key;
-	public $emetteur_iban;
-	public $emetteur_bic;
-	public $emetteur_ics;
-		public $date_trans; // 0-Wait, 1-Trans, 2-Done
-	public $user_trans;
-	public $total;
-	public $fetched;
-public $statut;
-	public $labelStatus = array();
-		public $invoice_in_error = array();		// STATUS_CREDITED and STATUS_DEBITED is same. Difference is in ->type
-		public $thirdparty_in_error = array();		// STATUS_CREDITED and STATUS_DEBITED is same. Difference is in ->type
+    public $raison_sociale;
+    public $reference_remise;
+    public $emetteur_code_guichet;
+    public $emetteur_numero_compte;
+    public $emetteur_code_banque;
+    public $emetteur_number_key;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      	Database handler
-	 */
-	public function __construct($db)
-	{
-		global $conf, $langs;
+    public $emetteur_iban;
+    public $emetteur_bic;
+    public $emetteur_ics;
 
-		$this->db = $db;
+    public $date_trans;
+    public $user_trans;
+
+    public $total;
+    public $fetched;
+    public $statut; // 0-Wait, 1-Trans, 2-Done
+    public $labelStatus = [];
+
+    public $invoice_in_error = [];
+    public $thirdparty_in_error = [];
+
+    const STATUS_DRAFT = 0;
+    const STATUS_TRANSFERED = 1;
+    const STATUS_CREDITED = 2;        // STATUS_CREDITED and STATUS_DEBITED is same. Difference is in ->type
+    const STATUS_DEBITED = 2;        // STATUS_CREDITED and STATUS_DEBITED is same. Difference is in ->type
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        global $conf, $langs;
+
+        $this->db = $db;
 
 		$this->filename = '';
 
@@ -103,30 +111,163 @@ public $statut;
 		$this->emetteur_bic = "";
 		$this->emetteur_ics = "";
 
-		$this->factures = array();
+		$this->factures = [];
 
-		$this->methodes_trans = array();
+        $this->methodes_trans = [];
 
-		$this->methodes_trans[0] = "Internet";
+        $this->methodes_trans[0] = "Internet";
 
-		$this->fetched = 0;
-	}
+        $this->fetched = 0;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return error string
-	 *
-	 *  @param	int		$error 		 Id of error
-	 *	@return	string               Error string
-	 */
-	public function getErrorString($error)
-	{
-		global $langs;
+    /**
+     * Add invoice to withdrawal
+     *
+     * @param int    $invoice_id   id invoice to add
+     * @param int    $client_id    id invoice customer
+     * @param string $client_nom   customer name
+     * @param int    $amount       amount of invoice
+     * @param string $code_banque  code of bank withdrawal
+     * @param string $code_guichet code of bank's office
+     * @param string $number       bank    account number
+     * @param string $number_key   number key of account number
+     * @param string $type         'debit-order' or 'bank-transfer'
+     *
+     * @return    int                        >0 if OK, <0 if KO
+     */
+    public function AddFacture($invoice_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key, $type = 'debit-order')
+    {
+        // phpcs:enable
+        $result = 0;
+        $line_id = 0;
 
-		$errors = array();
+        // Add lines
+        $result = $this->addline($line_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key);
 
-		$errors[1027] = $langs->trans("DateInvalid");
+        if ($result == 0) {
+            if ($line_id > 0) {
+                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "prelevement_facture (";
+                if ($type != 'bank-transfer') {
+                    $sql .= "fk_facture";
+                } else {
+                    $sql .= "fk_facture_fourn";
+                }
+                $sql .= ",fk_prelevement_lignes";
+                $sql .= ") VALUES (";
+                $sql .= ((int) $invoice_id);
+                $sql .= ", " . ((int) $line_id);
+                $sql .= ")";
+
+                if ($this->db->query($sql)) {
+                    $result = 0;
+                } else {
+                    $result = -1;
+                    $this->errors[] = get_class($this) . "::AddFacture " . $this->db->lasterror;
+                    dol_syslog(get_class($this) . "::AddFacture Error $result");
+                }
+            } else {
+                $result = -2;
+                $this->errors[] = get_class($this) . "::AddFacture linedid Empty";
+                dol_syslog(get_class($this) . "::AddFacture Error $result");
+            }
+        } else {
+            $result = -3;
+            dol_syslog(get_class($this) . "::AddFacture Error $result");
+        }
+
+        return $result;
+    }
+
+    /**
+     *    Add line to withdrawal
+     *
+     * @param int    $line_id      id line to add
+     * @param int    $client_id    id invoice customer
+     * @param string $client_nom   customer name
+     * @param int    $amount       amount of invoice
+     * @param string $code_banque  code of bank withdrawal
+     * @param string $code_guichet code of bank's office
+     * @param string $number       bank account number
+     * @param string $number_key   number key of account number
+     *
+     * @return    int                        >0 if OK, <0 if KO
+     */
+    public function addline(&$line_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key)
+    {
+        $result = -1;
+        $concat = 0;
+
+        if ($concat == 1) {
+            /*
+             * We aggregate the lines
+             */
+            $sql = "SELECT rowid";
+            $sql .= " FROM  " . MAIN_DB_PREFIX . "prelevement_lignes";
+            $sql .= " WHERE fk_prelevement_bons = " . ((int) $this->id);
+            $sql .= " AND fk_soc =" . ((int) $client_id);
+            $sql .= " AND code_banque = '" . $this->db->escape($code_banque) . "'";
+            $sql .= " AND code_guichet = '" . $this->db->escape($code_guichet) . "'";
+            $sql .= " AND number = '" . $this->db->escape($number) . "'";
+
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $num = $this->db->num_rows($resql);
+            } else {
+                $result = -1;
+            }
+        } else {
+            /*
+             * No aggregate
+             */
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "prelevement_lignes (";
+            $sql .= "fk_prelevement_bons";
+            $sql .= ", fk_soc";
+            $sql .= ", client_nom";
+            $sql .= ", amount";
+            $sql .= ", code_banque";
+            $sql .= ", code_guichet";
+            $sql .= ", number";
+            $sql .= ", cle_rib";
+            $sql .= ") VALUES (";
+            $sql .= $this->id;
+            $sql .= ", " . ((int) $client_id);
+            $sql .= ", '" . $this->db->escape($client_nom) . "'";
+            $sql .= ", " . ((float) price2num($amount));
+            $sql .= ", '" . $this->db->escape($code_banque) . "'";
+            $sql .= ", '" . $this->db->escape($code_guichet) . "'";
+            $sql .= ", '" . $this->db->escape($number) . "'";
+            $sql .= ", '" . $this->db->escape($number_key) . "'";
+            $sql .= ")";
+
+            if ($this->db->query($sql)) {
+                $line_id = $this->db->last_insert_id(MAIN_DB_PREFIX . "prelevement_lignes");
+                $result = 0;
+            } else {
+                $this->errors[] = get_class($this) . "::addline Error -2 " . $this->db->lasterror;
+                dol_syslog(get_class($this) . "::addline Error -2");
+                $result = -2;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     *    Return error string
+     *
+     * @param int $error Id of error
+     *
+     * @return    string               Error string
+     */
+    public function getErrorString($error)
+    {
+        global $langs;
+
+        $errors = array();
+
+        $errors[1027] = $langs->trans("DateInvalid");
 
 		return $errors[abs($error)];
 	}
@@ -194,11 +335,13 @@ public $statut;
 		}
 	}
 
-	/**
-	 * Set credite and set status of linked invoices. Still used ??
-	 *
-	 * @return		int		<0 if KO, >=0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Set credite and set status of linked invoices. Still used ??
+     *
+     * @return		int		<0 if KO, >=0 if OK
+     */
 	public function set_credite()
 	{
 		// phpcs:enable
@@ -261,74 +404,7 @@ public $statut;
 		}
 	}
 
-	/**
-	 *	Get invoice list
-	 *
-	 *  @param 	int		$amounts 	If you want to get the amount of the order for each invoice
-	 *	@return	array 				Id of invoices
-	 */
-	private function getListInvoices($amounts = 0)
-	{
-		global $conf;
-
-		$arr = array();
-
-		/*
-		 * Returns all invoices presented within same order
-		 */
-		$sql = "SELECT ";
-		if ($this->type == 'bank-transfer') {
-			$sql .= " pf.fk_facture_fourn";
-		} else {
-			$sql .= " pf.fk_facture";
-		}
-		if ($amounts) {
-			$sql .= ", SUM(pl.amount)";
-		}
-		$sql .= " FROM ".MAIN_DB_PREFIX."prelevement_bons as p";
-		$sql .= " , ".MAIN_DB_PREFIX."prelevement_lignes as pl";
-		$sql .= " , ".MAIN_DB_PREFIX."prelevement_facture as pf";
-		$sql .= " WHERE pf.fk_prelevement_lignes = pl.rowid";
-		$sql .= " AND pl.fk_prelevement_bons = p.rowid";
-		$sql .= " AND p.rowid = ".((int) $this->id);
-		$sql .= " AND p.entity = ".((int) $conf->entity);
-		if ($amounts) {
-			if ($this->type == 'bank-transfer') {
-				$sql .= " GROUP BY fk_facture_fourn";
-			} else {
-				$sql .= " GROUP BY fk_facture";
-			}
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-
-			if ($num) {
-				$i = 0;
-				while ($i < $num) {
-					$row = $this->db->fetch_row($resql);
-					if (!$amounts) {
-						$arr[$i] = $row[0];
-					} else {
-						$arr[$i] = array(
-							$row[0],
-							$row[1]
-						);
-					}
-					$i++;
-				}
-			}
-			$this->db->free($resql);
-		} else {
-			dol_syslog(get_class($this)."::getListInvoices Erreur");
-		}
-
-		return $arr;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set direct debit or credit transfer order to "paid" status.
 	 *
@@ -488,7 +564,6 @@ public $statut;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Set withdrawal to transmited status
 	 *
@@ -536,28 +611,96 @@ public $statut;
 				return 0;
 			} else {
 				$this->db->rollback();
-				dol_syslog(get_class($this)."::set_infotrans ROLLBACK", LOG_ERR);
+				dol_syslog(get_class($this) . "::set_infotrans ROLLBACK", LOG_ERR);
 
-				return -1;
-			}
-		} else {
-			dol_syslog(get_class($this)."::set_infotrans Ouverture transaction SQL impossible", LOG_CRIT);
-			return -2;
-		}
-	}
+                return -1;
+            }
+        } else {
+            dol_syslog(get_class($this) . "::set_infotrans Ouverture transaction SQL impossible", LOG_CRIT);
+            return -2;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Get invoice list
+     *
+     * @param int $amounts If you want to get the amount of the order for each invoice
+     *
+     * @return    array                Id of invoices
+     */
+    private function getListInvoices($amounts = 0)
+    {
+        global $conf;
 
-	/**
-	 *	Returns amount waiting for direct debit payment or credit transfer payment
-	 *
-	 *	@param	string	$mode		'direct-debit' or 'bank-transfer'
-	 *	@return	double	 			<O if KO, Total amount
-	 */
-	public function SommeAPrelever($mode = 'direct-debit')
-	{
-		// phpcs:enable
-		global $conf;
+        $arr = [];
+
+        /*
+         * Returns all invoices presented within same order
+         */
+        $sql = "SELECT ";
+        if ($this->type == 'bank-transfer') {
+            $sql .= " pf.fk_facture_fourn";
+        } else {
+            $sql .= " pf.fk_facture";
+        }
+        if ($amounts) {
+            $sql .= ", SUM(pl.amount)";
+        }
+        $sql .= " FROM " . MAIN_DB_PREFIX . "prelevement_bons as p";
+        $sql .= " , " . MAIN_DB_PREFIX . "prelevement_lignes as pl";
+        $sql .= " , " . MAIN_DB_PREFIX . "prelevement_facture as pf";
+        $sql .= " WHERE pf.fk_prelevement_lignes = pl.rowid";
+        $sql .= " AND pl.fk_prelevement_bons = p.rowid";
+        $sql .= " AND p.rowid = " . ((int) $this->id);
+        $sql .= " AND p.entity = " . ((int) $conf->entity);
+        if ($amounts) {
+            if ($this->type == 'bank-transfer') {
+                $sql .= " GROUP BY fk_facture_fourn";
+            } else {
+                $sql .= " GROUP BY fk_facture";
+            }
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+
+            if ($num) {
+                $i = 0;
+                while ($i < $num) {
+                    $row = $this->db->fetch_row($resql);
+                    if (!$amounts) {
+                        $arr[$i] = $row[0];
+                    } else {
+                        $arr[$i] = [
+                            $row[0],
+                            $row[1],
+                        ];
+                    }
+                    $i++;
+                }
+            }
+            $this->db->free($resql);
+        } else {
+            dol_syslog(get_class($this) . "::getListInvoices Erreur");
+        }
+
+        return $arr;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Returns amount waiting for direct debit payment or credit transfer payment
+     *
+     * @param string $mode 'direct-debit' or 'bank-transfer'
+     *
+     * @return    double                <O if KO, Total amount
+     */
+    public function SommeAPrelever($mode = 'direct-debit')
+    {
+        // phpcs:enable
+        global $conf;
 
 		$sql = "SELECT sum(pfd.amount) as nb";
 		if ($mode != 'bank-transfer') {
@@ -608,7 +751,6 @@ public $statut;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Get number of invoices to pay
 	 *
@@ -648,26 +790,29 @@ public $statut;
 
 			$this->db->free($resql);
 
-			return $obj->nb;
-		} else {
-			$this->error = get_class($this)."::NbFactureAPrelever Erreur -1 sql=".$this->db->error();
-			return -1;
-		}
-	}
+            return $obj->nb;
+        } else {
+            $this->error = get_class($this) . "::NbFactureAPrelever Erreur -1 sql=" . $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Create a direct debit order or a credit transfer order
-	 *  TODO delete params banque and agence when not necessary
-	 *
-	 *	@param 	int		$banque			dolibarr mysoc bank
-	 *	@param	int		$agence			dolibarr mysoc bank office (guichet)
-	 *	@param	string	$mode			real=do action, simu=test only
-	 *  @param	string	$format			FRST, RCUR or ALL
-	 *  @param  string  $executiondate	Date to execute the transfer
-	 *  @param	int	    $notrigger		Disable triggers
-	 *  @param	string	$type			'direct-debit' or 'bank-transfer'
-	 *	@return	int						<0 if KO, No of invoice included into file if OK
-	 */
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Create a direct debit order or a credit transfer order
+     *  TODO delete params banque and agence when not necessary
+     *
+     * @param int    $banque        dolibarr mysoc bank
+     * @param int    $agence        dolibarr mysoc bank office (guichet)
+     * @param string $mode          real=do action, simu=test only
+     * @param string $format        FRST, RCUR or ALL
+     * @param string $executiondate Date to execute the transfer
+     * @param int    $notrigger     Disable triggers
+     * @param string $type          'direct-debit' or 'bank-transfer'
+     *	@return	int						<0 if KO, No of invoice included into file if OK
+     */
 	public function create($banque = 0, $agence = 0, $mode = 'real', $format = 'ALL', $executiondate = '', $notrigger = 0, $type = 'direct-debit')
 	{
 		// phpcs:enable
@@ -1039,143 +1184,256 @@ public $statut;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
-	 * Add invoice to withdrawal
-	 *
-	 * @param	int		$invoice_id 	id invoice to add
-	 * @param	int		$client_id  	id invoice customer
-	 * @param	string	$client_nom 	customer name
-	 * @param	int		$amount 		amount of invoice
-	 * @param	string	$code_banque 	code of bank withdrawal
-	 * @param	string	$code_guichet 	code of bank's office
-	 * @param	string	$number bank 	account number
-	 * @param	string	$number_key 	number key of account number
-	 * @param	string	$type			'debit-order' or 'bank-transfer'
-	 * @return	int						>0 if OK, <0 if KO
-	 */
-	public function AddFacture($invoice_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key, $type = 'debit-order')
-	{
-		// phpcs:enable
-		$result = 0;
-		$line_id = 0;
+	 *  Get object and lines from database
+     *
+     * @param User $user      Object user that delete
+     * @param int  $notrigger 1=Does not execute triggers, 0= execute triggers
+     * @return    int                    >0 if OK, <0 if KO
+     */
+    public function delete($user = null, $notrigger = 0)
+    {
+        $this->db->begin();
 
-		// Add lines
-		$result = $this->addline($line_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key);
+        $error = 0;
+        $resql1 = $resql2 = $resql3 = $resql4 = 0;
 
-		if ($result == 0) {
-			if ($line_id > 0) {
-				$sql = "INSERT INTO ".MAIN_DB_PREFIX."prelevement_facture (";
-				if ($type != 'bank-transfer') {
-					$sql .= "fk_facture";
-				} else {
-					$sql .= "fk_facture_fourn";
-				}
-				$sql .= ",fk_prelevement_lignes";
-				$sql .= ") VALUES (";
-				$sql .= ((int) $invoice_id);
-				$sql .= ", ".((int) $line_id);
-				$sql .= ")";
+        if (!$notrigger) {
+            $triggername = 'DIRECT_DEBIT_ORDER_DELETE';
+            if ($this->type == 'bank-transfer') {
+                $triggername = 'PAYMENTBYBANKTRANFER_DELETE';
+            }
+            // Call trigger
+            $result = $this->call_trigger($triggername, $user);
+            if ($result < 0) {
+                $error++;
+            }
+            // End call triggers
+        }
 
-				if ($this->db->query($sql)) {
-					$result = 0;
-				} else {
-					$result = -1;
-					$this->errors[] = get_class($this)."::AddFacture ".$this->db->lasterror;
-					dol_syslog(get_class($this)."::AddFacture Error $result");
-				}
-			} else {
-				$result = -2;
-				$this->errors[] = get_class($this)."::AddFacture linedid Empty";
-				dol_syslog(get_class($this)."::AddFacture Error $result");
-			}
-		} else {
-			$result = -3;
-			dol_syslog(get_class($this)."::AddFacture Error $result");
-		}
+        if (!$error) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . "prelevement_facture WHERE fk_prelevement_lignes IN (SELECT rowid FROM " . MAIN_DB_PREFIX . "prelevement_lignes WHERE fk_prelevement_bons = " . ((int) $this->id) . ")";
+            $resql1 = $this->db->query($sql);
+            if (!$resql1) {
+                dol_print_error($this->db);
+            }
+        }
 
-		return $result;
-	}
+        if (!$error) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . "prelevement_lignes WHERE fk_prelevement_bons = " . ((int) $this->id);
+            $resql2 = $this->db->query($sql);
+            if (!$resql2) {
+                dol_print_error($this->db);
+            }
+        }
 
+        if (!$error) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . "prelevement_bons WHERE rowid = " . ((int) $this->id);
+            $resql3 = $this->db->query($sql);
+            if (!$resql3) {
+                dol_print_error($this->db);
+            }
+        }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        if (!$error) {
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "prelevement_facture_demande SET fk_prelevement_bons = NULL, traite = 0 WHERE fk_prelevement_bons = " . ((int) $this->id);
+            $resql4 = $this->db->query($sql);
+            if (!$resql4) {
+                dol_print_error($this->db);
+            }
+        }
 
-	/**
-	 *	Add line to withdrawal
-	 *
-	 *	@param	int		$line_id 		id line to add
-	 *	@param	int		$client_id  	id invoice customer
-	 *	@param	string	$client_nom 	customer name
-	 *	@param	int		$amount 		amount of invoice
-	 *	@param	string	$code_banque 	code of bank withdrawal
-	 *	@param	string	$code_guichet 	code of bank's office
-	 *	@param	string	$number 		bank account number
-	 *	@param  string	$number_key 	number key of account number
-	 *	@return	int						>0 if OK, <0 if KO
-	 */
-	public function addline(&$line_id, $client_id, $client_nom, $amount, $code_banque, $code_guichet, $number, $number_key)
-	{
-		$result = -1;
-		$concat = 0;
+        if ($resql1 && $resql2 && $resql3 && $resql4 && !$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-		if ($concat == 1) {
-			/*
-			 * We aggregate the lines
-			 */
-			$sql = "SELECT rowid";
-			$sql .= " FROM  ".MAIN_DB_PREFIX."prelevement_lignes";
-			$sql .= " WHERE fk_prelevement_bons = ".((int) $this->id);
-			$sql .= " AND fk_soc =".((int) $client_id);
-			$sql .= " AND code_banque = '".$this->db->escape($code_banque)."'";
-			$sql .= " AND code_guichet = '".$this->db->escape($code_guichet)."'";
-			$sql .= " AND number = '".$this->db->escape($number)."'";
+    /**
+     *    Returns clickable name (with picto)
+     *
+     * @param int    $withpicto             Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
+     * @param string $option                On what the link point to ('nolink', ...)
+     * @param int    $notooltip             1=Disable tooltip
+     * @param string $morecss               Add more css on link
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     *
+     * @return    string                                URL of target
+     */
+    public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
+    {
+        global $conf, $langs, $hookmanager;
 
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$num = $this->db->num_rows($resql);
-			} else {
-				$result = -1;
-			}
-		} else {
-			/*
-			 * No aggregate
-			 */
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."prelevement_lignes (";
-			$sql .= "fk_prelevement_bons";
-			$sql .= ", fk_soc";
-			$sql .= ", client_nom";
-			$sql .= ", amount";
-			$sql .= ", code_banque";
-			$sql .= ", code_guichet";
-			$sql .= ", number";
-			$sql .= ", cle_rib";
-			$sql .= ") VALUES (";
-			$sql .= $this->id;
-			$sql .= ", ".((int) $client_id);
-			$sql .= ", '".$this->db->escape($client_nom)."'";
-			$sql .= ", ".((float) price2num($amount));
-			$sql .= ", '".$this->db->escape($code_banque)."'";
-			$sql .= ", '".$this->db->escape($code_guichet)."'";
-			$sql .= ", '".$this->db->escape($number)."'";
-			$sql .= ", '".$this->db->escape($number_key)."'";
-			$sql .= ")";
+        if (!empty($conf->dol_no_mouse_hover)) {
+            $notooltip = 1; // Force disable tooltips
+        }
 
-			if ($this->db->query($sql)) {
-				$line_id = $this->db->last_insert_id(MAIN_DB_PREFIX."prelevement_lignes");
-				$result = 0;
-			} else {
-				$this->errors[] = get_class($this)."::addline Error -2 ".$this->db->lasterror;
-				dol_syslog(get_class($this)."::addline Error -2");
-				$result = -2;
-			}
-		}
+        $result = '';
 
-		return $result;
-	}
+        $labeltoshow = 'PaymentByDirectDebit';
+        if ($this->type == 'bank-transfer') {
+            $labeltoshow = 'PaymentByBankTransfer';
+        }
 
-	/**
-	 * Generate a direct debit or credit transfer file.
+        $label = '<u>' . $langs->trans($labeltoshow) . '</u>';
+        $label .= '<br>';
+        $label .= '<b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
+        if (isset($this->statut)) {
+            $label .= '<br><b>' . $langs->trans("Status") . ":</b> " . $this->getLibStatut(5);
+        }
+
+        $url = DOL_URL_ROOT . '/compta/prelevement/card.php?id=' . $this->id;
+        if ($this->type == 'bank-transfer') {
+            $url = DOL_URL_ROOT . '/compta/prelevement/card.php?id=' . $this->id;
+        }
+
+        if ($option != 'nolink') {
+            // Add param to save lastsearch_values or not
+            $add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
+            if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
+                $add_save_lastsearch_values = 1;
+            }
+            if ($add_save_lastsearch_values) {
+                $url .= '&save_lastsearch_values=1';
+            }
+        }
+
+        $linkclose = '';
+        if (empty($notooltip)) {
+            if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
+                $label = $langs->trans("ShowMyObject");
+                $linkclose .= ' alt="' . dol_escape_htmltag($label, 1) . '"';
+            }
+            $linkclose .= ' title="' . dol_escape_htmltag($label, 1) . '"';
+            $linkclose .= ' class="classfortooltip' . ($morecss ? ' ' . $morecss : '') . '"';
+            /*
+             $hookmanager->initHooks(array('myobjectdao'));
+             $parameters=array('id'=>$this->id);
+             $reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$this,$action);    // Note that $action and $object may have been modified by some hooks
+             if ($reshook > 0) $linkclose = $hookmanager->resPrint;
+             */
+        } else {
+            $linkclose = ($morecss ? ' class="' . $morecss . '"' : '');
+        }
+
+        $linkstart = '<a href="' . $url . '"';
+        $linkstart .= $linkclose . '>';
+        $linkend = '</a>';
+
+        $result .= $linkstart;
+        if ($withpicto) {
+            $result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="' . (($withpicto != 2) ? 'paddingright ' : '') . 'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
+        }
+        if ($withpicto != 2) {
+            $result .= $this->ref;
+        }
+        $result .= $linkend;
+        //if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+
+        global $action, $hookmanager;
+        $hookmanager->initHooks(['banktransferdao']);
+        $parameters = ['id' => $this->id, 'getnomurl' => $result];
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
+
+        return $result;
+    }
+
+    /**
+     *    Delete a notification def by id
+     *
+     * @param int $rowid id of notification
+     *
+     * @return    int                    0 if OK, <0 if KO
+     */
+    public function deleteNotificationById($rowid)
+    {
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "notify_def";
+        $sql .= " WHERE rowid = " . ((int) $rowid);
+
+        if ($this->db->query($sql)) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     *    Delete a notification
+     *
+     * @param int|User $user   notification user
+     * @param string   $action notification action
+     *
+     * @return    int                        >0 if OK, <0 if KO
+     */
+    public function deleteNotification($user, $action)
+    {
+        if (is_object($user)) {
+            $userid = $user->id;
+        } else {    // If user is an id
+            $userid = $user;
+        }
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "notify_def";
+        $sql .= " WHERE fk_user=" . ((int) $userid) . " AND fk_action='" . $this->db->escape($action) . "'";
+
+        if ($this->db->query($sql)) {
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Add a notification
+     *
+     * @param DoliDB   $db     database handler
+     * @param int|User $user   notification user
+     * @param string   $action notification action
+     *
+     * @return    int                        0 if OK, <0 if KO
+     */
+    public function addNotification($db, $user, $action)
+    {
+        // phpcs:enable
+        $result = 0;
+
+        if (is_object($user)) {
+            $userid = $user->id;
+        } else {    // If user is an id
+            $userid = $user;
+        }
+
+        if ($this->deleteNotification($user, $action) == 0) {
+            $now = dol_now();
+
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "notify_def (datec,fk_user, fk_soc, fk_contact, fk_action)";
+            $sql .= " VALUES ('" . $this->db->idate($now) . "', " . ((int) $userid) . ", 'NULL', 'NULL', '" . $this->db->escape($action) . "')";
+
+            dol_syslog("adnotiff: " . $sql);
+            if ($this->db->query($sql)) {
+                $result = 0;
+            } else {
+                $result = -1;
+                dol_syslog(get_class($this) . "::addNotification Error $result");
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate a direct debit or credit transfer file.
 	 * Generation Formats:
 	 * - Europe: SEPA (France: CFONB no more supported, Spain: AEB19 if external module EsAEB is enabled)
 	 * - Others countries: Warning message
@@ -1184,6 +1442,7 @@ public $statut;
 	 * @param	string	$format				FRST, RCUR or ALL
 	 * @param 	string 	$executiondate		Date to execute transfer
 	 * @param	string	$type				'direct-debit' or 'bank-transfer'
+	 *
 	 * @return	int							>=0 if OK, <0 if KO
 	 */
 	public function generate($format = 'ALL', $executiondate = '', $type = 'direct-debit')
@@ -1506,25 +1765,120 @@ public $statut;
 			fputs($this->file, $langs->transnoentitiesnoconv('WithdrawalFileNotCapable', $mysoc->country_code));
 		}
 
-		fclose($this->file);
-		if (!empty($conf->global->MAIN_UMASK)) {
-			@chmod($this->file, octdec($conf->global->MAIN_UMASK));
-		}
+        fclose($this->file);
+        if (!empty($conf->global->MAIN_UMASK)) {
+            @chmod($this->file, octdec($conf->global->MAIN_UMASK));
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 *	Write recipient of request (customer)
-	 *
-	 *	@param	string		$row_code_client	soc.code_client as code,
-	 *	@param	string		$row_nom			pl.client_nom AS name,
-	 *	@param	string		$row_address		soc.address AS adr,
-	 *	@param	string		$row_zip			soc.zip
-	 *  @param	string		$row_town			soc.town
-	 *	@param	string		$row_country_code	c.code AS country,
-	 *	@param	string		$row_cb				pl.code_banque AS cb,		Not used for SEPA
-	 *	@param	string		$row_cg				pl.code_guichet AS cg,		Not used for SEPA
+    /**
+     * Generate dynamically a RUM number for a customer bank account
+     *
+     * @param string $row_code_client Customer code (soc.code_client)
+     * @param int    $row_datec       Creation date of bank account (rib.datec)
+     * @param string $row_drum        Id of customer bank account (rib.rowid)
+     *
+     * @return    string        RUM number
+     */
+    public static function buildRumNumber($row_code_client, $row_datec, $row_drum)
+    {
+        global $langs;
+        $pre = substr(dol_string_nospecial(dol_string_unaccent($langs->transnoentitiesnoconv('RUM'))), 0, 3); // Must always be on 3 char ('RUM' or 'UMR'. This is a protection against bad translation)
+        return $pre . '-' . $row_code_client . '-' . $row_drum . '-' . date('U', $row_datec);
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Write recipient of request (customer)
+     *
+     * @param int    $rowid       id of line
+     * @param string $client_nom  name of customer
+     * @param string $rib_banque  code of bank
+     * @param string $rib_guichet code of bank office
+     * @param string $rib_number  bank account
+     * @param float  $amount      amount
+     * @param string $ref         ref of invoice
+     * @param int    $facid       id of invoice
+     * @param string $rib_dom     rib domiciliation
+     * @param string $type        'direct-debit' or 'bank-transfer'
+     *
+     * @return    void
+     * @see EnregDestinataireSEPA()
+     */
+    public function EnregDestinataire($rowid, $client_nom, $rib_banque, $rib_guichet, $rib_number, $amount, $ref, $facid, $rib_dom = '', $type = 'direct-debit')
+    {
+        // phpcs:enable
+        fputs($this->file, "06");
+        fputs($this->file, "08"); // Prelevement ordinaire
+
+        fputs($this->file, "        "); // Zone Reservee B2
+
+        fputs($this->file, $this->emetteur_ics); // ICS
+
+        // Date d'echeance C1
+
+        fputs($this->file, "       ");
+        fputs($this->file, strftime("%d%m", $this->date_echeance));
+        fputs($this->file, substr(strftime("%y", $this->date_echeance), 1));
+
+        // Raison Sociale Destinataire C2
+
+        fputs($this->file, substr(strtoupper($client_nom) . "                         ", 0, 24));
+
+        // Domiciliation facultative D1
+        $domiciliation = strtr($rib_dom, [" " => "-", CHR(13) => " ", CHR(10) => ""]);
+        fputs($this->file, substr($domiciliation . "                         ", 0, 24));
+
+        // Zone Reservee D2
+
+        fputs($this->file, substr("                             ", 0, 8));
+
+        // Code Guichet  D3
+
+        fputs($this->file, $rib_guichet);
+
+        // Numero de compte D4
+
+        fputs($this->file, substr("000000000000000" . $rib_number, -11));
+
+        // Zone E Montant
+
+        $montant = (round($amount, 2) * 100);
+
+        fputs($this->file, substr("000000000000000" . $montant, -16));
+
+        // Libelle F
+
+        fputs($this->file, substr("*_" . $ref . "_RDVnet" . $rowid . "                               ", 0, 31));
+
+        // Code etablissement G1
+
+        fputs($this->file, $rib_banque);
+
+        // Zone Reservee G2
+
+        fputs($this->file, substr("                                        ", 0, 5));
+
+        fputs($this->file, "\n");
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Write recipient of request (customer)
+     *
+     * @param string              $row_code_client       soc.code_client as code,
+     * @param string              $row_nom               pl.client_nom AS name,
+     * @param string              $row_address           soc.address AS adr,
+     * @param string              $row_zip               soc.zip
+     * @param string              $row_town              soc.town
+     * @param string              $row_country_code      c.code AS country,
+     * @param string              $row_cb                pl.code_banque AS cb,        Not used for SEPA
+     * @param	string		$row_cg				pl.code_guichet AS cg,		Not used for SEPA
 	 *	@param	string		$row_cc				pl.number AS cc,			Not used for SEPA
 	 *	@param	string		$row_somme			pl.amount AS somme,
 	 *	@param	string		$row_ref			f.ref
@@ -1645,31 +1999,89 @@ public $statut;
 			$XML_CREDITOR .= '					<Id>'.$CrLf;
 			$XML_CREDITOR .= '						<IBAN>'.preg_replace('/\s/', '', $row_iban).'</IBAN>'.$CrLf;
 			$XML_CREDITOR .= '					</Id>'.$CrLf;
-			$XML_CREDITOR .= '				</CdtrAcct>'.$CrLf;
-			$XML_CREDITOR .= '				<RmtInf>'.$CrLf;
-			// A string with some information on payment - 140 max
-			$XML_CREDITOR .= '					<Ustrd>'.(($conf->global->PRELEVEMENT_USTRD != "") ? $conf->global->PRELEVEMENT_USTRD : dol_trunc($row_ref, 135)).'</Ustrd>'.$CrLf; // 140 max
-			$XML_CREDITOR .= '				</RmtInf>'.$CrLf;
-			$XML_CREDITOR .= '			</CdtTrfTxInf>'.$CrLf;
-			return $XML_CREDITOR;
-		}
-	}
+            $XML_CREDITOR .= '				</CdtrAcct>' . $CrLf;
+            $XML_CREDITOR .= '				<RmtInf>' . $CrLf;
+            // A string with some information on payment - 140 max
+            $XML_CREDITOR .= '					<Ustrd>' . (($conf->global->PRELEVEMENT_USTRD != "") ? $conf->global->PRELEVEMENT_USTRD : dol_trunc($row_ref, 135)) . '</Ustrd>' . $CrLf; // 140 max
+            $XML_CREDITOR .= '				</RmtInf>' . $CrLf;
+            $XML_CREDITOR .= '			</CdtTrfTxInf>' . $CrLf;
+            return $XML_CREDITOR;
+        }
+    }
 
-	/**
-	 * Generate dynamically a RUM number for a customer bank account
-	 *
-	 * @param	string		$row_code_client	Customer code (soc.code_client)
-	 * @param	int			$row_datec			Creation date of bank account (rib.datec)
-	 * @param	string		$row_drum			Id of customer bank account (rib.rowid)
-	 * @return 	string		RUM number
-	 */
-	public static function buildRumNumber($row_code_client, $row_datec, $row_drum)
-	{
-		global $langs;
-		$pre = substr(dol_string_nospecial(dol_string_unaccent($langs->transnoentitiesnoconv('RUM'))), 0, 3); // Must always be on 3 char ('RUM' or 'UMR'. This is a protection against bad translation)
-		return $pre.'-'.$row_code_client.'-'.$row_drum.'-'.date('U', $row_datec);
-	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Write sender of request (me).
+     *
+     * @param string $type 'direct-debit' or 'bank-transfer'
+     *
+     * @return    void
+     * @see EnregEmetteurSEPA()
+     */
+    public function EnregEmetteur($type = 'direct-debit')
+    {
+        // phpcs:enable
+        fputs($this->file, "03");
+        fputs($this->file, "08"); // Prelevement ordinaire
+
+        fputs($this->file, "        "); // Zone Reservee B2
+
+        fputs($this->file, $this->emetteur_ics); // ICS
+
+        // Date d'echeance C1
+
+        fputs($this->file, "       ");
+        fputs($this->file, strftime("%d%m", $this->date_echeance));
+        fputs($this->file, substr(strftime("%y", $this->date_echeance), 1));
+
+        // Raison Sociale C2
+
+        fputs($this->file, substr($this->raison_sociale . "                           ", 0, 24));
+
+        // Reference de la remise creancier D1 sur 7 caracteres
+
+        fputs($this->file, substr($this->reference_remise . "                           ", 0, 7));
+
+        // Zone Reservee D1-2
+
+        fputs($this->file, substr("                                    ", 0, 17));
+
+        // Zone Reservee D2
+
+        fputs($this->file, substr("                             ", 0, 2));
+        fputs($this->file, "E");
+        fputs($this->file, substr("                             ", 0, 5));
+
+        // Code Guichet  D3
+
+        fputs($this->file, $this->emetteur_code_guichet);
+
+        // Numero de compte D4
+
+        fputs($this->file, substr("000000000000000" . $this->emetteur_numero_compte, -11));
+
+        // Zone Reservee E
+
+        fputs($this->file, substr("                                        ", 0, 16));
+
+        // Zone Reservee F
+
+        fputs($this->file, substr("                                        ", 0, 31));
+
+        // Code etablissement
+
+        fputs($this->file, $this->emetteur_code_banque);
+
+        // Zone Reservee G
+
+        fputs($this->file, substr("                                        ", 0, 5));
+
+        fputs($this->file, "\n");
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Write sender of request (me).
 	 *  Note: The tag PmtInf is opened here but closed into caller
@@ -1863,166 +2275,65 @@ public $statut;
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Get object and lines from database
-	 *
-	 *  @param	User	$user		Object user that delete
-	 *  @param	int		$notrigger	1=Does not execute triggers, 0= execute triggers
-	 *  @return	int					>0 if OK, <0 if KO
-	 */
-	public function delete($user = null, $notrigger = 0)
-	{
-		$this->db->begin();
+    /**
+     *    Write end
+     *
+     * @param int $total total amount
+     * @return    void
+     */
+    public function EnregTotal($total)
+    {
+        // phpcs:enable
+        fputs($this->file, "08");
+        fputs($this->file, "08"); // Prelevement ordinaire
 
-		$error = 0;
-		$resql1 = $resql2 = $resql3 = $resql4 = 0;
+        fputs($this->file, "        "); // Zone Reservee B2
 
-		if (!$notrigger) {
-			$triggername = 'DIRECT_DEBIT_ORDER_DELETE';
-			if ($this->type == 'bank-transfer') {
-				$triggername = 'PAYMENTBYBANKTRANFER_DELETE';
-			}
-			// Call trigger
-			$result = $this->call_trigger($triggername, $user);
-			if ($result < 0) {
-				$error++;
-			}
-			// End call triggers
-		}
+        fputs($this->file, $this->emetteur_ics); // ICS
 
-		if (!$error) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."prelevement_facture WHERE fk_prelevement_lignes IN (SELECT rowid FROM ".MAIN_DB_PREFIX."prelevement_lignes WHERE fk_prelevement_bons = ".((int) $this->id).")";
-			$resql1 = $this->db->query($sql);
-			if (!$resql1) {
-				dol_print_error($this->db);
-			}
-		}
+        // Reserve C1
 
-		if (!$error) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."prelevement_lignes WHERE fk_prelevement_bons = ".((int) $this->id);
-			$resql2 = $this->db->query($sql);
-			if (!$resql2) {
-				dol_print_error($this->db);
-			}
-		}
+        fputs($this->file, substr("                           ", 0, 12));
 
-		if (!$error) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."prelevement_bons WHERE rowid = ".((int) $this->id);
-			$resql3 = $this->db->query($sql);
-			if (!$resql3) {
-				dol_print_error($this->db);
-			}
-		}
+        // Raison Sociale C2
 
-		if (!$error) {
-			$sql = "UPDATE ".MAIN_DB_PREFIX."prelevement_facture_demande SET fk_prelevement_bons = NULL, traite = 0 WHERE fk_prelevement_bons = ".((int) $this->id);
-			$resql4 = $this->db->query($sql);
-			if (!$resql4) {
-				dol_print_error($this->db);
-			}
-		}
+        fputs($this->file, substr("                           ", 0, 24));
 
-		if ($resql1 && $resql2 && $resql3 && $resql4 && !$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        // D1
 
-	/**
-	 *	Returns clickable name (with picto)
-	 *
-	 *  @param  int     $withpicto                  Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
-	 *  @param  string  $option                     On what the link point to ('nolink', ...)
-	 *  @param  int     $notooltip                  1=Disable tooltip
-	 *  @param  string  $morecss                    Add more css on link
-	 *  @param  int     $save_lastsearch_value      -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *	@return	string								URL of target
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
-	{
-		global $conf, $langs, $hookmanager;
+        fputs($this->file, substr("                                    ", 0, 24));
 
-		if (!empty($conf->dol_no_mouse_hover)) {
-			$notooltip = 1; // Force disable tooltips
-		}
+        // Zone Reservee D2
 
-		$result = '';
+        fputs($this->file, substr("                             ", 0, 8));
 
-		$labeltoshow = 'PaymentByDirectDebit';
-		if ($this->type == 'bank-transfer') {
-			$labeltoshow = 'PaymentByBankTransfer';
-		}
+        // Code Guichet  D3
 
-		$label = '<u>'.$langs->trans($labeltoshow).'</u>';
-		$label .= '<br>';
-		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
-		if (isset($this->statut)) {
-			$label .= '<br><b>'.$langs->trans("Status").":</b> ".$this->getLibStatut(5);
-		}
+        fputs($this->file, substr("                             ", 0, 5));
 
-		$url = DOL_URL_ROOT.'/compta/prelevement/card.php?id='.$this->id;
-		if ($this->type == 'bank-transfer') {
-			$url = DOL_URL_ROOT.'/compta/prelevement/card.php?id='.$this->id;
-		}
+        // Numero de compte D4
 
-		if ($option != 'nolink') {
-			// Add param to save lastsearch_values or not
-			$add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
-			if ($save_lastsearch_value == -1 && preg_match('/list\.php/', $_SERVER["PHP_SELF"])) {
-				$add_save_lastsearch_values = 1;
-			}
-			if ($add_save_lastsearch_values) {
-				$url .= '&save_lastsearch_values=1';
-			}
-		}
+        fputs($this->file, substr("                             ", 0, 11));
 
-		$linkclose = '';
-		if (empty($notooltip)) {
-			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$label = $langs->trans("ShowMyObject");
-				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
-			}
-			$linkclose .= ' title="'.dol_escape_htmltag($label, 1).'"';
-			$linkclose .= ' class="classfortooltip'.($morecss ? ' '.$morecss : '').'"';
+        // Zone E Montant
 
-			/*
-			 $hookmanager->initHooks(array('myobjectdao'));
-			 $parameters=array('id'=>$this->id);
-			 $reshook=$hookmanager->executeHooks('getnomurltooltip',$parameters,$this,$action);    // Note that $action and $object may have been modified by some hooks
-			 if ($reshook > 0) $linkclose = $hookmanager->resPrint;
-			 */
-		} else {
-			$linkclose = ($morecss ? ' class="'.$morecss.'"' : '');
-		}
+        $montant = ($total * 100);
 
-		$linkstart = '<a href="'.$url.'"';
-		$linkstart .= $linkclose.'>';
-		$linkend = '</a>';
+        fputs($this->file, substr("000000000000000" . $montant, -16));
 
-		$result .= $linkstart;
-		if ($withpicto) {
-			$result .= img_object(($notooltip ? '' : $label), ($this->picto ? $this->picto : 'generic'), ($notooltip ? (($withpicto != 2) ? 'class="paddingright"' : '') : 'class="'.(($withpicto != 2) ? 'paddingright ' : '').'classfortooltip"'), 0, 0, $notooltip ? 0 : 1);
-		}
-		if ($withpicto != 2) {
-			$result .= $this->ref;
-		}
-		$result .= $linkend;
-		//if ($withpicto != 2) $result.=(($addlabel && $this->label) ? $sep . dol_trunc($this->label, ($addlabel > 1 ? $addlabel : 0)) : '');
+        // Zone Reservee F
 
-		global $action, $hookmanager;
-		$hookmanager->initHooks(array('banktransferdao'));
-		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) {
-			$result = $hookmanager->resPrint;
-		} else {
-			$result .= $hookmanager->resPrint;
-		}
+        fputs($this->file, substr("                                        ", 0, 31));
 
-		return $result;
+        // Code etablissement
+
+        fputs($this->file, substr("                                        ", 0, 5));
+
+        // Zone Reservee F
+
+        fputs($this->file, substr("                                        ", 0, 5));
+
+        fputs($this->file, "\n");
 	}
 
 	/**
@@ -2036,9 +2347,7 @@ public $statut;
 		return $this->LibStatut($this->statut, $mode);
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return status label for a status
 	 *
@@ -2074,299 +2383,5 @@ public $statut;
 		}
 
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Delete a notification def by id
-	 *
-	 *	@param	int		$rowid		id of notification
-	 *	@return	int					0 if OK, <0 if KO
-	 */
-	public function deleteNotificationById($rowid)
-	{
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."notify_def";
-		$sql .= " WHERE rowid = ".((int) $rowid);
-
-		if ($this->db->query($sql)) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Add a notification
-	 *
-	 *	@param	DoliDB		$db			database handler
-	 *	@param	int|User	$user		notification user
-	 *	@param	string		$action		notification action
-	 *	@return	int						0 if OK, <0 if KO
-	 */
-	public function addNotification($db, $user, $action)
-	{
-		// phpcs:enable
-		$result = 0;
-
-		if (is_object($user)) {
-			$userid = $user->id;
-		} else {	// If user is an id
-			$userid = $user;
-		}
-
-		if ($this->deleteNotification($user, $action) == 0) {
-			$now = dol_now();
-
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."notify_def (datec,fk_user, fk_soc, fk_contact, fk_action)";
-			$sql .= " VALUES ('".$this->db->idate($now)."', ".((int) $userid).", 'NULL', 'NULL', '".$this->db->escape($action)."')";
-
-			dol_syslog("adnotiff: ".$sql);
-			if ($this->db->query($sql)) {
-				$result = 0;
-			} else {
-				$result = -1;
-				dol_syslog(get_class($this)."::addNotification Error $result");
-			}
-		}
-
-		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Delete a notification
-	 *
-	 *	@param	int|User	$user		notification user
-	 *	@param	string		$action		notification action
-	 *	@return	int						>0 if OK, <0 if KO
-	 */
-	public function deleteNotification($user, $action)
-	{
-		if (is_object($user)) {
-			$userid = $user->id;
-		} else {	// If user is an id
-			$userid = $user;
-		}
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."notify_def";
-		$sql .= " WHERE fk_user=".((int) $userid)." AND fk_action='".$this->db->escape($action)."'";
-
-		if ($this->db->query($sql)) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Write recipient of request (customer)
-	 *
-	 *	@param	int		$rowid			id of line
-	 *	@param	string	$client_nom		name of customer
-	 *	@param	string	$rib_banque		code of bank
-	 *	@param	string	$rib_guichet 	code of bank office
-	 *	@param	string	$rib_number		bank account
-	 *	@param	float	$amount			amount
-	 *	@param	string	$ref		ref of invoice
-	 *	@param	int		$facid			id of invoice
-	 *  @param	string	$rib_dom		rib domiciliation
-	 *  @param	string	$type			'direct-debit' or 'bank-transfer'
-	 *	@return	void
-	 *  @see EnregDestinataireSEPA()
-	 */
-	public function EnregDestinataire($rowid, $client_nom, $rib_banque, $rib_guichet, $rib_number, $amount, $ref, $facid, $rib_dom = '', $type = 'direct-debit')
-	{
-		// phpcs:enable
-		fputs($this->file, "06");
-		fputs($this->file, "08"); // Prelevement ordinaire
-
-		fputs($this->file, "        "); // Zone Reservee B2
-
-		fputs($this->file, $this->emetteur_ics); // ICS
-
-		// Date d'echeance C1
-
-		fputs($this->file, "       ");
-		fputs($this->file, strftime("%d%m", $this->date_echeance));
-		fputs($this->file, substr(strftime("%y", $this->date_echeance), 1));
-
-		// Raison Sociale Destinataire C2
-
-		fputs($this->file, substr(strtoupper($client_nom)."                         ", 0, 24));
-
-		// Domiciliation facultative D1
-		$domiciliation = strtr($rib_dom, array(" " => "-", CHR(13) => " ", CHR(10) => ""));
-		fputs($this->file, substr($domiciliation."                         ", 0, 24));
-
-		// Zone Reservee D2
-
-		fputs($this->file, substr("                             ", 0, 8));
-
-		// Code Guichet  D3
-
-		fputs($this->file, $rib_guichet);
-
-		// Numero de compte D4
-
-		fputs($this->file, substr("000000000000000".$rib_number, -11));
-
-		// Zone E Montant
-
-		$montant = (round($amount, 2) * 100);
-
-		fputs($this->file, substr("000000000000000".$montant, -16));
-
-		// Libelle F
-
-		fputs($this->file, substr("*_".$ref."_RDVnet".$rowid."                               ", 0, 31));
-
-		// Code etablissement G1
-
-		fputs($this->file, $rib_banque);
-
-		// Zone Reservee G2
-
-		fputs($this->file, substr("                                        ", 0, 5));
-
-		fputs($this->file, "\n");
-	}
-
-	/**
-	 *	Write sender of request (me).
-	 *
-	 *  @param	string		$type				'direct-debit' or 'bank-transfer'
-	 *	@return	void
-	 *  @see EnregEmetteurSEPA()
-	 */
-	public function EnregEmetteur($type = 'direct-debit')
-	{
-		// phpcs:enable
-		fputs($this->file, "03");
-		fputs($this->file, "08"); // Prelevement ordinaire
-
-		fputs($this->file, "        "); // Zone Reservee B2
-
-		fputs($this->file, $this->emetteur_ics); // ICS
-
-		// Date d'echeance C1
-
-		fputs($this->file, "       ");
-		fputs($this->file, strftime("%d%m", $this->date_echeance));
-		fputs($this->file, substr(strftime("%y", $this->date_echeance), 1));
-
-		// Raison Sociale C2
-
-		fputs($this->file, substr($this->raison_sociale."                           ", 0, 24));
-
-		// Reference de la remise creancier D1 sur 7 caracteres
-
-		fputs($this->file, substr($this->reference_remise."                           ", 0, 7));
-
-		// Zone Reservee D1-2
-
-		fputs($this->file, substr("                                    ", 0, 17));
-
-		// Zone Reservee D2
-
-		fputs($this->file, substr("                             ", 0, 2));
-		fputs($this->file, "E");
-		fputs($this->file, substr("                             ", 0, 5));
-
-		// Code Guichet  D3
-
-		fputs($this->file, $this->emetteur_code_guichet);
-
-		// Numero de compte D4
-
-		fputs($this->file, substr("000000000000000".$this->emetteur_numero_compte, -11));
-
-		// Zone Reservee E
-
-		fputs($this->file, substr("                                        ", 0, 16));
-
-		// Zone Reservee F
-
-		fputs($this->file, substr("                                        ", 0, 31));
-
-		// Code etablissement
-
-		fputs($this->file, $this->emetteur_code_banque);
-
-		// Zone Reservee G
-
-		fputs($this->file, substr("                                        ", 0, 5));
-
-		fputs($this->file, "\n");
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Write end
-	 *
-	 *	@param	int		$total	total amount
-	 *	@return	void
-	 */
-	public function EnregTotal($total)
-	{
-		// phpcs:enable
-		fputs($this->file, "08");
-		fputs($this->file, "08"); // Prelevement ordinaire
-
-		fputs($this->file, "        "); // Zone Reservee B2
-
-		fputs($this->file, $this->emetteur_ics); // ICS
-
-		// Reserve C1
-
-		fputs($this->file, substr("                           ", 0, 12));
-
-
-		// Raison Sociale C2
-
-		fputs($this->file, substr("                           ", 0, 24));
-
-		// D1
-
-		fputs($this->file, substr("                                    ", 0, 24));
-
-		// Zone Reservee D2
-
-		fputs($this->file, substr("                             ", 0, 8));
-
-		// Code Guichet  D3
-
-		fputs($this->file, substr("                             ", 0, 5));
-
-		// Numero de compte D4
-
-		fputs($this->file, substr("                             ", 0, 11));
-
-		// Zone E Montant
-
-		$montant = ($total * 100);
-
-		fputs($this->file, substr("000000000000000".$montant, -16));
-
-		// Zone Reservee F
-
-		fputs($this->file, substr("                                        ", 0, 31));
-
-		// Code etablissement
-
-		fputs($this->file, substr("                                        ", 0, 5));
-
-		// Zone Reservee F
-
-		fputs($this->file, substr("                                        ", 0, 5));
-
-		fputs($this->file, "\n");
 	}
 }

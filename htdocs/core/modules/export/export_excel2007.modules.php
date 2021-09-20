@@ -279,33 +279,6 @@ class ExportExcel2007 extends ModeleExports
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Convert a column to letter (1->A, 0->B, 27->AA, ...)
-	 *
-	 * @param 	int		$c		Column position
-	 * @return 	string			Letter
-	 */
-	public function column2Letter($c)
-	{
-
-		$c = intval($c);
-		if ($c <= 0) {
-			return '';
-		}
-
-		while ($c != 0) {
-			$p = ($c - 1) % 26;
-			$c = intval(($c - $p) / 26);
-			$letter = chr(65 + $p).$letter;
-		}
-
-		return $letter;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Output record line into file
 	 *
@@ -383,83 +356,159 @@ class ExportExcel2007 extends ModeleExports
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Clean a cell to respect rules of Excel file cells
-	 *
-	 * @param 	string	$newvalue	String to clean
-	 * @return 	string				Value cleaned
-	 */
-	public function excel_clean($newvalue)
-	{
-		// phpcs:enable
-		// Rule Dolibarr: No HTML
-		$newvalue = dol_string_nohtmltag($newvalue);
-
-		return $newvalue;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Write footer
-	 *
-	 * 	@param		Translate	$outputlangs	Output language object
-	 * 	@return		int							<0 if KO, >0 if OK
-	 */
-	public function write_footer($outputlangs)
-	{
-		// phpcs:enable
-		return 0;
-	}
+     *
+     * @param Translate $outputlangs Output language object
+     * @return        int                            <0 if KO, >0 if OK
+     */
+    public function write_footer($outputlangs)
+    {
+        // phpcs:enable
+        return 0;
+    }
 
-	/**
-	 *	Close Excel file
-	 *
-	 * 	@return		int							<0 if KO, >0 if OK
-	 */
-	public function close_file()
-	{
-		// phpcs:enable
-		global $conf;
 
-		$objWriter = new Xlsx($this->workbook);
-		$objWriter->save($this->file);
-		$this->workbook->disconnectWorksheets();
-		unset($this->workbook);
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		return 1;
-	}
+    /**
+     *    Close Excel file
+     *
+     * @return        int                            <0 if KO, >0 if OK
+     */
+    public function close_file()
+    {
+        // phpcs:enable
+        global $conf;
 
-	/**
-	 * Set border style
-	 *
-	 * @param string $thickness style \PhpOffice\PhpSpreadsheet\Style\Border
-	 * @param string $color     color \PhpOffice\PhpSpreadsheet\Style\Color
-	 * @return int 1 if ok
-	 */
+        $objWriter = new Xlsx($this->workbook);
+        $objWriter->save($this->file);
+        $this->workbook->disconnectWorksheets();
+        unset($this->workbook);
+
+        return 1;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Clean a cell to respect rules of Excel file cells
+     *
+     * @param string $newvalue String to clean
+     *
+     * @return    string                Value cleaned
+     */
+    public function excel_clean($newvalue)
+    {
+        // phpcs:enable
+        // Rule Dolibarr: No HTML
+        $newvalue = dol_string_nohtmltag($newvalue);
+
+        return $newvalue;
+    }
+
+    /**
+     * Convert a column to letter (1->A, 0->B, 27->AA, ...)
+     *
+     * @param int $c Column position
+     *
+     * @return    string            Letter
+     */
+    public function column2Letter($c)
+    {
+
+        $c = intval($c);
+        if ($c <= 0) {
+            return '';
+        }
+
+        while ($c != 0) {
+            $p = ($c - 1) % 26;
+            $c = intval(($c - $p) / 26);
+            $letter = chr(65 + $p) . $letter;
+        }
+
+        return $letter;
+    }
+
+    /**
+     * Set cell value and automatically merge if we give an endcell
+     *
+     * @param string $val       cell value
+     * @param string $startCell starting cell
+     * @param string $endCell   ending cell
+     *
+     * @return int 1 if success -1 if failed
+     */
+    public function setCellValue($val, $startCell, $endCell = '')
+    {
+        try {
+            $this->workbook->getActiveSheet()->setCellValue($startCell, $val);
+
+            if (!empty($endCell)) {
+                $cellRange = $startCell . ':' . $endCell;
+                $this->workbook->getActiveSheet()->mergeCells($startCell . ':' . $endCell);
+            } else {
+                $cellRange = $startCell;
+            }
+            if (!empty($this->styleArray)) {
+                $this->workbook->getActiveSheet()->getStyle($cellRange)->applyFromArray($this->styleArray);
+            }
+        } catch (Exception $e) {
+            $this->error = $e->getMessage();
+            return -1;
+        }
+        return 1;
+    }
+
+    /**
+     * Set border style
+     *
+     * @param string $thickness style \PhpOffice\PhpSpreadsheet\Style\Border
+     * @param string $color     color \PhpOffice\PhpSpreadsheet\Style\Color
+     *
+     * @return int 1 if ok
+     */
 	public function setBorderStyle($thickness, $color)
-	{
-		$this->styleArray['borders'] = array(
-			'outline' => array(
-				'borderStyle' => $thickness,
-				'color' => array('argb' => $color)
-			)
-		);
-		return 1;
-	}
+    {
+        $this->styleArray['borders'] = [
+            'outline' => [
+                'borderStyle' => $thickness,
+                'color' => ['argb' => $color],
+            ],
+        ];
+        return 1;
+    }
 
-	/**
-	 * Set alignment style (horizontal, left, right, ...)
-	 *
-	 * @param string $horizontal PhpOffice\PhpSpreadsheet\Style\Alignment
-	 * @return int 1
-	 */
-	public function setAlignmentStyle($horizontal)
-	{
-		$this->styleArray['alignment'] = array('horizontal' => $horizontal);
-		return 1;
+    /**
+     * Set font style
+     *
+     * @param bool   $bold  true if bold
+     * @param string $color color \PhpOffice\PhpSpreadsheet\Style\Color
+     *
+     * @return int 1
+     */
+    public function setFontStyle($bold, $color)
+    {
+        $this->styleArray['font'] = [
+            'color' => ['argb' => $color],
+            'bold' => $bold,
+        ];
+        return 1;
+    }
+
+    /**
+     * Set alignment style (horizontal, left, right, ...)
+     *
+     * @param string $horizontal PhpOffice\PhpSpreadsheet\Style\Alignment
+     *
+     * @return int 1
+     */
+    public function setAlignmentStyle($horizontal)
+    {
+        $this->styleArray['alignment'] = array('horizontal' => $horizontal);
+        return 1;
 	}
 
 	/**
@@ -504,51 +553,6 @@ class ExportExcel2007 extends ModeleExports
 					}
 					$startColumn++;
 				}
-			}
-		} catch (Exception $e) {
-			$this->error = $e->getMessage();
-			return -1;
-		}
-		return 1;
-	}
-
-	/**
-	 * Set font style
-	 *
-	 * @param bool   $bold  true if bold
-	 * @param string $color color \PhpOffice\PhpSpreadsheet\Style\Color
-	 * @return int 1
-	 */
-	public function setFontStyle($bold, $color)
-	{
-		$this->styleArray['font'] = array(
-			'color' => array('argb' => $color),
-			'bold' => $bold
-		);
-		return 1;
-	}
-
-	/**
-	 * Set cell value and automatically merge if we give an endcell
-	 *
-	 * @param string $val cell value
-	 * @param string $startCell starting cell
-	 * @param string $endCell  ending cell
-	 * @return int 1 if success -1 if failed
-	 */
-	public function setCellValue($val, $startCell, $endCell = '')
-	{
-		try {
-			$this->workbook->getActiveSheet()->setCellValue($startCell, $val);
-
-			if (!empty($endCell)) {
-				$cellRange = $startCell.':'.$endCell;
-				$this->workbook->getActiveSheet()->mergeCells($startCell.':'.$endCell);
-			} else {
-				$cellRange = $startCell;
-			}
-			if (!empty($this->styleArray)) {
-				$this->workbook->getActiveSheet()->getStyle($cellRange)->applyFromArray($this->styleArray);
 			}
 		} catch (Exception $e) {
 			$this->error = $e->getMessage();

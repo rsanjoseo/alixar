@@ -196,8 +196,8 @@ foreach ($dirmodels as $reldir) {
 						if ($conf->global->TAKEPOS_REF_ADDON == "$file") {
 							print img_picto($langs->trans("Activated"), 'switch_on');
 						} else {
-							print '<a href="'.$_SERVER["PHP_SELF"].'?action=setrefmod&amp;token='.newToken().'&amp;value='.urlencode($file).'">';
-							print img_picto($langs->trans("Disabled"), 'switch_off');
+							print '<a href="' . $_SERVER["PHP_SELF"] . '?action=setrefmod&token=' . newToken() . '&value=' . urlencode($file) . '">';
+                            print img_picto($langs->trans("Disabled"), 'switch_off');
 							print '</a>';
 						}
 						print '</td>';

@@ -273,22 +273,34 @@ if (empty($reshook) && $action == 'add') {
 	}
 
 	if (!$error) {
-		// Initialisation objet actioncomm
-		$object->priority = GETPOSTISSET("priority") ? GETPOST("priority", "int") : 0;
-		$object->fulldayevent = (!empty($fulldayevent) ? 1 : 0);
-		$object->location = GETPOST("location", 'alphanohtml');
-		$object->label = GETPOST('label', 'alphanohtml');
-		$object->fk_element = GETPOST("fk_element", 'int');
-		$object->elementtype = GETPOST("elementtype", 'alpha');
-		if (!GETPOST('label')) {
-			if (GETPOST('actioncode', 'aZ09') == 'AC_RDV' && $contact->getFullName($langs)) {
-				$object->label = $langs->transnoentitiesnoconv("TaskRDVWith", $contact->getFullName($langs));
-			} else {
-				if ($langs->trans("Action".$object->type_code) != "Action".$object->type_code) {
-					$object->label = $langs->transnoentitiesnoconv("Action".$object->type_code)."\n";
-				} else {
-					$cactioncomm->fetch($object->type_code);
-					$object->label = $cactioncomm->label;
+        // Initialisation objet actioncomm
+        $object->priority = GETPOSTISSET("priority") ? GETPOST("priority", "int") : 0;
+        $object->fulldayevent = (!empty($fulldayevent) ? 1 : 0);
+        $object->location = GETPOST("location", 'alphanohtml');
+        $object->label = GETPOST('label', 'alphanohtml');
+
+        if (GETPOST("elementtype", 'alpha')) {
+            $modulecodetouseforpermissioncheck = GETPOST("elementtype", 'alpha');
+
+            $hasPermissionOnLinkedObject = 0;
+            if ($user->hasRight($modulecodetouseforpermissioncheck, 'read')) {
+                $hasPermissionOnLinkedObject = 1;
+            }
+            if ($hasPermissionOnLinkedObject) {
+                $object->fk_element = GETPOST("fk_element", 'int');
+                $object->elementtype = GETPOST("elementtype", 'alpha');
+            }
+        }
+
+        if (!GETPOST('label')) {
+            if (GETPOST('actioncode', 'aZ09') == 'AC_RDV' && $contact->getFullName($langs)) {
+                $object->label = $langs->transnoentitiesnoconv("TaskRDVWith", $contact->getFullName($langs));
+            } else {
+                if ($langs->trans("Action" . $object->type_code) != "Action" . $object->type_code) {
+                    $object->label = $langs->transnoentitiesnoconv("Action" . $object->type_code) . "\n";
+                } else {
+                    $cactioncomm->fetch($object->type_code);
+                    $object->label = $cactioncomm->label;
 				}
 			}
 		}
@@ -510,28 +522,41 @@ if (empty($reshook) && $action == 'update') {
 		$object->socid       = GETPOST("socid", "int");
 		$socpeopleassigned   = GETPOST("socpeopleassigned", 'array');
 		$object->socpeopleassigned = array();
-		foreach ($socpeopleassigned as $cid) {
-			$object->socpeopleassigned[$cid] = array('id' => $cid);
-		}
-		$object->contact_id = GETPOST("contactid", 'int');
-		if (empty($object->contact_id) && !empty($object->socpeopleassigned)) {
-			reset($object->socpeopleassigned);
-			$object->contact_id = key($object->socpeopleassigned);
-		}
-		$object->fk_project  = GETPOST("projectid", 'int');
-		$object->note_private = trim(GETPOST("note", "restricthtml"));
-		$object->fk_element	 = GETPOST("fk_element", "int");
-		$object->elementtype = GETPOST("elementtype", "alphanohtml");
-		if (!$datef && $percentage == 100) {
-			$error++; $donotclearsession = 1;
-			setEventMessages($langs->transnoentitiesnoconv("ErrorFieldRequired", $langs->transnoentitiesnoconv("DateEnd")), $object->errors, 'errors');
-			$action = 'edit';
-		}
+        foreach ($socpeopleassigned as $cid) {
+            $object->socpeopleassigned[$cid] = ['id' => $cid];
+        }
+        $object->contact_id = GETPOST("contactid", 'int');
+        if (empty($object->contact_id) && !empty($object->socpeopleassigned)) {
+            reset($object->socpeopleassigned);
+            $object->contact_id = key($object->socpeopleassigned);
+        }
+        $object->fk_project = GETPOST("projectid", 'int');
+        $object->note_private = trim(GETPOST("note", "restricthtml"));
 
-		$transparency = (GETPOST("transparency") == 'on' ? 1 : 0);
+        if (GETPOST("elementtype", 'alpha')) {
+            $modulecodetouseforpermissioncheck = GETPOST("elementtype", 'alpha');
 
-		// Users
-		$listofuserid = array();
+            $hasPermissionOnLinkedObject = 0;
+            if ($user->hasRight($modulecodetouseforpermissioncheck, 'read')) {
+                $hasPermissionOnLinkedObject = 1;
+            }
+            if ($hasPermissionOnLinkedObject) {
+                $object->fk_element = GETPOST("fk_element", 'int');
+                $object->elementtype = GETPOST("elementtype", 'alpha');
+            }
+        }
+
+        if (!$datef && $percentage == 100) {
+            $error++;
+            $donotclearsession = 1;
+            setEventMessages($langs->transnoentitiesnoconv("ErrorFieldRequired", $langs->transnoentitiesnoconv("DateEnd")), $object->errors, 'errors');
+            $action = 'edit';
+        }
+
+        $transparency = (GETPOST("transparency") == 'on' ? 1 : 0);
+
+        // Users
+        $listofuserid = array();
 		if (!empty($_SESSION['assignedtouser'])) {	// Now concat assigned users
 			// Restore array with key with same value than param 'id'
 			$tmplist1 = json_decode($_SESSION['assignedtouser'], true);
@@ -1191,9 +1216,9 @@ if ($action == 'create') {
 		print img_picto('', 'project', 'class="pictofixedwidth"');
 		print $formproject->select_projects((empty($societe->id) ? '' : $societe->id), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
 
-		print '&nbsp;<a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.(empty($societe->id) ? '' : $societe->id).'&action=create&amp;backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create').'">';
-		print '<span class="fa fa-plus-circle valignmiddle paddingleft" title="'.$langs->trans("AddProject").'"></span></a>';
-		$urloption = '?action=create&donotclearsession=1';
+		print '&nbsp;<a href="' . DOL_URL_ROOT . '/projet/card.php?socid=' . (empty($societe->id) ? '' : $societe->id) . '&action=create&backtopage=' . urlencode($_SERVER["PHP_SELF"] . '?action=create') . '">';
+        print '<span class="fa fa-plus-circle valignmiddle paddingleft" title="' . $langs->trans("AddProject") . '"></span></a>';
+        $urloption = '?action=create&donotclearsession=1';
 		$url = dol_buildpath('comm/action/card.php', 2).$urloption;
 
 		// update task list
@@ -1218,23 +1243,39 @@ if ($action == 'create') {
 		if (!empty($projectid)) {
 			$projectsListId = $projectid;
 		}
-		$tid = GETPOST("projecttaskid") ? GETPOST("projecttaskid") : '';
-		$formproject->selectTasks((!empty($societe->id) ? $societe->id : -1), $tid, 'taskid', 24, 0, '1', 1, 0, 0, 'maxwidth500', $projectsListId);
-		print '</td></tr>';
+		$tid = GETPOSTISSET("projecttaskid") ? GETPOST("projecttaskid", 'int') : (GETPOSTISSET("taskid") ? GETPOST("taskid", 'int') : '');
+        $formproject->selectTasks((!empty($societe->id) ? $societe->id : -1), $tid, 'taskid', 24, 0, '1', 1, 0, 0, 'maxwidth500', $projectsListId);
+        print '</td></tr>';
 	}
 
 	// Object linked
 	if (!empty($origin) && !empty($originid)) {
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-		print '<tr><td class="titlefieldcreate">'.$langs->trans("LinkedObject").'</td>';
-		print '<td colspan="3">'.dolGetElementUrl($originid, $origin, 1).'</td></tr>';
-		print '<input type="hidden" name="fk_element" value="'.GETPOST('originid', 'int').'">';
-		print '<input type="hidden" name="elementtype" value="'.GETPOST('origin').'">';
-		print '<input type="hidden" name="originid" value="'.GETPOST('originid', 'int').'">';
-		print '<input type="hidden" name="origin" value="'.GETPOST('origin').'">';
-	}
+		include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
-	$reg = array();
+        $hasPermissionOnLinkedObject = 0;
+        if ($user->hasRight($origin, 'read')) {
+            $hasPermissionOnLinkedObject = 1;
+        }
+        //var_dump('origin='.$origin.' originid='.$originid.' $hasPermissionOnLinkedObject='.$hasPermissionOnLinkedObject);
+
+        if (!in_array($origin, ['societe', 'project', 'task', 'user'])) {
+            // We do not use link for object that already contains a hard coded field to make links with agenda events
+            print '<tr><td class="titlefieldcreate">' . $langs->trans("LinkedObject") . '</td>';
+            print '<td colspan="3">';
+            if ($hasPermissionOnLinkedObject) {
+                print dolGetElementUrl($originid, $origin, 1);
+                print '<input type="hidden" name="fk_element" value="' . $originid . '">';
+                print '<input type="hidden" name="elementtype" value="' . $origin . '">';
+                print '<input type="hidden" name="originid" value="' . $originid . '">';
+                print '<input type="hidden" name="origin" value="' . $origin . '">';
+            } else {
+                print '<!-- no permission on object to link ' . $origin . ' id ' . $originid . ' -->';
+            }
+            print '</td></tr>';
+        }
+    }
+
+    $reg = array();
 	if (GETPOST("datep") && preg_match('/^([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])$/', GETPOST("datep"), $reg)) {
 		$object->datep = dol_mktime(0, 0, 0, $reg[2], $reg[3], $reg[1]);
 	}
@@ -1847,9 +1888,9 @@ if ($id > 0) {
 			if ($user->rights->agenda->allactions->create ||
 				(($object->authorid == $user->id || $object->userownerid == $user->id) && $user->rights->agenda->myactions->create)) {
 				if ($action != 'classify') {
-					$morehtmlref .= '<a class="editfielda" href="'.$_SERVER['PHP_SELF'].'?action=classify&amp;id='.$object->id.'">'.img_edit($langs->transnoentitiesnoconv('SetProject')).'</a> : ';
-				}
-				if ($action == 'classify') {
+					$morehtmlref .= '<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token=' . newToken() . '&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
+                }
+                if ($action == 'classify') {
 					//$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
 					$morehtmlref .= '<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
 					$morehtmlref .= '<input type="hidden" name="action" value="classin">';

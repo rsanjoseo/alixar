@@ -22,9 +22,9 @@
  * \brief        Setup page to configure journals
  */
 
-//if (!defined('CSRFCHECK_WITH_TOKEN')) {
-//	define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
-//}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1'); // Force use of CSRF protection with tokens even for GET
+}
 
 require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formadmin.class.php';
@@ -36,9 +36,9 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/accounting.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/accountancy/class/accountingjournal.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "compta", "accountancy"));
+$langs->loadLangs(["admin", "compta", "accountancy"]);
 
-$action = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view';
+$action = GETPOST('action', 'aZ09') ? GETPOST('action', 'aZ09') : 'view';
 $confirm = GETPOST('confirm', 'alpha');
 $id = 35;
 $rowid = GETPOST('rowid', 'alpha');

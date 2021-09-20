@@ -40,25 +40,54 @@ class Warehouses extends DolibarrApi
 	 */
 	public $warehouse;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->warehouse = new Entrepot($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->warehouse = new Entrepot($this->db);
+    }
 
-	/**
-	 * List warehouses
-	 *
-	 * Get a list of warehouses
-	 *
-	 * @param string	$sortfield	Sort field
-	 * @param string	$sortorder	Sort order
-	 * @param int		$limit		Limit for list
-	 * @param int		$page		Page number
+    /**
+     * Get properties of a warehouse object
+     *
+     * Return an array with warehouse informations
+     *
+     * @param int $id ID of warehouse
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->stock->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->warehouse->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'warehouse not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('warehouse', $this->warehouse->id)) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        return $this->_cleanObjectDatas($this->warehouse);
+    }
+
+    /**
+     * List warehouses
+     *
+     * Get a list of warehouses
+     *
+     * @param string    $sortfield  Sort field
+     * @param string    $sortorder  Sort order
+     * @param int       $limit      Limit for list
+     * @param int       $page       Page number
 	 * @param  int    $category   Use this param to filter list by category
 	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.label:like:'WH-%') and (t.date_creation:<:'20160101')"
 	 * @return array                Array of warehouse objects
@@ -127,22 +156,6 @@ class Warehouses extends DolibarrApi
 		return $obj_ret;
 	}
 
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Entrepot  $object   Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		// Remove the subscriptions because they are handled as a subresource.
-		//unset($object->subscriptions);
-
-		return $object;
-	}
 
 	/**
 	 * Create warehouse object
@@ -166,26 +179,6 @@ class Warehouses extends DolibarrApi
 			throw new RestException(500, "Error creating warehouse", array_merge(array($this->warehouse->error), $this->warehouse->errors));
 		}
 		return $this->warehouse->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array|null    $data    Data to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$warehouse = array();
-		foreach (Warehouses::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$warehouse[$field] = $data[$field];
-		}
-		return $warehouse;
 	}
 
 	/**
@@ -224,37 +217,6 @@ class Warehouses extends DolibarrApi
 		return false;
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Get properties of a warehouse object
-	 *
-	 * Return an array with warehouse informations
-	 *
-	 * @param 	int 	$id ID of warehouse
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->stock->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->warehouse->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'warehouse not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('warehouse', $this->warehouse->id)) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		return $this->_cleanObjectDatas($this->warehouse);
-	}
-
 	/**
 	 * Delete warehouse
 	 *
@@ -276,14 +238,56 @@ class Warehouses extends DolibarrApi
 		}
 
 		if (!$this->warehouse->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(401, 'error when delete warehouse');
-		}
+            throw new RestException(401, 'error when delete warehouse');
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Warehouse deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Warehouse deleted',
+            ],
+        ];
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Entrepot $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        // Remove the subscriptions because they are handled as a subresource.
+        //unset($object->subscriptions);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array|null $data Data to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $warehouse = [];
+        foreach (Warehouses::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $warehouse[$field] = $data[$field];
+        }
+        return $warehouse;
+    }
 }

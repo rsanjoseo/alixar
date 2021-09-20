@@ -39,7 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'bills', 'banks', 'compta'));
+$langs->loadLangs(['companies', 'bills', 'banks', 'compta']);
 
 $action = GETPOST('action', 'alpha');
 $massaction = GETPOST('massaction', 'alpha');
@@ -48,15 +48,20 @@ $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 've
 
 $socid = GETPOST('socid', 'int');
 
-$search_ref				= GETPOST('search_ref', 'alpha');
-$search_date_startday	= GETPOST('search_date_startday', 'int');
-$search_date_startmonth	= GETPOST('search_date_startmonth', 'int');
-$search_date_startyear	= GETPOST('search_date_startyear', 'int');
-$search_date_endday		= GETPOST('search_date_endday', 'int');
-$search_date_endmonth	= GETPOST('search_date_endmonth', 'int');
-$search_date_endyear	= GETPOST('search_date_endyear', 'int');
-$search_date_start		= dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);	// Use tzserver
-$search_date_end		= dol_mktime(23, 59, 59, $search_date_endmonth, $search_date_endday, $search_date_endyear);
+// Security check
+if ($user->socid) {
+    $socid = $user->socid;
+}
+
+$search_ref = GETPOST('search_ref', 'alpha');
+$search_date_startday = GETPOST('search_date_startday', 'int');
+$search_date_startmonth = GETPOST('search_date_startmonth', 'int');
+$search_date_startyear = GETPOST('search_date_startyear', 'int');
+$search_date_endday = GETPOST('search_date_endday', 'int');
+$search_date_endmonth = GETPOST('search_date_endmonth', 'int');
+$search_date_endyear = GETPOST('search_date_endyear', 'int');
+$search_date_start = dol_mktime(0, 0, 0, $search_date_startmonth, $search_date_startday, $search_date_startyear);    // Use tzserver
+$search_date_end = dol_mktime(23, 59, 59, $search_date_endmonth, $search_date_endday, $search_date_endyear);
 $search_company			= GETPOST('search_company', 'alpha');
 $search_payment_type	= GETPOST('search_payment_type');
 $search_cheque_num		= GETPOST('search_cheque_num', 'alpha');

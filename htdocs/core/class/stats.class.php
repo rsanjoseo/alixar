@@ -29,20 +29,20 @@
  */
 abstract class Stats
 {
-public $cachefilesuffix = '';
-		protected $db; // Dates of cache file read by methods
-	protected $lastfetchdate = array(); // Suffix to add to name of cache file (to avoid file name conflicts)
+    protected $db;
+    protected $lastfetchdate = []; // Dates of cache file read by methods
+    public $cachefilesuffix = ''; // Suffix to add to name of cache file (to avoid file name conflicts)
 
-	/**
-	 * Return nb of elements by month for several years
-	 *
-	 * @param 	int		$endyear		Start year
-	 * @param 	int		$startyear		End year
-	 * @param	int		$cachedelay		Delay we accept for cache file (0=No read, no save of cache, -1=No read but save)
-	 * @param	int		$format			0=Label of abscissa is a translated text, 1=Label of abscissa is month number, 2=Label of abscissa is first letter of month
-	 * @param   int 	$startmonth		month of the fiscal year start min 1 max 12 ; if 1 = january
-	 * @return 	array					Array of values
-	 */
+    /**
+     * Return nb of elements by month for several years
+     *
+     * @param int $endyear    Start year
+     * @param int $startyear  End year
+     * @param int $cachedelay Delay we accept for cache file (0=No read, no save of cache, -1=No read but save)
+     * @param int $format     0=Label of abscissa is a translated text, 1=Label of abscissa is month number, 2=Label of abscissa is first letter of month
+     * @param int $startmonth month of the fiscal year start min 1 max 12 ; if 1 = january
+     * @return    array                    Array of values
+     */
 	public function getNbByMonthWithPrevYear($endyear, $startyear, $cachedelay = 0, $format = 0, $startmonth = 1)
 	{
 		global $conf, $user, $langs;

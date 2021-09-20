@@ -193,122 +193,42 @@ class EvalMath
 	}
 
 	/**
-	 * trigger an error, but nicely, if need be
-	 *
-	 * @param string $code		   	Code
-	 * @param string $msg			Msg
-	 * @param string|null $info		String
-	 * @return boolean 				False
-	 */
-	public function trigger($code, $msg, $info = null)
-	{
-		$this->last_error = $msg;
-		$this->last_error_code = array($code, $info);
-		if (!$this->suppress_errors) {
-			trigger_error($msg, E_USER_WARNING);
-		}
-		return false;
-	}
+     * vars
+     *
+     * @return string Output
+     */
+    public function vars()
+    {
+        $output = $this->v;
+        unset($output['pi']);
+        unset($output['e']);
+        return $output;
+    }
 
-	/**
-	 * evaluate postfix notation
-	 *
-	 * @param string $tokens      	Expression
-	 * @param array $vars       	Array
-	 * @return string 				Output
-	 */
-	private function pfx($tokens, $vars = array())
-	{
-		if ($tokens == false) {
-			return false;
-		}
+    /**
+     * vars
+     *
+     * @return string Output
+     */
+    private function funcs()
+    {
+        $output = [];
+        foreach ($this->f as $fnn => $dat) {
+            $output[] = $fnn . '(' . implode(',', $dat['args']) . ')';
+        }
+        return $output;
+    }
 
-		$stack = new EvalMathStack();
+    // ===================== HERE BE INTERNAL METHODS ====================\\
 
-		foreach ($tokens as $token) { // nice and easy
-									  // if the token is a binary operator, pop two values off the stack, do the operation, and push the result back on
-			$matches = array();
-			if (in_array($token, array('+', '-', '*', '/', '^'))) {
-				if (is_null($op2 = $stack->pop())) {
-					return $this->trigger(12, "internal error");
-				}
-				if (is_null($op1 = $stack->pop())) {
-					return $this->trigger(13, "internal error");
-				}
-				switch ($token) {
-					case '+':
-						$stack->push($op1 + $op2);
-						break;
-					case '-':
-						$stack->push($op1 - $op2);
-						break;
-					case '*':
-						$stack->push($op1 * $op2);
-						break;
-					case '/':
-						if ($op2 == 0) {
-							return $this->trigger(14, "division by zero");
-						}
-						$stack->push($op1 / $op2);
-						break;
-					case '^':
-						$stack->push(pow($op1, $op2));
-						break;
-				}
-				// if the token is a unary operator, pop one value off the stack, do the operation, and push it back on
-			} elseif ($token == "_") {
-				$stack->push(-1 * $stack->pop());
-				// if the token is a function, pop arguments off the stack, hand them to the function, and push the result back on
-			} elseif (preg_match("/^([a-z]\w*)\($/", $token, $matches)) { // it's a function!
-				$fnn = $matches[1];
-				if (in_array($fnn, $this->fb)) { // built-in function:
-					if (is_null($op1 = $stack->pop())) {
-						return $this->trigger(15, "internal error");
-					}
-					$fnn = preg_replace("/^arc/", "a", $fnn); // for the 'arc' trig synonyms
-					if ($fnn == 'ln') {
-						$fnn = 'log';
-					}
-					eval('$stack->push('.$fnn.'($op1));'); // perfectly safe eval()
-				} elseif (array_key_exists($fnn, $this->f)) { // user function
-															  // get args
-					$args = array();
-					for ($i = count($this->f[$fnn]['args']) - 1; $i >= 0; $i--) {
-						if (is_null($args[$this->f[$fnn]['args'][$i]] = $stack->pop())) {
-							return $this->trigger(16, "internal error");
-						}
-					}
-					$stack->push($this->pfx($this->f[$fnn]['func'], $args)); // yay... recursion!!!!
-				}
-				// if the token is a number or variable, push it on the stack
-			} else {
-				if (is_numeric($token)) {
-					$stack->push($token);
-				} elseif (array_key_exists($token, $this->v)) {
-					$stack->push($this->v[$token]);
-				} elseif (array_key_exists($token, $vars)) {
-					$stack->push($vars[$token]);
-				} else {
-					return $this->trigger(17, "undefined variable '$token'", $token);
-				}
-			}
-		}
-		// when we're out of tokens, the stack should have a single element, the final result
-		if ($stack->count != 1) {
-			return $this->trigger(18, "internal error");
-		}
-		return $stack->pop();
-	}
-
-	// ===================== HERE BE INTERNAL METHODS ====================\\
-
-	/**
-	 * Convert infix to postfix notation
-	 *
-	 * @param string $expr		Expression
-	 * @return string 			Output
-	 */
-	private function nfx($expr)
+    /**
+     * Convert infix to postfix notation
+     *
+     * @param string $expr Expression
+     *
+     * @return string            Output
+     */
+    private function nfx($expr)
 	{
 		$index = 0;
 		$stack = new EvalMathStack();
@@ -447,31 +367,112 @@ class EvalMath
 	}
 
 	/**
-	 * vars
-	 *
-	 * @return string Output
-	 */
-	public function vars()
-	{
-		$output = $this->v;
-		unset($output['pi']);
-		unset($output['e']);
-		return $output;
-	}
+     * evaluate postfix notation
+     *
+     * @param string $tokens Expression
+     * @param array  $vars   Array
+     * @return string                Output
+     */
+    private function pfx($tokens, $vars = [])
+    {
+        if ($tokens == false) {
+            return false;
+        }
 
-	/**
-	 * vars
-	 *
-	 * @return string Output
-	 */
-	private function funcs()
-	{
-		$output = array();
-		foreach ($this->f as $fnn => $dat) {
-			$output[] = $fnn.'('.implode(',', $dat['args']).')';
-		}
-		return $output;
-	}
+        $stack = new EvalMathStack();
+
+        foreach ($tokens as $token) { // nice and easy
+            // if the token is a binary operator, pop two values off the stack, do the operation, and push the result back on
+            $matches = [];
+            if (in_array($token, ['+', '-', '*', '/', '^'])) {
+                if (is_null($op2 = $stack->pop())) {
+                    return $this->trigger(12, "internal error");
+                }
+                if (is_null($op1 = $stack->pop())) {
+                    return $this->trigger(13, "internal error");
+                }
+                switch ($token) {
+                    case '+':
+                        $stack->push($op1 + $op2);
+                        break;
+                    case '-':
+                        $stack->push($op1 - $op2);
+                        break;
+                    case '*':
+                        $stack->push($op1 * $op2);
+                        break;
+                    case '/':
+                        if ($op2 == 0) {
+                            return $this->trigger(14, "division by zero");
+                        }
+                        $stack->push($op1 / $op2);
+                        break;
+                    case '^':
+                        $stack->push(pow($op1, $op2));
+                        break;
+                }
+                // if the token is a unary operator, pop one value off the stack, do the operation, and push it back on
+            } elseif ($token == "_") {
+                $stack->push(-1 * $stack->pop());
+                // if the token is a function, pop arguments off the stack, hand them to the function, and push the result back on
+            } elseif (preg_match("/^([a-z]\w*)\($/", $token, $matches)) { // it's a function!
+                $fnn = $matches[1];
+                if (in_array($fnn, $this->fb)) { // built-in function:
+                    if (is_null($op1 = $stack->pop())) {
+                        return $this->trigger(15, "internal error");
+                    }
+                    $fnn = preg_replace("/^arc/", "a", $fnn); // for the 'arc' trig synonyms
+                    if ($fnn == 'ln') {
+                        $fnn = 'log';
+                    }
+                    eval('$stack->push(' . $fnn . '($op1));'); // perfectly safe eval()
+                } elseif (array_key_exists($fnn, $this->f)) { // user function
+                    // get args
+                    $args = [];
+                    for ($i = count($this->f[$fnn]['args']) - 1; $i >= 0; $i--) {
+                        if (is_null($args[$this->f[$fnn]['args'][$i]] = $stack->pop())) {
+                            return $this->trigger(16, "internal error");
+                        }
+                    }
+                    $stack->push($this->pfx($this->f[$fnn]['func'], $args)); // yay... recursion!!!!
+                }
+                // if the token is a number or variable, push it on the stack
+            } else {
+                if (is_numeric($token)) {
+                    $stack->push($token);
+                } elseif (array_key_exists($token, $this->v)) {
+                    $stack->push($this->v[$token]);
+                } elseif (array_key_exists($token, $vars)) {
+                    $stack->push($vars[$token]);
+                } else {
+                    return $this->trigger(17, "undefined variable '$token'", $token);
+                }
+            }
+        }
+        // when we're out of tokens, the stack should have a single element, the final result
+        if ($stack->count != 1) {
+            return $this->trigger(18, "internal error");
+        }
+        return $stack->pop();
+    }
+
+    /**
+     * trigger an error, but nicely, if need be
+     *
+     * @param string      $code Code
+     * @param string      $msg  Msg
+     * @param string|null $info String
+     * @return boolean                False
+     */
+    public function trigger($code, $msg, $info = null)
+    {
+        $this->last_error = $msg;
+        $this->last_error_code = [$code, $info];
+        if (!$this->suppress_errors) {
+            trigger_error($msg, E_USER_WARNING);
+        }
+        return false;
+    }
 }
 
 /**

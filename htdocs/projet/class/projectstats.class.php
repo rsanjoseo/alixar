@@ -24,10 +24,10 @@ include_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
  */
 class ProjectStats extends Stats
 {
-	public $userid;
+	private $project;
+    public $userid;
 	public $socid;
 	public $year;
-	private $project;
 
 	/**
 	 * Constructor
@@ -102,26 +102,56 @@ class ProjectStats extends Stats
 				$other
 				);
 			}
-				$this->db->free($resql);
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this).'::'.__METHOD__.' '.$this->error, LOG_ERR);
-			return -1;
-		}
+            $this->db->free($resql);
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . '::' . __METHOD__ . ' ' . $this->error, LOG_ERR);
+            return -1;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Build the where part
-	 *
-	 * @return string
-	 */
-	public function buildWhere()
-	{
-		global $user;
+    /**
+     * Return count, and sum of products
+     *
+     * @return array of values
+     */
+    public function getAllByYear()
+    {
+        global $conf, $user, $langs;
 
-		$sqlwhere_str = '';
+        $datay = [];
+
+        $wonlostfilter = 0; // No filter on status WON/LOST
+
+        $sql = "SELECT date_format(t.datec,'%Y') as year, COUNT(t.rowid) as nb, SUM(t.opp_amount) as total, AVG(t.opp_amount) as avg,";
+        $sql .= " SUM(t.opp_amount * " . $this->db->ifsql("t.opp_percent IS NULL" . ($wonlostfilter ? " OR cls.code IN ('WON','LOST')" : ""), '0', 't.opp_percent') . " / 100) as weighted";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "projet as t LEFT JOIN " . MAIN_DB_PREFIX . "c_lead_status as cls ON cls.rowid = t.fk_opp_status";
+        // No check is done on company permission because readability is managed by public status of project and assignement.
+        //if (! $user->rights->societe->client->voir && ! $user->soc_id)
+        //	$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "societe_commerciaux as sc ON sc.fk_soc=t.fk_soc AND sc.fk_user = ".((int) $user->id);
+        $sql .= $this->buildWhere();
+        // For external user, no check is done on company permission because readability is managed by public status of project and assignement.
+        //if ($socid > 0) $sql.= " AND t.fk_soc = ".((int) $socid);
+        // No check is done on company permission because readability is managed by public status of project and assignement.
+        //if (! $user->rights->societe->client->voir && ! $socid) $sql.= " AND ((s.rowid = sc.fk_soc AND sc.fk_user = ".((int) $user->id).") OR (s.rowid IS NULL))";
+        $sql .= " GROUP BY year";
+        $sql .= $this->db->order('year', 'DESC');
+
+        return $this->_getAllByYear($sql);
+    }
+
+    /**
+     * Build the where part
+     *
+     * @return string
+     */
+    public function buildWhere()
+    {
+        global $user;
+
+        $sqlwhere_str = '';
 		$sqlwhere = array();
 
 		// Get list of project id allowed to user (in a string list separated by coma)
@@ -161,36 +191,6 @@ class ProjectStats extends Stats
 		}
 
 		return $sqlwhere_str;
-	}
-
-	/**
-	 * Return count, and sum of products
-	 *
-	 * @return array of values
-	 */
-	public function getAllByYear()
-	{
-		global $conf, $user, $langs;
-
-		$datay = array();
-
-		$wonlostfilter = 0; // No filter on status WON/LOST
-
-		$sql = "SELECT date_format(t.datec,'%Y') as year, COUNT(t.rowid) as nb, SUM(t.opp_amount) as total, AVG(t.opp_amount) as avg,";
-		$sql .= " SUM(t.opp_amount * ".$this->db->ifsql("t.opp_percent IS NULL".($wonlostfilter ? " OR cls.code IN ('WON','LOST')" : ""), '0', 't.opp_percent')." / 100) as weighted";
-		$sql .= " FROM ".MAIN_DB_PREFIX."projet as t LEFT JOIN ".MAIN_DB_PREFIX."c_lead_status as cls ON cls.rowid = t.fk_opp_status";
-		// No check is done on company permission because readability is managed by public status of project and assignement.
-		//if (! $user->rights->societe->client->voir && ! $user->soc_id)
-		//	$sql .= " INNER JOIN " . MAIN_DB_PREFIX . "societe_commerciaux as sc ON sc.fk_soc=t.fk_soc AND sc.fk_user = ".((int) $user->id);
-		$sql .= $this->buildWhere();
-		// For external user, no check is done on company permission because readability is managed by public status of project and assignement.
-		//if ($socid > 0) $sql.= " AND t.fk_soc = ".((int) $socid);
-		// No check is done on company permission because readability is managed by public status of project and assignement.
-		//if (! $user->rights->societe->client->voir && ! $socid) $sql.= " AND ((s.rowid = sc.fk_soc AND sc.fk_user = ".((int) $user->id).") OR (s.rowid IS NULL))";
-		$sql .= " GROUP BY year";
-		$sql .= $this->db->order('year', 'DESC');
-
-		return $this->_getAllByYear($sql);
 	}
 
 	/**

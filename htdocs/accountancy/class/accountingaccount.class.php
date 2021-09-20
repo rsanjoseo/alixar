@@ -350,26 +350,58 @@ class AccountingAccount extends CommonObject
 		$sql .= " , fk_user_modif = ".((int) $user->id);
 		$sql .= " , active = ".(int) $this->active;
 		$sql .= " , reconcilable = ".(int) $this->reconcilable;
-		$sql .= " WHERE rowid = ".((int) $this->id);
+        $sql .= " WHERE rowid = " . ((int) $this->id);
 
-		dol_syslog(get_class($this)."::update", LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        dol_syslog(get_class($this) . "::update", LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	/**
-	 * Delete object in database
-	 *
-	 * @param User $user User that deletes
-	 * @param int $notrigger 0=triggers after, 1=disable triggers
-	 * @return int <0 if KO, >0 if OK
+    /**
+     * Check usage of accounting code
+     *
+     * @return int <0 if KO, >0 if OK
+     */
+    public function checkUsage()
+    {
+        global $langs;
+
+        $sql = "(SELECT fk_code_ventilation FROM " . MAIN_DB_PREFIX . "facturedet";
+        $sql .= " WHERE fk_code_ventilation=" . ((int) $this->id) . ")";
+        $sql .= "UNION";
+        $sql .= " (SELECT fk_code_ventilation FROM " . MAIN_DB_PREFIX . "facture_fourn_det";
+        $sql .= " WHERE fk_code_ventilation=" . ((int) $this->id) . ")";
+
+        dol_syslog(get_class($this) . "::checkUsage", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            if ($num > 0) {
+                $this->error = $langs->trans('ErrorAccountancyCodeIsAlreadyUse');
+                return 0;
+            } else {
+                return 1;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     * Delete object in database
+     *
+     * @param User $user      User that deletes
+     * @param int  $notrigger 0=triggers after, 1=disable triggers
+     * @return int <0 if KO, >0 if OK
 	 */
 	public function delete($user, $notrigger = 0)
 	{
@@ -405,38 +437,6 @@ class AccountingAccount extends CommonObject
 				return 1;
 			}
 		} else {
-			return -1;
-		}
-	}
-
-	/**
-	 * Check usage of accounting code
-	 *
-	 * @return int <0 if KO, >0 if OK
-	 */
-	public function checkUsage()
-	{
-		global $langs;
-
-		$sql = "(SELECT fk_code_ventilation FROM ".MAIN_DB_PREFIX."facturedet";
-		$sql .= " WHERE fk_code_ventilation=".((int) $this->id).")";
-		$sql .= "UNION";
-		$sql .= " (SELECT fk_code_ventilation FROM ".MAIN_DB_PREFIX."facture_fourn_det";
-		$sql .= " WHERE fk_code_ventilation=".((int) $this->id).")";
-
-		dol_syslog(get_class($this)."::checkUsage", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			if ($num > 0) {
-				$this->error = $langs->trans('ErrorAccountancyCodeIsAlreadyUse');
-				return 0;
-			} else {
-				return 1;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
 			return -1;
 		}
 	}

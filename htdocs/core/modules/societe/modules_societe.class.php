@@ -65,26 +65,112 @@ abstract class ModeleThirdPartyDoc extends CommonDocGenerator
  */
 abstract class ModeleThirdPartyCode
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
+    /**
+     * @var string Error code (or message)
+     */
+    public $error = '';
 
-	/**
-	 * @var array Error code (or message) array
-	 */
-	public $errors;
+    /**
+     * @var array Error code (or message) array
+     */
+    public $errors;
 
-	/**
-	 *  Renvoie la liste des modeles de numérotation
-	 *
-	 *  @param	DoliDB	$db     			Database handler
-	 *  @param  integer	$maxfilenamelength  Max length of value to show
-	 *  @return	array|int					List of numbers
-	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
-	{
-		// phpcs:enable
+    /**     Renvoi la description par defaut du modele de numerotation
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Texte descripif
+     */
+    public function info($langs)
+    {
+        $langs->load("bills");
+        return $langs->trans("NoDescription");
+    }
+
+    /**     Return name of module
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Nom du module
+     */
+    public function getNom($langs)
+    {
+        return $this->name;
+    }
+
+    /**     Return an example of numbering
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Example
+     */
+    public function getExample($langs)
+    {
+        $langs->load("bills");
+        return $langs->trans("NoExample");
+    }
+
+    /**
+     *  Checks if the numbers already in the database do not
+     *  cause conflicts that would prevent this numbering working.
+     *
+     * @return     boolean     false if conflict, true if ok
+     */
+    public function canBeActivated()
+    {
+        return true;
+    }
+
+    /**
+     *  Return next value available
+     *
+     * @param Societe $objsoc Object thirdparty
+     * @param int     $type   Type
+     *
+     * @return string                Value
+     */
+    public function getNextValue($objsoc = 0, $type = -1)
+    {
+        global $langs;
+        return $langs->trans("Function_getNextValue_InModuleNotWorking");
+    }
+
+    /**
+     *  Return version of module
+     *
+     * @return     string      Version
+     */
+    public function getVersion()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($this->version == 'development') {
+            return $langs->trans("VersionDevelopment");
+        } elseif ($this->version == 'experimental') {
+            return $langs->trans("VersionExperimental");
+        } elseif ($this->version == 'dolibarr') {
+            return DOL_VERSION;
+        } elseif ($this->version) {
+            return $this->version;
+        } else {
+            return $langs->trans("NotAvailable");
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoie la liste des modeles de numérotation
+     *
+     * @param DoliDB  $db                Database handler
+     * @param integer $maxfilenamelength Max length of value to show
+     *
+     * @return    array|int                    List of numbers
+     */
+    public static function liste_modeles($db, $maxfilenamelength = 0)
+    {
+        // phpcs:enable
 		$list = array();
 		$sql = "";
 
@@ -101,39 +187,6 @@ abstract class ModeleThirdPartyCode
 			return -1;
 		}
 		return $list;
-	}
-
-	/**     Renvoi la description par defaut du modele de numerotation
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Texte descripif
-	 */
-	public function info($langs)
-	{
-		$langs->load("bills");
-		return $langs->trans("NoDescription");
-	}
-
-	/**     Return an example of numbering
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Example
-	 */
-	public function getExample($langs)
-	{
-		$langs->load("bills");
-		return $langs->trans("NoExample");
-	}
-
-	/**
-	 *  Checks if the numbers already in the database do not
-	 *  cause conflicts that would prevent this numbering working.
-	 *
-	 *  @return     boolean     false if conflict, true if ok
-	 */
-	public function canBeActivated()
-	{
-		return true;
 	}
 
 	/**
@@ -208,56 +261,7 @@ abstract class ModeleThirdPartyCode
 		return $s;
 	}
 
-	/**     Return name of module
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Nom du module
-	 */
-	public function getNom($langs)
-	{
-		return $this->name;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return version of module
-	 *
-	 *  @return     string      Version
-	 */
-	public function getVersion()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($this->version == 'development') {
-			return $langs->trans("VersionDevelopment");
-		} elseif ($this->version == 'experimental') {
-			return $langs->trans("VersionExperimental");
-		} elseif ($this->version == 'dolibarr') {
-			return DOL_VERSION;
-		} elseif ($this->version) {
-			return $this->version;
-		} else {
-			return $langs->trans("NotAvailable");
-		}
-	}
-
-	/**
-	 *  Return next value available
-	 *
-	 *	@param	Societe		$objsoc		Object thirdparty
-	 *	@param	int			$type		Type
-	 *  @return string      			Value
-	 */
-	public function getNextValue($objsoc = 0, $type = -1)
-	{
-		global $langs;
-		return $langs->trans("Function_getNextValue_InModuleNotWorking");
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Check if mask/numbering use prefix
 	 *
@@ -306,28 +310,52 @@ abstract class ModeleAccountancyCode
 	{
 		$langs->load("bills");
 		return $langs->trans("NoExample");
-	}
+    }
 
-	/**
-	 *  Checks if the numbers already in the database do not
-	 *  cause conflicts that would prevent this numbering working.
-	 *
-	 *  @return     boolean     false if conflict, true if ok
-	 */
-	public function canBeActivated()
-	{
-		return true;
-	}
+    /**
+     *  Checks if the numbers already in the database do not
+     *  cause conflicts that would prevent this numbering working.
+     *
+     * @return     boolean     false if conflict, true if ok
+     */
+    public function canBeActivated()
+    {
+        return true;
+    }
 
-	/**
-	 *  Return description of module parameters
-	 *
-	 *  @param	Translate	$langs      Output language
-	 *  @param	Societe		$soc		Third party object
-	 *  @param	int			$type		-1=Nothing, 0=Customer, 1=Supplier
-	 *  @return	string					HTML translated description
-	 */
-	public function getToolTip($langs, $soc, $type)
+    /**
+     *  Return version of module
+     *
+     * @return     string      Version
+     */
+    public function getVersion()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($this->version == 'development') {
+            return $langs->trans("VersionDevelopment");
+        } elseif ($this->version == 'experimental') {
+            return $langs->trans("VersionExperimental");
+        } elseif ($this->version == 'dolibarr') {
+            return DOL_VERSION;
+        } elseif ($this->version) {
+            return $this->version;
+        } else {
+            return $langs->trans("NotAvailable");
+        }
+    }
+
+    /**
+     *  Return description of module parameters
+     *
+     * @param Translate $langs Output language
+     * @param Societe   $soc   Third party object
+     * @param int       $type  -1=Nothing, 0=Customer, 1=Supplier
+     *
+     * @return    string                    HTML translated description
+     */
+    public function getToolTip($langs, $soc, $type)
 	{
 		global $conf, $db;
 
@@ -360,31 +388,7 @@ abstract class ModeleAccountancyCode
 		return $s;
 	}
 
-	/**
-	 *  Return version of module
-	 *
-	 *  @return     string      Version
-	 */
-	public function getVersion()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($this->version == 'development') {
-			return $langs->trans("VersionDevelopment");
-		} elseif ($this->version == 'experimental') {
-			return $langs->trans("VersionExperimental");
-		} elseif ($this->version == 'dolibarr') {
-			return DOL_VERSION;
-		} elseif ($this->version) {
-			return $this->version;
-		} else {
-			return $langs->trans("NotAvailable");
-		}
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Set accountancy account code for a third party into this->code
 	 *

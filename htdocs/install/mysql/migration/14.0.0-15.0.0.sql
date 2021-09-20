@@ -100,12 +100,22 @@ CREATE TABLE llx_categorie_knowledgemanagement
   import_key    varchar(14)
 )ENGINE=innodb;
 
-ALTER TABLE llx_categorie_knowledgemanagement ADD PRIMARY KEY pk_categorie_knowledgemanagement (fk_categorie, fk_knowledgemanagement);
-ALTER TABLE llx_categorie_knowledgemanagement ADD INDEX idx_categorie_knowledgemanagement_fk_categorie (fk_categorie);
-ALTER TABLE llx_categorie_knowledgemanagement ADD INDEX idx_categorie_knowledgemanagement_fk_knowledgemanagement (fk_knowledgemanagement);
+ALTER TABLE llx_categorie_knowledgemanagement
+    ADD PRIMARY KEY pk_categorie_knowledgemanagement (fk_categorie, fk_knowledgemanagement);
+ALTER TABLE llx_categorie_knowledgemanagement
+    ADD INDEX idx_categorie_knowledgemanagement_fk_categorie (fk_categorie);
+ALTER TABLE llx_categorie_knowledgemanagement
+    ADD INDEX idx_categorie_knowledgemanagement_fk_knowledgemanagement (fk_knowledgemanagement);
 
-ALTER TABLE llx_categorie_knowledgemanagement ADD CONSTRAINT fk_categorie_knowledgemanagement_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
-ALTER TABLE llx_categorie_knowledgemanagement ADD CONSTRAINT fk_categorie_knowledgemanagement_knowledgemanagement_rowid   FOREIGN KEY (fk_knowledgemanagement) REFERENCES llx_knowledgemanagement (rowid);
+ALTER TABLE llx_categorie_knowledgemanagement
+    ADD CONSTRAINT fk_categorie_knowledgemanagement_categorie_rowid FOREIGN KEY (fk_categorie) REFERENCES llx_categorie (rowid);
+ALTER TABLE llx_categorie_knowledgemanagement
+    ADD CONSTRAINT fk_categorie_knowledgemanagement_knowledgemanagement_rowid FOREIGN KEY (fk_knowledgemanagement) REFERENCES llx_knowledgemanagement (rowid);
 
-ALTER TABLE llx_product_lot ADD COLUMN barcode varchar(180) DEFAULT NULL;
-ALTER TABLE llx_product_lot ADD COLUMN fk_barcode_type integer DEFAULT NULL;
+ALTER TABLE llx_product_lot
+    ADD COLUMN barcode varchar(180) DEFAULT NULL;
+ALTER TABLE llx_product_lot
+    ADD COLUMN fk_barcode_type integer DEFAULT NULL;
+
+ALTER TABLE llx_projet
+    ADD COLUMN max_attendees integer DEFAULT 0;

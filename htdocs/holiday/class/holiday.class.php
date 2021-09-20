@@ -34,126 +34,200 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class Holiday extends CommonObject
 {
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 1;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 2;
-	/**
-	 * Approved
-	 */
-	const STATUS_APPROVED = 3;
-	/**
-	 * Canceled
-	 */
-	const STATUS_CANCELED = 4;
-	/**
-	 * Refused
-	 */
-	const STATUS_REFUSED = 5;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'holiday';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'holiday';
+
 	/**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
-	public $ismultientitymanaged = 0;
-	/**
-	 * @var string Field with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_holiday';
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'holiday'; // Date start in PHP server TZ
-		/**
-	 * @deprecated
-	 * @see $id
-	 */
-	public $rowid; // Date end in PHP server TZ
-		/**
-	 * @var int User ID
-	 */
-	public $fk_user; // Date start in GMT
-		public $date_create = ''; // Date end in GMT
-		/**
-	 * @var string description
-	 */
-	public $description; // 0:Full days, 2:Start afternoon end morning, -1:Start afternoon end afternoon, 1:Start morning end morning
-	public $date_debut = ''; // 1=draft, 2=validated, 3=approved
-public $date_fin = '';
-public $date_debut_gmt = '';
-public $date_fin_gmt = '';
-public $halfday = '';
-public $statut = '';
-	/**
-	 * @var int 	ID of user that must approve. TODO: there is no date for validation (date_valid is used for approval), add one.
-	 */
-	public $fk_validator;
-	/**
-	 * @var int 	Date of approval. TODO: Add a field for approval date and use date_valid instead for validation.
-	 */
-	public $date_valid = '';
+    public $ismultientitymanaged = 0;
+
+    /**
+     * @var string Field with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_holiday';
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'holiday';
+
+    /**
+     * @deprecated
+     * @see $id
+     */
+    public $rowid;
+
+    /**
+     * @var int User ID
+     */
+    public $fk_user;
+
+    public $date_create = '';
+
+    /**
+     * @var string description
+     */
+    public $description;
+
+    public $date_debut = ''; // Date start in PHP server TZ
+    public $date_fin = ''; // Date end in PHP server TZ
+    public $date_debut_gmt = ''; // Date start in GMT
+    public $date_fin_gmt = ''; // Date end in GMT
+    public $halfday = ''; // 0:Full days, 2:Start afternoon end morning, -1:Start afternoon end afternoon, 1:Start morning end morning
+    public $statut = ''; // 1=draft, 2=validated, 3=approved
+
+    /**
+     * @var int    ID of user that must approve. TODO: there is no date for validation (date_valid is used for approval), add one.
+     */
+    public $fk_validator;
+
+    /**
+     * @var int    Date of approval. TODO: Add a field for approval date and use date_valid instead for validation.
+     */
+    public $date_valid = '';
+
 	/**
 	 * @var int 	ID of user that has approved (empty if not approved)
 	 */
 	public $fk_user_valid;
-	/**
+
+    /**
 	 * @var int 	Date for refuse
 	 */
 	public $date_refuse = '';
+
 	/**
 	 * @var int 	ID for refuse
 	 */
 	public $fk_user_refuse;
+
 	/**
 	 * @var int 	Date for cancelation
 	 */
 	public $date_cancel = '';
+
 	/**
 	 * @var int 	ID for cancelation
 	 */
 	public $fk_user_cancel;
-	public $detail_refuse = '';
+
+    public $detail_refuse = '';
+
 	/**
 	 * @var int ID
 	 */
-	public $fk_type;
-	public $holiday = array();
-	public $events = array();
-	public $logs = array();
-	public $optName = '';
-	public $optValue = '';
-	public $optRowid = '';
+    public $fk_type;
 
-	/**
-	 *   Constructor
-	 *
-	 *   @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    public $holiday = [];
+    public $events = [];
+    public $logs = [];
 
-	/**
-	 * Update balance of vacations and check table of users for holidays is complete. If not complete.
-	 *
-	 * @return	int			<0 if KO, >0 if OK
-	 */
-	public function updateBalance()
-	{
-		$this->db->begin();
+    public $optName = '';
+    public $optValue = '';
+    public $optRowid = '';
 
-		// Update sold of vocations
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 1;
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 2;
+    /**
+     * Approved
+     */
+    const STATUS_APPROVED = 3;
+    /**
+     * Canceled
+     */
+    const STATUS_CANCELED = 4;
+    /**
+     * Refused
+     */
+    const STATUS_REFUSED = 5;
+
+    /**
+     *   Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     *  Returns the reference to the following non used Order depending on the active numbering module
+     *  defined into HOLIDAY_ADDON
+     *
+     * @param Societe $objsoc third party object
+     *
+     * @return string                Holiday free reference
+     */
+    public function getNextNumRef($objsoc)
+    {
+        global $langs, $conf;
+        $langs->load("order");
+
+        if (empty($conf->global->HOLIDAY_ADDON)) {
+            $conf->global->HOLIDAY_ADDON = 'mod_holiday_madonna';
+        }
+
+        if (!empty($conf->global->HOLIDAY_ADDON)) {
+            $mybool = false;
+
+            $file = $conf->global->HOLIDAY_ADDON . ".php";
+            $classname = $conf->global->HOLIDAY_ADDON;
+
+            // Include file with class
+            $dirmodels = array_merge(['/'], (array) $conf->modules_parts['models']);
+            foreach ($dirmodels as $reldir) {
+                $dir = dol_buildpath($reldir . "core/modules/holiday/");
+
+                // Load file with numbering class (if found)
+                $mybool |= @include_once $dir . $file;
+            }
+
+            if ($mybool === false) {
+                dol_print_error('', "Failed to include file " . $file);
+                return '';
+            }
+
+            $obj = new $classname();
+            $numref = $obj->getNextValue($objsoc, $this);
+
+            if ($numref != "") {
+                return $numref;
+            } else {
+                $this->error = $obj->error;
+                //dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
+                return "";
+            }
+        } else {
+            print $langs->trans("Error") . " " . $langs->trans("Error_HOLIDAY_ADDON_NotDefined");
+            return "";
+        }
+    }
+
+    /**
+     * Update balance of vacations and check table of users for holidays is complete. If not complete.
+     *
+     * @return    int            <0 if KO, >0 if OK
+     */
+    public function updateBalance()
+    {
+        $this->db->begin();
+
+        // Update sold of vocations
 		$result = $this->updateSoldeCP();
 
 		// Check nb of users into table llx_holiday_users and update with empty lines
@@ -165,515 +239,6 @@ public $statut = '';
 		} else {
 			$this->db->rollback();
 			return -1;
-		}
-	}
-
-	/**
-	 *	Met à jour le timestamp de la dernière mise à jour du solde des CP
-	 *
-	 *	@param		int		$userID		Id of user
-	 *	@param		float	$nbHoliday	Nb of days
-	 *  @param		int		$fk_type	Type of vacation
-	 *  @return     int					0=Nothing done, 1=OK, -1=KO
-	 */
-	public function updateSoldeCP($userID = '', $nbHoliday = '', $fk_type = '')
-	{
-		global $user, $langs;
-
-		$error = 0;
-
-		if (empty($userID) && empty($nbHoliday) && empty($fk_type)) {
-			$langs->load("holiday");
-
-			// Si mise à jour pour tout le monde en début de mois
-			$now = dol_now();
-
-			$month = date('m', $now);
-			$newdateforlastupdate = dol_print_date($now, '%Y%m%d%H%M%S');
-
-			// Get month of last update
-			$lastUpdate = $this->getConfCP('lastUpdate', $newdateforlastupdate);
-			$monthLastUpdate = $lastUpdate[4].$lastUpdate[5];
-			//print 'month: '.$month.' lastUpdate:'.$lastUpdate.' monthLastUpdate:'.$monthLastUpdate;exit;
-
-			// Si la date du mois n'est pas la même que celle sauvegardée, on met à jour le timestamp
-			if ($month != $monthLastUpdate) {
-				$this->db->begin();
-
-				$users = $this->fetchUsers(false, false);
-				$nbUser = count($users);
-
-				$sql = "UPDATE ".MAIN_DB_PREFIX."holiday_config SET";
-				$sql .= " value = '".$this->db->escape($newdateforlastupdate)."'";
-				$sql .= " WHERE name = 'lastUpdate'";
-				$result = $this->db->query($sql);
-
-				$typeleaves = $this->getTypes(1, 1);
-
-				// Update each user counter
-				foreach ($users as $userCounter) {
-					$nbDaysToAdd = (isset($typeleaves[$userCounter['type']]['newByMonth']) ? $typeleaves[$userCounter['type']]['newByMonth'] : 0);
-					if (empty($nbDaysToAdd)) {
-						continue;
-					}
-
-					dol_syslog("We update leave type id ".$userCounter['type']." for user id ".$userCounter['rowid'], LOG_DEBUG);
-
-					$nowHoliday = $userCounter['nb_holiday'];
-					$newSolde = $nowHoliday + $nbDaysToAdd;
-
-					// We add a log for each user
-					$this->addLogCP($user->id, $userCounter['rowid'], $langs->trans('HolidaysMonthlyUpdate'), $newSolde, $userCounter['type']);
-
-					$result = $this->updateSoldeCP($userCounter['rowid'], $newSolde, $userCounter['type'], $langs->trans('HolidaysMonthlyUpdate'));
-
-					if ($result < 0) {
-						$error++;
-						break;
-					}
-				}
-
-				if (!$error) {
-					$this->db->commit();
-					return 1;
-				} else {
-					$this->db->rollback();
-					return -1;
-				}
-			}
-
-			return 0;
-		} else {
-			// Mise à jour pour un utilisateur
-			$nbHoliday = price2num($nbHoliday, 5);
-
-			$sql = "SELECT nb_holiday FROM ".MAIN_DB_PREFIX."holiday_users";
-			$sql .= " WHERE fk_user = ".(int) $userID." AND fk_type = ".(int) $fk_type;
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$num = $this->db->num_rows($resql);
-
-				if ($num > 0) {
-					// Update for user
-					$sql = "UPDATE ".MAIN_DB_PREFIX."holiday_users SET";
-					$sql .= " nb_holiday = ".((float) $nbHoliday);
-					$sql .= " WHERE fk_user = ".(int) $userID." AND fk_type = ".(int) $fk_type;
-					$result = $this->db->query($sql);
-					if (!$result) {
-						$error++;
-						$this->errors[] = $this->db->lasterror();
-					}
-				} else {
-					// Insert for user
-					$sql = "INSERT INTO ".MAIN_DB_PREFIX."holiday_users(nb_holiday, fk_user, fk_type) VALUES (";
-					$sql .= ((float) $nbHoliday);
-					$sql .= ", ".(int) $userID.", ".(int) $fk_type.")";
-					$result = $this->db->query($sql);
-					if (!$result) {
-						$error++;
-						$this->errors[] = $this->db->lasterror();
-					}
-				}
-			} else {
-				$this->errors[] = $this->db->lasterror();
-				$error++;
-			}
-
-			if (!$error) {
-				return 1;
-			} else {
-				return -1;
-			}
-		}
-	}
-
-	/**
-	 *  Return value of a conf parameterfor leave module
-	 *  TODO Move this into llx_const table
-	 *
-	 *  @param	string	$name                 Name of parameter
-	 *  @param  string  $createifnotfound     'stringvalue'=Create entry with string value if not found. For example 'YYYYMMDDHHMMSS'.
-	 *  @return string      		          Value of parameter. Example: 'YYYYMMDDHHMMSS' or < 0 if error
-	 */
-	public function getConfCP($name, $createifnotfound = '')
-	{
-		$sql = "SELECT value";
-		$sql .= " FROM ".MAIN_DB_PREFIX."holiday_config";
-		$sql .= " WHERE name = '".$this->db->escape($name)."'";
-
-		dol_syslog(get_class($this).'::getConfCP name='.$name.' createifnotfound='.$createifnotfound, LOG_DEBUG);
-		$result = $this->db->query($sql);
-
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			// Return value
-			if (empty($obj)) {
-				if ($createifnotfound) {
-					$sql = "INSERT INTO ".MAIN_DB_PREFIX."holiday_config(name, value)";
-					$sql .= " VALUES('".$this->db->escape($name)."', '".$this->db->escape($createifnotfound)."')";
-					$result = $this->db->query($sql);
-					if ($result) {
-						return $createifnotfound;
-					} else {
-						$this->error = $this->db->lasterror();
-						return -2;
-					}
-				} else {
-					return '';
-				}
-			} else {
-				return $obj->value;
-			}
-		} else {
-			// Erreur SQL
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Get list of Users or list of vacation balance.
-	 *
-	 *    @param      boolean			$stringlist	    If true return a string list of id. If false, return an array with detail.
-	 *    @param      boolean   		$type			If true, read Dolibarr user list, if false, return vacation balance list.
-	 *    @param      string            $filters        Filters
-	 *    @return     array|string|int      			Return an array
-	 */
-	public function fetchUsers($stringlist = true, $type = true, $filters = '')
-	{
-		global $conf;
-
-		dol_syslog(get_class($this)."::fetchUsers", LOG_DEBUG);
-
-		if ($stringlist) {
-			if ($type) {
-				// If user of Dolibarr
-				$sql = "SELECT";
-				if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-					$sql .= " DISTINCT";
-				}
-				$sql .= " u.rowid";
-				$sql .= " FROM ".MAIN_DB_PREFIX."user as u";
-
-				if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-					$sql .= ", ".MAIN_DB_PREFIX."usergroup_user as ug";
-					$sql .= " WHERE ((ug.fk_user = u.rowid";
-					$sql .= " AND ug.entity IN (".getEntity('usergroup')."))";
-					$sql .= " OR u.entity = 0)"; // Show always superadmin
-				} else {
-					$sql .= " WHERE u.entity IN (".getEntity('user').")";
-				}
-				$sql .= " AND u.statut > 0";
-				$sql .= " AND u.employee = 1"; // We only want employee users for holidays
-				if ($filters) {
-					$sql .= $filters;
-				}
-
-				$resql = $this->db->query($sql);
-
-				// Si pas d'erreur SQL
-				if ($resql) {
-					$i = 0;
-					$num = $this->db->num_rows($resql);
-					$stringlist = '';
-
-					// Boucles du listage des utilisateurs
-					while ($i < $num) {
-						$obj = $this->db->fetch_object($resql);
-
-						if ($i == 0) {
-							$stringlist .= $obj->rowid;
-						} else {
-							$stringlist .= ', '.$obj->rowid;
-						}
-
-						$i++;
-					}
-					// Retoune le tableau des utilisateurs
-					return $stringlist;
-				} else {
-					// Erreur SQL
-					$this->error = "Error ".$this->db->lasterror();
-					return -1;
-				}
-			} else {
-				// We want only list of vacation balance for user ids
-				$sql = "SELECT DISTINCT cpu.fk_user";
-				$sql .= " FROM ".MAIN_DB_PREFIX."holiday_users as cpu, ".MAIN_DB_PREFIX."user as u";
-				$sql .= " WHERE cpu.fk_user = u.rowid";
-				if ($filters) {
-					$sql .= $filters;
-				}
-
-				$resql = $this->db->query($sql);
-
-				// Si pas d'erreur SQL
-				if ($resql) {
-					$i = 0;
-					$num = $this->db->num_rows($resql);
-					$stringlist = '';
-
-					// Boucles du listage des utilisateurs
-					while ($i < $num) {
-						$obj = $this->db->fetch_object($resql);
-
-						if ($i == 0) {
-							$stringlist .= $obj->fk_user;
-						} else {
-							$stringlist .= ', '.$obj->fk_user;
-						}
-
-						$i++;
-					}
-					// Retoune le tableau des utilisateurs
-					return $stringlist;
-				} else {
-					// Erreur SQL
-					$this->error = "Error ".$this->db->lasterror();
-					return -1;
-				}
-			}
-		} else {
-			// Si faux donc return array
-			// List for Dolibarr users
-			if ($type) {
-								// If user of Dolibarr
-				$sql = "SELECT";
-				if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-					$sql .= " DISTINCT";
-				}
-				$sql .= " u.rowid, u.lastname, u.firstname, u.gender, u.photo, u.employee, u.statut, u.fk_user";
-				$sql .= " FROM ".MAIN_DB_PREFIX."user as u";
-
-				if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-					$sql .= ", ".MAIN_DB_PREFIX."usergroup_user as ug";
-					$sql .= " WHERE ((ug.fk_user = u.rowid";
-					$sql .= " AND ug.entity IN (".getEntity('usergroup')."))";
-					$sql .= " OR u.entity = 0)"; // Show always superadmin
-				} else {
-					$sql .= " WHERE u.entity IN (".getEntity('user').")";
-				}
-
-				$sql .= " AND u.statut > 0";
-				$sql .= " AND u.employee = 1"; // We only want employee users for holidays
-				if ($filters) {
-					$sql .= $filters;
-				}
-
-				$resql = $this->db->query($sql);
-
-				// Si pas d'erreur SQL
-				if ($resql) {
-					$i = 0;
-					$tab_result = $this->holiday;
-					$num = $this->db->num_rows($resql);
-
-					// Boucles du listage des utilisateurs
-					while ($i < $num) {
-						$obj = $this->db->fetch_object($resql);
-
-						$tab_result[$i]['rowid'] = $obj->rowid; // rowid of user
-						$tab_result[$i]['name'] = $obj->lastname; // deprecated
-						$tab_result[$i]['lastname'] = $obj->lastname;
-						$tab_result[$i]['firstname'] = $obj->firstname;
-						$tab_result[$i]['gender'] = $obj->gender;
-						$tab_result[$i]['status'] = $obj->statut;
-						$tab_result[$i]['employee'] = $obj->employee;
-						$tab_result[$i]['photo'] = $obj->photo;
-						$tab_result[$i]['fk_user'] = $obj->fk_user; // rowid of manager
-						//$tab_result[$i]['type'] = $obj->type;
-						//$tab_result[$i]['nb_holiday'] = $obj->nb_holiday;
-
-						$i++;
-					}
-					// Retoune le tableau des utilisateurs
-					return $tab_result;
-				} else {
-					// Erreur SQL
-					$this->errors[] = "Error ".$this->db->lasterror();
-					return -1;
-				}
-			} else {
-				// List of vacation balance users
-				$sql = "SELECT cpu.fk_type, cpu.nb_holiday, u.rowid, u.lastname, u.firstname, u.gender, u.photo, u.employee, u.statut, u.fk_user";
-				$sql .= " FROM ".MAIN_DB_PREFIX."holiday_users as cpu, ".MAIN_DB_PREFIX."user as u";
-				$sql .= " WHERE cpu.fk_user = u.rowid";
-				if ($filters) {
-					$sql .= $filters;
-				}
-
-				$resql = $this->db->query($sql);
-
-				// Si pas d'erreur SQL
-				if ($resql) {
-					$i = 0;
-					$tab_result = $this->holiday;
-					$num = $this->db->num_rows($resql);
-
-					// Boucles du listage des utilisateurs
-					while ($i < $num) {
-						$obj = $this->db->fetch_object($resql);
-
-						$tab_result[$i]['rowid'] = $obj->rowid; // rowid of user
-						$tab_result[$i]['name'] = $obj->lastname; // deprecated
-						$tab_result[$i]['lastname'] = $obj->lastname;
-						$tab_result[$i]['firstname'] = $obj->firstname;
-						$tab_result[$i]['gender'] = $obj->gender;
-						$tab_result[$i]['status'] = $obj->statut;
-						$tab_result[$i]['employee'] = $obj->employee;
-						$tab_result[$i]['photo'] = $obj->photo;
-						$tab_result[$i]['fk_user'] = $obj->fk_user; // rowid of manager
-
-						$tab_result[$i]['type'] = $obj->fk_type;
-						$tab_result[$i]['nb_holiday'] = $obj->nb_holiday;
-
-						$i++;
-					}
-					// Retoune le tableau des utilisateurs
-					return $tab_result;
-				} else {
-					// Erreur SQL
-					$this->error = "Error ".$this->db->lasterror();
-					return -1;
-				}
-			}
-		}
-	}
-
-	/**
-	 *  Return array with list of types
-	 *
-	 *  @param		int		$active		Status of type. -1 = Both
-	 *  @param		int		$affect		Filter on affect (a request will change sold or not). -1 = Both
-	 *  @return     array	    		Return array with list of types
-	 */
-	public function getTypes($active = -1, $affect = -1)
-	{
-		global $mysoc;
-
-		$sql = "SELECT rowid, code, label, affect, delay, newByMonth";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_holiday_types";
-		$sql .= " WHERE (fk_country IS NULL OR fk_country = ".((int) $mysoc->country_id).')';
-		if ($active >= 0) {
-			$sql .= " AND active = ".((int) $active);
-		}
-		if ($affect >= 0) {
-			$sql .= " AND affect = ".((int) $affect);
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$num = $this->db->num_rows($result);
-			if ($num) {
-				while ($obj = $this->db->fetch_object($result)) {
-					$types[$obj->rowid] = array('rowid'=> $obj->rowid, 'code'=> $obj->code, 'label'=>$obj->label, 'affect'=>$obj->affect, 'delay'=>$obj->delay, 'newByMonth'=>$obj->newByMonth);
-				}
-
-				return $types;
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-
-		return array();
-	}
-
-	/**
-	 * addLogCP
-	 *
-	 * @param 	int		$fk_user_action		Id user creation
-	 * @param 	int		$fk_user_update		Id user update
-	 * @param 	string	$label				Label (Example: 'Leave', 'Manual update', 'Leave request cancelation'...)
-	 * @param 	int		$new_solde			New value
-	 * @param	int		$fk_type			Type of vacation
-	 * @return 	int							Id of record added, 0 if nothing done, < 0 if KO
-	 */
-	public function addLogCP($fk_user_action, $fk_user_update, $label, $new_solde, $fk_type)
-	{
-		global $conf, $langs;
-
-		$error = 0;
-
-		$prev_solde = price2num($this->getCPforUser($fk_user_update, $fk_type), 5);
-		$new_solde = price2num($new_solde, 5);
-		//print "$prev_solde == $new_solde";
-
-		if ($prev_solde == $new_solde) {
-			return 0;
-		}
-
-		$this->db->begin();
-
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."holiday_logs (";
-		$sql .= "date_action,";
-		$sql .= "fk_user_action,";
-		$sql .= "fk_user_update,";
-		$sql .= "type_action,";
-		$sql .= "prev_solde,";
-		$sql .= "new_solde,";
-		$sql .= "fk_type";
-		$sql .= ") VALUES (";
-		$sql .= " '".$this->db->idate(dol_now())."',";
-		$sql .= " ".((int) $fk_user_action).",";
-		$sql .= " ".((int) $fk_user_update).",";
-		$sql .= " '".$this->db->escape($label)."',";
-		$sql .= " ".((float) $prev_solde).",";
-		$sql .= " ".((float) $new_solde).",";
-		$sql .= " ".((int) $fk_type);
-		$sql .= ")";
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++; $this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			$this->optRowid = $this->db->last_insert_id(MAIN_DB_PREFIX."holiday_logs");
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::addLogCP ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->optRowid;
-		}
-	}
-
-	/**
-	 *  Return balance of holiday for one user
-	 *
-	 *  @param	int		$user_id    ID de l'utilisateur
-	 *  @param	int		$fk_type	Filter on type
-	 *  @return float        		Retourne le solde de congés payés de l'utilisateur
-	 */
-	public function getCPforUser($user_id, $fk_type = 0)
-	{
-		$sql = "SELECT nb_holiday";
-		$sql .= " FROM ".MAIN_DB_PREFIX."holiday_users";
-		$sql .= " WHERE fk_user = ".(int) $user_id;
-		if ($fk_type > 0) {
-			$sql .= " AND fk_type = ".(int) $fk_type;
-		}
-
-		dol_syslog(get_class($this).'::getCPforUser user_id='.$user_id.' type_id='.$fk_type, LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			//return number_format($obj->nb_holiday,2);
-			if ($obj) {
-				return $obj->nb_holiday;
-			} else {
-				return null;
-			}
-		} else {
-			return null;
 		}
 	}
 
@@ -786,11 +351,13 @@ public $statut = '';
 		}
 	}
 
+
 	/**
 	 *	Load object in memory from database
 	 *
 	 *  @param	int		$id         Id object
 	 *  @param	string	$ref        Ref object
+	 *
 	 *  @return int         		<0 if KO, 0 if not found, >0 if OK
 	 */
 	public function fetch($id, $ref = '')
@@ -863,26 +430,153 @@ public $statut = '';
 				$result = 1;
 			} else {
 				$result = 0;
-			}
-			$this->db->free($resql);
+            }
+            $this->db->free($resql);
 
-			return $result;
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			return -1;
-		}
-	}
+            return $result;
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *	List all holidays of all users
-	 *
-	 *  @param      string	$order      Sort order
-	 *  @param      string	$filter     SQL Filter
-	 *  @return     int      			-1 if KO, 1 if OK, 2 if no result
-	 */
-	public function fetchAll($order, $filter)
-	{
-		global $langs;
+    /**
+     *    List holidays for a particular user or list of users
+     *
+     * @param int|string $user_id ID of user to list, or comma separated list of IDs of users to list
+     * @param string     $order   Sort order
+     * @param string     $filter  SQL Filter
+     *
+     * @return     int                        -1 if KO, 1 if OK, 2 if no result
+     */
+    public function fetchByUser($user_id, $order = '', $filter = '')
+    {
+        global $langs, $conf;
+
+        $sql = "SELECT";
+        $sql .= " cp.rowid,";
+        $sql .= " cp.ref,";
+
+        $sql .= " cp.fk_user,";
+        $sql .= " cp.fk_type,";
+        $sql .= " cp.date_create,";
+        $sql .= " cp.description,";
+        $sql .= " cp.date_debut,";
+        $sql .= " cp.date_fin,";
+        $sql .= " cp.halfday,";
+        $sql .= " cp.statut,";
+        $sql .= " cp.fk_validator,";
+        $sql .= " cp.date_valid,";
+        $sql .= " cp.fk_user_valid,";
+        $sql .= " cp.date_refuse,";
+        $sql .= " cp.fk_user_refuse,";
+        $sql .= " cp.date_cancel,";
+        $sql .= " cp.fk_user_cancel,";
+        $sql .= " cp.detail_refuse,";
+
+        $sql .= " uu.lastname as user_lastname,";
+        $sql .= " uu.firstname as user_firstname,";
+        $sql .= " uu.login as user_login,";
+        $sql .= " uu.statut as user_statut,";
+        $sql .= " uu.photo as user_photo,";
+
+        $sql .= " ua.lastname as validator_lastname,";
+        $sql .= " ua.firstname as validator_firstname,";
+        $sql .= " ua.login as validator_login,";
+        $sql .= " ua.statut as validator_statut,";
+        $sql .= " ua.photo as validator_photo";
+
+        $sql .= " FROM " . MAIN_DB_PREFIX . "holiday as cp, " . MAIN_DB_PREFIX . "user as uu, " . MAIN_DB_PREFIX . "user as ua";
+        $sql .= " WHERE cp.entity IN (" . getEntity('holiday') . ")";
+        $sql .= " AND cp.fk_user = uu.rowid AND cp.fk_validator = ua.rowid"; // Hack pour la recherche sur le tableau
+        $sql .= " AND cp.fk_user IN (" . $this->db->sanitize($user_id) . ")";
+
+        // Selection filter
+        if (!empty($filter)) {
+            $sql .= $filter;
+        }
+
+        // Order of display of the result
+        if (!empty($order)) {
+            $sql .= $order;
+        }
+
+        dol_syslog(get_class($this) . "::fetchByUser", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+
+        // If no SQL error
+        if ($resql) {
+            $i = 0;
+            $tab_result = $this->holiday;
+            $num = $this->db->num_rows($resql);
+
+            // If no registration
+            if (!$num) {
+                return 2;
+            }
+
+            // List the records and add them to the table
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+
+                $tab_result[$i]['rowid'] = $obj->rowid;
+                $tab_result[$i]['ref'] = ($obj->ref ? $obj->ref : $obj->rowid);
+
+                $tab_result[$i]['fk_user'] = $obj->fk_user;
+                $tab_result[$i]['fk_type'] = $obj->fk_type;
+                $tab_result[$i]['date_create'] = $this->db->jdate($obj->date_create);
+                $tab_result[$i]['description'] = $obj->description;
+                $tab_result[$i]['date_debut'] = $this->db->jdate($obj->date_debut);
+                $tab_result[$i]['date_fin'] = $this->db->jdate($obj->date_fin);
+                $tab_result[$i]['date_debut_gmt'] = $this->db->jdate($obj->date_debut, 1);
+                $tab_result[$i]['date_fin_gmt'] = $this->db->jdate($obj->date_fin, 1);
+                $tab_result[$i]['halfday'] = $obj->halfday;
+                $tab_result[$i]['statut'] = $obj->statut;
+                $tab_result[$i]['fk_validator'] = $obj->fk_validator;
+                $tab_result[$i]['date_valid'] = $this->db->jdate($obj->date_valid);
+                $tab_result[$i]['fk_user_valid'] = $obj->fk_user_valid;
+                $tab_result[$i]['date_refuse'] = $this->db->jdate($obj->date_refuse);
+                $tab_result[$i]['fk_user_refuse'] = $obj->fk_user_refuse;
+                $tab_result[$i]['date_cancel'] = $this->db->jdate($obj->date_cancel);
+                $tab_result[$i]['fk_user_cancel'] = $obj->fk_user_cancel;
+                $tab_result[$i]['detail_refuse'] = $obj->detail_refuse;
+
+                $tab_result[$i]['user_firstname'] = $obj->user_firstname;
+                $tab_result[$i]['user_lastname'] = $obj->user_lastname;
+                $tab_result[$i]['user_login'] = $obj->user_login;
+                $tab_result[$i]['user_statut'] = $obj->user_statut;
+                $tab_result[$i]['user_photo'] = $obj->user_photo;
+
+                $tab_result[$i]['validator_firstname'] = $obj->validator_firstname;
+                $tab_result[$i]['validator_lastname'] = $obj->validator_lastname;
+                $tab_result[$i]['validator_login'] = $obj->validator_login;
+                $tab_result[$i]['validator_statut'] = $obj->validator_statut;
+                $tab_result[$i]['validator_photo'] = $obj->validator_photo;
+
+                $i++;
+            }
+
+            // Returns 1 with the filled array
+            $this->holiday = $tab_result;
+            return 1;
+        } else {
+            // SQL Error
+            $this->error = "Error " . $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     *    List all holidays of all users
+     *
+     * @param string $order  Sort order
+     * @param string $filter SQL Filter
+     *
+     * @return     int                -1 if KO, 1 if OK, 2 if no result
+     */
+    public function fetchAll($order, $filter)
+    {
+        global $langs;
 
 		$sql = "SELECT";
 		$sql .= " cp.rowid,";
@@ -996,11 +690,13 @@ public $statut = '';
 		}
 	}
 
+
 	/**
-	 *	Validate leave request
+     *	Validate leave request
 	 *
 	 *  @param	User	$user        	User that validate
 	 *  @param  int		$notrigger	    0=launch triggers after, 1=disable triggers
+	 *
 	 *  @return int         			<0 if KO, >0 if OK
 	 */
 	public function validate($user = null, $notrigger = 0)
@@ -1059,57 +755,6 @@ public $statut = '';
 		}
 	}
 
-	/**
-	 *  Returns the reference to the following non used Order depending on the active numbering module
-	 *  defined into HOLIDAY_ADDON
-	 *
-	 *	@param	Societe		$objsoc     third party object
-	 *  @return string      			Holiday free reference
-	 */
-	public function getNextNumRef($objsoc)
-	{
-		global $langs, $conf;
-		$langs->load("order");
-
-		if (empty($conf->global->HOLIDAY_ADDON)) {
-			$conf->global->HOLIDAY_ADDON = 'mod_holiday_madonna';
-		}
-
-		if (!empty($conf->global->HOLIDAY_ADDON)) {
-			$mybool = false;
-
-			$file = $conf->global->HOLIDAY_ADDON.".php";
-			$classname = $conf->global->HOLIDAY_ADDON;
-
-			// Include file with class
-			$dirmodels = array_merge(array('/'), (array) $conf->modules_parts['models']);
-			foreach ($dirmodels as $reldir) {
-				$dir = dol_buildpath($reldir."core/modules/holiday/");
-
-				// Load file with numbering class (if found)
-				$mybool |= @include_once $dir.$file;
-			}
-
-			if ($mybool === false) {
-				dol_print_error('', "Failed to include file ".$file);
-				return '';
-			}
-
-			$obj = new $classname();
-			$numref = $obj->getNextValue($objsoc, $this);
-
-			if ($numref != "") {
-				return $numref;
-			} else {
-				$this->error = $obj->error;
-				//dol_print_error($this->db,get_class($this)."::getNextNumRef ".$obj->error);
-				return "";
-			}
-		} else {
-			print $langs->trans("Error")." ".$langs->trans("Error_HOLIDAY_ADDON_NotDefined");
-			return "";
-		}
-	}
 
 	/**
 	 *	Approve leave request
@@ -1328,7 +973,6 @@ public $statut = '';
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *   Delete object in database
@@ -1465,130 +1109,6 @@ public $statut = '';
 		return true;
 	}
 
-	/**
-	 *	List holidays for a particular user or list of users
-	 *
-	 *  @param		int|string		$user_id    ID of user to list, or comma separated list of IDs of users to list
-	 *  @param      string			$order      Sort order
-	 *  @param      string			$filter     SQL Filter
-	 *  @return     int      					-1 if KO, 1 if OK, 2 if no result
-	 */
-	public function fetchByUser($user_id, $order = '', $filter = '')
-	{
-		global $langs, $conf;
-
-		$sql = "SELECT";
-		$sql .= " cp.rowid,";
-		$sql .= " cp.ref,";
-
-		$sql .= " cp.fk_user,";
-		$sql .= " cp.fk_type,";
-		$sql .= " cp.date_create,";
-		$sql .= " cp.description,";
-		$sql .= " cp.date_debut,";
-		$sql .= " cp.date_fin,";
-		$sql .= " cp.halfday,";
-		$sql .= " cp.statut,";
-		$sql .= " cp.fk_validator,";
-		$sql .= " cp.date_valid,";
-		$sql .= " cp.fk_user_valid,";
-		$sql .= " cp.date_refuse,";
-		$sql .= " cp.fk_user_refuse,";
-		$sql .= " cp.date_cancel,";
-		$sql .= " cp.fk_user_cancel,";
-		$sql .= " cp.detail_refuse,";
-
-		$sql .= " uu.lastname as user_lastname,";
-		$sql .= " uu.firstname as user_firstname,";
-		$sql .= " uu.login as user_login,";
-		$sql .= " uu.statut as user_statut,";
-		$sql .= " uu.photo as user_photo,";
-
-		$sql .= " ua.lastname as validator_lastname,";
-		$sql .= " ua.firstname as validator_firstname,";
-		$sql .= " ua.login as validator_login,";
-		$sql .= " ua.statut as validator_statut,";
-		$sql .= " ua.photo as validator_photo";
-
-		$sql .= " FROM ".MAIN_DB_PREFIX."holiday as cp, ".MAIN_DB_PREFIX."user as uu, ".MAIN_DB_PREFIX."user as ua";
-		$sql .= " WHERE cp.entity IN (".getEntity('holiday').")";
-		$sql .= " AND cp.fk_user = uu.rowid AND cp.fk_validator = ua.rowid"; // Hack pour la recherche sur le tableau
-		$sql .= " AND cp.fk_user IN (".$this->db->sanitize($user_id).")";
-
-		// Selection filter
-		if (!empty($filter)) {
-			$sql .= $filter;
-		}
-
-		// Order of display of the result
-		if (!empty($order)) {
-			$sql .= $order;
-		}
-
-		dol_syslog(get_class($this)."::fetchByUser", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-
-		// If no SQL error
-		if ($resql) {
-			$i = 0;
-			$tab_result = $this->holiday;
-			$num = $this->db->num_rows($resql);
-
-			// If no registration
-			if (!$num) {
-				return 2;
-			}
-
-			// List the records and add them to the table
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-
-				$tab_result[$i]['rowid'] = $obj->rowid;
-				$tab_result[$i]['ref'] = ($obj->ref ? $obj->ref : $obj->rowid);
-
-				$tab_result[$i]['fk_user'] = $obj->fk_user;
-				$tab_result[$i]['fk_type'] = $obj->fk_type;
-				$tab_result[$i]['date_create'] = $this->db->jdate($obj->date_create);
-				$tab_result[$i]['description'] = $obj->description;
-				$tab_result[$i]['date_debut'] = $this->db->jdate($obj->date_debut);
-				$tab_result[$i]['date_fin'] = $this->db->jdate($obj->date_fin);
-				$tab_result[$i]['date_debut_gmt'] = $this->db->jdate($obj->date_debut, 1);
-				$tab_result[$i]['date_fin_gmt'] = $this->db->jdate($obj->date_fin, 1);
-				$tab_result[$i]['halfday'] = $obj->halfday;
-				$tab_result[$i]['statut'] = $obj->statut;
-				$tab_result[$i]['fk_validator'] = $obj->fk_validator;
-				$tab_result[$i]['date_valid'] = $this->db->jdate($obj->date_valid);
-				$tab_result[$i]['fk_user_valid'] = $obj->fk_user_valid;
-				$tab_result[$i]['date_refuse'] = $this->db->jdate($obj->date_refuse);
-				$tab_result[$i]['fk_user_refuse'] = $obj->fk_user_refuse;
-				$tab_result[$i]['date_cancel'] = $this->db->jdate($obj->date_cancel);
-				$tab_result[$i]['fk_user_cancel'] = $obj->fk_user_cancel;
-				$tab_result[$i]['detail_refuse'] = $obj->detail_refuse;
-
-				$tab_result[$i]['user_firstname'] = $obj->user_firstname;
-				$tab_result[$i]['user_lastname'] = $obj->user_lastname;
-				$tab_result[$i]['user_login'] = $obj->user_login;
-				$tab_result[$i]['user_statut'] = $obj->user_statut;
-				$tab_result[$i]['user_photo'] = $obj->user_photo;
-
-				$tab_result[$i]['validator_firstname'] = $obj->validator_firstname;
-				$tab_result[$i]['validator_lastname'] = $obj->validator_lastname;
-				$tab_result[$i]['validator_login'] = $obj->validator_login;
-				$tab_result[$i]['validator_statut'] = $obj->validator_statut;
-				$tab_result[$i]['validator_photo'] = $obj->validator_photo;
-
-				$i++;
-			}
-
-			// Returns 1 with the filled array
-			$this->holiday = $tab_result;
-			return 1;
-		} else {
-			// SQL Error
-			$this->error = "Error ".$this->db->lasterror();
-			return -1;
-		}
-	}
 
 	/**
 	 *	Check that a user is not on holiday for a particular timestamp. Can check approved leave requests and not into public holidays of company.
@@ -1668,7 +1188,7 @@ public $statut = '';
 		return $result;
 	}
 
-	/**
+    /**
 	 *	Return clicable name (with picto eventually)
 	 *
 	 *	@param	int			$withpicto					0=_No picto, 1=Includes the picto in the linkn, 2=Picto only
@@ -1717,7 +1237,7 @@ public $statut = '';
 		return $result;
 	}
 
-	/**
+    /**
 	 *	Returns the label status
 	 *
 	 *	@param      int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
@@ -1728,6 +1248,7 @@ public $statut = '';
 		return $this->LibStatut($this->statut, $mode, $this->date_debut);
 	}
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Returns the label of a status
 	 *
@@ -1778,7 +1299,7 @@ public $statut = '';
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode, '', $params);
 	}
 
-	/**
+    /**
 	 *   Affiche un select HTML des statuts de congés payés
 	 *
 	 *   @param 	int		$selected   	Id of preselected status
@@ -1827,23 +1348,189 @@ public $statut = '';
 		$sql .= " value = '".$this->db->escape($value)."'";
 		$sql .= " WHERE name = '".$this->db->escape($name)."'";
 
-		dol_syslog(get_class($this).'::updateConfCP name='.$name.'', LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			return true;
-		}
+        dol_syslog(get_class($this) . '::updateConfCP name=' . $name . '', LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 *	Retourne un checked si vrai
-	 *
-	 *  @param	string	$name       name du paramètre de configuration
-	 *  @return string      		retourne checked si > 0
-	 */
-	public function getCheckOption($name)
-	{
+    /**
+     *  Return value of a conf parameterfor leave module
+     *  TODO Move this into llx_const table
+     *
+     * @param string $name             Name of parameter
+     * @param string $createifnotfound 'stringvalue'=Create entry with string value if not found. For example 'YYYYMMDDHHMMSS'.
+     *
+     * @return string                      Value of parameter. Example: 'YYYYMMDDHHMMSS' or < 0 if error
+     */
+    public function getConfCP($name, $createifnotfound = '')
+    {
+        $sql = "SELECT value";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "holiday_config";
+        $sql .= " WHERE name = '" . $this->db->escape($name) . "'";
+
+        dol_syslog(get_class($this) . '::getConfCP name=' . $name . ' createifnotfound=' . $createifnotfound, LOG_DEBUG);
+        $result = $this->db->query($sql);
+
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            // Return value
+            if (empty($obj)) {
+                if ($createifnotfound) {
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "holiday_config(name, value)";
+                    $sql .= " VALUES('" . $this->db->escape($name) . "', '" . $this->db->escape($createifnotfound) . "')";
+                    $result = $this->db->query($sql);
+                    if ($result) {
+                        return $createifnotfound;
+                    } else {
+                        $this->error = $this->db->lasterror();
+                        return -2;
+                    }
+                } else {
+                    return '';
+                }
+            } else {
+                return $obj->value;
+            }
+        } else {
+            // Erreur SQL
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     *    Met à jour le timestamp de la dernière mise à jour du solde des CP
+     *
+     * @param int   $userID    Id of user
+     * @param float $nbHoliday Nb of days
+     * @param int   $fk_type   Type of vacation
+     *
+     * @return     int                    0=Nothing done, 1=OK, -1=KO
+     */
+    public function updateSoldeCP($userID = '', $nbHoliday = '', $fk_type = '')
+    {
+        global $user, $langs;
+
+        $error = 0;
+
+        if (empty($userID) && empty($nbHoliday) && empty($fk_type)) {
+            $langs->load("holiday");
+
+            // Si mise à jour pour tout le monde en début de mois
+            $now = dol_now();
+
+            $month = date('m', $now);
+            $newdateforlastupdate = dol_print_date($now, '%Y%m%d%H%M%S');
+
+            // Get month of last update
+            $lastUpdate = $this->getConfCP('lastUpdate', $newdateforlastupdate);
+            $monthLastUpdate = $lastUpdate[4] . $lastUpdate[5];
+            //print 'month: '.$month.' lastUpdate:'.$lastUpdate.' monthLastUpdate:'.$monthLastUpdate;exit;
+
+            // Si la date du mois n'est pas la même que celle sauvegardée, on met à jour le timestamp
+            if ($month != $monthLastUpdate) {
+                $this->db->begin();
+
+                $users = $this->fetchUsers(false, false);
+                $nbUser = count($users);
+
+                $sql = "UPDATE " . MAIN_DB_PREFIX . "holiday_config SET";
+                $sql .= " value = '" . $this->db->escape($newdateforlastupdate) . "'";
+                $sql .= " WHERE name = 'lastUpdate'";
+                $result = $this->db->query($sql);
+
+                $typeleaves = $this->getTypes(1, 1);
+
+                // Update each user counter
+                foreach ($users as $userCounter) {
+                    $nbDaysToAdd = (isset($typeleaves[$userCounter['type']]['newByMonth']) ? $typeleaves[$userCounter['type']]['newByMonth'] : 0);
+                    if (empty($nbDaysToAdd)) {
+                        continue;
+                    }
+
+                    dol_syslog("We update leave type id " . $userCounter['type'] . " for user id " . $userCounter['rowid'], LOG_DEBUG);
+
+                    $nowHoliday = $userCounter['nb_holiday'];
+                    $newSolde = $nowHoliday + $nbDaysToAdd;
+
+                    // We add a log for each user
+                    $this->addLogCP($user->id, $userCounter['rowid'], $langs->trans('HolidaysMonthlyUpdate'), $newSolde, $userCounter['type']);
+
+                    $result = $this->updateSoldeCP($userCounter['rowid'], $newSolde, $userCounter['type'], $langs->trans('HolidaysMonthlyUpdate'));
+
+                    if ($result < 0) {
+                        $error++;
+                        break;
+                    }
+                }
+
+                if (!$error) {
+                    $this->db->commit();
+                    return 1;
+                } else {
+                    $this->db->rollback();
+                    return -1;
+                }
+            }
+
+            return 0;
+        } else {
+            // Mise à jour pour un utilisateur
+            $nbHoliday = price2num($nbHoliday, 5);
+
+            $sql = "SELECT nb_holiday FROM " . MAIN_DB_PREFIX . "holiday_users";
+            $sql .= " WHERE fk_user = " . (int) $userID . " AND fk_type = " . (int) $fk_type;
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $num = $this->db->num_rows($resql);
+
+                if ($num > 0) {
+                    // Update for user
+                    $sql = "UPDATE " . MAIN_DB_PREFIX . "holiday_users SET";
+                    $sql .= " nb_holiday = " . ((float) $nbHoliday);
+                    $sql .= " WHERE fk_user = " . (int) $userID . " AND fk_type = " . (int) $fk_type;
+                    $result = $this->db->query($sql);
+                    if (!$result) {
+                        $error++;
+                        $this->errors[] = $this->db->lasterror();
+                    }
+                } else {
+                    // Insert for user
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "holiday_users(nb_holiday, fk_user, fk_type) VALUES (";
+                    $sql .= ((float) $nbHoliday);
+                    $sql .= ", " . (int) $userID . ", " . (int) $fk_type . ")";
+                    $result = $this->db->query($sql);
+                    if (!$result) {
+                        $error++;
+                        $this->errors[] = $this->db->lasterror();
+                    }
+                }
+            } else {
+                $this->errors[] = $this->db->lasterror();
+                $error++;
+            }
+
+            if (!$error) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
+    }
+
+    /**
+     *    Retourne un checked si vrai
+     *
+     * @param string $name name du paramètre de configuration
+     *
+     * @return string            retourne checked si > 0
+     */
+    public function getCheckOption($name)
+    {
 
 		$sql = "SELECT value";
 		$sql .= " FROM ".MAIN_DB_PREFIX."holiday_config";
@@ -1861,8 +1548,6 @@ public $statut = '';
 		}
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Créer les entrées pour chaque utilisateur au moment de la configuration
@@ -1905,26 +1590,271 @@ public $statut = '';
 	 *
 	 *  @param	int		$user_id        ID de l'utilisateur à supprimer
 	 *  @return boolean      			Vrai si pas d'erreur, faut si Erreur
-	 */
-	public function deleteCPuser($user_id)
-	{
+     */
+    public function deleteCPuser($user_id)
+    {
 
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."holiday_users";
-		$sql .= " WHERE fk_user = ".((int) $user_id);
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "holiday_users";
+        $sql .= " WHERE fk_user = " . ((int) $user_id);
 
-		$this->db->query($sql);
-	}
+        $this->db->query($sql);
+    }
 
-	/**
-	 * Return list of people with permission to validate leave requests.
-	 * Search for permission "approve leave requests"
-	 *
-	 * @return  array       Array of user ids
-	 */
-	public function fetch_users_approver_holiday()
-	{
-		// phpcs:enable
-		$users_validator = array();
+    /**
+     *  Return balance of holiday for one user
+     *
+     * @param int $user_id ID de l'utilisateur
+     * @param int $fk_type Filter on type
+     *
+     * @return float                Retourne le solde de congés payés de l'utilisateur
+     */
+    public function getCPforUser($user_id, $fk_type = 0)
+    {
+        $sql = "SELECT nb_holiday";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "holiday_users";
+        $sql .= " WHERE fk_user = " . (int) $user_id;
+        if ($fk_type > 0) {
+            $sql .= " AND fk_type = " . (int) $fk_type;
+        }
+
+        dol_syslog(get_class($this) . '::getCPforUser user_id=' . $user_id . ' type_id=' . $fk_type, LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            //return number_format($obj->nb_holiday,2);
+            if ($obj) {
+                return $obj->nb_holiday;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *    Get list of Users or list of vacation balance.
+     *
+     * @param boolean $stringlist If true return a string list of id. If false, return an array with detail.
+     * @param boolean $type       If true, read Dolibarr user list, if false, return vacation balance list.
+     * @param string  $filters    Filters
+     *
+     * @return     array|string|int                Return an array
+     */
+    public function fetchUsers($stringlist = true, $type = true, $filters = '')
+    {
+        global $conf;
+
+        dol_syslog(get_class($this) . "::fetchUsers", LOG_DEBUG);
+
+        if ($stringlist) {
+            if ($type) {
+                // If user of Dolibarr
+                $sql = "SELECT";
+                if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+                    $sql .= " DISTINCT";
+                }
+                $sql .= " u.rowid";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "user as u";
+
+                if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+                    $sql .= ", " . MAIN_DB_PREFIX . "usergroup_user as ug";
+                    $sql .= " WHERE ((ug.fk_user = u.rowid";
+                    $sql .= " AND ug.entity IN (" . getEntity('usergroup') . "))";
+                    $sql .= " OR u.entity = 0)"; // Show always superadmin
+                } else {
+                    $sql .= " WHERE u.entity IN (" . getEntity('user') . ")";
+                }
+                $sql .= " AND u.statut > 0";
+                $sql .= " AND u.employee = 1"; // We only want employee users for holidays
+                if ($filters) {
+                    $sql .= $filters;
+                }
+
+                $resql = $this->db->query($sql);
+
+                // Si pas d'erreur SQL
+                if ($resql) {
+                    $i = 0;
+                    $num = $this->db->num_rows($resql);
+                    $stringlist = '';
+
+                    // Boucles du listage des utilisateurs
+                    while ($i < $num) {
+                        $obj = $this->db->fetch_object($resql);
+
+                        if ($i == 0) {
+                            $stringlist .= $obj->rowid;
+                        } else {
+                            $stringlist .= ', ' . $obj->rowid;
+                        }
+
+                        $i++;
+                    }
+                    // Retoune le tableau des utilisateurs
+                    return $stringlist;
+                } else {
+                    // Erreur SQL
+                    $this->error = "Error " . $this->db->lasterror();
+                    return -1;
+                }
+            } else {
+                // We want only list of vacation balance for user ids
+                $sql = "SELECT DISTINCT cpu.fk_user";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "holiday_users as cpu, " . MAIN_DB_PREFIX . "user as u";
+                $sql .= " WHERE cpu.fk_user = u.rowid";
+                if ($filters) {
+                    $sql .= $filters;
+                }
+
+                $resql = $this->db->query($sql);
+
+                // Si pas d'erreur SQL
+                if ($resql) {
+                    $i = 0;
+                    $num = $this->db->num_rows($resql);
+                    $stringlist = '';
+
+                    // Boucles du listage des utilisateurs
+                    while ($i < $num) {
+                        $obj = $this->db->fetch_object($resql);
+
+                        if ($i == 0) {
+                            $stringlist .= $obj->fk_user;
+                        } else {
+                            $stringlist .= ', ' . $obj->fk_user;
+                        }
+
+                        $i++;
+                    }
+                    // Retoune le tableau des utilisateurs
+                    return $stringlist;
+                } else {
+                    // Erreur SQL
+                    $this->error = "Error " . $this->db->lasterror();
+                    return -1;
+                }
+            }
+        } else {
+            // Si faux donc return array
+            // List for Dolibarr users
+            if ($type) {
+                // If user of Dolibarr
+                $sql = "SELECT";
+                if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+                    $sql .= " DISTINCT";
+                }
+                $sql .= " u.rowid, u.lastname, u.firstname, u.gender, u.photo, u.employee, u.statut, u.fk_user";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "user as u";
+
+                if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+                    $sql .= ", " . MAIN_DB_PREFIX . "usergroup_user as ug";
+                    $sql .= " WHERE ((ug.fk_user = u.rowid";
+                    $sql .= " AND ug.entity IN (" . getEntity('usergroup') . "))";
+                    $sql .= " OR u.entity = 0)"; // Show always superadmin
+                } else {
+                    $sql .= " WHERE u.entity IN (" . getEntity('user') . ")";
+                }
+
+                $sql .= " AND u.statut > 0";
+                $sql .= " AND u.employee = 1"; // We only want employee users for holidays
+                if ($filters) {
+                    $sql .= $filters;
+                }
+
+                $resql = $this->db->query($sql);
+
+                // Si pas d'erreur SQL
+                if ($resql) {
+                    $i = 0;
+                    $tab_result = $this->holiday;
+                    $num = $this->db->num_rows($resql);
+
+                    // Boucles du listage des utilisateurs
+                    while ($i < $num) {
+                        $obj = $this->db->fetch_object($resql);
+
+                        $tab_result[$i]['rowid'] = $obj->rowid; // rowid of user
+                        $tab_result[$i]['name'] = $obj->lastname; // deprecated
+                        $tab_result[$i]['lastname'] = $obj->lastname;
+                        $tab_result[$i]['firstname'] = $obj->firstname;
+                        $tab_result[$i]['gender'] = $obj->gender;
+                        $tab_result[$i]['status'] = $obj->statut;
+                        $tab_result[$i]['employee'] = $obj->employee;
+                        $tab_result[$i]['photo'] = $obj->photo;
+                        $tab_result[$i]['fk_user'] = $obj->fk_user; // rowid of manager
+                        //$tab_result[$i]['type'] = $obj->type;
+                        //$tab_result[$i]['nb_holiday'] = $obj->nb_holiday;
+
+                        $i++;
+                    }
+                    // Retoune le tableau des utilisateurs
+                    return $tab_result;
+                } else {
+                    // Erreur SQL
+                    $this->errors[] = "Error " . $this->db->lasterror();
+                    return -1;
+                }
+            } else {
+                // List of vacation balance users
+                $sql = "SELECT cpu.fk_type, cpu.nb_holiday, u.rowid, u.lastname, u.firstname, u.gender, u.photo, u.employee, u.statut, u.fk_user";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "holiday_users as cpu, " . MAIN_DB_PREFIX . "user as u";
+                $sql .= " WHERE cpu.fk_user = u.rowid";
+                if ($filters) {
+                    $sql .= $filters;
+                }
+
+                $resql = $this->db->query($sql);
+
+                // Si pas d'erreur SQL
+                if ($resql) {
+                    $i = 0;
+                    $tab_result = $this->holiday;
+                    $num = $this->db->num_rows($resql);
+
+                    // Boucles du listage des utilisateurs
+                    while ($i < $num) {
+                        $obj = $this->db->fetch_object($resql);
+
+                        $tab_result[$i]['rowid'] = $obj->rowid; // rowid of user
+                        $tab_result[$i]['name'] = $obj->lastname; // deprecated
+                        $tab_result[$i]['lastname'] = $obj->lastname;
+                        $tab_result[$i]['firstname'] = $obj->firstname;
+                        $tab_result[$i]['gender'] = $obj->gender;
+                        $tab_result[$i]['status'] = $obj->statut;
+                        $tab_result[$i]['employee'] = $obj->employee;
+                        $tab_result[$i]['photo'] = $obj->photo;
+                        $tab_result[$i]['fk_user'] = $obj->fk_user; // rowid of manager
+
+                        $tab_result[$i]['type'] = $obj->fk_type;
+                        $tab_result[$i]['nb_holiday'] = $obj->nb_holiday;
+
+                        $i++;
+                    }
+                    // Retoune le tableau des utilisateurs
+                    return $tab_result;
+                } else {
+                    // Erreur SQL
+                    $this->error = "Error " . $this->db->lasterror();
+                    return -1;
+                }
+            }
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return list of people with permission to validate leave requests.
+     * Search for permission "approve leave requests"
+     *
+     * @return  array       Array of user ids
+     */
+    public function fetch_users_approver_holiday()
+    {
+        // phpcs:enable
+        $users_validator = array();
 
 		$sql = "SELECT DISTINCT ur.fk_user";
 		$sql .= " FROM ".MAIN_DB_PREFIX."user_rights as ur, ".MAIN_DB_PREFIX."rights_def as rd";
@@ -1948,9 +1878,10 @@ public $statut = '';
 		} else {
 			$this->error = $this->db->lasterror();
 			dol_syslog(get_class($this)."::fetch_users_approver_holiday  Error ".$this->error, LOG_ERR);
-			return -1;
+            return -1;
 		}
 	}
+
 
 	/**
 	 *	Compte le nombre d'utilisateur actifs dans Dolibarr
@@ -1968,7 +1899,6 @@ public $statut = '';
 
 		return $objet->compteur;
 	}
-
 	/**
 	 *	Compte le nombre d'utilisateur actifs dans Dolibarr sans CP
 	 *
@@ -1992,25 +1922,96 @@ public $statut = '';
 	 *
 	 *  @param    int	$userDolibarrWithoutCP	Number of active users in Dolibarr without holidays
 	 *  @param    int	$userCP    				Number of active users into table of holidays
-	 *  @return   int							<0 if KO, >0 if OK
-	 */
-	public function verifNbUsers($userDolibarrWithoutCP, $userCP)
-	{
-		if (empty($userCP)) {
-			$userCP = 0;
-		}
-		dol_syslog(get_class($this).'::verifNbUsers userDolibarr='.$userDolibarrWithoutCP.' userCP='.$userCP);
-		return 1;
-	}
+	 *  @return   int                            <0 if KO, >0 if OK
+     */
+    public function verifNbUsers($userDolibarrWithoutCP, $userCP)
+    {
+        if (empty($userCP)) {
+            $userCP = 0;
+        }
+        dol_syslog(get_class($this) . '::verifNbUsers userDolibarr=' . $userDolibarrWithoutCP . ' userCP=' . $userCP);
+        return 1;
+    }
 
-	/**
-	 *  Liste le log des congés payés
-	 *
-	 *  @param	string	$order      Filtrage par ordre
-	 *  @param  string	$filter     Filtre de séléction
-	 *  @return int         		-1 si erreur, 1 si OK et 2 si pas de résultat
-	 */
-	public function fetchLog($order, $filter)
+    /**
+     * addLogCP
+     *
+     * @param int    $fk_user_action Id user creation
+     * @param int    $fk_user_update Id user update
+     * @param string $label          Label (Example: 'Leave', 'Manual update', 'Leave request cancelation'...)
+     * @param int    $new_solde      New value
+     * @param int    $fk_type        Type of vacation
+     *
+     * @return    int                            Id of record added, 0 if nothing done, < 0 if KO
+     */
+    public function addLogCP($fk_user_action, $fk_user_update, $label, $new_solde, $fk_type)
+    {
+        global $conf, $langs;
+
+        $error = 0;
+
+        $prev_solde = price2num($this->getCPforUser($fk_user_update, $fk_type), 5);
+        $new_solde = price2num($new_solde, 5);
+        //print "$prev_solde == $new_solde";
+
+        if ($prev_solde == $new_solde) {
+            return 0;
+        }
+
+        $this->db->begin();
+
+        // Insert request
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "holiday_logs (";
+        $sql .= "date_action,";
+        $sql .= "fk_user_action,";
+        $sql .= "fk_user_update,";
+        $sql .= "type_action,";
+        $sql .= "prev_solde,";
+        $sql .= "new_solde,";
+        $sql .= "fk_type";
+        $sql .= ") VALUES (";
+        $sql .= " '" . $this->db->idate(dol_now()) . "',";
+        $sql .= " " . ((int) $fk_user_action) . ",";
+        $sql .= " " . ((int) $fk_user_update) . ",";
+        $sql .= " '" . $this->db->escape($label) . "',";
+        $sql .= " " . ((float) $prev_solde) . ",";
+        $sql .= " " . ((float) $new_solde) . ",";
+        $sql .= " " . ((int) $fk_type);
+        $sql .= ")";
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
+
+        if (!$error) {
+            $this->optRowid = $this->db->last_insert_id(MAIN_DB_PREFIX . "holiday_logs");
+        }
+
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::addLogCP " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->optRowid;
+        }
+    }
+
+    /**
+     *  Liste le log des congés payés
+     *
+     * @param string $order  Filtrage par ordre
+     * @param string $filter Filtre de séléction
+     *
+     * @return int                -1 si erreur, 1 si OK et 2 si pas de résultat
+     */
+    public function fetchLog($order, $filter)
 	{
 		$sql = "SELECT";
 		$sql .= " cpl.rowid,";
@@ -2061,26 +2062,66 @@ public $statut = '';
 				$tab_result[$i]['new_solde'] = $obj->new_solde;
 				$tab_result[$i]['fk_type'] = $obj->fk_type;
 
-				$i++;
-			}
-			// Retourne 1 et ajoute le tableau à la variable
-			$this->logs = $tab_result;
-			return 1;
-		} else {
-			// Erreur SQL
-			$this->error = "Error ".$this->db->lasterror();
-			return -1;
-		}
-	}
+                $i++;
+            }
+            // Retourne 1 et ajoute le tableau à la variable
+            $this->logs = $tab_result;
+            return 1;
+        } else {
+            // Erreur SQL
+            $this->error = "Error " . $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *  Load information on object
-	 *
-	 *  @param  int     $id      Id of object
-	 *  @return void
-	 */
-	public function info($id)
-	{
+    /**
+     *  Return array with list of types
+     *
+     * @param int $active Status of type. -1 = Both
+     * @param int $affect Filter on affect (a request will change sold or not). -1 = Both
+     *
+     * @return     array                Return array with list of types
+     */
+    public function getTypes($active = -1, $affect = -1)
+    {
+        global $mysoc;
+
+        $sql = "SELECT rowid, code, label, affect, delay, newByMonth";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_holiday_types";
+        $sql .= " WHERE (fk_country IS NULL OR fk_country = " . ((int) $mysoc->country_id) . ')';
+        if ($active >= 0) {
+            $sql .= " AND active = " . ((int) $active);
+        }
+        if ($affect >= 0) {
+            $sql .= " AND affect = " . ((int) $affect);
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $num = $this->db->num_rows($result);
+            if ($num) {
+                while ($obj = $this->db->fetch_object($result)) {
+                    $types[$obj->rowid] = ['rowid' => $obj->rowid, 'code' => $obj->code, 'label' => $obj->label, 'affect' => $obj->affect, 'delay' => $obj->delay, 'newByMonth' => $obj->newByMonth];
+                }
+
+                return $types;
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+
+        return [];
+    }
+
+    /**
+     *  Load information on object
+     *
+     * @param int $id Id of object
+     *
+     * @return void
+     */
+    public function info($id)
+    {
 		global $conf;
 
 		$sql = "SELECT f.rowid, f.statut as status,";

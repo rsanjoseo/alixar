@@ -33,80 +33,96 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class ChargeSociales extends CommonObject
 {
-	const STATUS_UNPAID = 0;
-	const STATUS_PAID = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'chargesociales';
+
 	public $table = 'chargesociales';
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'chargesociales';
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'bill';
-	/**
-	 * @var integer|string $date_ech
-	 */
-	public $date_ech;
-	public $label;
-	public $type;
-	public $type_label;
+
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'chargesociales';
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'bill';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    /**
+     * @var integer|string $date_ech
+     */
+    public $date_ech;
+
+    public $label;
+    public $type;
+    public $type_label;
 	public $amount;
 	public $paye;
 	public $periode;
+
 	/**
 	 * @var integer|string date_creation
 	 */
 	public $date_creation;
+
 	/**
 	 * @var integer|string $date_modification
 	 */
 	public $date_modification;
-	/**
+
+    /**
 	 * @var integer|string $date_validation
 	 */
 	public $date_validation;
-	/**
+
+    /**
 	 * @deprecated Use label instead
 	 */
 	public $lib;
-	/**
+
+    /**
 	 * @var int account ID
 	 */
 	public $fk_account;
-	/**
+
+    /**
 	 * @var int account ID (identical to fk_account)
 	 */
 	public $accountid;
-	/**
+
+    /**
 	 * @var int payment type (identical to mode_reglement_id in commonobject class)
 	 */
 	public $paiementtype;
-	/**
-	 * @var int ID
-	 */
-	public $fk_project;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user;
-	/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref';
 
-	/**
-	 * Constructor
-	 *
-	 * @param	DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    /**
+     * @var int ID
+     */
+    public $fk_project;
+
+    /**
+     * @var int ID
+     */
+    public $fk_user;
+
+    const STATUS_UNPAID = 0;
+    const STATUS_PAID = 1;
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
 	}
 
 	/**
@@ -159,25 +175,43 @@ class ChargeSociales extends CommonObject
 
 				$this->db->free($resql);
 
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *      Create a social contribution into database
-	 *
-	 *      @param	User	$user   User making creation
-	 *      @return int     		<0 if KO, id if OK
-	 */
-	public function create($user)
-	{
-		global $conf;
+    /**
+     * Check if a social contribution can be created into database
+     *
+     * @return    boolean        True or false
+     */
+    public function check()
+    {
+        $newamount = price2num($this->amount, 'MT');
+
+        // Validation of parameters
+        if (!$newamount > 0 || empty($this->date_ech) || empty($this->periode)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     *      Create a social contribution into database
+     *
+     * @param User $user User making creation
+     *
+     * @return int            <0 if KO, id if OK
+     */
+    public function create($user)
+    {
+        global $conf;
 		$error = 0;
 
 		$now = dol_now();
@@ -232,23 +266,6 @@ class ChargeSociales extends CommonObject
 		}
 	}
 
-	/**
-	 * Check if a social contribution can be created into database
-	 *
-	 * @return	boolean		True or false
-	 */
-	public function check()
-	{
-		$newamount = price2num($this->amount, 'MT');
-
-		// Validation of parameters
-		if (!$newamount > 0 || empty($this->date_ech) || empty($this->periode)) {
-			return false;
-		}
-
-
-		return true;
-	}
 
 	/**
 	 *      Delete a social contribution
@@ -459,27 +476,89 @@ class ChargeSociales extends CommonObject
 	public function setUnpaid($user)
 	{
 		$sql = "UPDATE ".MAIN_DB_PREFIX."chargesociales SET";
-		$sql .= " paye = 0";
-		$sql .= " WHERE rowid = ".((int) $this->id);
-		$return = $this->db->query($sql);
-		if ($return) {
-			return 1;
-		} else {
-			return -1;
-		}
-	}
+        $sql .= " paye = 0";
+        $sql .= " WHERE rowid = " . ((int) $this->id);
+        $return = $this->db->query($sql);
+        if ($return) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
 
-	/**
-	 *  Return a link to the object card (with optionaly the picto)
-	 *
-	 *	@param	int		$withpicto					Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
-	 *  @param  string  $option                     On what the link point to ('nolink', ...)
-	 *  @param	int  	$notooltip					1=Disable tooltip
-	 *  @param  int		$short           			1=Return just URL
-	 *  @param  int     $save_lastsearch_value		-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *	@return	string								String with link
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $short = 0, $save_lastsearch_value = -1)
+    /**
+     *  Retourne le libelle du statut d'une charge (impaye, payee)
+     *
+     * @param int    $mode        0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
+     * @param double $alreadypaid 0=No payment already done, >0=Some payments were already done (we recommand to put here amount paid if you have it, 1 otherwise)
+     *
+     * @return    string                    Label
+     */
+    public function getLibStatut($mode = 0, $alreadypaid = -1)
+    {
+        return $this->LibStatut($this->paye, $mode, $alreadypaid);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoi le libelle d'un statut donne
+     *
+     * @param int    $status      Id status
+     * @param int    $mode        0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
+     * @param double $alreadypaid 0=No payment already done, >0=Some payments were already done (we recommand to put here amount paid if you have it, 1 otherwise)
+     *
+     * @return string                    Label
+     */
+    public function LibStatut($status, $mode = 0, $alreadypaid = -1)
+    {
+        // phpcs:enable
+        global $langs;
+
+        // Load translation files required by the page
+        $langs->loadLangs(["customers", "bills"]);
+
+        // We reinit status array to force to redefine them because label may change according to properties values.
+        $this->labelStatus = [];
+        $this->labelStatusShort = [];
+
+        if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+            global $langs;
+            //$langs->load("mymodule");
+            $this->labelStatus[self::STATUS_UNPAID] = $langs->trans('Unpaid');
+            $this->labelStatus[self::STATUS_PAID] = $langs->trans('Paid');
+            if ($status == self::STATUS_UNPAID && $alreadypaid > 0) {
+                $this->labelStatus[self::STATUS_UNPAID] = $langs->trans("BillStatusStarted");
+            }
+            $this->labelStatusShort[self::STATUS_UNPAID] = $langs->trans('Unpaid');
+            $this->labelStatusShort[self::STATUS_PAID] = $langs->trans('Paid');
+            if ($status == self::STATUS_UNPAID && $alreadypaid > 0) {
+                $this->labelStatusShort[self::STATUS_UNPAID] = $langs->trans("BillStatusStarted");
+            }
+        }
+
+        $statusType = 'status1';
+        if ($status == 0 && $alreadypaid > 0) {
+            $statusType = 'status3';
+        }
+        if ($status == 1) {
+            $statusType = 'status6';
+        }
+
+        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
+
+    /**
+     *  Return a link to the object card (with optionaly the picto)
+     *
+     * @param int    $withpicto             Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
+     * @param string $option                On what the link point to ('nolink', ...)
+     * @param int    $notooltip             1=Disable tooltip
+     * @param int    $short                 1=Return just URL
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     * @return    string                                String with link
+     */
+    public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $short = 0, $save_lastsearch_value = -1)
 	{
 		global $langs, $conf, $user, $form;
 
@@ -548,66 +627,6 @@ class ChargeSociales extends CommonObject
 		$result .= $linkend;
 
 		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Retourne le libelle du statut d'une charge (impaye, payee)
-	 *
-	 *  @param	int		$mode       	0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
-	 *  @param  double	$alreadypaid	0=No payment already done, >0=Some payments were already done (we recommand to put here amount paid if you have it, 1 otherwise)
-	 *  @return	string        			Label
-	 */
-	public function getLibStatut($mode = 0, $alreadypaid = -1)
-	{
-		return $this->LibStatut($this->paye, $mode, $alreadypaid);
-	}
-
-	/**
-	 *  Renvoi le libelle d'un statut donne
-	 *
-	 *  @param	int		$status        	Id status
-	 *  @param  int		$mode          	0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
-	 *  @param  double	$alreadypaid	0=No payment already done, >0=Some payments were already done (we recommand to put here amount paid if you have it, 1 otherwise)
-	 *  @return string        			Label
-	 */
-	public function LibStatut($status, $mode = 0, $alreadypaid = -1)
-	{
-		// phpcs:enable
-		global $langs;
-
-		// Load translation files required by the page
-		$langs->loadLangs(array("customers", "bills"));
-
-		// We reinit status array to force to redefine them because label may change according to properties values.
-		$this->labelStatus = array();
-		$this->labelStatusShort = array();
-
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-			//$langs->load("mymodule");
-			$this->labelStatus[self::STATUS_UNPAID] = $langs->trans('Unpaid');
-			$this->labelStatus[self::STATUS_PAID] = $langs->trans('Paid');
-			if ($status == self::STATUS_UNPAID && $alreadypaid > 0) {
-				$this->labelStatus[self::STATUS_UNPAID] = $langs->trans("BillStatusStarted");
-			}
-			$this->labelStatusShort[self::STATUS_UNPAID] = $langs->trans('Unpaid');
-			$this->labelStatusShort[self::STATUS_PAID] = $langs->trans('Paid');
-			if ($status == self::STATUS_UNPAID && $alreadypaid > 0) {
-				$this->labelStatusShort[self::STATUS_UNPAID] = $langs->trans("BillStatusStarted");
-			}
-		}
-
-		$statusType = 'status1';
-		if ($status == 0 && $alreadypaid > 0) {
-			$statusType = 'status3';
-		}
-		if ($status == 1) {
-			$statusType = 'status6';
-		}
-
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
 	/**

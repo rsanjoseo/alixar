@@ -3123,17 +3123,17 @@ if (!GETPOST('hide_websitemenu')) {
 		print '</span>'; // end websitetools
 
 		print '<span class="websitehelp">';
-		if (GETPOST('editsource', 'alpha') || GETPOST('editcontent', 'alpha')) {
-			$url = 'https://wiki.dolibarr.org/index.php/Module_Website';
+		if ($action == 'editsource' || $action == 'editcontent' || GETPOST('editsource', 'alpha') || GETPOST('editcontent', 'alpha')) {
+            $url = 'https://wiki.dolibarr.org/index.php/Module_Website';
 
-			$htmltext = $langs->transnoentitiesnoconv("YouCanEditHtmlSource", $url);
-			$htmltext .= $langs->transnoentitiesnoconv("YouCanEditHtmlSource2", $url);
-			$htmltext .= $langs->transnoentitiesnoconv("YouCanEditHtmlSourceMore", $url);
-			$htmltext .= '<br>';
-			if ($conf->browser->layout == 'phone') {
-				print $form->textwithpicto('', $htmltext, 1, 'help', 'inline-block', 1, 2, 'tooltipsubstitution');
-			} else {
-				//img_help(($tooltiptrigger != '' ? 2 : 1), $alt)
+            $htmltext = $langs->transnoentitiesnoconv("YouCanEditHtmlSource", $url);
+            $htmltext .= $langs->transnoentitiesnoconv("YouCanEditHtmlSource2", $url);
+            $htmltext .= $langs->transnoentitiesnoconv("YouCanEditHtmlSourceMore", $url);
+            $htmltext .= '<br>';
+            if ($conf->browser->layout == 'phone') {
+                print $form->textwithpicto('', $htmltext, 1, 'help', 'inline-block', 1, 2, 'tooltipsubstitution');
+            } else {
+                //img_help(($tooltiptrigger != '' ? 2 : 1), $alt)
 				print $form->textwithpicto($langs->trans("SyntaxHelp").' '.img_help(2, $langs->trans("SyntaxHelp")), $htmltext, 1, 'none', 'inline-block', 1, 2, 'tooltipsubstitution');
 			}
 		}

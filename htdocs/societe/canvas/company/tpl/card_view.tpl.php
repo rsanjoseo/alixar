@@ -267,8 +267,9 @@ for ($i = 1; $i <= 4; $i++) {
 	<?php if ($conf->use_javascript_ajax) { ?>
 		<span id="action-delete" class="butActionDelete"><?php echo $langs->trans('Delete'); ?></span>
 	<?php } else { ?>
-		<a class="butActionDelete" href="<?php echo $_SERVER["PHP_SELF"].'?socid='.$this->control->tpl['id'].'&amp;action=delete&amp;token='.newToken().'&amp;canvas='.$canvas; ?>"><?php echo $langs->trans('Delete'); ?></a>
-	<?php } ?>
+        <a class="butActionDelete"
+           href="<?php echo $_SERVER["PHP_SELF"] . '?socid=' . $this->control->tpl['id'] . '&action=delete&token=' . newToken() . '&canvas=' . $canvas; ?>"><?php echo $langs->trans('Delete'); ?></a>
+    <?php } ?>
 <?php } ?>
 </div>
 

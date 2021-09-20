@@ -23,7 +23,7 @@
  * \brief		File that include javascript functions (included if option use_javascript activated)
  * 				JQuery (providing object $) and JQuery-UI (providing $datepicker) libraries must be loaded before this file.
  */
-/*
+
 if (!defined('NOREQUIRESOC')) {
 	define('NOREQUIRESOC', '1');
 }
@@ -45,7 +45,7 @@ if (!defined('NOREQUIREHTML')) {
 if (!defined('NOREQUIREAJAX')) {
 	define('NOREQUIREAJAX', '1');
 }
-*/
+
 session_cache_limiter('public');
 
 require_once '../../main.inc.php';

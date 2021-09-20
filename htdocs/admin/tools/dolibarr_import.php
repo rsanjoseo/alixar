@@ -22,9 +22,9 @@
  *        \brief      Page to import database
  */
 
-//if (! defined('CSRFCHECK_WITH_TOKEN')) {
-//	define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
-//}
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1');        // Force use of CSRF protection with tokens even for GET
+}
 
 require '../../main.inc.php';
 
@@ -32,7 +32,7 @@ require '../../main.inc.php';
 $langs->loadLangs(["other", "admin"]);
 
 if (!$user->admin) {
-    accessforbidden();
+	accessforbidden();
 }
 
 $radio_dump = GETPOST('radio_dump');

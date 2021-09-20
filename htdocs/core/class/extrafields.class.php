@@ -37,144 +37,166 @@
  */
 class ExtraFields
 {
-	public static $type2label = array(
-		'varchar'=>'String1Line',
-		'text'=>'TextLongNLines',
-		'html'=>'HtmlText',
-		'int'=>'Int',
-		'double'=>'Float',
-		'date'=>'Date',
-		'datetime'=>'DateAndTime',
-		'boolean'=>'Boolean',
-		'price'=>'ExtrafieldPrice',
-		'phone'=>'ExtrafieldPhone',
-		'mail'=>'ExtrafieldMail',
-		'url'=>'ExtrafieldUrl',
-		'password' => 'ExtrafieldPassword',
-		'select' => 'ExtrafieldSelect',
-		'sellist' => 'ExtrafieldSelectList',
-		'radio' => 'ExtrafieldRadio',
-		'checkbox' => 'ExtrafieldCheckBox',
-		'chkbxlst' => 'ExtrafieldCheckBoxFromList',
-		'link' => 'ExtrafieldLink',
-		'separate' => 'ExtrafieldSeparator',
-	);
 	/**
 	 * @var DoliDB Database handler.
 	 */
 	public $db;
+
 	/**
 	 * @var array Array with type of element (for what object is the extrafield)
 	 * @deprecated
 	 */
 	public $attribute_elementtype;
+
 	/**
 	 * @var array Array with type of the extra field
 	 * @deprecated
 	 */
 	public $attribute_type;
-	/**
+
+    /**
 	 * @var array Array with label of extra field
 	 * @deprecated
 	 */
 	public $attribute_label;
-	/**
+
+    /**
 	 * @var array Array with size of extra field
 	 * @deprecated
 	 */
 	public $attribute_size;
-	/**
+
+    /**
 	 * @var array Array with list of possible values for some types of extra fields
 	 * @deprecated
 	 */
 	public $attribute_choice;
-	/**
+
+    /**
 	 * @var array Array to store compute formula for computed fields
 	 * @deprecated
 	 */
 	public $attribute_computed;
-	/**
+
+    /**
 	 * @var array Array to store default value
 	 * @deprecated
 	 */
 	public $attribute_default;
-	/**
+
+    /**
 	 * @var array Array to store if attribute is unique or not
 	 * @deprecated
 	 */
 	public $attribute_unique;
-	/**
+
+    /**
 	 * @var array Array to store if attribute is required or not
 	 * @deprecated
 	 */
 	public $attribute_required;
-	/**
+
+    /**
 	 * @var array Array to store parameters of attribute (used in select type)
 	 * @deprecated
 	 */
 	public $attribute_param;
-	/**
+
+    /**
 	 * @var array Array to store position of attribute
 	 * @deprecated
 	 */
 	public $attribute_pos;
-	/**
+
+    /**
 	 * @var array Array to store if attribute is editable regardless of the document status
 	 * @deprecated
 	 */
 	public $attribute_alwayseditable;
-	/**
+
+    /**
 	 * @var array Array to store permission to check
 	 * @deprecated
 	 */
 	public $attribute_perms;
-	/**
+
+    /**
 	 * @var array Array to store language file to translate label of values
 	 * @deprecated
 	 */
 	public $attribute_langfile;
-	/**
+
+    /**
 	 * @var array Array to store if field is visible by default on list
 	 * @deprecated
 	 */
 	public $attribute_list;
-	/**
+
+    /**
 	 * @var array Array to store if field is summable
 	 * @deprecated
 	 */
 	public $attribute_totalizable;
-	/**
+
+    /**
 	 * @var array Array to store entity id of extrafield
 	 * @deprecated
 	 */
 	public $attribute_entityid;
-	/**
+
+    /**
 	 * @var array New array to store extrafields definition
 	 */
 	public $attributes;
-	/**
+
+    /**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-	/**
-	 * @var string[] Array of Error code (or message)
-	 */
-	public $errors = array();
-	/**
-	 * @var string DB Error number
-	 */
-	public $errno;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->error = '';
-		$this->errors = array();
+    /**
+     * @var string[] Array of Error code (or message)
+     */
+    public $errors = [];
+
+    /**
+     * @var string DB Error number
+     */
+    public $errno;
+
+    public static $type2label = [
+        'varchar' => 'String1Line',
+        'text' => 'TextLongNLines',
+        'html' => 'HtmlText',
+        'int' => 'Int',
+        'double' => 'Float',
+        'date' => 'Date',
+        'datetime' => 'DateAndTime',
+        'boolean' => 'Boolean',
+        'price' => 'ExtrafieldPrice',
+        'phone' => 'ExtrafieldPhone',
+        'mail' => 'ExtrafieldMail',
+        'url' => 'ExtrafieldUrl',
+        'password' => 'ExtrafieldPassword',
+        'select' => 'ExtrafieldSelect',
+        'sellist' => 'ExtrafieldSelectList',
+        'radio' => 'ExtrafieldRadio',
+        'checkbox' => 'ExtrafieldCheckBox',
+        'chkbxlst' => 'ExtrafieldCheckBoxFromList',
+        'link' => 'ExtrafieldLink',
+        'separate' => 'ExtrafieldSeparator',
+    ];
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->error = '';
+        $this->errors = array();
 		$this->attributes = array();
 
 		// For old usage
@@ -1208,7 +1230,7 @@ class ExtraFields
 					}
 				}
 				if (count($InfoFieldList) > 3 && !empty($InfoFieldList[3])) {
-					list($parentName, $parentField) = explode('|', $InfoFieldList[3]);
+					[$parentName, $parentField] = explode('|', $InfoFieldList[3]);
 					$keyList .= ', '.$parentField;
 				}
 
@@ -1369,7 +1391,7 @@ class ExtraFields
 				$keyList = (empty($InfoFieldList[2]) ? 'rowid' : $InfoFieldList[2].' as rowid');
 
 				if (count($InfoFieldList) > 3 && !empty($InfoFieldList[3])) {
-					list ($parentName, $parentField) = explode('|', $InfoFieldList[3]);
+					[$parentName, $parentField] = explode('|', $InfoFieldList[3]);
 					$keyList .= ', '.$parentField;
 				}
 				if (count($InfoFieldList) > 4 && !empty($InfoFieldList[4])) {

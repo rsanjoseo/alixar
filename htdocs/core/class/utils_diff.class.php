@@ -21,28 +21,6 @@ class Diff
 	const INSERTED = 2;
 
 	/**
-	 * Returns the diff for two files. The parameters are:
-	 *
-	 * @param	string	$file1              Path to the first file
-	 * @param	string	$file2              Path to the second file
-	 * @param	boolean	$compareCharacters  true to compare characters, and false to compare lines; this optional parameter defaults to false
-	 * @return	array						Array of diff
-	 */
-	public static function compareFiles(
-		$file1,
-		$file2,
-		$compareCharacters = false
-	) {
-
-		// return the diff of the files
-		return self::compare(
-			file_get_contents($file1),
-			file_get_contents($file2),
-			$compareCharacters
-		);
-	}
-
-	/**
 	 * Returns the diff for two strings. The return value is an array, each of
 	 * whose values is an array containing two values: a line (or character, if
 	 * $compareCharacters is true), and one of the constants DIFF::UNMODIFIED (the
@@ -99,25 +77,48 @@ class Diff
 			$diff[] = array_pop($partialDiff);
 		}
 
-		$end2 = ($compareCharacters ? strlen($sequence1) : count($sequence1));
-		for ($index = $end1 + 1; $index < $end2; $index++) {
-			$diff[] = array($sequence1[$index], self::UNMODIFIED);
-		}
+        $end2 = ($compareCharacters ? strlen($sequence1) : count($sequence1));
+        for ($index = $end1 + 1; $index < $end2; $index++) {
+            $diff[] = [$sequence1[$index], self::UNMODIFIED];
+        }
 
-		// return the diff
-		return $diff;
-	}
+        // return the diff
+        return $diff;
+    }
 
-	/**
-	 * Returns the table of longest common subsequence lengths for the specified sequences. The parameters are:
-	 *
-	 * @param	string	$sequence1 	the first sequence
-	 * @param	string	$sequence2 	the second sequence
-	 * @param	string	$start     	the starting index
-	 * @param	string	$end1      	the ending index for the first sequence
-	 * @param	string	$end2      	the ending index for the second sequence
-	 * @return	array				array of diff
-	 */
+    /**
+     * Returns the diff for two files. The parameters are:
+     *
+     * @param string  $file1             Path to the first file
+     * @param string  $file2             Path to the second file
+     * @param boolean $compareCharacters true to compare characters, and false to compare lines; this optional parameter defaults to false
+     *
+     * @return    array                        Array of diff
+     */
+    public static function compareFiles(
+        $file1,
+        $file2,
+        $compareCharacters = false
+    ) {
+
+        // return the diff of the files
+        return self::compare(
+            file_get_contents($file1),
+            file_get_contents($file2),
+            $compareCharacters
+        );
+    }
+
+    /**
+     * Returns the table of longest common subsequence lengths for the specified sequences. The parameters are:
+     *
+     * @param string $sequence1 the first sequence
+     * @param string $sequence2 the second sequence
+     * @param string $start     the starting index
+     * @param string $end1      the ending index for the first sequence
+     * @param string $end2      the ending index for the second sequence
+     * @return    array                array of diff
+     */
 	private static function computeTable($sequence1, $sequence2, $start, $end1, $end2)
 	{
 		// determine the lengths to be compared

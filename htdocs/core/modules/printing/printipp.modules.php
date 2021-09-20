@@ -30,70 +30,83 @@ include_once DOL_DOCUMENT_ROOT.'/core/modules/printing/modules_printing.php';
  */
 class printing_printipp extends PrintingDriver
 {
-	const LANGFILE = 'printipp';
 	/**
 	 * @var string module name
 	 */
 	public $name = 'printipp';
+
 	/**
 	 * @var string module description
 	 */
 	public $desc = 'PrintIPPDesc';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'printer';
-	/**
+
+    /**
 	 * @var string Constant name
 	 */
 	public $active = 'PRINTING_PRINTIPP';
-	/**
+
+    /**
 	 * @var array array of setup value
 	 */
 	public $conf = array();
-	/**
+
+    /**
 	 * @var string host
 	 */
 	public $host;
-	/**
+
+    /**
 	 * @var string port
 	 */
 	public $port;
-	/**
+
+    /**
 	 * @var string username
 	 */
 	public $userid;
-	/**
+
+    /**
 	 * @var string login for printer host
 	 */
 	public $user;
-	/**
+
+    /**
 	 * @var string password for printer host
 	 */
 	public $password;
-	/**
+
+    /**
 	 * @var string Error code (or message)
 	 */
 	public $error = '';
-	/**
-	 * @var string[] Error codes (or messages)
-	 */
-	public $errors = array();
-	/**
-	 * @var DoliDB Database handler.
-	 */
-	public $db;
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB      $db      Database handler
-	 */
-	public function __construct($db)
-	{
-		global $conf;
+    /**
+     * @var string[] Error codes (or messages)
+     */
+    public $errors = [];
 
-		$this->db = $db;
+    /**
+     * @var DoliDB Database handler.
+     */
+    public $db;
+
+    const LANGFILE = 'printipp';
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        global $conf;
+
+        $this->db = $db;
 		$this->host = $conf->global->PRINTIPP_HOST;
 		$this->port = $conf->global->PRINTIPP_PORT;
 		$this->user = $conf->global->PRINTIPP_USER;
@@ -219,8 +232,8 @@ class printing_printipp extends PrintingDriver
 			if ($conf->global->PRINTIPP_URI_DEFAULT == $value) {
 				$html .= img_picto($langs->trans("Default"), 'on');
 			} else {
-				$html .= '<a href="'.$_SERVER["PHP_SELF"].'?action=setvalue&amp;token='.newToken().'&amp;mode=test&amp;varname=PRINTIPP_URI_DEFAULT&amp;driver=printipp&amp;value='.urlencode($value).'" alt="'.$langs->trans("Default").'">'.img_picto($langs->trans("Disabled"), 'off').'</a>';
-			}
+				$html .= '<a href="' . $_SERVER["PHP_SELF"] . '?action=setvalue&token=' . newToken() . '&mode=test&varname=PRINTIPP_URI_DEFAULT&driver=printipp&value=' . urlencode($value) . '" alt="' . $langs->trans("Default") . '">' . img_picto($langs->trans("Disabled"), 'off') . '</a>';
+            }
 			$html .= '</td>';
 			$html .= '</tr>'."\n";
 		}

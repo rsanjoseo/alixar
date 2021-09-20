@@ -49,52 +49,94 @@ class Societe extends CommonObject
 	use CommonIncoterm;
 
 	/**
-	 * Third party is no customer
-	 */
-	const NO_CUSTOMER = 0;
-	/**
-	 * Third party is a customer
-	 */
-	const CUSTOMER = 1;
-	/**
-	 * Third party is a prospect
-	 */
-	const PROSPECT = 2;
-	/**
-	 * Third party is a customer and a prospect
-	 */
-	const CUSTOMER_AND_PROSPECT = 3;
-	/**
-	 * Third party is no supplier
-	 */
-	const NO_SUPPLIER = 0;
-	/**
-	 * Third party is a supplier
-	 */
-	const SUPPLIER = 1;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'societe';
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'societe';
-	/**
-	 * @var string Field with ID of parent key if this field has a parent or for child tables
-	 */
-	public $fk_element = 'fk_soc';
 
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'societe';
 
-	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+    /**
+     * @var string Field with ID of parent key if this field has a parent or for child tables
+     */
+    public $fk_element = 'fk_soc';
+
+    /**
+     * @var string Fields for combobox
+     */
+    public $fieldsforcombobox = 'nom,name_alias';
+
+    /**
+     * @var array    List of child tables. To test if we can delete object.
+     */
+    protected $childtables = [
+        "supplier_proposal" => 'SupplierProposal',
+        "propal" => 'Proposal',
+        "commande" => 'Order',
+        "facture" => 'Invoice',
+        "facture_rec" => 'RecurringInvoiceTemplate',
+        "contrat" => 'Contract',
+        "fichinter" => 'Fichinter',
+        "facture_fourn" => 'SupplierInvoice',
+        "commande_fournisseur" => 'SupplierOrder',
+        "projet" => 'Project',
+        "expedition" => 'Shipment',
+        "prelevement_lignes" => 'DirectDebitRecord',
+    ];
+
+    /**
+     * @var array    List of child tables. To know object to delete on cascade.
+     *               if name like with @ClassName:FilePathClass:ParentFkFieldName' it will call method deleteByParentField (with parentId as parameters) and FieldName to fetch and delete child object
+     */
+    protected $childtablesoncascade = [
+        "societe_prices",
+        "societe_address",
+        "product_fournisseur_price",
+        "product_customer_price_log",
+        "product_customer_price",
+        "@Contact:/contact/class/contact.class.php:fk_soc",
+        "adherent",
+        "societe_account",
+        "societe_rib",
+        "societe_remise",
+        "societe_remise_except",
+        "societe_commerciaux",
+        "categorie",
+        "notify",
+        "notify_def",
+        "actioncomm",
+    ];
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'company';
+
+    /**
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     *
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
+     *
+     * @var integer
+     */
+    public $restrictiononfksoc = 1;
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
@@ -111,24 +153,7 @@ class Societe extends CommonObject
 	 *
 	 *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
 	 */
-	/**
-	 * @var string Fields for combobox
-	 */
-	public $fieldsforcombobox = 'nom,name_alias';
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'company';
-	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1;
-	/**
-	 * 0=Default, 1=View may be restricted to sales representative only if no permission to see all or to company of external user if external user
-	 * @var integer
-	 */
-	public $restrictiononfksoc = 1;
+
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
@@ -214,87 +239,106 @@ class Societe extends CommonObject
 		'status' =>array('type'=>'tinyint(4)', 'label'=>'Status', 'enabled'=>1, 'visible'=>-1, 'position'=>500),
 		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>1000),
 	);
+
 	/**
 	 * @var int Entity
 	 */
 	public $entity;
-	/**
-	 * Thirdparty name
+
+    /**
+     * Thirdparty name
+	 *
 	 * @var string
 	 * @deprecated Use $name instead
 	 * @see $name
 	 */
 	public $nom;
+
 	/**
 	 * @var string Thirdparty name
 	 */
 	public $name;
+
 	/**
 	 * Alias names (commercial, trademark or alias names)
 	 * @var string
 	 */
 	public $name_alias;
+
 	/**
 	 * @var int Physical thirdparty not a company
 	 */
 	public $particulier;
+
 	/**
 	 * @var string Address
 	 */
 	public $address;
+
 	/**
 	 * @var string Zip code of thirdparty
 	 */
 	public $zip;
+
 	/**
 	 * @var string Town of thirdparty
 	 */
 	public $town;
+
 	/**
 	 * Thirdparty status : 0=activity ceased, 1= in activity
 	 * @var int
 	 */
 	public $status = 1;
+
 	/**
 	 * Id of department
 	 * @var int
 	 */
 	public $state_id;
+
 	/**
 	 * @var string State code
 	 */
 	public $state_code;
+
 	/**
 	 * @var string State name
 	 */
 	public $state;
+
 	/**
 	 * Id of region
 	 * @var int
 	 */
 	public $region_code;
+
 	/**
 	 * @var string Region name
 	 */
 	public $region;
+
 	/**
 	 * @var string State code
 	 * @deprecated Use state_code instead
 	 * @see $state_code
 	 */
 	public $departement_code;
+
 	/**
 	 * @var string
 	 * @deprecated Use state instead
 	 * @see $state
 	 */
 	public $departement;
+
 	/**
 	 * @var string
 	 * @deprecated Use country instead
 	 * @see $country
 	 */
 	public $pays;
+
 	/**
 	 * Phone number
 	 * @var string
@@ -310,16 +354,19 @@ class Societe extends CommonObject
 	 * @var string
 	 */
 	public $email;
+
 	/**
 	 * @var array array of socialnetworks
 	 */
 	public $socialnetworks;
+
 	/**
 	 * Skype username
 	 * @var string
 	 * @deprecated
 	 */
 	public $skype;
+
 	/**
 	 * Twitter username
 	 * @var string
@@ -327,86 +374,105 @@ class Societe extends CommonObject
 	 */
 	public $twitter;
 
-	// 6 professional id (usage depends on country)
 	/**
 	 * Facebook username
 	 * @var string
 	 * @deprecated
 	 */
 	public $facebook;
+
 	/**
 	 * LinkedIn username
 	 * @var string
 	 * @deprecated
 	 */
 	public $linkedin;
+
 	/**
-	 * Webpage
-	 * @var string
-	 */
-	public $url;
-	/**
-	 * Barcode value
-	 * @var string
-	 */
-	public $barcode;
-	/**
-	 * Professional ID 1 (Ex: Siren in France)
-	 * @var string
-	 */
-	public $idprof1;
-	/**
-	 * Professional ID 2 (Ex: Siret in France)
-	 * @var string
+     * Webpage
+     * @var string
+     */
+    public $url;
+
+    /**
+     * Barcode value
+     *
+     * @var string
+     */
+    public $barcode;
+
+    // 6 professional id (usage depends on country)
+
+    /**
+     * Professional ID 1 (Ex: Siren in France)
+     *
+     * @var string
+     */
+    public $idprof1;
+
+    /**
+     * Professional ID 2 (Ex: Siret in France)
+     * @var string
 	 */
 	public $idprof2;
+
 	/**
 	 * Professional ID 3 (Ex: Ape in France)
 	 * @var string
 	 */
 	public $idprof3;
+
 	/**
 	 * Professional ID 4 (Ex: RCS in France)
 	 * @var string
 	 */
 	public $idprof4;
+
 	/**
 	 * Professional ID 5
 	 * @var string
 	 */
 	public $idprof5;
 
-	// Local taxes
 	/**
 	 * Professional ID 6
 	 * @var string
 	 */
 	public $idprof6;
+
 	/**
 	 * @var string Prefix comm
 	 */
 	public $prefix_comm;
-	/**
-	 * @var int Vat concerned
-	 */
-	public $tva_assuj = 1;
-	/**
-	 * Intracommunitary VAT ID
-	 * @var string
-	 */
-	public $tva_intra;
-	public $localtax1_assuj;
-	public $localtax1_value;
-	public $localtax2_assuj;
-	public $localtax2_value;
-	/**
-	 * @var string Manager
-	 */
-	public $managers;
+
+    /**
+     * @var int Vat concerned
+     */
+    public $tva_assuj = 1;
+
+    /**
+     * Intracommunitary VAT ID
+     *
+     * @var string
+     */
+    public $tva_intra;
+
+    // Local taxes
+    public $localtax1_assuj;
+    public $localtax1_value;
+    public $localtax2_assuj;
+    public $localtax2_value;
+
+    /**
+     * @var string Manager
+     */
+    public $managers;
+
 	/**
 	 * @var float Capital
 	 */
 	public $capital;
+
 	/**
 	 * @var int Type thirdparty
 	 */
@@ -416,275 +482,317 @@ class Societe extends CommonObject
 	public $effectif_id = 0;
 	public $forme_juridique_code;
 	public $forme_juridique = 0;
+
 	public $remise_percent;
 	public $remise_supplier_percent;
-	public $mode_reglement_supplier_id;
 
-	//Log data
+	public $mode_reglement_supplier_id;
 	public $cond_reglement_supplier_id;
 	public $transport_mode_supplier_id;
-	/**
-	 * @var int ID
-	 */
-	public $fk_prospectlevel;
-	/**
-	 * @var string second name
-	 */
-	public $name_bis;
-	/**
-	 * Date of last update
-	 * @var string
-	 */
-	public $date_modification;
-	/**
-	 * User that made last update
-	 * @var string
+
+    /**
+     * @var int ID
+     */
+    public $fk_prospectlevel;
+
+    /**
+     * @var string second name
+     */
+    public $name_bis;
+
+    //Log data
+
+    /**
+     * Date of last update
+     *
+     * @var string
+     */
+    public $date_modification;
+
+    /**
+     * User that made last update
+     * @var string
 	 */
 	public $user_modification;
+
 	/**
 	 * @var integer|string date_creation
 	 */
 	public $date_creation;
+
 	/**
 	 * User that created the thirdparty
 	 * @var User
 	 */
 	public $user_creation;
+
 	/**
 	 * 0=no customer, 1=customer, 2=prospect, 3=customer and prospect
 	 * @var int
 	 */
 	public $client = 0;
+
 	/**
 	 * 0=no prospect, 1=prospect
 	 * @var int
 	 */
 	public $prospect = 0;
+
 	/**
 	 * 0=no supplier, 1=supplier
 	 * @var int
 	 */
 	public $fournisseur;
+
 	/**
 	 * Client code. E.g: CU2014-003
 	 * @var string
 	 */
 	public $code_client;
+
 	/**
 	 * Supplier code. E.g: SU2014-003
 	 * @var string
 	 */
 	public $code_fournisseur;
+
 	/**
 	 * Accounting code for client
 	 * @var string
 	 */
 	public $code_compta;
+
 	/**
 	 * Accounting code for client
 	 * @var string
 	 */
 	public $code_compta_client;
+
 	/**
 	 * Accounting code for suppliers
 	 * @var string
 	 */
 	public $code_compta_fournisseur;
+
 	/**
 	 * @var string
 	 * @deprecated Note is split in public and private notes
 	 * @see $note_public, $note_private
-	 */
+     */
 	public $note;
+
 	/**
 	 * Private note
 	 * @var string
 	 */
 	public $note_private;
+
 	/**
 	 * Public note
 	 * @var string
 	 */
 	public $note_public;
+
 	/**
 	 * Status prospect id
 	 * @var int
 	 */
 	public $stcomm_id;
+
 	/**
 	 * Status prospect picto
 	 * @var string
 	 */
 	public $stcomm_picto;
+
 	/**
 	 * Status prospect label
 	 * @var int
 	 */
 	public $status_prospect_label;
+
 	/**
 	 * Assigned price level
 	 * @var int
 	 */
 	public $price_level;
+
 	/**
 	 * @var string outstanding limit
 	 */
 	public $outstanding_limit;
+
 	/**
 	 * @var string Min order amount
 	 */
 	public $order_min_amount;
+
 	/**
 	 * @var string Supplier min order amount
 	 */
 	public $supplier_order_min_amount;
+
 	/**
 	 * Id of sales representative to link (used for thirdparty creation). Not filled by a fetch, because we can have several sales representatives.
 	 * @var int
 	 */
 	public $commercial_id;
+
 	/**
 	 * Id of parent thirdparty (if one)
+	 *
 	 * @var int
-	 */
+     */
 	public $parent;
+
 	/**
 	 * Default language code of thirdparty (en_US, ...)
 	 * @var string
 	 */
-	public $default_lang;
+    public $default_lang;
+
 	/**
 	 * @var string Ref
 	 */
 	public $ref;
+
 	/**
 	 * @var string Internal ref
 	 * @deprecated
-	 */
+     */
 	public $ref_int;
+
 	/**
 	 * External user reference.
 	 * This is to allow external systems to store their id and make self-developed synchronizing functions easier to build.
+	 *
 	 * @var string
-	 */
+     */
 	public $ref_ext;
+
 	/**
 	 * Import key.
 	 * Set when the thirdparty has been created through an import process. This is to relate those created thirdparties
 	 * to an import process
+	 *
 	 * @var string
-	 */
+     */
 	public $import_key;
+
 	/**
 	 * Supplier WebServices URL
+	 *
 	 * @var string
-	 */
+     */
 	public $webservices_url;
+
 	/**
 	 * Supplier WebServices Key
+	 *
 	 * @var string
 	 */
 	public $webservices_key;
+
 	/**
 	 * @var string Logo
 	 */
 	public $logo;
+
 	/**
 	 * @var string logo small
 	 */
 	public $logo_small;
+
 	/**
 	 * @var string Logo mini
 	 */
 	public $logo_mini;
+
 	/**
 	 * @var string Logo squarred
 	 */
 	public $logo_squarred;
 
-	// Multicurrency
 	/**
 	 * @var string Logo squarred small
 	 */
 	public $logo_squarred_small;
 
-	// Warehouse
 	/**
 	 * @var string Logo squarred mini
-	 */
-	public $logo_squarred_mini;
-	/**
-	 * @var string Accountancy account for sales
-	 */
-	public $accountancy_code_sell;
+     */
+    public $logo_squarred_mini;
 
+    /**
+     * @var string Accountancy account for sales
+     */
+    public $accountancy_code_sell;
 
-	// Fields loaded by fetchPartnerships()
-	/**
-	 * @var string Accountancy account for bought
-	 */
-	public $accountancy_code_buy;
-	/**
-	 * @var int ID
-	 */
-	public $fk_multicurrency;
-	/**
-	 * @var int ID
-	 */
-	public $fk_warehouse;
-	/**
-	 * @var string Multicurrency code
-	 */
-	public $multicurrency_code;
-	public $partnerships = array();
-	/**
-	 * @var Account|string Default BAN account
-	 */
-	public $bank_account;
-	/**
-	 * @var array	List of child tables. To test if we can delete object.
-	 */
-	protected $childtables = array(
-		"supplier_proposal" => 'SupplierProposal',
-		"propal" => 'Proposal',
-		"commande" => 'Order',
-		"facture" => 'Invoice',
-		"facture_rec" => 'RecurringInvoiceTemplate',
-		"contrat" => 'Contract',
-		"fichinter" => 'Fichinter',
-		"facture_fourn" => 'SupplierInvoice',
-		"commande_fournisseur" => 'SupplierOrder',
-		"projet" => 'Project',
-		"expedition" => 'Shipment',
-		"prelevement_lignes" => 'DirectDebitRecord',
-	);
-	/**
-	 * @var array    List of child tables. To know object to delete on cascade.
-	 *               if name like with @ClassName:FilePathClass:ParentFkFieldName' it will call method deleteByParentField (with parentId as parameters) and FieldName to fetch and delete child object
-	 */
-	protected $childtablesoncascade = array(
-		"societe_prices",
-		"societe_address",
-		"product_fournisseur_price",
-		"product_customer_price_log",
-		"product_customer_price",
-		"@Contact:/contact/class/contact.class.php:fk_soc",
-		"adherent",
-		"societe_account",
-		"societe_rib",
-		"societe_remise",
-		"societe_remise_except",
-		"societe_commerciaux",
-		"categorie",
-		"notify",
-		"notify_def",
-		"actioncomm",
-	);
+    /**
+     * @var string Accountancy account for bought
+     */
+    public $accountancy_code_buy;
 
-	/**
-	 *    Constructor
-	 *
-	 *    @param	DoliDB		$db		Database handler
+    // Multicurrency
+    /**
+     * @var int ID
+     */
+    public $fk_multicurrency;
+
+    // Warehouse
+    /**
+     * @var int ID
+     */
+    public $fk_warehouse;
+
+    /**
+     * @var string Multicurrency code
+     */
+    public $multicurrency_code;
+
+    // Fields loaded by fetchPartnerships()
+
+    public $partnerships = [];
+
+    /**
+     * @var Account|string Default BAN account
+     */
+    public $bank_account;
+
+    /**
+     * Third party is no customer
+     */
+    const NO_CUSTOMER = 0;
+
+    /**
+     * Third party is a customer
+     */
+    const CUSTOMER = 1;
+
+    /**
+     * Third party is a prospect
+     */
+    const PROSPECT = 2;
+
+    /**
+     * Third party is a customer and a prospect
+     */
+    const CUSTOMER_AND_PROSPECT = 3;
+
+    /**
+     * Third party is no supplier
+     */
+    const NO_SUPPLIER = 0;
+
+    /**
+     * Third party is a supplier
+     */
+    const SUPPLIER = 1;
+
+    /**
+     *    Constructor
+     *
+     * @param	DoliDB		$db		Database handler
 	 */
 	public function __construct($db)
 	{
@@ -706,68 +814,818 @@ class Societe extends CommonObject
 			$this->fields['zip']['showoncombobox'] = $conf->global->COMPANY_SHOW_ADDRESS_SELECTLIST;
 			$this->fields['town']['showoncombobox'] = $conf->global->COMPANY_SHOW_ADDRESS_SELECTLIST;
 			//$this->fields['fk_pays']['showoncombobox'] = $conf->global->COMPANY_SHOW_ADDRESS_SELECTLIST;
-		}
-	}
+        }
+    }
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 * It must be used within a transaction to avoid trouble
-	 *
-	 * @param 	DoliDB 	$db 		Database handler
-	 * @param 	int 	$origin_id 	Old thirdparty id (will be removed)
-	 * @param 	int 	$dest_id 	New thirdparty id
-	 * @return 	bool				True if success, False if error
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		if ($origin_id == $dest_id) {
-			dol_syslog('Error: Try to merge a thirdparty into itself');
-			return false;
-		}
+    /**
+     *    Create third party in database.
+     *    $this->code_client = -1 and $this->code_fournisseur = -1 means automatic assignement.
+     *
+     * @param User $user Object of user that ask creation
+     * @return   int                >=0 if OK, <0 if KO
+     */
+    public function create(User $user)
+    {
+        global $langs, $conf, $mysoc;
 
-		/**
-		 * Thirdparty commercials cannot be the same in both thirdparties so we look for them and remove some to avoid duplicate.
-		 * Because this function is meant to be executed within a transaction, we won't take care of begin/commit.
-		 */
-		$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'societe_commerciaux ';
-		$sql .= ' WHERE fk_soc = '.(int) $dest_id.' AND fk_user IN ( ';
-		$sql .= ' SELECT fk_user ';
-		$sql .= ' FROM '.MAIN_DB_PREFIX.'societe_commerciaux ';
-		$sql .= ' WHERE fk_soc = '.(int) $origin_id.') ';
+        $error = 0;
 
-		$resql = $db->query($sql);
-		while ($obj = $db->fetch_object($resql)) {
-			$db->query('DELETE FROM '.MAIN_DB_PREFIX.'societe_commerciaux WHERE rowid = '.((int) $obj->rowid));
-		}
+        // Clean parameters
+        if (empty($this->status)) {
+            $this->status = 0;
+        }
+        $this->name = $this->name ? trim($this->name) : trim($this->nom);
+        $this->setUpperOrLowerCase();
+        $this->nom = $this->name; // For backward compatibility
+        if (empty($this->client)) {
+            $this->client = 0;
+        }
+        if (empty($this->fournisseur)) {
+            $this->fournisseur = 0;
+        }
+        $this->import_key = trim($this->import_key);
 
-		/**
-		 * llx_societe_extrafields table must not be here because we don't care about the old thirdparty data
-		 * Do not include llx_societe because it will be replaced later
-		 */
-		$tables = array(
-			'societe_address',
-			'societe_commerciaux',
-			'societe_prices',
-			'societe_remise',
-			'societe_remise_except',
-			'societe_rib'
-		);
+        $this->accountancy_code_buy = trim($this->accountancy_code_buy);
+        $this->accountancy_code_sell = trim($this->accountancy_code_sell);
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+        if (!empty($this->multicurrency_code)) {
+            $this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
+        }
+        if (empty($this->fk_multicurrency)) {
+            $this->multicurrency_code = '';
+            $this->fk_multicurrency = 0;
+        }
+
+        dol_syslog(get_class($this) . "::create " . $this->name);
+
+        $now = dol_now();
+
+        $this->db->begin();
+
+        // For automatic creation during create action (not used by Dolibarr GUI, can be used by scripts)
+        if ($this->code_client == -1 || $this->code_client === 'auto') {
+            $this->get_codeclient($this, 0);
+        }
+        if ($this->code_fournisseur == -1 || $this->code_fournisseur === 'auto') {
+            $this->get_codefournisseur($this, 1);
+        }
+
+        // Check more parameters (including mandatory setup
+        // If error, this->errors[] is filled
+        $result = $this->verify();
+
+        if ($result >= 0) {
+            $this->entity = ((isset($this->entity) && is_numeric($this->entity)) ? $this->entity : $conf->entity);
+
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe (";
+            $sql .= "nom";
+            $sql .= ", name_alias";
+            $sql .= ", entity";
+            $sql .= ", datec";
+            $sql .= ", fk_typent";
+            $sql .= ", fk_user_creat";
+            $sql .= ", canvas";
+            $sql .= ", status";
+            $sql .= ", ref_ext";
+            $sql .= ", fk_stcomm";
+            $sql .= ", fk_incoterms";
+            $sql .= ", location_incoterms";
+            $sql .= ", import_key";
+            $sql .= ", fk_multicurrency";
+            $sql .= ", multicurrency_code";
+            if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
+                $sql .= ", accountancy_code_buy";
+                $sql .= ", accountancy_code_sell";
+            }
+            $sql .= ") VALUES ('" . $this->db->escape($this->name) . "', '" . $this->db->escape($this->name_alias) . "', " . ((int) $this->entity) . ", '" . $this->db->idate($now) . "'";
+            $sql .= ", " . (!empty($user->id) ? ((int) $user->id) : "null");
+            $sql .= ", " . (!empty($this->typent_id) ? ((int) $this->typent_id) : "null");
+            $sql .= ", " . (!empty($this->canvas) ? "'" . $this->db->escape($this->canvas) . "'" : "null");
+            $sql .= ", " . ((int) $this->status);
+            $sql .= ", " . (!empty($this->ref_ext) ? "'" . $this->db->escape($this->ref_ext) . "'" : "null");
+            $sql .= ", 0";
+            $sql .= ", " . (int) $this->fk_incoterms;
+            $sql .= ", '" . $this->db->escape($this->location_incoterms) . "'";
+            $sql .= ", " . (!empty($this->import_key) ? "'" . $this->db->escape($this->import_key) . "'" : "null");
+            $sql .= ", " . (int) $this->fk_multicurrency;
+            $sql .= ", '" . $this->db->escape($this->multicurrency_code) . "'";
+            if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
+                $sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
+                $sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
+            }
+            $sql .= ")";
+
+            dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+            $result = $this->db->query($sql);
+            if ($result) {
+                $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "societe");
+
+                $ret = $this->update($this->id, $user, 0, 1, 1, 'add');
+
+                // update accountancy for this entity
+                if (!$error && !empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
+                    $this->db->query("DELETE FROM " . MAIN_DB_PREFIX . "societe_perentity WHERE fk_soc = " . ((int) $this->id) . " AND entity = " . ((int) $conf->entity));
+
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_perentity (";
+                    $sql .= " fk_soc";
+                    $sql .= ", entity";
+                    $sql .= ", accountancy_code_buy";
+                    $sql .= ", accountancy_code_sell";
+                    $sql .= ") VALUES (";
+                    $sql .= $this->id;
+                    $sql .= ", " . $conf->entity;
+                    $sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
+                    $sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
+                    $sql .= ")";
+                    $result = $this->db->query($sql);
+                    if (!$result) {
+                        $error++;
+                        $this->error = 'ErrorFailedToUpdateAccountancyForEntity';
+                    }
+                }
+
+                // Ajout du commercial affecte
+                if ($this->commercial_id != '' && $this->commercial_id != -1) {
+                    $this->add_commercial($user, $this->commercial_id);
+                } elseif (empty($user->rights->societe->client->voir)) {
+                    // si un commercial cree un client il lui est affecte automatiquement
+                    $this->add_commercial($user, $user->id);
+                }
+
+                if ($ret >= 0) {
+                    // Call trigger
+                    $result = $this->call_trigger('COMPANY_CREATE', $user);
+                    if ($result < 0) {
+                        $error++;
+                    }
+                    // End call triggers
+                } else {
+                    $error++;
+                }
+
+                if (!$error) {
+                    dol_syslog(get_class($this) . "::Create success id=" . $this->id);
+                    $this->db->commit();
+                    return $this->id;
+                } else {
+                    dol_syslog(get_class($this) . "::Create echec update " . $this->error . (empty($this->errors) ? '' : ' ' . join(',', $this->errors)), LOG_ERR);
+                    $this->db->rollback();
+                    return -4;
+                }
+            } else {
+                if ($this->db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                    $this->error = $langs->trans("ErrorCompanyNameAlreadyExists", $this->name); // duplicate on a field (code or profid or ...)
+                    $result = -1;
+                } else {
+                    $this->error = $this->db->lasterror();
+                    $result = -2;
+                }
+                $this->db->rollback();
+                return $result;
+            }
+        } else {
+            $this->db->rollback();
+            dol_syslog(get_class($this) . "::Create fails verify " . join(',', $this->errors), LOG_WARNING);
+            return -3;
+        }
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *    Load a third party from database into memory
-	 *
-	 *    @param	int		$rowid			Id of third party to load
-	 *    @param    string	$ref			Reference of third party, name (Warning, this can return several records)
-	 *    @param    string	$ref_ext       	External reference of third party (Warning, this information is a free field not provided by Dolibarr)
-	 *    @param    string	$barcode       	Barcode of third party to load
-	 *    @param    string	$idprof1		Prof id 1 of third party (Warning, this can return several records)
-	 *    @param    string	$idprof2		Prof id 2 of third party (Warning, this can return several records)
+    /**
+     * Create a contact/address from thirdparty
+     *
+     * @param User  $user     Object user
+     * @param int   $no_email 1=Do not send mailing, 0=Ok to recieve mailling
+     * @param array $tags     Array of tag to affect to contact
+     *
+     * @return    int                    <0 if KO, >0 if OK
+     */
+    public function create_individual(User $user, $no_email = 0, $tags = [])
+    {
+        global $conf;
+
+        $error = 0;
+
+        $this->db->begin();
+
+        // phpcs:enable
+        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        $contact = new Contact($this->db);
+
+        $contact->name = $this->name_bis;
+        $contact->firstname = $this->firstname;
+        $contact->civility_id = $this->civility_id;
+        $contact->socid = $this->id; // fk_soc
+        $contact->statut = 1; // deprecated
+        $contact->status = 1;
+        $contact->priv = 0;
+        $contact->country_id = $this->country_id;
+        $contact->state_id = $this->state_id;
+        $contact->address = $this->address;
+        $contact->email = $this->email;
+        $contact->zip = $this->zip;
+        $contact->town = $this->town;
+        $this->setUpperOrLowerCase();
+        $contact->phone_pro = $this->phone;
+
+        $contactId = $contact->create($user);
+        if ($contactId < 0) {
+            $error++;
+            $this->error = $contact->error;
+            $this->errors = $contact->errors;
+            dol_syslog(get_class($this) . "::create_individual ERROR:" . $this->error, LOG_ERR);
+        }
+
+        if (empty($error) && is_array($tags) && !empty($tags)) {
+            $result = $contact->setCategories($tags);
+            if ($result < 0) {
+                $error++;
+                $this->error = $contact->error;
+                $this->errors = array_merge($this->errors, $contact->errors);
+                dol_syslog(get_class($this) . "::create_individual Affect Tag ERROR:" . $this->error, LOG_ERR);
+                $contactId = $result;
+            }
+        }
+
+        if (empty($error) && !empty($conf->mailing->enabled) && !empty($contact->email) && isset($no_email)) {
+            $result = $contact->setNoEmail($no_email);
+            if ($result < 0) {
+                $this->error = $contact->error;
+                $this->errors = array_merge($this->errors, $contact->errors);
+                dol_syslog(get_class($this) . "::create_individual set mailing status ERROR:" . $this->error, LOG_ERR);
+                $contactId = $result;
+            }
+        }
+
+        if (!empty($error)) {
+            dol_syslog(get_class($this) . "::create_individual success");
+            $this->db->commit();
+        } else {
+            $this->db->rollback();
+        }
+
+        return $contactId;
+    }
+
+    /**
+     *    Check properties of third party are ok (like name, third party codes, ...)
+     *    Used before an add or update.
+     *
+     * @return     int        0 if OK, <0 if KO
+     */
+    public function verify()
+    {
+        global $conf, $langs, $mysoc;
+
+        $error = 0;
+        $this->errors = [];
+
+        $result = 0;
+        $this->name = trim($this->name);
+        $this->nom = $this->name; // For backward compatibility
+
+        if (!$this->name) {
+            $this->errors[] = 'ErrorBadThirdPartyName';
+            $result = -2;
+        }
+
+        if ($this->client) {
+            $rescode = $this->check_codeclient();
+            if ($rescode != 0 && $rescode != -5) {
+                if ($rescode == -1) {
+                    $this->errors[] = 'ErrorBadCustomerCodeSyntax';
+                } elseif ($rescode == -2) {
+                    $this->errors[] = 'ErrorCustomerCodeRequired';
+                } elseif ($rescode == -3) {
+                    $this->errors[] = 'ErrorCustomerCodeAlreadyUsed';
+                } elseif ($rescode == -4) {
+                    $this->errors[] = 'ErrorPrefixRequired';
+                } else {
+                    $this->errors[] = 'ErrorUnknownOnCustomerCodeCheck';
+                }
+
+                $result = -3;
+            }
+        }
+
+        if ($this->fournisseur) {
+            $rescode = $this->check_codefournisseur();
+            if ($rescode != 0 && $rescode != -5) {
+                if ($rescode == -1) {
+                    $this->errors[] = 'ErrorBadSupplierCodeSyntax';
+                } elseif ($rescode == -2) {
+                    $this->errors[] = 'ErrorSupplierCodeRequired';
+                } elseif ($rescode == -3) {
+                    $this->errors[] = 'ErrorSupplierCodeAlreadyUsed';
+                } elseif ($rescode == -4) {
+                    $this->errors[] = 'ErrorPrefixRequired';
+                } else {
+                    $this->errors[] = 'ErrorUnknownOnSupplierCodeCheck';
+                }
+                $result = -3;
+            }
+        }
+
+        // Check for duplicate or mandatory fields defined into setup
+        $array_to_check = ['IDPROF1', 'IDPROF2', 'IDPROF3', 'IDPROF4', 'IDPROF5', 'IDPROF6', 'EMAIL'];
+        foreach ($array_to_check as $key) {
+            $keymin = strtolower($key);
+            $i = (int) preg_replace('/[^0-9]/', '', $key);
+            $vallabel = $this->$keymin;
+
+            if ($i > 0) {
+                if ($this->isACompany()) {
+                    // Check for mandatory prof id (but only if country is same than ours)
+                    if ($mysoc->country_id > 0 && $this->country_id == $mysoc->country_id) {
+                        $idprof_mandatory = 'SOCIETE_' . $key . '_MANDATORY';
+                        if (!$vallabel && !empty($conf->global->$idprof_mandatory)) {
+                            $langs->load("errors");
+                            $error++;
+                            $this->errors[] = $langs->trans("ErrorProdIdIsMandatory", $langs->transcountry('ProfId' . $i, $this->country_code)) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
+                        }
+                    }
+                }
+
+                // Check for unicity on profid
+                if (!$error && $vallabel && $this->id_prof_verifiable($i)) {
+                    if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
+                        $langs->load("errors");
+                        $error++;
+                        $this->errors[] = $langs->transcountry('ProfId' . $i, $this->country_code) . " " . $langs->trans("ErrorProdIdAlreadyExist", $vallabel) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
+                    }
+                }
+            } else {
+                //var_dump($conf->global->SOCIETE_EMAIL_UNIQUE);
+                //var_dump($conf->global->SOCIETE_EMAIL_MANDATORY);
+                if ($key == 'EMAIL') {
+                    // Check for mandatory
+                    if (!empty($conf->global->SOCIETE_EMAIL_MANDATORY) && !isValidEMail($this->email)) {
+                        $langs->load("errors");
+                        $error++;
+                        $this->errors[] = $langs->trans("ErrorBadEMail", $this->email) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
+                    }
+
+                    // Check for unicity
+                    if (!$error && $vallabel && !empty($conf->global->SOCIETE_EMAIL_UNIQUE)) {
+                        if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
+                            $langs->load("errors");
+                            $error++;
+                            $this->errors[] = $langs->trans('Email') . " " . $langs->trans("ErrorProdIdAlreadyExist", $vallabel) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($error) {
+            $result = -4;
+        }
+
+        return $result;
+    }
+
+    /**
+     *      Update parameters of third party
+     *
+     * @param int    $id                      Id of company (deprecated, use 0 here and call update on an object loaded by a fetch)
+     * @param User   $user                    User who requests the update
+     * @param int    $call_trigger            0=no, 1=yes
+     * @param int    $allowmodcodeclient      Inclut modif code client et code compta
+     * @param int    $allowmodcodefournisseur Inclut modif code fournisseur et code compta fournisseur
+     * @param string $action                  'add' or 'update' or 'merge'
+     * @param int    $nosyncmember            Do not synchronize info of linked member
+     *
+     * @return int                                <0 if KO, >=0 if OK
+     */
+    public function update($id, $user = '', $call_trigger = 1, $allowmodcodeclient = 0, $allowmodcodefournisseur = 0, $action = 'update', $nosyncmember = 1)
+    {
+        global $langs, $conf, $hookmanager;
+
+        require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+
+        if (empty($id)) {
+            $id = $this->id;
+        }
+
+        $error = 0;
+
+        dol_syslog(get_class($this) . "::Update id=" . $id . " call_trigger=" . $call_trigger . " allowmodcodeclient=" . $allowmodcodeclient . " allowmodcodefournisseur=" . $allowmodcodefournisseur);
+
+        $now = dol_now();
+
+        // Clean parameters
+        $this->id = $id;
+        $this->entity = ((isset($this->entity) && is_numeric($this->entity)) ? $this->entity : $conf->entity);
+        $this->name = $this->name ? trim($this->name) : trim($this->nom);
+        $this->nom = $this->name; // For backward compatibility
+        $this->name_alias = trim($this->name_alias);
+        $this->ref_ext = trim($this->ref_ext);
+        $this->address = $this->address ? trim($this->address) : trim($this->address);
+        $this->zip = $this->zip ? trim($this->zip) : trim($this->zip);
+        $this->town = $this->town ? trim($this->town) : trim($this->town);
+        $this->setUpperOrLowerCase();
+        $this->state_id = trim($this->state_id);
+        $this->country_id = ($this->country_id > 0) ? $this->country_id : 0;
+        $this->phone = trim($this->phone);
+        $this->phone = preg_replace("/\s/", "", $this->phone);
+        $this->phone = preg_replace("/\./", "", $this->phone);
+        $this->fax = trim($this->fax);
+        $this->fax = preg_replace("/\s/", "", $this->fax);
+        $this->fax = preg_replace("/\./", "", $this->fax);
+        $this->email = trim($this->email);
+        $this->url = $this->url ? clean_url($this->url, 0) : '';
+        $this->note_private = trim($this->note_private);
+        $this->note_public = trim($this->note_public);
+        $this->idprof1 = trim($this->idprof1);
+        $this->idprof2 = trim($this->idprof2);
+        $this->idprof3 = trim($this->idprof3);
+        $this->idprof4 = trim($this->idprof4);
+        $this->idprof5 = (!empty($this->idprof5) ? trim($this->idprof5) : '');
+        $this->idprof6 = (!empty($this->idprof6) ? trim($this->idprof6) : '');
+        $this->prefix_comm = trim($this->prefix_comm);
+        $this->outstanding_limit = price2num($this->outstanding_limit);
+        $this->order_min_amount = price2num($this->order_min_amount);
+        $this->supplier_order_min_amount = price2num($this->supplier_order_min_amount);
+
+        $this->tva_assuj = trim($this->tva_assuj);
+        $this->tva_intra = dol_sanitizeFileName($this->tva_intra, '');
+        if (empty($this->status)) {
+            $this->status = 0;
+        }
+
+        if (!empty($this->multicurrency_code)) {
+            $this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
+        }
+        if (empty($this->fk_multicurrency)) {
+            $this->multicurrency_code = '';
+            $this->fk_multicurrency = 0;
+        }
+
+        // Local taxes
+        $this->localtax1_assuj = trim($this->localtax1_assuj);
+        $this->localtax2_assuj = trim($this->localtax2_assuj);
+
+        $this->localtax1_value = trim($this->localtax1_value);
+        $this->localtax2_value = trim($this->localtax2_value);
+
+        if ($this->capital != '') {
+            $this->capital = price2num(trim($this->capital));
+        }
+        if (!is_numeric($this->capital)) {
+            $this->capital = ''; // '' = undef
+        }
+
+        $this->effectif_id = trim($this->effectif_id);
+        $this->forme_juridique_code = trim($this->forme_juridique_code);
+
+        //Gencod
+        $this->barcode = trim($this->barcode);
+
+        // For automatic creation
+        if ($this->code_client == -1 || $this->code_client === 'auto') {
+            $this->get_codeclient($this, 0);
+        }
+        if ($this->code_fournisseur == -1 || $this->code_fournisseur === 'auto') {
+            $this->get_codefournisseur($this, 1);
+        }
+
+        $this->code_compta_client = trim(empty($this->code_compta) ? $this->code_compta_client : $this->code_compta);
+        $this->code_compta = $this->code_compta_client;        // for backward compatbility
+        $this->code_compta_fournisseur = trim($this->code_compta_fournisseur);
+
+        // Check parameters. More tests are done later in the ->verify()
+        if (!is_numeric($this->client) && !is_numeric($this->fournisseur)) {
+            $langs->load("errors");
+            $this->error = $langs->trans("BadValueForParameterClientOrSupplier");
+            return -1;
+        }
+
+        $customer = false;
+        if (!empty($allowmodcodeclient) && !empty($this->client)) {
+            // If $allowmodcodeclient is set and value is not set, we generate it
+            if (empty($this->code_compta_client)) {
+                $ret = $this->get_codecompta('customer');
+                if ($ret < 0) {
+                    return -1;
+                }
+            }
+
+            $customer = true;
+        }
+
+        $supplier = false;
+        if (!empty($allowmodcodefournisseur) && !empty($this->fournisseur)) {
+            // If $allowmodcodefournisseur is set and value is not set, we generate it
+            if (empty($this->code_compta_fournisseur)) {
+                $ret = $this->get_codecompta('supplier');
+                if ($ret < 0) {
+                    return -1;
+                }
+            }
+
+            $supplier = true;
+        }
+
+        //Web services
+        $this->webservices_url = $this->webservices_url ? clean_url($this->webservices_url, 0) : '';
+        $this->webservices_key = trim($this->webservices_key);
+
+        $this->accountancy_code_buy = trim($this->accountancy_code_buy);
+        $this->accountancy_code_sell = trim($this->accountancy_code_sell);
+
+        //Incoterms
+        $this->fk_incoterms = (int) $this->fk_incoterms;
+        $this->location_incoterms = trim($this->location_incoterms);
+
+        $this->db->begin();
+
+        // Check name is required and codes are ok or unique.
+        // If error, this->errors[] is filled
+        $result = 0;
+        if ($action != 'add' && $action != 'merge') {
+            // We don't check when update called during a create because verify was already done.
+            // For a merge, we suppose source data is clean and a customer code of a deleted thirdparty must be accepted into a target thirdparty with empty code without duplicate error
+            $result = $this->verify();
+
+            // If there is only one error and error is ErrorBadCustomerCodeSyntax and we don't change customer code, we allow the update
+            // So we can update record that were using and old numbering rule.
+            if (is_array($this->errors)) {
+                if (in_array('ErrorBadCustomerCodeSyntax', $this->errors) && is_object($this->oldcopy) && $this->oldcopy->code_client == $this->code_client) {
+                    if (($key = array_search('ErrorBadCustomerCodeSyntax', $this->errors)) !== false) {
+                        unset($this->errors[$key]); // Remove error message
+                    }
+                }
+                if (in_array('ErrorBadSupplierCodeSyntax', $this->errors) && is_object($this->oldcopy) && $this->oldcopy->code_fournisseur == $this->code_fournisseur) {
+                    if (($key = array_search('ErrorBadSupplierCodeSyntax', $this->errors)) !== false) {
+                        unset($this->errors[$key]); // Remove error message
+                    }
+                }
+                if (empty($this->errors)) {    // If there is no more error, we can make like if there is no error at all
+                    $result = 0;
+                }
+            }
+        }
+
+        if ($result >= 0) {
+            dol_syslog(get_class($this) . "::update verify ok or not done");
+
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "societe SET ";
+            $sql .= "entity = " . $this->db->escape($this->entity);
+            $sql .= ",nom = '" . $this->db->escape($this->name) . "'"; // Required
+            $sql .= ",name_alias = '" . $this->db->escape($this->name_alias) . "'";
+            $sql .= ",ref_ext = " . (!empty($this->ref_ext) ? "'" . $this->db->escape($this->ref_ext) . "'" : "null");
+            $sql .= ",address = '" . $this->db->escape($this->address) . "'";
+
+            $sql .= ",zip = " . (!empty($this->zip) ? "'" . $this->db->escape($this->zip) . "'" : "null");
+            $sql .= ",town = " . (!empty($this->town) ? "'" . $this->db->escape($this->town) . "'" : "null");
+
+            $sql .= ",fk_departement = " . ((!empty($this->state_id) && $this->state_id > 0) ? ((int) $this->state_id) : 'null');
+            $sql .= ",fk_pays = " . ((!empty($this->country_id) && $this->country_id > 0) ? ((int) $this->country_id) : 'null');
+
+            $sql .= ",phone = " . (!empty($this->phone) ? "'" . $this->db->escape($this->phone) . "'" : "null");
+            $sql .= ",fax = " . (!empty($this->fax) ? "'" . $this->db->escape($this->fax) . "'" : "null");
+            $sql .= ",email = " . (!empty($this->email) ? "'" . $this->db->escape($this->email) . "'" : "null");
+            $sql .= ",socialnetworks = '" . $this->db->escape(json_encode($this->socialnetworks)) . "'";
+            $sql .= ",url = " . (!empty($this->url) ? "'" . $this->db->escape($this->url) . "'" : "null");
+
+            $sql .= ",parent = " . ($this->parent > 0 ? $this->parent : "null");
+
+            $sql .= ",note_private = " . (!empty($this->note_private) ? "'" . $this->db->escape($this->note_private) . "'" : "null");
+            $sql .= ",note_public = " . (!empty($this->note_public) ? "'" . $this->db->escape($this->note_public) . "'" : "null");
+
+            $sql .= ",siren   = '" . $this->db->escape($this->idprof1) . "'";
+            $sql .= ",siret   = '" . $this->db->escape($this->idprof2) . "'";
+            $sql .= ",ape     = '" . $this->db->escape($this->idprof3) . "'";
+            $sql .= ",idprof4 = '" . $this->db->escape($this->idprof4) . "'";
+            $sql .= ",idprof5 = '" . $this->db->escape($this->idprof5) . "'";
+            $sql .= ",idprof6 = '" . $this->db->escape($this->idprof6) . "'";
+
+            $sql .= ",tva_assuj = " . ($this->tva_assuj != '' ? "'" . $this->db->escape($this->tva_assuj) . "'" : "null");
+            $sql .= ",tva_intra = '" . $this->db->escape($this->tva_intra) . "'";
+            $sql .= ",status = " . ((int) $this->status);
+
+            // Local taxes
+            $sql .= ",localtax1_assuj = " . ($this->localtax1_assuj != '' ? "'" . $this->db->escape($this->localtax1_assuj) . "'" : "null");
+            $sql .= ",localtax2_assuj = " . ($this->localtax2_assuj != '' ? "'" . $this->db->escape($this->localtax2_assuj) . "'" : "null");
+            if ($this->localtax1_assuj == 1) {
+                if ($this->localtax1_value != '') {
+                    $sql .= ",localtax1_value =" . $this->localtax1_value;
+                } else {
+                    $sql .= ",localtax1_value =0.000";
+                }
+            } else {
+                $sql .= ",localtax1_value =0.000";
+            }
+
+            if ($this->localtax2_assuj == 1) {
+                if ($this->localtax2_value != '') {
+                    $sql .= ",localtax2_value =" . $this->localtax2_value;
+                } else {
+                    $sql .= ",localtax2_value =0.000";
+                }
+            } else {
+                $sql .= ",localtax2_value =0.000";
+            }
+
+            $sql .= ",capital = " . ($this->capital == '' ? "null" : $this->capital);
+
+            $sql .= ",prefix_comm = " . (!empty($this->prefix_comm) ? "'" . $this->db->escape($this->prefix_comm) . "'" : "null");
+
+            $sql .= ",fk_effectif = " . (!empty($this->effectif_id) ? "'" . $this->db->escape($this->effectif_id) . "'" : "null");
+            if (isset($this->stcomm_id)) {
+                $sql .= ",fk_stcomm=" . (!empty($this->stcomm_id) ? $this->stcomm_id : "0");
+            }
+            $sql .= ",fk_typent = " . (!empty($this->typent_id) ? "'" . $this->db->escape($this->typent_id) . "'" : "0");
+
+            $sql .= ",fk_forme_juridique = " . (!empty($this->forme_juridique_code) ? "'" . $this->db->escape($this->forme_juridique_code) . "'" : "null");
+
+            $sql .= ",mode_reglement = " . (!empty($this->mode_reglement_id) ? "'" . $this->db->escape($this->mode_reglement_id) . "'" : "null");
+            $sql .= ",cond_reglement = " . (!empty($this->cond_reglement_id) ? "'" . $this->db->escape($this->cond_reglement_id) . "'" : "null");
+            $sql .= ",transport_mode = " . (!empty($this->transport_mode_id) ? "'" . $this->db->escape($this->transport_mode_id) . "'" : "null");
+            $sql .= ",mode_reglement_supplier = " . (!empty($this->mode_reglement_supplier_id) ? "'" . $this->db->escape($this->mode_reglement_supplier_id) . "'" : "null");
+            $sql .= ",cond_reglement_supplier = " . (!empty($this->cond_reglement_supplier_id) ? "'" . $this->db->escape($this->cond_reglement_supplier_id) . "'" : "null");
+            $sql .= ",transport_mode_supplier = " . (!empty($this->transport_mode_supplier_id) ? "'" . $this->db->escape($this->transport_mode_supplier_id) . "'" : "null");
+            $sql .= ",fk_shipping_method = " . (!empty($this->shipping_method_id) ? "'" . $this->db->escape($this->shipping_method_id) . "'" : "null");
+
+            $sql .= ",client = " . (!empty($this->client) ? $this->client : 0);
+            $sql .= ",fournisseur = " . (!empty($this->fournisseur) ? $this->fournisseur : 0);
+            $sql .= ",barcode = " . (!empty($this->barcode) ? "'" . $this->db->escape($this->barcode) . "'" : "null");
+            $sql .= ",default_lang = " . (!empty($this->default_lang) ? "'" . $this->db->escape($this->default_lang) . "'" : "null");
+            $sql .= ",logo = " . (!empty($this->logo) ? "'" . $this->db->escape($this->logo) . "'" : "null");
+            $sql .= ",logo_squarred = " . (!empty($this->logo_squarred) ? "'" . $this->db->escape($this->logo_squarred) . "'" : "null");
+            $sql .= ",outstanding_limit= " . ($this->outstanding_limit != '' ? $this->outstanding_limit : 'null');
+            $sql .= ",order_min_amount= " . ($this->order_min_amount != '' ? $this->order_min_amount : 'null');
+            $sql .= ",supplier_order_min_amount= " . ($this->supplier_order_min_amount != '' ? $this->supplier_order_min_amount : 'null');
+            $sql .= ",fk_prospectlevel='" . $this->db->escape($this->fk_prospectlevel) . "'";
+            if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
+                $sql .= ", accountancy_code_buy = '" . $this->db->escape($this->accountancy_code_buy) . "'";
+                $sql .= ", accountancy_code_sell= '" . $this->db->escape($this->accountancy_code_sell) . "'";
+            }
+            $sql .= ",webservices_url = " . (!empty($this->webservices_url) ? "'" . $this->db->escape($this->webservices_url) . "'" : "null");
+            $sql .= ",webservices_key = " . (!empty($this->webservices_key) ? "'" . $this->db->escape($this->webservices_key) . "'" : "null");
+
+            //Incoterms
+            $sql .= ", fk_incoterms = " . ((int) $this->fk_incoterms);
+            $sql .= ", location_incoterms = " . (!empty($this->location_incoterms) ? "'" . $this->db->escape($this->location_incoterms) . "'" : "null");
+
+            if ($customer) {
+                $sql .= ", code_client = " . (!empty($this->code_client) ? "'" . $this->db->escape($this->code_client) . "'" : "null");
+                $sql .= ", code_compta = " . (!empty($this->code_compta_client) ? "'" . $this->db->escape($this->code_compta_client) . "'" : "null");
+            }
+
+            if ($supplier) {
+                $sql .= ", code_fournisseur = " . (!empty($this->code_fournisseur) ? "'" . $this->db->escape($this->code_fournisseur) . "'" : "null");
+                $sql .= ", code_compta_fournisseur = " . (($this->code_compta_fournisseur != "") ? "'" . $this->db->escape($this->code_compta_fournisseur) . "'" : "null");
+            }
+            $sql .= ", fk_user_modif = " . ($user->id > 0 ? $user->id : "null");
+            $sql .= ", fk_multicurrency = " . (int) $this->fk_multicurrency;
+            $sql .= ", multicurrency_code = '" . $this->db->escape($this->multicurrency_code) . "'";
+            $sql .= ", model_pdf = '" . $this->db->escape($this->model_pdf) . "'";
+            $sql .= " WHERE rowid = " . (int) $id;
+
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                if (is_object($this->oldcopy)) {    // If we have information on old values
+                    if ($this->oldcopy->country_id != $this->country_id) {
+                        unset($this->country_code);
+                        unset($this->country);
+                    }
+                    if ($this->oldcopy->state_id != $this->state_id) {
+                        unset($this->state_code);
+                        unset($this->state);
+                    }
+                } else {
+                    unset($this->country_code); // We clean this, in the doubt, because it may have been changed after an update of country_id
+                    unset($this->country);
+                    unset($this->state_code);
+                    unset($this->state);
+                }
+
+                $nbrowsaffected = $this->db->affected_rows($resql);
+
+                if (!$error && $nbrowsaffected) {
+                    // Update information on linked member if it is an update
+                    if (!$nosyncmember && !empty($conf->adherent->enabled)) {
+                        require_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+
+                        dol_syslog(get_class($this) . "::update update linked member");
+
+                        $lmember = new Adherent($this->db);
+                        $result = $lmember->fetch(0, 0, $this->id);
+
+                        if ($result > 0) {
+                            $lmember->company = $this->name;
+                            //$lmember->firstname=$this->firstname?$this->firstname:$lmember->firstname;	// We keep firstname and lastname of member unchanged
+                            //$lmember->lastname=$this->lastname?$this->lastname:$lmember->lastname;		// We keep firstname and lastname of member unchanged
+                            $lmember->address = $this->address;
+                            $lmember->zip = $this->zip;
+                            $lmember->town = $this->town;
+                            $lmember->email = $this->email;
+                            $lmember->socialnetworks = $this->socialnetworks;
+                            $lmember->phone = $this->phone;
+                            $lmember->state_id = $this->state_id;
+                            $lmember->country_id = $this->country_id;
+
+                            $result = $lmember->update($user, 0, 1, 1, 1); // Use nosync to 1 to avoid cyclic updates
+                            if ($result < 0) {
+                                $this->error = $lmember->error;
+                                $this->errors = array_merge($this->errors, $lmember->errors);
+                                dol_syslog(get_class($this) . "::update " . $this->error, LOG_ERR);
+                                $error++;
+                            }
+                        } elseif ($result < 0) {
+                            $this->error = $lmember->error;
+                            $error++;
+                        }
+                    }
+                }
+
+                $action = 'update';
+
+                // update accountancy for this entity
+                if (!$error && !empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
+                    $this->db->query("DELETE FROM " . MAIN_DB_PREFIX . "societe_perentity WHERE fk_soc = " . ((int) $this->id) . " AND entity = " . ((int) $conf->entity));
+
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_perentity (";
+                    $sql .= " fk_soc";
+                    $sql .= ", entity";
+                    $sql .= ", accountancy_code_buy";
+                    $sql .= ", accountancy_code_sell";
+                    $sql .= ") VALUES (";
+                    $sql .= $this->id;
+                    $sql .= ", " . $conf->entity;
+                    $sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
+                    $sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
+                    $sql .= ")";
+                    $result = $this->db->query($sql);
+                    if (!$result) {
+                        $error++;
+                        $this->error = 'ErrorFailedToUpdateAccountancyForEntity';
+                    }
+                }
+
+                // Actions on extra fields
+                if (!$error) {
+                    $result = $this->insertExtraFields();
+                    if ($result < 0) {
+                        $error++;
+                    }
+                }
+                // Actions on extra languages
+                if (!$error && empty($conf->global->MAIN_EXTRALANGUAGES_DISABLED)) { // For avoid conflicts if trigger used
+                    $result = $this->insertExtraLanguages();
+                    if ($result < 0) {
+                        $error++;
+                    }
+                }
+
+                if (!$error && $call_trigger) {
+                    // Call trigger
+                    $result = $this->call_trigger('COMPANY_MODIFY', $user);
+                    if ($result < 0) {
+                        $error++;
+                    }
+                    // End call triggers
+                }
+
+                if (!$error) {
+                    dol_syslog(get_class($this) . "::Update success");
+                    $this->db->commit();
+                    return 1;
+                } else {
+                    $this->db->rollback();
+                    return -1;
+                }
+            } else {
+                if ($this->db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                    // Doublon
+                    $this->error = $langs->trans("ErrorDuplicateField");
+                    $result = -1;
+                } else {
+                    $this->error = $this->db->lasterror();
+                    $result = -2;
+                }
+                $this->db->rollback();
+                return $result;
+            }
+        } else {
+            $this->db->rollback();
+            dol_syslog(get_class($this) . "::Update fails verify " . join(',', $this->errors), LOG_WARNING);
+            return -3;
+        }
+    }
+
+    /**
+     *    Load a third party from database into memory
+     *
+     * @param int             $rowid            Id of third party to load
+     * @param string          $ref              Reference of third party, name (Warning, this can return several records)
+     * @param string          $ref_ext          External reference of third party (Warning, this information is a free field not provided by Dolibarr)
+     * @param string          $barcode          Barcode of third party to load
+     * @param string          $idprof1          Prof id 1 of third party (Warning, this can return several records)
+     * @param string          $idprof2          Prof id 2 of third party (Warning, this can return several records)
 	 *    @param    string	$idprof3		Prof id 3 of third party (Warning, this can return several records)
 	 *    @param    string	$idprof4		Prof id 4 of third party (Warning, this can return several records)
 	 *    @param    string	$idprof5		Prof id 5 of third party (Warning, this can return several records)
@@ -1191,10 +2049,11 @@ class Societe extends CommonObject
 			}
 		} else {
 			dol_syslog("Can't remove thirdparty with id ".$id.". There is ".$objectisused." childs", LOG_WARNING);
-		}
-		return 0;
-	}
+        }
+        return 0;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Define third party as a customer
 	 *
@@ -1218,11 +2077,12 @@ class Societe extends CommonObject
 				return 1;
 			} else {
 				return -1;
-			}
-		}
-		return 0;
-	}
+            }
+        }
+        return 0;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Defines the company as a customer
 	 *
@@ -1277,10 +2137,11 @@ class Societe extends CommonObject
 			}
 
 			$this->db->commit();
-			return 1;
-		}
-	}
+            return 1;
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Defines the company as a customer
 	 *
@@ -1340,7 +2201,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    	Add a discount for third party
 	 *
@@ -1407,8 +2267,6 @@ class Societe extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Returns amount of included taxes of the current discounts/credits available from the company
 	 *
@@ -1422,26 +2280,96 @@ class Societe extends CommonObject
 	{
 		require_once DOL_DOCUMENT_ROOT.'/core/class/discount.class.php';
 
-		$discountstatic = new DiscountAbsolute($this->db);
-		$result = $discountstatic->getAvailableDiscounts($this, $user, $filter, $maxvalue, $discount_type);
-		if ($result >= 0) {
-			return $result;
-		} else {
-			$this->error = $discountstatic->error;
-			return -1;
-		}
-	}
+        $discountstatic = new DiscountAbsolute($this->db);
+        $result = $discountstatic->getAvailableDiscounts($this, $user, $filter, $maxvalue, $discount_type);
+        if ($result >= 0) {
+            return $result;
+        } else {
+            $this->error = $discountstatic->error;
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Return array of sales representatives
+     *
+     * @param User   $user      Object user
+     * @param int    $mode      0=Array with properties, 1=Array of id.
+     * @param string $sortfield List of sort fields, separated by comma. Example: 't1.fielda,t2.fieldb'
+     * @param string $sortorder Sort order, separated by comma. Example: 'ASC,DESC';
+     *
+     * @return array                    Array of sales representatives of third party
+     */
+    public function getSalesRepresentatives(User $user, $mode = 0, $sortfield = null, $sortorder = null)
+    {
+        global $conf;
 
-	/**
-	 * Set the price level
-	 *
-	 * @param 	int		$price_level	Level of price
-	 * @param 	User	$user			Use making change
-	 * @return	int						<0 if KO, >0 if OK
-	 */
-	public function setPriceLevel($price_level, User $user)
+        $reparray = [];
+
+        $sql = "SELECT DISTINCT u.rowid, u.login, u.lastname, u.firstname, u.office_phone, u.job, u.email, u.statut as status, u.entity, u.photo, u.gender";
+        $sql .= ", u.office_fax, u.user_mobile, u.personal_mobile";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "societe_commerciaux as sc, " . MAIN_DB_PREFIX . "user as u";
+        if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+            $sql .= ", " . MAIN_DB_PREFIX . "usergroup_user as ug";
+            $sql .= " WHERE ((ug.fk_user = sc.fk_user";
+            $sql .= " AND ug.entity = " . $conf->entity . ")";
+            $sql .= " OR u.admin = 1)";
+        } else {
+            $sql .= " WHERE entity in (0, " . $conf->entity . ")";
+        }
+
+        $sql .= " AND u.rowid = sc.fk_user AND sc.fk_soc = " . ((int) $this->id);
+        if (empty($sortfield) && empty($sortorder)) {
+            $sortfield = 'u.lastname,u.firstname';
+            $sortorder = 'ASC,ASC';
+        }
+        $sql .= $this->db->order($sortfield, $sortorder);
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+
+                if (empty($mode)) {
+                    $reparray[$i]['id'] = $obj->rowid;
+                    $reparray[$i]['lastname'] = $obj->lastname;
+                    $reparray[$i]['firstname'] = $obj->firstname;
+                    $reparray[$i]['email'] = $obj->email;
+                    $reparray[$i]['phone'] = $obj->office_phone;
+                    $reparray[$i]['office_phone'] = $obj->office_phone;
+                    $reparray[$i]['office_fax'] = $obj->office_fax;
+                    $reparray[$i]['user_mobile'] = $obj->user_mobile;
+                    $reparray[$i]['personal_mobile'] = $obj->personal_mobile;
+                    $reparray[$i]['job'] = $obj->job;
+                    $reparray[$i]['statut'] = $obj->status; // deprecated
+                    $reparray[$i]['status'] = $obj->status;
+                    $reparray[$i]['entity'] = $obj->entity;
+                    $reparray[$i]['login'] = $obj->login;
+                    $reparray[$i]['photo'] = $obj->photo;
+                    $reparray[$i]['gender'] = $obj->gender;
+                } else {
+                    $reparray[] = $obj->rowid;
+                }
+                $i++;
+            }
+            return $reparray;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     * Set the price level
+     *
+     * @param int  $price_level Level of price
+     * @param User $user        Use making change
+     *
+     * @return    int                        <0 if KO, >0 if OK
+     */
+    public function setPriceLevel($price_level, User $user)
 	{
 		if ($this->id) {
 			$now = dol_now();
@@ -1457,27 +2385,118 @@ class Societe extends CommonObject
 
 			$sql  = "INSERT INTO ".MAIN_DB_PREFIX."societe_prices";
 			$sql .= " (datec, fk_soc, price_level, fk_user_author)";
-			$sql .= " VALUES ('".$this->db->idate($now)."', ".((int) $this->id).", ".((int) $price_level).", ".((int) $user->id).")";
+			$sql .= " VALUES ('".$this->db->idate($now)."', ".((int) $this->id).", ".((int) $price_level). ", " . ((int) $user->id) . ")";
 
-			if (!$this->db->query($sql)) {
-				dol_print_error($this->db);
-				return -1;
-			}
-			return 1;
-		}
-		return -1;
-	}
+            if (!$this->db->query($sql)) {
+                dol_print_error($this->db);
+                return -1;
+            }
+            return 1;
+        }
+        return -1;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *    	Return a link on thirdparty (with picto)
-	 *
-	 *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 *		@param	string	$option			          Target of link ('', 'customer', 'prospect', 'supplier', 'project')
-	 *		@param	int		$maxlen			          Max length of name
-	 *      @param	int  	$notooltip		          1=Disable tooltip
-	 *      @param  int     $save_lastsearch_value    -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+    /**
+     *    Add link to sales representative
+     *
+     * @param User $user   Object user
+     * @param int  $commid Id of user
+     *
+     * @return    int                    <=0 if KO, >0 if OK
+     */
+    public function add_commercial(User $user, $commid)
+    {
+        // phpcs:enable
+        $error = 0;
+
+        if ($this->id > 0 && $commid > 0) {
+            $this->db->begin();
+
+            if (!$error) {
+                $sql = "DELETE FROM  " . MAIN_DB_PREFIX . "societe_commerciaux";
+                $sql .= " WHERE fk_soc = " . ((int) $this->id) . " AND fk_user = " . ((int) $commid);
+
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
+                    $error++;
+                }
+            }
+
+            if (!$error) {
+                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_commerciaux";
+                $sql .= " (fk_soc, fk_user)";
+                $sql .= " VALUES (" . ((int) $this->id) . ", " . ((int) $commid) . ")";
+
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
+                    $error++;
+                }
+            }
+
+            if (!$error) {
+                $this->context = ['commercial_modified' => $commid];
+
+                $result = $this->call_trigger('COMPANY_LINK_SALE_REPRESENTATIVE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+            }
+
+            if (!$error) {
+                $this->db->commit();
+                return 1;
+            } else {
+                $this->db->rollback();
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Add link to sales representative
+     *
+     * @param User $user   Object user
+     * @param int  $commid Id of user
+     *
+     * @return    void
+     */
+    public function del_commercial(User $user, $commid)
+    {
+        // phpcs:enable
+        $error = 0;
+        $this->context = ['commercial_modified' => $commid];
+
+        $result = $this->call_trigger('COMPANY_UNLINK_SALE_REPRESENTATIVE', $user);
+        if ($result < 0) {
+            $error++;
+        }
+
+        if ($this->id > 0 && $commid > 0) {
+            $sql = "DELETE FROM  " . MAIN_DB_PREFIX . "societe_commerciaux ";
+            $sql .= " WHERE fk_soc = " . ((int) $this->id) . " AND fk_user = " . ((int) $commid);
+
+            if (!$this->db->query($sql)) {
+                dol_syslog(get_class($this) . "::del_commercial Erreur");
+            }
+        }
+    }
+
+    /**
+     *        Return a link on thirdparty (with picto)
+     *
+     * @param int    $withpicto             Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+     * @param string $option                Target of link ('', 'customer', 'prospect', 'supplier', 'project')
+     * @param int    $maxlen                Max length of name
+     * @param int    $notooltip             1=Disable tooltip
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *		@return	string					          String with URL
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $maxlen = 0, $notooltip = 0, $save_lastsearch_value = -1)
@@ -1575,10 +2594,10 @@ class Societe extends CommonObject
 		if (!empty($this->name)) {
 			$label .= '<br><b>'.$langs->trans('Name').':</b> '.dol_escape_htmltag($this->name);
 			if (!empty($this->name_alias)) {
-				$label .= ' ('.dol_escape_htmltag($this->name_alias).')';
-			}
-		}
-		$label .= '<br><b>'.$langs->trans('Email').':</b> '.$this->email;
+				$label .= ' ('.dol_escape_htmltag($this->name_alias) . ')';
+            }
+        }
+        $label .= '<br>' . img_picto('', 'email', 'class="pictofixedwidth"').$this->email;
 		if (!empty($this->phone) || !empty($this->fax)) {
 			$phonelist = array();
 			if ($this->phone) {
@@ -1586,8 +2605,8 @@ class Societe extends CommonObject
 			}
 			if ($this->fax) {
 				$phonelist[] = dol_print_phone($this->fax, $this->country_code, $this->id, 0, '', '&nbsp', 'fax');
-			}
-			$label .= '<br><b>'.$langs->trans('Phone').':</b> '.implode('&nbsp;', $phonelist);
+            }
+            $label .= '<br>' . implode('&nbsp;', $phonelist);
 		}
 		if (!empty($this->address)) {
 			$label .= '<br><b>'.$langs->trans("Address").':</b> '.dol_format_address($this, 1, ' ', $langs);	// Address + country
@@ -1687,28 +2706,62 @@ class Societe extends CommonObject
 			'maxlen'=> $maxlen,
 			'notooltip'=> $notooltip,
 			'save_lastsearch_value'=> $save_lastsearch_value
-		);
-		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) {
-			$result = $hookmanager->resPrint;
-		} else {
-			$result .= $hookmanager->resPrint;
-		}
+        );
+        $reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 *    Return label of status (activity, closed)
-	 *
-	 *    @param  	int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *    @return   string     	   		Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->status, $mode);
-	}
+    /**
+     *        Return link(s) on type of thirdparty (with picto)
+     *
+     * @param int    $withpicto Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
+     * @param string $option    ''=All
+     * @param int    $notooltip 1=Disable tooltip
+     *
+     * @return    string                              String with URL
+     */
+    public function getTypeUrl($withpicto = 0, $option = '', $notooltip = 0)
+    {
+        global $conf, $langs;
 
+        $s = '';
+        if (empty($option) || preg_match('/prospect/', $option)) {
+            if (($this->client == 2 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_PROSPECTS)) {
+                $s .= '<a class="customer-back opacitymedium" title="' . $langs->trans("Prospect") . '" href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Prospect"), 0, 1) . '</a>';
+            }
+        }
+        if (empty($option) || preg_match('/customer/', $option)) {
+            if (($this->client == 1 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_CUSTOMERS)) {
+                $s .= '<a class="customer-back" title="' . $langs->trans("Customer") . '" href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Customer"), 0, 1) . '</a>';
+            }
+        }
+        if (empty($option) || preg_match('/supplier/', $option)) {
+            if (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && $this->fournisseur) {
+                $s .= '<a class="vendor-back" title="' . $langs->trans("Supplier") . '" href="' . DOL_URL_ROOT . '/fourn/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Supplier"), 0, 1) . '</a>';
+            }
+        }
+        return $s;
+    }
+
+    /**
+     *    Return label of status (activity, closed)
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return   string                Label of status
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->status, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return the label of a given status
 	 *
@@ -1737,39 +2790,7 @@ class Societe extends CommonObject
 		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
 	}
 
-	/**
-	 *    	Return link(s) on type of thirdparty (with picto)
-	 *
-	 *		@param	int		$withpicto		          Add picto into link (0=No picto, 1=Include picto with link, 2=Picto only)
-	 *		@param	string	$option					  ''=All
-	 *      @param	int  	$notooltip		          1=Disable tooltip
-	 *		@return	string					          String with URL
-	 */
-	public function getTypeUrl($withpicto = 0, $option = '', $notooltip = 0)
-	{
-		global $conf, $langs;
-
-		$s = '';
-		if (empty($option) || preg_match('/prospect/', $option)) {
-			if (($this->client == 2 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_PROSPECTS)) {
-				$s .= '<a class="customer-back opacitymedium" title="'.$langs->trans("Prospect").'" href="'.DOL_URL_ROOT.'/comm/card.php?socid='.$this->id.'">'.dol_substr($langs->trans("Prospect"), 0, 1).'</a>';
-			}
-		}
-		if (empty($option) || preg_match('/customer/', $option)) {
-			if (($this->client == 1 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_CUSTOMERS)) {
-				$s .= '<a class="customer-back" title="'.$langs->trans("Customer").'" href="'.DOL_URL_ROOT.'/comm/card.php?socid='.$this->id.'">'.dol_substr($langs->trans("Customer"), 0, 1).'</a>';
-			}
-		}
-		if (empty($option) || preg_match('/supplier/', $option)) {
-			if (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && $this->fournisseur) {
-				$s .= '<a class="vendor-back" title="'.$langs->trans("Supplier").'" href="'.DOL_URL_ROOT.'/fourn/card.php?socid='.$this->id.'">'.dol_substr($langs->trans("Supplier"), 0, 1).'</a>';
-			}
-		}
-		return $s;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return list of contacts emails existing for third party
 	 *
@@ -1783,25 +2804,50 @@ class Societe extends CommonObject
 
 		$contact_emails = $this->contact_property_array('email', 1);
 		if ($this->email && $addthirdparty) {
-			if (empty($this->name)) {
-				$this->name = $this->nom;
-			}
-			$contact_emails['thirdparty'] = $langs->transnoentitiesnoconv("ThirdParty").': '.dol_trunc($this->name, 16)." <".$this->email.">";
-		}
-		//var_dump($contact_emails)
-		return $contact_emails;
-	}
+            if (empty($this->name)) {
+                $this->name = $this->nom;
+            }
+            $contact_emails['thirdparty'] = $langs->transnoentitiesnoconv("ThirdParty") . ': ' . dol_trunc($this->name, 16) . " <" . $this->email . ">";
+        }
+        //var_dump($contact_emails)
+        return $contact_emails;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Return list of contacts emails or mobile existing for third party
-	 *
-	 *  @param	string	$mode       		'email' or 'mobile'
-	 * 	@param	int		$hidedisabled		1=Hide contact if disabled
-	 *  @return array       				Array of contacts emails or mobile. Example: array(id=>'Name <email>')
-	 */
-	public function contact_property_array($mode = 'email', $hidedisabled = 0)
+    /**
+     *    Return list of contacts mobile phone existing for third party
+     *
+     * @return     array       Array of contacts emails
+     */
+    public function thirdparty_and_contact_phone_array()
+    {
+        // phpcs:enable
+        global $langs;
+
+        $contact_phone = $this->contact_property_array('mobile');
+
+        if (!empty($this->phone)) {    // If a phone of thirdparty is defined, we add it ot mobile of contacts
+            if (empty($this->name)) {
+                $this->name = $this->nom;
+            }
+            // TODO: Tester si tel non deja present dans tableau contact
+            $contact_phone['thirdparty'] = $langs->transnoentitiesnoconv("ThirdParty") . ': ' . dol_trunc($this->name, 16) . " <" . $this->phone . ">";
+        }
+        return $contact_phone;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return list of contacts emails or mobile existing for third party
+     *
+     * @param string $mode         'email' or 'mobile'
+     * @param int    $hidedisabled 1=Hide contact if disabled
+     *
+     * @return array                    Array of contacts emails or mobile. Example: array(id=>'Name <email>')
+     */
+    public function contact_property_array($mode = 'email', $hidedisabled = 0)
 	{
 		// phpcs:enable
 		global $langs;
@@ -1855,32 +2901,12 @@ class Societe extends CommonObject
 			}
 		} else {
 			dol_print_error($this->db);
-		}
-		return $contact_property;
-	}
+        }
+        return $contact_property;
+    }
 
-	/**
-	 *    Return list of contacts mobile phone existing for third party
-	 *
-	 *    @return     array       Array of contacts emails
-	 */
-	public function thirdparty_and_contact_phone_array()
-	{
-		// phpcs:enable
-		global $langs;
 
-		$contact_phone = $this->contact_property_array('mobile');
-
-		if (!empty($this->phone)) {	// If a phone of thirdparty is defined, we add it ot mobile of contacts
-			if (empty($this->name)) {
-				$this->name = $this->nom;
-			}
-			// TODO: Tester si tel non deja present dans tableau contact
-			$contact_phone['thirdparty'] = $langs->transnoentitiesnoconv("ThirdParty").': '.dol_trunc($this->name, 16)." <".$this->phone.">";
-		}
-		return $contact_phone;
-	}
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Returns the contact list of this company
 	 *
@@ -1905,10 +2931,11 @@ class Societe extends CommonObject
 			}
 		} else {
 			dol_print_error($this->db);
-		}
-		return $contacts;
-	}
+        }
+        return $contacts;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *    Returns the contact list of this company
 	 *
@@ -1941,7 +2968,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return property of contact from its id
 	 *
@@ -1977,12 +3003,12 @@ class Societe extends CommonObject
 			}
 			return $contact_property;
 		} else {
-			dol_print_error($this->db);
+            dol_print_error($this->db);
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return bank number property of thirdparty (label or rum)
 	 *
@@ -2019,7 +3045,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return Array of RIB
 	 *
@@ -2040,26 +3065,93 @@ class Societe extends CommonObject
 			$rib_array = array();
 			if ($num_rows) {
 				while ($obj = $this->db->fetch_object($result)) {
-					$rib = new CompanyBankAccount($this->db);
-					$rib->fetch($obj->rowid);
-					$rib_array[] = $rib;
-				}
-			}
-			return $rib_array;
-		}
-	}
+                    $rib = new CompanyBankAccount($this->db);
+                    $rib->fetch($obj->rowid);
+                    $rib_array[] = $rib;
+                }
+            }
+            return $rib_array;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *    Check if a client code is editable based on the parameters of the
-	 *    code control module.
-	 *
-	 *    @return     int		0=No, 1=Yes
-	 */
-	public function codeclient_modifiable()
-	{
-		// phpcs:enable
+    /**
+     *  Assigns a customer code from the code control module.
+     *  Return value is stored into this->code_client
+     *
+     * @param Societe $objsoc Object thirdparty
+     * @param int     $type   Should be 0 to say customer
+     *
+     * @return void
+     */
+    public function get_codeclient($objsoc = 0, $type = 0)
+    {
+        // phpcs:enable
+        global $conf;
+        if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
+            $module = $conf->global->SOCIETE_CODECLIENT_ADDON;
+
+            $dirsociete = array_merge(['/core/modules/societe/'], $conf->modules_parts['societe']);
+            foreach ($dirsociete as $dirroot) {
+                $res = dol_include_once($dirroot . $module . '.php');
+                if ($res) {
+                    break;
+                }
+            }
+            $mod = new $module();
+
+            $this->code_client = $mod->getNextValue($objsoc, $type);
+            $this->prefixCustomerIsRequired = $mod->prefixIsRequired;
+
+            dol_syslog(get_class($this) . "::get_codeclient code_client=" . $this->code_client . " module=" . $module);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Assigns a vendor code from the code control module.
+     *  Return value is stored into this->code_fournisseur
+     *
+     * @param Societe $objsoc Object thirdparty
+     * @param int     $type   Should be 1 to say supplier
+     *
+     * @return void
+     */
+    public function get_codefournisseur($objsoc = 0, $type = 1)
+    {
+        // phpcs:enable
+        global $conf;
+        if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
+            $module = $conf->global->SOCIETE_CODECLIENT_ADDON;
+
+            $dirsociete = array_merge(['/core/modules/societe/'], $conf->modules_parts['societe']);
+            foreach ($dirsociete as $dirroot) {
+                $res = dol_include_once($dirroot . $module . '.php');
+                if ($res) {
+                    break;
+                }
+            }
+            $mod = new $module();
+
+            $this->code_fournisseur = $mod->getNextValue($objsoc, $type);
+
+            dol_syslog(get_class($this) . "::get_codefournisseur code_fournisseur=" . $this->code_fournisseur . " module=" . $module);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Check if a client code is editable based on the parameters of the
+     *    code control module.
+     *
+     * @return     int        0=No, 1=Yes
+     */
+    public function codeclient_modifiable()
+    {
+        // phpcs:enable
 		global $conf;
 		if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
 			$module = $conf->global->SOCIETE_CODECLIENT_ADDON;
@@ -2080,29 +3172,70 @@ class Societe extends CommonObject
 			}
 			if ($mod->code_modifiable_invalide && $this->check_codeclient() < 0) {
 				return 1;
-			}
-			if ($mod->code_modifiable) {
-				return 1; // A mettre en dernier
-			}
-			return 0;
-		} else {
-			return 0;
-		}
-	}
+            }
+            if ($mod->code_modifiable) {
+                return 1; // A mettre en dernier
+            }
+            return 0;
+        } else {
+            return 0;
+        }
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Check customer code
-	 *
-	 *  @return     int				0 if OK
-	 * 								-1 ErrorBadCustomerCodeSyntax
-	 * 								-2 ErrorCustomerCodeRequired
-	 * 								-3 ErrorCustomerCodeAlreadyUsed
-	 * 								-4 ErrorPrefixRequired
-	 * 								-5 NotConfigured - Setup empty so any value may be ok or not
-	 * 								-6 Other (see this->error)
+    /**
+     *    Check if a vendor code is editable in the code control module configuration
+     *
+     * @return     int        0=No, 1=Yes
+     */
+    public function codefournisseur_modifiable()
+    {
+        // phpcs:enable
+        global $conf;
+        if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
+            $module = $conf->global->SOCIETE_CODECLIENT_ADDON;
+
+            $dirsociete = array_merge(['/core/modules/societe/'], $conf->modules_parts['societe']);
+            foreach ($dirsociete as $dirroot) {
+                $res = dol_include_once($dirroot . $module . '.php');
+                if ($res) {
+                    break;
+                }
+            }
+
+            $mod = new $module();
+
+            dol_syslog(get_class($this) . "::codefournisseur_modifiable code_founisseur=" . $this->code_fournisseur . " module=" . $module);
+            if ($mod->code_modifiable_null && !$this->code_fournisseur) {
+                return 1;
+            }
+            if ($mod->code_modifiable_invalide && $this->check_codefournisseur() < 0) {
+                return 1;
+            }
+            if ($mod->code_modifiable) {
+                return 1; // A mettre en dernier
+            }
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Check customer code
+     *
+     * @return     int                0 if OK
+     *                                -1 ErrorBadCustomerCodeSyntax
+     *                                -2 ErrorCustomerCodeRequired
+     *                                -3 ErrorCustomerCodeAlreadyUsed
+     *                                -4 ErrorPrefixRequired
+     *                                -5 NotConfigured - Setup empty so any value may be ok or not
+     *                                -6 Other (see this->error)
 	 */
 	public function check_codeclient()
 	{
@@ -2134,47 +3267,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *    Check if a vendor code is editable in the code control module configuration
-	 *
-	 *    @return     int		0=No, 1=Yes
-	 */
-	public function codefournisseur_modifiable()
-	{
-		// phpcs:enable
-		global $conf;
-		if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
-			$module = $conf->global->SOCIETE_CODECLIENT_ADDON;
-
-			$dirsociete = array_merge(array('/core/modules/societe/'), $conf->modules_parts['societe']);
-			foreach ($dirsociete as $dirroot) {
-				$res = dol_include_once($dirroot.$module.'.php');
-				if ($res) {
-					break;
-				}
-			}
-
-			$mod = new $module();
-
-			dol_syslog(get_class($this)."::codefournisseur_modifiable code_founisseur=".$this->code_fournisseur." module=".$module);
-			if ($mod->code_modifiable_null && !$this->code_fournisseur) {
-				return 1;
-			}
-			if ($mod->code_modifiable_invalide && $this->check_codefournisseur() < 0) {
-				return 1;
-			}
-			if ($mod->code_modifiable) {
-				return 1; // A mettre en dernier
-			}
-			return 0;
-		} else {
-			return 0;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Check supplier code
 	 *
@@ -2205,28 +3297,83 @@ class Societe extends CommonObject
 
 			dol_syslog(get_class($this)."::check_codefournisseur code_fournisseur=".$this->code_fournisseur." module=".$module);
 			$result = $mod->verif($this->db, $this->code_fournisseur, $this, 1);
-			if ($result) {	// If error
-				$this->error = $mod->error;
-				$this->errors = $mod->errors;
-			}
-			return $result;
-		} else {
-			return 0;
-		}
-	}
+            if ($result) {    // If error
+                $this->error = $mod->error;
+                $this->errors = $mod->errors;
+            }
+            return $result;
+        } else {
+            return 0;
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *        Assigns a accounting code from the accounting code module.
+     *      Computed value is stored into this->code_compta or this->code_compta_fournisseur according to $type.
+     *      May be identical to the one entered or generated automatically. Currently, only the automatic generation is implemented.
+     *
+     * @param string $type Type of thirdparty ('customer' or 'supplier')
+     *
+     * @return    int                    0 if OK, <0 if $type is not valid
+     */
+    public function get_codecompta($type)
+    {
+        // phpcs:enable
+        global $conf;
 
-	/**
-	 *    Define parent commany of current company
-	 *
-	 *    @param	int		$id     Id of thirdparty to set or '' to remove
-	 *    @return	int     		<0 if KO, >0 if OK
-	 */
-	public function setParent($id)
-	{
-		dol_syslog(get_class($this).'::setParent', LOG_DEBUG);
+        if (!empty($conf->global->SOCIETE_CODECOMPTA_ADDON)) {
+            $res = false;
+            $dirsociete = array_merge(['/core/modules/societe/'], $conf->modules_parts['societe']);
+            foreach ($dirsociete as $dirroot) {
+                $res = dol_include_once($dirroot . $conf->global->SOCIETE_CODECOMPTA_ADDON . '.php');
+                if ($res) {
+                    break;
+                }
+            }
+
+            if ($res) {
+                $classname = $conf->global->SOCIETE_CODECOMPTA_ADDON;
+                $mod = new $classname;
+
+                // Set code count in $mod->code
+                $result = $mod->get_code($this->db, $this, $type);
+
+                if ($type == 'customer') {
+                    $this->code_compta_client = $mod->code;
+                    $this->code_compta = $this->code_compta_client;        // For backward compatibility
+                } elseif ($type == 'supplier') {
+                    $this->code_compta_fournisseur = $mod->code;
+                }
+
+                return $result;
+            } else {
+                $this->error = 'ErrorAccountancyCodeNotDefined';
+                return -1;
+            }
+        } else {
+            if ($type == 'customer') {
+                $this->code_compta_client = '';
+                $this->code_compta = '';
+            } elseif ($type == 'supplier') {
+                $this->code_compta_fournisseur = '';
+            }
+
+            return 0;
+        }
+    }
+
+    /**
+     *    Define parent commany of current company
+     *
+     * @param int $id Id of thirdparty to set or '' to remove
+     *
+     * @return    int            <0 if KO, >0 if OK
+     */
+    public function setParent($id)
+    {
+        dol_syslog(get_class($this).'::setParent', LOG_DEBUG);
 
 		if ($this->id) {
 			// Check if the id we want to add as parent has not already one parent that is the current id we try to update
@@ -2255,8 +3402,6 @@ class Societe extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Check if a thirdparty $idchild is or not inside the parents (or grand parents) of another thirdparty id $idparent.
 	 *
@@ -2280,28 +3425,132 @@ class Societe extends CommonObject
 
 			if ($obj->parent == '')	{
 				return 0;
-			} elseif ($obj->parent == $idchild)	{
-				return 1;
-			} else {
-				$sameparent	= $this->validateFamilyTree($obj->parent, $idchild, ($counter + 1));
-			}
-			return $sameparent;
-		} else {
-			return -1;
-		}
-	}
+			} elseif ($obj->parent == $idchild) {
+                return 1;
+            } else {
+                $sameparent = $this->validateFamilyTree($obj->parent, $idchild, ($counter + 1));
+            }
+            return $sameparent;
+        } else {
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Check the validity of a professional identifier according to the country of the company (siren, siret, ...)
-	 *
-	 *  @param	int			$idprof         1,2,3,4 (Exemple: 1=siren,2=siret,3=naf,4=rcs/rm)
-	 *  @param  Societe		$soc            Objet societe
-	 *  @return int             			<=0 if KO, >0 if OK
-	 *  TODO better to have this in a lib than into a business class
-	 */
-	public function id_prof_check($idprof, $soc)
+    /**
+     *  Returns if a profid sould be verified to be unique
+     *
+     * @param int $idprof 1,2,3,4,5,6 (Example: 1=siren, 2=siret, 3=naf, 4=rcs/rm, 5=eori, 6=idprof6)
+     *
+     * @return boolean            true if the ID must be unique
+     */
+    public function id_prof_verifiable($idprof)
+    {
+        // phpcs:enable
+        global $conf;
+
+        switch ($idprof) {
+            case 1:
+                $ret = (empty($conf->global->SOCIETE_IDPROF1_UNIQUE) ? false : true);
+                break;
+            case 2:
+                $ret = (empty($conf->global->SOCIETE_IDPROF2_UNIQUE) ? false : true);
+                break;
+            case 3:
+                $ret = (empty($conf->global->SOCIETE_IDPROF3_UNIQUE) ? false : true);
+                break;
+            case 4:
+                $ret = (empty($conf->global->SOCIETE_IDPROF4_UNIQUE) ? false : true);
+                break;
+            case 5:
+                $ret = (empty($conf->global->SOCIETE_IDPROF5_UNIQUE) ? false : true);
+                break;
+            case 6:
+                $ret = (empty($conf->global->SOCIETE_IDPROF6_UNIQUE) ? false : true);
+                break;
+            default:
+                $ret = false;
+        }
+
+        return $ret;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Verify if a profid exists into database for others thirds
+     *
+     * @param string $idprof 'idprof1','idprof2','idprof3','idprof4','idprof5','idprof6','email' (Example: idprof1=siren, idprof2=siret, idprof3=naf, idprof4=rcs/rm)
+     * @param string $value  Value of profid
+     * @param int    $socid  Id of thirdparty to exclude (if update)
+     *
+     * @return   boolean                True if exists, False if not
+     */
+    public function id_prof_exists($idprof, $value, $socid = 0)
+    {
+        // phpcs:enable
+        $field = $idprof;
+
+        switch ($idprof) {    // For backward compatibility
+            case '1':
+            case 'idprof1':
+                $field = "siren";
+                break;
+            case '2':
+            case 'idprof2':
+                $field = "siret";
+                break;
+            case '3':
+            case 'idprof3':
+                $field = "ape";
+                break;
+            case '4':
+            case 'idprof4':
+                $field = "idprof4";
+                break;
+            case '5':
+                $field = "idprof5";
+                break;
+            case '6':
+                $field = "idprof6";
+                break;
+        }
+
+        //Verify duplicate entries
+        $sql = "SELECT COUNT(*) as idprof FROM " . MAIN_DB_PREFIX . "societe WHERE " . $field . " = '" . $this->db->escape($value) . "' AND entity IN (" . getEntity('societe') . ")";
+        if ($socid) {
+            $sql .= " AND rowid <> " . $socid;
+        }
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $obj = $this->db->fetch_object($resql);
+            $count = $obj->idprof;
+        } else {
+            $count = 0;
+            print $this->db->error();
+        }
+        $this->db->free($resql);
+
+        if ($count > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Check the validity of a professional identifier according to the country of the company (siren, siret, ...)
+     *
+     * @param int     $idprof 1,2,3,4 (Exemple: 1=siren,2=siret,3=naf,4=rcs/rm)
+     * @param Societe $soc    Objet societe
+     *
+     * @return int                        <=0 if KO, >0 if OK
+     *  TODO better to have this in a lib than into a business class
+     */
+    public function id_prof_check($idprof, $soc)
 	{
 		// phpcs:enable
 		global $conf;
@@ -2469,7 +3718,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Return an url to check online a professional id or empty string
 	 *
@@ -2523,7 +3771,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Indicates if the company has projects
 	 *
@@ -2545,8 +3792,6 @@ class Societe extends CommonObject
 		return ($count > 0);
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Load information for tab info
@@ -2578,21 +3823,45 @@ class Societe extends CommonObject
 					$muser = new User($this->db);
 					$muser->fetch($obj->fk_user_modif);
 					$this->user_modification = $muser;
-				}
+                }
 
-				$this->ref = $obj->name;
-				$this->date_creation     = $this->db->jdate($obj->date_creation);
-				$this->date_modification = $this->db->jdate($obj->date_modification);
+                $this->ref = $obj->name;
+                $this->date_creation = $this->db->jdate($obj->date_creation);
+                $this->date_modification = $this->db->jdate($obj->date_modification);
+            }
+
+            $this->db->free($result);
+        } else {
+            dol_print_error($this->db);
+        }
+    }
+
+    /**
+     *  Return if third party is a company (Business) or an end user (Consumer)
+     *
+     * @return    boolean     true=is a company, false=a and user
+     */
+    public function isACompany()
+    {
+        global $conf;
+
+        // Define if third party is treated as company (or not) when nature is unknown
+        $isacompany = empty($conf->global->MAIN_UNKNOWN_CUSTOMERS_ARE_COMPANIES) ? 0 : 1; // 0 by default
+        if (!empty($this->tva_intra)) {
+            $isacompany = 1;
+        } elseif (!empty($this->idprof1) || !empty($this->idprof2) || !empty($this->idprof3) || !empty($this->idprof4) || !empty($this->idprof5) || !empty($this->idprof6)) {
+            $isacompany = 1;
+        } elseif (!empty($this->typent_code) && $this->typent_code != 'TE_UNKNOWN') {
+            // TODO Add a field is_a_company into dictionary
+            if (preg_match('/^TE_PRIVATE/', $this->typent_code)) {
+                $isacompany = 0;
+            } else {
+                $isacompany = 1;
 			}
-
-			$this->db->free($result);
-		} else {
-			dol_print_error($this->db);
 		}
+
+		return $isacompany;
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return if a company is inside the EEC (European Economic Community)
@@ -2606,7 +3875,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Load the list of provider categories
 	 *
@@ -2632,7 +3900,6 @@ class Societe extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Insert link supplier - category
 	 *
@@ -2644,27 +3911,31 @@ class Societe extends CommonObject
 		// phpcs:enable
 		if ($categorie_id > 0 && $this->id > 0) {
 			$sql = "INSERT INTO ".MAIN_DB_PREFIX."categorie_fournisseur (fk_categorie, fk_soc) ";
-			$sql .= " VALUES (".((int) $categorie_id).", ".((int) $this->id).")";
+			$sql .= " VALUES (".((int) $categorie_id) . ", " . ((int) $this->id) . ")";
 
-			if ($resql = $this->db->query($sql)) {
-				return 0;
-			}
-		} else {
-			return 0;
-		}
-		return -1;
-	}
+            if ($resql = $this->db->query($sql)) {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+        return -1;
+    }
 
-	/**
-	 *  Create a third party into database from a member object
-	 *
-	 *  @param	Adherent	$member			Object member
-	 * 	@param	string		$socname		Name of third party to force
-	 *	@param	string		$socalias		Alias name of third party to force
-	 *  @param	string		$customercode	Customer code
-	 *  @return int							<0 if KO, id of created account if OK
-	 */
-	public function create_from_member(Adherent $member, $socname = '', $socalias = '', $customercode = '')
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Create a third party into database from a member object
+     *
+     * @param Adherent $member       Object member
+     * @param string   $socname      Name of third party to force
+     * @param string   $socalias     Alias name of third party to force
+     * @param string   $customercode Customer code
+     *
+     * @return int                            <0 if KO, id of created account if OK
+     */
+    public function create_from_member(Adherent $member, $socname = '', $socalias = '', $customercode = '')
 	{
         // phpcs:enable
 		global $conf, $user, $langs;
@@ -2743,1115 +4014,6 @@ class Societe extends CommonObject
 			return $result;
 		}
 	}
-
-	/**
-	 *    Create third party in database.
-	 *    $this->code_client = -1 and $this->code_fournisseur = -1 means automatic assignement.
-	 *
-	 *    @param	User	$user       Object of user that ask creation
-	 *    @return   int         		>=0 if OK, <0 if KO
-	 */
-	public function create(User $user)
-	{
-		global $langs, $conf, $mysoc;
-
-		$error = 0;
-
-		// Clean parameters
-		if (empty($this->status)) {
-			$this->status = 0;
-		}
-		$this->name = $this->name ?trim($this->name) : trim($this->nom);
-		$this->setUpperOrLowerCase();
-		$this->nom = $this->name; // For backward compatibility
-		if (empty($this->client)) {
-			$this->client = 0;
-		}
-		if (empty($this->fournisseur)) {
-			$this->fournisseur = 0;
-		}
-		$this->import_key = trim($this->import_key);
-
-		$this->accountancy_code_buy = trim($this->accountancy_code_buy);
-		$this->accountancy_code_sell= trim($this->accountancy_code_sell);
-
-		if (!empty($this->multicurrency_code)) {
-			$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
-		}
-		if (empty($this->fk_multicurrency)) {
-			$this->multicurrency_code = '';
-			$this->fk_multicurrency = 0;
-		}
-
-		dol_syslog(get_class($this)."::create ".$this->name);
-
-		$now = dol_now();
-
-		$this->db->begin();
-
-		// For automatic creation during create action (not used by Dolibarr GUI, can be used by scripts)
-		if ($this->code_client == -1 || $this->code_client === 'auto') {
-			$this->get_codeclient($this, 0);
-		}
-		if ($this->code_fournisseur == -1 || $this->code_fournisseur === 'auto') {
-			$this->get_codefournisseur($this, 1);
-		}
-
-		// Check more parameters (including mandatory setup
-		// If error, this->errors[] is filled
-		$result = $this->verify();
-
-		if ($result >= 0) {
-			$this->entity = ((isset($this->entity) && is_numeric($this->entity)) ? $this->entity : $conf->entity);
-
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."societe (";
-			$sql .= "nom";
-			$sql .= ", name_alias";
-			$sql .= ", entity";
-			$sql .= ", datec";
-			$sql .= ", fk_typent";
-			$sql .= ", fk_user_creat";
-			$sql .= ", canvas";
-			$sql .= ", status";
-			$sql .= ", ref_ext";
-			$sql .= ", fk_stcomm";
-			$sql .= ", fk_incoterms";
-			$sql .= ", location_incoterms";
-			$sql .= ", import_key";
-			$sql .= ", fk_multicurrency";
-			$sql .= ", multicurrency_code";
-			if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
-				$sql .= ", accountancy_code_buy";
-				$sql .= ", accountancy_code_sell";
-			}
-			$sql .= ") VALUES ('".$this->db->escape($this->name)."', '".$this->db->escape($this->name_alias)."', ".((int) $this->entity).", '".$this->db->idate($now)."'";
-			$sql .= ", ".(!empty($user->id) ? ((int) $user->id) : "null");
-			$sql .= ", ".(!empty($this->typent_id) ? ((int) $this->typent_id) : "null");
-			$sql .= ", ".(!empty($this->canvas) ? "'".$this->db->escape($this->canvas)."'" : "null");
-			$sql .= ", ".((int) $this->status);
-			$sql .= ", ".(!empty($this->ref_ext) ? "'".$this->db->escape($this->ref_ext)."'" : "null");
-			$sql .= ", 0";
-			$sql .= ", ".(int) $this->fk_incoterms;
-			$sql .= ", '".$this->db->escape($this->location_incoterms)."'";
-			$sql .= ", ".(!empty($this->import_key) ? "'".$this->db->escape($this->import_key)."'" : "null");
-			$sql .= ", ".(int) $this->fk_multicurrency;
-			$sql .= ", '".$this->db->escape($this->multicurrency_code)."'";
-			if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
-				$sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
-				$sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
-			}
-			$sql .= ")";
-
-			dol_syslog(get_class($this)."::create", LOG_DEBUG);
-			$result = $this->db->query($sql);
-			if ($result) {
-				$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."societe");
-
-				$ret = $this->update($this->id, $user, 0, 1, 1, 'add');
-
-				// update accountancy for this entity
-				if (!$error && !empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
-					$this->db->query("DELETE FROM " . MAIN_DB_PREFIX . "societe_perentity WHERE fk_soc = " . ((int) $this->id) . " AND entity = " . ((int) $conf->entity));
-
-					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_perentity (";
-					$sql .= " fk_soc";
-					$sql .= ", entity";
-					$sql .= ", accountancy_code_buy";
-					$sql .= ", accountancy_code_sell";
-					$sql .= ") VALUES (";
-					$sql .= $this->id;
-					$sql .= ", " . $conf->entity;
-					$sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
-					$sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
-					$sql .= ")";
-					$result = $this->db->query($sql);
-					if (!$result) {
-						$error++;
-						$this->error = 'ErrorFailedToUpdateAccountancyForEntity';
-					}
-				}
-
-				// Ajout du commercial affecte
-				if ($this->commercial_id != '' && $this->commercial_id != -1) {
-					$this->add_commercial($user, $this->commercial_id);
-				} elseif (empty($user->rights->societe->client->voir)) {
-					// si un commercial cree un client il lui est affecte automatiquement
-					$this->add_commercial($user, $user->id);
-				}
-
-				if ($ret >= 0) {
-					// Call trigger
-					$result = $this->call_trigger('COMPANY_CREATE', $user);
-					if ($result < 0) {
-						$error++;
-					}
-					// End call triggers
-				} else {
-					$error++;
-				}
-
-				if (!$error) {
-					dol_syslog(get_class($this)."::Create success id=".$this->id);
-					$this->db->commit();
-					return $this->id;
-				} else {
-					dol_syslog(get_class($this)."::Create echec update ".$this->error.(empty($this->errors) ? '' : ' '.join(',', $this->errors)), LOG_ERR);
-					$this->db->rollback();
-					return -4;
-				}
-			} else {
-				if ($this->db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$this->error = $langs->trans("ErrorCompanyNameAlreadyExists", $this->name); // duplicate on a field (code or profid or ...)
-					$result = -1;
-				} else {
-					$this->error = $this->db->lasterror();
-					$result = -2;
-				}
-				$this->db->rollback();
-				return $result;
-			}
-		} else {
-			$this->db->rollback();
-			dol_syslog(get_class($this)."::Create fails verify ".join(',', $this->errors), LOG_WARNING);
-			return -3;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Assigns a customer code from the code control module.
-	 *  Return value is stored into this->code_client
-	 *
-	 *	@param	Societe		$objsoc		Object thirdparty
-	 *	@param	int			$type		Should be 0 to say customer
-	 *  @return void
-	 */
-	public function get_codeclient($objsoc = 0, $type = 0)
-	{
-		// phpcs:enable
-		global $conf;
-		if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
-			$module = $conf->global->SOCIETE_CODECLIENT_ADDON;
-
-			$dirsociete = array_merge(array('/core/modules/societe/'), $conf->modules_parts['societe']);
-			foreach ($dirsociete as $dirroot) {
-				$res = dol_include_once($dirroot.$module.'.php');
-				if ($res) {
-					break;
-				}
-			}
-			$mod = new $module();
-
-			$this->code_client = $mod->getNextValue($objsoc, $type);
-			$this->prefixCustomerIsRequired = $mod->prefixIsRequired;
-
-			dol_syslog(get_class($this)."::get_codeclient code_client=".$this->code_client." module=".$module);
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Assigns a vendor code from the code control module.
-	 *  Return value is stored into this->code_fournisseur
-	 *
-	 *	@param	Societe		$objsoc		Object thirdparty
-	 *	@param	int			$type		Should be 1 to say supplier
-	 *  @return void
-	 */
-	public function get_codefournisseur($objsoc = 0, $type = 1)
-	{
-		// phpcs:enable
-		global $conf;
-		if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
-			$module = $conf->global->SOCIETE_CODECLIENT_ADDON;
-
-			$dirsociete = array_merge(array('/core/modules/societe/'), $conf->modules_parts['societe']);
-			foreach ($dirsociete as $dirroot) {
-				$res = dol_include_once($dirroot.$module.'.php');
-				if ($res) {
-					break;
-				}
-			}
-			$mod = new $module();
-
-			$this->code_fournisseur = $mod->getNextValue($objsoc, $type);
-
-			dol_syslog(get_class($this)."::get_codefournisseur code_fournisseur=".$this->code_fournisseur." module=".$module);
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *    Check properties of third party are ok (like name, third party codes, ...)
-	 *    Used before an add or update.
-	 *
-	 *    @return     int		0 if OK, <0 if KO
-	 */
-	public function verify()
-	{
-		global $conf, $langs, $mysoc;
-
-		$error = 0;
-		$this->errors = array();
-
-		$result = 0;
-		$this->name = trim($this->name);
-		$this->nom = $this->name; // For backward compatibility
-
-		if (!$this->name) {
-			$this->errors[] = 'ErrorBadThirdPartyName';
-			$result = -2;
-		}
-
-		if ($this->client) {
-			$rescode = $this->check_codeclient();
-			if ($rescode != 0 && $rescode != -5) {
-				if ($rescode == -1) {
-					$this->errors[] = 'ErrorBadCustomerCodeSyntax';
-				} elseif ($rescode == -2) {
-					$this->errors[] = 'ErrorCustomerCodeRequired';
-				} elseif ($rescode == -3) {
-					$this->errors[] = 'ErrorCustomerCodeAlreadyUsed';
-				} elseif ($rescode == -4) {
-					$this->errors[] = 'ErrorPrefixRequired';
-				} else {
-					$this->errors[] = 'ErrorUnknownOnCustomerCodeCheck';
-				}
-
-				$result = -3;
-			}
-		}
-
-		if ($this->fournisseur) {
-			$rescode = $this->check_codefournisseur();
-			if ($rescode != 0 && $rescode != -5) {
-				if ($rescode == -1) {
-					$this->errors[] = 'ErrorBadSupplierCodeSyntax';
-				} elseif ($rescode == -2) {
-					$this->errors[] = 'ErrorSupplierCodeRequired';
-				} elseif ($rescode == -3) {
-					$this->errors[] = 'ErrorSupplierCodeAlreadyUsed';
-				} elseif ($rescode == -4) {
-					$this->errors[] = 'ErrorPrefixRequired';
-				} else {
-					$this->errors[] = 'ErrorUnknownOnSupplierCodeCheck';
-				}
-				$result = -3;
-			}
-		}
-
-		// Check for duplicate or mandatory fields defined into setup
-		$array_to_check = array('IDPROF1', 'IDPROF2', 'IDPROF3', 'IDPROF4', 'IDPROF5', 'IDPROF6', 'EMAIL');
-		foreach ($array_to_check as $key) {
-			$keymin = strtolower($key);
-			$i = (int) preg_replace('/[^0-9]/', '', $key);
-			$vallabel = $this->$keymin;
-
-			if ($i > 0) {
-				if ($this->isACompany()) {
-					// Check for mandatory prof id (but only if country is same than ours)
-					if ($mysoc->country_id > 0 && $this->country_id == $mysoc->country_id) {
-						$idprof_mandatory = 'SOCIETE_'.$key.'_MANDATORY';
-						if (!$vallabel && !empty($conf->global->$idprof_mandatory)) {
-							$langs->load("errors");
-							$error++;
-							$this->errors[] = $langs->trans("ErrorProdIdIsMandatory", $langs->transcountry('ProfId'.$i, $this->country_code)).' ('.$langs->trans("ForbiddenBySetupRules").')';
-						}
-					}
-				}
-
-				// Check for unicity on profid
-				if (!$error && $vallabel && $this->id_prof_verifiable($i)) {
-					if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
-						$langs->load("errors");
-						$error++;
-						$this->errors[] = $langs->transcountry('ProfId'.$i, $this->country_code)." ".$langs->trans("ErrorProdIdAlreadyExist", $vallabel).' ('.$langs->trans("ForbiddenBySetupRules").')';
-					}
-				}
-			} else {
-				//var_dump($conf->global->SOCIETE_EMAIL_UNIQUE);
-				//var_dump($conf->global->SOCIETE_EMAIL_MANDATORY);
-				if ($key == 'EMAIL') {
-					// Check for mandatory
-					if (!empty($conf->global->SOCIETE_EMAIL_MANDATORY) && !isValidEMail($this->email)) {
-						$langs->load("errors");
-						$error++;
-						$this->errors[] = $langs->trans("ErrorBadEMail", $this->email).' ('.$langs->trans("ForbiddenBySetupRules").')';
-					}
-
-					// Check for unicity
-					if (!$error && $vallabel && !empty($conf->global->SOCIETE_EMAIL_UNIQUE)) {
-						if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
-							$langs->load("errors");
-							$error++; $this->errors[] = $langs->trans('Email')." ".$langs->trans("ErrorProdIdAlreadyExist", $vallabel).' ('.$langs->trans("ForbiddenBySetupRules").')';
-						}
-					}
-				}
-			}
-		}
-
-		if ($error) {
-			$result = -4;
-		}
-
-		return $result;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return if third party is a company (Business) or an end user (Consumer)
-	 *
-	 *  @return    boolean     true=is a company, false=a and user
-	 */
-	public function isACompany()
-	{
-		global $conf;
-
-		// Define if third party is treated as company (or not) when nature is unknown
-		$isacompany = empty($conf->global->MAIN_UNKNOWN_CUSTOMERS_ARE_COMPANIES) ? 0 : 1; // 0 by default
-		if (!empty($this->tva_intra)) {
-			$isacompany = 1;
-		} elseif (!empty($this->idprof1) || !empty($this->idprof2) || !empty($this->idprof3) || !empty($this->idprof4) || !empty($this->idprof5) || !empty($this->idprof6)) {
-			$isacompany = 1;
-		} elseif (!empty($this->typent_code) && $this->typent_code != 'TE_UNKNOWN') {
-			// TODO Add a field is_a_company into dictionary
-			if (preg_match('/^TE_PRIVATE/', $this->typent_code)) {
-				$isacompany = 0;
-			} else {
-				$isacompany = 1;
-			}
-		}
-
-		return $isacompany;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Returns if a profid sould be verified to be unique
-	 *
-	 *  @param	int		$idprof		1,2,3,4,5,6 (Example: 1=siren, 2=siret, 3=naf, 4=rcs/rm, 5=eori, 6=idprof6)
-	 *  @return boolean         	true if the ID must be unique
-	 */
-	public function id_prof_verifiable($idprof)
-	{
-		// phpcs:enable
-		global $conf;
-
-		switch ($idprof) {
-			case 1:
-				$ret = (empty($conf->global->SOCIETE_IDPROF1_UNIQUE) ? false : true);
-				break;
-			case 2:
-				$ret = (empty($conf->global->SOCIETE_IDPROF2_UNIQUE) ? false : true);
-				break;
-			case 3:
-				$ret = (empty($conf->global->SOCIETE_IDPROF3_UNIQUE) ? false : true);
-				break;
-			case 4:
-				$ret = (empty($conf->global->SOCIETE_IDPROF4_UNIQUE) ? false : true);
-				break;
-			case 5:
-				$ret = (empty($conf->global->SOCIETE_IDPROF5_UNIQUE) ? false : true);
-				break;
-			case 6:
-				$ret = (empty($conf->global->SOCIETE_IDPROF6_UNIQUE) ? false : true);
-				break;
-			default:
-				$ret = false;
-		}
-
-		return $ret;
-	}
-
-	/**
-	 *    Verify if a profid exists into database for others thirds
-	 *
-	 *    @param	string	$idprof		'idprof1','idprof2','idprof3','idprof4','idprof5','idprof6','email' (Example: idprof1=siren, idprof2=siret, idprof3=naf, idprof4=rcs/rm)
-	 *    @param	string	$value		Value of profid
-	 *    @param	int		$socid		Id of thirdparty to exclude (if update)
-	 *    @return   boolean				True if exists, False if not
-	 */
-	public function id_prof_exists($idprof, $value, $socid = 0)
-	{
-		// phpcs:enable
-		$field = $idprof;
-
-		switch ($idprof) {	// For backward compatibility
-			case '1':
-			case 'idprof1':
-				$field = "siren";
-				break;
-			case '2':
-			case 'idprof2':
-				$field = "siret";
-				break;
-			case '3':
-			case 'idprof3':
-				$field = "ape";
-				break;
-			case '4':
-			case 'idprof4':
-				$field = "idprof4";
-				break;
-			case '5':
-				$field = "idprof5";
-				break;
-			case '6':
-				$field = "idprof6";
-				break;
-		}
-
-		 //Verify duplicate entries
-		$sql = "SELECT COUNT(*) as idprof FROM ".MAIN_DB_PREFIX."societe WHERE ".$field." = '".$this->db->escape($value)."' AND entity IN (".getEntity('societe').")";
-		if ($socid) {
-			$sql .= " AND rowid <> ".$socid;
-		}
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_object($resql);
-			$count = $obj->idprof;
-		} else {
-			$count = 0;
-			print $this->db->error();
-		}
-		$this->db->free($resql);
-
-		if ($count > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 *      Update parameters of third party
-	 *
-	 *      @param	int		$id              			Id of company (deprecated, use 0 here and call update on an object loaded by a fetch)
-	 *      @param  User	$user            			User who requests the update
-	 *      @param  int		$call_trigger    			0=no, 1=yes
-	 *		@param	int		$allowmodcodeclient			Inclut modif code client et code compta
-	 *		@param	int		$allowmodcodefournisseur	Inclut modif code fournisseur et code compta fournisseur
-	 *		@param	string	$action						'add' or 'update' or 'merge'
-	 *		@param	int		$nosyncmember				Do not synchronize info of linked member
-	 *      @return int  			           			<0 if KO, >=0 if OK
-	 */
-	public function update($id, $user = '', $call_trigger = 1, $allowmodcodeclient = 0, $allowmodcodefournisseur = 0, $action = 'update', $nosyncmember = 1)
-	{
-		global $langs, $conf, $hookmanager;
-
-		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-
-		if (empty($id)) {
-			$id = $this->id;
-		}
-
-		$error = 0;
-
-		dol_syslog(get_class($this)."::Update id=".$id." call_trigger=".$call_trigger." allowmodcodeclient=".$allowmodcodeclient." allowmodcodefournisseur=".$allowmodcodefournisseur);
-
-		$now = dol_now();
-
-		// Clean parameters
-		$this->id = $id;
-		$this->entity = ((isset($this->entity) && is_numeric($this->entity)) ? $this->entity : $conf->entity);
-		$this->name = $this->name ?trim($this->name) : trim($this->nom);
-		$this->nom = $this->name; // For backward compatibility
-		$this->name_alias = trim($this->name_alias);
-		$this->ref_ext		= trim($this->ref_ext);
-		$this->address		= $this->address ?trim($this->address) : trim($this->address);
-		$this->zip = $this->zip ?trim($this->zip) : trim($this->zip);
-		$this->town = $this->town ?trim($this->town) : trim($this->town);
-		$this->setUpperOrLowerCase();
-		$this->state_id = trim($this->state_id);
-		$this->country_id = ($this->country_id > 0) ? $this->country_id : 0;
-		$this->phone		= trim($this->phone);
-		$this->phone		= preg_replace("/\s/", "", $this->phone);
-		$this->phone		= preg_replace("/\./", "", $this->phone);
-		$this->fax			= trim($this->fax);
-		$this->fax			= preg_replace("/\s/", "", $this->fax);
-		$this->fax			= preg_replace("/\./", "", $this->fax);
-		$this->email = trim($this->email);
-		$this->url			= $this->url ?clean_url($this->url, 0) : '';
-		$this->note_private = trim($this->note_private);
-		$this->note_public  = trim($this->note_public);
-		$this->idprof1		= trim($this->idprof1);
-		$this->idprof2		= trim($this->idprof2);
-		$this->idprof3		= trim($this->idprof3);
-		$this->idprof4		= trim($this->idprof4);
-		$this->idprof5		= (!empty($this->idprof5) ?trim($this->idprof5) : '');
-		$this->idprof6		= (!empty($this->idprof6) ?trim($this->idprof6) : '');
-		$this->prefix_comm = trim($this->prefix_comm);
-		$this->outstanding_limit = price2num($this->outstanding_limit);
-		$this->order_min_amount = price2num($this->order_min_amount);
-		$this->supplier_order_min_amount = price2num($this->supplier_order_min_amount);
-
-		$this->tva_assuj	= trim($this->tva_assuj);
-		$this->tva_intra	= dol_sanitizeFileName($this->tva_intra, '');
-		if (empty($this->status)) {
-			$this->status = 0;
-		}
-
-		if (!empty($this->multicurrency_code)) {
-			$this->fk_multicurrency = MultiCurrency::getIdFromCode($this->db, $this->multicurrency_code);
-		}
-		if (empty($this->fk_multicurrency)) {
-			$this->multicurrency_code = '';
-			$this->fk_multicurrency = 0;
-		}
-
-		// Local taxes
-		$this->localtax1_assuj = trim($this->localtax1_assuj);
-		$this->localtax2_assuj = trim($this->localtax2_assuj);
-
-		$this->localtax1_value = trim($this->localtax1_value);
-		$this->localtax2_value = trim($this->localtax2_value);
-
-		if ($this->capital != '') {
-			$this->capital = price2num(trim($this->capital));
-		}
-		if (!is_numeric($this->capital)) {
-			$this->capital = ''; // '' = undef
-		}
-
-		$this->effectif_id = trim($this->effectif_id);
-		$this->forme_juridique_code = trim($this->forme_juridique_code);
-
-		//Gencod
-		$this->barcode = trim($this->barcode);
-
-		// For automatic creation
-		if ($this->code_client == -1 || $this->code_client === 'auto') {
-			$this->get_codeclient($this, 0);
-		}
-		if ($this->code_fournisseur == -1 || $this->code_fournisseur === 'auto') {
-			$this->get_codefournisseur($this, 1);
-		}
-
-		$this->code_compta_client = trim(empty($this->code_compta) ? $this->code_compta_client : $this->code_compta);
-		$this->code_compta = $this->code_compta_client;		// for backward compatbility
-		$this->code_compta_fournisseur = trim($this->code_compta_fournisseur);
-
-		// Check parameters. More tests are done later in the ->verify()
-		if (!is_numeric($this->client) && !is_numeric($this->fournisseur)) {
-			$langs->load("errors");
-			$this->error = $langs->trans("BadValueForParameterClientOrSupplier");
-			return -1;
-		}
-
-		$customer = false;
-		if (!empty($allowmodcodeclient) && !empty($this->client)) {
-			// If $allowmodcodeclient is set and value is not set, we generate it
-			if (empty($this->code_compta_client)) {
-				$ret = $this->get_codecompta('customer');
-				if ($ret < 0) {
-					return -1;
-				}
-			}
-
-			$customer = true;
-		}
-
-		$supplier = false;
-		if (!empty($allowmodcodefournisseur) && !empty($this->fournisseur)) {
-			// If $allowmodcodefournisseur is set and value is not set, we generate it
-			if (empty($this->code_compta_fournisseur)) {
-				$ret = $this->get_codecompta('supplier');
-				if ($ret < 0) {
-					return -1;
-				}
-			}
-
-			$supplier = true;
-		}
-
-		//Web services
-		$this->webservices_url = $this->webservices_url ?clean_url($this->webservices_url, 0) : '';
-		$this->webservices_key = trim($this->webservices_key);
-
-		$this->accountancy_code_buy = trim($this->accountancy_code_buy);
-		$this->accountancy_code_sell= trim($this->accountancy_code_sell);
-
-		//Incoterms
-		$this->fk_incoterms = (int) $this->fk_incoterms;
-		$this->location_incoterms = trim($this->location_incoterms);
-
-		$this->db->begin();
-
-		// Check name is required and codes are ok or unique.
-		// If error, this->errors[] is filled
-		$result = 0;
-		if ($action != 'add' && $action != 'merge') {
-			// We don't check when update called during a create because verify was already done.
-			// For a merge, we suppose source data is clean and a customer code of a deleted thirdparty must be accepted into a target thirdparty with empty code without duplicate error
-			$result = $this->verify();
-
-			// If there is only one error and error is ErrorBadCustomerCodeSyntax and we don't change customer code, we allow the update
-			// So we can update record that were using and old numbering rule.
-			if (is_array($this->errors)) {
-				if (in_array('ErrorBadCustomerCodeSyntax', $this->errors) && is_object($this->oldcopy) && $this->oldcopy->code_client == $this->code_client) {
-					if (($key = array_search('ErrorBadCustomerCodeSyntax', $this->errors)) !== false) {
-						unset($this->errors[$key]); // Remove error message
-					}
-				}
-				if (in_array('ErrorBadSupplierCodeSyntax', $this->errors) && is_object($this->oldcopy) && $this->oldcopy->code_fournisseur == $this->code_fournisseur) {
-					if (($key = array_search('ErrorBadSupplierCodeSyntax', $this->errors)) !== false) {
-						unset($this->errors[$key]); // Remove error message
-					}
-				}
-				if (empty($this->errors)) {	// If there is no more error, we can make like if there is no error at all
-					$result = 0;
-				}
-			}
-		}
-
-		if ($result >= 0) {
-			dol_syslog(get_class($this)."::update verify ok or not done");
-
-			$sql  = "UPDATE ".MAIN_DB_PREFIX."societe SET ";
-			$sql .= "entity = ".$this->db->escape($this->entity);
-			$sql .= ",nom = '".$this->db->escape($this->name)."'"; // Required
-			$sql .= ",name_alias = '".$this->db->escape($this->name_alias)."'";
-			$sql .= ",ref_ext = ".(!empty($this->ref_ext) ? "'".$this->db->escape($this->ref_ext)."'" : "null");
-			$sql .= ",address = '".$this->db->escape($this->address)."'";
-
-			$sql .= ",zip = ".(!empty($this->zip) ? "'".$this->db->escape($this->zip)."'" : "null");
-			$sql .= ",town = ".(!empty($this->town) ? "'".$this->db->escape($this->town)."'" : "null");
-
-			$sql .= ",fk_departement = ".((!empty($this->state_id) && $this->state_id > 0) ? ((int) $this->state_id) : 'null');
-			$sql .= ",fk_pays = ".((!empty($this->country_id) && $this->country_id > 0) ? ((int) $this->country_id) : 'null');
-
-			$sql .= ",phone = ".(!empty($this->phone) ? "'".$this->db->escape($this->phone)."'" : "null");
-			$sql .= ",fax = ".(!empty($this->fax) ? "'".$this->db->escape($this->fax)."'" : "null");
-			$sql .= ",email = ".(!empty($this->email) ? "'".$this->db->escape($this->email)."'" : "null");
-			$sql .= ",socialnetworks = '".$this->db->escape(json_encode($this->socialnetworks))."'";
-			$sql .= ",url = ".(!empty($this->url) ? "'".$this->db->escape($this->url)."'" : "null");
-
-			$sql .= ",parent = ".($this->parent > 0 ? $this->parent : "null");
-
-			$sql .= ",note_private = ".(!empty($this->note_private) ? "'".$this->db->escape($this->note_private)."'" : "null");
-			$sql .= ",note_public = ".(!empty($this->note_public) ? "'".$this->db->escape($this->note_public)."'" : "null");
-
-			$sql .= ",siren   = '".$this->db->escape($this->idprof1)."'";
-			$sql .= ",siret   = '".$this->db->escape($this->idprof2)."'";
-			$sql .= ",ape     = '".$this->db->escape($this->idprof3)."'";
-			$sql .= ",idprof4 = '".$this->db->escape($this->idprof4)."'";
-			$sql .= ",idprof5 = '".$this->db->escape($this->idprof5)."'";
-			$sql .= ",idprof6 = '".$this->db->escape($this->idprof6)."'";
-
-			$sql .= ",tva_assuj = ".($this->tva_assuj != '' ? "'".$this->db->escape($this->tva_assuj)."'" : "null");
-			$sql .= ",tva_intra = '".$this->db->escape($this->tva_intra)."'";
-			$sql .= ",status = ".((int) $this->status);
-
-			// Local taxes
-			$sql .= ",localtax1_assuj = ".($this->localtax1_assuj != '' ? "'".$this->db->escape($this->localtax1_assuj)."'" : "null");
-			$sql .= ",localtax2_assuj = ".($this->localtax2_assuj != '' ? "'".$this->db->escape($this->localtax2_assuj)."'" : "null");
-			if ($this->localtax1_assuj == 1) {
-				if ($this->localtax1_value != '') {
-					$sql .= ",localtax1_value =".$this->localtax1_value;
-				} else {
-					$sql .= ",localtax1_value =0.000";
-				}
-			} else {
-				$sql .= ",localtax1_value =0.000";
-			}
-
-			if ($this->localtax2_assuj == 1) {
-				if ($this->localtax2_value != '') {
-					$sql .= ",localtax2_value =".$this->localtax2_value;
-				} else {
-					$sql .= ",localtax2_value =0.000";
-				}
-			} else {
-				$sql .= ",localtax2_value =0.000";
-			}
-
-			$sql .= ",capital = ".($this->capital == '' ? "null" : $this->capital);
-
-			$sql .= ",prefix_comm = ".(!empty($this->prefix_comm) ? "'".$this->db->escape($this->prefix_comm)."'" : "null");
-
-			$sql .= ",fk_effectif = ".(!empty($this->effectif_id) ? "'".$this->db->escape($this->effectif_id)."'" : "null");
-			if (isset($this->stcomm_id)) {
-				$sql .= ",fk_stcomm=".(!empty($this->stcomm_id) ? $this->stcomm_id : "0");
-			}
-			$sql .= ",fk_typent = ".(!empty($this->typent_id) ? "'".$this->db->escape($this->typent_id)."'" : "0");
-
-			$sql .= ",fk_forme_juridique = ".(!empty($this->forme_juridique_code) ? "'".$this->db->escape($this->forme_juridique_code)."'" : "null");
-
-			$sql .= ",mode_reglement = ".(!empty($this->mode_reglement_id) ? "'".$this->db->escape($this->mode_reglement_id)."'" : "null");
-			$sql .= ",cond_reglement = ".(!empty($this->cond_reglement_id) ? "'".$this->db->escape($this->cond_reglement_id)."'" : "null");
-			$sql .= ",transport_mode = ".(!empty($this->transport_mode_id) ? "'".$this->db->escape($this->transport_mode_id)."'" : "null");
-			$sql .= ",mode_reglement_supplier = ".(!empty($this->mode_reglement_supplier_id) ? "'".$this->db->escape($this->mode_reglement_supplier_id)."'" : "null");
-			$sql .= ",cond_reglement_supplier = ".(!empty($this->cond_reglement_supplier_id) ? "'".$this->db->escape($this->cond_reglement_supplier_id)."'" : "null");
-			$sql .= ",transport_mode_supplier = ".(!empty($this->transport_mode_supplier_id) ? "'".$this->db->escape($this->transport_mode_supplier_id)."'" : "null");
-			$sql .= ",fk_shipping_method = ".(!empty($this->shipping_method_id) ? "'".$this->db->escape($this->shipping_method_id)."'" : "null");
-
-			$sql .= ",client = ".(!empty($this->client) ? $this->client : 0);
-			$sql .= ",fournisseur = ".(!empty($this->fournisseur) ? $this->fournisseur : 0);
-			$sql .= ",barcode = ".(!empty($this->barcode) ? "'".$this->db->escape($this->barcode)."'" : "null");
-			$sql .= ",default_lang = ".(!empty($this->default_lang) ? "'".$this->db->escape($this->default_lang)."'" : "null");
-			$sql .= ",logo = ".(!empty($this->logo) ? "'".$this->db->escape($this->logo)."'" : "null");
-			$sql .= ",logo_squarred = ".(!empty($this->logo_squarred) ? "'".$this->db->escape($this->logo_squarred)."'" : "null");
-			$sql .= ",outstanding_limit= ".($this->outstanding_limit != '' ? $this->outstanding_limit : 'null');
-			$sql .= ",order_min_amount= ".($this->order_min_amount != '' ? $this->order_min_amount : 'null');
-			$sql .= ",supplier_order_min_amount= ".($this->supplier_order_min_amount != '' ? $this->supplier_order_min_amount : 'null');
-			$sql .= ",fk_prospectlevel='".$this->db->escape($this->fk_prospectlevel)."'";
-			if (empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
-				$sql .= ", accountancy_code_buy = '" . $this->db->escape($this->accountancy_code_buy) . "'";
-				$sql .= ", accountancy_code_sell= '" . $this->db->escape($this->accountancy_code_sell) . "'";
-			}
-			$sql .= ",webservices_url = ".(!empty($this->webservices_url) ? "'".$this->db->escape($this->webservices_url)."'" : "null");
-			$sql .= ",webservices_key = ".(!empty($this->webservices_key) ? "'".$this->db->escape($this->webservices_key)."'" : "null");
-
-			//Incoterms
-			$sql .= ", fk_incoterms = ".((int) $this->fk_incoterms);
-			$sql .= ", location_incoterms = ".(!empty($this->location_incoterms) ? "'".$this->db->escape($this->location_incoterms)."'" : "null");
-
-			if ($customer) {
-				$sql .= ", code_client = ".(!empty($this->code_client) ? "'".$this->db->escape($this->code_client)."'" : "null");
-				$sql .= ", code_compta = ".(!empty($this->code_compta_client) ? "'".$this->db->escape($this->code_compta_client)."'" : "null");
-			}
-
-			if ($supplier) {
-				$sql .= ", code_fournisseur = ".(!empty($this->code_fournisseur) ? "'".$this->db->escape($this->code_fournisseur)."'" : "null");
-				$sql .= ", code_compta_fournisseur = ".(($this->code_compta_fournisseur != "") ? "'".$this->db->escape($this->code_compta_fournisseur)."'" : "null");
-			}
-			$sql .= ", fk_user_modif = ".($user->id > 0 ? $user->id : "null");
-			$sql .= ", fk_multicurrency = ".(int) $this->fk_multicurrency;
-			$sql .= ", multicurrency_code = '".$this->db->escape($this->multicurrency_code)."'";
-			$sql .= ", model_pdf = '".$this->db->escape($this->model_pdf)."'";
-			$sql .= " WHERE rowid = ".(int) $id;
-
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				if (is_object($this->oldcopy)) {	// If we have information on old values
-					if ($this->oldcopy->country_id != $this->country_id) {
-						unset($this->country_code);
-						unset($this->country);
-					}
-					if ($this->oldcopy->state_id != $this->state_id) {
-						unset($this->state_code);
-						unset($this->state);
-					}
-				} else {
-					unset($this->country_code); // We clean this, in the doubt, because it may have been changed after an update of country_id
-					unset($this->country);
-					unset($this->state_code);
-					unset($this->state);
-				}
-
-				$nbrowsaffected = $this->db->affected_rows($resql);
-
-				if (!$error && $nbrowsaffected) {
-					// Update information on linked member if it is an update
-					if (!$nosyncmember && !empty($conf->adherent->enabled)) {
-						require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
-
-						dol_syslog(get_class($this)."::update update linked member");
-
-						$lmember = new Adherent($this->db);
-						$result = $lmember->fetch(0, 0, $this->id);
-
-						if ($result > 0) {
-							$lmember->company = $this->name;
-							//$lmember->firstname=$this->firstname?$this->firstname:$lmember->firstname;	// We keep firstname and lastname of member unchanged
-							//$lmember->lastname=$this->lastname?$this->lastname:$lmember->lastname;		// We keep firstname and lastname of member unchanged
-							$lmember->address = $this->address;
-							$lmember->zip = $this->zip;
-							$lmember->town = $this->town;
-							$lmember->email = $this->email;
-							$lmember->socialnetworks = $this->socialnetworks;
-							$lmember->phone = $this->phone;
-							$lmember->state_id = $this->state_id;
-							$lmember->country_id = $this->country_id;
-
-							$result = $lmember->update($user, 0, 1, 1, 1); // Use nosync to 1 to avoid cyclic updates
-							if ($result < 0) {
-								$this->error = $lmember->error;
-								$this->errors = array_merge($this->errors, $lmember->errors);
-								dol_syslog(get_class($this)."::update ".$this->error, LOG_ERR);
-								$error++;
-							}
-						} elseif ($result < 0) {
-							$this->error = $lmember->error;
-							$error++;
-						}
-					}
-				}
-
-				$action = 'update';
-
-				// update accountancy for this entity
-				if (!$error && !empty($conf->global->MAIN_COMPANY_PERENTITY_SHARED)) {
-					$this->db->query("DELETE FROM " . MAIN_DB_PREFIX . "societe_perentity WHERE fk_soc = " . ((int) $this->id) . " AND entity = " . ((int) $conf->entity));
-
-					$sql = "INSERT INTO " . MAIN_DB_PREFIX . "societe_perentity (";
-					$sql .= " fk_soc";
-					$sql .= ", entity";
-					$sql .= ", accountancy_code_buy";
-					$sql .= ", accountancy_code_sell";
-					$sql .= ") VALUES (";
-					$sql .= $this->id;
-					$sql .= ", " . $conf->entity;
-					$sql .= ", '" . $this->db->escape($this->accountancy_code_buy) . "'";
-					$sql .= ", '" . $this->db->escape($this->accountancy_code_sell) . "'";
-					$sql .= ")";
-					$result = $this->db->query($sql);
-					if (!$result) {
-						$error++;
-						$this->error = 'ErrorFailedToUpdateAccountancyForEntity';
-					}
-				}
-
-				// Actions on extra fields
-				if (!$error) {
-					$result = $this->insertExtraFields();
-					if ($result < 0) {
-						$error++;
-					}
-				}
-				// Actions on extra languages
-				if (!$error && empty($conf->global->MAIN_EXTRALANGUAGES_DISABLED)) { // For avoid conflicts if trigger used
-					$result = $this->insertExtraLanguages();
-					if ($result < 0) {
-						$error++;
-					}
-				}
-
-				if (!$error && $call_trigger) {
-					// Call trigger
-					$result = $this->call_trigger('COMPANY_MODIFY', $user);
-					if ($result < 0) {
-						$error++;
-					}
-					// End call triggers
-				}
-
-				if (!$error) {
-					dol_syslog(get_class($this)."::Update success");
-					$this->db->commit();
-					return 1;
-				} else {
-					$this->db->rollback();
-					return -1;
-				}
-			} else {
-				if ($this->db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					// Doublon
-					$this->error = $langs->trans("ErrorDuplicateField");
-					$result = -1;
-				} else {
-					$this->error = $this->db->lasterror();
-					$result = -2;
-				}
-				$this->db->rollback();
-				return $result;
-			}
-		} else {
-			$this->db->rollback();
-			dol_syslog(get_class($this)."::Update fails verify ".join(',', $this->errors), LOG_WARNING);
-			return -3;
-		}
-	}
-
-	/**
-	 *    	Assigns a accounting code from the accounting code module.
-	 *      Computed value is stored into this->code_compta or this->code_compta_fournisseur according to $type.
-	 *      May be identical to the one entered or generated automatically. Currently, only the automatic generation is implemented.
-	 *
-	 *    	@param	string	$type		Type of thirdparty ('customer' or 'supplier')
-	 *		@return	int					0 if OK, <0 if $type is not valid
-	 */
-	public function get_codecompta($type)
-	{
-		// phpcs:enable
-		global $conf;
-
-		if (!empty($conf->global->SOCIETE_CODECOMPTA_ADDON)) {
-			$res = false;
-			$dirsociete = array_merge(array('/core/modules/societe/'), $conf->modules_parts['societe']);
-			foreach ($dirsociete as $dirroot) {
-				$res = dol_include_once($dirroot.$conf->global->SOCIETE_CODECOMPTA_ADDON.'.php');
-				if ($res) {
-					break;
-				}
-			}
-
-			if ($res) {
-				$classname = $conf->global->SOCIETE_CODECOMPTA_ADDON;
-				$mod = new $classname;
-
-				// Set code count in $mod->code
-				$result = $mod->get_code($this->db, $this, $type);
-
-				if ($type == 'customer') {
-					$this->code_compta_client = $mod->code;
-					$this->code_compta = $this->code_compta_client;		// For backward compatibility
-				} elseif ($type == 'supplier') {
-					$this->code_compta_fournisseur = $mod->code;
-				}
-
-				return $result;
-			} else {
-				$this->error = 'ErrorAccountancyCodeNotDefined';
-				return -1;
-			}
-		} else {
-			if ($type == 'customer') {
-				$this->code_compta_client = '';
-				$this->code_compta = '';
-			} elseif ($type == 'supplier') {
-				$this->code_compta_fournisseur = '';
-			}
-
-			return 0;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Add link to sales representative
-	 *
-	 *	@param	User	$user		Object user
-	 *	@param	int		$commid		Id of user
-	 *	@return	int					<=0 if KO, >0 if OK
-	 */
-	public function add_commercial(User $user, $commid)
-	{
-		// phpcs:enable
-		$error = 0;
-
-		if ($this->id > 0 && $commid > 0) {
-			$this->db->begin();
-
-			if (!$error) {
-				$sql = "DELETE FROM  ".MAIN_DB_PREFIX."societe_commerciaux";
-				$sql .= " WHERE fk_soc = ".((int) $this->id)." AND fk_user = ".((int) $commid);
-
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					dol_syslog(get_class($this)."::add_commercial Error ".$this->db->lasterror());
-					$error++;
-				}
-			}
-
-			if (!$error) {
-				$sql = "INSERT INTO ".MAIN_DB_PREFIX."societe_commerciaux";
-				$sql .= " (fk_soc, fk_user)";
-				$sql .= " VALUES (".((int) $this->id).", ".((int) $commid).")";
-
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					dol_syslog(get_class($this)."::add_commercial Error ".$this->db->lasterror());
-					$error++;
-				}
-			}
-
-			if (!$error) {
-				$this->context = array('commercial_modified' => $commid);
-
-				$result = $this->call_trigger('COMPANY_LINK_SALE_REPRESENTATIVE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-			}
-
-			if (!$error) {
-				$this->db->commit();
-				return 1;
-			} else {
-				$this->db->rollback();
-				return -1;
-			}
-		}
-
-		return 0;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Create a contact/address from thirdparty
-	 *
-	 * @param 	User	$user		Object user
-	 * @param 	int		$no_email	1=Do not send mailing, 0=Ok to recieve mailling
-	 * @param 	array	$tags		Array of tag to affect to contact
-	 * @return 	int					<0 if KO, >0 if OK
-	 */
-	public function create_individual(User $user, $no_email = 0, $tags = array())
-	{
-		global $conf;
-
-		$error = 0;
-
-		$this->db->begin();
-
-		// phpcs:enable
-		require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-		$contact = new Contact($this->db);
-
-		$contact->name              = $this->name_bis;
-		$contact->firstname         = $this->firstname;
-		$contact->civility_id       = $this->civility_id;
-		$contact->socid             = $this->id; // fk_soc
-		$contact->statut            = 1; // deprecated
-		$contact->status            = 1;
-		$contact->priv              = 0;
-		$contact->country_id        = $this->country_id;
-		$contact->state_id          = $this->state_id;
-		$contact->address           = $this->address;
-		$contact->email             = $this->email;
-		$contact->zip               = $this->zip;
-		$contact->town              = $this->town;
-		$this->setUpperOrLowerCase();
-		$contact->phone_pro         = $this->phone;
-
-		$contactId = $contact->create($user);
-		if ($contactId < 0) {
-			$error++;
-			$this->error = $contact->error;
-			$this->errors = $contact->errors;
-			dol_syslog(get_class($this)."::create_individual ERROR:".$this->error, LOG_ERR);
-		}
-
-		if (empty($error) && is_array($tags) && !empty($tags)) {
-			$result = $contact->setCategories($tags);
-			if ($result < 0) {
-				$error++;
-				$this->error = $contact->error;
-				$this->errors = array_merge($this->errors, $contact->errors);
-				dol_syslog(get_class($this) . "::create_individual Affect Tag ERROR:" . $this->error, LOG_ERR);
-				$contactId = $result;
-			}
-		}
-
-		if (empty($error) && !empty($conf->mailing->enabled) && !empty($contact->email) && isset($no_email)) {
-			$result = $contact->setNoEmail($no_email);
-			if ($result < 0) {
-				$this->error = $contact->error;
-				$this->errors = array_merge($this->errors, $contact->errors);
-				dol_syslog(get_class($this) . "::create_individual set mailing status ERROR:" . $this->error, LOG_ERR);
-				$contactId = $result;
-			}
-		}
-
-		if (!empty($error)) {
-			dol_syslog(get_class($this)."::create_individual success");
-			$this->db->commit();
-		} else {
-			$this->db->rollback();
-		}
-
-		return $contactId;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * 	Set properties with value into $conf
@@ -4119,8 +4281,9 @@ class Societe extends CommonObject
 	public function getLibProspLevel()
 	{
 		return $this->LibProspLevel($this->fk_prospectlevel);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return label of prospect level
 	 *
@@ -4140,8 +4303,6 @@ class Societe extends CommonObject
 		return $lib;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return status of prospect
 	 *
@@ -4152,8 +4313,9 @@ class Societe extends CommonObject
 	public function getLibProspCommStatut($mode = 0, $label = '')
 	{
 		return $this->LibProspCommStatut($this->stcomm_id, $mode, $label, $this->stcomm_picto);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return label of a given status
 	 *
@@ -4219,8 +4381,6 @@ class Societe extends CommonObject
 
 		return "Error, mode/status not found";
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return amount of proposal not yet paid and total an dlist of all proposals
@@ -4410,8 +4570,9 @@ class Societe extends CommonObject
 	public function getLibCustProspStatut()
 	{
 		return $this->LibCustProspStatut($this->client);
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return the label of the customer/prospect status
 	 *
@@ -4435,7 +4596,6 @@ class Societe extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -4491,6 +4651,7 @@ class Societe extends CommonObject
 
 		return $result;
 	}
+
 
 	/**
 	 * Sets object to supplied categories.
@@ -4563,104 +4724,6 @@ class Societe extends CommonObject
 	}
 
 	/**
-	 *  Return array of sales representatives
-	 *
-	 *  @param	User		$user			Object user
-	 *  @param	int			$mode			0=Array with properties, 1=Array of id.
-	 *  @param	string		$sortfield		List of sort fields, separated by comma. Example: 't1.fielda,t2.fieldb'
-	 *  @param	string		$sortorder		Sort order, separated by comma. Example: 'ASC,DESC';
-	 *  @return array       				Array of sales representatives of third party
-	 */
-	public function getSalesRepresentatives(User $user, $mode = 0, $sortfield = null, $sortorder = null)
-	{
-		global $conf;
-
-		$reparray = array();
-
-		$sql = "SELECT DISTINCT u.rowid, u.login, u.lastname, u.firstname, u.office_phone, u.job, u.email, u.statut as status, u.entity, u.photo, u.gender";
-		$sql .= ", u.office_fax, u.user_mobile, u.personal_mobile";
-		$sql .= " FROM ".MAIN_DB_PREFIX."societe_commerciaux as sc, ".MAIN_DB_PREFIX."user as u";
-		if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-			$sql .= ", ".MAIN_DB_PREFIX."usergroup_user as ug";
-			$sql .= " WHERE ((ug.fk_user = sc.fk_user";
-			$sql .= " AND ug.entity = ".$conf->entity.")";
-			$sql .= " OR u.admin = 1)";
-		} else {
-			$sql .= " WHERE entity in (0, ".$conf->entity.")";
-		}
-
-		$sql .= " AND u.rowid = sc.fk_user AND sc.fk_soc = ".((int) $this->id);
-		if (empty($sortfield) && empty($sortorder)) {
-			$sortfield = 'u.lastname,u.firstname';
-			$sortorder = 'ASC,ASC';
-		}
-		$sql .= $this->db->order($sortfield, $sortorder);
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-
-				if (empty($mode)) {
-					$reparray[$i]['id'] = $obj->rowid;
-					$reparray[$i]['lastname'] = $obj->lastname;
-					$reparray[$i]['firstname'] = $obj->firstname;
-					$reparray[$i]['email'] = $obj->email;
-					$reparray[$i]['phone'] = $obj->office_phone;
-					$reparray[$i]['office_phone'] = $obj->office_phone;
-					$reparray[$i]['office_fax'] = $obj->office_fax;
-					$reparray[$i]['user_mobile'] = $obj->user_mobile;
-					$reparray[$i]['personal_mobile'] = $obj->personal_mobile;
-					$reparray[$i]['job'] = $obj->job;
-					$reparray[$i]['statut'] = $obj->status; // deprecated
-					$reparray[$i]['status'] = $obj->status;
-					$reparray[$i]['entity'] = $obj->entity;
-					$reparray[$i]['login'] = $obj->login;
-					$reparray[$i]['photo'] = $obj->photo;
-					$reparray[$i]['gender'] = $obj->gender;
-				} else {
-					$reparray[] = $obj->rowid;
-				}
-				$i++;
-			}
-			return $reparray;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
-
-	/**
-	 *	Add link to sales representative
-	 *
-	 *	@param	User	$user		Object user
-	 *	@param	int		$commid		Id of user
-	 *	@return	void
-	 */
-	public function del_commercial(User $user, $commid)
-	{
-		// phpcs:enable
-		$error = 0;
-		$this->context = array('commercial_modified'=>$commid);
-
-		$result = $this->call_trigger('COMPANY_UNLINK_SALE_REPRESENTATIVE', $user);
-		if ($result < 0) {
-			$error++;
-		}
-
-		if ($this->id > 0 && $commid > 0) {
-			$sql  = "DELETE FROM  ".MAIN_DB_PREFIX."societe_commerciaux ";
-			$sql .= " WHERE fk_soc = ".((int) $this->id)." AND fk_user = ".((int) $commid);
-
-			if (!$this->db->query($sql)) {
-				dol_syslog(get_class($this)."::del_commercial Erreur");
-			}
-		}
-	}
-
-	/**
 	 *    Define third-party type of current company
 	 *
 	 *    @param	int		$typent_id	third party type rowid in llx_c_typent
@@ -4674,27 +4737,76 @@ class Societe extends CommonObject
 			$sql .= " WHERE rowid = ".((int) $this->id);
 			dol_syslog(get_class($this).'::setThirdpartyType', LOG_DEBUG);
 			$resql = $this->db->query($sql);
-			if ($resql) {
-				$this->typent_id = $typent_id;
-				$this->typent_code = dol_getIdFromCode($this->db, $this->$typent_id, 'c_typent', 'id', 'code');
-				return 1;
-			} else {
-				return -1;
-			}
-		} else {
-			return -1;
-		}
-	}
+            if ($resql) {
+                $this->typent_id = $typent_id;
+                $this->typent_code = dol_getIdFromCode($this->db, $this->$typent_id, 'c_typent', 'id', 'code');
+                return 1;
+            } else {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    }
 
-	/**
-	 * Sets an accountancy code for a thirdparty.
-	 * Also calls COMPANY_MODIFY trigger when modified
-	 *
-	 * @param   string  $type   It can be only 'buy' or 'sell'
-	 * @param   string  $value  Accountancy code
-	 * @return  int             <0 KO >0 OK
-	 */
-	public function setAccountancyCode($type, $value)
+    /**
+     * Function used to replace a thirdparty id with another one.
+     * It must be used within a transaction to avoid trouble
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id (will be removed)
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return    bool                True if success, False if error
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        if ($origin_id == $dest_id) {
+            dol_syslog('Error: Try to merge a thirdparty into itself');
+            return false;
+        }
+
+        /**
+         * Thirdparty commercials cannot be the same in both thirdparties so we look for them and remove some to avoid duplicate.
+         * Because this function is meant to be executed within a transaction, we won't take care of begin/commit.
+         */
+        $sql = 'SELECT rowid FROM ' . MAIN_DB_PREFIX . 'societe_commerciaux ';
+        $sql .= ' WHERE fk_soc = ' . (int) $dest_id . ' AND fk_user IN ( ';
+        $sql .= ' SELECT fk_user ';
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . 'societe_commerciaux ';
+        $sql .= ' WHERE fk_soc = ' . (int) $origin_id . ') ';
+
+        $resql = $db->query($sql);
+        while ($obj = $db->fetch_object($resql)) {
+            $db->query('DELETE FROM ' . MAIN_DB_PREFIX . 'societe_commerciaux WHERE rowid = ' . ((int) $obj->rowid));
+        }
+
+        /**
+         * llx_societe_extrafields table must not be here because we don't care about the old thirdparty data
+         * Do not include llx_societe because it will be replaced later
+         */
+        $tables = [
+            'societe_address',
+            'societe_commerciaux',
+            'societe_prices',
+            'societe_remise',
+            'societe_remise_except',
+            'societe_rib',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Sets an accountancy code for a thirdparty.
+     * Also calls COMPANY_MODIFY trigger when modified
+     *
+     * @param string $type  It can be only 'buy' or 'sell'
+     * @param string $value Accountancy code
+     *
+     * @return  int             <0 KO >0 OK
+     */
+    public function setAccountancyCode($type, $value)
 	{
 		global $user, $langs, $conf;
 

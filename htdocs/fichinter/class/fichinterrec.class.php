@@ -38,52 +38,61 @@ require_once DOL_DOCUMENT_ROOT.'/fichinter/class/fichinter.class.php';
  */
 class FichinterRec extends Fichinter
 {
-	public $element = 'fichinterrec';
-	public $table_element = 'fichinter_rec';
-	public $table_element_line = 'fichinter_rec';
+    public $element = 'fichinterrec';
+    public $table_element = 'fichinter_rec';
+    public $table_element_line = 'fichinter_rec';
 
-	/**
-	 * @var string Fieldname with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_fichinter';
-	/**
-	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
-	 */
-	public $picto = 'intervention';
-	/**
-	 * @var string title
-	 */
-	public $title;
+    /**
+     * @var string Fieldname with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_fichinter';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'titre';
+
+    /**
+     * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
+     */
+    public $picto = 'intervention';
+
+    /**
+     * @var string title
+     */
+    public $title;
 	public $number;
 	public $date;
 	public $amount;
 	public $remise;
 	public $tva;
 	public $total;
+
 	/**
 	 * @var int Proposal Id
 	 */
 	public $propalid;
+
 	public $date_last_gen;
 	public $date_when;
+
 	/**
 	 * @var int number of generation done
 	 */
 	public $nb_gen_done;
-	/**
+
+    /**
 	 * @var int number of maximum generation
 	 */
 	public $nb_gen_max;
-	/**
+
+    /**
 	 * int rank
 	 */
 	public $rang;
 	public $special_code;
-	public $usenewprice = 0;
-	/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'titre';
+
+    public $usenewprice = 0;
 
 	/**
 	 *	Constructor
@@ -106,21 +115,6 @@ class FichinterRec extends Fichinter
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array('fichinter_rec');
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	/**
 	 *	Returns the label status
 	 *
 	 *	@param      int		$mode       0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
@@ -131,7 +125,7 @@ class FichinterRec extends Fichinter
 		return $this->LibStatut($this->statut, $mode);
 	}
 
-	/**
+    /**
 	 *  Create a predefined fichinter
 	 *
 	 *  @param      User    $user       User object
@@ -267,132 +261,6 @@ class FichinterRec extends Fichinter
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Add a line to fichinter rec
-	 *
-	 *  @param		string		$desc               Description de la ligne
-	 *  @param		integer		$duration           Durée
-	 *  @param		string	    $datei				Date
-	 *  @param	    int			$rang			    Position of line
-	 *  @param		double		$pu_ht			    Unit price without tax (> 0 even for credit note)
-	 *  @param		double		$qty			 	Quantity
-	 *  @param		double		$txtva		   	    Forced VAT rate, otherwise -1
-	 *  @param		int			$fk_product	  	    Id of predefined product/service
-	 *  @param		double		$remise_percent  	Percentage of discount on line
-	 *  @param		string		$price_base_type	HT or TTC
-	 *  @param		int			$info_bits			Bits for type of lines
-	 *  @param		int			$fk_remise_except   Id discount
-	 *  @param		double		$pu_ttc			    Unit price with tax (> 0 even for credit note)
-	 *  @param		int			$type				Type of line (0=product, 1=service)
-	 *  @param		int			$special_code		Special code
-	 *  @param		string		$label				Label of the line
-	 *  @param		string		$fk_unit			Unit
-	 *  @return		int			 				    <0 if KO, Id of line if OK
-	 */
-	public function addline($desc, $duration, $datei, $rang = -1, $pu_ht = 0, $qty = 0, $txtva = 0, $fk_product = 0, $remise_percent = 0, $price_base_type = 'HT', $info_bits = 0, $fk_remise_except = '', $pu_ttc = 0, $type = 0, $special_code = 0, $label = '', $fk_unit = null)
-	{
-		global $mysoc;
-
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/price.lib.php';
-
-		// Check parameters
-		if ($type < 0) {
-			return -1;
-		}
-
-		if ($this->brouillon) {
-			// Clean parameters
-			$remise_percent = price2num($remise_percent);
-			$qty = price2num($qty);
-			if (!$qty) {
-				$qty = 1;
-			}
-			if (!$info_bits) {
-				$info_bits = 0;
-			}
-			$pu_ht = price2num($pu_ht);
-			$pu_ttc = price2num($pu_ttc);
-			if (!preg_match('/\((.*)\)/', $txtva)) {
-				$txtva = price2num($txtva); // $txtva can have format '5.0(XXX)' or '5'
-			}
-
-			if ($price_base_type == 'HT') {
-				$pu = $pu_ht;
-			} else {
-				$pu = $pu_ttc;
-			}
-
-			// Calcul du total TTC et de la TVA pour la ligne a partir de
-			// qty, pu, remise_percent et txtva
-			// TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
-			// la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
-			$tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, 0, 0, 0, $price_base_type, $info_bits, $type, $mysoc);
-
-			$total_ht  = $tabprice[0];
-			$total_tva = $tabprice[1];
-			$total_ttc = $tabprice[2];
-
-			$product_type = $type;
-			if ($fk_product) {
-				$product = new Product($this->db);
-				$result = $product->fetch($fk_product);
-				$product_type = $product->type;
-			}
-
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."fichinterdet_rec (";
-			$sql .= "fk_fichinter";
-			$sql .= ", label";
-			$sql .= ", description";
-			$sql .= ", date";
-			$sql .= ", duree";
-			//$sql.= ", price";
-			//$sql.= ", qty";
-			//$sql.= ", tva_tx";
-			$sql .= ", fk_product";
-			$sql .= ", product_type";
-			$sql .= ", remise_percent";
-			//$sql.= ", subprice";
-			$sql .= ", remise";
-			$sql .= ", total_ht";
-			$sql .= ", total_tva";
-			$sql .= ", total_ttc";
-			$sql .= ", rang";
-			//$sql.= ", special_code";
-			$sql .= ", fk_unit";
-			$sql .= ") VALUES (";
-			$sql .= (int) $this->id;
-			$sql .= ", ".(!empty($label) ? "'".$this->db->escape($label)."'" : "null");
-			$sql .= ", ".(!empty($desc) ? "'".$this->db->escape($desc)."'" : "null");
-			$sql .= ", ".(!empty($datei) ? "'".$this->db->idate($datei)."'" : "null");
-			$sql .= ", ".$duration;
-			//$sql.= ", ".price2num($pu_ht);
-			//$sql.= ", ".(!empty($qty)? $qty :(!empty($duration)? $duration :"null"));
-			//$sql.= ", ".price2num($txtva);
-			$sql .= ", ".(!empty($fk_product) ? $fk_product : "null");
-			$sql .= ", ".$product_type;
-			$sql .= ", ".(!empty($remise_percent) ? $remise_percent : "null");
-			//$sql.= ", '".price2num($pu_ht)."'";
-			$sql .= ", null";
-			$sql .= ", '".price2num($total_ht)."'";
-			$sql .= ", '".price2num($total_tva)."'";
-			$sql .= ", '".price2num($total_ttc)."'";
-			$sql .= ", ".(int) $rang;
-			//$sql.= ", ".$special_code;
-			$sql .= ", ".(!empty($fk_unit) ? $fk_unit : "null");
-			$sql .= ")";
-
-			dol_syslog(get_class($this)."::addline", LOG_DEBUG);
-			if ($this->db->query($sql)) {
-				return 1;
-			} else {
-				$this->error = $this->db->lasterror();
-				return -1;
-			}
-		}
-	}
-
 	/**
 	 *	Get the template of intervention object and lines
 	 *
@@ -458,26 +326,30 @@ class FichinterRec extends Fichinter
 				}
 				return 1;
 			} else {
-				$this->error = 'Interventional with id '.$rowid.' not found sql='.$sql;
-				dol_syslog(get_class($this).'::Fetch Error '.$this->error, LOG_ERR);
-				return -2;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+                $this->error = 'Interventional with id ' . $rowid . ' not found sql=' . $sql;
+                dol_syslog(get_class($this) . '::Fetch Error ' . $this->error, LOG_ERR);
+                return -2;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 *  Load all lines of template of intervention into this->lines
-	 *
-	 *  @param   int	$sall   sall
-	 *  @return	 int            1 if OK, < 0 if KO
-	 */
-	public function fetch_lines($sall = 0)
-	{
-		// phpcs:enable
-		$sql = 'SELECT l.rowid, l.fk_product, l.product_type, l.label as custom_label, l.description, ';
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Load all lines of template of intervention into this->lines
+     *
+     * @param int $sall sall
+     *
+     * @return     int            1 if OK, < 0 if KO
+     */
+    public function fetch_lines($sall = 0)
+    {
+        // phpcs:enable
+        $sql = 'SELECT l.rowid, l.fk_product, l.product_type, l.label as custom_label, l.description, ';
 		$sql .= ' l.price, l.qty, l.tva_tx, l.remise, l.remise_percent, l.subprice, l.duree, ';
 		$sql .= ' l.total_ht, l.total_tva, l.total_ttc,';
 		$sql .= ' l.rang, l.special_code,';
@@ -544,8 +416,6 @@ class FichinterRec extends Fichinter
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Delete template fichinter rec
 	 *
@@ -577,26 +447,155 @@ class FichinterRec extends Fichinter
 		} else {
 			$this->error = $this->db->lasterror();
 			$error = -2;
-		}
+        }
 
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return $error;
-		}
-	}
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return $error;
+        }
+    }
 
-	/**
-	 *	Rend la fichinter automatique
-	 *
-	 *	@param		User	$user		User object
-	 *	@param		int		$freq		Freq
-	 *	@param		string	$courant	Courant
-	 *	@return		int					0 if OK, <0 if KO
-	 */
-	public function set_auto($user, $freq, $courant)
+    /**
+     *  Add a line to fichinter rec
+     *
+     * @param string  $desc             Description de la ligne
+     * @param integer $duration         Durée
+     * @param string  $datei            Date
+     * @param int     $rang             Position of line
+     * @param double  $pu_ht            Unit price without tax (> 0 even for credit note)
+     * @param double  $qty              Quantity
+     * @param double  $txtva            Forced VAT rate, otherwise -1
+     * @param int     $fk_product       Id of predefined product/service
+     * @param double  $remise_percent   Percentage of discount on line
+     * @param string  $price_base_type  HT or TTC
+     * @param int     $info_bits        Bits for type of lines
+     * @param int     $fk_remise_except Id discount
+     * @param double  $pu_ttc           Unit price with tax (> 0 even for credit note)
+     * @param int     $type             Type of line (0=product, 1=service)
+     * @param int     $special_code     Special code
+     * @param string  $label            Label of the line
+     * @param string  $fk_unit          Unit
+     *
+     * @return        int                                <0 if KO, Id of line if OK
+     */
+    public function addline($desc, $duration, $datei, $rang = -1, $pu_ht = 0, $qty = 0, $txtva = 0, $fk_product = 0, $remise_percent = 0, $price_base_type = 'HT', $info_bits = 0, $fk_remise_except = '', $pu_ttc = 0, $type = 0, $special_code = 0, $label = '', $fk_unit = null)
+    {
+        global $mysoc;
+
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/price.lib.php';
+
+        // Check parameters
+        if ($type < 0) {
+            return -1;
+        }
+
+        if ($this->brouillon) {
+            // Clean parameters
+            $remise_percent = price2num($remise_percent);
+            $qty = price2num($qty);
+            if (!$qty) {
+                $qty = 1;
+            }
+            if (!$info_bits) {
+                $info_bits = 0;
+            }
+            $pu_ht = price2num($pu_ht);
+            $pu_ttc = price2num($pu_ttc);
+            if (!preg_match('/\((.*)\)/', $txtva)) {
+                $txtva = price2num($txtva); // $txtva can have format '5.0(XXX)' or '5'
+            }
+
+            if ($price_base_type == 'HT') {
+                $pu = $pu_ht;
+            } else {
+                $pu = $pu_ttc;
+            }
+
+            // Calcul du total TTC et de la TVA pour la ligne a partir de
+            // qty, pu, remise_percent et txtva
+            // TRES IMPORTANT: C'est au moment de l'insertion ligne qu'on doit stocker
+            // la part ht, tva et ttc, et ce au niveau de la ligne qui a son propre taux tva.
+            $tabprice = calcul_price_total($qty, $pu, $remise_percent, $txtva, 0, 0, 0, $price_base_type, $info_bits, $type, $mysoc);
+
+            $total_ht = $tabprice[0];
+            $total_tva = $tabprice[1];
+            $total_ttc = $tabprice[2];
+
+            $product_type = $type;
+            if ($fk_product) {
+                $product = new Product($this->db);
+                $result = $product->fetch($fk_product);
+                $product_type = $product->type;
+            }
+
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "fichinterdet_rec (";
+            $sql .= "fk_fichinter";
+            $sql .= ", label";
+            $sql .= ", description";
+            $sql .= ", date";
+            $sql .= ", duree";
+            //$sql.= ", price";
+            //$sql.= ", qty";
+            //$sql.= ", tva_tx";
+            $sql .= ", fk_product";
+            $sql .= ", product_type";
+            $sql .= ", remise_percent";
+            //$sql.= ", subprice";
+            $sql .= ", remise";
+            $sql .= ", total_ht";
+            $sql .= ", total_tva";
+            $sql .= ", total_ttc";
+            $sql .= ", rang";
+            //$sql.= ", special_code";
+            $sql .= ", fk_unit";
+            $sql .= ") VALUES (";
+            $sql .= (int) $this->id;
+            $sql .= ", " . (!empty($label) ? "'" . $this->db->escape($label) . "'" : "null");
+            $sql .= ", " . (!empty($desc) ? "'" . $this->db->escape($desc) . "'" : "null");
+            $sql .= ", " . (!empty($datei) ? "'" . $this->db->idate($datei) . "'" : "null");
+            $sql .= ", " . $duration;
+            //$sql.= ", ".price2num($pu_ht);
+            //$sql.= ", ".(!empty($qty)? $qty :(!empty($duration)? $duration :"null"));
+            //$sql.= ", ".price2num($txtva);
+            $sql .= ", " . (!empty($fk_product) ? $fk_product : "null");
+            $sql .= ", " . $product_type;
+            $sql .= ", " . (!empty($remise_percent) ? $remise_percent : "null");
+            //$sql.= ", '".price2num($pu_ht)."'";
+            $sql .= ", null";
+            $sql .= ", '" . price2num($total_ht) . "'";
+            $sql .= ", '" . price2num($total_tva) . "'";
+            $sql .= ", '" . price2num($total_ttc) . "'";
+            $sql .= ", " . (int) $rang;
+            //$sql.= ", ".$special_code;
+            $sql .= ", " . (!empty($fk_unit) ? $fk_unit : "null");
+            $sql .= ")";
+
+            dol_syslog(get_class($this) . "::addline", LOG_DEBUG);
+            if ($this->db->query($sql)) {
+                return 1;
+            } else {
+                $this->error = $this->db->lasterror();
+                return -1;
+            }
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Rend la fichinter automatique
+     *
+     * @param User   $user    User object
+     * @param int    $freq    Freq
+     * @param string $courant Courant
+     *
+     * @return        int                    0 if OK, <0 if KO
+     */
+    public function set_auto($user, $freq, $courant)
 	{
 		// phpcs:enable
 		if ($user->rights->fichinter->creer) {
@@ -660,6 +659,7 @@ class FichinterRec extends Fichinter
 		return $result;
 	}
 
+
 	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
@@ -672,23 +672,40 @@ class FichinterRec extends Fichinter
 	{
 		global $user, $langs, $conf;
 
-		$now = dol_now();
-		$arraynow = dol_getdate($now);
-		$nownotime = dol_mktime(0, 0, 0, $arraynow['mon'], $arraynow['mday'], $arraynow['year']);
+        $now = dol_now();
+        $arraynow = dol_getdate($now);
+        $nownotime = dol_mktime(0, 0, 0, $arraynow['mon'], $arraynow['mday'], $arraynow['year']);
 
-		parent::initAsSpecimen($option);
+        parent::initAsSpecimen($option);
 
-		$this->usenewprice = 1;
-	}
+        $this->usenewprice = 1;
+    }
 
-	/**
-	 *	Update frequency and unit
-	 *
-	 *	@param	 	int		$frequency		value of frequency
-	 *	@param	 	string	$unit 			unit of frequency  (d, m, y)
-	 *	@return		int						<0 if KO, >0 if OK
-	 */
-	public function setFrequencyAndUnit($frequency, $unit)
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = ['fichinter_rec'];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     *    Update frequency and unit
+     *
+     * @param int    $frequency value of frequency
+     * @param string $unit      unit of frequency  (d, m, y)
+     *
+     * @return        int                        <0 if KO, >0 if OK
+     */
+    public function setFrequencyAndUnit($frequency, $unit)
 	{
 		if (!$this->table_element) {
 			dol_syslog(get_class($this)."::setFrequencyAndUnit called with table_element not defined", LOG_ERR);

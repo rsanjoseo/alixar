@@ -66,21 +66,107 @@ abstract class ModelePDFProduct extends CommonDocGenerator
  */
 abstract class ModeleProductCode
 {
-	/**
-	 * @var string Error code (or message)
-	 */
-	public $error = '';
+    /**
+     * @var string Error code (or message)
+     */
+    public $error = '';
 
-	/**
-	 *  Renvoi la liste des modeles de numérotation
-	 *
-	 *  @param	DoliDB	$db     			Database handler
-	 *  @param  integer	$maxfilenamelength  Max length of value to show
-	 *  @return	array						List of numbers
-	 */
-	public static function liste_modeles($db, $maxfilenamelength = 0)
-	{
-		// phpcs:enable
+    /**     Renvoi la description par defaut du modele de numerotation
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Texte descripif
+     */
+    public function info($langs)
+    {
+        $langs->load("bills");
+        return $langs->trans("NoDescription");
+    }
+
+    /**     Renvoi nom module
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Nom du module
+     */
+    public function getNom($langs)
+    {
+        return empty($this->name) ? $this->nom : $this->name;
+    }
+
+    /**     Return an example of numbering
+     *
+     * @param Translate $langs Object langs
+     *
+     * @return string                Example
+     */
+    public function getExample($langs)
+    {
+        return $langs->trans("NoExample");
+    }
+
+    /**
+     *  Checks if the numbers already in the database do not
+     *  cause conflicts that would prevent this numbering working.
+     *
+     * @return     boolean     false if conflict, true if ok
+     */
+    public function canBeActivated()
+    {
+        return true;
+    }
+
+    /**
+     *  Return next value available
+     *
+     * @param Product $objproduct Object product
+     * @param int     $type       Type
+     *
+     * @return string                Value
+     */
+    public function getNextValue($objproduct = 0, $type = -1)
+    {
+        global $langs;
+        return $langs->trans("Function_getNextValue_InModuleNotWorking");
+    }
+
+    /**     Return version of module
+     *
+     * @return     string      Version
+     */
+    public function getVersion()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($this->version == 'development') {
+            return $langs->trans("VersionDevelopment");
+        }
+        if ($this->version == 'experimental') {
+            return $langs->trans("VersionExperimental");
+        }
+        if ($this->version == 'dolibarr') {
+            return DOL_VERSION;
+        }
+        if ($this->version) {
+            return $this->version;
+        }
+        return $langs->trans("NotAvailable");
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Renvoi la liste des modeles de numérotation
+     *
+     * @param DoliDB  $db                Database handler
+     * @param integer $maxfilenamelength Max length of value to show
+     *
+     * @return    array                        List of numbers
+     */
+    public static function liste_modeles($db, $maxfilenamelength = 0)
+    {
+        // phpcs:enable
 		$list = array();
 		$sql = "";
 
@@ -97,38 +183,6 @@ abstract class ModeleProductCode
 			return -1;
 		}
 		return $list;
-	}
-
-	/**     Renvoi la description par defaut du modele de numerotation
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Texte descripif
-	 */
-	public function info($langs)
-	{
-		$langs->load("bills");
-		return $langs->trans("NoDescription");
-	}
-
-	/**     Return an example of numbering
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Example
-	 */
-	public function getExample($langs)
-	{
-		return $langs->trans("NoExample");
-	}
-
-	/**
-	 *  Checks if the numbers already in the database do not
-	 *  cause conflicts that would prevent this numbering working.
-	 *
-	 *      @return     boolean     false if conflict, true if ok
-	 */
-	public function canBeActivated()
-	{
-		return true;
 	}
 
 	/**
@@ -201,57 +255,7 @@ abstract class ModeleProductCode
 		return $s;
 	}
 
-	/**     Renvoi nom module
-	 *
-	 *		@param	Translate	$langs		Object langs
-	 *      @return string      			Nom du module
-	 */
-	public function getNom($langs)
-	{
-		return empty($this->name) ? $this->nom : $this->name;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**     Return version of module
-	 *
-	 *      @return     string      Version
-	 */
-	public function getVersion()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($this->version == 'development') {
-			return $langs->trans("VersionDevelopment");
-		}
-		if ($this->version == 'experimental') {
-			return $langs->trans("VersionExperimental");
-		}
-		if ($this->version == 'dolibarr') {
-			return DOL_VERSION;
-		}
-		if ($this->version) {
-			return $this->version;
-		}
-		return $langs->trans("NotAvailable");
-	}
-
-	/**
-	 *  Return next value available
-	 *
-	 *	@param	Product		$objproduct		Object product
-	 *	@param	int			$type		Type
-	 *  @return string      			Value
-	 */
-	public function getNextValue($objproduct = 0, $type = -1)
-	{
-		global $langs;
-		return $langs->trans("Function_getNextValue_InModuleNotWorking");
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *   Check if mask/numbering use prefix
 	 *

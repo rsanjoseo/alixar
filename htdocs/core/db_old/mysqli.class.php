@@ -32,24 +32,24 @@ require_once DOL_DOCUMENT_ROOT.'/core/db/DoliDB.class.php';
  */
 class DoliDBMysqli extends DoliDB
 {
-	const LABEL = 'MySQL or MariaDB';
-	//! Database type
-	const VERSIONMIN = '5.0.3';
-	//! Database label
-	/** @var mysqli Database object */
-	public $db;
-	//! Version min database
-	public $type = 'mysqli';
-	/** @var bool|mysqli_result Resultset of last query */
-	private $_results;
+    /** @var mysqli Database object */
+    public $db;
+    //! Database type
+    public $type = 'mysqli';
+    //! Database label
+    const LABEL = 'MySQL or MariaDB';
+    //! Version min database
+    const VERSIONMIN = '5.0.3';
+    /** @var bool|mysqli_result Resultset of last query */
+    private $_results;
 
-	/**
-	 *	Constructor.
-	 *	This create an opened connexion to a database server and eventually to a database
-	 *
-	 *	@param      string	$type		Type of database (mysql, pgsql...)
-	 *	@param	    string	$host		Address of database server
-	 *	@param	    string	$user		Nom de l'utilisateur autorise
+    /**
+     *    Constructor.
+     *    This create an opened connexion to a database server and eventually to a database
+     *
+     * @param string               $type        Type of database (mysql, pgsql...)
+     * @param string               $host        Address of database server
+     * @param string               $user        Nom de l'utilisateur autorise
 	 *	@param	    string	$pass		Mot de passe
 	 *	@param	    string	$name		Nom de la database
 	 *	@param	    int		$port		Port of database server
@@ -157,25 +157,54 @@ class DoliDBMysqli extends DoliDB
 					}
 					if (preg_match('/utf8mb4/', $collation)) {
 						$collation = 'utf8_unicode_ci';
-					}
+                    }
 
-					if (!preg_match('/general/', $collation)) {
-						$this->db->query("SET collation_connection = ".$collation);
-					}
-				}
-			}
-		}
-	}
+                    if (!preg_match('/general/', $collation)) {
+                        $this->db->query("SET collation_connection = " . $collation);
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * Connect to server
-	 *
-	 * @param   string  $host 	Database server host
-	 * @param   string  $login 	Login
-	 * @param   string  $passwd Password
-	 * @param   string  $name 	Name of database (not used for mysql, used for pgsql)
-	 * @param   integer $port 	Port of database server
-	 * @return  mysqli  		Database access object
+    /**
+     *  Convert a SQL request in Mysql syntax to native syntax
+     *
+     * @param string $line SQL request line to convert
+     * @param string $type Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
+     *
+     * @return    string        SQL request line converted
+     */
+    public static function convertSQLFromMysql($line, $type = 'ddl')
+    {
+        return $line;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Select a database
+     *
+     * @param string $database Name of database
+     *
+     * @return        boolean            true if OK, false if KO
+     */
+    public function select_db($database)
+    {
+        // phpcs:enable
+        dol_syslog(get_class($this) . "::select_db database=" . $database, LOG_DEBUG);
+        return $this->db->select_db($database);
+    }
+
+    /**
+     * Connect to server
+     *
+     * @param string  $host   Database server host
+     * @param string  $login  Login
+     * @param string  $passwd Password
+     * @param string  $name   Name of database (not used for mysql, used for pgsql)
+     * @param integer $port   Port of database server
+     * @return  mysqli        Database access object
 	 * @see close()
 	 */
 	public function connect($host, $login, $passwd, $name, $port = 0)
@@ -186,48 +215,6 @@ class DoliDBMysqli extends DoliDB
 		// mysqli::init(); mysql::options(MYSQLI_INIT_COMMAND, 'SET AUTOCOMMIT = 0'); mysqli::options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 		// return mysqli::real_connect($host, $user, $pass, $db, $port);
 		return new mysqli($host, $login, $passwd, $name, $port);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Select a database
-	 *
-	 *  @param	    string	$database	Name of database
-	 *  @return	    boolean  		    true if OK, false if KO
-	 */
-	public function select_db($database)
-	{
-		// phpcs:enable
-		dol_syslog(get_class($this)."::select_db database=".$database, LOG_DEBUG);
-		return $this->db->select_db($database);
-	}
-
-	/**
-	 *	Return description of last error
-	 *
-	 *	@return	string		Error text
-	 */
-	public function error()
-	{
-		if (!$this->connected) {
-			// Si il y a eu echec de connexion, $this->db n'est pas valide pour mysqli_error.
-			return 'Not connected. Check setup parameters in conf/conf.php file and your mysql client and server versions';
-		} else {
-			return $this->db->error;
-		}
-	}
-
-	/**
-	 *  Convert a SQL request in Mysql syntax to native syntax
-	 *
-	 *  @param     string	$line   SQL request line to convert
-	 *  @param     string	$type	Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
-	 *  @return    string   		SQL request line converted
-	 */
-	public static function convertSQLFromMysql($line, $type = 'ddl')
-	{
-		return $line;
 	}
 
 	/**
@@ -250,6 +237,7 @@ class DoliDBMysqli extends DoliDB
 		return $this->db->client_info;
 	}
 
+
 	/**
 	 *  Close database connexion
 	 *
@@ -266,154 +254,6 @@ class DoliDBMysqli extends DoliDB
 			return $this->db->close();
 		}
 		return false;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return number of lines for result of a SELECT
-	 *
-	 *	@param	mysqli_result	$resultset  Resulset of requests
-	 *	@return	int				Nb of lines
-	 *	@see    affected_rows()
-	 */
-	public function num_rows($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_object($resultset)) {
-			$resultset = $this->_results;
-		}
-		return $resultset->num_rows;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return the number of lines in the result of a request INSERT, DELETE or UPDATE
-	 *
-	 *	@param	mysqli_result	$resultset	Curseur de la requete voulue
-	 *	@return int							Number of lines
-	 *	@see    num_rows()
-	 */
-	public function affected_rows($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_object($resultset)) {
-			$resultset = $this->_results;
-		}
-		// mysql necessite un link de base pour cette fonction contrairement
-		// a pqsql qui prend un resultset
-		return $this->db->affected_rows;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Get last ID after an insert INSERT
-	 *
-	 * @param   string	$tab    	Table name concerned by insert. Ne sert pas sous MySql mais requis pour compatibilite avec Postgresql
-	 * @param	string	$fieldid	Field name
-	 * @return  int|string			Id of row
-	 */
-	public function last_insert_id($tab, $fieldid = 'rowid')
-	{
-		// phpcs:enable
-		return $this->db->insert_id;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Encrypt sensitive data in database
-	 * Warning: This function includes the escape and add the SQL simple quotes on strings.
-	 *
-	 * @param	string	$fieldorvalue	Field name or value to encrypt
-	 * @param	int		$withQuotes		Return string including the SQL simple quotes. This param must always be 1 (Value 0 is bugged and deprecated).
-	 * @return	string					XXX(field) or XXX('value') or field or 'value'
-	 */
-	public function encrypt($fieldorvalue, $withQuotes = 1)
-	{
-		global $conf;
-
-		// Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
-		$cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
-
-		//Encryption key
-		$cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
-
-		$escapedstringwithquotes = ($withQuotes ? "'" : "").$this->escape($fieldorvalue).($withQuotes ? "'" : "");
-
-		if ($cryptType && !empty($cryptKey)) {
-			if ($cryptType == 2) {
-				$escapedstringwithquotes = "AES_ENCRYPT(".$escapedstringwithquotes.", '".$this->escape($cryptKey)."')";
-			} elseif ($cryptType == 1) {
-				$escapedstringwithquotes = "DES_ENCRYPT(".$escapedstringwithquotes.", '".$this->escape($cryptKey)."')";
-			}
-		}
-
-		return $escapedstringwithquotes;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Escape a string to insert data
-	 *
-	 *	@param	string	$stringtoencode		String to escape
-	 *	@return	string						String escaped
-	 */
-	public function escape($stringtoencode)
-	{
-		return $this->db->real_escape_string($stringtoencode);
-	}
-
-	/**
-	 *	Decrypt sensitive data in database
-	 *
-	 *	@param	string	$value			Value to decrypt
-	 * 	@return	string					Decrypted value if used
-	 */
-	public function decrypt($value)
-	{
-		global $conf;
-
-		// Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
-		$cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
-
-		//Encryption key
-		$cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
-
-		$return = $value;
-
-		if ($cryptType && !empty($cryptKey)) {
-			if ($cryptType == 2) {
-				$return = 'AES_DECRYPT('.$value.',\''.$cryptKey.'\')';
-			} elseif ($cryptType == 1) {
-				$return = 'DES_DECRYPT('.$value.',\''.$cryptKey.'\')';
-			}
-		}
-
-		return $return;
-	}
-
-	/**
-	 * Return connexion ID
-	 *
-	 * @return	        string      Id connexion
-	 */
-	public function DDLGetConnectId()
-	{
-		// phpcs:enable
-		$resql = $this->query('SELECT CONNECTION_ID()');
-		if ($resql) {
-			$row = $this->fetch_row($resql);
-			return $row[0];
-		} else {
-			return '?';
-		}
 	}
 
 	/**
@@ -465,26 +305,162 @@ class DoliDBMysqli extends DoliDB
 
 				if ($conf->global->SYSLOG_LEVEL < LOG_DEBUG) {
 					dol_syslog(get_class($this)."::query SQL Error query: ".$query, LOG_ERR); // Log of request was not yet done previously
-				}
-				dol_syslog(get_class($this)."::query SQL Error message: ".$this->lasterrno." ".$this->lasterror, LOG_ERR);
-				//var_dump(debug_print_backtrace());
-			}
-			$this->lastquery = $query;
-			$this->_results = $ret;
-		}
+                }
+                dol_syslog(get_class($this) . "::query SQL Error message: " . $this->lasterrno . " " . $this->lasterror, LOG_ERR);
+                //var_dump(debug_print_backtrace());
+            }
+            $this->lastquery = $query;
+            $this->_results = $ret;
+        }
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	/**
-	 *	Return generic error code of last operation.
-	 *
-	 *	@return	string		Error code (Exemples: DB_ERROR_TABLE_ALREADY_EXISTS, DB_ERROR_RECORD_ALREADY_EXISTS...)
-	 */
-	public function errno()
-	{
-		if (!$this->connected) {
-			// Si il y a eu echec de connexion, $this->db n'est pas valide.
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Returns the current line (as an object) for the resultset cursor
+     *
+     * @param mysqli_result $resultset Curseur de la requete voulue
+     *
+     * @return    object|null                    Object result line or null if KO or end of cursor
+     */
+    public function fetch_object($resultset)
+    {
+        // phpcs:enable
+        // Si le resultset n'est pas fourni, on prend le dernier utilise sur cette connexion
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        return $resultset->fetch_object();
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return datas as an array
+     *
+     * @param mysqli_result $resultset Resultset of request
+     *
+     * @return    array|null                    Array or null if KO or end of cursor
+     */
+    public function fetch_array($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        return $resultset->fetch_array();
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return datas as an array
+     *
+     * @param mysqli_result $resultset Resultset of request
+     *
+     * @return    array|null|int                Array or null if KO or end of cursor or 0 if resultset is bool
+     */
+    public function fetch_row($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_bool($resultset)) {
+            if (!is_object($resultset)) {
+                $resultset = $this->_results;
+            }
+            return $resultset->fetch_row();
+        } else {
+            // si le curseur est un booleen on retourne la valeur 0
+            return 0;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return number of lines for result of a SELECT
+     *
+     * @param mysqli_result $resultset Resulset of requests
+     *
+     * @return    int                Nb of lines
+     * @see    affected_rows()
+     */
+    public function num_rows($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        return $resultset->num_rows;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return the number of lines in the result of a request INSERT, DELETE or UPDATE
+     *
+     * @param mysqli_result $resultset Curseur de la requete voulue
+     *
+     * @return int                            Number of lines
+     * @see    num_rows()
+     */
+    public function affected_rows($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        // mysql necessite un link de base pour cette fonction contrairement
+        // a pqsql qui prend un resultset
+        return $this->db->affected_rows;
+    }
+
+    /**
+     *    Libere le dernier resultset utilise sur cette connexion
+     *
+     * @param mysqli_result $resultset Curseur de la requete voulue
+     *
+     * @return    void
+     */
+    public function free($resultset = null)
+    {
+        // If resultset not provided, we take the last used by connexion
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        // Si resultset en est un, on libere la memoire
+        if (is_object($resultset)) {
+            $resultset->free_result();
+        }
+    }
+
+    /**
+     *    Escape a string to insert data
+     *
+     * @param string $stringtoencode String to escape
+     *
+     * @return    string                        String escaped
+     */
+    public function escape($stringtoencode)
+    {
+        return $this->db->real_escape_string($stringtoencode);
+    }
+
+    /**
+     *    Return generic error code of last operation.
+     *
+     * @return    string        Error code (Exemples: DB_ERROR_TABLE_ALREADY_EXISTS, DB_ERROR_RECORD_ALREADY_EXISTS...)
+     */
+    public function errno()
+    {
+        if (!$this->connected) {
+            // Si il y a eu echec de connexion, $this->db n'est pas valide.
 			return 'DB_ERROR_FAILED_TO_CONNECT';
 		} else {
 			// Constants to convert a MySql error code to a generic Dolibarr error code
@@ -518,43 +494,135 @@ class DoliDBMysqli extends DoliDB
 			1396 => 'DB_ERROR_USER_ALREADY_EXISTS', // When creating a user that already existing
 			1451 => 'DB_ERROR_CHILD_EXISTS',
 			1826 => 'DB_ERROR_KEY_NAME_ALREADY_EXISTS'
-			);
+            );
 
-			if (isset($errorcode_map[$this->db->errno])) {
-				return $errorcode_map[$this->db->errno];
-			}
-			$errno = $this->db->errno;
-			return ($errno ? 'DB_ERROR_'.$errno : '0');
-		}
-	}
+            if (isset($errorcode_map[$this->db->errno])) {
+                return $errorcode_map[$this->db->errno];
+            }
+            $errno = $this->db->errno;
+            return ($errno ? 'DB_ERROR_' . $errno : '0');
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Return description of last error
+     *
+     * @return    string        Error text
+     */
+    public function error()
+    {
+        if (!$this->connected) {
+            // Si il y a eu echec de connexion, $this->db n'est pas valide pour mysqli_error.
+            return 'Not connected. Check setup parameters in conf/conf.php file and your mysql client and server versions';
+        } else {
+            return $this->db->error;
+        }
+    }
 
-	/**
-	 *	Return datas as an array
-	 *
-	 *	@param	mysqli_result	$resultset	Resultset of request
-	 *	@return	array|null|int				Array or null if KO or end of cursor or 0 if resultset is bool
-	 */
-	public function fetch_row($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_bool($resultset)) {
-			if (!is_object($resultset)) {
-				$resultset = $this->_results;
-			}
-			return $resultset->fetch_row();
-		} else {
-			// si le curseur est un booleen on retourne la valeur 0
-			return 0;
-		}
-	}
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Create a new database
-	 *	Do not use function xxx_create_db (xxx=mysql, ...) as they are deprecated
-	 *	We force to create database with charset this->forcecharset and collate this->forcecollate
+    /**
+     * Get last ID after an insert INSERT
+     *
+     * @param string $tab     Table name concerned by insert. Ne sert pas sous MySql mais requis pour compatibilite avec Postgresql
+     * @param string $fieldid Field name
+     *
+     * @return  int|string            Id of row
+     */
+    public function last_insert_id($tab, $fieldid = 'rowid')
+    {
+        // phpcs:enable
+        return $this->db->insert_id;
+    }
+
+    /**
+     * Encrypt sensitive data in database
+     * Warning: This function includes the escape and add the SQL simple quotes on strings.
+     *
+     * @param string $fieldorvalue Field name or value to encrypt
+     * @param int    $withQuotes   Return string including the SQL simple quotes. This param must always be 1 (Value 0 is bugged and deprecated).
+     *
+     * @return    string                    XXX(field) or XXX('value') or field or 'value'
+     */
+    public function encrypt($fieldorvalue, $withQuotes = 1)
+    {
+        global $conf;
+
+        // Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
+        $cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
+
+        //Encryption key
+        $cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
+
+        $escapedstringwithquotes = ($withQuotes ? "'" : "") . $this->escape($fieldorvalue) . ($withQuotes ? "'" : "");
+
+        if ($cryptType && !empty($cryptKey)) {
+            if ($cryptType == 2) {
+                $escapedstringwithquotes = "AES_ENCRYPT(" . $escapedstringwithquotes . ", '" . $this->escape($cryptKey) . "')";
+            } elseif ($cryptType == 1) {
+                $escapedstringwithquotes = "DES_ENCRYPT(" . $escapedstringwithquotes . ", '" . $this->escape($cryptKey) . "')";
+            }
+        }
+
+        return $escapedstringwithquotes;
+    }
+
+    /**
+     *    Decrypt sensitive data in database
+     *
+     * @param string $value Value to decrypt
+     *
+     * @return    string                    Decrypted value if used
+     */
+    public function decrypt($value)
+    {
+        global $conf;
+
+        // Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
+        $cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
+
+        //Encryption key
+        $cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
+
+        $return = $value;
+
+        if ($cryptType && !empty($cryptKey)) {
+            if ($cryptType == 2) {
+                $return = 'AES_DECRYPT(' . $value . ',\'' . $cryptKey . '\')';
+            } elseif ($cryptType == 1) {
+                $return = 'DES_DECRYPT(' . $value . ',\'' . $cryptKey . '\')';
+            }
+        }
+
+        return $return;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return connexion ID
+     *
+     * @return            string      Id connexion
+     */
+    public function DDLGetConnectId()
+    {
+        // phpcs:enable
+        $resql = $this->query('SELECT CONNECTION_ID()');
+        if ($resql) {
+            $row = $this->fetch_row($resql);
+            return $row[0];
+        } else {
+            return '?';
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Create a new database
+     *    Do not use function xxx_create_db (xxx=mysql, ...) as they are deprecated
+     *    We force to create database with charset this->forcecharset and collate this->forcecollate
 	 *
 	 *	@param	string	$database		Database name to create
 	 * 	@param	string	$charset		Charset used to store data
@@ -583,10 +651,11 @@ class DoliDBMysqli extends DoliDB
 			$sql = "CREATE DATABASE `".$this->escape($database)."`";
 			dol_syslog($sql, LOG_DEBUG);
 			$ret = $this->query($sql);
-		}
-		return $ret;
-	}
+        }
+        return $ret;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  List tables into a database
 	 *
@@ -614,9 +683,7 @@ class DoliDBMysqli extends DoliDB
 		return $listtables;
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	List information of columns into a table.
 	 *
@@ -641,7 +708,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Create a table into database
 	 *
@@ -726,7 +792,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Drop a table into database
 	 *
@@ -746,7 +811,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Return a pointer of line with description of a table or field
 	 *
@@ -765,7 +829,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Create a new field into table
 	 *
@@ -813,7 +876,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Update format of a field into a table
 	 *
@@ -860,7 +922,6 @@ class DoliDBMysqli extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Drop a field from table
 	 *
@@ -880,8 +941,8 @@ class DoliDBMysqli extends DoliDB
 		return -1;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * 	Create a user and privileges to connect to database (even if database does not exists yet)
 	 *
@@ -929,8 +990,6 @@ class DoliDBMysqli extends DoliDB
 		return 1;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Return charset used to store data in current database
 	 *  Note: if we are connected to databasename, it is same result than using SELECT default_character_set_name FROM information_schema.SCHEMATA WHERE schema_name = "databasename";)
@@ -950,27 +1009,6 @@ class DoliDBMysqli extends DoliDB
 
 		return $tmpval;
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return datas as an array
-	 *
-	 *	@param	mysqli_result	$resultset	Resultset of request
-	 *	@return	array|null					Array or null if KO or end of cursor
-	 */
-	public function fetch_array($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_object($resultset)) {
-			$resultset = $this->_results;
-		}
-		return $resultset->fetch_array();
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Return list of available charset that can be used to store data in database
@@ -994,40 +1032,6 @@ class DoliDBMysqli extends DoliDB
 			return null;
 		}
 		return $liste;
-	}
-
-	/**
-	 * 	Returns the current line (as an object) for the resultset cursor
-	 *
-	 *	@param	mysqli_result	$resultset	Curseur de la requete voulue
-	 *	@return	object|null					Object result line or null if KO or end of cursor
-	 */
-	public function fetch_object($resultset)
-	{
-		// phpcs:enable
-		// Si le resultset n'est pas fourni, on prend le dernier utilise sur cette connexion
-		if (!is_object($resultset)) {
-			$resultset = $this->_results;
-		}
-		return $resultset->fetch_object();
-	}
-
-	/**
-	 *	Libere le dernier resultset utilise sur cette connexion
-	 *
-	 *	@param  mysqli_result	$resultset	Curseur de la requete voulue
-	 *	@return	void
-	 */
-	public function free($resultset = null)
-	{
-		// If resultset not provided, we take the last used by connexion
-		if (!is_object($resultset)) {
-			$resultset = $this->_results;
-		}
-		// Si resultset en est un, on libere la memoire
-		if (is_object($resultset)) {
-			$resultset->free_result();
-		}
 	}
 
 	/**

@@ -342,29 +342,29 @@ class Localtax extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 *  Total of localtax paid
-	 *
-	 *	@param	int		$year		Year
-	 *	@return	int					???
-	 */
-	public function localtax_sum_reglee($year = 0)
-	{
-		// phpcs:enable
+     *    Total de la localtax des factures emises par la societe.
+     *
+     * @param int $year Year
+     *
+     * @return    int                    ???
+     */
+    public function localtax_sum_collectee($year = 0)
+    {
+        // phpcs:enable
+        $sql = "SELECT sum(f.localtax) as amount";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "facture as f";
+        $sql .= " WHERE f.paye = 1";
+        if ($year) {
+            $sql .= " AND f.datef BETWEEN '" . $this->db->idate(dol_get_first_day($year, 1, 'gmt')) . "' AND '" . $this->db->idate(dol_get_last_day($year, 1, 'gmt')) . "'";
+        }
 
-		$sql = "SELECT sum(f.amount) as amount";
-		$sql .= " FROM ".MAIN_DB_PREFIX."localtax as f";
-		if ($year) {
-			$sql .= " WHERE f.datev BETWEEN '".$this->db->idate(dol_get_first_day($year, 1, 'gmt'))."' AND '".$this->db->idate(dol_get_last_day($year, 1, 'gmt'))."'";
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj = $this->db->fetch_object($result);
-				$ret = $obj->amount;
-				$this->db->free($result);
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result)) {
+                $obj = $this->db->fetch_object($result);
+                $ret = $obj->amount;
+                $this->db->free($result);
 				return $ret;
 			} else {
 				$this->db->free($result);
@@ -377,7 +377,6 @@ class Localtax extends CommonObject
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Total of localtax paid in invoice
 	 *
@@ -414,28 +413,28 @@ class Localtax extends CommonObject
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Total de la localtax des factures emises par la societe.
-	 *
-	 *	@param	int		$year		Year
-	 *	@return	int					???
-	 */
-	public function localtax_sum_collectee($year = 0)
-	{
-		// phpcs:enable
-		$sql = "SELECT sum(f.localtax) as amount";
-		$sql .= " FROM ".MAIN_DB_PREFIX."facture as f";
-		$sql .= " WHERE f.paye = 1";
-		if ($year) {
-			$sql .= " AND f.datef BETWEEN '".$this->db->idate(dol_get_first_day($year, 1, 'gmt'))."' AND '".$this->db->idate(dol_get_last_day($year, 1, 'gmt'))."'";
-		}
+    /**
+     *  Total of localtax paid
+     *
+     * @param int $year Year
+     * @return    int                    ???
+     */
+    public function localtax_sum_reglee($year = 0)
+    {
+        // phpcs:enable
 
-		$result = $this->db->query($sql);
-		if ($result) {
-			if ($this->db->num_rows($result)) {
-				$obj = $this->db->fetch_object($result);
-				$ret = $obj->amount;
-				$this->db->free($result);
+        $sql = "SELECT sum(f.amount) as amount";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "localtax as f";
+        if ($year) {
+            $sql .= " WHERE f.datev BETWEEN '" . $this->db->idate(dol_get_first_day($year, 1, 'gmt')) . "' AND '" . $this->db->idate(dol_get_last_day($year, 1, 'gmt')) . "'";
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            if ($this->db->num_rows($result)) {
+                $obj = $this->db->fetch_object($result);
+                $ret = $obj->amount;
+                $this->db->free($result);
 				return $ret;
 			} else {
 				$this->db->free($result);
@@ -445,7 +444,8 @@ class Localtax extends CommonObject
 			print $this->db->lasterror();
 			return -1;
 		}
-	}
+    }
+
 
 	/**
 	 *	Add a payment of localtax

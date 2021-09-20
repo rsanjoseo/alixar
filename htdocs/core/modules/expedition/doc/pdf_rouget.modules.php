@@ -668,27 +668,226 @@ class pdf_rouget extends ModelePdfExpedition
 				return 1; // No error
 			} else {
 				$this->error = $langs->transnoentities("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
-			return 0;
-		}
-	}
+                return 0;
+            }
+        } else {
+            $this->error = $langs->transnoentities("ErrorConstantNotDefined", "EXP_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Show total to pay
+     *
+     * @param TCPDF      $pdf         Object PDF
+     * @param Expedition $object      Object invoice
+     * @param int        $deja_regle  Montant deja regle
+     * @param int        $posy        Position depart
+     * @param Translate  $outputlangs Objet langs
+     *
+     * @return int                            Position pour suite
+     */
+    protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
+    {
+        // phpcs:enable
+        global $conf, $mysoc;
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Expedition	$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+        $sign = 1;
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        $tab2_top = $posy;
+        $tab2_hl = 4;
+        $pdf->SetFont('', 'B', $default_font_size - 1);
+
+        // Tableau total
+        $col1x = $this->posxweightvol - 50;
+        $col2x = $this->posxweightvol;
+        /*if ($this->page_largeur < 210) // To work with US executive format
+        {
+            $col2x-=20;
+        }*/
+        if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
+            $largcol2 = ($this->posxqtyordered - $this->posxweightvol);
+        } else {
+            $largcol2 = ($this->posxqtytoship - $this->posxweightvol);
+        }
+
+        $useborder = 0;
+        $index = 0;
+
+        $totalWeighttoshow = '';
+        $totalVolumetoshow = '';
+
+        // Load dim data
+        $tmparray = $object->getTotalWeightVolume();
+        $totalWeight = $tmparray['weight'];
+        $totalVolume = $tmparray['volume'];
+        $totalOrdered = $tmparray['ordered'];
+        $totalToShip = $tmparray['toship'];
+        // Set trueVolume and volume_units not currently stored into database
+        if ($object->trueWidth && $object->trueHeight && $object->trueDepth) {
+            $object->trueVolume = price(($object->trueWidth * $object->trueHeight * $object->trueDepth), 0, $outputlangs, 0, 0);
+            $object->volume_units = $object->size_units * 3;
+        }
+
+        if ($totalWeight != '') {
+            $totalWeighttoshow = showDimensionInBestUnit($totalWeight, 0, "weight", $outputlangs);
+        }
+        if ($totalVolume != '') {
+            $totalVolumetoshow = showDimensionInBestUnit($totalVolume, 0, "volume", $outputlangs);
+        }
+        if (!empty($object->trueWeight)) {
+            $totalWeighttoshow = showDimensionInBestUnit($object->trueWeight, $object->weight_units, "weight", $outputlangs);
+        }
+        if (!empty($object->trueVolume)) {
+            $totalVolumetoshow = showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
+        }
+
+        $pdf->SetFillColor(255, 255, 255);
+        $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
+        $pdf->MultiCell($col2x - $col1x, $tab2_hl, $outputlangs->transnoentities("Total"), 0, 'L', 1);
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
+            $pdf->SetXY($this->posxqtyordered, $tab2_top + $tab2_hl * $index);
+            $pdf->MultiCell($this->posxqtytoship - $this->posxqtyordered, $tab2_hl, $totalOrdered, 0, 'C', 1);
+        }
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_QTYTOSHIP)) {
+            $pdf->SetXY($this->posxqtytoship, $tab2_top + $tab2_hl * $index);
+            $pdf->MultiCell($this->posxpuht - $this->posxqtytoship, $tab2_hl, $totalToShip, 0, 'C', 1);
+        }
+
+        if (!empty($conf->global->SHIPPING_PDF_DISPLAY_AMOUNT_HT)) {
+            $pdf->SetXY($this->posxpuht, $tab2_top + $tab2_hl * $index);
+            $pdf->MultiCell($this->posxtotalht - $this->posxpuht, $tab2_hl, '', 0, 'C', 1);
+
+            $pdf->SetXY($this->posxtotalht, $tab2_top + $tab2_hl * $index);
+            $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxtotalht, $tab2_hl, price($object->total_ht, 0, $outputlangs), 0, 'C', 1);
+        }
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_WEIGHT_AND_VOLUME)) {
+            // Total Weight
+            if ($totalWeighttoshow) {
+                $pdf->SetXY($this->posxweightvol, $tab2_top + $tab2_hl * $index);
+                $pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), $tab2_hl, $totalWeighttoshow, 0, 'C', 1);
+
+                $index++;
+            }
+            if ($totalVolumetoshow) {
+                $pdf->SetXY($this->posxweightvol, $tab2_top + $tab2_hl * $index);
+                $pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), $tab2_hl, $totalVolumetoshow, 0, 'C', 1);
+
+                $index++;
+            }
+            if (!$totalWeighttoshow && !$totalVolumetoshow) {
+                $index++;
+            }
+        }
+
+        $pdf->SetTextColor(0, 0, 0);
+
+        return ($tab2_top + ($tab2_hl * $index));
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+
+        // Amount in (at tab_top - 1)
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->SetFont('', '', $default_font_size - 2);
+
+        // Output Rect
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
+
+        $pdf->SetDrawColor(128, 128, 128);
+        $pdf->SetFont('', '', $default_font_size - 1);
+
+        if (empty($hidetop)) {
+            $pdf->line($this->marge_gauche, $tab_top + 5, $this->page_largeur - $this->marge_droite, $tab_top + 5);
+
+            $pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
+            $pdf->MultiCell($this->posxqtyordered - $this->posxdesc, 2, $outputlangs->transnoentities("Description"), '', 'L');
+        }
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_WEIGHT_AND_VOLUME)) {
+            $pdf->line($this->posxweightvol - 1, $tab_top, $this->posxweightvol - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxweightvol - 1, $tab_top + 1);
+                $pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), 2, $outputlangs->transnoentities("WeightVolShort"), '', 'C');
+            }
+        }
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
+            $pdf->line($this->posxqtyordered - 1, $tab_top, $this->posxqtyordered - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxqtyordered - 1, $tab_top + 1);
+                $pdf->MultiCell(($this->posxqtytoship - $this->posxqtyordered), 2, $outputlangs->transnoentities("QtyOrdered"), '', 'C');
+            }
+        }
+
+        if (empty($conf->global->SHIPPING_PDF_HIDE_QTYTOSHIP)) {
+            $pdf->line($this->posxqtytoship - 1, $tab_top, $this->posxqtytoship - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxqtytoship, $tab_top + 1);
+                $pdf->MultiCell(($this->posxpuht - $this->posxqtytoship), 2, $outputlangs->transnoentities("QtyToShip"), '', 'C');
+            }
+        }
+
+        if (!empty($conf->global->SHIPPING_PDF_DISPLAY_AMOUNT_HT)) {
+            $pdf->line($this->posxpuht - 1, $tab_top, $this->posxpuht - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxpuht - 1, $tab_top + 1);
+                $pdf->MultiCell(($this->posxtotalht - $this->posxpuht), 2, $outputlangs->transnoentities("PriceUHT"), '', 'C');
+            }
+
+            $pdf->line($this->posxtotalht - 1, $tab_top, $this->posxtotalht - 1, $tab_top + $tab_height);
+            if (empty($hidetop)) {
+                $pdf->SetXY($this->posxtotalht - 1, $tab_top + 1);
+                $pdf->MultiCell(($this->page_largeur - $this->marge_droite - $this->posxtotalht), 2, $outputlangs->transnoentities("TotalHT"), '', 'C');
+            }
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF      $pdf         Object PDF
+     * @param Expedition $object      Object to show
+     * @param int        $showaddress 0=no, 1=yes
+     * @param Translate  $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $conf, $langs, $mysoc;
 
@@ -924,89 +1123,6 @@ class pdf_rouget extends ModelePdfExpedition
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		// Amount in (at tab_top - 1)
-		$pdf->SetTextColor(0, 0, 0);
-		$pdf->SetFont('', '', $default_font_size - 2);
-
-		// Output Rect
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height, $hidetop, $hidebottom); // Rect takes a length in 3rd parameter and 4th parameter
-
-		$pdf->SetDrawColor(128, 128, 128);
-		$pdf->SetFont('', '', $default_font_size - 1);
-
-		if (empty($hidetop)) {
-			$pdf->line($this->marge_gauche, $tab_top + 5, $this->page_largeur - $this->marge_droite, $tab_top + 5);
-
-			$pdf->SetXY($this->posxdesc - 1, $tab_top + 1);
-			$pdf->MultiCell($this->posxqtyordered - $this->posxdesc, 2, $outputlangs->transnoentities("Description"), '', 'L');
-		}
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_WEIGHT_AND_VOLUME)) {
-			$pdf->line($this->posxweightvol - 1, $tab_top, $this->posxweightvol - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxweightvol - 1, $tab_top + 1);
-				$pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), 2, $outputlangs->transnoentities("WeightVolShort"), '', 'C');
-			}
-		}
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
-			$pdf->line($this->posxqtyordered - 1, $tab_top, $this->posxqtyordered - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxqtyordered - 1, $tab_top + 1);
-				$pdf->MultiCell(($this->posxqtytoship - $this->posxqtyordered), 2, $outputlangs->transnoentities("QtyOrdered"), '', 'C');
-			}
-		}
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_QTYTOSHIP)) {
-			$pdf->line($this->posxqtytoship - 1, $tab_top, $this->posxqtytoship - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxqtytoship, $tab_top + 1);
-				$pdf->MultiCell(($this->posxpuht - $this->posxqtytoship), 2, $outputlangs->transnoentities("QtyToShip"), '', 'C');
-			}
-		}
-
-		if (!empty($conf->global->SHIPPING_PDF_DISPLAY_AMOUNT_HT)) {
-			$pdf->line($this->posxpuht - 1, $tab_top, $this->posxpuht - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxpuht - 1, $tab_top + 1);
-				$pdf->MultiCell(($this->posxtotalht - $this->posxpuht), 2, $outputlangs->transnoentities("PriceUHT"), '', 'C');
-			}
-
-			$pdf->line($this->posxtotalht - 1, $tab_top, $this->posxtotalht - 1, $tab_top + $tab_height);
-			if (empty($hidetop)) {
-				$pdf->SetXY($this->posxtotalht - 1, $tab_top + 1);
-				$pdf->MultiCell(($this->page_largeur - $this->marge_droite - $this->posxtotalht), 2, $outputlangs->transnoentities("TotalHT"), '', 'C');
-			}
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *  Show footer of page. Need this->emetteur object
 	 *
@@ -1021,120 +1137,5 @@ class pdf_rouget extends ModelePdfExpedition
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'SHIPPING_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 *	Show total to pay
-	 *
-	 *	@param	TCPDF		$pdf           	Object PDF
-	 *	@param  Expedition	$object         Object invoice
-	 *	@param  int			$deja_regle     Montant deja regle
-	 *	@param	int			$posy			Position depart
-	 *	@param	Translate	$outputlangs	Objet langs
-	 *	@return int							Position pour suite
-	 */
-	protected function _tableau_tot(&$pdf, $object, $deja_regle, $posy, $outputlangs)
-	{
-		// phpcs:enable
-		global $conf, $mysoc;
-
-		$sign = 1;
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-
-		$tab2_top = $posy;
-		$tab2_hl = 4;
-		$pdf->SetFont('', 'B', $default_font_size - 1);
-
-		// Tableau total
-		$col1x = $this->posxweightvol - 50;
-		$col2x = $this->posxweightvol;
-		/*if ($this->page_largeur < 210) // To work with US executive format
-		{
-			$col2x-=20;
-		}*/
-		if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
-			$largcol2 = ($this->posxqtyordered - $this->posxweightvol);
-		} else {
-			$largcol2 = ($this->posxqtytoship - $this->posxweightvol);
-		}
-
-		$useborder = 0;
-		$index = 0;
-
-		$totalWeighttoshow = '';
-		$totalVolumetoshow = '';
-
-		// Load dim data
-		$tmparray = $object->getTotalWeightVolume();
-		$totalWeight = $tmparray['weight'];
-		$totalVolume = $tmparray['volume'];
-		$totalOrdered = $tmparray['ordered'];
-		$totalToShip = $tmparray['toship'];
-		// Set trueVolume and volume_units not currently stored into database
-		if ($object->trueWidth && $object->trueHeight && $object->trueDepth) {
-			$object->trueVolume = price(($object->trueWidth * $object->trueHeight * $object->trueDepth), 0, $outputlangs, 0, 0);
-			$object->volume_units = $object->size_units * 3;
-		}
-
-		if ($totalWeight != '') {
-			$totalWeighttoshow = showDimensionInBestUnit($totalWeight, 0, "weight", $outputlangs);
-		}
-		if ($totalVolume != '') {
-			$totalVolumetoshow = showDimensionInBestUnit($totalVolume, 0, "volume", $outputlangs);
-		}
-		if (!empty($object->trueWeight)) {
-			$totalWeighttoshow = showDimensionInBestUnit($object->trueWeight, $object->weight_units, "weight", $outputlangs);
-		}
-		if (!empty($object->trueVolume)) {
-			$totalVolumetoshow = showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
-		}
-
-		$pdf->SetFillColor(255, 255, 255);
-		$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
-		$pdf->MultiCell($col2x - $col1x, $tab2_hl, $outputlangs->transnoentities("Total"), 0, 'L', 1);
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_ORDERED)) {
-			$pdf->SetXY($this->posxqtyordered, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($this->posxqtytoship - $this->posxqtyordered, $tab2_hl, $totalOrdered, 0, 'C', 1);
-		}
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_QTYTOSHIP)) {
-			$pdf->SetXY($this->posxqtytoship, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($this->posxpuht - $this->posxqtytoship, $tab2_hl, $totalToShip, 0, 'C', 1);
-		}
-
-		if (!empty($conf->global->SHIPPING_PDF_DISPLAY_AMOUNT_HT)) {
-			$pdf->SetXY($this->posxpuht, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($this->posxtotalht - $this->posxpuht, $tab2_hl, '', 0, 'C', 1);
-
-			$pdf->SetXY($this->posxtotalht, $tab2_top + $tab2_hl * $index);
-			$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->posxtotalht, $tab2_hl, price($object->total_ht, 0, $outputlangs), 0, 'C', 1);
-		}
-
-		if (empty($conf->global->SHIPPING_PDF_HIDE_WEIGHT_AND_VOLUME)) {
-			// Total Weight
-			if ($totalWeighttoshow) {
-				$pdf->SetXY($this->posxweightvol, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), $tab2_hl, $totalWeighttoshow, 0, 'C', 1);
-
-				$index++;
-			}
-			if ($totalVolumetoshow) {
-				$pdf->SetXY($this->posxweightvol, $tab2_top + $tab2_hl * $index);
-				$pdf->MultiCell(($this->posxqtyordered - $this->posxweightvol), $tab2_hl, $totalVolumetoshow, 0, 'C', 1);
-
-				$index++;
-			}
-			if (!$totalWeighttoshow && !$totalVolumetoshow) {
-				$index++;
-			}
-		}
-
-		$pdf->SetTextColor(0, 0, 0);
-
-		return ($tab2_top + ($tab2_hl * $index));
 	}
 }

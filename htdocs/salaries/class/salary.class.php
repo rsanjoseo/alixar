@@ -32,65 +32,79 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Salary extends CommonObject
 {
-	const STATUS_UNPAID = 0;
-	const STATUS_PAID = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'salary';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'salary';
-	/**
+
+    /**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'salary';
-	public $tms;
-	/**
+
+    public $tms;
+
+    /**
 	 * @var int User ID
 	 */
 	public $fk_user;
-	public $datep;
+
+    public $datep;
 	public $datev;
 	public $amount;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_project;
-	public $type_payment;
-	/**
+
+    public $type_payment;
+
+    /**
 	 * @var string salary payments label
 	 */
 	public $label;
-	public $datesp;
+
+    public $datesp;
 	public $dateep;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_bank;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_user_author;
-	/**
-	 * @var int ID
-	 */
-	public $fk_user_modif;
-	/**
-	 * @var user	User
-	 */
-	public $user;
 
-	/**
-	 *	Constructor
-	 *
-	 *  @param		DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->element = 'salary';
+    /**
+     * @var int ID
+     */
+    public $fk_user_modif;
+
+    /**
+     * @var user    User
+     */
+    public $user;
+
+    const STATUS_UNPAID = 0;
+    const STATUS_PAID = 1;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->element = 'salary';
 		$this->table_element = 'salary';
 	}
 

@@ -558,568 +558,6 @@ class CMailFile
 		}
 	}
 
-	/**
-	 * Seearch images into html message and init array this->images_encoded if found
-	 *
-	 * @param	string	$images_dir		Location of physical images files
-	 * @return	int 		        	>0 if OK, <0 if KO
-	 */
-	public function findHtmlImages($images_dir)
-	{
-		// Build the list of image extensions
-		$extensions = array_keys($this->image_types);
-
-		$matches = array();
-		preg_match_all('/(?:"|\')([^"\']+\.('.implode('|', $extensions).'))(?:"|\')/Ui', $this->html, $matches); // If "xxx.ext" or 'xxx.ext' found
-
-		if (!empty($matches)) {
-			$i = 0;
-			foreach ($matches[1] as $full) {
-				if (preg_match('/file=([A-Za-z0-9_\-\/]+[\.]?[A-Za-z0-9]+)?$/i', $full, $regs)) {   // If xxx is 'file=aaa'
-					$img = $regs[1];
-
-					if (file_exists($images_dir.'/'.$img)) {
-						// Image path in src
-						$src = preg_quote($full, '/');
-
-						// Image full path
-						$this->html_images[$i]["fullpath"] = $images_dir.'/'.$img;
-
-						// Image name
-						$this->html_images[$i]["name"] = $img;
-
-						// Content type
-						if (preg_match('/^.+\.(\w{3,4})$/', $img, $reg)) {
-							$ext = strtolower($reg[1]);
-							$this->html_images[$i]["content_type"] = $this->image_types[$ext];
-						}
-
-						// cid
-						$this->html_images[$i]["cid"] = dol_hash(uniqid(time()), 3); // Force md5 hash (does not contains special chars)
-						$this->html = preg_replace("/src=\"$src\"|src='$src'/i", "src=\"cid:".$this->html_images[$i]["cid"]."\"", $this->html);
-					}
-					$i++;
-				}
-			}
-
-			if (!empty($this->html_images)) {
-				$inline = array();
-
-				$i = 0;
-
-				foreach ($this->html_images as $img) {
-					$fullpath = $images_dir.'/'.$img["name"];
-
-					// If duplicate images are embedded, they may show up as attachments, so remove them.
-					if (!in_array($fullpath, $inline)) {
-						// Read image file
-						if ($image = file_get_contents($fullpath)) {
-							// On garde que le nom de l'image
-							preg_match('/([A-Za-z0-9_-]+[\.]?[A-Za-z0-9]+)?$/i', $img["name"], $regs);
-							$imgName = $regs[1];
-
-							$this->images_encoded[$i]['name'] = $imgName;
-							$this->images_encoded[$i]['fullpath'] = $fullpath;
-							$this->images_encoded[$i]['content_type'] = $img["content_type"];
-							$this->images_encoded[$i]['cid'] = $img["cid"];
-							// Encodage de l'image
-							$this->images_encoded[$i]["image_encoded"] = chunk_split(base64_encode($image), 68, $this->eol);
-							$inline[] = $fullpath;
-						}
-					}
-					$i++;
-				}
-			} else {
-				return -1;
-			}
-
-			return 1;
-		} else {
-			return 0;
-		}
-	}
-
-	/**
-	 * Create SMTP headers (mode = 'mail')
-	 *
-	 * @return	string headers
-	 */
-	public function write_smtpheaders()
-	{
-		// phpcs:enable
-		global $conf;
-		$out = "";
-
-		$host = dol_getprefix('email');
-
-		// Sender
-		//$out.= "Sender: ".getValidAddress($this->addr_from,2)).$this->eol2;
-		$out .= "From: ".$this->getValidAddress($this->addr_from, 3, 1).$this->eol2;
-		if (!empty($conf->global->MAIN_MAIL_SENDMAIL_FORCE_BA)) {
-			$out .= "To: ".$this->getValidAddress($this->addr_to, 0, 1).$this->eol2;
-		}
-		// Return-Path is important because it is used by SPF. Some MTA does not read Return-Path from header but from command line. See option MAIN_MAIL_ALLOW_SENDMAIL_F for that.
-		$out .= "Return-Path: ".$this->getValidAddress($this->addr_from, 0, 1).$this->eol2;
-		if (isset($this->reply_to) && $this->reply_to) {
-			$out .= "Reply-To: ".$this->getValidAddress($this->reply_to, 2).$this->eol2;
-		}
-		if (isset($this->errors_to) && $this->errors_to) {
-			$out .= "Errors-To: ".$this->getValidAddress($this->errors_to, 2).$this->eol2;
-		}
-
-		// Receiver
-		if (isset($this->addr_cc) && $this->addr_cc) {
-			$out .= "Cc: ".$this->getValidAddress($this->addr_cc, 2).$this->eol2;
-		}
-		if (isset($this->addr_bcc) && $this->addr_bcc) {
-			$out .= "Bcc: ".$this->getValidAddress($this->addr_bcc, 2).$this->eol2; // TODO Question: bcc must not be into header, only into SMTP command "RCPT TO". Does php mail support this ?
-		}
-
-		// Delivery receipt
-		if (isset($this->deliveryreceipt) && $this->deliveryreceipt == 1) {
-			$out .= "Disposition-Notification-To: ".$this->getValidAddress($this->addr_from, 2).$this->eol2;
-		}
-
-		//$out.= "X-Priority: 3".$this->eol2;
-
-		$out .= 'Date: '.date("r").$this->eol2;
-
-		$trackid = $this->trackid;
-		if ($trackid) {
-			// References is kept in response and Message-ID is returned into In-Reply-To:
-			$this->msgid = time().'.phpmail-dolibarr-'.$trackid.'@'.$host;
-			$out .= 'Message-ID: <'.$this->msgid.">".$this->eol2; // Uppercase seems replaced by phpmail
-			$out .= 'References: <'.$this->msgid.">".$this->eol2;
-			$out .= 'X-Dolibarr-TRACKID: '.$trackid.'@'.$host.$this->eol2;
-		} else {
-			$this->msgid = time().'.phpmail@'.$host;
-			$out .= 'Message-ID: <'.$this->msgid.">".$this->eol2;
-		}
-
-		if (!empty($_SERVER['REMOTE_ADDR'])) {
-			$out .= "X-RemoteAddr: ".$_SERVER['REMOTE_ADDR'].$this->eol2;
-		}
-		$out .= "X-Mailer: Dolibarr version ".DOL_VERSION." (using php mail)".$this->eol2;
-		$out .= "Mime-Version: 1.0".$this->eol2;
-
-		//$out.= "From: ".$this->getValidAddress($this->addr_from,3,1).$this->eol;
-
-		$out .= "Content-Type: multipart/mixed;".$this->eol2." boundary=\"".$this->mixed_boundary."\"".$this->eol2;
-		$out .= "Content-Transfer-Encoding: 8bit".$this->eol2; // TODO Seems to be ignored. Header is 7bit once received.
-
-		dol_syslog("CMailFile::write_smtpheaders smtp_header=\n".$out);
-		return $out;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return a formatted address string for SMTP protocol
-	 *
-	 * @param	string		$address		     Example: 'John Doe <john@doe.com>, Alan Smith <alan@smith.com>' or 'john@doe.com, alan@smith.com'
-	 * @param	int			$format			     0=auto, 1=emails with <>, 2=emails without <>, 3=auto + label between ", 4 label or email, 5 mailto link
-	 * @param	int			$encode			     0=No encode name, 1=Encode name to RFC2822
-	 * @param   int         $maxnumberofemail    0=No limit. Otherwise, maximum number of emails returned ($address may contains several email separated with ','). Add '...' if there is more.
-	 * @return	string						     If format 0: '<john@doe.com>' or 'John Doe <john@doe.com>' or '=?UTF-8?B?Sm9obiBEb2U=?= <john@doe.com>'
-	 * 										     If format 1: '<john@doe.com>'
-	 *										     If format 2: 'john@doe.com'
-	 *										     If format 3: '<john@doe.com>' or '"John Doe" <john@doe.com>' or '"=?UTF-8?B?Sm9obiBEb2U=?=" <john@doe.com>'
-	 *                                           If format 4: 'John Doe' or 'john@doe.com' if no label exists
-	 *                                           If format 5: <a href="mailto:john@doe.com">John Doe</a> or <a href="mailto:john@doe.com">john@doe.com</a> if no label exists
-	 * @see getArrayAddress()
-	 */
-	public static function getValidAddress($address, $format, $encode = 0, $maxnumberofemail = 0)
-	{
-		global $conf;
-
-		$ret = '';
-
-		$arrayaddress = explode(',', $address);
-
-		// Boucle sur chaque composant de l'adresse
-		$i = 0;
-		foreach ($arrayaddress as $val) {
-			$regs = array();
-			if (preg_match('/^(.*)<(.*)>$/i', trim($val), $regs)) {
-				$name  = trim($regs[1]);
-				$email = trim($regs[2]);
-			} else {
-				$name  = '';
-				$email = trim($val);
-			}
-
-			if ($email) {
-				$i++;
-
-				$newemail = '';
-				if ($format == 5) {
-					$newemail = $name ? $name : $email;
-					$newemail = '<a href="mailto:'.$email.'">'.$newemail.'</a>';
-				}
-				if ($format == 4) {
-					$newemail = $name ? $name : $email;
-				}
-				if ($format == 2) {
-					$newemail = $email;
-				}
-				if ($format == 1 || $format == 3) {
-					$newemail = '<'.$email.'>';
-				}
-				if ($format == 0 || $format == 3) {
-					if (!empty($conf->global->MAIN_MAIL_NO_FULL_EMAIL)) {
-						$newemail = '<'.$email.'>';
-					} elseif (!$name) {
-						$newemail = '<'.$email.'>';
-					} else {
-						$newemail = ($format == 3 ? '"' : '').($encode ?self::encodetorfc2822($name) : $name).($format == 3 ? '"' : '').' <'.$email.'>';
-					}
-				}
-
-				$ret = ($ret ? $ret.',' : '').$newemail;
-
-				// Stop if we have too much records
-				if ($maxnumberofemail && $i >= $maxnumberofemail) {
-					if (count($arrayaddress) > $maxnumberofemail) {
-						$ret .= '...';
-					}
-					break;
-				}
-			}
-		}
-
-		return $ret;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Encode subject according to RFC 2822 - http://en.wikipedia.org/wiki/MIME#Encoded-Word
-	 *
-	 * @param string $stringtoencode String to encode
-	 * @return string                string encoded
-	 */
-	public static function encodetorfc2822($stringtoencode)
-	{
-		global $conf;
-		return '=?'.$conf->file->character_set_client.'?B?'.base64_encode($stringtoencode).'?=';
-	}
-
-	/**
-	 * Create header MIME (mode = 'mail')
-	 *
-	 * @param	array	$filename_list			Array of filenames
-	 * @param 	array	$mimefilename_list		Array of mime types
-	 * @return	string							mime headers
-	 */
-	public function write_mimeheaders($filename_list, $mimefilename_list)
-	{
-		// phpcs:enable
-		$mimedone = 0;
-		$out = "";
-
-		if (is_array($filename_list)) {
-			$filename_list_size = count($filename_list);
-			for ($i = 0; $i < $filename_list_size; $i++) {
-				if ($filename_list[$i]) {
-					if ($mimefilename_list[$i]) {
-						$filename_list[$i] = $mimefilename_list[$i];
-					}
-					$out .= "X-attachments: $filename_list[$i]".$this->eol2;
-				}
-			}
-		}
-
-		dol_syslog("CMailFile::write_mimeheaders mime_header=\n".$out, LOG_DEBUG);
-		return $out;
-	}
-
-	/**
-	 * Build a css style (mode = all) into this->styleCSS and this->bodyCSS
-	 *
-	 * @return string
-	 */
-	public function buildCSS()
-	{
-		if (!empty($this->css)) {
-			// Style CSS
-			$this->styleCSS = '<style type="text/css">';
-			$this->styleCSS .= 'body {';
-
-			if ($this->css['bgcolor']) {
-				$this->styleCSS .= '  background-color: '.$this->css['bgcolor'].';';
-				$this->bodyCSS .= ' bgcolor="'.$this->css['bgcolor'].'"';
-			}
-			if ($this->css['bgimage']) {
-				// TODO recuperer cid
-				$this->styleCSS .= ' background-image: url("cid:'.$this->css['bgimage_cid'].'");';
-			}
-			$this->styleCSS .= '}';
-			$this->styleCSS .= '</style>';
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return email content (mode = 'mail')
-	 *
-	 * @param	string		$msgtext		Message string
-	 * @return	string						String content
-	 */
-	public function write_body($msgtext)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$out = '';
-
-		$out .= "--".$this->mixed_boundary.$this->eol;
-
-		if ($this->atleastoneimage) {
-			$out .= "Content-Type: multipart/alternative;".$this->eol." boundary=\"".$this->alternative_boundary."\"".$this->eol;
-			$out .= $this->eol;
-			$out .= "--".$this->alternative_boundary.$this->eol;
-		}
-
-		// Make RFC821 Compliant, replace bare linefeeds
-		$strContent = preg_replace("/(?<!\r)\n/si", "\r\n", $msgtext); // PCRE modifier /s means new lines are common chars
-		if (!empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA)) {
-			$strContent = preg_replace("/\r\n/si", "\n", $strContent); // PCRE modifier /s means new lines are common chars
-		}
-
-		$strContentAltText = '';
-		if ($this->msgishtml) {
-			// Similar code to forge a text from html is also in smtps.class.php
-			$strContentAltText = preg_replace("/<br\s*[^>]*>/", " ", $strContent);
-			$strContentAltText = html_entity_decode(strip_tags($strContentAltText));
-			$strContentAltText = trim(wordwrap($strContentAltText, 75, empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA) ? "\r\n" : "\n"));
-
-			// Check if html header already in message, if not complete the message
-			$strContent = $this->checkIfHTML($strContent);
-		}
-
-		// Make RFC2045 Compliant, split lines
-		//$strContent = rtrim(chunk_split($strContent));    // Function chunck_split seems ko if not used on a base64 content
-		// TODO Encode main content into base64 and use the chunk_split, or quoted-printable
-		$strContent = rtrim(wordwrap($strContent, 75, empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA) ? "\r\n" : "\n")); // TODO Using this method creates unexpected line break on text/plain content.
-
-		if ($this->msgishtml) {
-			if ($this->atleastoneimage) {
-				$out .= "Content-Type: text/plain; charset=".$conf->file->character_set_client.$this->eol;
-				//$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
-				$out .= $this->eol.($strContentAltText ? $strContentAltText : strip_tags($strContent)).$this->eol; // Add plain text message
-				$out .= "--".$this->alternative_boundary.$this->eol;
-				$out .= "Content-Type: multipart/related;".$this->eol." boundary=\"".$this->related_boundary."\"".$this->eol;
-				$out .= $this->eol;
-				$out .= "--".$this->related_boundary.$this->eol;
-			}
-
-			if (!$this->atleastoneimage && $strContentAltText && !empty($conf->global->MAIN_MAIL_USE_MULTI_PART)) {    // Add plain text message part before html part
-				$out .= "Content-Type: multipart/alternative;".$this->eol." boundary=\"".$this->alternative_boundary."\"".$this->eol;
-				$out .= $this->eol;
-				$out .= "--".$this->alternative_boundary.$this->eol;
-				$out .= "Content-Type: text/plain; charset=".$conf->file->character_set_client.$this->eol;
-				//$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
-				$out .= $this->eol.$strContentAltText.$this->eol;
-				$out .= "--".$this->alternative_boundary.$this->eol;
-			}
-
-			$out .= "Content-Type: text/html; charset=".$conf->file->character_set_client.$this->eol;
-			//$out.= "Content-Transfer-Encoding: 7bit".$this->eol;	// TODO Use base64
-			$out .= $this->eol.$strContent.$this->eol;
-
-			if (!$this->atleastoneimage && $strContentAltText && !empty($conf->global->MAIN_MAIL_USE_MULTI_PART)) {    // Add plain text message part after html part
-				$out .= "--".$this->alternative_boundary."--".$this->eol;
-			}
-		} else {
-			$out .= "Content-Type: text/plain; charset=".$conf->file->character_set_client.$this->eol;
-			//$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
-			$out .= $this->eol.$strContent.$this->eol;
-		}
-
-		$out .= $this->eol;
-
-		// Encode images
-		if ($this->atleastoneimage) {
-			$out .= $this->write_images($this->images_encoded);
-			// always end related and end alternative after inline images
-			$out .= "--".$this->related_boundary."--".$this->eol;
-			$out .= $this->eol."--".$this->alternative_boundary."--".$this->eol;
-			$out .= $this->eol;
-		}
-
-		return $out;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Correct an uncomplete html string
-	 *
-	 * @param	string	$msg	String
-	 * @return	string			Completed string
-	 */
-	public function checkIfHTML($msg)
-	{
-		if (!preg_match('/^[\s\t]*<html/i', $msg)) {
-			$out = "<html><head><title></title>";
-			if (!empty($this->styleCSS)) {
-				$out .= $this->styleCSS;
-			}
-			$out .= "</head><body";
-			if (!empty($this->bodyCSS)) {
-				$out .= $this->bodyCSS;
-			}
-			$out .= ">";
-			$out .= $msg;
-			$out .= "</body></html>";
-		} else {
-			$out = $msg;
-		}
-
-		return $out;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Attach an image to email (mode = 'mail')
-	 *
-	 * @param	array	$images_list	Array of array image
-	 * @return	string					Chaine images encodees
-	 */
-	public function write_images($images_list)
-	{
-		// phpcs:enable
-		$out = '';
-
-		if (is_array($images_list)) {
-			foreach ($images_list as $img) {
-				dol_syslog("CMailFile::write_images: ".$img["name"]);
-
-				$out .= "--".$this->related_boundary.$this->eol; // always related for an inline image
-				$out .= "Content-Type: ".$img["content_type"]."; name=\"".$img["name"]."\"".$this->eol;
-				$out .= "Content-Transfer-Encoding: base64".$this->eol;
-				$out .= "Content-Disposition: inline; filename=\"".$img["name"]."\"".$this->eol;
-				$out .= "Content-ID: <".$img["cid"].">".$this->eol;
-				$out .= $this->eol;
-				$out .= $img["image_encoded"];
-				$out .= $this->eol;
-			}
-		}
-
-		return $out;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Attach file to email (mode = 'mail')
-	 *
-	 * @param	array	$filename_list		Tableau
-	 * @param	array	$mimetype_list		Tableau
-	 * @param 	array	$mimefilename_list	Tableau
-	 * @return	string						Chaine fichiers encodes
-	 */
-	public function write_files($filename_list, $mimetype_list, $mimefilename_list)
-	{
-		// phpcs:enable
-		$out = '';
-
-		$filename_list_size = count($filename_list);
-		for ($i = 0; $i < $filename_list_size; $i++) {
-			if ($filename_list[$i]) {
-				dol_syslog("CMailFile::write_files: i=$i");
-				$encoded = $this->_encode_file($filename_list[$i]);
-				if ($encoded >= 0) {
-					if ($mimefilename_list[$i]) {
-						$filename_list[$i] = $mimefilename_list[$i];
-					}
-					if (!$mimetype_list[$i]) {
-						$mimetype_list[$i] = "application/octet-stream";
-					}
-
-					$out .= "--".$this->mixed_boundary.$this->eol;
-					$out .= "Content-Disposition: attachment; filename=\"".$filename_list[$i]."\"".$this->eol;
-					$out .= "Content-Type: ".$mimetype_list[$i]."; name=\"".$filename_list[$i]."\"".$this->eol;
-					$out .= "Content-Transfer-Encoding: base64".$this->eol;
-					$out .= "Content-Description: ".$filename_list[$i].$this->eol;
-					$out .= $this->eol;
-					$out .= $encoded;
-					$out .= $this->eol;
-					//$out.= $this->eol;
-				} else {
-					return $encoded;
-				}
-			}
-		}
-
-		return $out;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Read a file on disk and return encoded content for emails (mode = 'mail')
-	 *
-	 * @param	string	$sourcefile		Path to file to encode
-	 * @return 	int|string			    <0 if KO, encoded string if OK
-	 */
-	private function _encode_file($sourcefile)
-	{
-		// phpcs:enable
-		$newsourcefile = dol_osencode($sourcefile);
-
-		if (is_readable($newsourcefile)) {
-			$contents = file_get_contents($newsourcefile); // Need PHP 4.3
-			$encoded = chunk_split(base64_encode($contents), 76, $this->eol); // 76 max is defined into http://tools.ietf.org/html/rfc2047
-			return $encoded;
-		} else {
-			$this->error = "Error: Can't read file '".$sourcefile."' into _encode_file";
-			dol_syslog("CMailFile::encode_file: ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return a formatted array of address string for SMTP protocol
-	 *
-	 * @param   string      $address        Example: 'John Doe <john@doe.com>, Alan Smith <alan@smith.com>' or 'john@doe.com, alan@smith.com'
-	 * @return  array                       array of email => name
-	 * @see getValidAddress()
-	 */
-	public static function getArrayAddress($address)
-	{
-		global $conf;
-
-		$ret = array();
-
-		$arrayaddress = explode(',', $address);
-
-		// Boucle sur chaque composant de l'adresse
-		foreach ($arrayaddress as $val) {
-			if (preg_match('/^(.*)<(.*)>$/i', trim($val), $regs)) {
-				$name  = trim($regs[1]);
-				$email = trim($regs[2]);
-			} else {
-				$name  = null;
-				$email = trim($val);
-			}
-
-			$ret[$email] = empty($conf->global->MAIN_MAIL_NO_FULL_EMAIL) ? $name : null;
-		}
-
-		return $ret;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Send mail that was prepared by constructor.
@@ -1522,26 +960,67 @@ class CMailFile
 
 				return $reshook;
 			}
-		} else {
-			$this->error = 'No mail sent. Feature is disabled by option MAIN_DISABLE_ALL_MAILS';
-			dol_syslog("CMailFile::sendfile: ".$this->error, LOG_WARNING);
-		}
+        } else {
+            $this->error = 'No mail sent. Feature is disabled by option MAIN_DISABLE_ALL_MAILS';
+            dol_syslog("CMailFile::sendfile: " . $this->error, LOG_WARNING);
+        }
 
-		error_reporting($errorlevel); // Reactive niveau erreur origine
+        error_reporting($errorlevel); // Reactive niveau erreur origine
 
-		return $res;
-	}
+        return $res;
+    }
 
-	/**
-	 *  Write content of a SMTP request into a dump file (mode = all)
-	 *  Used for debugging.
-	 *  Note that to see full SMTP protocol, you can use tcpdump -w /tmp/smtp -s 2000 port 25"
-	 *
-	 *  @return	void
-	 */
-	public function dump_mail()
-	{
-		// phpcs:enable
+    /**
+     * Encode subject according to RFC 2822 - http://en.wikipedia.org/wiki/MIME#Encoded-Word
+     *
+     * @param string $stringtoencode String to encode
+     *
+     * @return string                string encoded
+     */
+    public static function encodetorfc2822($stringtoencode)
+    {
+        global $conf;
+        return '=?' . $conf->file->character_set_client . '?B?' . base64_encode($stringtoencode) . '?=';
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Read a file on disk and return encoded content for emails (mode = 'mail')
+     *
+     * @param string $sourcefile Path to file to encode
+     *
+     * @return    int|string                <0 if KO, encoded string if OK
+     */
+    private function _encode_file($sourcefile)
+    {
+        // phpcs:enable
+        $newsourcefile = dol_osencode($sourcefile);
+
+        if (is_readable($newsourcefile)) {
+            $contents = file_get_contents($newsourcefile); // Need PHP 4.3
+            $encoded = chunk_split(base64_encode($contents), 76, $this->eol); // 76 max is defined into http://tools.ietf.org/html/rfc2047
+            return $encoded;
+        } else {
+            $this->error = "Error: Can't read file '" . $sourcefile . "' into _encode_file";
+            dol_syslog("CMailFile::encode_file: " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Write content of a SMTP request into a dump file (mode = all)
+     *  Used for debugging.
+     *  Note that to see full SMTP protocol, you can use tcpdump -w /tmp/smtp -s 2000 port 25"
+     *
+     * @return    void
+     */
+    public function dump_mail()
+    {
+        // phpcs:enable
 		global $conf, $dolibarr_main_data_root;
 
 		if (@is_writeable($dolibarr_main_data_root)) {	// Avoid fatal error on fopen with open_basedir
@@ -1555,26 +1034,365 @@ class CMailFile
 			} elseif ($this->sendmode == 'smtps') {
 				fputs($fp, $this->smtps->log); // this->smtps->log is filled only if MAIN_MAIL_DEBUG was set to on
 			} elseif ($this->sendmode == 'swiftmailer') {
-				fputs($fp, $this->logger->dump()); // this->logger is filled only if MAIN_MAIL_DEBUG was set to on
-			}
+                fputs($fp, $this->logger->dump()); // this->logger is filled only if MAIN_MAIL_DEBUG was set to on
+            }
 
-			fclose($fp);
-			if (!empty($conf->global->MAIN_UMASK)) {
-				@chmod($outputfile, octdec($conf->global->MAIN_UMASK));
-			}
-		}
-	}
+            fclose($fp);
+            if (!empty($conf->global->MAIN_UMASK)) {
+                @chmod($outputfile, octdec($conf->global->MAIN_UMASK));
+            }
+        }
+    }
 
-	/**
-	 * Try to create a socket connection
-	 *
-	 * @param 	string		$host		Add ssl:// for SSL/TLS.
-	 * @param 	int			$port		Example: 25, 465
-	 * @return	int						Socket id if ok, 0 if KO
-	 */
-	public function check_server_port($host, $port)
-	{
-		// phpcs:enable
+    /**
+     * Correct an uncomplete html string
+     *
+     * @param string $msg String
+     *
+     * @return    string            Completed string
+     */
+    public function checkIfHTML($msg)
+    {
+        if (!preg_match('/^[\s\t]*<html/i', $msg)) {
+            $out = "<html><head><title></title>";
+            if (!empty($this->styleCSS)) {
+                $out .= $this->styleCSS;
+            }
+            $out .= "</head><body";
+            if (!empty($this->bodyCSS)) {
+                $out .= $this->bodyCSS;
+            }
+            $out .= ">";
+            $out .= $msg;
+            $out .= "</body></html>";
+        } else {
+            $out = $msg;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Build a css style (mode = all) into this->styleCSS and this->bodyCSS
+     *
+     * @return string
+     */
+    public function buildCSS()
+    {
+        if (!empty($this->css)) {
+            // Style CSS
+            $this->styleCSS = '<style type="text/css">';
+            $this->styleCSS .= 'body {';
+
+            if ($this->css['bgcolor']) {
+                $this->styleCSS .= '  background-color: ' . $this->css['bgcolor'] . ';';
+                $this->bodyCSS .= ' bgcolor="' . $this->css['bgcolor'] . '"';
+            }
+            if ($this->css['bgimage']) {
+                // TODO recuperer cid
+                $this->styleCSS .= ' background-image: url("cid:' . $this->css['bgimage_cid'] . '");';
+            }
+            $this->styleCSS .= '}';
+            $this->styleCSS .= '</style>';
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Create SMTP headers (mode = 'mail')
+     *
+     * @return    string headers
+     */
+    public function write_smtpheaders()
+    {
+        // phpcs:enable
+        global $conf;
+        $out = "";
+
+        $host = dol_getprefix('email');
+
+        // Sender
+        //$out.= "Sender: ".getValidAddress($this->addr_from,2)).$this->eol2;
+        $out .= "From: " . $this->getValidAddress($this->addr_from, 3, 1) . $this->eol2;
+        if (!empty($conf->global->MAIN_MAIL_SENDMAIL_FORCE_BA)) {
+            $out .= "To: " . $this->getValidAddress($this->addr_to, 0, 1) . $this->eol2;
+        }
+        // Return-Path is important because it is used by SPF. Some MTA does not read Return-Path from header but from command line. See option MAIN_MAIL_ALLOW_SENDMAIL_F for that.
+        $out .= "Return-Path: " . $this->getValidAddress($this->addr_from, 0, 1) . $this->eol2;
+        if (isset($this->reply_to) && $this->reply_to) {
+            $out .= "Reply-To: " . $this->getValidAddress($this->reply_to, 2) . $this->eol2;
+        }
+        if (isset($this->errors_to) && $this->errors_to) {
+            $out .= "Errors-To: " . $this->getValidAddress($this->errors_to, 2) . $this->eol2;
+        }
+
+        // Receiver
+        if (isset($this->addr_cc) && $this->addr_cc) {
+            $out .= "Cc: " . $this->getValidAddress($this->addr_cc, 2) . $this->eol2;
+        }
+        if (isset($this->addr_bcc) && $this->addr_bcc) {
+            $out .= "Bcc: " . $this->getValidAddress($this->addr_bcc, 2) . $this->eol2; // TODO Question: bcc must not be into header, only into SMTP command "RCPT TO". Does php mail support this ?
+        }
+
+        // Delivery receipt
+        if (isset($this->deliveryreceipt) && $this->deliveryreceipt == 1) {
+            $out .= "Disposition-Notification-To: " . $this->getValidAddress($this->addr_from, 2) . $this->eol2;
+        }
+
+        //$out.= "X-Priority: 3".$this->eol2;
+
+        $out .= 'Date: ' . date("r") . $this->eol2;
+
+        $trackid = $this->trackid;
+        if ($trackid) {
+            // References is kept in response and Message-ID is returned into In-Reply-To:
+            $this->msgid = time() . '.phpmail-dolibarr-' . $trackid . '@' . $host;
+            $out .= 'Message-ID: <' . $this->msgid . ">" . $this->eol2; // Uppercase seems replaced by phpmail
+            $out .= 'References: <' . $this->msgid . ">" . $this->eol2;
+            $out .= 'X-Dolibarr-TRACKID: ' . $trackid . '@' . $host . $this->eol2;
+        } else {
+            $this->msgid = time() . '.phpmail@' . $host;
+            $out .= 'Message-ID: <' . $this->msgid . ">" . $this->eol2;
+        }
+
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
+            $out .= "X-RemoteAddr: " . $_SERVER['REMOTE_ADDR'] . $this->eol2;
+        }
+        $out .= "X-Mailer: Dolibarr version " . DOL_VERSION . " (using php mail)" . $this->eol2;
+        $out .= "Mime-Version: 1.0" . $this->eol2;
+
+        //$out.= "From: ".$this->getValidAddress($this->addr_from,3,1).$this->eol;
+
+        $out .= "Content-Type: multipart/mixed;" . $this->eol2 . " boundary=\"" . $this->mixed_boundary . "\"" . $this->eol2;
+        $out .= "Content-Transfer-Encoding: 8bit" . $this->eol2; // TODO Seems to be ignored. Header is 7bit once received.
+
+        dol_syslog("CMailFile::write_smtpheaders smtp_header=\n" . $out);
+        return $out;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Create header MIME (mode = 'mail')
+     *
+     * @param array $filename_list     Array of filenames
+     * @param array $mimefilename_list Array of mime types
+     *
+     * @return    string                            mime headers
+     */
+    public function write_mimeheaders($filename_list, $mimefilename_list)
+    {
+        // phpcs:enable
+        $mimedone = 0;
+        $out = "";
+
+        if (is_array($filename_list)) {
+            $filename_list_size = count($filename_list);
+            for ($i = 0; $i < $filename_list_size; $i++) {
+                if ($filename_list[$i]) {
+                    if ($mimefilename_list[$i]) {
+                        $filename_list[$i] = $mimefilename_list[$i];
+                    }
+                    $out .= "X-attachments: $filename_list[$i]" . $this->eol2;
+                }
+            }
+        }
+
+        dol_syslog("CMailFile::write_mimeheaders mime_header=\n" . $out, LOG_DEBUG);
+        return $out;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return email content (mode = 'mail')
+     *
+     * @param string $msgtext Message string
+     *
+     * @return    string                        String content
+     */
+    public function write_body($msgtext)
+    {
+        // phpcs:enable
+        global $conf;
+
+        $out = '';
+
+        $out .= "--" . $this->mixed_boundary . $this->eol;
+
+        if ($this->atleastoneimage) {
+            $out .= "Content-Type: multipart/alternative;" . $this->eol . " boundary=\"" . $this->alternative_boundary . "\"" . $this->eol;
+            $out .= $this->eol;
+            $out .= "--" . $this->alternative_boundary . $this->eol;
+        }
+
+        // Make RFC821 Compliant, replace bare linefeeds
+        $strContent = preg_replace("/(?<!\r)\n/si", "\r\n", $msgtext); // PCRE modifier /s means new lines are common chars
+        if (!empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA)) {
+            $strContent = preg_replace("/\r\n/si", "\n", $strContent); // PCRE modifier /s means new lines are common chars
+        }
+
+        $strContentAltText = '';
+        if ($this->msgishtml) {
+            // Similar code to forge a text from html is also in smtps.class.php
+            $strContentAltText = preg_replace("/<br\s*[^>]*>/", " ", $strContent);
+            $strContentAltText = html_entity_decode(strip_tags($strContentAltText));
+            $strContentAltText = trim(wordwrap($strContentAltText, 75, empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA) ? "\r\n" : "\n"));
+
+            // Check if html header already in message, if not complete the message
+            $strContent = $this->checkIfHTML($strContent);
+        }
+
+        // Make RFC2045 Compliant, split lines
+        //$strContent = rtrim(chunk_split($strContent));    // Function chunck_split seems ko if not used on a base64 content
+        // TODO Encode main content into base64 and use the chunk_split, or quoted-printable
+        $strContent = rtrim(wordwrap($strContent, 75, empty($conf->global->MAIN_FIX_FOR_BUGGED_MTA) ? "\r\n" : "\n")); // TODO Using this method creates unexpected line break on text/plain content.
+
+        if ($this->msgishtml) {
+            if ($this->atleastoneimage) {
+                $out .= "Content-Type: text/plain; charset=" . $conf->file->character_set_client . $this->eol;
+                //$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
+                $out .= $this->eol . ($strContentAltText ? $strContentAltText : strip_tags($strContent)) . $this->eol; // Add plain text message
+                $out .= "--" . $this->alternative_boundary . $this->eol;
+                $out .= "Content-Type: multipart/related;" . $this->eol . " boundary=\"" . $this->related_boundary . "\"" . $this->eol;
+                $out .= $this->eol;
+                $out .= "--" . $this->related_boundary . $this->eol;
+            }
+
+            if (!$this->atleastoneimage && $strContentAltText && !empty($conf->global->MAIN_MAIL_USE_MULTI_PART)) {    // Add plain text message part before html part
+                $out .= "Content-Type: multipart/alternative;" . $this->eol . " boundary=\"" . $this->alternative_boundary . "\"" . $this->eol;
+                $out .= $this->eol;
+                $out .= "--" . $this->alternative_boundary . $this->eol;
+                $out .= "Content-Type: text/plain; charset=" . $conf->file->character_set_client . $this->eol;
+                //$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
+                $out .= $this->eol . $strContentAltText . $this->eol;
+                $out .= "--" . $this->alternative_boundary . $this->eol;
+            }
+
+            $out .= "Content-Type: text/html; charset=" . $conf->file->character_set_client . $this->eol;
+            //$out.= "Content-Transfer-Encoding: 7bit".$this->eol;	// TODO Use base64
+            $out .= $this->eol . $strContent . $this->eol;
+
+            if (!$this->atleastoneimage && $strContentAltText && !empty($conf->global->MAIN_MAIL_USE_MULTI_PART)) {    // Add plain text message part after html part
+                $out .= "--" . $this->alternative_boundary . "--" . $this->eol;
+            }
+        } else {
+            $out .= "Content-Type: text/plain; charset=" . $conf->file->character_set_client . $this->eol;
+            //$out.= "Content-Transfer-Encoding: 7bit".$this->eol;
+            $out .= $this->eol . $strContent . $this->eol;
+        }
+
+        $out .= $this->eol;
+
+        // Encode images
+        if ($this->atleastoneimage) {
+            $out .= $this->write_images($this->images_encoded);
+            // always end related and end alternative after inline images
+            $out .= "--" . $this->related_boundary . "--" . $this->eol;
+            $out .= $this->eol . "--" . $this->alternative_boundary . "--" . $this->eol;
+            $out .= $this->eol;
+        }
+
+        return $out;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Attach file to email (mode = 'mail')
+     *
+     * @param array $filename_list     Tableau
+     * @param array $mimetype_list     Tableau
+     * @param array $mimefilename_list Tableau
+     *
+     * @return    string                        Chaine fichiers encodes
+     */
+    public function write_files($filename_list, $mimetype_list, $mimefilename_list)
+    {
+        // phpcs:enable
+        $out = '';
+
+        $filename_list_size = count($filename_list);
+        for ($i = 0; $i < $filename_list_size; $i++) {
+            if ($filename_list[$i]) {
+                dol_syslog("CMailFile::write_files: i=$i");
+                $encoded = $this->_encode_file($filename_list[$i]);
+                if ($encoded >= 0) {
+                    if ($mimefilename_list[$i]) {
+                        $filename_list[$i] = $mimefilename_list[$i];
+                    }
+                    if (!$mimetype_list[$i]) {
+                        $mimetype_list[$i] = "application/octet-stream";
+                    }
+
+                    $out .= "--" . $this->mixed_boundary . $this->eol;
+                    $out .= "Content-Disposition: attachment; filename=\"" . $filename_list[$i] . "\"" . $this->eol;
+                    $out .= "Content-Type: " . $mimetype_list[$i] . "; name=\"" . $filename_list[$i] . "\"" . $this->eol;
+                    $out .= "Content-Transfer-Encoding: base64" . $this->eol;
+                    $out .= "Content-Description: " . $filename_list[$i] . $this->eol;
+                    $out .= $this->eol;
+                    $out .= $encoded;
+                    $out .= $this->eol;
+                    //$out.= $this->eol;
+                } else {
+                    return $encoded;
+                }
+            }
+        }
+
+        return $out;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Attach an image to email (mode = 'mail')
+     *
+     * @param array $images_list Array of array image
+     *
+     * @return    string                    Chaine images encodees
+     */
+    public function write_images($images_list)
+    {
+        // phpcs:enable
+        $out = '';
+
+        if (is_array($images_list)) {
+            foreach ($images_list as $img) {
+                dol_syslog("CMailFile::write_images: " . $img["name"]);
+
+                $out .= "--" . $this->related_boundary . $this->eol; // always related for an inline image
+                $out .= "Content-Type: " . $img["content_type"] . "; name=\"" . $img["name"] . "\"" . $this->eol;
+                $out .= "Content-Transfer-Encoding: base64" . $this->eol;
+                $out .= "Content-Disposition: inline; filename=\"" . $img["name"] . "\"" . $this->eol;
+                $out .= "Content-ID: <" . $img["cid"] . ">" . $this->eol;
+                $out .= $this->eol;
+                $out .= $img["image_encoded"];
+                $out .= $this->eol;
+            }
+        }
+
+        return $out;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Try to create a socket connection
+     *
+     * @param string $host Add ssl:// for SSL/TLS.
+     * @param int    $port Example: 25, 465
+     *
+     * @return    int                        Socket id if ok, 0 if KO
+     */
+    public function check_server_port($host, $port)
+    {
+        // phpcs:enable
 		global $conf;
 
 		$_retVal = 0;
@@ -1625,11 +1443,12 @@ class CMailFile
 				}
 			} else {
 				$this->error = utf8_check('Error '.$errno.' - '.$errstr) ? 'Error '.$errno.' - '.$errstr : utf8_encode('Error '.$errno.' - '.$errstr);
-			}
-		}
-		return $_retVal;
-	}
+            }
+        }
+        return $_retVal;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * This function has been modified as provided by SirSir to allow multiline responses when
 	 * using SMTP Extensions.
@@ -1647,15 +1466,207 @@ class CMailFile
 		while (substr($server_response, 3, 1) != ' ') {
 			if (!($server_response = fgets($socket, 256))) {
 				$this->error = "Couldn't get mail server response codes";
-				return false;
-			}
-		}
+                return false;
+            }
+        }
 
-		if (!(substr($server_response, 0, 3) == $response)) {
-			$this->error = "Ran into problems sending Mail.\r\nResponse: $server_response";
-			$_retVal = false;
-		}
+        if (!(substr($server_response, 0, 3) == $response)) {
+            $this->error = "Ran into problems sending Mail.\r\nResponse: $server_response";
+            $_retVal = false;
+        }
 
-		return $_retVal;
-	}
+        return $_retVal;
+    }
+
+    /**
+     * Seearch images into html message and init array this->images_encoded if found
+     *
+     * @param string $images_dir Location of physical images files
+     *
+     * @return    int                    >0 if OK, <0 if KO
+     */
+    public function findHtmlImages($images_dir)
+    {
+        // Build the list of image extensions
+        $extensions = array_keys($this->image_types);
+
+        $matches = [];
+        preg_match_all('/(?:"|\')([^"\']+\.(' . implode('|', $extensions) . '))(?:"|\')/Ui', $this->html, $matches); // If "xxx.ext" or 'xxx.ext' found
+
+        if (!empty($matches)) {
+            $i = 0;
+            foreach ($matches[1] as $full) {
+                if (preg_match('/file=([A-Za-z0-9_\-\/]+[\.]?[A-Za-z0-9]+)?$/i', $full, $regs)) {   // If xxx is 'file=aaa'
+                    $img = $regs[1];
+
+                    if (file_exists($images_dir . '/' . $img)) {
+                        // Image path in src
+                        $src = preg_quote($full, '/');
+
+                        // Image full path
+                        $this->html_images[$i]["fullpath"] = $images_dir . '/' . $img;
+
+                        // Image name
+                        $this->html_images[$i]["name"] = $img;
+
+                        // Content type
+                        if (preg_match('/^.+\.(\w{3,4})$/', $img, $reg)) {
+                            $ext = strtolower($reg[1]);
+                            $this->html_images[$i]["content_type"] = $this->image_types[$ext];
+                        }
+
+                        // cid
+                        $this->html_images[$i]["cid"] = dol_hash(uniqid(time()), 3); // Force md5 hash (does not contains special chars)
+                        $this->html = preg_replace("/src=\"$src\"|src='$src'/i", "src=\"cid:" . $this->html_images[$i]["cid"] . "\"", $this->html);
+                    }
+                    $i++;
+                }
+            }
+
+            if (!empty($this->html_images)) {
+                $inline = [];
+
+                $i = 0;
+
+                foreach ($this->html_images as $img) {
+                    $fullpath = $images_dir . '/' . $img["name"];
+
+                    // If duplicate images are embedded, they may show up as attachments, so remove them.
+                    if (!in_array($fullpath, $inline)) {
+                        // Read image file
+                        if ($image = file_get_contents($fullpath)) {
+                            // On garde que le nom de l'image
+                            preg_match('/([A-Za-z0-9_-]+[\.]?[A-Za-z0-9]+)?$/i', $img["name"], $regs);
+                            $imgName = $regs[1];
+
+                            $this->images_encoded[$i]['name'] = $imgName;
+                            $this->images_encoded[$i]['fullpath'] = $fullpath;
+                            $this->images_encoded[$i]['content_type'] = $img["content_type"];
+                            $this->images_encoded[$i]['cid'] = $img["cid"];
+                            // Encodage de l'image
+                            $this->images_encoded[$i]["image_encoded"] = chunk_split(base64_encode($image), 68, $this->eol);
+                            $inline[] = $fullpath;
+                        }
+                    }
+                    $i++;
+                }
+            } else {
+                return -1;
+            }
+
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Return a formatted address string for SMTP protocol
+     *
+     * @param string $address          Example: 'John Doe <john@doe.com>, Alan Smith <alan@smith.com>' or 'john@doe.com, alan@smith.com'
+     * @param int    $format           0=auto, 1=emails with <>, 2=emails without <>, 3=auto + label between ", 4 label or email, 5 mailto link
+     * @param int    $encode           0=No encode name, 1=Encode name to RFC2822
+     * @param int    $maxnumberofemail 0=No limit. Otherwise, maximum number of emails returned ($address may contains several email separated with ','). Add '...' if there is more.
+     *
+     * @return    string                             If format 0: '<john@doe.com>' or 'John Doe <john@doe.com>' or '=?UTF-8?B?Sm9obiBEb2U=?= <john@doe.com>'
+     *                                             If format 1: '<john@doe.com>'
+     *                                             If format 2: 'john@doe.com'
+     *                                             If format 3: '<john@doe.com>' or '"John Doe" <john@doe.com>' or '"=?UTF-8?B?Sm9obiBEb2U=?=" <john@doe.com>'
+     *                                           If format 4: 'John Doe' or 'john@doe.com' if no label exists
+     *                                           If format 5: <a href="mailto:john@doe.com">John Doe</a> or <a href="mailto:john@doe.com">john@doe.com</a> if no label exists
+     * @see getArrayAddress()
+     */
+    public static function getValidAddress($address, $format, $encode = 0, $maxnumberofemail = 0)
+    {
+        global $conf;
+
+        $ret = '';
+
+        $arrayaddress = explode(',', $address);
+
+        // Boucle sur chaque composant de l'adresse
+        $i = 0;
+        foreach ($arrayaddress as $val) {
+            $regs = [];
+            if (preg_match('/^(.*)<(.*)>$/i', trim($val), $regs)) {
+                $name = trim($regs[1]);
+                $email = trim($regs[2]);
+            } else {
+                $name = '';
+                $email = trim($val);
+            }
+
+            if ($email) {
+                $i++;
+
+                $newemail = '';
+                if ($format == 5) {
+                    $newemail = $name ? $name : $email;
+                    $newemail = '<a href="mailto:' . $email . '">' . $newemail . '</a>';
+                }
+                if ($format == 4) {
+                    $newemail = $name ? $name : $email;
+                }
+                if ($format == 2) {
+                    $newemail = $email;
+                }
+                if ($format == 1 || $format == 3) {
+                    $newemail = '<' . $email . '>';
+                }
+                if ($format == 0 || $format == 3) {
+                    if (!empty($conf->global->MAIN_MAIL_NO_FULL_EMAIL)) {
+                        $newemail = '<' . $email . '>';
+                    } elseif (!$name) {
+                        $newemail = '<' . $email . '>';
+                    } else {
+                        $newemail = ($format == 3 ? '"' : '') . ($encode ? self::encodetorfc2822($name) : $name) . ($format == 3 ? '"' : '') . ' <' . $email . '>';
+                    }
+                }
+
+                $ret = ($ret ? $ret . ',' : '') . $newemail;
+
+                // Stop if we have too much records
+                if ($maxnumberofemail && $i >= $maxnumberofemail) {
+                    if (count($arrayaddress) > $maxnumberofemail) {
+                        $ret .= '...';
+                    }
+                    break;
+                }
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Return a formatted array of address string for SMTP protocol
+     *
+     * @param string $address Example: 'John Doe <john@doe.com>, Alan Smith <alan@smith.com>' or 'john@doe.com, alan@smith.com'
+     *
+     * @return  array                       array of email => name
+     * @see getValidAddress()
+     */
+    public static function getArrayAddress($address)
+    {
+        global $conf;
+
+        $ret = [];
+
+        $arrayaddress = explode(',', $address);
+
+        // Boucle sur chaque composant de l'adresse
+        foreach ($arrayaddress as $val) {
+            if (preg_match('/^(.*)<(.*)>$/i', trim($val), $regs)) {
+                $name = trim($regs[1]);
+                $email = trim($regs[2]);
+            } else {
+                $name = null;
+                $email = trim($val);
+            }
+
+            $ret[$email] = empty($conf->global->MAIN_MAIL_NO_FULL_EMAIL) ? $name : null;
+        }
+
+        return $ret;
+    }
 }

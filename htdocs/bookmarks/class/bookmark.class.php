@@ -105,23 +105,6 @@ class Bookmark extends CommonObject
 	}
 
 	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'bookmark'
-		);
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	/**
 	 *    Directs the bookmark
 	 *
 	 *    @param    int		$id		Bookmark Id Loader
@@ -258,28 +241,47 @@ class Bookmark extends CommonObject
 		$sql  = "DELETE FROM ".MAIN_DB_PREFIX."bookmark";
 		$sql .= " WHERE rowid = ".((int) $id);
 
-		dol_syslog("Bookmark::remove", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			return 1;
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+        dol_syslog("Bookmark::remove", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *	Return label of contact status
-	 *
-	 *	@param      int			$mode       0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
-	 * 	@return 	string					Label of contact status
-	 */
-	public function getLibStatut($mode)
-	{
-		return '';
-	}
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'bookmark',
+        ];
 
-	/**
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     *    Return label of contact status
+     *
+     * @param int $mode 0=libelle long, 1=libelle court, 2=Picto + Libelle court, 3=Picto, 4=Picto + Libelle long, 5=Libelle court + Picto
+     *
+     * @return    string                    Label of contact status
+     */
+    public function getLibStatut($mode)
+    {
+        return '';
+    }
+
+    /**
 	 *  Return a link to the object card (with optionaly the picto)
 	 *
 	 *  @param  int     $withpicto                  Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)

@@ -32,17 +32,17 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
  */
 class PriceParser
 {
-	public $limit = 100;
-	// Limit of expressions per price
-	public $error_parser;
-	// The error that occurred when parsing price
-	public $error_expr;
-	// The expression that caused the error
-	public $special_chr = "#";
-	//The special char
-	public $separator_chr = ";";
-	//The separator char
-	protected $db;
+    protected $db;
+    // Limit of expressions per price
+    public $limit = 100;
+    // The error that occurred when parsing price
+    public $error_parser;
+    // The expression that caused the error
+    public $error_expr;
+    //The special char
+    public $special_chr = "#";
+    //The separator char
+    public $separator_chr = ";";
 
 	/**
 	 *  Constructor
@@ -99,7 +99,7 @@ class PriceParser
 		if (empty($this->error_parser)) {
 			return $langs->trans("ErrorPriceExpressionUnknown", 0); //this is not supposed to happen
 		}
-		list($code, $info) = $this->error_parser;
+		[$code, $info] = $this->error_parser;
 		if (in_array($code, array(9, 14, 19, 20))) { //Errors which have 0 arg
 			return $langs->trans("ErrorPriceExpression".$code);
 		} elseif (in_array($code, array(1, 2, 3, 4, 5, 8, 10, 11, 17, 21, 22))) { //Errors which have 1 arg
@@ -112,50 +112,6 @@ class PriceParser
 		{
 			return $langs->trans("ErrorPriceExpressionUnknown", $code);
 		}
-	}
-
-	/**
-	 *	Calculates product price based on product id and associated expression
-	 *
-	 *	@param	Product				$product    	The Product object to get information
-	 *	@param	array 				$extra_values   Any aditional values for expression
-	 *	@return int 						> 0 if OK, < 1 if KO
-	 */
-	public function parseProduct($product, $extra_values = array())
-	{
-		//Get the expression from db
-		$price_expression = new PriceExpression($this->db);
-		$res = $price_expression->fetch($product->fk_price_expression);
-		if ($res < 1) {
-			$this->error_parser = array(19, null);
-			return -1;
-		}
-
-		//Get the supplier min price
-		$productFournisseur = new ProductFournisseur($this->db);
-		$res = $productFournisseur->find_min_price_product_fournisseur($product->id, 0, 0);
-		if ($res < 0) {
-			$this->error_parser = array(25, null);
-			return -1;
-		} elseif ($res == 0) {
-			$supplier_min_price = 0;
-		} else {
-			 $supplier_min_price = $productFournisseur->fourn_unitprice;
-		}
-
-		//Accessible values by expressions
-		$extra_values = array_merge($extra_values, array(
-			"supplier_min_price" => $supplier_min_price,
-		));
-
-		//Parse the expression and return the price, if not error occurred check if price is higher than min
-		$result = $this->parseExpression($product, $price_expression->expression, $extra_values);
-		if (empty($this->error_parser)) {
-			if ($result < $product->price_min) {
-				$result = $product->price_min;
-			}
-		}
-		return $result;
 	}
 
 	/**
@@ -272,27 +228,73 @@ class PriceParser
 			$vars["price"] = $last_result;
 		}
 		if (!isset($vars["price"])) {
-			$this->error_parser = array(21, $expression);
-			return -4;
-		}
-		if ($vars["price"] < 0) {
-			$this->error_parser = array(22, $expression);
-			return -5;
-		}
-		return $vars["price"];
-	}
+			$this->error_parser = [21, $expression];
+            return -4;
+        }
+        if ($vars["price"] < 0) {
+            $this->error_parser = [22, $expression];
+            return -5;
+        }
+        return $vars["price"];
+    }
 
-	/**
-	 *	Calculates supplier product price based on product supplier price and associated expression
-	 *
-	 *	@param	ProductFournisseur	$product_supplier   The Product supplier object to get information
-	 *	@param	array 				$extra_values       Any aditional values for expression
-	 *  @return int 				> 0 if OK, < 1 if KO
-	 */
-	public function parseProductSupplier($product_supplier, $extra_values = array())
-	{
-		//Get the expression from db
-		$price_expression = new PriceExpression($this->db);
+    /**
+     *    Calculates product price based on product id and associated expression
+     *
+     * @param Product $product      The Product object to get information
+     * @param array   $extra_values Any aditional values for expression
+     *
+     * @return int                        > 0 if OK, < 1 if KO
+     */
+    public function parseProduct($product, $extra_values = [])
+    {
+        //Get the expression from db
+        $price_expression = new PriceExpression($this->db);
+        $res = $price_expression->fetch($product->fk_price_expression);
+        if ($res < 1) {
+            $this->error_parser = [19, null];
+            return -1;
+        }
+
+        //Get the supplier min price
+        $productFournisseur = new ProductFournisseur($this->db);
+        $res = $productFournisseur->find_min_price_product_fournisseur($product->id, 0, 0);
+        if ($res < 0) {
+            $this->error_parser = [25, null];
+            return -1;
+        } elseif ($res == 0) {
+            $supplier_min_price = 0;
+        } else {
+            $supplier_min_price = $productFournisseur->fourn_unitprice;
+        }
+
+        //Accessible values by expressions
+        $extra_values = array_merge($extra_values, [
+            "supplier_min_price" => $supplier_min_price,
+        ]);
+
+        //Parse the expression and return the price, if not error occurred check if price is higher than min
+        $result = $this->parseExpression($product, $price_expression->expression, $extra_values);
+        if (empty($this->error_parser)) {
+            if ($result < $product->price_min) {
+                $result = $product->price_min;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     *    Calculates supplier product price based on product supplier price and associated expression
+     *
+     * @param ProductFournisseur $product_supplier The Product supplier object to get information
+     * @param array              $extra_values     Any aditional values for expression
+     *
+     * @return int                > 0 if OK, < 1 if KO
+     */
+    public function parseProductSupplier($product_supplier, $extra_values = [])
+    {
+        //Get the expression from db
+        $price_expression = new PriceExpression($this->db);
 		$res = $price_expression->fetch($product_supplier->fk_supplier_price_expression);
 		if ($res < 1) {
 			$this->error_parser = array(19, null);

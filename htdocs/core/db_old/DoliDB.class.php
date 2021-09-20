@@ -29,24 +29,26 @@ require_once DOL_DOCUMENT_ROOT.'/core/db/Database.interface.php';
  */
 abstract class DoliDB implements Database
 {
-	/** @var bool|resource|SQLite3 Database handler */
-	public $db;
-	/** @var string Database type */
-	public $type;
-	/** @var string Charset used to force charset when creating database */
-	public $forcecharset = 'utf8';
-	/** @var string Collate used to force collate when creating database */
-	public $forcecollate = 'utf8_unicode_ci';
-	/** @var bool true if connected, else false */
-	public $connected;
-	/** @var bool true if database selected, else false */
-	public $database_selected;
-	/** @var string Selected database name */
-	public $database_name;
-	/** @var string Database username */
-	public $database_user;
-	/** @var string Database host */
-	public $database_host;
+    /** @var bool|resource|SQLite3 Database handler */
+    public $db;
+    /** @var string Database type */
+    public $type;
+    /** @var string Charset used to force charset when creating database */
+    public $forcecharset = 'utf8';
+    /** @var string Collate used to force collate when creating database */
+    public $forcecollate = 'utf8_unicode_ci';
+    /** @var resource Resultset of last query */
+    private $_results;
+    /** @var bool true if connected, else false */
+    public $connected;
+    /** @var bool true if database selected, else false */
+    public $database_selected;
+    /** @var string Selected database name */
+    public $database_name;
+    /** @var string Database username */
+    public $database_user;
+    /** @var string Database host */
+    public $database_host;
 	/** @var int Database port */
 	public $database_port;
 	/** @var int >=1 if a transaction is opened, 0 otherwise */
@@ -59,12 +61,11 @@ abstract class DoliDB implements Database
 	public $lasterror;
 	/** @var string Last error number. For example: 'DB_ERROR_RECORD_ALREADY_EXISTS', '12345', ... */
 	public $lasterrno;
-	/** @var bool Status */
+
+    /** @var bool Status */
 	public $ok;
 	/** @var string */
 	public $error;
-	/** @var resource Resultset of last query */
-	private $_results;
 
 	/**
 	 *	Format a SQL IF

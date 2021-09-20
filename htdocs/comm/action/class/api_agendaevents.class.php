@@ -41,26 +41,64 @@ class AgendaEvents extends DolibarrApi
 	 */
 	public $actioncomm;
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->actioncomm = new ActionComm($this->db);
+    }
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->actioncomm = new ActionComm($this->db);
-	}
+    /**
+     * Get properties of a Agenda Events object
+     *
+     * Return an array with Agenda Events informations
+     *
+     * @param int $id ID of Agenda Events
+     *
+     * @return        array|mixed             Data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->agenda->myactions->read) {
+            throw new RestException(401, "Insufficient rights to read an event");
+        }
+        if ($id === 0) {
+            $result = $this->actioncomm->initAsSpecimen();
+        } else {
+            $result = $this->actioncomm->fetch($id);
+            if ($result) {
+                $this->actioncomm->fetch_optionals();
+                $this->actioncomm->fetchObjectLinked();
+            }
+        }
+        if (!$result) {
+            throw new RestException(404, 'Agenda Events not found');
+        }
 
-	/**
-	 * List Agenda Events
-	 *
-	 * Get a list of Agenda Events
-	 *
-	 * @param string	$sortfield	Sort field
-	 * @param string	$sortorder	Sort order
-	 * @param int		$limit		Limit for list
-	 * @param int		$page		Page number
+        if (!DolibarrApiAccess::$user->rights->agenda->allactions->read && $this->actioncomm->userownerid != DolibarrApiAccess::$user->id) {
+            throw new RestException(401, "Insufficient rights to read event for owner id " . $request_data['userownerid'] . ' Your id is ' . DolibarrApiAccess::$user->id);
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('agenda', $this->actioncomm->id, 'actioncomm', '', 'fk_soc', 'id')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+        return $this->_cleanObjectDatas($this->actioncomm);
+    }
+
+    /**
+     * List Agenda Events
+     *
+     * Get a list of Agenda Events
+     *
+     * @param string    $sortfield  Sort field
+     * @param string    $sortorder  Sort order
+     * @param int       $limit      Limit for list
+     * @param int       $page       Page number
 	 * @param string   	$user_ids   User ids filter field (owners of event). Example: '1' or '1,2,3'          {@pattern /^[0-9,]*$/i}
 	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.label:like:'%dol%') and (t.datec:<:'20160101')"
 	 * @return  array               Array of Agenda Events objects
@@ -161,72 +199,6 @@ class AgendaEvents extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->note); // alreaydy into note_private
-		unset($object->usermod);
-		unset($object->libelle);
-		unset($object->context);
-		unset($object->canvas);
-		unset($object->contact);
-		unset($object->contact_id);
-		unset($object->thirdparty);
-		unset($object->user);
-		unset($object->origin);
-		unset($object->origin_id);
-		unset($object->ref_ext);
-		unset($object->statut);
-		unset($object->state_code);
-		unset($object->state_id);
-		unset($object->state);
-		unset($object->region);
-		unset($object->region_code);
-		unset($object->country);
-		unset($object->country_id);
-		unset($object->country_code);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-		unset($object->mode_reglement_id);
-		unset($object->cond_reglement_id);
-		unset($object->cond_reglement);
-		unset($object->fk_delivery_address);
-		unset($object->shipping_method_id);
-		unset($object->fk_account);
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->contact);
-		unset($object->societe);
-		unset($object->demand_reason_id);
-		unset($object->transport_mode_id);
-		unset($object->region_id);
-		unset($object->actions);
-		unset($object->lines);
-		unset($object->modelpdf);
-
-		return $object;
-	}
-
-	/**
 	 * Create Agenda Event object
 	 *
 	 * @param   array   $request_data   Request data
@@ -262,24 +234,6 @@ class AgendaEvents extends DolibarrApi
 		return $this->actioncomm->id;
 	}
 
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param   array           $data   Array with data to verify
-	 * @return  array
-	 * @throws  RestException
-	 */
-	private function _validate($data)
-	{
-		$event = array();
-		foreach (AgendaEvents::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$event[$field] = $data[$field];
-		}
-		return $event;
-	}
 
 	/**
 	 * Update Agenda Event general fields
@@ -327,46 +281,6 @@ class AgendaEvents extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a Agenda Events object
-	 *
-	 * Return an array with Agenda Events informations
-	 *
-	 * @param       int         $id         ID of Agenda Events
-	 * @return 	    array|mixed             Data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->agenda->myactions->read) {
-			throw new RestException(401, "Insufficient rights to read an event");
-		}
-		if ($id === 0) {
-			$result = $this->actioncomm->initAsSpecimen();
-		} else {
-			$result = $this->actioncomm->fetch($id);
-			if ($result) {
-				$this->actioncomm->fetch_optionals();
-				$this->actioncomm->fetchObjectLinked();
-			}
-		}
-		if (!$result) {
-			throw new RestException(404, 'Agenda Events not found');
-		}
-
-		if (!DolibarrApiAccess::$user->rights->agenda->allactions->read && $this->actioncomm->userownerid != DolibarrApiAccess::$user->id) {
-			throw new RestException(401, "Insufficient rights to read event for owner id ".$request_data['userownerid'].' Your id is '.DolibarrApiAccess::$user->id);
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('agenda', $this->actioncomm->id, 'actioncomm', '', 'fk_soc', 'id')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-		return $this->_cleanObjectDatas($this->actioncomm);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete Agenda Event
 	 *
 	 * @param   int     $id         Agenda Event ID
@@ -399,14 +313,103 @@ class AgendaEvents extends DolibarrApi
 		}
 
 		if (!$this->actioncomm->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(500, 'Error when delete Agenda Event : '.$this->actioncomm->error);
-		}
+            throw new RestException(500, 'Error when delete Agenda Event : ' . $this->actioncomm->error);
+        }
 
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'Agenda Event deleted'
-			)
-		);
-	}
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'Agenda Event deleted',
+            ],
+        ];
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array with data to verify
+     *
+     * @return  array
+     * @throws  RestException
+     */
+    private function _validate($data)
+    {
+        $event = [];
+        foreach (AgendaEvents::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $event[$field] = $data[$field];
+        }
+        return $event;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->note); // alreaydy into note_private
+        unset($object->usermod);
+        unset($object->libelle);
+        unset($object->context);
+        unset($object->canvas);
+        unset($object->contact);
+        unset($object->contact_id);
+        unset($object->thirdparty);
+        unset($object->user);
+        unset($object->origin);
+        unset($object->origin_id);
+        unset($object->ref_ext);
+        unset($object->statut);
+        unset($object->state_code);
+        unset($object->state_id);
+        unset($object->state);
+        unset($object->region);
+        unset($object->region_code);
+        unset($object->country);
+        unset($object->country_id);
+        unset($object->country_code);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+        unset($object->mode_reglement_id);
+        unset($object->cond_reglement_id);
+        unset($object->cond_reglement);
+        unset($object->fk_delivery_address);
+        unset($object->shipping_method_id);
+        unset($object->fk_account);
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->contact);
+        unset($object->societe);
+        unset($object->demand_reason_id);
+        unset($object->transport_mode_id);
+        unset($object->region_id);
+        unset($object->actions);
+        unset($object->lines);
+        unset($object->modelpdf);
+
+        return $object;
+    }
 }

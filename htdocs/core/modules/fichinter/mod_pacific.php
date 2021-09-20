@@ -118,18 +118,6 @@ class mod_pacific extends ModeleNumRefFicheinter
 	/**
 	 * 	Return next free value
 	 *
-	 *  @param	Societe	$objsoc     Object third party
-	 * 	@param	Object	$objforref	Object for number to search
-	 *  @return string      		Next free value
-	 */
-	public function getNumRef($objsoc, $objforref)
-	{
-		return $this->getNextValue($objsoc, $objforref);
-	}
-
-	/**
-	 * 	Return next free value
-	 *
 	 *  @param	Societe		$objsoc     Object thirdparty
 	 *  @param  Object		$object		Object we need next value for
 	 *  @return string      			Value if KO, <0 if KO
@@ -157,14 +145,27 @@ class mod_pacific extends ModeleNumRefFicheinter
 
 		//$date=time();
 		$date = $object->datec;
-		$yymm = strftime("%y%m", $date);
+        $yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		return $this->prefix.$yymm."-".$num;
-	}
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+    /**
+     *    Return next free value
+     *
+     * @param Societe $objsoc    Object third party
+     * @param Object  $objforref Object for number to search
+     *
+     * @return string            Next free value
+     */
+    public function getNumRef($objsoc, $objforref)
+    {
+        return $this->getNextValue($objsoc, $objforref);
+    }
 }

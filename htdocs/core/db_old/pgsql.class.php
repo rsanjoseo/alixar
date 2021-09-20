@@ -35,30 +35,32 @@ require_once DOL_DOCUMENT_ROOT.'/core/db/DoliDB.class.php';
  */
 class DoliDBPgsql extends DoliDB
 {
-	//! Database type
-	const LABEL = 'PostgreSQL'; // Name of manager
+    //! Database type
+    public $type = 'pgsql'; // Name of manager
 
-	//! Database label
-	const VERSIONMIN = '9.0.0'; // Label of manager
+    //! Database label
+    const LABEL = 'PostgreSQL'; // Label of manager
 
-	//! Charset
-	public $type = 'pgsql'; // Can't be static as it may be forced with a dynamic value
+    //! Charset
+    public $forcecharset = 'UTF8'; // Can't be static as it may be forced with a dynamic value
 
-	//! Collate used to force collate when creating database
-	public $forcecharset = 'UTF8'; // Can't be static as it may be forced with a dynamic value
+    //! Collate used to force collate when creating database
+    public $forcecollate = ''; // Can't be static as it may be forced with a dynamic value
 
-	//! Version min database
-	public $forcecollate = ''; // Version min database
-	public $unescapeslashquot;
-	public $standard_conforming_strings;
-	/** @var resource|boolean Resultset of last query */
-	private $_results;
+    //! Version min database
+    const VERSIONMIN = '9.0.0'; // Version min database
 
-	/**
-	 *	Constructor.
-	 *	This create an opened connexion to a database server and eventually to a database
-	 *
-	 *	@param      string	$type		Type of database (mysql, pgsql...)
+    /** @var resource|boolean Resultset of last query */
+    private $_results;
+
+    public $unescapeslashquot;
+    public $standard_conforming_strings;
+
+    /**
+     *    Constructor.
+     *    This create an opened connexion to a database server and eventually to a database
+     *
+     * @param string               $type        Type of database (mysql, pgsql...)
 	 *	@param	    string	$host		Address of database server
 	 *	@param	    string	$user		Nom de l'utilisateur autorise
 	 *	@param	    string	$pass		Mot de passe
@@ -137,188 +139,6 @@ class DoliDBPgsql extends DoliDB
 		return $this->ok;
 	}
 
-	/**
-	 *	Connexion to server
-	 *
-	 *	@param	    string		$host		Database server host
-	 *	@param	    string		$login		Login
-	 *	@param	    string		$passwd		Password
-	 *	@param		string		$name		Name of database (not used for mysql, used for pgsql)
-	 *	@param		integer		$port		Port of database server
-	 *	@return		bool|resource			Database access handler
-	 *	@see		close()
-	 */
-	public function connect($host, $login, $passwd, $name, $port = 0)
-	{
-		// use pg_pconnect() instead of pg_connect() if you want to use persistent connection costing 1ms, instead of 30ms for non persistent
-
-		$this->db = false;
-
-		// connections parameters must be protected (only \ and ' according to pg_connect() manual)
-		$host = str_replace(array("\\", "'"), array("\\\\", "\\'"), $host);
-		$login = str_replace(array("\\", "'"), array("\\\\", "\\'"), $login);
-		$passwd = str_replace(array("\\", "'"), array("\\\\", "\\'"), $passwd);
-		$name = str_replace(array("\\", "'"), array("\\\\", "\\'"), $name);
-		$port = str_replace(array("\\", "'"), array("\\\\", "\\'"), $port);
-
-		if (!$name) {
-			$name = "postgres"; // When try to connect using admin user
-		}
-
-		// try first Unix domain socket (local)
-		if ((!empty($host) && $host == "socket") && !defined('NOLOCALSOCKETPGCONNECT')) {
-			$con_string = "dbname='".$name."' user='".$login."' password='".$passwd."'"; // $name may be empty
-			$this->db = @pg_connect($con_string);
-		}
-
-		// if local connection failed or not requested, use TCP/IP
-		if (!$this->db) {
-			if (!$host) {
-				$host = "localhost";
-			}
-			if (!$port) {
-				$port = 5432;
-			}
-
-			$con_string = "host='".$host."' port='".$port."' dbname='".$name."' user='".$login."' password='".$passwd."'";
-			$this->db = @pg_connect($con_string);
-		}
-
-		// now we test if at least one connect method was a success
-		if ($this->db) {
-			$this->database_name = $name;
-			pg_set_error_verbosity($this->db, PGSQL_ERRORS_VERBOSE); // Set verbosity to max
-			pg_query($this->db, "set datestyle = 'ISO, YMD';");
-		}
-
-		return $this->db;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Select a database
-	 *  Ici postgresql n'a aucune fonction equivalente de mysql_select_db
-	 *  On compare juste manuellement si la database choisie est bien celle activee par la connexion
-	 *
-	 *	@param	    string	$database	Name of database
-	 *	@return	    bool				true if OK, false if KO
-	 */
-	public function select_db($database)
-	{
-		// phpcs:enable
-		if ($database == $this->database_name) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Renvoie le texte de l'erreur pgsql de l'operation precedente
-	 *
-	 * @return	string		Error text
-	 */
-	public function error()
-	{
-		return pg_last_error($this->db);
-	}
-
-	/**
-	 *	Return version of database server
-	 *
-	 *	@return	        string      Version string
-	 */
-	public function getVersion()
-	{
-		$resql = $this->query('SHOW server_version');
-		if ($resql) {
-			$liste = $this->fetch_array($resql);
-			return $liste['server_version'];
-		}
-		return '';
-	}
-
-	/**
-	 * Convert request to PostgreSQL syntax, execute it and return the resultset
-	 *
-	 * @param	string	$query			SQL query string
-	 * @param	int		$usesavepoint	0=Default mode, 1=Run a savepoint before and a rollback to savepoint if error (this allow to have some request with errors inside global transactions).
-	 * @param   string	$type           Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
-	 * @param	int		$result_mode	Result mode (not used with pgsql)
-	 * @return	false|resource			Resultset of answer
-	 */
-	public function query($query, $usesavepoint = 0, $type = 'auto', $result_mode = 0)
-	{
-		global $conf, $dolibarr_main_db_readonly;
-
-		$query = trim($query);
-
-		// Convert MySQL syntax to PostgresSQL syntax
-		$query = $this->convertSQLFromMysql($query, $type, ($this->unescapeslashquot && $this->standard_conforming_strings));
-		//print "After convertSQLFromMysql:\n".$query."<br>\n";
-
-		if (!empty($conf->global->MAIN_DB_AUTOFIX_BAD_SQL_REQUEST)) {
-			// Fix bad formed requests. If request contains a date without quotes, we fix this but this should not occurs.
-			$loop = true;
-			while ($loop) {
-				if (preg_match('/([^\'])([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9])/', $query)) {
-					$query = preg_replace('/([^\'])([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9])/', '\\1\'\\2\'', $query);
-					dol_syslog("Warning: Bad formed request converted into ".$query, LOG_WARNING);
-				} else {
-					$loop = false;
-				}
-			}
-		}
-
-		if ($usesavepoint && $this->transaction_opened) {
-			@pg_query($this->db, 'SAVEPOINT mysavepoint');
-		}
-
-		if (!in_array($query, array('BEGIN', 'COMMIT', 'ROLLBACK'))) {
-			$SYSLOG_SQL_LIMIT = 10000; // limit log to 10kb per line to limit DOS attacks
-			dol_syslog('sql='.substr($query, 0, $SYSLOG_SQL_LIMIT), LOG_DEBUG);
-		}
-		if (empty($query)) {
-			return false; // Return false = error if empty request
-		}
-
-		if (!empty($dolibarr_main_db_readonly)) {
-			if (preg_match('/^(INSERT|UPDATE|REPLACE|DELETE|CREATE|ALTER|TRUNCATE|DROP)/i', $query)) {
-				$this->lasterror = 'Application in read-only mode';
-				$this->lasterrno = 'APPREADONLY';
-				$this->lastquery = $query;
-				return false;
-			}
-		}
-
-		$ret = @pg_query($this->db, $query);
-
-		//print $query;
-		if (!preg_match("/^COMMIT/i", $query) && !preg_match("/^ROLLBACK/i", $query)) { // Si requete utilisateur, on la sauvegarde ainsi que son resultset
-			if (!$ret) {
-				if ($this->errno() != 'DB_ERROR_25P02') {	// Do not overwrite errors if this is a consecutive error
-					$this->lastqueryerror = $query;
-					$this->lasterror = $this->error();
-					$this->lasterrno = $this->errno();
-
-					if ($conf->global->SYSLOG_LEVEL < LOG_DEBUG) {
-						dol_syslog(get_class($this)."::query SQL Error query: ".$query, LOG_ERR); // Log of request was not yet done previously
-					}
-					dol_syslog(get_class($this)."::query SQL Error message: ".$this->lasterror." (".$this->lasterrno.")", LOG_ERR);
-					dol_syslog(get_class($this)."::query SQL Error usesavepoint = ".$usesavepoint, LOG_ERR);
-				}
-
-				if ($usesavepoint && $this->transaction_opened) {	// Warning, after that errno will be erased
-					@pg_query($this->db, 'ROLLBACK TO SAVEPOINT mysavepoint');
-				}
-			}
-			$this->lastquery = $query;
-			$this->_results = $ret;
-		}
-
-		return $ret;
-	}
 
 	/**
 	 *  Convert a SQL request in Mysql syntax to native syntax
@@ -548,133 +368,281 @@ class DoliDBPgsql extends DoliDB
 		return $line;
 	}
 
-	/**
-	 * Renvoie le code erreur generique de l'operation precedente.
-	 *
-	 * @return	string		Error code (Exemples: DB_ERROR_TABLE_ALREADY_EXISTS, DB_ERROR_RECORD_ALREADY_EXISTS...)
-	 */
-	public function errno()
-	{
-		if (!$this->connected) {
-			// Si il y a eu echec de connexion, $this->db n'est pas valide.
-			return 'DB_ERROR_FAILED_TO_CONNECT';
-		} else {
-			// Constants to convert error code to a generic Dolibarr error code
-			$errorcode_map = array(
-			1004 => 'DB_ERROR_CANNOT_CREATE',
-			1005 => 'DB_ERROR_CANNOT_CREATE',
-			1006 => 'DB_ERROR_CANNOT_CREATE',
-			1007 => 'DB_ERROR_ALREADY_EXISTS',
-			1008 => 'DB_ERROR_CANNOT_DROP',
-			1025 => 'DB_ERROR_NO_FOREIGN_KEY_TO_DROP',
-			1044 => 'DB_ERROR_ACCESSDENIED',
-			1046 => 'DB_ERROR_NODBSELECTED',
-			1048 => 'DB_ERROR_CONSTRAINT',
-			'42P07' => 'DB_ERROR_TABLE_OR_KEY_ALREADY_EXISTS',
-			'42703' => 'DB_ERROR_NOSUCHFIELD',
-			1060 => 'DB_ERROR_COLUMN_ALREADY_EXISTS',
-			42701=> 'DB_ERROR_COLUMN_ALREADY_EXISTS',
-			'42710' => 'DB_ERROR_KEY_NAME_ALREADY_EXISTS',
-			'23505' => 'DB_ERROR_RECORD_ALREADY_EXISTS',
-			'42704' => 'DB_ERROR_NO_INDEX_TO_DROP', // May also be Type xxx does not exists
-			'42601' => 'DB_ERROR_SYNTAX',
-			'42P16' => 'DB_ERROR_PRIMARY_KEY_ALREADY_EXISTS',
-			1075 => 'DB_ERROR_CANT_DROP_PRIMARY_KEY',
-			1091 => 'DB_ERROR_NOSUCHFIELD',
-			1100 => 'DB_ERROR_NOT_LOCKED',
-			1136 => 'DB_ERROR_VALUE_COUNT_ON_ROW',
-			'42P01' => 'DB_ERROR_NOSUCHTABLE',
-			'23503' => 'DB_ERROR_NO_PARENT',
-			1217 => 'DB_ERROR_CHILD_EXISTS',
-			1451 => 'DB_ERROR_CHILD_EXISTS',
-			'42P04' => 'DB_DATABASE_ALREADY_EXISTS'
-			);
-
-			$errorlabel = pg_last_error($this->db);
-			$errorcode = '';
-			$reg = array();
-			if (preg_match('/: *([0-9P]+):/', $errorlabel, $reg)) {
-				$errorcode = $reg[1];
-				if (isset($errorcode_map[$errorcode])) {
-					return $errorcode_map[$errorcode];
-				}
-			}
-			$errno = $errorcode ? $errorcode : $errorlabel;
-			return ($errno ? 'DB_ERROR_'.$errno : '0');
-		}
-		//                '/(Table does not exist\.|Relation [\"\'].*[\"\'] does not exist|sequence does not exist|class ".+" not found)$/' => 'DB_ERROR_NOSUCHTABLE',
-		//                '/table [\"\'].*[\"\'] does not exist/' => 'DB_ERROR_NOSUCHTABLE',
-		//                '/Relation [\"\'].*[\"\'] already exists|Cannot insert a duplicate key into (a )?unique index.*/'      => 'DB_ERROR_RECORD_ALREADY_EXISTS',
-		//                '/divide by zero$/'                     => 'DB_ERROR_DIVZERO',
-		//                '/pg_atoi: error in .*: can\'t parse /' => 'DB_ERROR_INVALID_NUMBER',
-		//                '/ttribute [\"\'].*[\"\'] not found$|Relation [\"\'].*[\"\'] does not have attribute [\"\'].*[\"\']/' => 'DB_ERROR_NOSUCHFIELD',
-		//                '/parser: parse error at or near \"/'   => 'DB_ERROR_SYNTAX',
-		//                '/referential integrity violation/'     => 'DB_ERROR_CONSTRAINT'
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *	Return datas as an array
-	 *
-	 *	@param	resource	$resultset  Resultset of request
-	 *	@return	false|array				Array
-	 */
-	public function fetch_array($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_resource($resultset)) {
-			$resultset = $this->_results;
-		}
-		return pg_fetch_array($resultset);
-	}
+    /**
+     *  Select a database
+     *  Ici postgresql n'a aucune fonction equivalente de mysql_select_db
+     *  On compare juste manuellement si la database choisie est bien celle activee par la connexion
+     *
+     * @param string $database Name of database
+     *
+     * @return        bool                true if OK, false if KO
+     */
+    public function select_db($database)
+    {
+        // phpcs:enable
+        if ($database == $this->database_name) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Connexion to server
+     *
+     * @param string  $host   Database server host
+     * @param string  $login  Login
+     * @param string  $passwd Password
+     * @param string  $name   Name of database (not used for mysql, used for pgsql)
+     * @param integer $port   Port of database server
+     *
+     * @return        bool|resource            Database access handler
+     * @see        close()
+     */
+    public function connect($host, $login, $passwd, $name, $port = 0)
+    {
+        // use pg_pconnect() instead of pg_connect() if you want to use persistent connection costing 1ms, instead of 30ms for non persistent
 
-	/**
-	 *	Return version of database client driver
-	 *
-	 *	@return	        string      Version string
-	 */
-	public function getDriverInfo()
-	{
-		return 'pgsql php driver';
-	}
+        $this->db = false;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        // connections parameters must be protected (only \ and ' according to pg_connect() manual)
+        $host = str_replace(["\\", "'"], ["\\\\", "\\'"], $host);
+        $login = str_replace(["\\", "'"], ["\\\\", "\\'"], $login);
+        $passwd = str_replace(["\\", "'"], ["\\\\", "\\'"], $passwd);
+        $name = str_replace(["\\", "'"], ["\\\\", "\\'"], $name);
+        $port = str_replace(["\\", "'"], ["\\\\", "\\'"], $port);
 
-	/**
-	 *  Close database connexion
-	 *
-	 *  @return     boolean     True if disconnect successfull, false otherwise
+        if (!$name) {
+            $name = "postgres"; // When try to connect using admin user
+        }
+
+        // try first Unix domain socket (local)
+        if ((!empty($host) && $host == "socket") && !defined('NOLOCALSOCKETPGCONNECT')) {
+            $con_string = "dbname='" . $name . "' user='" . $login . "' password='" . $passwd . "'"; // $name may be empty
+            $this->db = @pg_connect($con_string);
+        }
+
+        // if local connection failed or not requested, use TCP/IP
+        if (!$this->db) {
+            if (!$host) {
+                $host = "localhost";
+            }
+            if (!$port) {
+                $port = 5432;
+            }
+
+            $con_string = "host='" . $host . "' port='" . $port . "' dbname='" . $name . "' user='" . $login . "' password='" . $passwd . "'";
+            $this->db = @pg_connect($con_string);
+        }
+
+        // now we test if at least one connect method was a success
+        if ($this->db) {
+            $this->database_name = $name;
+            pg_set_error_verbosity($this->db, PGSQL_ERRORS_VERBOSE); // Set verbosity to max
+            pg_query($this->db, "set datestyle = 'ISO, YMD';");
+        }
+
+        return $this->db;
+    }
+
+    /**
+     *    Return version of database server
+     *
+     * @return            string      Version string
+     */
+    public function getVersion()
+    {
+        $resql = $this->query('SHOW server_version');
+        if ($resql) {
+            $liste = $this->fetch_array($resql);
+            return $liste['server_version'];
+        }
+        return '';
+    }
+
+    /**
+     *    Return version of database client driver
+     *
+     * @return            string      Version string
+     */
+    public function getDriverInfo()
+    {
+        return 'pgsql php driver';
+    }
+
+    /**
+     *  Close database connexion
+     *
+     * @return     boolean     True if disconnect successfull, false otherwise
 	 *  @see        connect()
 	 */
 	public function close()
 	{
 		if ($this->db) {
 			if ($this->transaction_opened > 0) {
-				dol_syslog(get_class($this)."::close Closing a connection with an opened transaction depth=".$this->transaction_opened, LOG_ERR);
-			}
-			$this->connected = false;
-			return pg_close($this->db);
-		}
-		return false;
-	}
+                dol_syslog(get_class($this) . "::close Closing a connection with an opened transaction depth=" . $this->transaction_opened, LOG_ERR);
+            }
+            $this->connected = false;
+            return pg_close($this->db);
+        }
+        return false;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * Convert request to PostgreSQL syntax, execute it and return the resultset
+     *
+     * @param string $query        SQL query string
+     * @param int    $usesavepoint 0=Default mode, 1=Run a savepoint before and a rollback to savepoint if error (this allow to have some request with errors inside global transactions).
+     * @param string $type         Type of SQL order ('ddl' for insert, update, select, delete or 'dml' for create, alter...)
+     * @param int    $result_mode  Result mode (not used with pgsql)
+     *
+     * @return    false|resource            Resultset of answer
+     */
+    public function query($query, $usesavepoint = 0, $type = 'auto', $result_mode = 0)
+    {
+        global $conf, $dolibarr_main_db_readonly;
 
-	/**
-	 *	Return number of lines for result of a SELECT
-	 *
-	 *	@param	resource	$resultset  Resulset of requests
-	 *	@return int		    			Nb of lines, -1 on error
-	 *	@see    affected_rows()
-	 */
-	public function num_rows($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
+        $query = trim($query);
+
+        // Convert MySQL syntax to PostgresSQL syntax
+        $query = $this->convertSQLFromMysql($query, $type, ($this->unescapeslashquot && $this->standard_conforming_strings));
+        //print "After convertSQLFromMysql:\n".$query."<br>\n";
+
+        if (!empty($conf->global->MAIN_DB_AUTOFIX_BAD_SQL_REQUEST)) {
+            // Fix bad formed requests. If request contains a date without quotes, we fix this but this should not occurs.
+            $loop = true;
+            while ($loop) {
+                if (preg_match('/([^\'])([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9])/', $query)) {
+                    $query = preg_replace('/([^\'])([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9])/', '\\1\'\\2\'', $query);
+                    dol_syslog("Warning: Bad formed request converted into " . $query, LOG_WARNING);
+                } else {
+                    $loop = false;
+                }
+            }
+        }
+
+        if ($usesavepoint && $this->transaction_opened) {
+            @pg_query($this->db, 'SAVEPOINT mysavepoint');
+        }
+
+        if (!in_array($query, ['BEGIN', 'COMMIT', 'ROLLBACK'])) {
+            $SYSLOG_SQL_LIMIT = 10000; // limit log to 10kb per line to limit DOS attacks
+            dol_syslog('sql=' . substr($query, 0, $SYSLOG_SQL_LIMIT), LOG_DEBUG);
+        }
+        if (empty($query)) {
+            return false; // Return false = error if empty request
+        }
+
+        if (!empty($dolibarr_main_db_readonly)) {
+            if (preg_match('/^(INSERT|UPDATE|REPLACE|DELETE|CREATE|ALTER|TRUNCATE|DROP)/i', $query)) {
+                $this->lasterror = 'Application in read-only mode';
+                $this->lasterrno = 'APPREADONLY';
+                $this->lastquery = $query;
+                return false;
+            }
+        }
+
+        $ret = @pg_query($this->db, $query);
+
+        //print $query;
+        if (!preg_match("/^COMMIT/i", $query) && !preg_match("/^ROLLBACK/i", $query)) { // Si requete utilisateur, on la sauvegarde ainsi que son resultset
+            if (!$ret) {
+                if ($this->errno() != 'DB_ERROR_25P02') {    // Do not overwrite errors if this is a consecutive error
+                    $this->lastqueryerror = $query;
+                    $this->lasterror = $this->error();
+                    $this->lasterrno = $this->errno();
+
+                    if ($conf->global->SYSLOG_LEVEL < LOG_DEBUG) {
+                        dol_syslog(get_class($this) . "::query SQL Error query: " . $query, LOG_ERR); // Log of request was not yet done previously
+                    }
+                    dol_syslog(get_class($this) . "::query SQL Error message: " . $this->lasterror . " (" . $this->lasterrno . ")", LOG_ERR);
+                    dol_syslog(get_class($this) . "::query SQL Error usesavepoint = " . $usesavepoint, LOG_ERR);
+                }
+
+                if ($usesavepoint && $this->transaction_opened) {    // Warning, after that errno will be erased
+                    @pg_query($this->db, 'ROLLBACK TO SAVEPOINT mysavepoint');
+                }
+            }
+            $this->lastquery = $query;
+            $this->_results = $ret;
+        }
+
+        return $ret;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Returns the current line (as an object) for the resultset cursor
+     *
+     * @param resource $resultset Curseur de la requete voulue
+     *
+     * @return    false|object            Object result line or false if KO or end of cursor
+     */
+    public function fetch_object($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_resource($resultset)) {
+            $resultset = $this->_results;
+        }
+        return pg_fetch_object($resultset);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return datas as an array
+     *
+     * @param resource $resultset Resultset of request
+     *
+     * @return    false|array                Array
+     */
+    public function fetch_array($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
+        if (!is_resource($resultset)) {
+            $resultset = $this->_results;
+        }
+        return pg_fetch_array($resultset);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return datas as an array
+     *
+     * @param resource $resultset Resultset of request
+     *
+     * @return    false|array                Array
+     */
+    public function fetch_row($resultset)
+    {
+        // phpcs:enable
+        // Si le resultset n'est pas fourni, on prend le dernier utilise sur cette connexion
+        if (!is_resource($resultset)) {
+            $resultset = $this->_results;
+        }
+        return pg_fetch_row($resultset);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Return number of lines for result of a SELECT
+     *
+     * @param resource $resultset Resulset of requests
+     *
+     * @return int                        Nb of lines, -1 on error
+     * @see    affected_rows()
+     */
+    public function num_rows($resultset)
+    {
+        // phpcs:enable
+        // If resultset not provided, we take the last used by connexion
 		if (!is_resource($resultset)) {
 			$resultset = $this->_results;
 		}
@@ -693,61 +661,171 @@ class DoliDBPgsql extends DoliDB
 	{
 		// phpcs:enable
 		// If resultset not provided, we take the last used by connexion
-		if (!is_resource($resultset)) {
-			$resultset = $this->_results;
-		}
-		// pgsql necessite un resultset pour cette fonction contrairement
-		// a mysql qui prend un link de base
-		return pg_affected_rows($resultset);
-	}
+        if (!is_resource($resultset)) {
+            $resultset = $this->_results;
+        }
+        // pgsql necessite un resultset pour cette fonction contrairement
+        // a mysql qui prend un link de base
+        return pg_affected_rows($resultset);
+    }
 
-	/**
-	 *	Define limits and offset of request
-	 *
-	 *	@param	int		$limit      Maximum number of lines returned (-1=conf->liste_limit, 0=no limit)
-	 *	@param	int		$offset     Numero of line from where starting fetch
-	 *	@return	string      		String with SQL syntax to add a limit and offset
-	 */
-	public function plimit($limit = 0, $offset = 0)
-	{
-		global $conf;
-		if (empty($limit)) {
+    /**
+     * Libere le dernier resultset utilise sur cette connexion
+     *
+     * @param resource $resultset Result set of request
+     *
+     * @return    void
+     */
+    public function free($resultset = null)
+    {
+        // If resultset not provided, we take the last used by connexion
+        if (!is_resource($resultset)) {
+            $resultset = $this->_results;
+        }
+        // Si resultset en est un, on libere la memoire
+        if (is_resource($resultset)) {
+            pg_free_result($resultset);
+        }
+    }
+
+    /**
+     *    Define limits and offset of request
+     *
+     * @param int $limit  Maximum number of lines returned (-1=conf->liste_limit, 0=no limit)
+     * @param int $offset Numero of line from where starting fetch
+     *
+     * @return    string            String with SQL syntax to add a limit and offset
+     */
+    public function plimit($limit = 0, $offset = 0)
+    {
+        global $conf;
+        if (empty($limit)) {
 			return "";
 		}
 		if ($limit < 0) {
-			$limit = $conf->liste_limit;
-		}
-		if ($offset > 0) {
-			return " LIMIT ".$limit." OFFSET ".$offset." ";
-		} else {
-			return " LIMIT $limit ";
-		}
-	}
+            $limit = $conf->liste_limit;
+        }
+        if ($offset > 0) {
+            return " LIMIT " . $limit . " OFFSET " . $offset . " ";
+        } else {
+            return " LIMIT $limit ";
+        }
+    }
 
-	/**
-	 *  Format a SQL IF
-	 *
-	 *  @param	string	$test           Test string (example: 'cd.statut=0', 'field IS NULL')
-	 *  @param	string	$resok          resultat si test egal
-	 *  @param	string	$resko          resultat si test non egal
-	 *  @return	string          		chaine formate SQL
-	 */
-	public function ifsql($test, $resok, $resko)
-	{
-		return '(CASE WHEN '.$test.' THEN '.$resok.' ELSE '.$resko.' END)';
-	}
+    /**
+     *   Escape a string to insert data
+     *
+     * @param string $stringtoencode String to escape
+     *
+     * @return    string                        String escaped
+     */
+    public function escape($stringtoencode)
+    {
+        return pg_escape_string($stringtoencode);
+    }
 
-	/**
-	 * Get last ID after an insert INSERT
-	 *
-	 * @param   string	$tab    	Table name concerned by insert. Ne sert pas sous MySql mais requis pour compatibilite avec Postgresql
-	 * @param	string	$fieldid	Field name
-	 * @return  string     			Id of row
-	 */
-	public function last_insert_id($tab, $fieldid = 'rowid')
-	{
-		// phpcs:enable
-		//$result = pg_query($this->db,"SELECT MAX(".$fieldid.") FROM ".$tab);
+    /**
+     *  Format a SQL IF
+     *
+     * @param string $test  Test string (example: 'cd.statut=0', 'field IS NULL')
+     * @param string $resok resultat si test egal
+     * @param string $resko resultat si test non egal
+     *
+     * @return    string                chaine formate SQL
+     */
+    public function ifsql($test, $resok, $resko)
+    {
+        return '(CASE WHEN ' . $test . ' THEN ' . $resok . ' ELSE ' . $resko . ' END)';
+    }
+
+    /**
+     * Renvoie le code erreur generique de l'operation precedente.
+     *
+     * @return    string        Error code (Exemples: DB_ERROR_TABLE_ALREADY_EXISTS, DB_ERROR_RECORD_ALREADY_EXISTS...)
+     */
+    public function errno()
+    {
+        if (!$this->connected) {
+            // Si il y a eu echec de connexion, $this->db n'est pas valide.
+            return 'DB_ERROR_FAILED_TO_CONNECT';
+        } else {
+            // Constants to convert error code to a generic Dolibarr error code
+            $errorcode_map = [
+                1004 => 'DB_ERROR_CANNOT_CREATE',
+                1005 => 'DB_ERROR_CANNOT_CREATE',
+                1006 => 'DB_ERROR_CANNOT_CREATE',
+                1007 => 'DB_ERROR_ALREADY_EXISTS',
+                1008 => 'DB_ERROR_CANNOT_DROP',
+                1025 => 'DB_ERROR_NO_FOREIGN_KEY_TO_DROP',
+                1044 => 'DB_ERROR_ACCESSDENIED',
+                1046 => 'DB_ERROR_NODBSELECTED',
+                1048 => 'DB_ERROR_CONSTRAINT',
+                '42P07' => 'DB_ERROR_TABLE_OR_KEY_ALREADY_EXISTS',
+                '42703' => 'DB_ERROR_NOSUCHFIELD',
+                1060 => 'DB_ERROR_COLUMN_ALREADY_EXISTS',
+                42701 => 'DB_ERROR_COLUMN_ALREADY_EXISTS',
+                '42710' => 'DB_ERROR_KEY_NAME_ALREADY_EXISTS',
+                '23505' => 'DB_ERROR_RECORD_ALREADY_EXISTS',
+                '42704' => 'DB_ERROR_NO_INDEX_TO_DROP', // May also be Type xxx does not exists
+                '42601' => 'DB_ERROR_SYNTAX',
+                '42P16' => 'DB_ERROR_PRIMARY_KEY_ALREADY_EXISTS',
+                1075 => 'DB_ERROR_CANT_DROP_PRIMARY_KEY',
+                1091 => 'DB_ERROR_NOSUCHFIELD',
+                1100 => 'DB_ERROR_NOT_LOCKED',
+                1136 => 'DB_ERROR_VALUE_COUNT_ON_ROW',
+                '42P01' => 'DB_ERROR_NOSUCHTABLE',
+                '23503' => 'DB_ERROR_NO_PARENT',
+                1217 => 'DB_ERROR_CHILD_EXISTS',
+                1451 => 'DB_ERROR_CHILD_EXISTS',
+                '42P04' => 'DB_DATABASE_ALREADY_EXISTS',
+            ];
+
+            $errorlabel = pg_last_error($this->db);
+            $errorcode = '';
+            $reg = [];
+            if (preg_match('/: *([0-9P]+):/', $errorlabel, $reg)) {
+                $errorcode = $reg[1];
+                if (isset($errorcode_map[$errorcode])) {
+                    return $errorcode_map[$errorcode];
+                }
+            }
+            $errno = $errorcode ? $errorcode : $errorlabel;
+            return ($errno ? 'DB_ERROR_' . $errno : '0');
+        }
+        //                '/(Table does not exist\.|Relation [\"\'].*[\"\'] does not exist|sequence does not exist|class ".+" not found)$/' => 'DB_ERROR_NOSUCHTABLE',
+        //                '/table [\"\'].*[\"\'] does not exist/' => 'DB_ERROR_NOSUCHTABLE',
+        //                '/Relation [\"\'].*[\"\'] already exists|Cannot insert a duplicate key into (a )?unique index.*/'      => 'DB_ERROR_RECORD_ALREADY_EXISTS',
+        //                '/divide by zero$/'                     => 'DB_ERROR_DIVZERO',
+        //                '/pg_atoi: error in .*: can\'t parse /' => 'DB_ERROR_INVALID_NUMBER',
+        //                '/ttribute [\"\'].*[\"\'] not found$|Relation [\"\'].*[\"\'] does not have attribute [\"\'].*[\"\']/' => 'DB_ERROR_NOSUCHFIELD',
+        //                '/parser: parse error at or near \"/'   => 'DB_ERROR_SYNTAX',
+        //                '/referential integrity violation/'     => 'DB_ERROR_CONSTRAINT'
+    }
+
+    /**
+     * Renvoie le texte de l'erreur pgsql de l'operation precedente
+     *
+     * @return    string        Error text
+     */
+    public function error()
+    {
+        return pg_last_error($this->db);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Get last ID after an insert INSERT
+     *
+     * @param string $tab     Table name concerned by insert. Ne sert pas sous MySql mais requis pour compatibilite avec Postgresql
+     * @param string $fieldid Field name
+     *
+     * @return  string                Id of row
+     */
+    public function last_insert_id($tab, $fieldid = 'rowid')
+    {
+        // phpcs:enable
+        //$result = pg_query($this->db,"SELECT MAX(".$fieldid.") FROM ".$tab);
 		$result = pg_query($this->db, "SELECT currval('".$tab."_".$fieldid."_seq')");
 		if (!$result) {
 			print pg_last_error($this->db);
@@ -780,16 +858,6 @@ class DoliDBPgsql extends DoliDB
 		return ($withQuotes ? "'" : "").$this->escape($return).($withQuotes ? "'" : "");
 	}
 
-	/**
-	 *   Escape a string to insert data
-	 *
-	 *   @param		string	$stringtoencode		String to escape
-	 *   @return	string						String escaped
-	 */
-	public function escape($stringtoencode)
-	{
-		return pg_escape_string($stringtoencode);
-	}
 
 	/**
 	 *	Decrypt sensitive data in database
@@ -811,31 +879,36 @@ class DoliDBPgsql extends DoliDB
 		return $return;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return connexion ID
-	 *
-	 * @return	        string      Id connexion
-	 */
-	public function DDLGetConnectId()
-	{
-		// phpcs:enable
-		return '?';
-	}
+     *
+     * @return            string      Id connexion
+     */
+    public function DDLGetConnectId()
+    {
+        // phpcs:enable
+        return '?';
+    }
 
-	/**
-	 *	Create a new database
-	 *	Do not use function xxx_create_db (xxx=mysql, ...) as they are deprecated
-	 *	We force to create database with charset this->forcecharset and collate this->forcecollate
-	 *
-	 *	@param	string	$database		Database name to create
-	 * 	@param	string	$charset		Charset used to store data
-	 * 	@param	string	$collation		Charset used to sort data
-	 * 	@param	string	$owner			Username of database owner
-	 * 	@return	false|resource				resource defined if OK, null if KO
-	 */
-	public function DDLCreateDb($database, $charset = '', $collation = '', $owner = '')
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Create a new database
+     *    Do not use function xxx_create_db (xxx=mysql, ...) as they are deprecated
+     *    We force to create database with charset this->forcecharset and collate this->forcecollate
+     *
+     * @param string $database  Database name to create
+     * @param string $charset   Charset used to store data
+     * @param string $collation Charset used to sort data
+     * @param string $owner     Username of database owner
+     *
+     * @return    false|resource                resource defined if OK, null if KO
+     */
+    public function DDLCreateDb($database, $charset = '', $collation = '', $owner = '')
 	{
 		// phpcs:enable
 		if (empty($charset)) {
@@ -854,13 +927,15 @@ class DoliDBPgsql extends DoliDB
 		return $ret;
 	}
 
-	/**
-	 *  List tables into a database
-	 *
-	 *  @param	string		$database	Name of database
-	 *  @param	string		$table		Name of table filter ('xxx%')
-	 *  @return	array					List of tables in an array
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  List tables into a database
+     *
+     *  @param	string		$database	Name of database
+     *  @param	string		$table		Name of table filter ('xxx%')
+     *  @return	array					List of tables in an array
+     */
 	public function DDLListTables($database, $table = '')
 	{
 		// phpcs:enable
@@ -879,29 +954,7 @@ class DoliDBPgsql extends DoliDB
 		return $listtables;
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *	Return datas as an array
-	 *
-	 *	@param	resource	$resultset  Resultset of request
-	 *	@return	false|array				Array
-	 */
-	public function fetch_row($resultset)
-	{
-		// phpcs:enable
-		// Si le resultset n'est pas fourni, on prend le dernier utilise sur cette connexion
-		if (!is_resource($resultset)) {
-			$resultset = $this->_results;
-		}
-		return pg_fetch_row($resultset);
-	}
-
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	List information of columns into a table.
 	 *
@@ -940,8 +993,8 @@ class DoliDBPgsql extends DoliDB
 		return $infotables;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Create a table into database
 	 *
@@ -1022,7 +1075,6 @@ class DoliDBPgsql extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Drop a table into database
 	 *
@@ -1041,9 +1093,7 @@ class DoliDBPgsql extends DoliDB
 		}
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Create a user to connect to database
 	 *
@@ -1069,7 +1119,6 @@ class DoliDBPgsql extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Return a pointer of line with description of a table or field
 	 *
@@ -1092,7 +1141,6 @@ class DoliDBPgsql extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Create a new field into table
 	 *
@@ -1140,7 +1188,6 @@ class DoliDBPgsql extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Update format of a field into a table
 	 *
@@ -1185,7 +1232,6 @@ class DoliDBPgsql extends DoliDB
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Drop a field from table
 	 *
@@ -1205,8 +1251,6 @@ class DoliDBPgsql extends DoliDB
 		return 1;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Return charset used to store data in database
 	 *
@@ -1222,8 +1266,6 @@ class DoliDBPgsql extends DoliDB
 			return '';
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Return list of available charset that can be used to store data in database
@@ -1246,40 +1288,6 @@ class DoliDBPgsql extends DoliDB
 			return null;
 		}
 		return $liste;
-	}
-
-	/**
-	 * 	Returns the current line (as an object) for the resultset cursor
-	 *
-	 *	@param	resource	$resultset  Curseur de la requete voulue
-	 *	@return	false|object			Object result line or false if KO or end of cursor
-	 */
-	public function fetch_object($resultset)
-	{
-		// phpcs:enable
-		// If resultset not provided, we take the last used by connexion
-		if (!is_resource($resultset)) {
-			$resultset = $this->_results;
-		}
-		return pg_fetch_object($resultset);
-	}
-
-	/**
-	 * Libere le dernier resultset utilise sur cette connexion
-	 *
-	 * @param	resource	$resultset  Result set of request
-	 * @return	void
-	 */
-	public function free($resultset = null)
-	{
-		// If resultset not provided, we take the last used by connexion
-		if (!is_resource($resultset)) {
-			$resultset = $this->_results;
-		}
-		// Si resultset en est un, on libere la memoire
-		if (is_resource($resultset)) {
-			pg_free_result($resultset);
-		}
 	}
 
 	/**

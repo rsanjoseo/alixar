@@ -40,25 +40,55 @@ class Mos extends DolibarrApi
 	 */
 	public $mo;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->mo = new Mo($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->mo = new Mo($this->db);
+    }
 
-	/**
-	 * List Mos
-	 *
-	 * Get a list of MOs
-	 *
-	 * @param string	       $sortfield	        Sort field
-	 * @param string	       $sortorder	        Sort order
-	 * @param int		       $limit		        Limit for list
-	 * @param int		       $page		        Page number
+    /**
+     * Get properties of a MO object
+     *
+     * Return an array with MO informations
+     *
+     * @param int $id ID of MO
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url    GET {id}
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->mrp->read) {
+            throw new RestException(401);
+        }
+
+        $result = $this->mo->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'MO not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('mrp', $this->mo->id, 'mrp_mo')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        return $this->_cleanObjectDatas($this->mo);
+    }
+
+    /**
+     * List Mos
+     *
+     * Get a list of MOs
+     *
+     * @param string           $sortfield           Sort field
+     * @param string           $sortorder           Sort order
+     * @param int              $limit               Limit for list
+     * @param int              $page                Page number
 	 * @param string           $sqlfilters          Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
 	 * @return  array                               Array of order objects
 	 *
@@ -156,67 +186,6 @@ class Mos extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->rowid);
-		unset($object->canvas);
-
-		unset($object->name);
-		unset($object->lastname);
-		unset($object->firstname);
-		unset($object->civility_id);
-		unset($object->statut);
-		unset($object->state);
-		unset($object->state_id);
-		unset($object->state_code);
-		unset($object->region);
-		unset($object->region_code);
-		unset($object->country);
-		unset($object->country_id);
-		unset($object->country_code);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-		unset($object->total_ht);
-		unset($object->total_tva);
-		unset($object->total_localtax1);
-		unset($object->total_localtax2);
-		unset($object->total_ttc);
-		unset($object->fk_account);
-		unset($object->comments);
-		unset($object->note);
-		unset($object->mode_reglement_id);
-		unset($object->cond_reglement_id);
-		unset($object->cond_reglement);
-		unset($object->shipping_method_id);
-		unset($object->fk_incoterms);
-		unset($object->label_incoterms);
-		unset($object->location_incoterms);
-
-		// If object has lines, remove $db property
-		if (isset($object->lines) && is_array($object->lines) && count($object->lines) > 0) {
-			$nboflines = count($object->lines);
-			for ($i = 0; $i < $nboflines; $i++) {
-				$this->_cleanObjectDatas($object->lines[$i]);
-
-				unset($object->lines[$i]->lines);
-				unset($object->lines[$i]->note);
-			}
-		}
-
-		return $object;
-	}
-
-	/**
 	 * Create MO object
 	 *
 	 * @param array $request_data   Request datas
@@ -237,29 +206,6 @@ class Mos extends DolibarrApi
 			throw new RestException(500, "Error creating MO", array_merge(array($this->mo->error), $this->mo->errors));
 		}
 		return $this->mo->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param	array		$data   Array of data to validate
-	 * @return	array
-	 *
-	 * @throws	RestException
-	 */
-	private function _validate($data)
-	{
-		$myobject = array();
-		foreach ($this->mo->fields as $field => $propfield) {
-			if (in_array($field, array('rowid', 'entity', 'date_creation', 'tms', 'fk_user_creat')) || $propfield['notnull'] != 1) {
-				continue; // Not a mandatory field
-			}
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$myobject[$field] = $data[$field];
-		}
-		return $myobject;
 	}
 
 	/**
@@ -300,38 +246,6 @@ class Mos extends DolibarrApi
 	}
 
 	/**
-	 * Get properties of a MO object
-	 *
-	 * Return an array with MO informations
-	 *
-	 * @param 	int 	$id ID of MO
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url	GET {id}
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->mrp->read) {
-			throw new RestException(401);
-		}
-
-		$result = $this->mo->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'MO not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('mrp', $this->mo->id, 'mrp_mo')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		return $this->_cleanObjectDatas($this->mo);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 * Delete MO
 	 *
 	 * @param   int     $id   MO ID
@@ -361,7 +275,8 @@ class Mos extends DolibarrApi
 				'message' => 'MO deleted'
 			)
 		);
-	}
+    }
+
 
 	/**
 	 * Produce and consume
@@ -709,14 +624,103 @@ class Mos extends DolibarrApi
 		dol_syslog("consumptioncomplete = ".$consumptioncomplete." productioncomplete = ".$productioncomplete);
 		//var_dump("consumptioncomplete = ".$consumptioncomplete." productioncomplete = ".$productioncomplete);
 		if ($consumptioncomplete && $productioncomplete) {
-			$result = $this->mo->setStatut(self::STATUS_PRODUCED, 0, '', 'MRP_MO_PRODUCED');
-		} else {
-			$result = $this->mo->setStatut(self::STATUS_INPROGRESS, 0, '', 'MRP_MO_PRODUCED');
-		}
-		if ($result <= 0) {
-			throw new RestException(500, $this->mo->error);
-		}
+            $result = $this->mo->setStatut(self::STATUS_PRODUCED, 0, '', 'MRP_MO_PRODUCED');
+        } else {
+            $result = $this->mo->setStatut(self::STATUS_INPROGRESS, 0, '', 'MRP_MO_PRODUCED');
+        }
+        if ($result <= 0) {
+            throw new RestException(500, $this->mo->error);
+        }
 
-		return $this->mo->id;
-	}
+        return $this->mo->id;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->rowid);
+        unset($object->canvas);
+
+        unset($object->name);
+        unset($object->lastname);
+        unset($object->firstname);
+        unset($object->civility_id);
+        unset($object->statut);
+        unset($object->state);
+        unset($object->state_id);
+        unset($object->state_code);
+        unset($object->region);
+        unset($object->region_code);
+        unset($object->country);
+        unset($object->country_id);
+        unset($object->country_code);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+        unset($object->total_ht);
+        unset($object->total_tva);
+        unset($object->total_localtax1);
+        unset($object->total_localtax2);
+        unset($object->total_ttc);
+        unset($object->fk_account);
+        unset($object->comments);
+        unset($object->note);
+        unset($object->mode_reglement_id);
+        unset($object->cond_reglement_id);
+        unset($object->cond_reglement);
+        unset($object->shipping_method_id);
+        unset($object->fk_incoterms);
+        unset($object->label_incoterms);
+        unset($object->location_incoterms);
+
+        // If object has lines, remove $db property
+        if (isset($object->lines) && is_array($object->lines) && count($object->lines) > 0) {
+            $nboflines = count($object->lines);
+            for ($i = 0; $i < $nboflines; $i++) {
+                $this->_cleanObjectDatas($object->lines[$i]);
+
+                unset($object->lines[$i]->lines);
+                unset($object->lines[$i]->note);
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Array of data to validate
+     *
+     * @return    array
+     *
+     * @throws    RestException
+     */
+    private function _validate($data)
+    {
+        $myobject = [];
+        foreach ($this->mo->fields as $field => $propfield) {
+            if (in_array($field, ['rowid', 'entity', 'date_creation', 'tms', 'fk_user_creat']) || $propfield['notnull'] != 1) {
+                continue; // Not a mandatory field
+            }
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $myobject[$field] = $data[$field];
+        }
+        return $myobject;
+    }
 }

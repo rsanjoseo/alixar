@@ -566,26 +566,112 @@ class pdf_standard extends ModeleExpenseReport
 				$this->result = array('fullpath'=>$file);
 
 				return 1; // No error
-			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "EXPENSEREPORT_OUTPUTDIR");
-			return 0;
-		}
-	}
+            } else {
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "EXPENSEREPORT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF			$pdf     		Object PDF
-	 *  @param  ExpenseReport	$object     	Object to show
-	 *  @param  int	    		$showaddress    0=no, 1=yes
-	 *  @param  Translate		$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    /**
+     * @param TCPDF         $pdf               Object PDF
+     * @param ExpenseReport $object            Object to show
+     * @param int           $linenumber        line number
+     * @param int           $curY              current y position
+     * @param int           $default_font_size default siez of font
+     * @param Translate     $outputlangs       Object lang for output
+     * @param int           $hidedetails       Hide details (0=no, 1=yes, 2=just special lines)
+     *
+     * @return  void
+     */
+    protected function printLine(&$pdf, $object, $linenumber, $curY, $default_font_size, $outputlangs, $hidedetails = 0)
+    {
+        global $conf;
+        $pdf->SetFont('', '', $default_font_size - 1);
+        $pdf->SetTextColor(0, 0, 0);
+
+        // Accountancy piece
+        $pdf->SetXY($this->posxpiece, $curY);
+        $pdf->writeHTMLCell($this->posxcomment - $this->posxpiece - 0.8, 4, $this->posxpiece - 1, $curY, $linenumber + 1, 0, 1);
+
+        // Date
+        //$pdf->SetXY($this->posxdate -1, $curY);
+        //$pdf->MultiCell($this->posxtype-$this->posxdate-0.8, 4, dol_print_date($object->lines[$linenumber]->date,"day",false,$outputlangs), 0, 'C');
+
+        // Type
+        $pdf->SetXY($this->posxtype - 1, $curY);
+        $nextColumnPosX = $this->posxup;
+        if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT)) {
+            $nextColumnPosX = $this->posxtva;
+        }
+        if (!empty($conf->projet->enabled)) {
+            $nextColumnPosX = $this->posxprojet;
+        }
+
+        $expensereporttypecode = $object->lines[$linenumber]->type_fees_code;
+        $expensereporttypecodetoshow = ($outputlangs->trans(($expensereporttypecode)) == $expensereporttypecode ? $object->lines[$linenumber]->type_fees_libelle : $outputlangs->trans($expensereporttypecode));
+
+        if ($expensereporttypecodetoshow == $expensereporttypecode) {
+            $expensereporttypecodetoshow = preg_replace('/^(EX_|TF_)/', '', $expensereporttypecodetoshow);
+        }
+        //$expensereporttypecodetoshow = dol_trunc($expensereporttypecodetoshow, 9);
+
+        //$pdf->MultiCell($nextColumnPosX-$this->posxtype-0.8, 4, $expensereporttypecodetoshow, 0, 'C');
+
+        // Project
+        //if (! empty($conf->projet->enabled))
+        //{
+        //    $pdf->SetFont('','', $default_font_size - 1);
+        //    $pdf->SetXY($this->posxprojet, $curY);
+        //    $pdf->MultiCell($this->posxtva-$this->posxprojet-0.8, 4, $object->lines[$linenumber]->projet_ref, 0, 'C');
+        //}
+
+        // VAT Rate
+        if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT)) {
+            $vat_rate = pdf_getlinevatrate($object, $linenumber, $outputlangs, $hidedetails);
+            $pdf->SetXY($this->posxtva, $curY);
+            $pdf->MultiCell($this->posxup - $this->posxtva - 0.8, 4, $vat_rate, 0, 'R');
+        }
+
+        // Unit price
+        $pdf->SetXY($this->posxup, $curY);
+        $pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 4, price($object->lines[$linenumber]->value_unit), 0, 'R');
+
+        // Quantity
+        $pdf->SetXY($this->posxqty, $curY);
+        $pdf->MultiCell($this->postotalttc - $this->posxqty - 0.8, 4, $object->lines[$linenumber]->qty, 0, 'R');
+
+        // Total with all taxes
+        $pdf->SetXY($this->postotalttc - 1, $curY);
+        $pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalttc, 4, price($object->lines[$linenumber]->total_ttc), 0, 'R');
+
+        // Comments
+        $pdf->SetXY($this->posxcomment, $curY);
+        $comment = $outputlangs->trans("Date") . ':' . dol_print_date($object->lines[$linenumber]->date, "day", false, $outputlangs) . ' ';
+        $comment .= $outputlangs->trans("Type") . ':' . $expensereporttypecodetoshow . '<br>';
+        if (!empty($object->lines[$linenumber]->projet_ref)) {
+            $comment .= $outputlangs->trans("Project") . ':' . $object->lines[$linenumber]->projet_ref . '<br>';
+        }
+        $comment .= $object->lines[$linenumber]->comments;
+        $pdf->writeHTMLCell($this->posxtva - $this->posxcomment - 0.8, 4, $this->posxcomment - 1, $curY, $comment, 0, 1);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF         $pdf         Object PDF
+     * @param ExpenseReport $object      Object to show
+     * @param int           $showaddress 0=no, 1=yes
+     * @param Translate     $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		// global $conf, $langs, $hookmanager;
 		global $user, $langs, $conf, $mysoc, $db, $hookmanager;
@@ -819,92 +905,6 @@ class pdf_standard extends ModeleExpenseReport
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * @param   TCPDF       	$pdf                Object PDF
-	 * @param   ExpenseReport	$object             Object to show
-	 * @param   int         	$linenumber         line number
-	 * @param   int         	$curY               current y position
-	 * @param   int         	$default_font_size  default siez of font
-	 * @param   Translate   	$outputlangs        Object lang for output
-	 * @param	int				$hidedetails		Hide details (0=no, 1=yes, 2=just special lines)
-	 * @return  void
-	 */
-	protected function printLine(&$pdf, $object, $linenumber, $curY, $default_font_size, $outputlangs, $hidedetails = 0)
-	{
-		global $conf;
-		$pdf->SetFont('', '', $default_font_size - 1);
-		$pdf->SetTextColor(0, 0, 0);
-
-		// Accountancy piece
-		$pdf->SetXY($this->posxpiece, $curY);
-		$pdf->writeHTMLCell($this->posxcomment - $this->posxpiece - 0.8, 4, $this->posxpiece - 1, $curY, $linenumber + 1, 0, 1);
-
-		// Date
-		//$pdf->SetXY($this->posxdate -1, $curY);
-		//$pdf->MultiCell($this->posxtype-$this->posxdate-0.8, 4, dol_print_date($object->lines[$linenumber]->date,"day",false,$outputlangs), 0, 'C');
-
-		// Type
-		$pdf->SetXY($this->posxtype - 1, $curY);
-		$nextColumnPosX = $this->posxup;
-		if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT)) {
-			$nextColumnPosX = $this->posxtva;
-		}
-		if (!empty($conf->projet->enabled)) {
-			$nextColumnPosX = $this->posxprojet;
-		}
-
-		$expensereporttypecode = $object->lines[$linenumber]->type_fees_code;
-		$expensereporttypecodetoshow = ($outputlangs->trans(($expensereporttypecode)) == $expensereporttypecode ? $object->lines[$linenumber]->type_fees_libelle : $outputlangs->trans($expensereporttypecode));
-
-
-		if ($expensereporttypecodetoshow == $expensereporttypecode) {
-			$expensereporttypecodetoshow = preg_replace('/^(EX_|TF_)/', '', $expensereporttypecodetoshow);
-		}
-		//$expensereporttypecodetoshow = dol_trunc($expensereporttypecodetoshow, 9);
-
-		//$pdf->MultiCell($nextColumnPosX-$this->posxtype-0.8, 4, $expensereporttypecodetoshow, 0, 'C');
-
-		// Project
-		//if (! empty($conf->projet->enabled))
-		//{
-		//    $pdf->SetFont('','', $default_font_size - 1);
-		//    $pdf->SetXY($this->posxprojet, $curY);
-		//    $pdf->MultiCell($this->posxtva-$this->posxprojet-0.8, 4, $object->lines[$linenumber]->projet_ref, 0, 'C');
-		//}
-
-		// VAT Rate
-		if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT)) {
-			$vat_rate = pdf_getlinevatrate($object, $linenumber, $outputlangs, $hidedetails);
-			$pdf->SetXY($this->posxtva, $curY);
-			$pdf->MultiCell($this->posxup - $this->posxtva - 0.8, 4, $vat_rate, 0, 'R');
-		}
-
-		// Unit price
-		$pdf->SetXY($this->posxup, $curY);
-		$pdf->MultiCell($this->posxqty - $this->posxup - 0.8, 4, price($object->lines[$linenumber]->value_unit), 0, 'R');
-
-		// Quantity
-		$pdf->SetXY($this->posxqty, $curY);
-		$pdf->MultiCell($this->postotalttc - $this->posxqty - 0.8, 4, $object->lines[$linenumber]->qty, 0, 'R');
-
-		// Total with all taxes
-		$pdf->SetXY($this->postotalttc - 1, $curY);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $this->postotalttc, 4, price($object->lines[$linenumber]->total_ttc), 0, 'R');
-
-		// Comments
-		$pdf->SetXY($this->posxcomment, $curY);
-		$comment = $outputlangs->trans("Date").':'.dol_print_date($object->lines[$linenumber]->date, "day", false, $outputlangs).' ';
-		$comment .= $outputlangs->trans("Type").':'.$expensereporttypecodetoshow.'<br>';
-		if (!empty($object->lines[$linenumber]->projet_ref)) {
-			$comment .= $outputlangs->trans("Project").':'.$object->lines[$linenumber]->projet_ref.'<br>';
-		}
-		$comment .= $object->lines[$linenumber]->comments;
-		$pdf->writeHTMLCell($this->posxtva - $this->posxcomment - 0.8, 4, $this->posxcomment - 1, $curY, $comment, 0, 1);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   Show table for lines
 	 *
@@ -1022,24 +1022,6 @@ class pdf_standard extends ModeleExpenseReport
 	}
 
 	/**
-	 *  Show footer of page. Need this->emetteur object
-	 *
-	 *  @param  TCPDF			$pdf     			PDF
-	 *  @param  ExpenseReport	$object				Object to show
-	 *  @param  Translate		$outputlangs		Object lang for output
-	 *  @param  int				$hidefreetext		1=Hide free text
-	 *  @return int									Return height of bottom margin including footer text
-	 */
-	protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
-	{
-		global $conf;
-		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
-		return pdf_pagefoot($pdf, $outputlangs, 'EXPENSEREPORT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
 	 *  Show payments table
 	 *
 	 *  @param	TCPDF			$pdf            Object PDF
@@ -1137,14 +1119,33 @@ class pdf_standard extends ModeleExpenseReport
 				$pdf->MultiCell(30, 4, $outputlangs->transnoentitiesnoconv("AmountExpected"), 0, 'L', 0);
 				$y += $tab3_height - 2;
 				$remaintopay = $object->total_ttc - $totalpaid;
-				$pdf->SetXY($tab3_posx + 17, $tab3_top + $y);
-				$pdf->MultiCell(15, 3, price($remaintopay), 0, 'R', 0);
-				$pdf->SetXY($tab3_posx + 35, $tab3_top + $y);
-				$pdf->MultiCell(30, 4, $outputlangs->transnoentitiesnoconv("RemainderToPay"), 0, 'L', 0);
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+                $pdf->SetXY($tab3_posx + 17, $tab3_top + $y);
+                $pdf->MultiCell(15, 3, price($remaintopay), 0, 'R', 0);
+                $pdf->SetXY($tab3_posx + 35, $tab3_top + $y);
+                $pdf->MultiCell(30, 4, $outputlangs->transnoentitiesnoconv("RemainderToPay"), 0, 'L', 0);
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show footer of page. Need this->emetteur object
+     *
+     * @param TCPDF         $pdf          PDF
+     * @param ExpenseReport $object       Object to show
+     * @param Translate     $outputlangs  Object lang for output
+     * @param int           $hidefreetext 1=Hide free text
+     *
+     * @return int                                    Return height of bottom margin including footer text
+     */
+    protected function _pagefoot(&$pdf, $object, $outputlangs, $hidefreetext = 0)
+    {
+        global $conf;
+        $showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
+        return pdf_pagefoot($pdf, $outputlangs, 'EXPENSEREPORT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
+    }
 }

@@ -44,25 +44,57 @@ class KnowledgeManagement extends DolibarrApi
 	/**
 	 * Constructor
 	 *
-	 * @url     GET /
-	 *
-	 */
-	public function __construct()
-	{
-		global $db, $conf;
-		$this->db = $db;
-		$this->knowledgerecord = new KnowledgeRecord($this->db);
-	}
+     * @url     GET /
+     *
+     */
+    public function __construct()
+    {
+        global $db, $conf;
+        $this->db = $db;
+        $this->knowledgerecord = new KnowledgeRecord($this->db);
+    }
 
-	/**
-	 * List knowledgerecords
-	 *
-	 * Get a list of knowledgerecords
-	 *
-	 * @param string	       $sortfield	        Sort field
-	 * @param string	       $sortorder	        Sort order
-	 * @param int		       $limit		        Limit for list
-	 * @param int		       $page		        Page number
+    /**
+     * Get properties of a knowledgerecord object
+     *
+     * Return an array with knowledgerecord informations
+     *
+     * @param int $id ID of knowledgerecord
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @url    GET knowledgerecords/{id}
+     *
+     * @throws RestException 401 Not allowed
+     * @throws RestException 404 Not found
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->read) {
+            throw new RestException(401);
+        }
+
+        $result = $this->knowledgerecord->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'KnowledgeRecord not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
+            throw new RestException(401, 'Access to instance id=' . $this->knowledgerecord->id . ' of object not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        return $this->_cleanObjectDatas($this->knowledgerecord);
+    }
+
+    /**
+     * List knowledgerecords
+     *
+     * Get a list of knowledgerecords
+     *
+     * @param string           $sortfield           Sort field
+     * @param string           $sortorder           Sort order
+     * @param int              $limit               Limit for list
+     * @param int              $page                Page number
 	 * @param string           $sqlfilters          Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.date_creation:<:'20160101')"
 	 * @return  array                               Array of order objects
 	 *
@@ -151,28 +183,146 @@ class KnowledgeManagement extends DolibarrApi
 					$obj_ret[] = $this->_cleanObjectDatas($tmp_object);
 				}
 				$i++;
-			}
-		} else {
-			throw new RestException(503, 'Error when retrieving knowledgerecord list: '.$this->db->lasterror());
-		}
-		if (!count($obj_ret)) {
-			throw new RestException(404, 'No knowledgerecord found');
-		}
-		return $obj_ret;
-	}
+            }
+        } else {
+            throw new RestException(503, 'Error when retrieving knowledgerecord list: ' . $this->db->lasterror());
+        }
+        if (!count($obj_ret)) {
+            throw new RestException(404, 'No knowledgerecord found');
+        }
+        return $obj_ret;
+    }
 
-	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
+    /**
+     * Create knowledgerecord object
+     *
+     * @param array $request_data Request datas
+     *
+     * @return int  ID of knowledgerecord
+     *
+     * @throws RestException
+     *
+     * @url    POST knowledgerecords/
+     */
+    public function post($request_data = null)
+    {
+        if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->write) {
+            throw new RestException(401);
+        }
 
-		unset($object->rowid);
+        // Check mandatory fields
+        $result = $this->_validate($request_data);
+
+        foreach ($request_data as $field => $value) {
+            $this->knowledgerecord->$field = $this->_checkValForAPI($field, $value, $this->knowledgerecord);
+        }
+
+        // Clean data
+        // $this->knowledgerecord->abc = checkVal($this->knowledgerecord->abc, 'alphanohtml');
+
+        if ($this->knowledgerecord->create(DolibarrApiAccess::$user) < 0) {
+            throw new RestException(500, "Error creating KnowledgeRecord", array_merge([$this->knowledgerecord->error], $this->knowledgerecord->errors));
+        }
+        return $this->knowledgerecord->id;
+    }
+
+    /**
+     * Update knowledgerecord
+     *
+     * @param int   $id           Id of knowledgerecord to update
+     * @param array $request_data Datas
+     *
+     * @return int
+     *
+     * @throws RestException
+     *
+     * @url    PUT knowledgerecords/{id}
+     */
+    public function put($id, $request_data = null)
+    {
+        if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->write) {
+            throw new RestException(401);
+        }
+
+        $result = $this->knowledgerecord->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'KnowledgeRecord not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
+            throw new RestException(401, 'Access to instance id=' . $this->knowledgerecord->id . ' of object not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        foreach ($request_data as $field => $value) {
+            if ($field == 'id') {
+                continue;
+            }
+            $this->knowledgerecord->$field = $this->_checkValForAPI($field, $value, $this->knowledgerecord);
+        }
+
+        // Clean data
+        // $this->knowledgerecord->abc = checkVal($this->knowledgerecord->abc, 'alphanohtml');
+
+        if ($this->knowledgerecord->update(DolibarrApiAccess::$user, false) > 0) {
+            return $this->get($id);
+        } else {
+            throw new RestException(500, $this->knowledgerecord->error);
+        }
+    }
+
+    /**
+     * Delete knowledgerecord
+     *
+     * @param int $id KnowledgeRecord ID
+     *
+     * @return  array
+     *
+     * @throws RestException
+     *
+     * @url    DELETE knowledgerecords/{id}
+     */
+    public function delete($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->delete) {
+            throw new RestException(401);
+        }
+        $result = $this->knowledgerecord->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'KnowledgeRecord not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
+            throw new RestException(401, 'Access to instance id=' . $this->knowledgerecord->id . ' of object not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        if (!$this->knowledgerecord->delete(DolibarrApiAccess::$user)) {
+            throw new RestException(500, 'Error when deleting KnowledgeRecord : ' . $this->knowledgerecord->error);
+        }
+
+        return [
+            'success' => [
+                'code' => 200,
+                'message' => 'KnowledgeRecord deleted',
+            ],
+        ];
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->rowid);
 		unset($object->canvas);
 
 		/*unset($object->name);
@@ -224,38 +374,6 @@ class KnowledgeManagement extends DolibarrApi
 	}
 
 	/**
-	 * Create knowledgerecord object
-	 *
-	 * @param array $request_data   Request datas
-	 * @return int  ID of knowledgerecord
-	 *
-	 * @throws RestException
-	 *
-	 * @url	POST knowledgerecords/
-	 */
-	public function post($request_data = null)
-	{
-		if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->write) {
-			throw new RestException(401);
-		}
-
-		// Check mandatory fields
-		$result = $this->_validate($request_data);
-
-		foreach ($request_data as $field => $value) {
-			$this->knowledgerecord->$field = $this->_checkValForAPI($field, $value, $this->knowledgerecord);
-		}
-
-		// Clean data
-		// $this->knowledgerecord->abc = checkVal($this->knowledgerecord->abc, 'alphanohtml');
-
-		if ($this->knowledgerecord->create(DolibarrApiAccess::$user)<0) {
-			throw new RestException(500, "Error creating KnowledgeRecord", array_merge(array($this->knowledgerecord->error), $this->knowledgerecord->errors));
-		}
-		return $this->knowledgerecord->id;
-	}
-
-	/**
 	 * Validate fields before create or update object
 	 *
 	 * @param	array		$data   Array of data to validate
@@ -276,118 +394,5 @@ class KnowledgeManagement extends DolibarrApi
 			$knowledgerecord[$field] = $data[$field];
 		}
 		return $knowledgerecord;
-	}
-
-	/**
-	 * Update knowledgerecord
-	 *
-	 * @param int   $id             Id of knowledgerecord to update
-	 * @param array $request_data   Datas
-	 * @return int
-	 *
-	 * @throws RestException
-	 *
-	 * @url	PUT knowledgerecords/{id}
-	 */
-	public function put($id, $request_data = null)
-	{
-		if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->write) {
-			throw new RestException(401);
-		}
-
-		$result = $this->knowledgerecord->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'KnowledgeRecord not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
-			throw new RestException(401, 'Access to instance id='.$this->knowledgerecord->id.' of object not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		foreach ($request_data as $field => $value) {
-			if ($field == 'id') {
-				continue;
-			}
-			$this->knowledgerecord->$field = $this->_checkValForAPI($field, $value, $this->knowledgerecord);
-		}
-
-		// Clean data
-		// $this->knowledgerecord->abc = checkVal($this->knowledgerecord->abc, 'alphanohtml');
-
-		if ($this->knowledgerecord->update(DolibarrApiAccess::$user, false) > 0) {
-			return $this->get($id);
-		} else {
-			throw new RestException(500, $this->knowledgerecord->error);
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Get properties of a knowledgerecord object
-	 *
-	 * Return an array with knowledgerecord informations
-	 *
-	 * @param 	int 	$id ID of knowledgerecord
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @url	GET knowledgerecords/{id}
-	 *
-	 * @throws RestException 401 Not allowed
-	 * @throws RestException 404 Not found
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->read) {
-			throw new RestException(401);
-		}
-
-		$result = $this->knowledgerecord->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'KnowledgeRecord not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
-			throw new RestException(401, 'Access to instance id='.$this->knowledgerecord->id.' of object not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		return $this->_cleanObjectDatas($this->knowledgerecord);
-	}
-
-	/**
-	 * Delete knowledgerecord
-	 *
-	 * @param   int     $id   KnowledgeRecord ID
-	 * @return  array
-	 *
-	 * @throws RestException
-	 *
-	 * @url	DELETE knowledgerecords/{id}
-	 */
-	public function delete($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->knowledgemanagement->knowledgerecord->delete) {
-			throw new RestException(401);
-		}
-		$result = $this->knowledgerecord->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'KnowledgeRecord not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('knowledgerecord', $this->knowledgerecord->id, 'knowledgemanagement_knowledgerecord')) {
-			throw new RestException(401, 'Access to instance id='.$this->knowledgerecord->id.' of object not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		if (!$this->knowledgerecord->delete(DolibarrApiAccess::$user)) {
-			throw new RestException(500, 'Error when deleting KnowledgeRecord : '.$this->knowledgerecord->error);
-		}
-
-		return array(
-			'success' => array(
-				'code' => 200,
-				'message' => 'KnowledgeRecord deleted'
-			)
-		);
 	}
 }

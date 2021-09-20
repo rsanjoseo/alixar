@@ -197,26 +197,41 @@ class mailing_fraise extends MailingTargets
 
 		$s .= '</select>';
 
+        $s .= '<br>';
+        $s .= $langs->trans("DateEndSubscription") . ': &nbsp;';
+        $s .= $langs->trans("After") . ' > ' . $form->selectDate(-1, 'subscriptionafter', 0, 0, 1, 'fraise', 1, 0, 0);
+        $s .= ' &nbsp; ';
+        $s .= $langs->trans("Before") . ' < ' . $form->selectDate(-1, 'subscriptionbefore', 0, 0, 1, 'fraise', 1, 0, 0);
 
-		$s .= '<br>';
-		$s .= $langs->trans("DateEndSubscription").': &nbsp;';
-		$s .= $langs->trans("After").' > '.$form->selectDate(-1, 'subscriptionafter', 0, 0, 1, 'fraise', 1, 0, 0);
-		$s .= ' &nbsp; ';
-		$s .= $langs->trans("Before").' < '.$form->selectDate(-1, 'subscriptionbefore', 0, 0, 1, 'fraise', 1, 0, 0);
+        return $s;
+    }
 
-		return $s;
-	}
+    /**
+     *  Renvoie url lien vers fiche de la source du destinataire du mailing
+     *
+     * @param int $id ID
+     *
+     * @return     string      Url lien
+     */
+    public function url($id)
+    {
+        return '<a href="' . DOL_URL_ROOT . '/adherents/card.php?rowid=' . $id . '">' . img_object('', "user") . '</a>';
+    }
 
-	/**
-	 *  Ajoute destinataires dans table des cibles
-	 *
-	 *  @param    int        $mailing_id        Id of emailing
-	 *  @return int                       < 0 si erreur, nb ajout si ok
-	 */
-	public function add_to_target($mailing_id)
-	{
-		// phpcs:enable
-		global $langs, $_POST;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Ajoute destinataires dans table des cibles
+     *
+     * @param int $mailing_id Id of emailing
+     *
+     * @return int                       < 0 si erreur, nb ajout si ok
+     */
+    public function add_to_target($mailing_id)
+    {
+        // phpcs:enable
+        global $langs, $_POST;
 
 		// Load translation files required by the page
 		$langs->loadLangs(array("members", "companies"));
@@ -308,19 +323,5 @@ class mailing_fraise extends MailingTargets
 		}
 
 		return parent::addTargetsToDatabase($mailing_id, $cibles);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Renvoie url lien vers fiche de la source du destinataire du mailing
-	 *
-	 *  @param    int        $id        ID
-	 *  @return     string      Url lien
-	 */
-	public function url($id)
-	{
-		return '<a href="'.DOL_URL_ROOT.'/adherents/card.php?rowid='.$id.'">'.img_object('', "user").'</a>';
 	}
 }

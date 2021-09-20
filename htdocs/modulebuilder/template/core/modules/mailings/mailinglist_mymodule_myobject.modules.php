@@ -71,27 +71,43 @@ class mailing_mailinglist_mymodule_myobject extends MailingTargets
 		$s = '';
 		$s .= $langs->trans("Status").': ';
 		$s .= '<select name="filter" class="flat">';
-		$s .= '<option value="none">&nbsp;</option>';
-		foreach ($arraystatus as $status) {
-			$s .= '<option value="'.$status.'">'.$status.'</option>';
-		}
-		$s .= '</select>';
-		$s .= '<br>';
+        $s .= '<option value="none">&nbsp;</option>';
+        foreach ($arraystatus as $status) {
+            $s .= '<option value="' . $status . '">' . $status . '</option>';
+        }
+        $s .= '</select>';
+        $s .= '<br>';
 
-		return $s;
-	}
+        return $s;
+    }
 
-	/**
-	 *  This is the main function that returns the array of emails
-	 *
-	 *  @param  int     $mailing_id     Id of emailing
-	 *  @return int                     <0 if error, number of emails added if ok
-	 */
-	public function add_to_target($mailing_id)
-	{
-		// phpcs:enable
-		$target = array();
-		$j = 0;
+    /**
+     *  Renvoie url lien vers fiche de la source du destinataire du mailing
+     *
+     * @param int $id ID
+     *
+     * @return     string              Url lien
+     */
+    public function url($id)
+    {
+        return '<a href="' . dol_buildpath('/mymodule/myobject_card.php', 1) . '?id=' . $id . '">' . img_object('', "generic") . '</a>';
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  This is the main function that returns the array of emails
+     *
+     * @param int $mailing_id Id of emailing
+     *
+     * @return int                     <0 if error, number of emails added if ok
+     */
+    public function add_to_target($mailing_id)
+    {
+        // phpcs:enable
+        $target = [];
+        $j = 0;
 
 		$sql = " select rowid as id, email, firstname, lastname, plan, partner";
 		$sql .= " from ".MAIN_DB_PREFIX."myobject";
@@ -147,19 +163,6 @@ class mailing_mailinglist_mymodule_myobject extends MailingTargets
 		return parent::addTargetsToDatabase($mailing_id, $target);
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Renvoie url lien vers fiche de la source du destinataire du mailing
-	 *
-	 *  @param      int         $id     ID
-	 *  @return     string              Url lien
-	 */
-	public function url($id)
-	{
-		return '<a href="'.dol_buildpath('/mymodule/myobject_card.php', 1).'?id='.$id.'">'.img_object('', "generic").'</a>';
-	}
 
 	/**
 	 *  On the main mailing area, there is a box with statistics.

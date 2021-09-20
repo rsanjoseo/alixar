@@ -217,34 +217,6 @@ class ExportTsv extends ModeleExports
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Clean a cell to respect rules of TSV file cells
-	 *
-	 * @param 	string	$newvalue	String to clean
-	 * @param	string	$charset	Input AND Output character set
-	 * @return 	string				Value cleaned
-	 */
-	public function tsv_clean($newvalue, $charset)
-	{
-		// phpcs:enable
-		// Rule Dolibarr: No HTML
-		$newvalue = dol_string_nohtmltag($newvalue, 1, $charset);
-
-		// Rule 1 TSV: No CR, LF in cells
-		$newvalue = str_replace("\r", '', $newvalue);
-		$newvalue = str_replace("\n", '\n', $newvalue);
-
-		// Rule 2 TSV: If value contains tab, we must replace by space
-		if (preg_match('/'.$this->separator.'/', $newvalue)) {
-			$newvalue = str_replace("\t", " ", $newvalue);
-		}
-
-		return $newvalue;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Output record line into file
 	 *
@@ -294,7 +266,6 @@ class ExportTsv extends ModeleExports
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Output footer into file
 	 *
@@ -308,16 +279,43 @@ class ExportTsv extends ModeleExports
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 * 	Close file handle
-	 *
-	 * 	@return		int							<0 if KO, >0 if OK
-	 */
-	public function close_file()
-	{
-		// phpcs:enable
-		fclose($this->handle);
-		return 0;
-	}
+     *    Close file handle
+     *
+     * @return        int                            <0 if KO, >0 if OK
+     */
+    public function close_file()
+    {
+        // phpcs:enable
+        fclose($this->handle);
+        return 0;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Clean a cell to respect rules of TSV file cells
+     *
+     * @param string $newvalue String to clean
+     * @param string $charset  Input AND Output character set
+     *
+     * @return    string                Value cleaned
+     */
+    public function tsv_clean($newvalue, $charset)
+    {
+        // phpcs:enable
+        // Rule Dolibarr: No HTML
+        $newvalue = dol_string_nohtmltag($newvalue, 1, $charset);
+
+        // Rule 1 TSV: No CR, LF in cells
+        $newvalue = str_replace("\r", '', $newvalue);
+        $newvalue = str_replace("\n", '\n', $newvalue);
+
+        // Rule 2 TSV: If value contains tab, we must replace by space
+        if (preg_match('/' . $this->separator . '/', $newvalue)) {
+            $newvalue = str_replace("\t", " ", $newvalue);
+        }
+
+        return $newvalue;
+    }
 }

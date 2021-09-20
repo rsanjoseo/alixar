@@ -43,242 +43,297 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/usergroup.class.php';
  */
 class User extends CommonObject
 {
-	const STATUS_DISABLED = 0;
-	const STATUS_ENABLED = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'user';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'user';
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_user';
+
 	/**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var string picto
 	 */
 	public $picto = 'user';
+
 	public $id = 0;
 	public $statut;
 	public $ldap_sid;
 	public $search_sid;
 	public $employee;
 	public $civility_code;
+
 	/**
 	 * @var string gender
 	 */
 	public $gender;
 	public $birth;
+
 	/**
 	 * @var string email
 	 */
 	public $email;
+
 	/**
 	 * @var string personal email
 	 */
 	public $personal_email;
+
 	/**
 	 * @var array array of socialnetworks
 	 */
 	public $socialnetworks;
+
 	/**
 	 * @var string skype account
 	 * @deprecated
 	 */
 	public $skype;
+
 	/**
 	 * @var string twitter account
 	 * @deprecated
 	 */
 	public $twitter;
+
 	/**
 	 * @var string facebook account
 	 * @deprecated
 	 */
 	public $facebook;
+
 	/**
 	 * @var string linkedin account
 	 * @deprecated
 	 */
 	public $linkedin;
+
 	/**
 	 * @var string job position
 	 */
 	public $job;
-	/**
-	 * @var string user signature
-	 */
-	public $signature;
-	/**
-	 * @var string Address
-	 */
-	public $address;
-		/**
-	 * @var string zip code
-	 */
-	public $zip; // The state/department
-	/**
-	 * @var string town
-	 */
-	public $town;
-public $state_id;
-	public $state_code;
-	public $state;
-	/**
-	 * @var string office phone
-	 */
-	public $office_phone;
-	/**
-	 * @var string office fax
+
+    /**
+     * @var string user signature
+     */
+    public $signature;
+
+    /**
+     * @var string Address
+     */
+    public $address;
+
+    /**
+     * @var string zip code
+     */
+    public $zip;
+
+    /**
+     * @var string town
+     */
+    public $town;
+    public $state_id; // The state/department
+    public $state_code;
+    public $state;
+
+    /**
+     * @var string office phone
+     */
+    public $office_phone;
+
+    /**
+     * @var string office fax
 	 */
 	public $office_fax;
+
 	/**
 	 * @var string phone mobile
 	 */
 	public $user_mobile;
+
 	/**
 	 * @var string personal phone mobile
 	 */
 	public $personal_mobile;
+
 	/**
 	 * @var int 1 if admin 0 if standard user
 	 */
 	public $admin;
+
 	/**
 	 * @var string user login
 	 */
 	public $login;
+
 	/**
 	 * @var string user apikey
 	 */
 	public $api_key;
+
 	/**
 	 * @var int Entity
 	 */
 	public $entity;
+
 	/**
 	 * @var string Clear password in memory
 	 */
 	public $pass;
-	/**
+
+    /**
 	 * @var string Clear password in database (defined if DATABASE_PWD_ENCRYPTED=0)
 	 */
 	public $pass_indatabase;
-	/**
+
+    /**
 	 * @var string Encrypted password in database (always defined)
 	 */
 	public $pass_indatabase_crypted;
-	/**
+
+    /**
 	 * @var string Temporary password
 	 */
 	public $pass_temp;
-	/**
+
+    /**
 	 * Date creation record (datec)
 	 *
 	 * @var integer
 	 */
 	public $datec;
-	/**
+
+    /**
 	 * Date modification record (tms)
 	 *
 	 * @var integer
 	 */
 	public $datem;
-	/**
+
+    /**
 	 * @var int If this is defined, it is an external user
 	 */
 	public $socid;
-	/**
+
+    /**
 	 * @var int If this is defined, it is a user created from a contact
 	 */
 	public $contact_id;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_member;
-	/**
+
+    /**
 	 * @var int User ID of supervisor
 	 */
 	public $fk_user;
-	/**
+
+    /**
 	 * @var int User ID of expense validator
 	 */
 	public $fk_user_expense_validator;
-	/**
+
+    /**
 	 * @var int User ID of holidays validator
 	 */
 	public $fk_user_holiday_validator;
-	/**
+
+    /**
 	 * @string clicktodial url
 	 */
 	public $clicktodial_url;
-	/**
+
+    /**
 	 * @var string clicktodial login
 	 */
 	public $clicktodial_login;
-	/**
+
+    /**
 	 * @var string clicktodial password
 	 */
 	public $clicktodial_password;
-	/**
+
+    /**
 	 * @var string clicktodial poste
 	 */
 	public $clicktodial_poste;
-	public $datelastlogin;
+
+    public $datelastlogin;
 	public $datepreviouslogin;
 	public $datestartvalidity;
 	public $dateendvalidity;
-	/**
+
+    /**
 	 * @var string photo filename
 	 */
 	public $photo;
 	public $lang;
-	/**
+
+    /**
 	 * @var stdClass Class of permissions user->rights->permx
 	 */
 	public $rights;
-	/**
+
+    /**
 	 * @var int  All permissions are loaded
 	 */
 	public $all_permissions_are_loaded;
-	/**
-	 * @var int Number of rights granted to the user
-	 */
-	public $nb_rights;
-	/**
-	 * @var array	To store list of groups of user (used by API /info for example)
-	 */
-	public $user_group_list;
-		/**
-	 * @var stdClass To store personal config
-	 */
-	public $conf; // To store default values for user
-	public $default_values; // To store current search criterias for user
-	public $lastsearch_values_tmp; // To store last saved search criterias for user
-public $lastsearch_values; // To store all tree of users hierarchy
-	public $users = array(); // To store an array of all parents for all ids.
-	public $parentof; // Cache array of already loaded childs
-public $accountancy_code; // Accountancy code in prevision of the complete accountancy module
 
-	public $thm; // Average cost of employee - Used for valuation of time spent
-	public $tjm; // Average cost of employee
+    /**
+     * @var int Number of rights granted to the user
+     */
+    public $nb_rights;
 
-	public $salary; // Monthly salary       - Denormalized value from llx_user_employment
-	public $salaryextra; // Monthly salary extra - Denormalized value from llx_user_employment
-	public $weeklyhours; // Weekly hours         - Denormalized value from llx_user_employment
+    /**
+     * @var array    To store list of groups of user (used by API /info for example)
+     */
+    public $user_group_list;
 
-	/**
-	 * @var string Define background color for user in agenda
-	 */
-	public $color;
+    /**
+     * @var array Cache array of already loaded permissions
+     */
+    private $_tab_loaded = [];
+
+    /**
+     * @var stdClass To store personal config
+     */
+    public $conf;
+    public $default_values; // To store default values for user
+    public $lastsearch_values_tmp; // To store current search criterias for user
+    public $lastsearch_values; // To store last saved search criterias for user
+
+    public $users = []; // To store all tree of users hierarchy
+    public $parentof; // To store an array of all parents for all ids.
+    private $cache_childids; // Cache array of already loaded childs
+
+    public $accountancy_code; // Accountancy code in prevision of the complete accountancy module
+
+    public $thm; // Average cost of employee - Used for valuation of time spent
+    public $tjm; // Average cost of employee
+
+    public $salary; // Monthly salary       - Denormalized value from llx_user_employment
+    public $salaryextra; // Monthly salary extra - Denormalized value from llx_user_employment
+    public $weeklyhours; // Weekly hours         - Denormalized value from llx_user_employment
+
+    /**
+     * @var string Define background color for user in agenda
+     */
+    public $color;
 
 	public $dateemployment; // Define date of employment by company
 	public $dateemploymentend; // Define date of employment end by company
@@ -288,39 +343,29 @@ public $accountancy_code; // Accountancy code in prevision of the complete accou
 
 	/**
 	 *@var int id of warehouse
-	 */
-	public $fk_warehouse;
+     */
+    public $fk_warehouse;
 
-	public $fields = array(
-		'rowid'=>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'index'=>1, 'position'=>1, 'comment'=>'Id'),
-		'lastname'=>array('type'=>'varchar(50)', 'label'=>'Name', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'index'=>1, 'position'=>20, 'searchall'=>1),
-		'firstname'=>array('type'=>'varchar(50)', 'label'=>'Name', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'index'=>1, 'position'=>10, 'searchall'=>1),
-	);
-	/**
-	 * @var array Cache array of already loaded permissions
-	 */
-	private $_tab_loaded = array();
-private $cache_childids;
-	/**
-	 * Cache the SQL results of the function "findUserIdByEmail($email)"
-	 *
-	 * NOTE: findUserIdByEmailCache[...] === -1 means not found in database
-	 *
-	 * @var array
-	 */
-	private $findUserIdByEmailCache;
+    public $fields = [
+        'rowid' => ['type' => 'integer', 'label' => 'TechnicalID', 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'index' => 1, 'position' => 1, 'comment' => 'Id'],
+        'lastname' => ['type' => 'varchar(50)', 'label' => 'Name', 'enabled' => 1, 'visible' => 1, 'notnull' => 1, 'showoncombobox' => 1, 'index' => 1, 'position' => 20, 'searchall' => 1],
+        'firstname' => ['type' => 'varchar(50)', 'label' => 'Name', 'enabled' => 1, 'visible' => 1, 'notnull' => 1, 'showoncombobox' => 1, 'index' => 1, 'position' => 10, 'searchall' => 1],
+    ];
 
-	/**
-	 *    Constructor of the class
-	 *
-	 *    @param   DoliDb  $db     Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    const STATUS_DISABLED = 0;
+    const STATUS_ENABLED = 1;
 
-		// User preference
-		$this->liste_limit = 0;
+    /**
+     *    Constructor of the class
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+
+        // User preference
+        $this->liste_limit = 0;
 		$this->clicktodial_loaded = 0;
 
 		// For cache usage
@@ -332,70 +377,403 @@ private $cache_childids;
 		$this->employee = 1;
 
 		$this->conf = new stdClass();
-		$this->rights = new stdClass();
-		$this->rights->user = new stdClass();
-		$this->rights->user->user = new stdClass();
-		$this->rights->user->self = new stdClass();
-	}
+        $this->rights = new stdClass();
+        $this->rights->user = new stdClass();
+        $this->rights->user->user = new stdClass();
+        $this->rights->user->self = new stdClass();
+    }
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB $db Database handler
-	 * @param int $origin_id Old thirdparty id
-	 * @param int $dest_id New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    /**
+     *    Load a user from database with its id or ref (login).
+     *  This function does not load permissions, only user properties. Use getrights() for this just after the fetch.
+     *
+     * @param int    $id               If defined, id to used for search
+     * @param string $login            If defined, login to used for search
+     * @param string $sid              If defined, sid to used for search
+     * @param int    $loadpersonalconf 1=also load personal conf of user (in $user->conf->xxx), 0=do not load personal conf.
+     * @param int    $entity           If a value is >= 0, we force the search on a specific entity. If -1, means search depens on default setup.
+     * @param int    $email            If defined, email to used for search
+     *
+     * @return    int                            <0 if KO, 0 not found, >0 if OK
+     */
+    public function fetch($id = '', $login = '', $sid = '', $loadpersonalconf = 0, $entity = -1, $email = '')
+    {
+        global $conf, $user;
+
+        // Clean parameters
+        $login = trim($login);
+
+        // Get user
+        $sql = "SELECT u.rowid, u.lastname, u.firstname, u.employee, u.gender, u.civility as civility_code, u.birth, u.email, u.personal_email, u.job,";
+        $sql .= " u.socialnetworks,";
+        $sql .= " u.signature, u.office_phone, u.office_fax, u.user_mobile, u.personal_mobile,";
+        $sql .= " u.address, u.zip, u.town, u.fk_state as state_id, u.fk_country as country_id,";
+        $sql .= " u.admin, u.login, u.note as note_private, u.note_public,";
+        $sql .= " u.pass, u.pass_crypted, u.pass_temp, u.api_key,";
+        $sql .= " u.fk_soc, u.fk_socpeople, u.fk_member, u.fk_user, u.ldap_sid, u.fk_user_expense_validator, u.fk_user_holiday_validator,";
+        $sql .= " u.statut, u.lang, u.entity,";
+        $sql .= " u.datec as datec,";
+        $sql .= " u.tms as datem,";
+        $sql .= " u.datelastlogin as datel,";
+        $sql .= " u.datepreviouslogin as datep,";
+        $sql .= " u.datelastpassvalidation,";
+        $sql .= " u.datestartvalidity,";
+        $sql .= " u.dateendvalidity,";
+        $sql .= " u.photo as photo,";
+        $sql .= " u.openid as openid,";
+        $sql .= " u.accountancy_code,";
+        $sql .= " u.thm,";
+        $sql .= " u.tjm,";
+        $sql .= " u.salary,";
+        $sql .= " u.salaryextra,";
+        $sql .= " u.weeklyhours,";
+        $sql .= " u.color,";
+        $sql .= " u.dateemployment, u.dateemploymentend,";
+        $sql .= " u.fk_warehouse,";
+        $sql .= " u.ref_ext,";
+        $sql .= " u.default_range, u.default_c_exp_tax_cat,"; // Expense report default mode
+        $sql .= " c.code as country_code, c.label as country,";
+        $sql .= " d.code_departement as state_code, d.nom as state";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "user as u";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_country as c ON u.fk_country = c.rowid";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_departements as d ON u.fk_state = d.rowid";
+
+        if ($entity < 0) {
+            if ((empty($conf->multicompany->enabled) || empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) && (!empty($user->entity))) {
+                $sql .= " WHERE u.entity IN (0, " . ((int) $conf->entity) . ")";
+            } else {
+                $sql .= " WHERE u.entity IS NOT NULL"; // multicompany is on in transverse mode or user making fetch is on entity 0, so user is allowed to fetch anywhere into database
+            }
+        } else {
+            // The fetch was forced on an entity
+            if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
+                $sql .= " WHERE u.entity IS NOT NULL"; // multicompany is on in transverse mode or user making fetch is on entity 0, so user is allowed to fetch anywhere into database
+            } else {
+                $sql .= " WHERE u.entity IN (0, " . ((int) (($entity != '' && $entity >= 0) ? $entity : $conf->entity)) . ")"; // search in entity provided in parameter
+            }
+        }
+
+        if ($sid) {
+            // permet une recherche du user par son SID ActiveDirectory ou Samba
+            $sql .= " AND (u.ldap_sid = '" . $this->db->escape($sid) . "' OR u.login = '" . $this->db->escape($login) . "')";
+        } elseif ($login) {
+            $sql .= " AND u.login = '" . $this->db->escape($login) . "'";
+        } elseif ($email) {
+            $sql .= " AND u.email = '" . $this->db->escape($email) . "'";
+        } else {
+            $sql .= " AND u.rowid = " . ((int) $id);
+        }
+        $sql .= " ORDER BY u.entity ASC"; // Avoid random result when there is 2 login in 2 different entities
+
+        if ($sid) {
+            // permet une recherche du user par son SID ActiveDirectory ou Samba
+            $sql .= ' ' . $this->db->plimit(1);
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            if ($obj) {
+                $this->id = $obj->rowid;
+                $this->ref = $obj->rowid;
+
+                $this->ref_ext = $obj->ref_ext;
+
+                $this->ldap_sid = $obj->ldap_sid;
+                $this->civility_code = $obj->civility_code;
+                $this->lastname = $obj->lastname;
+                $this->firstname = $obj->firstname;
+
+                $this->employee = $obj->employee;
+
+                $this->login = $obj->login;
+                $this->gender = $obj->gender;
+                $this->birth = $this->db->jdate($obj->birth);
+                $this->pass_indatabase = $obj->pass;
+                $this->pass_indatabase_crypted = $obj->pass_crypted;
+                $this->pass = $obj->pass;
+                $this->pass_temp = $obj->pass_temp;
+                $this->api_key = $obj->api_key;
+
+                $this->address = $obj->address;
+                $this->zip = $obj->zip;
+                $this->town = $obj->town;
+
+                $this->country_id = $obj->country_id;
+                $this->country_code = $obj->country_id ? $obj->country_code : '';
+                //$this->country = $obj->country_id?($langs->trans('Country'.$obj->country_code)!='Country'.$obj->country_code?$langs->transnoentities('Country'.$obj->country_code):$obj->country):'';
+
+                $this->state_id = $obj->state_id;
+                $this->state_code = $obj->state_code;
+                $this->state = ($obj->state != '-' ? $obj->state : '');
+
+                $this->office_phone = $obj->office_phone;
+                $this->office_fax = $obj->office_fax;
+                $this->user_mobile = $obj->user_mobile;
+                $this->personal_mobile = $obj->personal_mobile;
+                $this->email = $obj->email;
+                $this->personal_email = $obj->personal_email;
+                $this->socialnetworks = (array) json_decode($obj->socialnetworks, true);
+                $this->job = $obj->job;
+                $this->signature = $obj->signature;
+                $this->admin = $obj->admin;
+                $this->note_public = $obj->note_public;
+                $this->note_private = $obj->note_private;
+                $this->note = $obj->note_private;
+                $this->statut = $obj->statut;
+                $this->photo = $obj->photo;
+                $this->openid = $obj->openid;
+                $this->lang = $obj->lang;
+                $this->entity = $obj->entity;
+                $this->accountancy_code = $obj->accountancy_code;
+                $this->thm = $obj->thm;
+                $this->tjm = $obj->tjm;
+                $this->salary = $obj->salary;
+                $this->salaryextra = $obj->salaryextra;
+                $this->weeklyhours = $obj->weeklyhours;
+                $this->color = $obj->color;
+                $this->dateemployment = $this->db->jdate($obj->dateemployment);
+                $this->dateemploymentend = $this->db->jdate($obj->dateemploymentend);
+
+                $this->datec = $this->db->jdate($obj->datec);
+                $this->datem = $this->db->jdate($obj->datem);
+                $this->datelastlogin = $this->db->jdate($obj->datel);
+                $this->datepreviouslogin = $this->db->jdate($obj->datep);
+                $this->datestartvalidity = $this->db->jdate($obj->datestartvalidity);
+                $this->dateendvalidity = $this->db->jdate($obj->dateendvalidity);
+
+                $this->socid = $obj->fk_soc;
+                $this->contact_id = $obj->fk_socpeople;
+                $this->fk_member = $obj->fk_member;
+                $this->fk_user = $obj->fk_user;
+                $this->fk_user_expense_validator = $obj->fk_user_expense_validator;
+                $this->fk_user_holiday_validator = $obj->fk_user_holiday_validator;
+
+                $this->default_range = $obj->default_range;
+                $this->default_c_exp_tax_cat = $obj->default_c_exp_tax_cat;
+                $this->fk_warehouse = $obj->fk_warehouse;
+
+                // Protection when module multicompany was set, admin was set to first entity and then, the module was disabled,
+                // in such case, this admin user must be admin for ALL entities.
+                if (empty($conf->multicompany->enabled) && $this->admin && $this->entity == 1) {
+                    $this->entity = 0;
+                }
+
+                // Retrieve all extrafield
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+
+                $this->db->free($result);
+            } else {
+                $this->error = "USERNOTFOUND";
+                dol_syslog(get_class($this) . "::fetch user not found", LOG_DEBUG);
+
+                $this->db->free($result);
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+
+        // To get back the global configuration unique to the user
+        if ($loadpersonalconf) {
+            // Load user->conf for user
+            $sql = "SELECT param, value FROM " . MAIN_DB_PREFIX . "user_param";
+            $sql .= " WHERE fk_user = " . ((int) $this->id);
+            $sql .= " AND entity = " . ((int) $conf->entity);
+            //dol_syslog(get_class($this).'::fetch load personalized conf', LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $num = $this->db->num_rows($resql);
+                $i = 0;
+                while ($i < $num) {
+                    $obj = $this->db->fetch_object($resql);
+                    $p = (!empty($obj->param) ? $obj->param : '');
+                    if (!empty($p)) {
+                        $this->conf->$p = $obj->value;
+                    }
+                    $i++;
+                }
+                $this->db->free($resql);
+            } else {
+                $this->error = $this->db->lasterror();
+                return -2;
+            }
+
+            $result = $this->loadDefaultValues();
+
+            if ($result < 0) {
+                $this->error = $this->db->lasterror();
+                return -3;
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     *  Load default values from database table into property ->default_values
+     *
+     * @return int                        > 0 if OK, < 0 if KO
+     */
+    public function loadDefaultValues()
+    {
+        global $conf;
+        if (!empty($conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
+            // Load user->default_values for user. TODO Save this in memcached ?
+            require_once DOL_DOCUMENT_ROOT . '/core/class/defaultvalues.class.php';
+
+            $defaultValues = new DefaultValues($this->db);
+            $result = $defaultValues->fetchAll('', '', 0, 0, ['t.user_id' => [0, $this->id], 'entity' => [(isset($this->entity) ? $this->entity : $conf->entity), $conf->entity]]);    // User 0 (all) + me (if defined)
+
+            if (!is_array($result) && $result < 0) {
+                setEventMessages($defaultValues->error, $defaultValues->errors, 'errors');
+                dol_print_error($this->db);
+                return -1;
+            } elseif (count($result) > 0) {
+                foreach ($result as $defval) {
+                    if (!empty($defval->page) && !empty($defval->type) && !empty($defval->param)) {
+                        $pagewithoutquerystring = $defval->page;
+                        $pagequeries = '';
+                        $reg = [];
+                        if (preg_match('/^([^\?]+)\?(.*)$/', $pagewithoutquerystring, $reg)) {    // There is query param
+                            $pagewithoutquerystring = $reg[1];
+                            $pagequeries = $reg[2];
+                        }
+                        $this->default_values[$pagewithoutquerystring][$defval->type][$pagequeries ? $pagequeries : '_noquery_'][$defval->param] = $defval->value;
+                    }
+                }
+            }
+            if (!empty($this->default_values)) {
+                foreach ($this->default_values as $a => $b) {
+                    foreach ($b as $c => $d) {
+                        krsort($this->default_values[$a][$c]);
+                    }
+                }
+            }
+        }
+        return 1;
+    }
+
+    /**
+     *  Return if a user has a permission.
+     *  You can use it like this: if ($user->hasRight('module', 'level11')).
+     *  It replaces old syntax: if ($user->rights->module->level1)
+     *
+     * @param int    $module     Module of permission to check
+     * @param string $permlevel1 Permission level1 (Example: 'read', 'write', 'delete')
+     * @param string $permlevel2 Permission level2
+     * @return int                        1 if user has permission, 0 if not.
+     * @see    clearrights(), delrights(), getrights(), hasRight()
+     */
+    public function hasRight($module, $permlevel1, $permlevel2 = '')
 	{
-		$tables = array(
-			'user',
-		);
+		global $conf;
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+		// For compatibility with bad naming permissions on module
+        $moduletomoduletouse = [
+            'contract' => 'contrat',
+            'member' => 'adherent',    // We must check $user->rights->adherent...
+            'mo' => 'mrp',
+            'order' => 'commande',
+            'product' => 'produit',    // We must check $user->rights->produit...
+            'project' => 'projet',
+            'shipping' => 'expedition',
+            'task' => 'task@projet',
+            'fichinter' => 'ficheinter',
+            'invoice' => 'facture',
+            'invoice_supplier' => 'fournisseur',
+            'knowledgerecord' => 'knowledgerecord@knowledgemanagement',
+        ];
+        if (!empty($moduletomoduletouse[$module])) {
+            $module = $moduletomoduletouse[$module];
+        }
 
-	/**
-	 *  Return if a user has a permission.
-	 *  You can use it like this: if ($user->hasRight('module', 'level11')).
-	 *  It replaces old syntax: if ($user->rights->module->level1)
-	 *
-	 * 	@param	int		$module			Id of permission to add or 0 to add several permissions
-	 *  @param  string	$permlevel1		Permission level1
-	 *  @param  string	$permlevel2		Permission level2
-	 *  @return int						1 if user has permission, 0 if not.
-	 *  @see	clearrights(), delrights(), getrights(), hasRight()
-	 */
-	public function hasRight($module, $permlevel1, $permlevel2 = '')
-	{
-		if (empty($module) || empty($this->rights) || empty($this->rights->$module) || empty($permlevel1)) {
-			return 0;
-		}
+        // If module is abc@module, we check permission user->rights->module->abc->permlevel1
+        $tmp = explode('@', $module, 2);
+        if (!empty($tmp[1])) {
+            $module = $tmp[1];
+            $permlevel2 = $permlevel1;
+            $permlevel1 = $tmp[0];
+        }
 
-		if ($permlevel2) {
-			if (!empty($this->rights->$module->$permlevel1) && !empty($this->rights->$module->$permlevel1->$permlevel2)) {
-				return $this->rights->$module->$permlevel1->$permlevel2;
-			}
-		} else {
-			if (!empty($this->rights->$module->$permlevel1)) {
-				return $this->rights->$module->$permlevel1;
-			}
-		}
+        //var_dump($module);
+        //var_dump($this->rights->$module);
+        if (!in_array($module, $conf->modules)) {
+            return 0;
+        }
 
-		return 0;
-	}
+        // For compatibility with bad naming permissions on permlevel1
+        if ($permlevel1 == 'propale') {
+            $permlevel1 = 'propal';
+        }
+        if ($permlevel1 == 'member') {
+            $permlevel1 = 'adherent';
+        }
+        if ($permlevel1 == 'recruitmentcandidature') {
+            $permlevel1 = 'recruitmentjobposition';
+        }
 
-	/**
-	 *  Add a right to the user
-	 *
-	 * 	@param	int		$rid			Id of permission to add or 0 to add several permissions
-	 *  @param  string	$allmodule		Add all permissions of module $allmodule or 'allmodules' to include all modules.
-	 *  @param  string	$allperms		Add all permissions of module $allmodule, subperms $allperms only or '' to include all permissions.
-	 *  @param	int		$entity			Entity to use
-	 *  @param  int	    $notrigger		1=Does not execute triggers, 0=Execute triggers
-	 *  @return int						> 0 if OK, < 0 if KO
-	 *  @see	clearrights(), delrights(), getrights(), hasRight()
-	 */
+        //var_dump($module.' '.$permlevel1.' '.$permlevel2);
+        if (empty($module) || empty($this->rights) || empty($this->rights->$module) || empty($permlevel1)) {
+            return 0;
+        }
+
+        if ($permlevel2) {
+            if (!empty($this->rights->$module->$permlevel1)) {
+                if (!empty($this->rights->$module->$permlevel1->$permlevel2)) {
+                    return $this->rights->$module->$permlevel1->$permlevel2;
+                }
+                // For backward compatibility with old permissions called "lire", "creer", "create", "supprimer"
+                // instead of "read", "write", "delete"
+                if ($permlevel2 == 'read' && !empty($this->rights->$module->$permlevel1->lire)) {
+                    return $this->rights->$module->lire;
+                }
+                if ($permlevel2 == 'write' && !empty($this->rights->$module->$permlevel1->creer)) {
+                    return $this->rights->$module->create;
+                }
+                if ($permlevel2 == 'write' && !empty($this->rights->$module->$permlevel1->create)) {
+                    return $this->rights->$module->create;
+                }
+                if ($permlevel2 == 'delete' && !empty($this->rights->$module->$permlevel1->supprimer)) {
+                    return $this->rights->$module->supprimer;
+                }
+            }
+        } else {
+            if (!empty($this->rights->$module->$permlevel1)) {
+                return $this->rights->$module->$permlevel1;
+            }
+            // For backward compatibility with old permissions called "lire", "creer", "create", "supprimer"
+            // instead of "read", "write", "delete"
+            if ($permlevel1 == 'read' && !empty($this->rights->$module->lire)) {
+                return $this->rights->$module->lire;
+            }
+            if ($permlevel1 == 'write' && !empty($this->rights->$module->creer)) {
+                return $this->rights->$module->create;
+            }
+            if ($permlevel1 == 'write' && !empty($this->rights->$module->create)) {
+                return $this->rights->$module->create;
+            }
+            if ($permlevel1 == 'delete' && !empty($this->rights->$module->supprimer)) {
+                return $this->rights->$module->supprimer;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     *  Add a right to the user
+     *
+     * 	@param	int		$rid			Id of permission to add or 0 to add several permissions
+     *  @param  string	$allmodule		Add all permissions of module $allmodule or 'allmodules' to include all modules.
+     *  @param  string	$allperms		Add all permissions of module $allmodule, subperms $allperms only or '' to include all permissions.
+     *  @param	int		$entity			Entity to use
+     *  @param  int	    $notrigger		1=Does not execute triggers, 0=Execute triggers
+     *  @return int						> 0 if OK, < 0 if KO
+     *  @see	clearrights(), delrights(), getrights(), hasRight()
+     */
 	public function addrights($rid, $allmodule = '', $allperms = '', $entity = 0, $notrigger = 0)
 	{
 		global $conf, $user, $langs;
@@ -981,368 +1359,6 @@ private $cache_childids;
 	}
 
 	/**
-	 *	Load a user from database with its id or ref (login).
-	 *  This function does not load permissions, only user properties. Use getrights() for this just after the fetch.
-	 *
-	 *	@param	int		$id		       		If defined, id to used for search
-	 * 	@param  string	$login       		If defined, login to used for search
-	 *	@param  string	$sid				If defined, sid to used for search
-	 * 	@param	int		$loadpersonalconf	1=also load personal conf of user (in $user->conf->xxx), 0=do not load personal conf.
-	 *  @param  int     $entity             If a value is >= 0, we force the search on a specific entity. If -1, means search depens on default setup.
-	 *  @param	int		$email       		If defined, email to used for search
-	 * 	@return	int							<0 if KO, 0 not found, >0 if OK
-	 */
-	public function fetch($id = '', $login = '', $sid = '', $loadpersonalconf = 0, $entity = -1, $email = '')
-	{
-		global $conf, $user;
-
-		// Clean parameters
-		$login = trim($login);
-
-		// Get user
-		$sql = "SELECT u.rowid, u.lastname, u.firstname, u.employee, u.gender, u.civility as civility_code, u.birth, u.email, u.personal_email, u.job,";
-		$sql .= " u.socialnetworks,";
-		$sql .= " u.signature, u.office_phone, u.office_fax, u.user_mobile, u.personal_mobile,";
-		$sql .= " u.address, u.zip, u.town, u.fk_state as state_id, u.fk_country as country_id,";
-		$sql .= " u.admin, u.login, u.note as note_private, u.note_public,";
-		$sql .= " u.pass, u.pass_crypted, u.pass_temp, u.api_key,";
-		$sql .= " u.fk_soc, u.fk_socpeople, u.fk_member, u.fk_user, u.ldap_sid, u.fk_user_expense_validator, u.fk_user_holiday_validator,";
-		$sql .= " u.statut, u.lang, u.entity,";
-		$sql .= " u.datec as datec,";
-		$sql .= " u.tms as datem,";
-		$sql .= " u.datelastlogin as datel,";
-		$sql .= " u.datepreviouslogin as datep,";
-		$sql .= " u.datelastpassvalidation,";
-		$sql .= " u.datestartvalidity,";
-		$sql .= " u.dateendvalidity,";
-		$sql .= " u.photo as photo,";
-		$sql .= " u.openid as openid,";
-		$sql .= " u.accountancy_code,";
-		$sql .= " u.thm,";
-		$sql .= " u.tjm,";
-		$sql .= " u.salary,";
-		$sql .= " u.salaryextra,";
-		$sql .= " u.weeklyhours,";
-		$sql .= " u.color,";
-		$sql .= " u.dateemployment, u.dateemploymentend,";
-		$sql .= " u.fk_warehouse,";
-		$sql .= " u.ref_ext,";
-		$sql .= " u.default_range, u.default_c_exp_tax_cat,"; // Expense report default mode
-		$sql .= " c.code as country_code, c.label as country,";
-		$sql .= " d.code_departement as state_code, d.nom as state";
-		$sql .= " FROM ".MAIN_DB_PREFIX."user as u";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_country as c ON u.fk_country = c.rowid";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_departements as d ON u.fk_state = d.rowid";
-
-		if ($entity < 0) {
-			if ((empty($conf->multicompany->enabled) || empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) && (!empty($user->entity))) {
-				$sql .= " WHERE u.entity IN (0, ".((int) $conf->entity).")";
-			} else {
-				$sql .= " WHERE u.entity IS NOT NULL"; // multicompany is on in transverse mode or user making fetch is on entity 0, so user is allowed to fetch anywhere into database
-			}
-		} else {
-			// The fetch was forced on an entity
-			if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-				$sql .= " WHERE u.entity IS NOT NULL"; // multicompany is on in transverse mode or user making fetch is on entity 0, so user is allowed to fetch anywhere into database
-			} else {
-				$sql .= " WHERE u.entity IN (0, ".((int) (($entity != '' && $entity >= 0) ? $entity : $conf->entity)).")"; // search in entity provided in parameter
-			}
-		}
-
-		if ($sid) {
-			// permet une recherche du user par son SID ActiveDirectory ou Samba
-			$sql .= " AND (u.ldap_sid = '".$this->db->escape($sid)."' OR u.login = '".$this->db->escape($login)."')";
-		} elseif ($login) {
-			$sql .= " AND u.login = '".$this->db->escape($login)."'";
-		} elseif ($email) {
-			$sql .= " AND u.email = '".$this->db->escape($email)."'";
-		} else {
-			$sql .= " AND u.rowid = ".((int) $id);
-		}
-		$sql .= " ORDER BY u.entity ASC"; // Avoid random result when there is 2 login in 2 different entities
-
-		if ($sid) {
-			// permet une recherche du user par son SID ActiveDirectory ou Samba
-			$sql .= ' '.$this->db->plimit(1);
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			if ($obj) {
-				$this->id = $obj->rowid;
-				$this->ref = $obj->rowid;
-
-				$this->ref_ext = $obj->ref_ext;
-
-				$this->ldap_sid = $obj->ldap_sid;
-				$this->civility_code = $obj->civility_code;
-				$this->lastname = $obj->lastname;
-				$this->firstname = $obj->firstname;
-
-				$this->employee = $obj->employee;
-
-				$this->login = $obj->login;
-				$this->gender       = $obj->gender;
-				$this->birth        = $this->db->jdate($obj->birth);
-				$this->pass_indatabase = $obj->pass;
-				$this->pass_indatabase_crypted = $obj->pass_crypted;
-				$this->pass = $obj->pass;
-				$this->pass_temp	= $obj->pass_temp;
-				$this->api_key = $obj->api_key;
-
-				$this->address 		= $obj->address;
-				$this->zip 			= $obj->zip;
-				$this->town 		= $obj->town;
-
-				$this->country_id = $obj->country_id;
-				$this->country_code = $obj->country_id ? $obj->country_code : '';
-				//$this->country = $obj->country_id?($langs->trans('Country'.$obj->country_code)!='Country'.$obj->country_code?$langs->transnoentities('Country'.$obj->country_code):$obj->country):'';
-
-				$this->state_id     = $obj->state_id;
-				$this->state_code   = $obj->state_code;
-				$this->state        = ($obj->state != '-' ? $obj->state : '');
-
-				$this->office_phone	= $obj->office_phone;
-				$this->office_fax   = $obj->office_fax;
-				$this->user_mobile  = $obj->user_mobile;
-				$this->personal_mobile = $obj->personal_mobile;
-				$this->email = $obj->email;
-				$this->personal_email = $obj->personal_email;
-				$this->socialnetworks = (array) json_decode($obj->socialnetworks, true);
-				$this->job = $obj->job;
-				$this->signature = $obj->signature;
-				$this->admin		= $obj->admin;
-				$this->note_public = $obj->note_public;
-				$this->note_private = $obj->note_private;
-				$this->note			= $obj->note_private;
-				$this->statut		= $obj->statut;
-				$this->photo		= $obj->photo;
-				$this->openid		= $obj->openid;
-				$this->lang			= $obj->lang;
-				$this->entity		= $obj->entity;
-				$this->accountancy_code = $obj->accountancy_code;
-				$this->thm			= $obj->thm;
-				$this->tjm			= $obj->tjm;
-				$this->salary = $obj->salary;
-				$this->salaryextra = $obj->salaryextra;
-				$this->weeklyhours = $obj->weeklyhours;
-				$this->color = $obj->color;
-				$this->dateemployment = $this->db->jdate($obj->dateemployment);
-				$this->dateemploymentend = $this->db->jdate($obj->dateemploymentend);
-
-				$this->datec				= $this->db->jdate($obj->datec);
-				$this->datem				= $this->db->jdate($obj->datem);
-				$this->datelastlogin = $this->db->jdate($obj->datel);
-				$this->datepreviouslogin = $this->db->jdate($obj->datep);
-				$this->datestartvalidity = $this->db->jdate($obj->datestartvalidity);
-				$this->dateendvalidity = $this->db->jdate($obj->dateendvalidity);
-
-				$this->socid                = $obj->fk_soc;
-				$this->contact_id           = $obj->fk_socpeople;
-				$this->fk_member            = $obj->fk_member;
-				$this->fk_user = $obj->fk_user;
-				$this->fk_user_expense_validator = $obj->fk_user_expense_validator;
-				$this->fk_user_holiday_validator = $obj->fk_user_holiday_validator;
-
-				$this->default_range = $obj->default_range;
-				$this->default_c_exp_tax_cat = $obj->default_c_exp_tax_cat;
-				$this->fk_warehouse = $obj->fk_warehouse;
-
-				// Protection when module multicompany was set, admin was set to first entity and then, the module was disabled,
-				// in such case, this admin user must be admin for ALL entities.
-				if (empty($conf->multicompany->enabled) && $this->admin && $this->entity == 1) {
-					$this->entity = 0;
-				}
-
-				// Retrieve all extrafield
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				$this->db->free($result);
-			} else {
-				$this->error = "USERNOTFOUND";
-				dol_syslog(get_class($this)."::fetch user not found", LOG_DEBUG);
-
-				$this->db->free($result);
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-
-		// To get back the global configuration unique to the user
-		if ($loadpersonalconf) {
-			// Load user->conf for user
-			$sql = "SELECT param, value FROM ".MAIN_DB_PREFIX."user_param";
-			$sql .= " WHERE fk_user = ".((int) $this->id);
-			$sql .= " AND entity = ".((int) $conf->entity);
-			//dol_syslog(get_class($this).'::fetch load personalized conf', LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$num = $this->db->num_rows($resql);
-				$i = 0;
-				while ($i < $num) {
-					$obj = $this->db->fetch_object($resql);
-					$p = (!empty($obj->param) ? $obj->param : '');
-					if (!empty($p)) {
-						$this->conf->$p = $obj->value;
-					}
-					$i++;
-				}
-				$this->db->free($resql);
-			} else {
-				$this->error = $this->db->lasterror();
-				return -2;
-			}
-
-			$result = $this->loadDefaultValues();
-
-			if ($result < 0) {
-				$this->error = $this->db->lasterror();
-				return -3;
-			}
-		}
-
-		return 1;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Load default values from database table into property ->default_values
-	 *
-	 *  @return int						> 0 if OK, < 0 if KO
-	 */
-	public function loadDefaultValues()
-	{
-		global $conf;
-		if (!empty($conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
-			// Load user->default_values for user. TODO Save this in memcached ?
-			require_once DOL_DOCUMENT_ROOT.'/core/class/defaultvalues.class.php';
-
-			$defaultValues = new DefaultValues($this->db);
-			$result = $defaultValues->fetchAll('', '', 0, 0, array('t.user_id'=>array(0, $this->id), 'entity'=>array((isset($this->entity) ? $this->entity : $conf->entity), $conf->entity)));	// User 0 (all) + me (if defined)
-
-			if (!is_array($result) && $result < 0) {
-				setEventMessages($defaultValues->error, $defaultValues->errors, 'errors');
-				dol_print_error($this->db);
-				return -1;
-			} elseif (count($result) > 0) {
-				foreach ($result as $defval) {
-					if (!empty($defval->page) && !empty($defval->type) && !empty($defval->param)) {
-						$pagewithoutquerystring = $defval->page;
-						$pagequeries = '';
-						$reg = array();
-						if (preg_match('/^([^\?]+)\?(.*)$/', $pagewithoutquerystring, $reg)) {    // There is query param
-							$pagewithoutquerystring = $reg[1];
-							$pagequeries = $reg[2];
-						}
-						$this->default_values[$pagewithoutquerystring][$defval->type][$pagequeries ? $pagequeries : '_noquery_'][$defval->param] = $defval->value;
-					}
-				}
-			}
-			if (!empty($this->default_values)) {
-				foreach ($this->default_values as $a => $b) {
-					foreach ($b as $c => $d) {
-						krsort($this->default_values[$a][$c]);
-					}
-				}
-			}
-		}
-		return 1;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Create a user from a contact object. User will be internal but if contact is linked to a third party, user will be external
-	 *
-	 *  @param	Contact	$contact    Object for source contact
-	 * 	@param  string	$login      Login to force
-	 *  @param  string	$password   Password to force
-	 *  @return int 				<0 if error, if OK returns id of created user
-	 */
-	public function create_from_contact($contact, $login = '', $password = '')
-	{
-		// phpcs:enable
-		global $conf, $user, $langs;
-
-		$error = 0;
-
-		// Define parameters
-		$this->admin = 0;
-		$this->civility_code = $contact->civility_code;
-		$this->lastname = $contact->lastname;
-		$this->firstname = $contact->firstname;
-		$this->gender = $contact->gender;
-		$this->email = $contact->email;
-		$this->socialnetworks = $contact->socialnetworks;
-		$this->office_phone = $contact->phone_pro;
-		$this->office_fax = $contact->fax;
-		$this->user_mobile = $contact->phone_mobile;
-		$this->address = $contact->address;
-		$this->zip = $contact->zip;
-		$this->town = $contact->town;
-		$this->setUpperOrLowerCase();
-		$this->state_id = $contact->state_id;
-		$this->country_id = $contact->country_id;
-		$this->employee = 0;
-
-		if (empty($login)) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-			$login = dol_buildlogin($contact->lastname, $contact->firstname);
-		}
-		$this->login = $login;
-
-		$this->db->begin();
-
-		// Create user and set $this->id. Trigger is disabled because executed later.
-		$result = $this->create($user, 1);
-		if ($result > 0) {
-			$sql = "UPDATE ".MAIN_DB_PREFIX."user";
-			$sql .= " SET fk_socpeople=".((int) $contact->id);
-			$sql .= ", civility='".$this->db->escape($contact->civility_code)."'";
-			if ($contact->socid > 0) {
-				$sql .= ", fk_soc=".((int) $contact->socid);
-			}
-			$sql .= " WHERE rowid=".((int) $this->id);
-
-			$resql = $this->db->query($sql);
-
-			dol_syslog(get_class($this)."::create_from_contact", LOG_DEBUG);
-			if ($resql) {
-				$this->context['createfromcontact'] = 'createfromcontact';
-
-				// Call trigger
-				$result = $this->call_trigger('USER_CREATE', $user);
-				if ($result < 0) {
-					$error++; $this->db->rollback(); return -1;
-				}
-				// End call triggers
-
-				$this->db->commit();
-				return $this->id;
-			} else {
-				$this->error = $this->db->error();
-
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			// $this->error deja positionne
-			dol_syslog(get_class($this)."::create_from_contact - 0");
-
-			$this->db->rollback();
-			return $result;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 *  Create a user into database
 	 *
 	 *  @param	User	$user        	Objet user doing creation
@@ -1474,25 +1490,207 @@ private $cache_childids;
 				return -3;
 			}
 		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -2;
-		}
-	}
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -2;
+        }
+    }
 
-	/**
-	 *    Assign rights by default
-	 *
-	 *    @return     integer erreur <0, si ok renvoi le nbre de droits par defaut positionnes
-	 */
-	public function set_default_rights()
-	{
-		// phpcs:enable
-		global $conf;
 
-		$rd = array();
-		$num = 0;
-		$sql = "SELECT id FROM ".MAIN_DB_PREFIX."rights_def";
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Create a user from a contact object. User will be internal but if contact is linked to a third party, user will be external
+     *
+     * @param Contact $contact  Object for source contact
+     * @param string  $login    Login to force
+     * @param string  $password Password to force
+     *
+     * @return int                <0 if error, if OK returns id of created user
+     */
+    public function create_from_contact($contact, $login = '', $password = '')
+    {
+        // phpcs:enable
+        global $conf, $user, $langs;
+
+        $error = 0;
+
+        // Define parameters
+        $this->admin = 0;
+        $this->civility_code = $contact->civility_code;
+        $this->lastname = $contact->lastname;
+        $this->firstname = $contact->firstname;
+        $this->gender = $contact->gender;
+        $this->email = $contact->email;
+        $this->socialnetworks = $contact->socialnetworks;
+        $this->office_phone = $contact->phone_pro;
+        $this->office_fax = $contact->fax;
+        $this->user_mobile = $contact->phone_mobile;
+        $this->address = $contact->address;
+        $this->zip = $contact->zip;
+        $this->town = $contact->town;
+        $this->setUpperOrLowerCase();
+        $this->state_id = $contact->state_id;
+        $this->country_id = $contact->country_id;
+        $this->employee = 0;
+
+        if (empty($login)) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+            $login = dol_buildlogin($contact->lastname, $contact->firstname);
+        }
+        $this->login = $login;
+
+        $this->db->begin();
+
+        // Create user and set $this->id. Trigger is disabled because executed later.
+        $result = $this->create($user, 1);
+        if ($result > 0) {
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "user";
+            $sql .= " SET fk_socpeople=" . ((int) $contact->id);
+            $sql .= ", civility='" . $this->db->escape($contact->civility_code) . "'";
+            if ($contact->socid > 0) {
+                $sql .= ", fk_soc=" . ((int) $contact->socid);
+            }
+            $sql .= " WHERE rowid=" . ((int) $this->id);
+
+            $resql = $this->db->query($sql);
+
+            dol_syslog(get_class($this) . "::create_from_contact", LOG_DEBUG);
+            if ($resql) {
+                $this->context['createfromcontact'] = 'createfromcontact';
+
+                // Call trigger
+                $result = $this->call_trigger('USER_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                    $this->db->rollback();
+                    return -1;
+                }
+                // End call triggers
+
+                $this->db->commit();
+                return $this->id;
+            } else {
+                $this->error = $this->db->error();
+
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            // $this->error deja positionne
+            dol_syslog(get_class($this) . "::create_from_contact - 0");
+
+            $this->db->rollback();
+            return $result;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Create a user into database from a member object.
+     *  If $member->fk_soc is set, it will be an external user.
+     *
+     * @param Adherent $member Object member source
+     * @param string   $login  Login to force
+     *
+     * @return int                            <0 if KO, if OK, return id of created account
+     */
+    public function create_from_member($member, $login = '')
+    {
+        // phpcs:enable
+        global $conf, $user, $langs;
+
+        // Set properties on new user
+        $this->admin = 0;
+        $this->civility_code = $member->civility_id;
+        $this->lastname = $member->lastname;
+        $this->firstname = $member->firstname;
+        $this->gender = $member->gender;
+        $this->email = $member->email;
+        $this->fk_member = $member->id;
+        $this->address = $member->address;
+        $this->zip = $member->zip;
+        $this->town = $member->town;
+        $this->setUpperOrLowerCase();
+        $this->state_id = $member->state_id;
+        $this->country_id = $member->country_id;
+        $this->socialnetworks = $member->socialnetworks;
+
+        $this->pass = $member->pass;
+        $this->pass_crypted = $member->pass_indatabase_crypted;
+
+        if (empty($login)) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+            $login = dol_buildlogin($member->lastname, $member->firstname);
+        }
+        $this->login = $login;
+
+        $this->db->begin();
+
+        // Create and set $this->id
+        $result = $this->create($user);
+        if ($result > 0) {
+            if (!empty($this->pass)) {    // If a clear password was received (this situation should not happen anymore now), we use it to save it into database
+                $newpass = $this->setPassword($user, $this->pass);
+                if (is_numeric($newpass) && $newpass < 0) {
+                    $result = -2;
+                }
+            } elseif (!empty($this->pass_crypted)) {    // If a crypted password is already known, we save it directly into database because the previous create did not save it.
+                $sql = "UPDATE " . MAIN_DB_PREFIX . "user";
+                $sql .= " SET pass_crypted = '" . $this->db->escape($this->pass_crypted) . "'";
+                $sql .= " WHERE rowid=" . ((int) $this->id);
+
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $result = -1;
+                }
+            }
+
+            if ($result > 0 && $member->fk_soc) {    // If member is linked to a thirdparty
+                $sql = "UPDATE " . MAIN_DB_PREFIX . "user";
+                $sql .= " SET fk_soc=" . ((int) $member->fk_soc);
+                $sql .= " WHERE rowid=" . ((int) $this->id);
+
+                dol_syslog(get_class($this) . "::create_from_member", LOG_DEBUG);
+                $resql = $this->db->query($sql);
+                if ($resql) {
+                    $this->db->commit();
+                    return $this->id;
+                } else {
+                    $this->error = $this->db->lasterror();
+
+                    $this->db->rollback();
+                    return -1;
+                }
+            }
+        }
+
+        if ($result > 0) {
+            $this->db->commit();
+            return $this->id;
+        } else {
+            // $this->error deja positionne
+            $this->db->rollback();
+            return -2;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Assign rights by default
+     *
+     * @return     integer erreur <0, si ok renvoi le nbre de droits par defaut positionnes
+     */
+    public function set_default_rights()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $rd = [];
+        $num = 0;
+        $sql = "SELECT id FROM ".MAIN_DB_PREFIX."rights_def";
 		$sql .= " WHERE bydefault = 1";
 		$sql .= " AND entity = ".((int) $conf->entity);
 
@@ -1522,8 +1720,6 @@ private $cache_childids;
 
 		return $i;
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  	Update a user into database (and also password if this->pass is defined)
@@ -1859,24 +2055,55 @@ private $cache_childids;
 				$this->db->rollback();
 				return -1;
 			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -2;
-		}
-	}
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -2;
+        }
+    }
 
-	/**
-	 *  Change password of a user
-	 *
-	 *  @param	User	$user             		Object user of user requesting the change (not the user for who we change the password). May be unknown.
-	 *  @param  string	$password         		New password, in clear text or already encrypted (to generate if not provided)
-	 *	@param	int		$changelater			0=Default, 1=Save password into pass_temp to change password only after clicking on confirm email
-	 *	@param	int		$notrigger				1=Does not launch triggers
-	 *	@param	int		$nosyncmember	        Do not synchronize linked member
-	 *  @param	int		$passwordalreadycrypted 0=Value is cleartext password, 1=Value is crypted value.
-	 *  @return string 			          		If OK return clear password, 0 if no change, < 0 if error
-	 */
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Mise a jour en base de la date de derniere connexion d'un utilisateur
+     *  Fonction appelee lors d'une nouvelle connexion
+     *
+     * @return int     <0 si echec, >=0 si ok
+     */
+    public function update_last_login_date()
+    {
+        // phpcs:enable
+        $now = dol_now();
+
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "user SET";
+        $sql .= " datepreviouslogin = datelastlogin,";
+        $sql .= " datelastlogin = '" . $this->db->idate($now) . "',";
+        $sql .= " tms = tms"; // La date de derniere modif doit changer sauf pour la mise a jour de date de derniere connexion
+        $sql .= " WHERE rowid = " . ((int) $this->id);
+
+        dol_syslog(get_class($this) . "::update_last_login_date user->id=" . $this->id . " " . $sql, LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $this->datepreviouslogin = $this->datelastlogin;
+            $this->datelastlogin = $now;
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror() . ' sql=' . $sql;
+            return -1;
+        }
+    }
+
+    /**
+     *  Change password of a user
+     *
+     * @param User   $user                   Object user of user requesting the change (not the user for who we change the password). May be unknown.
+     * @param string $password               New password, in clear text or already encrypted (to generate if not provided)
+     * @param int    $changelater            0=Default, 1=Save password into pass_temp to change password only after clicking on confirm email
+     * @param int    $notrigger              1=Does not launch triggers
+     * @param int    $nosyncmember           Do not synchronize linked member
+     * @param int    $passwordalreadycrypted 0=Value is cleartext password, 1=Value is crypted value.
+     * @return string                            If OK return clear password, 0 if no change, < 0 if error
+     */
 	public function setPassword($user, $password = '', $changelater = 0, $notrigger = 0, $nosyncmember = 0, $passwordalreadycrypted = 0)
 	{
 		global $conf, $langs;
@@ -1984,127 +2211,6 @@ private $cache_childids;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Create a user into database from a member object.
-	 *  If $member->fk_soc is set, it will be an external user.
-	 *
-	 *  @param	Adherent		$member		Object member source
-	 * 	@param	string			$login		Login to force
-	 *  @return int							<0 if KO, if OK, return id of created account
-	 */
-	public function create_from_member($member, $login = '')
-	{
-		// phpcs:enable
-		global $conf, $user, $langs;
-
-		// Set properties on new user
-		$this->admin = 0;
-		$this->civility_code = $member->civility_id;
-		$this->lastname     = $member->lastname;
-		$this->firstname    = $member->firstname;
-		$this->gender		= $member->gender;
-		$this->email        = $member->email;
-		$this->fk_member    = $member->id;
-		$this->address      = $member->address;
-		$this->zip          = $member->zip;
-		$this->town         = $member->town;
-		$this->setUpperOrLowerCase();
-		$this->state_id     = $member->state_id;
-		$this->country_id   = $member->country_id;
-		$this->socialnetworks = $member->socialnetworks;
-
-		$this->pass         = $member->pass;
-		$this->pass_crypted = $member->pass_indatabase_crypted;
-
-		if (empty($login)) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
-			$login = dol_buildlogin($member->lastname, $member->firstname);
-		}
-		$this->login = $login;
-
-		$this->db->begin();
-
-		// Create and set $this->id
-		$result = $this->create($user);
-		if ($result > 0) {
-			if (!empty($this->pass)) {	// If a clear password was received (this situation should not happen anymore now), we use it to save it into database
-				$newpass = $this->setPassword($user, $this->pass);
-				if (is_numeric($newpass) && $newpass < 0) {
-					$result = -2;
-				}
-			} elseif (!empty($this->pass_crypted)) {	// If a crypted password is already known, we save it directly into database because the previous create did not save it.
-				$sql = "UPDATE ".MAIN_DB_PREFIX."user";
-				$sql .= " SET pass_crypted = '".$this->db->escape($this->pass_crypted)."'";
-				$sql .= " WHERE rowid=".((int) $this->id);
-
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					$result = -1;
-				}
-			}
-
-			if ($result > 0 && $member->fk_soc) {	// If member is linked to a thirdparty
-				$sql = "UPDATE ".MAIN_DB_PREFIX."user";
-				$sql .= " SET fk_soc=".((int) $member->fk_soc);
-				$sql .= " WHERE rowid=".((int) $this->id);
-
-				dol_syslog(get_class($this)."::create_from_member", LOG_DEBUG);
-				$resql = $this->db->query($sql);
-				if ($resql) {
-					$this->db->commit();
-					return $this->id;
-				} else {
-					$this->error = $this->db->lasterror();
-
-					$this->db->rollback();
-					return -1;
-				}
-			}
-		}
-
-		if ($result > 0) {
-			$this->db->commit();
-			return $this->id;
-		} else {
-			// $this->error deja positionne
-			$this->db->rollback();
-			return -2;
-		}
-	}
-
-	/**
-	 *  Mise a jour en base de la date de derniere connexion d'un utilisateur
-	 *  Fonction appelee lors d'une nouvelle connexion
-	 *
-	 *  @return int     <0 si echec, >=0 si ok
-	 */
-	public function update_last_login_date()
-	{
-		// phpcs:enable
-		$now = dol_now();
-
-		$sql = "UPDATE ".MAIN_DB_PREFIX."user SET";
-		$sql .= " datepreviouslogin = datelastlogin,";
-		$sql .= " datelastlogin = '".$this->db->idate($now)."',";
-		$sql .= " tms = tms"; // La date de derniere modif doit changer sauf pour la mise a jour de date de derniere connexion
-		$sql .= " WHERE rowid = ".((int) $this->id);
-
-		dol_syslog(get_class($this)."::update_last_login_date user->id=".$this->id." ".$sql, LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$this->datepreviouslogin = $this->datelastlogin;
-			$this->datelastlogin = $now;
-			return 1;
-		} else {
-			$this->error = $this->db->lasterror().' sql='.$sql;
-			return -1;
-		}
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Send new password by email
 	 *
@@ -2215,8 +2321,6 @@ private $cache_childids;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 		Renvoie la derniere erreur fonctionnelle de manipulation de l'objet
 	 *
@@ -2229,7 +2333,6 @@ private $cache_childids;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Read clicktodial information for user
 	 *
@@ -2264,7 +2367,6 @@ private $cache_childids;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Update clicktodial info
 	 *
@@ -2294,25 +2396,29 @@ private $cache_childids;
 		if ($result) {
 			$this->db->commit();
 			return 1;
-		} else {
-			$this->db->rollback();
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+        } else {
+            $this->db->rollback();
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 *  Add user into a group
-	 *
-	 *  @param	int		$group      Id of group
-	 *  @param  int		$entity     Entity
-	 *  @param  int		$notrigger  Disable triggers
-	 *  @return int  				<0 if KO, >0 if OK
-	 */
-	public function SetInGroup($group, $entity, $notrigger = 0)
-	{
-		// phpcs:enable
-		global $conf, $langs, $user;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Add user into a group
+     *
+     * @param int $group     Id of group
+     * @param int $entity    Entity
+     * @param int $notrigger Disable triggers
+     *
+     * @return int                <0 if KO, >0 if OK
+     */
+    public function SetInGroup($group, $entity, $notrigger = 0)
+    {
+        // phpcs:enable
+        global $conf, $langs, $user;
 
 		$error = 0;
 
@@ -2357,14 +2463,16 @@ private $cache_childids;
 		}
 	}
 
-	/**
-	 *  Remove a user from a group
-	 *
-	 *  @param	int   	$group       Id of group
-	 *  @param  int		$entity      Entity
-	 *  @param  int		$notrigger   Disable triggers
-	 *  @return int  			     <0 if KO, >0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Remove a user from a group
+     *
+     *  @param	int   	$group       Id of group
+     *  @param  int		$entity      Entity
+     *  @param  int		$notrigger   Disable triggers
+     *  @return int  			     <0 if KO, >0 if OK
+     */
 	public function RemoveFromGroup($group, $entity, $notrigger = 0)
 	{
 		// phpcs:enable
@@ -2408,6 +2516,7 @@ private $cache_childids;
 		}
 	}
 
+
 	/**
 	 *  Return a link with photo
 	 * 	Use this->id,this->photo
@@ -2416,6 +2525,7 @@ private $cache_childids;
 	 *	@param	int		$height			Height of image
 	 *  @param	string	$cssclass		Force a css class
 	 * 	@param	string	$imagesize		'mini', 'small' or '' (original)
+	 *
 	 *	@return	string					String with URL link
 	 */
 	public function getPhotoUrl($width, $height, $cssclass = '', $imagesize = '')
@@ -2621,55 +2731,6 @@ private $cache_childids;
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return the label of the status of user (active, inactive)
-	 *
-	 *  @param  int		$mode          0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return	string 			       Label of status
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->statut, $mode);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return the label of a status of user (active, inactive)
-	 *
-	 *  @param  int     $status         Id status
-	 *  @param  int		$mode           0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *  @return string                  Label of status
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		global $langs;
-
-		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			global $langs;
-			//$langs->load("mymodule");
-			$this->labelStatus[self::STATUS_ENABLED] = $langs->trans('Enabled');
-			$this->labelStatus[self::STATUS_DISABLED] = $langs->trans('Disabled');
-			$this->labelStatusShort[self::STATUS_ENABLED] = $langs->trans('Enabled');
-			$this->labelStatusShort[self::STATUS_DISABLED] = $langs->trans('Disabled');
-		}
-
-		$statusType = 'status5';
-		if ($status == self::STATUS_ENABLED) {
-			$statusType = 'status4';
-		}
-
-		return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return clickable link of login (eventualy with picto)
 	 *
@@ -2714,53 +2775,103 @@ private $cache_childids;
 				$picto = '<!-- picto user --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'">'.img_object('', 'user', $paddafterimage.' '.($notooltip ? '' : 'class="paddingright classfortooltip"'), 0, 0, $notooltip ? 0 : 1).'</span>';
 			} else {
 				// Picto must be a photo
-				$picto = '<!-- picto photo user --><span class="nopadding userimg'.($morecss ? ' '.$morecss : '').'"'.($paddafterimage ? ' '.$paddafterimage : '').'>'.Form::showphoto('userphoto', $this, 0, 0, 0, 'userphoto'.($withpictoimg == -3 ? 'small' : ''), 'mini', 0, 1).'</span>';
-			}
-			$result .= $picto;
-		}
-		$result .= $this->login;
-		$result .= $linkend;
+				$picto = '<!-- picto photo user --><span class="nopadding userimg' . ($morecss ? ' ' . $morecss : '') . '"' . ($paddafterimage ? ' ' . $paddafterimage : '') . '>' . Form::showphoto('userphoto', $this, 0, 0, 0, 'userphoto' . ($withpictoimg == -3 ? 'small' : ''), 'mini', 0, 1) . '</span>';
+            }
+            $result .= $picto;
+        }
+        $result .= $this->login;
+        $result .= $linkend;
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 *	Retourne chaine DN complete dans l'annuaire LDAP pour l'objet
-	 *
-	 *	@param	array	$info		Info array loaded by _load_ldap_info
-	 *	@param	int		$mode		0=Return full DN (uid=qqq,ou=xxx,dc=aaa,dc=bbb)
-	 *								1=Return parent (ou=xxx,dc=aaa,dc=bbb)
-	 *								2=Return key only (RDN) (uid=qqq)
-	 *	@return	string				DN
-	 */
-	public function _load_ldap_dn($info, $mode = 0)
-	{
-		// phpcs:enable
-		global $conf;
-		$dn = '';
+    /**
+     *  Return the label of the status of user (active, inactive)
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return    string                   Label of status
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->statut, $mode);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return the label of a status of user (active, inactive)
+     *
+     * @param int $status Id status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return string                  Label of status
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        global $langs;
+
+        if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
+            global $langs;
+            //$langs->load("mymodule");
+            $this->labelStatus[self::STATUS_ENABLED] = $langs->trans('Enabled');
+            $this->labelStatus[self::STATUS_DISABLED] = $langs->trans('Disabled');
+            $this->labelStatusShort[self::STATUS_ENABLED] = $langs->trans('Enabled');
+            $this->labelStatusShort[self::STATUS_DISABLED] = $langs->trans('Disabled');
+        }
+
+        $statusType = 'status5';
+        if ($status == self::STATUS_ENABLED) {
+            $statusType = 'status4';
+        }
+
+        return dolGetStatus($this->labelStatus[$status], $this->labelStatusShort[$status], '', $statusType, $mode);
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Retourne chaine DN complete dans l'annuaire LDAP pour l'objet
+     *
+     * @param array $info             Info array loaded by _load_ldap_info
+     * @param int   $mode             0=Return full DN (uid=qqq,ou=xxx,dc=aaa,dc=bbb)
+     *                                1=Return parent (ou=xxx,dc=aaa,dc=bbb)
+     *                                2=Return key only (RDN) (uid=qqq)
+     *
+     * @return    string                DN
+     */
+    public function _load_ldap_dn($info, $mode = 0)
+    {
+        // phpcs:enable
+        global $conf;
+        $dn = '';
 		if ($mode == 0) {
-			$dn = $conf->global->LDAP_KEY_USERS."=".$info[$conf->global->LDAP_KEY_USERS].",".$conf->global->LDAP_USER_DN;
-		} elseif ($mode == 1) {
-			$dn = $conf->global->LDAP_USER_DN;
-		} elseif ($mode == 2) {
-			$dn = $conf->global->LDAP_KEY_USERS."=".$info[$conf->global->LDAP_KEY_USERS];
-		}
-		return $dn;
-	}
+			$dn = $conf->global->LDAP_KEY_USERS . "=" . $info[$conf->global->LDAP_KEY_USERS] . "," . $conf->global->LDAP_USER_DN;
+        } elseif ($mode == 1) {
+            $dn = $conf->global->LDAP_USER_DN;
+        } elseif ($mode == 2) {
+            $dn = $conf->global->LDAP_KEY_USERS . "=" . $info[$conf->global->LDAP_KEY_USERS];
+        }
+        return $dn;
+    }
 
-	/**
-	 *	Initialize the info array (array of LDAP values) that will be used to call LDAP functions
-	 *
-	 *	@return		array		Tableau info des attributs
-	 */
-	public function _load_ldap_info()
-	{
-		// phpcs:enable
-		global $conf, $langs;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Initialize the info array (array of LDAP values) that will be used to call LDAP functions
+     *
+     * @return        array        Tableau info des attributs
+     */
+    public function _load_ldap_info()
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
-		$info = array();
+        $info = [];
 
-		$socialnetworks = getArrayOfSocialNetworks();
+        $socialnetworks = getArrayOfSocialNetworks();
 
 		$keymodified = false;
 
@@ -2906,6 +3017,7 @@ private $cache_childids;
 		return $info;
 	}
 
+
 	/**
 	 *  Initialise an instance with random values.
 	 *  Used to build previews or test instances.
@@ -2989,7 +3101,6 @@ private $cache_childids;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Return number of mass Emailing received by this contacts with its email
@@ -3015,9 +3126,6 @@ private $cache_childids;
 			return -1;
 		}
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Return number of existing users
@@ -3058,12 +3166,14 @@ private $cache_childids;
 		}
 	}
 
-	/**
-	 *  Update user using data from the LDAP
-	 *
-	 *  @param	Object	$ldapuser	Ladp User
-	 *  @return int  				<0 if KO, >0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Update user using data from the LDAP
+     *
+     *  @param	Object	$ldapuser	Ladp User
+     *  @return int  				<0 if KO, >0 if OK
+     */
 	public function update_ldap2dolibarr(&$ldapuser)
 	{
 		// phpcs:enable
@@ -3098,8 +3208,8 @@ private $cache_childids;
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return and array with all instanciated first level children users of current user
 	 *
@@ -3128,45 +3238,38 @@ private $cache_childids;
 		}
 	}
 
+
 	/**
-	 * 	Return list of all child users id in herarchy (all sublevels).
-	 *  Note: Calling this function also reset full list of users into $this->users.
-	 *
-	 *  @param      int      $addcurrentuser    1=Add also current user id to the list.
-	 *	@return		array		      		  	Array of user id lower than user (all levels under user). This overwrite this->users.
-	 *  @see get_children()
-	 */
-	public function getAllChildIds($addcurrentuser = 0)
-	{
-		$childids = array();
+	 *  Load this->parentof that is array(id_son=>id_parent, ...)
+     *
+     * @return     int     <0 if KO, >0 if OK
+     */
+    private function loadParentOf()
+    {
+        global $conf;
 
-		if (isset($this->cache_childids[$this->id])) {
-			$childids = $this->cache_childids[$this->id];
-		} else {
-			// Init this->users
-			$this->get_full_tree();
+        $this->parentof = [];
 
-			$idtoscan = $this->id;
+        // Load array[child]=parent
+        $sql = "SELECT fk_user as id_parent, rowid as id_son";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "user";
+        $sql .= " WHERE fk_user <> 0";
+        $sql .= " AND entity IN (" . getEntity('user') . ")";
 
-			dol_syslog("Build childid for id = ".$idtoscan);
-			foreach ($this->users as $id => $val) {
-				//var_dump($val['fullpath']);
-				if (preg_match('/_'.$idtoscan.'_/', $val['fullpath'])) {
-					$childids[$val['id']] = $val['id'];
-				}
-			}
-		}
-		$this->cache_childids[$this->id] = $childids;
+        dol_syslog(get_class($this) . "::loadParentOf", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            while ($obj = $this->db->fetch_object($resql)) {
+                $this->parentof[$obj->id_son] = $obj->id_parent;
+            }
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
 
-		if ($addcurrentuser) {
-			$childids[$this->id] = $this->id;
-		}
-
-		return $childids;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * 	Build the hierarchy/tree of users into an array.
 	 *	Set and return this->users that is an array sorted according to tree with arrays of:
@@ -3268,38 +3371,43 @@ private $cache_childids;
 	}
 
 	/**
-	 *  Load this->parentof that is array(id_son=>id_parent, ...)
-	 *
-	 *  @return     int     <0 if KO, >0 if OK
-	 */
-	private function loadParentOf()
-	{
-		global $conf;
+	 * 	Return list of all child users id in herarchy (all sublevels).
+     *  Note: Calling this function also reset full list of users into $this->users.
+     *
+     * @param int $addcurrentuser 1=Add also current user id to the list.
+     * @return        array                        Array of user id lower than user (all levels under user). This overwrite this->users.
+     * @see get_children()
+     */
+    public function getAllChildIds($addcurrentuser = 0)
+    {
+        $childids = [];
 
-		$this->parentof = array();
+        if (isset($this->cache_childids[$this->id])) {
+            $childids = $this->cache_childids[$this->id];
+        } else {
+            // Init this->users
+            $this->get_full_tree();
 
-		// Load array[child]=parent
-		$sql = "SELECT fk_user as id_parent, rowid as id_son";
-		$sql .= " FROM ".MAIN_DB_PREFIX."user";
-		$sql .= " WHERE fk_user <> 0";
-		$sql .= " AND entity IN (".getEntity('user').")";
+            $idtoscan = $this->id;
 
-		dol_syslog(get_class($this)."::loadParentOf", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			while ($obj = $this->db->fetch_object($resql)) {
-				$this->parentof[$obj->id_son] = $obj->id_parent;
-			}
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+            dol_syslog("Build childid for id = " . $idtoscan);
+            foreach ($this->users as $id => $val) {
+                //var_dump($val['fullpath']);
+                if (preg_match('/_' . $idtoscan . '_/', $val['fullpath'])) {
+                    $childids[$val['id']] = $val['id'];
+                }
+            }
+        }
+        $this->cache_childids[$this->id] = $childids;
 
+        if ($addcurrentuser) {
+            $childids[$this->id] = $this->id;
+        }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        return $childids;
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	For user id_user and its childs available in this->users, define property fullpath and fullname.
 	 *  Function called by get_full_tree().
@@ -3332,29 +3440,51 @@ private $cache_childids;
 			}
 			$useridfound[] = $this->parentof[$cursor_user];
 			$this->users[$id_user]['fullpath'] = '_'.$this->parentof[$cursor_user].$this->users[$id_user]['fullpath'];
-			$this->users[$id_user]['fullname'] = $this->users[$this->parentof[$cursor_user]]['lastname'].' >> '.$this->users[$id_user]['fullname'];
-			$i++; $cursor_user = $this->parentof[$cursor_user];
-		}
+			$this->users[$id_user]['fullname'] = $this->users[$this->parentof[$cursor_user]]['lastname'] . ' >> ' . $this->users[$id_user]['fullname'];
+            $i++;
+            $cursor_user = $this->parentof[$cursor_user];
+        }
 
-		// We count number of _ to have level
-		$this->users[$id_user]['level'] = dol_strlen(preg_replace('/[^_]/i', '', $this->users[$id_user]['fullpath']));
+        // We count number of _ to have level
+        $this->users[$id_user]['level'] = dol_strlen(preg_replace('/[^_]/i', '', $this->users[$id_user]['fullpath']));
 
-		return 1;
-	}
+        return 1;
+    }
 
-	/**
-	 *      Load metrics this->nb for dashboard
-	 *
-	 *      @return     int         <0 if KO, >0 if OK
-	 */
-	public function load_state_board()
-	{
-		// phpcs:enable
-		global $conf;
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'user',
+        ];
 
-		$this->nb = array();
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 
-		$sql = "SELECT COUNT(DISTINCT u.rowid) as nb";
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *      Load metrics this->nb for dashboard
+     *
+     * @return     int         <0 if KO, >0 if OK
+     */
+    public function load_state_board()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $this->nb = [];
+
+        $sql = "SELECT COUNT(DISTINCT u.rowid) as nb";
 		$sql .= " FROM ".MAIN_DB_PREFIX."user as u";
 		if (!empty($conf->multicompany->enabled) && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
 			$sql .= ", ".MAIN_DB_PREFIX."usergroup_user as ug";
@@ -3379,8 +3509,6 @@ private $cache_childids;
 			return -1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -3413,13 +3541,15 @@ private $cache_childids;
 		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 	}
 
-	/**
-	 *  Return property of user from its id
-	 *
-	 *  @param	int		$rowid      id of contact
-	 *  @param  string	$mode       'email' or 'mobile'
-	 *  @return string  			Email of user with format: "Full name <email>"
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return property of user from its id
+     *
+     *  @param	int		$rowid      id of contact
+     *  @param  string	$mode       'email' or 'mobile'
+     *  @return string  			Email of user with format: "Full name <email>"
+     */
 	public function user_get_property($rowid, $mode)
 	{
 		// phpcs:enable
@@ -3528,24 +3658,34 @@ private $cache_childids;
 				$this->db->free($resql);
 			}
 			return $num;
-		} else {
-			$this->errors[] = $this->db->lasterror();
-			return -1;
-		}
-	}
+        } else {
+            $this->errors[] = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	/**
-	 * Find a user by the given e-mail and return it's user id when found
-	 *
-	 * NOTE:
-	 * Use AGENDA_DISABLE_EXACT_USER_EMAIL_COMPARE_FOR_EXTERNAL_CALENDAR
-	 * to disable exact e-mail search
-	 *
-	 * @param string	$email	The full e-mail (or a part of a e-mail)
-	 * @return int				<0 = user was not found, >0 = The id of the user
-	 */
-	public function findUserIdByEmail($email)
-	{
+    /**
+     * Cache the SQL results of the function "findUserIdByEmail($email)"
+     *
+     * NOTE: findUserIdByEmailCache[...] === -1 means not found in database
+     *
+     * @var array
+     */
+    private $findUserIdByEmailCache;
+
+    /**
+     * Find a user by the given e-mail and return it's user id when found
+     *
+     * NOTE:
+     * Use AGENDA_DISABLE_EXACT_USER_EMAIL_COMPARE_FOR_EXTERNAL_CALENDAR
+     * to disable exact e-mail search
+     *
+     * @param string $email The full e-mail (or a part of a e-mail)
+     *
+     * @return int                <0 = user was not found, >0 = The id of the user
+     */
+    public function findUserIdByEmail($email)
+    {
 		if ($this->findUserIdByEmailCache[$email]) {
 			return $this->findUserIdByEmailCache[$email];
 		}

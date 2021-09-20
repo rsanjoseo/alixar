@@ -32,40 +32,44 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class CompanyPaymentMode extends CommonObject
 {
-	const STATUS_ENABLED = 1;
-	const STATUS_CANCELED = 0;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'companypaymentmode';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'societe_rib';
+
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
 	public $ismultientitymanaged = 'fk_soc@societe';
-	/**
-	 * @var int  Does companypaymentmode support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 0;
-	/**
-	 * @var string String with name of icon for companypaymentmode. Must be the part after the 'object_' into object_companypaymentmode.png
-	 */
-	public $picto = 'generic';
 
+    /**
+     * @var int  Does companypaymentmode support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 0;
 
-	/**
-	 *  'type' if the field format.
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only. Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'index' if we want an index in database.
-	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
-	 *  'position' is the sort order of field.
+    /**
+     * @var string String with name of icon for companypaymentmode. Must be the part after the 'object_' into object_companypaymentmode.png
+     */
+    public $picto = 'generic';
+
+    const STATUS_ENABLED = 1;
+    const STATUS_CANCELED = 0;
+
+    /**
+     *  'type' if the field format.
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only. Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'index' if we want an index in database.
+     *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
+     *  'position' is the sort order of field.
 	 *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
 	 *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
 	 *  'help' is a string visible as a tooltip on field
@@ -388,7 +392,7 @@ class CompanyPaymentMode extends CommonObject
 		$label .= '<br>';
 		$label .= '<b>'.$langs->trans('Ref').':</b> '.$this->ref;
 
-		$url = dol_buildpath('/monmodule/companypaymentmode_card.php', 1).'?id='.$this->id;
+        $url = '';
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not

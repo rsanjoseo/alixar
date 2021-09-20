@@ -19,21 +19,23 @@
  */
 
 /**
- *	    \file       htdocs/comm/remx.php
+ *        \file       htdocs/comm/remx.php
  *      \ingroup    societe
- *		\brief      Page to edit absolute discounts for a customer
+ *        \brief      Page to edit absolute discounts for a customer
  */
 
-//if (! defined('CSRFCHECK_WITH_TOKEN')) define('CSRFCHECK_WITH_TOKEN', '1');		// Force use of CSRF protection with tokens even for GET
+if (!defined('CSRFCHECK_WITH_TOKEN')) {
+    define('CSRFCHECK_WITH_TOKEN', '1');
+}        // Force use of CSRF protection with tokens even for GET
 
 require '../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
-require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/discount.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/discount.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'bills', 'companies'));
+$langs->loadLangs(['orders', 'bills', 'companies']);
 
 $id = GETPOST('id', 'int');
 

@@ -66,26 +66,183 @@ class ProductStockEntrepot extends CommonObject
 	public $desiredstock;
 	public $import_key;
 
+    /**
+     * Constructor
+     *
+     * @param DoliDb $db Database handler
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param DoliDb $db Database handler
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-	}
+    /**
+     * Create object into database
+     *
+     * @param User $user      User that creates
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = false)
+    {
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int	 $fk_product Product from which we want to get limit and desired stock by warehouse
-	 * @param int	 $fk_entrepot Warehouse in which we want to get products limit and desired stock
-	 * @param string $sortorder  Sort Order
-	 * @param string $sortfield  Sort field
-	 * @param int    $limit      offset limit
-	 * @param int    $offset     offset limit
+        $error = 0;
+
+        // Clean parameters
+
+        if (isset($this->fk_product)) {
+            $this->fk_product = (int) $this->fk_product;
+        }
+        if (isset($this->fk_entrepot)) {
+            $this->fk_entrepot = (int) $this->fk_entrepot;
+        }
+        if (isset($this->seuil_stock_alerte)) {
+            $this->seuil_stock_alerte = trim($this->seuil_stock_alerte);
+        }
+        if (isset($this->desiredstock)) {
+            $this->desiredstock = trim($this->desiredstock);
+        }
+        if (isset($this->import_key)) {
+            $this->import_key = trim($this->import_key);
+        }
+
+        // Check parameters
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
+
+        $sql .= 'fk_product,';
+        $sql .= 'fk_entrepot,';
+        $sql .= 'seuil_stock_alerte,';
+        $sql .= 'desiredstock,';
+        $sql .= 'import_key';
+
+        $sql .= ') VALUES (';
+
+        $sql .= ' ' . (!isset($this->fk_product) ? 'NULL' : $this->fk_product) . ',';
+        $sql .= ' ' . (!isset($this->fk_entrepot) ? 'NULL' : $this->fk_entrepot) . ',';
+        $sql .= ' ' . (!isset($this->seuil_stock_alerte) ? '0' : $this->seuil_stock_alerte) . ',';
+        $sql .= ' ' . (!isset($this->desiredstock) ? '0' : $this->desiredstock) . ',';
+        $sql .= ' ' . (!isset($this->import_key) ? 'NULL' : "'" . $this->db->escape($this->import_key) . "'");
+
+        $sql .= ')';
+
+        $this->db->begin();
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
+
+            //if (!$notrigger) {
+            // Uncomment this and change MYOBJECT to your own tag if you
+            // want this action to call a trigger.
+
+            //// Call triggers
+            //$result=$this->call_trigger('MYOBJECT_CREATE',$user);
+            //if ($result < 0) $error++;
+            //// End call triggers
+            //}
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+
+            return $this->id;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int $id          Id object
+     * @param int $fk_product  Id product
+     * @param int $fk_entrepot Id warehouse
+     *
+     * @return int                        <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id, $fk_product = 0, $fk_entrepot = 0)
+    {
+        if (empty($id) && (empty($fk_product) || empty($fk_entrepot))) {
+            return -1;
+        }
+
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        $sql = 'SELECT';
+        $sql .= ' t.rowid,';
+        $sql .= " t.tms,";
+        $sql .= " t.fk_product,";
+        $sql .= " t.fk_entrepot,";
+        $sql .= " t.seuil_stock_alerte,";
+        $sql .= " t.desiredstock,";
+        $sql .= " t.import_key";
+        $sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
+        if (!empty($id)) {
+            $sql .= ' WHERE t.rowid = ' . ((int) $id);
+        } else {
+            $sql .= ' WHERE t.fk_product = ' . ((int) $fk_product) . ' AND t.fk_entrepot = ' . ((int) $fk_entrepot);
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $numrows = $this->db->num_rows($resql);
+            if ($numrows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+
+                $this->tms = $this->db->jdate($obj->tms);
+                $this->fk_product = $obj->fk_product;
+                $this->fk_entrepot = $obj->fk_entrepot;
+                $this->seuil_stock_alerte = $obj->seuil_stock_alerte;
+                $this->desiredstock = $obj->desiredstock;
+                $this->import_key = $obj->import_key;
+            }
+
+            // Retrieve all extrafield
+            // fetch optionals attributes and labels
+            $this->fetch_optionals();
+
+            // $this->fetch_lines();
+
+            $this->db->free($resql);
+
+            if ($numrows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+
+            return -1;
+        }
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int    $fk_product  Product from which we want to get limit and desired stock by warehouse
+     * @param int    $fk_entrepot Warehouse in which we want to get products limit and desired stock
+     * @param string $sortorder   Sort Order
+     * @param string $sortfield   Sort field
+     * @param int    $limit       offset limit
+     * @param int    $offset      offset limit
 	 * @param array  $filter     filter array
 	 * @param string $filtermode filter mode (AND or OR)
 	 *
@@ -335,165 +492,6 @@ class ProductStockEntrepot extends CommonObject
 			$this->db->rollback();
 
 			return -1;
-		}
-	}
-
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id  				Id object
-	 * @param int    $fk_product 		Id product
-	 * @param int    $fk_entrepot  		Id warehouse
-	 * @return int 						<0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $fk_product = 0, $fk_entrepot = 0)
-	{
-		if (empty($id) && (empty($fk_product) || empty($fk_entrepot))) {
-			return -1;
-		}
-
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$sql = 'SELECT';
-		$sql .= ' t.rowid,';
-		$sql .= " t.tms,";
-		$sql .= " t.fk_product,";
-		$sql .= " t.fk_entrepot,";
-		$sql .= " t.seuil_stock_alerte,";
-		$sql .= " t.desiredstock,";
-		$sql .= " t.import_key";
-		$sql .= ' FROM '.MAIN_DB_PREFIX.$this->table_element.' as t';
-		if (!empty($id)) {
-			$sql .= ' WHERE t.rowid = '.((int) $id);
-		} else {
-			$sql .= ' WHERE t.fk_product = '.((int) $fk_product).' AND t.fk_entrepot = '.((int) $fk_entrepot);
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numrows = $this->db->num_rows($resql);
-			if ($numrows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-
-				$this->tms = $this->db->jdate($obj->tms);
-				$this->fk_product = $obj->fk_product;
-				$this->fk_entrepot = $obj->fk_entrepot;
-				$this->seuil_stock_alerte = $obj->seuil_stock_alerte;
-				$this->desiredstock = $obj->desiredstock;
-				$this->import_key = $obj->import_key;
-			}
-
-			// Retrieve all extrafield
-			// fetch optionals attributes and labels
-			$this->fetch_optionals();
-
-			// $this->fetch_lines();
-
-			$this->db->free($resql);
-
-			if ($numrows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-
-			return -1;
-		}
-	}
-
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$error = 0;
-
-		// Clean parameters
-
-		if (isset($this->fk_product)) {
-			$this->fk_product = (int) $this->fk_product;
-		}
-		if (isset($this->fk_entrepot)) {
-			$this->fk_entrepot = (int) $this->fk_entrepot;
-		}
-		if (isset($this->seuil_stock_alerte)) {
-			$this->seuil_stock_alerte = trim($this->seuil_stock_alerte);
-		}
-		if (isset($this->desiredstock)) {
-			$this->desiredstock = trim($this->desiredstock);
-		}
-		if (isset($this->import_key)) {
-			$this->import_key = trim($this->import_key);
-		}
-
-		// Check parameters
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element.'(';
-
-		$sql .= 'fk_product,';
-		$sql .= 'fk_entrepot,';
-		$sql .= 'seuil_stock_alerte,';
-		$sql .= 'desiredstock,';
-		$sql .= 'import_key';
-
-
-		$sql .= ') VALUES (';
-
-		$sql .= ' '.(!isset($this->fk_product) ? 'NULL' : $this->fk_product).',';
-		$sql .= ' '.(!isset($this->fk_entrepot) ? 'NULL' : $this->fk_entrepot).',';
-		$sql .= ' '.(!isset($this->seuil_stock_alerte) ? '0' : $this->seuil_stock_alerte).',';
-		$sql .= ' '.(!isset($this->desiredstock) ? '0' : $this->desiredstock).',';
-		$sql .= ' '.(!isset($this->import_key) ? 'NULL' : "'".$this->db->escape($this->import_key)."'");
-
-
-		$sql .= ')';
-
-		$this->db->begin();
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.implode(',', $this->errors), LOG_ERR);
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
-
-			//if (!$notrigger) {
-				// Uncomment this and change MYOBJECT to your own tag if you
-				// want this action to call a trigger.
-
-				//// Call triggers
-				//$result=$this->call_trigger('MYOBJECT_CREATE',$user);
-				//if ($result < 0) $error++;
-				//// End call triggers
-			//}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-
-			return $this->id;
 		}
 	}
 

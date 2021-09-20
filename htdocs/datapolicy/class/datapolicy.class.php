@@ -62,26 +62,97 @@ class DataPolicy
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			$i = 0;
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$contact = new Contact($db);
-				$contact->fetch($obj->rowid);
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $contact = new Contact($db);
+                $contact->fetch($obj->rowid);
 
-				DataPolicy::sendMailDataPolicyContact($contact);
-				$i++;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+                DataPolicy::sendMailDataPolicyContact($contact);
+                $i++;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	/**
-	 * sendMailDataPolicyContact
-	 *
-	 * @param 	mixed		$contact		Contact
-	 * @return	void
-	 */
+    /**
+     * getAllCompaniesNotInformed
+     *
+     * @return number
+     */
+    public function getAllCompaniesNotInformed()
+    {
+        global $langs, $conf, $db, $user;
+
+        $langs->load("companies");
+
+        $sql = "SELECT s.rowid";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "societe as s";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_extrafields as se ON se.fk_object = s.rowid";
+        $sql .= " WHERE s.statut=0 AND (se.datapolicy_consentement=0 OR se.datapolicy_consentement IS NULL) AND (se.datapolicy_opposition_traitement=0 OR se.datapolicy_opposition_traitement IS NULL) AND (se.datapolicy_opposition_prospection=0 OR se.datapolicy_opposition_prospection IS NULL)";
+        $sql .= " AND se.datapolicy_send IS NULL";
+        $sql .= " AND s.entity=" . $conf->entity;
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $societe = new Societe($db);
+                $societe->fetch($obj->rowid);
+
+                DataPolicy::sendMailDataPolicyCompany($societe);
+                $i++;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     * getAllAdherentsNotInformed
+     *
+     * @return number
+     */
+    public function getAllAdherentsNotInformed()
+    {
+        global $langs, $conf, $db, $user;
+
+        $langs->load("adherent");
+
+        $sql = "SELECT a.rowid";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "adherent as a";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "adherent_extrafields as ae ON ae.fk_object = a.rowid";
+        $sql .= " WHERE a.statut=0 AND (ae.datapolicy_consentement=0 OR ae.datapolicy_consentement IS NULL) AND (ae.datapolicy_opposition_traitement=0 OR ae.datapolicy_opposition_traitement IS NULL) AND (ae.datapolicy_opposition_prospection=0 OR ae.datapolicy_opposition_prospection IS NULL)";
+        $sql .= " AND ae.datapolicy_send IS NULL";
+        $sql .= " AND a.entity=" . $conf->entity;
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+                $adherent = new Adherent($db);
+                $adherent->fetch($obj->rowid);
+
+                DataPolicy::sendMailDataPolicyAdherent($adherent);
+                $i++;
+            }
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     * sendMailDataPolicyContact
+     *
+     * @param mixed $contact Contact
+     *
+     * @return    void
+     */
 	public static function sendMailDataPolicyContact($contact)
 	{
 		global $langs, $conf, $db, $user;
@@ -150,41 +221,6 @@ class DataPolicy
 			}
 		}
 		setEventMessage($resultmasssend);
-	}
-
-	/**
-	 * getAllCompaniesNotInformed
-	 *
-	 * @return number
-	 */
-	public function getAllCompaniesNotInformed()
-	{
-		global $langs, $conf, $db, $user;
-
-		$langs->load("companies");
-
-		$sql = "SELECT s.rowid";
-		$sql .= " FROM ".MAIN_DB_PREFIX."societe as s";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe_extrafields as se ON se.fk_object = s.rowid";
-		$sql .= " WHERE s.statut=0 AND (se.datapolicy_consentement=0 OR se.datapolicy_consentement IS NULL) AND (se.datapolicy_opposition_traitement=0 OR se.datapolicy_opposition_traitement IS NULL) AND (se.datapolicy_opposition_prospection=0 OR se.datapolicy_opposition_prospection IS NULL)";
-		$sql .= " AND se.datapolicy_send IS NULL";
-		$sql .= " AND s.entity=".$conf->entity;
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$societe = new Societe($db);
-				$societe->fetch($obj->rowid);
-
-				DataPolicy::sendMailDataPolicyCompany($societe);
-				$i++;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
 	}
 
 	/**
@@ -258,41 +294,6 @@ class DataPolicy
 			}
 		}
 		setEventMessage($resultmasssend);
-	}
-
-	/**
-	 * getAllAdherentsNotInformed
-	 *
-	 * @return number
-	 */
-	public function getAllAdherentsNotInformed()
-	{
-		global $langs, $conf, $db, $user;
-
-		$langs->load("adherent");
-
-		$sql = "SELECT a.rowid";
-		$sql .= " FROM ".MAIN_DB_PREFIX."adherent as a";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."adherent_extrafields as ae ON ae.fk_object = a.rowid";
-		$sql .= " WHERE a.statut=0 AND (ae.datapolicy_consentement=0 OR ae.datapolicy_consentement IS NULL) AND (ae.datapolicy_opposition_traitement=0 OR ae.datapolicy_opposition_traitement IS NULL) AND (ae.datapolicy_opposition_prospection=0 OR ae.datapolicy_opposition_prospection IS NULL)";
-		$sql .= " AND ae.datapolicy_send IS NULL";
-		$sql .= " AND a.entity=".$conf->entity;
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-				$adherent = new Adherent($db);
-				$adherent->fetch($obj->rowid);
-
-				DataPolicy::sendMailDataPolicyAdherent($adherent);
-				$i++;
-			}
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
 	}
 
 	/**

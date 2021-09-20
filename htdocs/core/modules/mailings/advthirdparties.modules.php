@@ -174,25 +174,6 @@ class mailing_advthirdparties extends MailingTargets
 		return parent::addTargetsToDatabase($mailing_id, $cibles);
 	}
 
-	/**
-	 *  Can include an URL link on each record provided by selector shown on target page.
-	 *
-	 *  @param	int		$id		ID
-	 *  @param	string		$type	type
-	 *  @return string      	Url link
-	 */
-	public function url($id, $type)
-	{
-		if ($type == 'thirdparty') {
-			$companystatic = new Societe($this->db);
-			$companystatic->fetch($id);
-			return $companystatic->getNomUrl(0, '', 0, 1);
-		} elseif ($type == 'contact') {
-			$contactstatic = new Contact($this->db);
-			$contactstatic->fetch($id);
-			return $contactstatic->getNomUrl(0, '', 0, '', -1, 1);
-		}
-	}
 
 	/**
 	 *	On the main mailing area, there is a box with statistics.
@@ -210,6 +191,7 @@ class mailing_advthirdparties extends MailingTargets
 		//$this->statssql[0]="SELECT field1 as label, count(distinct(email)) as nb FROM mytable WHERE email IS NOT NULL";
 		return array();
 	}
+
 
 	/**
 	 *	Return here number of distinct emails returned by your selector.
@@ -286,14 +268,35 @@ class mailing_advthirdparties extends MailingTargets
 				if ($type) {
 					$s .= ' ('.$type.')';
 				}
-				$s .= '</option>';
-				$i++;
-			}
-		} else {
-			dol_print_error($this->db);
-		}
+                $s .= '</option>';
+                $i++;
+            }
+        } else {
+            dol_print_error($this->db);
+        }
 
-		$s .= '</select>';
-		return $s;
-	}
+        $s .= '</select>';
+        return $s;
+    }
+
+    /**
+     *  Can include an URL link on each record provided by selector shown on target page.
+     *
+     * @param int    $id   ID
+     * @param string $type type
+     *
+     * @return string        Url link
+     */
+    public function url($id, $type)
+    {
+        if ($type == 'thirdparty') {
+            $companystatic = new Societe($this->db);
+            $companystatic->fetch($id);
+            return $companystatic->getNomUrl(0, '', 0, 1);
+        } elseif ($type == 'contact') {
+            $contactstatic = new Contact($this->db);
+            $contactstatic->fetch($id);
+            return $contactstatic->getNomUrl(0, '', 0, '', -1, 1);
+        }
+    }
 }

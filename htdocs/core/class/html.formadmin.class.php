@@ -64,24 +64,36 @@ class FormAdmin
 	 */
 	public function select_language($selected = '', $htmlname = 'lang_id', $showauto = 0, $filter = null, $showempty = '', $showwarning = 0, $disabled = 0, $morecss = '', $showcode = 0, $forcecombo = 0, $multiselect = 0, $onlykeys = null, $mainlangonly = 0)
 	{
-		// phpcs:enable
-		global $conf, $langs;
+        // phpcs:enable
+        global $conf, $langs;
 
-		if (!empty($conf->global->MAIN_DEFAULT_LANGUAGE_FILTER)) {
-			$filter[$conf->global->MAIN_DEFAULT_LANGUAGE_FILTER] = 1;
-		}
+        if (!empty($conf->global->MAIN_DEFAULT_LANGUAGE_FILTER)) {
+            $filter[$conf->global->MAIN_DEFAULT_LANGUAGE_FILTER] = 1;
+        }
 
-		$langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 12, 0, $mainlangonly);
+        $langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 12, 0, $mainlangonly);
 
-		$out = '';
+        // If the language to select is not inside the list of available language and empty value is not available, we must find
+        // an alternative as the language code to pre-select (to avoid to have first element in list pre-selected).
+        if ($selected && !in_array($selected, $langs_available) && empty($showempty)) {
+            $tmparray = explode('_', $selected);
+            if (!empty($tmparray[1])) {
+                $selected = getLanguageCodeFromCountryCode($tmparray[1]);
+            }
+            if (empty($selected)) {
+                $selected = $langs->defaultlang;
+            }
+        }
 
-		$out .= '<select '.($multiselect ? 'multiple="multiple" ' : '').'class="flat'.($morecss ? ' '.$morecss : '').'" id="'.$htmlname.'" name="'.$htmlname.($multiselect ? '[]' : '').'"'.($disabled ? ' disabled' : '').'>';
-		if ($showempty && !$multiselect) {
-			$out .= '<option value="0"';
-			if ($selected === '') {
-				$out .= ' selected';
-			}
-			$out .= '>';
+        $out = '';
+
+        $out .= '<select ' . ($multiselect ? 'multiple="multiple" ' : '') . 'class="flat' . ($morecss ? ' ' . $morecss : '') . '" id="' . $htmlname . '" name="' . $htmlname . ($multiselect ? '[]' : '') . '"' . ($disabled ? ' disabled' : '') . '>';
+        if ($showempty && !$multiselect) {
+            $out .= '<option value="0"';
+            if ($selected === '') {
+                $out .= ' selected';
+            }
+            $out .= '>';
 			if ($showempty != '1') {
 				$out .= $showempty;
 			} else {

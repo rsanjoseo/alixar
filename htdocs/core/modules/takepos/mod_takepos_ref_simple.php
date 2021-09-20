@@ -118,18 +118,6 @@ class mod_takepos_ref_simple extends ModeleNumRefTakepos
 	}
 
 	/**
-	 *  Return next free value
-	 *
-	 * @param       Societe     $objsoc         Object third party
-	 * @param       Object      $objforref      Object for number to search
-	 * @return      string      Next free value
-	 */
-	public function getNumRef($objsoc, $objforref)
-	{
-		return $this->getNextValue($objsoc, $objforref);
-	}
-
-	/**
 	 *  Return next value
 	 *
 	 * @param   Societe     $objsoc     Object third party
@@ -194,14 +182,27 @@ class mod_takepos_ref_simple extends ModeleNumRefTakepos
 
 			if ($max >= (pow(10, 4) - 1)) {
 				$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-			} else {
-				$num = sprintf("%04s", $max + 1);
-			}
+            } else {
+                $num = sprintf("%04s", $max + 1);
+            }
 
-			dol_syslog(get_class($this)."::getNextValue return ".$this->prefix.$pos_source.'-'.$yymm.'-'.$num);
-			return $this->prefix.$pos_source.'-'.$yymm.'-'.$num;
-		} else {
-			dol_print_error('', 'Bad parameter for getNextValue');
-		}
-	}
+            dol_syslog(get_class($this) . "::getNextValue return " . $this->prefix . $pos_source . '-' . $yymm . '-' . $num);
+            return $this->prefix . $pos_source . '-' . $yymm . '-' . $num;
+        } else {
+            dol_print_error('', 'Bad parameter for getNextValue');
+        }
+    }
+
+    /**
+     *  Return next free value
+     *
+     * @param Societe $objsoc    Object third party
+     * @param Object  $objforref Object for number to search
+     *
+     * @return      string      Next free value
+     */
+    public function getNumRef($objsoc, $objforref)
+    {
+        return $this->getNextValue($objsoc, $objforref);
+    }
 }

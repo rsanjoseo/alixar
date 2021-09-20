@@ -125,220 +125,132 @@ class CommandeFournisseurDispatch extends CommonObjectLine
 		$this->statutshort[2] = 'Denied';
 	}
 
-	/**
-	 *  Update object into database
-	 *
-	 *  @param	User	$user        User that modifies
-	 *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
-	 *  @return int     		   	 <0 if KO, >0 if OK
-	 */
-	public function update($user, $notrigger = 0)
-	{
-		$error = 0;
-
-		// Clean parameters
-
-		if (isset($this->fk_commande)) {
-			$this->fk_commande = trim($this->fk_commande);
-		}
-		if (isset($this->fk_product)) {
-			$this->fk_product = trim($this->fk_product);
-		}
-		if (isset($this->fk_commandefourndet)) {
-			$this->fk_commandefourndet = trim($this->fk_commandefourndet);
-		}
-		if (isset($this->qty)) {
-			$this->qty = trim($this->qty);
-		}
-		if (isset($this->fk_entrepot)) {
-			$this->fk_entrepot = trim($this->fk_entrepot);
-		}
-		if (isset($this->fk_user)) {
-			$this->fk_user = trim($this->fk_user);
-		}
-		if (isset($this->comment)) {
-			$this->comment = trim($this->comment);
-		}
-		if (isset($this->status)) {
-			$this->status = trim($this->status);
-		}
-		if (isset($this->batch)) {
-			$this->batch = trim($this->batch);
-		}
-
-
-
-		// Check parameters
-		// Put here code to add a control on parameters values
-
-		// Update request
-		$sql = "UPDATE ".MAIN_DB_PREFIX.$this->table_element." SET";
-
-		$sql .= " fk_commande=".(isset($this->fk_commande) ? $this->fk_commande : "null").",";
-		$sql .= " fk_product=".(isset($this->fk_product) ? $this->fk_product : "null").",";
-		$sql .= " fk_commandefourndet=".(isset($this->fk_commandefourndet) ? $this->fk_commandefourndet : "null").",";
-		$sql .= " qty=".(isset($this->qty) ? $this->qty : "null").",";
-		$sql .= " fk_entrepot=".(isset($this->fk_entrepot) ? $this->fk_entrepot : "null").",";
-		$sql .= " fk_user=".(isset($this->fk_user) ? $this->fk_user : "null").",";
-		$sql .= " datec=".(dol_strlen($this->datec) != 0 ? "'".$this->db->idate($this->datec)."'" : 'null').",";
-		$sql .= " comment=".(isset($this->comment) ? "'".$this->db->escape($this->comment)."'" : "null").",";
-		$sql .= " status=".(isset($this->status) ? $this->status : "null").",";
-		$sql .= " tms=".(dol_strlen($this->tms) != 0 ? "'".$this->db->idate($this->tms)."'" : 'null').",";
-		$sql .= " batch=".(isset($this->batch) ? "'".$this->db->escape($this->batch)."'" : "null").",";
-		$sql .= " eatby=".(dol_strlen($this->eatby) != 0 ? "'".$this->db->idate($this->eatby)."'" : 'null').",";
-		$sql .= " sellby=".(dol_strlen($this->sellby) != 0 ? "'".$this->db->idate($this->sellby)."'" : 'null')."";
-
-
-		$sql .= " WHERE rowid=".((int) $this->id);
-
-		$this->db->begin();
-
-		dol_syslog(__METHOD__);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++; $this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			if (!$error) {
-				if (empty($this->id) && !empty($this->rowid)) {
-					$this->id = $this->rowid;
-				}
-				$result = $this->insertExtraFields();
-				if ($result < 0) {
-					$error++;
-				}
-			}
-
-			if (!$notrigger) {
-				// Call triggers
-				$result = $this->call_trigger('LINERECEPTION_UPDATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
 
 	/**
-	 *  Delete object in database
-	 *
-	 *	@param  User	$user        User that deletes
-	 *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
-	 *  @return	int					 <0 if KO, >0 if OK
-	 */
-	public function delete($user, $notrigger = 0)
-	{
-		$error = 0;
+     *  Create object into database
+     *
+     * @param User $user      User that creates
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                 <0 if KO, Id of created object if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs, $hookmanager;
+        $error = 0;
 
-		$this->db->begin();
+        // Clean parameters
 
-		if (!$error) {
-			if (!$notrigger) {
-				// Call triggers
-				$result = $this->call_trigger('LINERECEPTION_DELETE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
+        if (isset($this->fk_commande)) {
+            $this->fk_commande = trim($this->fk_commande);
+        }
+        if (isset($this->fk_product)) {
+            $this->fk_product = trim($this->fk_product);
+        }
+        if (isset($this->fk_commandefourndet)) {
+            $this->fk_commandefourndet = trim($this->fk_commandefourndet);
+        }
+        if (isset($this->qty)) {
+            $this->qty = trim($this->qty);
+        }
+        if (isset($this->fk_entrepot)) {
+            $this->fk_entrepot = trim($this->fk_entrepot);
+        }
+        if (isset($this->fk_user)) {
+            $this->fk_user = trim($this->fk_user);
+        }
+        if (isset($this->comment)) {
+            $this->comment = trim($this->comment);
+        }
+        if (isset($this->status)) {
+            $this->status = trim($this->status);
+        }
+        if (isset($this->batch)) {
+            $this->batch = trim($this->batch);
+        }
+        if (empty($this->datec)) {
+            $this->datec = dol_now();
+        }
 
-		// Remove extrafields
-		if (!$error) {
-			$result = $this->deleteExtraFields();
-			if ($result < 0) {
-				$error++;
-				dol_syslog(get_class($this)."::delete error deleteExtraFields ".$this->error, LOG_ERR);
-			}
-		}
+        // Check parameters
+        // Put here code to add control on parameters values
 
-		if (!$error) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX.$this->table_element;
-			$sql .= " WHERE rowid=".((int) $this->id);
+        // Insert request
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . $this->table_element . "(";
+        $sql .= "fk_commande,";
+        $sql .= "fk_product,";
+        $sql .= "fk_commandefourndet,";
+        $sql .= "qty,";
+        $sql .= "fk_entrepot,";
+        $sql .= "fk_user,";
+        $sql .= "datec,";
+        $sql .= "comment,";
+        $sql .= "status,";
+        $sql .= "batch,";
+        $sql .= "eatby,";
+        $sql .= "sellby,";
+        $sql .= "fk_reception";
 
-			dol_syslog(__METHOD__);
-			$resql = $this->db->query($sql);
-			if (!$resql) {
-				$error++; $this->errors[] = "Error ".$this->db->lasterror();
-			}
-		}
+        $sql .= ") VALUES (";
+        $sql .= " " . (!isset($this->fk_commande) ? 'NULL' : "'" . $this->db->escape($this->fk_commande) . "'") . ",";
+        $sql .= " " . (!isset($this->fk_product) ? 'NULL' : "'" . $this->db->escape($this->fk_product) . "'") . ",";
+        $sql .= " " . (!isset($this->fk_commandefourndet) ? 'NULL' : "'" . $this->db->escape($this->fk_commandefourndet) . "'") . ",";
+        $sql .= " " . (!isset($this->qty) ? 'NULL' : "'" . $this->db->escape($this->qty) . "'") . ",";
+        $sql .= " " . (!isset($this->fk_entrepot) ? 'NULL' : "'" . $this->db->escape($this->fk_entrepot) . "'") . ",";
+        $sql .= " " . (!isset($this->fk_user) ? 'NULL' : "'" . $this->db->escape($this->fk_user) . "'") . ",";
+        $sql .= " " . (!isset($this->datec) || dol_strlen($this->datec) == 0 ? 'NULL' : "'" . $this->db->idate($this->datec) . "'") . ",";
+        $sql .= " " . (!isset($this->comment) ? 'NULL' : "'" . $this->db->escape($this->comment) . "'") . ",";
+        $sql .= " " . (!isset($this->status) ? 'NULL' : "'" . $this->db->escape($this->status) . "'") . ",";
+        $sql .= " " . (!isset($this->batch) ? 'NULL' : "'" . $this->db->escape($this->batch) . "'") . ",";
+        $sql .= " " . (!isset($this->eatby) || dol_strlen($this->eatby) == 0 ? 'NULL' : "'" . $this->db->idate($this->eatby) . "'") . ",";
+        $sql .= " " . (!isset($this->sellby) || dol_strlen($this->sellby) == 0 ? 'NULL' : "'" . $this->db->idate($this->sellby) . "'") . ",";
+        $sql .= " " . (!isset($this->fk_reception) ? 'NULL' : "'" . $this->db->escape($this->fk_reception) . "'") . "";
+        $sql .= ")";
 
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
+        $this->db->begin();
 
-	/**
-	 *	Load an object from its id and create a new one in database
-	 *
-	 *  @param	User	$user		User making the clone
-	 *	@param	int		$fromid     Id of object to clone
-	 * 	@return	int					New id of clone
-	 */
-	public function createFromClone(User $user, $fromid)
-	{
-		$error = 0;
+        dol_syslog(__METHOD__, LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
 
-		$object = new Commandefournisseurdispatch($this->db);
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
 
-		$this->db->begin();
+            if (!$notrigger) {
+                // Call triggers
+                $result = $this->call_trigger('LINERECEPTION_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
 
-		// Load source object
-		$object->fetch($fromid);
-		$object->id = 0;
-		$object->statut = 0;
+        // Create extrafields
+        if (!$error) {
+            $result = $this->insertExtraFields();
+            if ($result < 0) {
+                $error++;
+            }
+        }
 
-		// Clear fields
-		// ...
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', '.$errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->id;
+        }
+    }
 
-		// Create clone
-		$object->context['createfromclone'] = 'createfromclone';
-		$result = $object->create($user);
-
-		// Other options
-		if ($result < 0) {
-			$this->error = $object->error;
-			$error++;
-		}
-
-		if (!$error) {
-		}
-
-		unset($object->context['createfromclone']);
-
-		// End
-		if (!$error) {
-			$this->db->commit();
-			return $object->id;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
 
 	/**
 	 *  Load object in memory from the database
@@ -410,25 +322,24 @@ class CommandeFournisseurDispatch extends CommonObjectLine
 		}
 	}
 
-	/**
-	 *  Create object into database
-	 *
-	 *  @param	User	$user        User that creates
-	 *  @param  int		$notrigger   0=launch triggers after, 1=disable triggers
-	 *  @return int      		   	 <0 if KO, Id of created object if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs, $hookmanager;
-		$error = 0;
+    /**
+     *  Update object into database
+     *
+     * @param User $user      User that modifies
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     * @return int                 <0 if KO, >0 if OK
+     */
+    public function update($user, $notrigger = 0)
+    {
+        $error = 0;
 
-		// Clean parameters
+        // Clean parameters
 
-		if (isset($this->fk_commande)) {
-			$this->fk_commande = trim($this->fk_commande);
-		}
-		if (isset($this->fk_product)) {
-			$this->fk_product = trim($this->fk_product);
+        if (isset($this->fk_commande)) {
+            $this->fk_commande = trim($this->fk_commande);
+        }
+        if (isset($this->fk_product)) {
+            $this->fk_product = trim($this->fk_product);
 		}
 		if (isset($this->fk_commandefourndet)) {
 			$this->fk_commandefourndet = trim($this->fk_commandefourndet);
@@ -447,101 +358,194 @@ class CommandeFournisseurDispatch extends CommonObjectLine
 		}
 		if (isset($this->status)) {
 			$this->status = trim($this->status);
-		}
-		if (isset($this->batch)) {
-			$this->batch = trim($this->batch);
-		}
-		if (empty($this->datec)) {
-			$this->datec = dol_now();
-		}
+        }
+        if (isset($this->batch)) {
+            $this->batch = trim($this->batch);
+        }
 
+        // Check parameters
+        // Put here code to add a control on parameters values
 
-		// Check parameters
-		// Put here code to add control on parameters values
+        // Update request
+        $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element . " SET";
 
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX.$this->table_element."(";
-		$sql .= "fk_commande,";
-		$sql .= "fk_product,";
-		$sql .= "fk_commandefourndet,";
-		$sql .= "qty,";
-		$sql .= "fk_entrepot,";
-		$sql .= "fk_user,";
-		$sql .= "datec,";
-		$sql .= "comment,";
-		$sql .= "status,";
-		$sql .= "batch,";
-		$sql .= "eatby,";
-		$sql .= "sellby,";
-		$sql .= "fk_reception";
+        $sql .= " fk_commande=" . (isset($this->fk_commande) ? $this->fk_commande : "null") . ",";
+        $sql .= " fk_product=" . (isset($this->fk_product) ? $this->fk_product : "null") . ",";
+        $sql .= " fk_commandefourndet=" . (isset($this->fk_commandefourndet) ? $this->fk_commandefourndet : "null") . ",";
+        $sql .= " qty=" . (isset($this->qty) ? $this->qty : "null") . ",";
+        $sql .= " fk_entrepot=" . (isset($this->fk_entrepot) ? $this->fk_entrepot : "null") . ",";
+        $sql .= " fk_user=" . (isset($this->fk_user) ? $this->fk_user : "null") . ",";
+        $sql .= " datec=" . (dol_strlen($this->datec) != 0 ? "'" . $this->db->idate($this->datec) . "'" : 'null') . ",";
+        $sql .= " comment=" . (isset($this->comment) ? "'" . $this->db->escape($this->comment) . "'" : "null") . ",";
+        $sql .= " status=" . (isset($this->status) ? $this->status : "null") . ",";
+        $sql .= " tms=" . (dol_strlen($this->tms) != 0 ? "'" . $this->db->idate($this->tms) . "'" : 'null') . ",";
+        $sql .= " batch=" . (isset($this->batch) ? "'" . $this->db->escape($this->batch) . "'" : "null") . ",";
+        $sql .= " eatby=" . (dol_strlen($this->eatby) != 0 ? "'" . $this->db->idate($this->eatby) . "'" : 'null') . ",";
+        $sql .= " sellby=" . (dol_strlen($this->sellby) != 0 ? "'" . $this->db->idate($this->sellby) . "'" : 'null') . "";
 
+        $sql .= " WHERE rowid=" . ((int) $this->id);
 
-		$sql .= ") VALUES (";
-		$sql .= " ".(!isset($this->fk_commande) ? 'NULL' : "'".$this->db->escape($this->fk_commande)."'").",";
-		$sql .= " ".(!isset($this->fk_product) ? 'NULL' : "'".$this->db->escape($this->fk_product)."'").",";
-		$sql .= " ".(!isset($this->fk_commandefourndet) ? 'NULL' : "'".$this->db->escape($this->fk_commandefourndet)."'").",";
-		$sql .= " ".(!isset($this->qty) ? 'NULL' : "'".$this->db->escape($this->qty)."'").",";
-		$sql .= " ".(!isset($this->fk_entrepot) ? 'NULL' : "'".$this->db->escape($this->fk_entrepot)."'").",";
-		$sql .= " ".(!isset($this->fk_user) ? 'NULL' : "'".$this->db->escape($this->fk_user)."'").",";
-		$sql .= " ".(!isset($this->datec) || dol_strlen($this->datec) == 0 ? 'NULL' : "'".$this->db->idate($this->datec)."'").",";
-		$sql .= " ".(!isset($this->comment) ? 'NULL' : "'".$this->db->escape($this->comment)."'").",";
-		$sql .= " ".(!isset($this->status) ? 'NULL' : "'".$this->db->escape($this->status)."'").",";
-		$sql .= " ".(!isset($this->batch) ? 'NULL' : "'".$this->db->escape($this->batch)."'").",";
-		$sql .= " ".(!isset($this->eatby) || dol_strlen($this->eatby) == 0 ? 'NULL' : "'".$this->db->idate($this->eatby)."'").",";
-		$sql .= " ".(!isset($this->sellby) || dol_strlen($this->sellby) == 0 ? 'NULL' : "'".$this->db->idate($this->sellby)."'").",";
-		$sql .= " ".(!isset($this->fk_reception) ? 'NULL' : "'".$this->db->escape($this->fk_reception)."'")."";
-		$sql .= ")";
+        $this->db->begin();
 
-		$this->db->begin();
+        dol_syslog(__METHOD__);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
 
-		dol_syslog(__METHOD__, LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++; $this->errors[] = "Error ".$this->db->lasterror();
-		}
+        if (!$error) {
+            if (!$error) {
+                if (empty($this->id) && !empty($this->rowid)) {
+                    $this->id = $this->rowid;
+                }
+                $result = $this->insertExtraFields();
+                if ($result < 0) {
+                    $error++;
+                }
+            }
 
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
+            if (!$notrigger) {
+                // Call triggers
+                $result = $this->call_trigger('LINERECEPTION_UPDATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
 
-			if (!$notrigger) {
-				// Call triggers
-				$result=$this->call_trigger('LINERECEPTION_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
 
-		// Create extrafields
-		if (!$error) {
-			$result = $this->insertExtraFields();
-			if ($result < 0) {
-				$error++;
-			}
-		}
+    /**
+     *  Delete object in database
+     *
+     * @param User $user      User that deletes
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return    int                     <0 if KO, >0 if OK
+     */
+    public function delete($user, $notrigger = 0)
+    {
+        $error = 0;
 
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(__METHOD__." ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->id;
-		}
-	}
+        $this->db->begin();
 
-	/**
-	 *  Return label of the status of object
-	 *
-	 *  @param      int		$mode			0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto
-	 *  @return 	string        			Label
-	 */
-	public function getLibStatut($mode = 0)
+        if (!$error) {
+            if (!$notrigger) {
+                // Call triggers
+                $result = $this->call_trigger('LINERECEPTION_DELETE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
+
+        // Remove extrafields
+        if (!$error) {
+            $result = $this->deleteExtraFields();
+            if ($result < 0) {
+                $error++;
+                dol_syslog(get_class($this) . "::delete error deleteExtraFields " . $this->error, LOG_ERR);
+            }
+        }
+
+        if (!$error) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . $this->table_element;
+            $sql .= " WHERE rowid=" . ((int) $this->id);
+
+            dol_syslog(__METHOD__);
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $error++;
+                $this->errors[] = "Error " . $this->db->lasterror();
+            }
+        }
+
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(__METHOD__ . " " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
+
+    /**
+     *    Load an object from its id and create a new one in database
+     *
+     * @param User $user   User making the clone
+     * @param int  $fromid Id of object to clone
+     *
+     * @return    int                    New id of clone
+     */
+    public function createFromClone(User $user, $fromid)
+    {
+        $error = 0;
+
+        $object = new Commandefournisseurdispatch($this->db);
+
+        $this->db->begin();
+
+        // Load source object
+        $object->fetch($fromid);
+        $object->id = 0;
+        $object->statut = 0;
+
+        // Clear fields
+        // ...
+
+        // Create clone
+        $object->context['createfromclone'] = 'createfromclone';
+        $result = $object->create($user);
+
+        // Other options
+        if ($result < 0) {
+            $this->error = $object->error;
+            $error++;
+        }
+
+        if (!$error) {
+        }
+
+        unset($object->context['createfromclone']);
+
+        // End
+        if (!$error) {
+            $this->db->commit();
+            return $object->id;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *  Return label of the status of object
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto
+     *
+     * @return    string                    Label
+     */
+    public function getLibStatut($mode = 0)
 	{
 		return $this->LibStatut($this->status, $mode);
 	}

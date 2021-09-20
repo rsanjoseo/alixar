@@ -30,51 +30,59 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class IntracommReport extends CommonObject
 {
 	/**
-	 * DEB - Product
-	 */
-	const TYPE_DEB = 0;
-	/**
-	 * DES - Service
-	 */
-	const TYPE_DES = 1;
-	public static $type = array(
-		'introduction'=>'Introduction',
-		'expedition'=>'Expédition'
-	);
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'intracommreport';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'intracommreport';
+
 	/**
 	 * @var string Field with ID of parent key if this field has a parent
 	 */
 	public $fk_element = 'fk_intracommreport';
-	/**
-	 * @var string declaration number
-	 */
-	public $declaration_number;
-	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1;
 
 	/**
-	 * Constructor
-	 *
-	 * @param DoliDB $db Database handle
-	 */
-	public function __construct(DoliDB $db)
-	{
-		$this->db = $db;
-		$this->exporttype = 'deb';
-	}
+     * @var string declaration number
+     */
+    public $declaration_number;
 
-	/**
+    /**
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     *
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * DEB - Product
+     */
+    const TYPE_DEB = 0;
+
+    /**
+     * DES - Service
+     */
+    const TYPE_DES = 1;
+
+    public static $type = [
+        'introduction' => 'Introduction',
+        'expedition' => 'Expédition',
+    ];
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handle
+     */
+    public function __construct(DoliDB $db)
+    {
+        $this->db = $db;
+        $this->exporttype = 'deb';
+    }
+
+    /**
 	 * Fonction create
 	 * @param 	User 	$user 		User
 	 * @param 	int 	$notrigger 	notrigger
@@ -170,17 +178,39 @@ class IntracommReport extends CommonObject
 	}
 
 	/**
-	 *	Verify declaration number. Positive integer of a maximum of 6 characters recommended by the documentation
-	 *
-	 *	@param     	string		$number		Number to verify / convert
-	 *	@return		string 				Number
-	 */
-	public static function getDeclarationNumber($number)
-	{
-		return str_pad($number, 6, 0, STR_PAD_LEFT);
-	}
+     * Generate XMLDes file
+     *
+     * @param int    $period_year      Year of declaration
+     * @param int    $period_month     Month of declaration
+     * @param string $type_declaration Declaration type by default - introduction or expedition (always 'expedition' for Des)
+     * @return SimpleXMLElement|int
+     */
+    public function getXMLDes($period_year, $period_month, $type_declaration = 'expedition')
+    {
+        global $mysoc;
 
-	/**
+        $e = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8" ?><fichier_des></fichier_des>');
+
+        $declaration_des = $e->addChild('declaration_des');
+        $declaration_des->addChild('num_des', self::getDeclarationNumber($this->numero_declaration));
+        $declaration_des->addChild('num_tvaFr', $mysoc->tva_intra); // /^FR[a-Z0-9]{2}[0-9]{9}$/  // Doit faire 13 caractères
+        $declaration_des->addChild('mois_des', $period_month);
+        $declaration_des->addChild('an_des', $period_year);
+
+        /**************Ajout des lignes de factures**************************/
+        $res = $this->addItemsFact($declaration_des, $type_declaration, $period_year . '-' . $period_month, 'des');
+        /********************************************************************/
+
+        $this->errors = array_unique($this->errors);
+
+        if (!empty($res)) {
+            return $e->asXML();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
 	 *  Add line from invoice
 	 *
 	 *  @param	SimpleXMLElement	$declaration		Reference declaration
@@ -290,22 +320,6 @@ class IntracommReport extends CommonObject
 	}
 
 	/**
-	 *	Add item for DES
-	 *
-	 * 	@param	SimpleXMLElement	$declaration		Reference declaration
-	 * 	@param	Resource				$res				Result of request SQL
-	 *  @param	int					$i					Line Id
-	 *  @return	void
-	 */
-	public function addItemXMlDes($declaration, &$res, $i)
-	{
-		$item = $declaration->addChild('ligne_des');
-		$item->addChild('numlin_des', $i);
-		$item->addChild('valeur', round($res->total_ht)); // Total amount excl. tax of the invoice (whole amount expected)
-		$item->addChild('partner_des', $res->tva_intra); // Represents the foreign customer's VAT number
-	}
-
-	/**
 	 *	Add item for DEB
 	 *
 	 * 	@param	SimpleXMLElement	$declaration		Reference declaration
@@ -332,26 +346,43 @@ class IntracommReport extends CommonObject
 		$item->addChild('invoicedAmount', round($res->total_ht)); // Montant total ht de la facture (entier attendu)
 		// $item->addChild('invoicedNumber', $res->refinvoice); // Numéro facture
 		if (!empty($res->tva_intra)) {
-			$item->addChild('partnerId', $res->tva_intra);
-		}
-		$item->addChild('statisticalProcedureCode', '11');
-		$nature_of_transaction = $item->addChild('NatureOfTransaction');
-		$nature_of_transaction->addChild('natureOfTransactionACode', 1);
-		$nature_of_transaction->addChild('natureOfTransactionBCode', 1);
-		$item->addChild('modeOfTransportCode', $res->mode_transport);
-		$item->addChild('regionCode', substr($res->zip, 0, 2));
-	}
+            $item->addChild('partnerId', $res->tva_intra);
+        }
+        $item->addChild('statisticalProcedureCode', '11');
+        $nature_of_transaction = $item->addChild('NatureOfTransaction');
+        $nature_of_transaction->addChild('natureOfTransactionACode', 1);
+        $nature_of_transaction->addChild('natureOfTransactionBCode', 1);
+        $item->addChild('modeOfTransportCode', $res->mode_transport);
+        $item->addChild('regionCode', substr($res->zip, 0, 2));
+    }
 
-	/**
-	 *	This function adds an item by retrieving the customs code of the product with the highest amount in the invoice
-	 *
-	 * 	@param	SimpleXMLElement	$declaration		Reference declaration
-	 * 	@param	array				$TLinesFraisDePort	Data of shipping costs line
-	 *  @param	string	    		$type				Declaration type by default - introduction or expedition (always 'expedition' for Des)
-	 *  @param	Categorie			$categ_fraisdeport	category of shipping costs
-	 *  @param	int		    		$i					Line Id
-	 *  @return	void
-	 */
+    /**
+     *    Add item for DES
+     *
+     * @param SimpleXMLElement $declaration Reference declaration
+     * @param Resource         $res         Result of request SQL
+     * @param int              $i           Line Id
+     *
+     * @return    void
+     */
+    public function addItemXMlDes($declaration, &$res, $i)
+    {
+        $item = $declaration->addChild('ligne_des');
+        $item->addChild('numlin_des', $i);
+        $item->addChild('valeur', round($res->total_ht)); // Total amount excl. tax of the invoice (whole amount expected)
+        $item->addChild('partner_des', $res->tva_intra); // Represents the foreign customer's VAT number
+    }
+
+    /**
+     *    This function adds an item by retrieving the customs code of the product with the highest amount in the invoice
+     *
+     * @param SimpleXMLElement $declaration       Reference declaration
+     * @param array            $TLinesFraisDePort Data of shipping costs line
+     * @param string           $type              Declaration type by default - introduction or expedition (always 'expedition' for Des)
+     * @param Categorie        $categ_fraisdeport category of shipping costs
+     * @param int              $i                 Line Id
+     * @return    void
+     */
 	public function addItemFraisDePort(&$declaration, &$TLinesFraisDePort, $type, &$categ_fraisdeport, $i)
 	{
 
@@ -402,62 +433,41 @@ class IntracommReport extends CommonObject
 	}
 
 	/**
-	 * Generate XMLDes file
-	 *
-	 * @param int		$period_year		Year of declaration
-	 * @param int		$period_month		Month of declaration
-	 * @param string	$type_declaration	Declaration type by default - introduction or expedition (always 'expedition' for Des)
-	 * @return SimpleXMLElement|int
-	 */
-	public function getXMLDes($period_year, $period_month, $type_declaration = 'expedition')
-	{
-		global $mysoc;
-
-		$e = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8" ?><fichier_des></fichier_des>');
-
-		$declaration_des = $e->addChild('declaration_des');
-		$declaration_des->addChild('num_des', self::getDeclarationNumber($this->numero_declaration));
-		$declaration_des->addChild('num_tvaFr', $mysoc->tva_intra); // /^FR[a-Z0-9]{2}[0-9]{9}$/  // Doit faire 13 caractères
-		$declaration_des->addChild('mois_des', $period_month);
-		$declaration_des->addChild('an_des', $period_year);
-
-		/**************Ajout des lignes de factures**************************/
-		$res = $this->addItemsFact($declaration_des, $type_declaration, $period_year.'-'.$period_month, 'des');
-		/********************************************************************/
-
-		$this->errors = array_unique($this->errors);
-
-		if (!empty($res)) {
-			return $e->asXML();
-		} else {
-			return 0;
-		}
-	}
-
-	/**
 	 *	Return next reference of declaration not already used (or last reference)
 	 *
 	 *	@return    string					free ref or last ref
-	 */
-	public function getNextDeclarationNumber()
-	{
-		$resql = $this->db->query('SELECT MAX(numero_declaration) as max_declaration_number FROM '.MAIN_DB_PREFIX.$this->table_element." WHERE exporttype='".$this->db->escape($this->exporttype)."'");
-		if ($resql) {
-			$res = $this->db->fetch_object($resql);
-		}
+     */
+    public function getNextDeclarationNumber()
+    {
+        $resql = $this->db->query('SELECT MAX(numero_declaration) as max_declaration_number FROM ' . MAIN_DB_PREFIX . $this->table_element . " WHERE exporttype='" . $this->db->escape($this->exporttype) . "'");
+        if ($resql) {
+            $res = $this->db->fetch_object($resql);
+        }
 
-		return ($res->max_declaration_number + 1);
-	}
+        return ($res->max_declaration_number + 1);
+    }
 
-	/**
-	 *	Generate XML file
-	 *
-	 *	@return		void
-	 */
-	public function generateXMLFile()
-	{
+    /**
+     *    Verify declaration number. Positive integer of a maximum of 6 characters recommended by the documentation
+     *
+     * @param string $number Number to verify / convert
+     *
+     * @return        string                Number
+     */
+    public static function getDeclarationNumber($number)
+    {
+        return str_pad($number, 6, 0, STR_PAD_LEFT);
+    }
 
-		$name = $this->periode.'.xml';
+    /**
+     *    Generate XML file
+     *
+     * @return        void
+     */
+    public function generateXMLFile()
+    {
+
+        $name = $this->periode . '.xml';
 		$fname = sys_get_temp_dir().'/'.$name;
 		$f = fopen($fname, 'w+');
 		fwrite($f, $this->content_xml);

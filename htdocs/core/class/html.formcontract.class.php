@@ -50,32 +50,6 @@ class FormContract
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Show a form to select a contract
-	 *
-	 *  @param  int     $page       Page
-	 *  @param  int     $socid      Id third party (-1=all, 0=only contracts not linked to a third party, id=contracts not linked or linked to third party id)
-	 *  @param  int     $selected   Id contract preselected
-	 *  @param  string  $htmlname   Nom de la zone html
-	 *  @param  int     $maxlength	Maximum length of label
-	 *  @param  int     $showempty	Show empty line
-	 *  @param  int     $showRef    Show customer and supplier reference on each contract (when found)
-	 *  @return int                 Nbr of project if OK, <0 if KO
-	 */
-	public function formSelectContract($page, $socid = -1, $selected = '', $htmlname = 'contrattid', $maxlength = 16, $showempty = 1, $showRef = 0)
-	{
-		global $langs;
-
-		print "\n";
-		print '<form method="post" action="'.$page.'">';
-		print '<input type="hidden" name="action" value="setcontract">';
-		print '<input type="hidden" name="token" value="'.newToken().'">';
-		$this->select_contract($socid, $selected, $htmlname, $maxlength, $showempty, $showRef);
-		print '<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-		print '</form>';
-	}
-
 	/**
 	 *	Show a combo list with contracts qualified for a third party
 	 *
@@ -182,14 +156,40 @@ class FormContract
 
 			if (!empty($conf->use_javascript_ajax)) {
 				// Make select dynamic
-				include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
-				print ajax_combobox($htmlname);
-			}
+                include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+                print ajax_combobox($htmlname);
+            }
 
-			return $num;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+            return $num;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     *  Show a form to select a contract
+     *
+     * @param int    $page      Page
+     * @param int    $socid     Id third party (-1=all, 0=only contracts not linked to a third party, id=contracts not linked or linked to third party id)
+     * @param int    $selected  Id contract preselected
+     * @param string $htmlname  Nom de la zone html
+     * @param int    $maxlength Maximum length of label
+     * @param int    $showempty Show empty line
+     * @param int    $showRef   Show customer and supplier reference on each contract (when found)
+     *
+     * @return int                 Nbr of project if OK, <0 if KO
+     */
+    public function formSelectContract($page, $socid = -1, $selected = '', $htmlname = 'contrattid', $maxlength = 16, $showempty = 1, $showRef = 0)
+    {
+        global $langs;
+
+        print "\n";
+        print '<form method="post" action="' . $page . '">';
+        print '<input type="hidden" name="action" value="setcontract">';
+        print '<input type="hidden" name="token" value="' . newToken() . '">';
+        $this->select_contract($socid, $selected, $htmlname, $maxlength, $showempty, $showRef);
+        print '<input type="submit" class="button valignmiddle" value="' . $langs->trans("Modify") . '">';
+        print '</form>';
+    }
 }

@@ -54,162 +54,6 @@ class FormProduct
 		$this->db = $db;
 	}
 
-	/**
-	 *    Display form to select warehouse
-	 *
-	 *    @param    string  $page        Page
-	 *    @param    int     $selected    Id of warehouse
-	 *    @param    string  $htmlname    Name of select html field
-	 *    @param    int     $addempty    1=Add an empty value in list, 2=Add an empty value in list only if there is more than 2 entries.
-	 *    @return   void
-	 */
-	public function formSelectWarehouses($page, $selected = '', $htmlname = 'warehouse_id', $addempty = 0)
-	{
-		global $langs;
-		if ($htmlname != "none") {
-			print '<form method="POST" action="'.$page.'">';
-			print '<input type="hidden" name="action" value="setwarehouse">';
-			print '<input type="hidden" name="token" value="'.newToken().'">';
-			print '<table class="nobordernopadding">';
-			print '<tr><td>';
-			print $this->selectWarehouses($selected, $htmlname, '', $addempty);
-			print '</td>';
-			print '<td class="left"><input type="submit" class="button smallpaddingimp" value="'.$langs->trans("Modify").'"></td>';
-			print '</tr></table></form>';
-		} else {
-			if ($selected) {
-				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
-				$warehousestatic = new Entrepot($this->db);
-				$warehousestatic->fetch($selected);
-				print $warehousestatic->getNomUrl();
-			} else {
-				print "&nbsp;";
-			}
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return list of warehouses
-	 *
-	 *  @param  string|int  $selected           Id of preselected warehouse ('' or '-1' for no value, 'ifone'=select value if one value otherwise no value, '-2' to use the default value from setup)
-	 *  @param  string      $htmlname           Name of html select html
-	 *  @param  string      $filterstatus       warehouse status filter, following comma separated filter options can be used
-	 *                                          'warehouseopen' = select products from open warehouses,
-	 *                                          'warehouseclosed' = select products from closed warehouses,
-	 *                                          'warehouseinternal' = select products from warehouses for internal correct/transfer only
-	 *  @param  int		    $empty			    1=Can be empty, 0 if not
-	 * 	@param	int		    $disabled		    1=Select is disabled
-	 * 	@param	int		    $fk_product		    Add quantity of stock in label for product with id fk_product. Nothing if 0.
-	 *  @param	string	    $empty_label	    Empty label if needed (only if $empty=1)
-	 *  @param	int		    $showstock		    1=Show stock count
-	 *  @param	int	    	$forcecombo		    1=Force combo iso ajax select2
-	 *  @param	array	    $events			            Events to add to select2
-	 *  @param  string      $morecss                    Add more css classes to HTML select
-	 *  @param	array	    $exclude            Warehouses ids to exclude
-	 *  @param  int         $showfullpath       1=Show full path of name (parent ref into label), 0=Show only ref of current warehouse
-	 *  @param  bool|int    $stockMin           [=false] Value of minimum stock to filter or false not not filter by minimum stock
-	 *  @param  string      $orderBy            [='e.ref'] Order by
-	 * 	@return string					        HTML select
-	 *
-	 *  @throws Exception
-	 */
-	public function selectWarehouses($selected = '', $htmlname = 'idwarehouse', $filterstatus = '', $empty = 0, $disabled = 0, $fk_product = 0, $empty_label = '', $showstock = 0, $forcecombo = 0, $events = array(), $morecss = 'minwidth200', $exclude = array(), $showfullpath = 1, $stockMin = false, $orderBy = 'e.ref')
-	{
-		global $conf, $langs, $user, $hookmanager;
-
-		dol_syslog(get_class($this)."::selectWarehouses $selected, $htmlname, $filterstatus, $empty, $disabled, $fk_product, $empty_label, $showstock, $forcecombo, $morecss", LOG_DEBUG);
-
-		$out = '';
-		if (empty($conf->global->ENTREPOT_EXTRA_STATUS)) {
-			$filterstatus = '';
-		}
-		if (!empty($fk_product) && $fk_product > 0) {
-			$this->cache_warehouses = array();
-		}
-
-		$this->loadWarehouses($fk_product, '', $filterstatus, true, $exclude, $stockMin, $orderBy);
-		$nbofwarehouses = count($this->cache_warehouses);
-
-		if ($conf->use_javascript_ajax && !$forcecombo) {
-			include_once DOL_DOCUMENT_ROOT.'/core/lib/ajax.lib.php';
-			$comboenhancement = ajax_combobox($htmlname, $events);
-			$out .= $comboenhancement;
-		}
-
-		if (strpos($htmlname, 'search_') !== 0) {
-			if (empty($user->fk_warehouse) || $user->fk_warehouse == -1) {
-				if (($selected == '-2' || $selected == 'ifone') && !empty($conf->global->MAIN_DEFAULT_WAREHOUSE)) {
-					$selected = $conf->global->MAIN_DEFAULT_WAREHOUSE;
-				}
-			} else {
-				if (($selected == '-2' || $selected == 'ifone') && !empty($conf->global->MAIN_DEFAULT_WAREHOUSE_USER)) {
-					$selected = $user->fk_warehouse;
-				}
-			}
-		}
-
-		$out .= '<select class="flat'.($morecss ? ' '.$morecss : '').'"'.($disabled ? ' disabled' : '').' id="'.$htmlname.'" name="'.($htmlname.($disabled ? '_disabled' : '')).'">';
-		if ($empty) {
-			$out .= '<option value="-1">'.($empty_label ? $empty_label : '&nbsp;').'</option>';
-		}
-		foreach ($this->cache_warehouses as $id => $arraytypes) {
-			$label = '';
-			if ($showfullpath) {
-				$label .= $arraytypes['full_label'];
-			} else {
-				$label .= $arraytypes['label'];
-			}
-			if (($fk_product || ($showstock > 0)) && ($arraytypes['stock'] != 0 || ($showstock > 0))) {
-				if ($arraytypes['stock'] <= 0) {
-					$label .= ' <span class= \'text-warning\'>('.$langs->trans("Stock").':'.$arraytypes['stock'].')</span>';
-				} else {
-					$label .= ' <span class=\'opacitymedium\'>('.$langs->trans("Stock").':'.$arraytypes['stock'].')</span>';
-				}
-			}
-
-			$out .= '<option value="'.$id.'"';
-			if ($selected == $id || ($selected == 'ifone' && $nbofwarehouses == 1)) {
-				$out .= ' selected';
-			}
-			$out .= ' data-html="'.dol_escape_htmltag($label).'"';
-			$out .= '>';
-			$out .= $label;
-			$out .= '</option>';
-		}
-		$out .= '</select>';
-		if ($disabled) {
-			$out .= '<input type="hidden" name="'.$htmlname.'" value="'.(($selected > 0) ? $selected : '').'">';
-		}
-
-		$parameters = array(
-			'selected' => $selected,
-			'htmlname' => $htmlname,
-			'filterstatus' => $filterstatus,
-			'empty' => $empty,
-			'disabled ' => $disabled,
-			'fk_product' => $fk_product,
-			'empty_label' => $empty_label,
-			'showstock' => $showstock,
-			'forcecombo' => $forcecombo,
-			'events' => $events,
-			'morecss' => $morecss,
-			'exclude' => $exclude,
-			'showfullpath' => $showfullpath,
-			'stockMin' => $stockMin,
-			'orderBy' => $orderBy
-		);
-
-		$reshook = $hookmanager->executeHooks('selectWarehouses', $parameters, $this);
-		if ($reshook > 0) {
-			$out = $hookmanager->resPrint;
-		} elseif ($reshook == 0) {
-			$out .= $hookmanager->resPrint;
-		}
-
-		return $out;
-	}
 
 	/**
 	 * Load in cache array list of warehouses
@@ -328,6 +172,7 @@ class FormProduct
 		}
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Return full path to current warehouse in $tab (recursive function)
 	 *
@@ -344,27 +189,184 @@ class FormProduct
 
 		if (empty($tab['parent_id'])) {
 			return $final_label;
-		} else {
-			if (!empty($this->cache_warehouses[$tab['parent_id']])) {
-				$final_label = $this->cache_warehouses[$tab['parent_id']]['label'].' >> '.$final_label;
-				return $this->get_parent_path($this->cache_warehouses[$tab['parent_id']], $final_label);
-			}
-		}
+        } else {
+            if (!empty($this->cache_warehouses[$tab['parent_id']])) {
+                $final_label = $this->cache_warehouses[$tab['parent_id']]['label'] . ' >> ' . $final_label;
+                return $this->get_parent_path($this->cache_warehouses[$tab['parent_id']], $final_label);
+            }
+        }
 
-		return $final_label;
-	}
+        return $final_label;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Return list of warehouses
+     *
+     * @param string|int $selected              Id of preselected warehouse ('' or '-1' for no value, 'ifone'=select value if one value otherwise no value, '-2' to use the default value from setup)
+     * @param string     $htmlname              Name of html select html
+     * @param string     $filterstatus          warehouse status filter, following comma separated filter options can be used
+     *                                          'warehouseopen' = select products from open warehouses,
+     *                                          'warehouseclosed' = select products from closed warehouses,
+     *                                          'warehouseinternal' = select products from warehouses for internal correct/transfer only
+     * @param int        $empty                 1=Can be empty, 0 if not
+     * @param int        $disabled              1=Select is disabled
+     * @param int        $fk_product            Add quantity of stock in label for product with id fk_product. Nothing if 0.
+     * @param string     $empty_label           Empty label if needed (only if $empty=1)
+     * @param int        $showstock             1=Show stock count
+     * @param int        $forcecombo            1=Force combo iso ajax select2
+     * @param array      $events                Events to add to select2
+     * @param string     $morecss               Add more css classes to HTML select
+     * @param array      $exclude               Warehouses ids to exclude
+     * @param int        $showfullpath          1=Show full path of name (parent ref into label), 0=Show only ref of current warehouse
+     * @param bool|int   $stockMin              [=false] Value of minimum stock to filter or false not not filter by minimum stock
+     * @param string     $orderBy               [='e.ref'] Order by
+     *
+     * @return string                            HTML select
+     *
+     * @throws Exception
+     */
+    public function selectWarehouses($selected = '', $htmlname = 'idwarehouse', $filterstatus = '', $empty = 0, $disabled = 0, $fk_product = 0, $empty_label = '', $showstock = 0, $forcecombo = 0, $events = [], $morecss = 'minwidth200', $exclude = [], $showfullpath = 1, $stockMin = false, $orderBy = 'e.ref')
+    {
+        global $conf, $langs, $user, $hookmanager;
 
-	/**
-	 *  Output a combo box with list of units
-	 *  pour l'instant on ne definit pas les unites dans la base
-	 *
-	 *  @param	string		$name               Name of HTML field
-	 *  @param	string		$measuring_style    Unit to show: weight, size, surface, volume, time
-	 *  @param  string		$default            Preselected value
-	 * 	@param	int			$adddefault			Add empty unit called "Default"
-	 *  @param  int         $mode               1=Use short label as value, 0=Use rowid
+        dol_syslog(get_class($this) . "::selectWarehouses $selected, $htmlname, $filterstatus, $empty, $disabled, $fk_product, $empty_label, $showstock, $forcecombo, $morecss", LOG_DEBUG);
+
+        $out = '';
+        if (empty($conf->global->ENTREPOT_EXTRA_STATUS)) {
+            $filterstatus = '';
+        }
+        if (!empty($fk_product) && $fk_product > 0) {
+            $this->cache_warehouses = [];
+        }
+
+        $this->loadWarehouses($fk_product, '', $filterstatus, true, $exclude, $stockMin, $orderBy);
+        $nbofwarehouses = count($this->cache_warehouses);
+
+        if ($conf->use_javascript_ajax && !$forcecombo) {
+            include_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php';
+            $comboenhancement = ajax_combobox($htmlname, $events);
+            $out .= $comboenhancement;
+        }
+
+        if (strpos($htmlname, 'search_') !== 0) {
+            if (empty($user->fk_warehouse) || $user->fk_warehouse == -1) {
+                if (($selected == '-2' || $selected == 'ifone') && !empty($conf->global->MAIN_DEFAULT_WAREHOUSE)) {
+                    $selected = $conf->global->MAIN_DEFAULT_WAREHOUSE;
+                }
+            } else {
+                if (($selected == '-2' || $selected == 'ifone') && !empty($conf->global->MAIN_DEFAULT_WAREHOUSE_USER)) {
+                    $selected = $user->fk_warehouse;
+                }
+            }
+        }
+
+        $out .= '<select class="flat' . ($morecss ? ' ' . $morecss : '') . '"' . ($disabled ? ' disabled' : '') . ' id="' . $htmlname . '" name="' . ($htmlname . ($disabled ? '_disabled' : '')) . '">';
+        if ($empty) {
+            $out .= '<option value="-1">' . ($empty_label ? $empty_label : '&nbsp;') . '</option>';
+        }
+        foreach ($this->cache_warehouses as $id => $arraytypes) {
+            $label = '';
+            if ($showfullpath) {
+                $label .= $arraytypes['full_label'];
+            } else {
+                $label .= $arraytypes['label'];
+            }
+            if (($fk_product || ($showstock > 0)) && ($arraytypes['stock'] != 0 || ($showstock > 0))) {
+                if ($arraytypes['stock'] <= 0) {
+                    $label .= ' <span class= \'text-warning\'>(' . $langs->trans("Stock") . ':' . $arraytypes['stock'] . ')</span>';
+                } else {
+                    $label .= ' <span class=\'opacitymedium\'>(' . $langs->trans("Stock") . ':' . $arraytypes['stock'] . ')</span>';
+                }
+            }
+
+            $out .= '<option value="' . $id . '"';
+            if ($selected == $id || ($selected == 'ifone' && $nbofwarehouses == 1)) {
+                $out .= ' selected';
+            }
+            $out .= ' data-html="' . dol_escape_htmltag($label) . '"';
+            $out .= '>';
+            $out .= $label;
+            $out .= '</option>';
+        }
+        $out .= '</select>';
+        if ($disabled) {
+            $out .= '<input type="hidden" name="' . $htmlname . '" value="' . (($selected > 0) ? $selected : '') . '">';
+        }
+
+        $parameters = [
+            'selected' => $selected,
+            'htmlname' => $htmlname,
+            'filterstatus' => $filterstatus,
+            'empty' => $empty,
+            'disabled ' => $disabled,
+            'fk_product' => $fk_product,
+            'empty_label' => $empty_label,
+            'showstock' => $showstock,
+            'forcecombo' => $forcecombo,
+            'events' => $events,
+            'morecss' => $morecss,
+            'exclude' => $exclude,
+            'showfullpath' => $showfullpath,
+            'stockMin' => $stockMin,
+            'orderBy' => $orderBy,
+        ];
+
+        $reshook = $hookmanager->executeHooks('selectWarehouses', $parameters, $this);
+        if ($reshook > 0) {
+            $out = $hookmanager->resPrint;
+        } elseif ($reshook == 0) {
+            $out .= $hookmanager->resPrint;
+        }
+
+        return $out;
+    }
+
+    /**
+     *    Display form to select warehouse
+     *
+     * @param string $page     Page
+     * @param int    $selected Id of warehouse
+     * @param string $htmlname Name of select html field
+     * @param int    $addempty 1=Add an empty value in list, 2=Add an empty value in list only if there is more than 2 entries.
+     *
+     * @return   void
+     */
+    public function formSelectWarehouses($page, $selected = '', $htmlname = 'warehouse_id', $addempty = 0)
+    {
+        global $langs;
+        if ($htmlname != "none") {
+            print '<form method="POST" action="' . $page . '">';
+            print '<input type="hidden" name="action" value="setwarehouse">';
+            print '<input type="hidden" name="token" value="' . newToken() . '">';
+            print '<table class="nobordernopadding">';
+            print '<tr><td>';
+            print $this->selectWarehouses($selected, $htmlname, '', $addempty);
+            print '</td>';
+            print '<td class="left"><input type="submit" class="button smallpaddingimp" value="' . $langs->trans("Modify") . '"></td>';
+            print '</tr></table></form>';
+        } else {
+            if ($selected) {
+                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/entrepot.class.php';
+                $warehousestatic = new Entrepot($this->db);
+                $warehousestatic->fetch($selected);
+                print $warehousestatic->getNomUrl();
+            } else {
+                print "&nbsp;";
+            }
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Output a combo box with list of units
+     *  pour l'instant on ne definit pas les unites dans la base
+     *
+     * @param string $name               Name of HTML field
+     * @param string $measuring_style    Unit to show: weight, size, surface, volume, time
+     * @param string $default            Preselected value
+     * @param int    $adddefault         Add empty unit called "Default"
+     * @param int    $mode               1=Use short label as value, 0=Use rowid
 	 * 	@return	void
 	 *  @deprecated
 	 */

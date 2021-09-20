@@ -25,7 +25,7 @@
  *    \brief      Dolibarr home page
  */
 
-//define('CSRFCHECK_WITH_TOKEN', 1);    // We force need to use a token to login when making a POST
+define('CSRFCHECK_WITH_TOKEN', 1);    // We force need to use a token to login when making a POST
 
 require 'main.inc.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
@@ -42,16 +42,13 @@ $hookmanager->initHooks(['index']);
 
 // Check if company name is defined (first install)
 if (!isset($conf->global->MAIN_INFO_SOCIETE_NOM) || empty($conf->global->MAIN_INFO_SOCIETE_NOM)) {
-    die("1 Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
 if (count($conf->modules) <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only user module enabled
-    die("2 Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
-
 if (GETPOST('addbox')) {    // Add box (when submit is done from a form when ajax disabled)
     require_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
     $zone = GETPOST('areacode', 'int');
@@ -70,24 +67,25 @@ if (GETPOST('addbox')) {    // Add box (when submit is done from a form when aja
  */
 
 if (!isset($form) || !is_object($form)) {
-    require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
-    $form = new Form($db);
+	$form = new Form($db);
 }
 
 // Title
 $title = $langs->trans("HomeArea") . ' - Dolibarr ' . DOL_VERSION;
 if (!empty($conf->global->MAIN_APPLICATION_TITLE)) {
-    $title = $langs->trans("HomeArea") . ' - ' . $conf->global->MAIN_APPLICATION_TITLE;
+	$title = $langs->trans("HomeArea") . ' - ' . $conf->global->MAIN_APPLICATION_TITLE;
 }
 
 llxHeader('', $title);
 
+
 $resultboxes = FormOther::getBoxesArea($user, "0"); // Load $resultboxes (selectboxlist + boxactivated + boxlista + boxlistb)
+
 
 print load_fiche_titre('&nbsp;', $resultboxes['selectboxlist'], '', 0, '', 'titleforhome');
 
 if (!empty($conf->global->MAIN_MOTD)) {
-    $conf->global->MAIN_MOTD = preg_replace('/<br(\s[\sa-zA-Z_="]*)?\/?>/i', '<br>', $conf->global->MAIN_MOTD);
+	$conf->global->MAIN_MOTD = preg_replace('/<br(\s[\sa-zA-Z_="]*)?\/?>/i', '<br>', $conf->global->MAIN_MOTD);
     if (!empty($conf->global->MAIN_MOTD)) {
         $substitutionarray = getCommonSubstitutionArray($langs);
         complete_substitutions_array($substitutionarray, $langs);
@@ -107,7 +105,7 @@ if (!empty($conf->global->MAIN_MOTD)) {
 
 // Security warning repertoire install existe (si utilisateur admin)
 if ($user->admin && empty($conf->global->MAIN_REMOVE_INSTALL_WARNING)) {
-    $message = '';
+	$message = '';
 
     // Check if install lock file is present
     $lockfile = DOL_DATA_ROOT . '/install.lock';
@@ -146,7 +144,7 @@ $langs->loadLangs(['commercial', 'bills', 'orders', 'contracts']);
 // Dolibarr Working Board with weather
 
 if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
-    $showweather = (empty($conf->global->MAIN_DISABLE_METEO) || $conf->global->MAIN_DISABLE_METEO == 2) ? 1 : 0;
+	$showweather = (empty($conf->global->MAIN_DISABLE_METEO) || $conf->global->MAIN_DISABLE_METEO == 2) ? 1 : 0;
 
     //Array that contains all WorkboardResponse classes to process them
     $dashboardlines = [];
@@ -726,7 +724,7 @@ $boxlist = '<div class="twocolumns">';
 
 $boxlist .= '<div class="firstcolumn fichehalfleft boxhalfleft" id="boxhalfleft">';
 if (!empty($nbworkboardcount)) {
-    $boxlist .= $boxwork;
+	$boxlist .= $boxwork;
 }
 
 $boxlist .= $resultboxes['boxlista'];
@@ -742,6 +740,7 @@ $boxlist .= "\n";
 
 $boxlist .= '</div>';
 
+
 print $boxlist;
 
 print '</div>';
@@ -752,14 +751,15 @@ print '</div>';
 llxFooter();
 $db->close();
 
+
 /**
  *  Show weather logo. Logo to show depends on $totallate and values for
  *  $conf->global->MAIN_METEO_LEVELx
  *
- * @param int    $totallate Nb of element late
- * @param string $text      Text to show on logo
- * @param string $options   More parameters on img tag
- * @param string $morecss   More CSS
+ *  @param      int     $totallate      Nb of element late
+ *  @param      string $text    Text to show on logo
+ * @param string       $options More parameters on img tag
+ * @param string       $morecss More CSS
  *
  * @return     string                  Return img tag of weather
  */
@@ -770,6 +770,7 @@ function showWeather($totallate, $text, $options, $morecss = '')
     $weather = getWeatherStatus($totallate);
     return img_weather($text, $weather->picto, $options, 0, $morecss);
 }
+
 
 /**
  *  get weather level

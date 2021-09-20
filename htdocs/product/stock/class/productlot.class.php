@@ -149,26 +149,27 @@ class Productlot extends CommonObject
 	}
 
 	/**
-	 * Update object into database
-	 *
-	 * @param  User $user      User that modifies
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, >0 if OK
-	 */
-	public function update(User $user, $notrigger = false)
-	{
-		$error = 0;
+     * Create object into database
+     *
+     * @param User $user      User that creates
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, Id of created object if OK
+     */
+    public function create(User $user, $notrigger = false)
+    {
+        global $conf;
+        dol_syslog(__METHOD__, LOG_DEBUG);
 
-		dol_syslog(__METHOD__, LOG_DEBUG);
+        $error = 0;
 
-		// Clean parameters
+        // Clean parameters
 
-		if (isset($this->entity)) {
-			 $this->entity = (int) $this->entity;
-		}
-		if (isset($this->fk_product)) {
-			 $this->fk_product = (int) $this->fk_product;
+        if (isset($this->entity)) {
+            $this->entity = (int) $this->entity;
+        }
+        if (isset($this->fk_product)) {
+            $this->fk_product = (int) $this->fk_product;
 		}
 		if (isset($this->batch)) {
 			 $this->batch = trim($this->batch);
@@ -176,66 +177,81 @@ class Productlot extends CommonObject
 		if (isset($this->fk_user_creat)) {
 			 $this->fk_user_creat = (int) $this->fk_user_creat;
 		}
-		if (isset($this->fk_user_modif)) {
-			 $this->fk_user_modif = (int) $this->fk_user_modif;
-		}
-		if (isset($this->import_key)) {
-			 $this->import_key = trim($this->import_key);
-		}
+        if (isset($this->fk_user_modif)) {
+            $this->fk_user_modif = (int) $this->fk_user_modif;
+        }
+        if (isset($this->import_key)) {
+            $this->import_key = trim($this->import_key);
+        }
 
-		// Check parameters
-		// Put here code to add a control on parameters values
+        // Check parameters
+        // Put here code to add control on parameters values
 
-		if (empty($this->oldcopy)) {
-			$org = new self($this->db);
-			$org->fetch($this->id);
-			$this->oldcopy = $org;
-		}
+        // Insert request
+        $sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
+        $sql .= 'entity,';
+        $sql .= 'fk_product,';
+        $sql .= 'batch,';
+        $sql .= 'eatby,';
+        $sql .= 'sellby,';
+        $sql .= 'eol_date,';
+        $sql .= 'manufacturing_date,';
+        $sql .= 'scrapping_date,';
+        //$sql .= 'commissionning_date,';
+        //$sql .= 'qc_frequency,';
+        $sql .= 'datec,';
+        $sql .= 'fk_user_creat,';
+        $sql .= 'fk_user_modif,';
+        $sql .= 'import_key';
+        $sql .= ') VALUES (';
+        $sql .= ' ' . (!isset($this->entity) ? $conf->entity : $this->entity) . ',';
+        $sql .= ' ' . (!isset($this->fk_product) ? 'NULL' : $this->fk_product) . ',';
+        $sql .= ' ' . (!isset($this->batch) ? 'NULL' : "'" . $this->db->escape($this->batch) . "'") . ',';
+        $sql .= ' ' . (!isset($this->eatby) || dol_strlen($this->eatby) == 0 ? 'NULL' : "'" . $this->db->idate($this->eatby) . "'") . ',';
+        $sql .= ' ' . (!isset($this->sellby) || dol_strlen($this->sellby) == 0 ? 'NULL' : "'" . $this->db->idate($this->sellby) . "'") . ',';
+        $sql .= ' ' . (!isset($this->eol_date) || dol_strlen($this->eol_date) == 0 ? 'NULL' : "'" . $this->db->idate($this->eol_date) . "'") . ',';
+        $sql .= ' ' . (!isset($this->manufacturing_date) || dol_strlen($this->manufacturing_date) == 0 ? 'NULL' : "'" . $this->db->idate($this->manufacturing_date) . "'") . ',';
+        $sql .= ' ' . (!isset($this->scrapping_date) || dol_strlen($this->scrapping_date) == 0 ? 'NULL' : "'" . $this->db->idate($this->scrapping_date) . "'") . ',';
+        //$sql .= ' '.(!isset($this->commissionning_date) || dol_strlen($this->commissionning_date) == 0 ? 'NULL' : "'".$this->db->idate($this->commissionning_date)."'").',';
+        //$sql .= ' '.(!isset($this->qc_frequency) ? 'NULL' : $this->qc_frequency).',';
+        $sql .= ' ' . "'" . $this->db->idate(dol_now()) . "'" . ',';
+        $sql .= ' ' . (!isset($this->fk_user_creat) ? 'NULL' : $this->fk_user_creat) . ',';
+        $sql .= ' ' . (!isset($this->fk_user_modif) ? 'NULL' : $this->fk_user_modif) . ',';
+        $sql .= ' ' . (!isset($this->import_key) ? 'NULL' : $this->import_key);
+        $sql .= ')';
 
-		// Update request
-		$sql = 'UPDATE '.MAIN_DB_PREFIX.$this->table_element.' SET';
-		$sql .= ' entity = '.(isset($this->entity) ? $this->entity : "null").',';
-		$sql .= ' fk_product = '.(isset($this->fk_product) ? $this->fk_product : "null").',';
-		$sql .= ' batch = '.(isset($this->batch) ? "'".$this->db->escape($this->batch)."'" : "null").',';
-		$sql .= ' eatby = '.(!isset($this->eatby) || dol_strlen($this->eatby) != 0 ? "'".$this->db->idate($this->eatby)."'" : 'null').',';
-		$sql .= ' sellby = '.(!isset($this->sellby) || dol_strlen($this->sellby) != 0 ? "'".$this->db->idate($this->sellby)."'" : 'null').',';
-		$sql .= ' eol_date = '.(!isset($this->eol_date) || dol_strlen($this->eol_date) != 0 ? "'".$this->db->idate($this->eol_date)."'" : 'null').',';
-		$sql .= ' manufacturing_date = '.(!isset($this->manufacturing_date) || dol_strlen($this->manufacturing_date) != 0 ? "'".$this->db->idate($this->manufacturing_date)."'" : 'null').',';
-		$sql .= ' scrapping_date = '.(!isset($this->scrapping_date) || dol_strlen($this->scrapping_date) != 0 ? "'".$this->db->idate($this->scrapping_date)."'" : 'null').',';
-		//$sql .= ' commissionning_date = '.(!isset($this->first_use_date) || dol_strlen($this->first_use_date) != 0 ? "'".$this->db->idate($this->first_use_date)."'" : 'null').',';
-		//$sql .= ' qc_frequency = '.(!isset($this->qc_frequency) || dol_strlen($this->qc_frequency) != 0 ? "'".$this->db->escape($this->qc_frequency)."'" : 'null').',';
-		$sql .= ' datec = '.(!isset($this->datec) || dol_strlen($this->datec) != 0 ? "'".$this->db->idate($this->datec)."'" : 'null').',';
-		$sql .= ' tms = '.(dol_strlen($this->tms) != 0 ? "'".$this->db->idate($this->tms)."'" : "'".$this->db->idate(dol_now())."'").',';
-		$sql .= ' fk_user_creat = '.(isset($this->fk_user_creat) ? $this->fk_user_creat : "null").',';
-		$sql .= ' fk_user_modif = '.(isset($this->fk_user_modif) ? $this->fk_user_modif : "null").',';
-		$sql .= ' import_key = '.(isset($this->import_key) ? $this->import_key : "null");
-		$sql .= ' WHERE rowid='.((int) $this->id);
+        $this->db->begin();
 
-		$this->db->begin();
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+        }
 
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
-		}
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element);
 
-		// Actions on extra fields
-		if (!$error) {
-			$result = $this->insertExtraFields();
-			if ($result < 0) {
-				$error++;
-			}
-		}
+            // Actions on extra fields
+            if (!$error) {
+                $result = $this->insertExtraFields();
+                if ($result < 0) {
+                    $error++;
+                }
+            }
 
-		if (!$error && !$notrigger) {
-			// Call triggers
-			$result = $this->call_trigger('PRODUCTLOT_MODIFY', $user);
-			if ($result < 0) {
-				$error++;
-			}
-			// End call triggers
-		}
+            if (!$error && !$notrigger) {
+                // Uncomment this and change MYOBJECT to your own tag if you
+                // want this action to call a trigger.
+
+                // Call triggers
+                $result = $this->call_trigger('PRODUCTLOT_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
 
 		// Commit or rollback
 		if ($error) {
@@ -245,7 +261,7 @@ class Productlot extends CommonObject
 		} else {
 			$this->db->commit();
 
-			return 1;
+            return $this->id;
 		}
 	}
 
@@ -323,25 +339,126 @@ class Productlot extends CommonObject
 			if ($numrows) {
 				return 1;
 			} else {
-				return 0;
-			}
-		} else {
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
+                return 0;
+            }
+        } else {
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
 
-			return -1;
-		}
-	}
+            return -1;
+        }
+    }
 
-	/**
-	 * Delete object in database
-	 *
-	 * @param User $user      User that deletes
-	 * @param bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, >0 if OK
-	 */
-	public function delete(User $user, $notrigger = false)
+    /**
+     * Update object into database
+     *
+     * @param User $user      User that modifies
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, >0 if OK
+     */
+    public function update(User $user, $notrigger = false)
+    {
+        $error = 0;
+
+        dol_syslog(__METHOD__, LOG_DEBUG);
+
+        // Clean parameters
+
+        if (isset($this->entity)) {
+            $this->entity = (int) $this->entity;
+        }
+        if (isset($this->fk_product)) {
+            $this->fk_product = (int) $this->fk_product;
+        }
+        if (isset($this->batch)) {
+            $this->batch = trim($this->batch);
+        }
+        if (isset($this->fk_user_creat)) {
+            $this->fk_user_creat = (int) $this->fk_user_creat;
+        }
+        if (isset($this->fk_user_modif)) {
+            $this->fk_user_modif = (int) $this->fk_user_modif;
+        }
+        if (isset($this->import_key)) {
+            $this->import_key = trim($this->import_key);
+        }
+
+        // Check parameters
+        // Put here code to add a control on parameters values
+
+        if (empty($this->oldcopy)) {
+            $org = new self($this->db);
+            $org->fetch($this->id);
+            $this->oldcopy = $org;
+        }
+
+        // Update request
+        $sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element . ' SET';
+        $sql .= ' entity = ' . (isset($this->entity) ? $this->entity : "null") . ',';
+        $sql .= ' fk_product = ' . (isset($this->fk_product) ? $this->fk_product : "null") . ',';
+        $sql .= ' batch = ' . (isset($this->batch) ? "'" . $this->db->escape($this->batch) . "'" : "null") . ',';
+        $sql .= ' eatby = ' . (!isset($this->eatby) || dol_strlen($this->eatby) != 0 ? "'" . $this->db->idate($this->eatby) . "'" : 'null') . ',';
+        $sql .= ' sellby = ' . (!isset($this->sellby) || dol_strlen($this->sellby) != 0 ? "'" . $this->db->idate($this->sellby) . "'" : 'null') . ',';
+        $sql .= ' eol_date = ' . (!isset($this->eol_date) || dol_strlen($this->eol_date) != 0 ? "'" . $this->db->idate($this->eol_date) . "'" : 'null') . ',';
+        $sql .= ' manufacturing_date = ' . (!isset($this->manufacturing_date) || dol_strlen($this->manufacturing_date) != 0 ? "'" . $this->db->idate($this->manufacturing_date) . "'" : 'null') . ',';
+        $sql .= ' scrapping_date = ' . (!isset($this->scrapping_date) || dol_strlen($this->scrapping_date) != 0 ? "'" . $this->db->idate($this->scrapping_date) . "'" : 'null') . ',';
+        //$sql .= ' commissionning_date = '.(!isset($this->first_use_date) || dol_strlen($this->first_use_date) != 0 ? "'".$this->db->idate($this->first_use_date)."'" : 'null').',';
+        //$sql .= ' qc_frequency = '.(!isset($this->qc_frequency) || dol_strlen($this->qc_frequency) != 0 ? "'".$this->db->escape($this->qc_frequency)."'" : 'null').',';
+        $sql .= ' datec = ' . (!isset($this->datec) || dol_strlen($this->datec) != 0 ? "'" . $this->db->idate($this->datec) . "'" : 'null') . ',';
+        $sql .= ' tms = ' . (dol_strlen($this->tms) != 0 ? "'" . $this->db->idate($this->tms) . "'" : "'" . $this->db->idate(dol_now()) . "'") . ',';
+        $sql .= ' fk_user_creat = ' . (isset($this->fk_user_creat) ? $this->fk_user_creat : "null") . ',';
+        $sql .= ' fk_user_modif = ' . (isset($this->fk_user_modif) ? $this->fk_user_modif : "null") . ',';
+        $sql .= ' import_key = ' . (isset($this->import_key) ? $this->import_key : "null");
+        $sql .= ' WHERE rowid=' . ((int) $this->id);
+
+        $this->db->begin();
+
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = 'Error ' . $this->db->lasterror();
+            dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
+        }
+
+        // Actions on extra fields
+        if (!$error) {
+            $result = $this->insertExtraFields();
+            if ($result < 0) {
+                $error++;
+            }
+        }
+
+        if (!$error && !$notrigger) {
+            // Call triggers
+            $result = $this->call_trigger('PRODUCTLOT_MODIFY', $user);
+            if ($result < 0) {
+                $error++;
+            }
+            // End call triggers
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+
+            return 1;
+        }
+    }
+
+    /**
+     * Delete object in database
+     *
+     * @param User $user      User that deletes
+     * @param bool $notrigger false=launch triggers after, true=disable triggers
+     *
+     * @return int <0 if KO, >0 if OK
+     */
+    public function delete(User $user, $notrigger = false)
 	{
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
@@ -434,122 +551,6 @@ class Productlot extends CommonObject
 		}
 	}
 
-	/**
-	 * Create object into database
-	 *
-	 * @param  User $user      User that creates
-	 * @param  bool $notrigger false=launch triggers after, true=disable triggers
-	 *
-	 * @return int <0 if KO, Id of created object if OK
-	 */
-	public function create(User $user, $notrigger = false)
-	{
-		global $conf;
-		dol_syslog(__METHOD__, LOG_DEBUG);
-
-		$error = 0;
-
-		// Clean parameters
-
-		if (isset($this->entity)) {
-			 $this->entity = (int) $this->entity;
-		}
-		if (isset($this->fk_product)) {
-			 $this->fk_product = (int) $this->fk_product;
-		}
-		if (isset($this->batch)) {
-			 $this->batch = trim($this->batch);
-		}
-		if (isset($this->fk_user_creat)) {
-			 $this->fk_user_creat = (int) $this->fk_user_creat;
-		}
-		if (isset($this->fk_user_modif)) {
-			 $this->fk_user_modif = (int) $this->fk_user_modif;
-		}
-		if (isset($this->import_key)) {
-			 $this->import_key = trim($this->import_key);
-		}
-
-		// Check parameters
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.$this->table_element.'(';
-		$sql .= 'entity,';
-		$sql .= 'fk_product,';
-		$sql .= 'batch,';
-		$sql .= 'eatby,';
-		$sql .= 'sellby,';
-		$sql .= 'eol_date,';
-		$sql .= 'manufacturing_date,';
-		$sql .= 'scrapping_date,';
-		//$sql .= 'commissionning_date,';
-		//$sql .= 'qc_frequency,';
-		$sql .= 'datec,';
-		$sql .= 'fk_user_creat,';
-		$sql .= 'fk_user_modif,';
-		$sql .= 'import_key';
-		$sql .= ') VALUES (';
-		$sql .= ' '.(!isset($this->entity) ? $conf->entity : $this->entity).',';
-		$sql .= ' '.(!isset($this->fk_product) ? 'NULL' : $this->fk_product).',';
-		$sql .= ' '.(!isset($this->batch) ? 'NULL' : "'".$this->db->escape($this->batch)."'").',';
-		$sql .= ' '.(!isset($this->eatby) || dol_strlen($this->eatby) == 0 ? 'NULL' : "'".$this->db->idate($this->eatby)."'").',';
-		$sql .= ' '.(!isset($this->sellby) || dol_strlen($this->sellby) == 0 ? 'NULL' : "'".$this->db->idate($this->sellby)."'").',';
-		$sql .= ' '.(!isset($this->eol_date) || dol_strlen($this->eol_date) == 0 ? 'NULL' : "'".$this->db->idate($this->eol_date)."'").',';
-		$sql .= ' '.(!isset($this->manufacturing_date) || dol_strlen($this->manufacturing_date) == 0 ? 'NULL' : "'".$this->db->idate($this->manufacturing_date)."'").',';
-		$sql .= ' '.(!isset($this->scrapping_date) || dol_strlen($this->scrapping_date) == 0 ? 'NULL' : "'".$this->db->idate($this->scrapping_date)."'").',';
-		//$sql .= ' '.(!isset($this->commissionning_date) || dol_strlen($this->commissionning_date) == 0 ? 'NULL' : "'".$this->db->idate($this->commissionning_date)."'").',';
-		//$sql .= ' '.(!isset($this->qc_frequency) ? 'NULL' : $this->qc_frequency).',';
-		$sql .= ' '."'".$this->db->idate(dol_now())."'".',';
-		$sql .= ' '.(!isset($this->fk_user_creat) ? 'NULL' : $this->fk_user_creat).',';
-		$sql .= ' '.(!isset($this->fk_user_modif) ? 'NULL' : $this->fk_user_modif).',';
-		$sql .= ' '.(!isset($this->import_key) ? 'NULL' : $this->import_key);
-		$sql .= ')';
-
-		$this->db->begin();
-
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++;
-			$this->errors[] = 'Error '.$this->db->lasterror();
-			dol_syslog(__METHOD__.' '.join(',', $this->errors), LOG_ERR);
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX.$this->table_element);
-
-			// Actions on extra fields
-			if (!$error) {
-				$result = $this->insertExtraFields();
-				if ($result < 0) {
-					$error++;
-				}
-			}
-
-			if (!$error && !$notrigger) {
-				// Uncomment this and change MYOBJECT to your own tag if you
-				// want this action to call a trigger.
-
-				// Call triggers
-				$result = $this->call_trigger('PRODUCTLOT_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-
-			return $this->id;
-		}
-	}
 
 	/**
 	 *	Return label of status of object

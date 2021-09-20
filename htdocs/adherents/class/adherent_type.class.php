@@ -119,25 +119,147 @@ class AdherentType extends CommonObject
 
 
 	/**
-	 *	Constructor
-	 *
-	 *	@param 		DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->status = 1;
-	}
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->status = 1;
+    }
 
-	   /**
-		* Delete a language for this member type
-		*
-		* @param string $langtodelete 	Language code to delete
-		* @param User   $user         	Object user making delete
-		* @return int                   <0 if KO, >0 if OK
-		*/
-	public function delMultiLangs($langtodelete, $user)
-	{
+    /**
+     * Load array this->multilangs
+     *
+     * @return int        <0 if KO, >0 if OK
+     */
+    public function getMultiLangs()
+    {
+        global $langs;
+
+        $current_lang = $langs->getDefaultLang();
+
+        $sql = "SELECT lang, label, description, email";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "adherent_type_lang";
+        $sql .= " WHERE fk_type = " . ((int) $this->id);
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            while ($obj = $this->db->fetch_object($result)) {
+                //print 'lang='.$obj->lang.' current='.$current_lang.'<br>';
+                if ($obj->lang == $current_lang) {  // si on a les traduct. dans la langue courante on les charge en infos principales.
+                    $this->label = $obj->label;
+                    $this->description = $obj->description;
+                    $this->email = $obj->email;
+                }
+                $this->multilangs["$obj->lang"]["label"] = $obj->label;
+                $this->multilangs["$obj->lang"]["description"] = $obj->description;
+                $this->multilangs["$obj->lang"]["email"] = $obj->email;
+            }
+            return 1;
+        } else {
+            $this->error = "Error: " . $this->db->lasterror() . " - " . $sql;
+            return -1;
+        }
+    }
+
+    /**
+     * Update or add a translation for this member type
+     *
+     * @param User $user Object user making update
+     *
+     * @return int        <0 if KO, >0 if OK
+     */
+    public function setMultiLangs($user)
+    {
+        global $conf, $langs;
+
+        $langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 0, 2);
+        $current_lang = $langs->getDefaultLang();
+
+        foreach ($langs_available as $key => $value) {
+            if ($key == $current_lang) {
+                $sql = "SELECT rowid";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "adherent_type_lang";
+                $sql .= " WHERE fk_type = " . ((int) $this->id);
+                $sql .= " AND lang = '" . $this->db->escape($key) . "'";
+
+                $result = $this->db->query($sql);
+
+                if ($this->db->num_rows($result)) { // if there is already a description line for this language
+                    $sql2 = "UPDATE " . MAIN_DB_PREFIX . "adherent_type_lang";
+                    $sql2 .= " SET";
+                    $sql2 .= " label = '" . $this->db->escape($this->label) . "',";
+                    $sql2 .= " description = '" . $this->db->escape($this->description) . "'";
+                    $sql2 .= " WHERE fk_type = " . ((int) $this->id) . " AND lang='" . $this->db->escape($key) . "'";
+                } else {
+                    $sql2 = "INSERT INTO " . MAIN_DB_PREFIX . "adherent_type_lang (fk_type, lang, label, description";
+                    $sql2 .= ")";
+                    $sql2 .= " VALUES(" . ((int) $this->id) . ",'" . $this->db->escape($key) . "','" . $this->db->escape($this->label) . "',";
+                    $sql2 .= " '" . $this->db->escape($this->description) . "'";
+                    $sql2 .= ")";
+                }
+                dol_syslog(get_class($this) . '::setMultiLangs key = current_lang = ' . $key);
+                if (!$this->db->query($sql2)) {
+                    $this->error = $this->db->lasterror();
+                    return -1;
+                }
+            } elseif (isset($this->multilangs[$key])) {
+                $sql = "SELECT rowid";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "adherent_type_lang";
+                $sql .= " WHERE fk_type = " . ((int) $this->id);
+                $sql .= " AND lang = '" . $this->db->escape($key) . "'";
+
+                $result = $this->db->query($sql);
+
+                if ($this->db->num_rows($result)) { // if there is already a description line for this language
+                    $sql2 = "UPDATE " . MAIN_DB_PREFIX . "adherent_type_lang";
+                    $sql2 .= " SET ";
+                    $sql2 .= " label = '" . $this->db->escape($this->multilangs["$key"]["label"]) . "',";
+                    $sql2 .= " description = '" . $this->db->escape($this->multilangs["$key"]["description"]) . "'";
+                    $sql2 .= " WHERE fk_type = " . ((int) $this->id) . " AND lang='" . $this->db->escape($key) . "'";
+                } else {
+                    $sql2 = "INSERT INTO " . MAIN_DB_PREFIX . "adherent_type_lang (fk_type, lang, label, description";
+                    $sql2 .= ")";
+                    $sql2 .= " VALUES(" . $this->id . ",'" . $this->db->escape($key) . "','" . $this->db->escape($this->multilangs["$key"]["label"]) . "',";
+                    $sql2 .= " '" . $this->db->escape($this->multilangs["$key"]["description"]) . "'";
+                    $sql2 .= ")";
+                }
+
+                // We do not save if main fields are empty
+                if ($this->multilangs["$key"]["label"] || $this->multilangs["$key"]["description"]) {
+                    if (!$this->db->query($sql2)) {
+                        $this->error = $this->db->lasterror();
+                        return -1;
+                    }
+                }
+            } else {
+                // language is not current language and we didn't provide a multilang description for this language
+            }
+        }
+
+        // Call trigger
+        $result = $this->call_trigger('MEMBER_TYPE_SET_MULTILANGS', $user);
+        if ($result < 0) {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+        // End call triggers
+
+        return 1;
+    }
+
+    /**
+     * Delete a language for this member type
+     *
+     * @param string $langtodelete Language code to delete
+     * @param User   $user         Object user making delete
+     *
+     * @return int                   <0 if KO, >0 if OK
+     */
+    public function delMultiLangs($langtodelete, $user)
+    {
 		$sql = "DELETE FROM ".MAIN_DB_PREFIX."adherent_type_lang";
 		$sql .= " WHERE fk_type = ".((int) $this->id)." AND lang = '".$this->db->escape($langtodelete)."'";
 
@@ -382,128 +504,7 @@ class AdherentType extends CommonObject
 		}
 	}
 
-	/**
-	 * Load array this->multilangs
-	 *
-	 * @return int        <0 if KO, >0 if OK
-	 */
-	public function getMultiLangs()
-	{
-		global $langs;
-
-		$current_lang = $langs->getDefaultLang();
-
-		$sql = "SELECT lang, label, description, email";
-		$sql .= " FROM ".MAIN_DB_PREFIX."adherent_type_lang";
-		$sql .= " WHERE fk_type = ".((int) $this->id);
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			while ($obj = $this->db->fetch_object($result)) {
-				//print 'lang='.$obj->lang.' current='.$current_lang.'<br>';
-				if ($obj->lang == $current_lang) {  // si on a les traduct. dans la langue courante on les charge en infos principales.
-					$this->label        = $obj->label;
-					$this->description = $obj->description;
-					$this->email        = $obj->email;
-				}
-				$this->multilangs["$obj->lang"]["label"] = $obj->label;
-				$this->multilangs["$obj->lang"]["description"] = $obj->description;
-				$this->multilangs["$obj->lang"]["email"] = $obj->email;
-			}
-			return 1;
-		} else {
-			$this->error = "Error: ".$this->db->lasterror()." - ".$sql;
-			return -1;
-		}
-	}
-
-	/**
-	 * Update or add a translation for this member type
-	 *
-	 * @param  User $user Object user making update
-	 * @return int        <0 if KO, >0 if OK
-	 */
-	public function setMultiLangs($user)
-	{
-		global $conf, $langs;
-
-		$langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 0, 2);
-		$current_lang = $langs->getDefaultLang();
-
-		foreach ($langs_available as $key => $value) {
-			if ($key == $current_lang) {
-				$sql = "SELECT rowid";
-				$sql .= " FROM ".MAIN_DB_PREFIX."adherent_type_lang";
-				$sql .= " WHERE fk_type = ".((int) $this->id);
-				$sql .= " AND lang = '".$this->db->escape($key)."'";
-
-				$result = $this->db->query($sql);
-
-				if ($this->db->num_rows($result)) { // if there is already a description line for this language
-					$sql2 = "UPDATE ".MAIN_DB_PREFIX."adherent_type_lang";
-					$sql2 .= " SET";
-					$sql2 .= " label = '".$this->db->escape($this->label)."',";
-					$sql2 .= " description = '".$this->db->escape($this->description)."'";
-					$sql2 .= " WHERE fk_type = ".((int) $this->id)." AND lang='".$this->db->escape($key)."'";
-				} else {
-					$sql2 = "INSERT INTO ".MAIN_DB_PREFIX."adherent_type_lang (fk_type, lang, label, description";
-					$sql2 .= ")";
-					$sql2 .= " VALUES(".((int) $this->id).",'".$this->db->escape($key)."','".$this->db->escape($this->label)."',";
-					$sql2 .= " '".$this->db->escape($this->description)."'";
-					$sql2 .= ")";
-				}
-				dol_syslog(get_class($this).'::setMultiLangs key = current_lang = '.$key);
-				if (!$this->db->query($sql2)) {
-					$this->error = $this->db->lasterror();
-					return -1;
-				}
-			} elseif (isset($this->multilangs[$key])) {
-				$sql = "SELECT rowid";
-				$sql .= " FROM ".MAIN_DB_PREFIX."adherent_type_lang";
-				$sql .= " WHERE fk_type = ".((int) $this->id);
-				$sql .= " AND lang = '".$this->db->escape($key)."'";
-
-				$result = $this->db->query($sql);
-
-				if ($this->db->num_rows($result)) { // if there is already a description line for this language
-					$sql2 = "UPDATE ".MAIN_DB_PREFIX."adherent_type_lang";
-					$sql2 .= " SET ";
-					$sql2 .= " label = '".$this->db->escape($this->multilangs["$key"]["label"])."',";
-					$sql2 .= " description = '".$this->db->escape($this->multilangs["$key"]["description"])."'";
-					$sql2 .= " WHERE fk_type = ".((int) $this->id)." AND lang='".$this->db->escape($key)."'";
-				} else {
-					$sql2 = "INSERT INTO ".MAIN_DB_PREFIX."adherent_type_lang (fk_type, lang, label, description";
-					$sql2 .= ")";
-					$sql2 .= " VALUES(".$this->id.",'".$this->db->escape($key)."','".$this->db->escape($this->multilangs["$key"]["label"])."',";
-					$sql2 .= " '".$this->db->escape($this->multilangs["$key"]["description"])."'";
-					$sql2 .= ")";
-				}
-
-				// We do not save if main fields are empty
-				if ($this->multilangs["$key"]["label"] || $this->multilangs["$key"]["description"]) {
-					if (!$this->db->query($sql2)) {
-						$this->error = $this->db->lasterror();
-						return -1;
-					}
-				}
-			} else {
-				// language is not current language and we didn't provide a multilang description for this language
-			}
-		}
-
-		// Call trigger
-		$result = $this->call_trigger('MEMBER_TYPE_SET_MULTILANGS', $user);
-		if ($result < 0) {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-		// End call triggers
-
-		return 1;
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return list of members' type
 	 *

@@ -38,133 +38,142 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class Account extends CommonObject
 {
 	/**
-	 * Current account
-	 */
-	const TYPE_CURRENT = 1;
-	/**
-	 * Cash account
-	 */
-	const TYPE_CASH = 2;
-	/**
-	 * Savings account
-	 */
-	const TYPE_SAVINGS = 0;
-	const STATUS_OPEN = 0;
-	const STATUS_CLOSED = 1;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'bank_account';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'bank_account';
+
 	/**
 	 * @var string String with name of icon for myobject. Must be the part after the 'object_' into object_myobject.png
 	 */
 	public $picto = 'account';
+
 	/**
 	 * @var	int		Use id instead of rowid
 	 * @deprecated
 	 * @see $id
 	 */
 	public $rowid;
+
 	/**
 	 * Account Label
 	 * @var string
 	 */
 	public $label;
+
 	/**
 	 * Bank account type. Check TYPE_ constants
 	 * @var int
 	 */
 	public $courant;
+
 	/**
 	 * Bank account type. Check TYPE_ constants
 	 * @var int
 	 */
 	public $type;
+
 	/**
 	 * Bank name
 	 * @var string
 	 */
 	public $bank;
+
 	/**
 	 * Status
 	 * @var int
 	 */
 	public $clos = self::STATUS_OPEN;
+
 	/**
 	 * Does it need to be conciliated?
 	 * @var int
 	 */
 	public $rappro = 1;
+
 	/**
 	 * Webpage
 	 * @var string
 	 */
 	public $url;
+
 	/**
 	 * Bank number. If in SEPA area, you should move to IBAN field
 	 * @var string
 	 */
 	public $code_banque;
+
 	/**
 	 * Branch number. If in SEPA area, you should move to IBAN field
 	 * @var string
 	 */
 	public $code_guichet;
+
 	/**
 	 * Account number. If in SEPA area, you should move to IBAN field
 	 * @var string
 	 */
 	public $number;
+
 	/**
 	 * Bank account number control digit. If in SEPA area, you should move to IBAN field
 	 * @var string
 	 */
 	public $cle_rib;
+
 	/**
 	 * BIC/Swift code
 	 * @var string
 	 */
 	public $bic;
-	/**
+
+    /**
 	 * IBAN number (International Bank Account Number). Stored into iban_prefix field into database
 	 * @var string
 	 */
 	public $iban;
-	/**
+
+    /**
 	 * Name of account holder
 	 * @var string
 	 */
 	public $proprio;
-	/**
+
+    /**
 	 * Address of account holder
 	 * @var string
 	 */
 	public $owner_address;
-	public $state_id;
+
+    public $state_id;
 	public $state_code;
 	public $state;
-	/**
+
+    /**
 	 * Variable containing all account types with their respective translated label.
 	 * Defined in __construct
 	 * @var array
 	 */
 	public $type_lib = array();
-	/**
+
+    /**
 	 * Variable containing all account statuses with their respective translated label.
 	 * Defined in __construct
 	 * @var array
 	 */
 	public $status = array();
-	/**
+
+    /**
 	 * Accountancy code
 	 * @var string
 	 */
 	public $account_number;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_accountancy_journal;
@@ -172,32 +181,69 @@ class Account extends CommonObject
 	 * @var string	Label of journal
 	 */
 	public $accountancy_journal;
-	/**
+
+    /**
 	 * Currency code
 	 * @var string
 	 */
 	public $currency_code;
-	/**
+
+    /**
 	 * Currency code
 	 * @var string
-	 * @deprecated Use currency_code instead
-	 */
-	public $account_currency_code;
-	/**
-	 * Authorized minimum balance
-	 * @var float
-	 */
-	public $min_allowed;
+     * @deprecated Use currency_code instead
+     */
+    public $account_currency_code;
 
+    /**
+     * Authorized minimum balance
+     *
+     * @var float
+     */
+    public $min_allowed;
 
+    /**
+     * Desired minimum balance
+     *
+     * @var float
+     */
+    public $min_desired;
 
-	/**
-	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+    /**
+     * Notes
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
+     * Date of the initial balance. Used in Account::create
+     *
+     * @var int
+     */
+    public $date_solde;
+
+    /**
+     * Creditor Identifier CI. Some banks use different ICS for direct debit and bank tranfer
+     *
+     * @var string
+     */
+    public $ics;
+
+    /**
+     * Creditor Identifier for Bank Transfer.
+     *
+     * @var string
+     */
+    public $ics_transfer;
+
+    /**
+     *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
 	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
@@ -217,80 +263,71 @@ class Account extends CommonObject
 
 	// BEGIN MODULEBUILDER PROPERTIES
 	/**
-	 * Desired minimum balance
-	 * @var float
-	 */
-	public $min_desired;
-	// END MODULEBUILDER PROPERTIES
-	/**
-	 * Notes
-	 * @var string
-	 */
-	public $comment;
-	/**
-	 * Date of the initial balance. Used in Account::create
-	 * @var int
-	 */
-	public $date_solde;
-	/**
-	 * Creditor Identifier CI. Some banks use different ICS for direct debit and bank tranfer
-	 * @var string
-	 */
-	public $ics;
-	/**
-	 * Creditor Identifier for Bank Transfer.
-	 * @var string
-	 */
-	public $ics_transfer;
-	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
-		'ref' =>array('type'=>'varchar(12)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>25),
-		'label' =>array('type'=>'varchar(30)', 'label'=>'Label', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>30),
-		'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>35, 'index'=>1),
-		'bank' =>array('type'=>'varchar(60)', 'label'=>'Bank', 'enabled'=>1, 'visible'=>-1, 'position'=>40),
-		'code_banque' =>array('type'=>'varchar(128)', 'label'=>'Code banque', 'enabled'=>1, 'visible'=>-1, 'position'=>45),
-		'code_guichet' =>array('type'=>'varchar(6)', 'label'=>'Code guichet', 'enabled'=>1, 'visible'=>-1, 'position'=>50),
-		'number' =>array('type'=>'varchar(255)', 'label'=>'Number', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
-		'cle_rib' =>array('type'=>'varchar(5)', 'label'=>'Cle rib', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
-		'bic' =>array('type'=>'varchar(11)', 'label'=>'Bic', 'enabled'=>1, 'visible'=>-1, 'position'=>65),
-		'iban_prefix' =>array('type'=>'varchar(34)', 'label'=>'Iban prefix', 'enabled'=>1, 'visible'=>-1, 'position'=>70),
-		'country_iban' =>array('type'=>'varchar(2)', 'label'=>'Country iban', 'enabled'=>1, 'visible'=>-1, 'position'=>75),
-		'cle_iban' =>array('type'=>'varchar(2)', 'label'=>'Cle iban', 'enabled'=>1, 'visible'=>-1, 'position'=>80),
-		'domiciliation' =>array('type'=>'varchar(255)', 'label'=>'Domiciliation', 'enabled'=>1, 'visible'=>-1, 'position'=>85),
-		'state_id' =>array('type'=>'integer', 'label'=>'State id', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
-		'fk_pays' =>array('type'=>'integer', 'label'=>'Fk pays', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>95),
-		'proprio' =>array('type'=>'varchar(60)', 'label'=>'Proprio', 'enabled'=>1, 'visible'=>-1, 'position'=>100),
-		'owner_address' =>array('type'=>'text', 'label'=>'Owner address', 'enabled'=>1, 'visible'=>-1, 'position'=>105),
-		'courant' =>array('type'=>'smallint(6)', 'label'=>'Courant', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>110),
-		'clos' =>array('type'=>'smallint(6)', 'label'=>'Clos', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>115),
-		'rappro' =>array('type'=>'smallint(6)', 'label'=>'Rappro', 'enabled'=>1, 'visible'=>-1, 'position'=>120),
-		'url' =>array('type'=>'varchar(128)', 'label'=>'Url', 'enabled'=>1, 'visible'=>-1, 'position'=>125),
-		'account_number' =>array('type'=>'varchar(32)', 'label'=>'Account number', 'enabled'=>1, 'visible'=>-1, 'position'=>130),
-		'fk_accountancy_journal' =>array('type'=>'integer', 'label'=>'Accountancy journal ID', 'enabled'=>1, 'visible'=>-1, 'position'=>132),
-		'accountancy_journal' =>array('type'=>'varchar(20)', 'label'=>'Accountancy journal', 'enabled'=>1, 'visible'=>-1, 'position'=>135),
-		'currency_code' =>array('type'=>'varchar(3)', 'label'=>'Currency code', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>140),
-		'min_allowed' =>array('type'=>'integer', 'label'=>'Min allowed', 'enabled'=>1, 'visible'=>-1, 'position'=>145),
-		'min_desired' =>array('type'=>'integer', 'label'=>'Min desired', 'enabled'=>1, 'visible'=>-1, 'position'=>150),
-		'comment' =>array('type'=>'text', 'label'=>'Comment', 'enabled'=>1, 'visible'=>-1, 'position'=>155),
-		'datec' =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-1, 'position'=>156),
-		'tms' =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>157),
-		'fk_user_author' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'Fk user author', 'enabled'=>1, 'visible'=>-1, 'position'=>160),
-		'fk_user_modif' =>array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>165),
-		'note_public' =>array('type'=>'text', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>170),
-		'model_pdf' =>array('type'=>'varchar(255)', 'label'=>'Model pdf', 'enabled'=>1, 'visible'=>0, 'position'=>175),
-		'import_key' =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'position'=>180),
-		'extraparams' =>array('type'=>'varchar(255)', 'label'=>'Extraparams', 'enabled'=>1, 'visible'=>-1, 'position'=>185),
-	);
+        'rowid' =>array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>10),
+        'ref' =>array('type'=>'varchar(12)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'showoncombobox'=>1, 'position'=>25),
+        'label' =>array('type'=>'varchar(30)', 'label'=>'Label', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>30),
+        'entity' =>array('type'=>'integer', 'label'=>'Entity', 'default'=>1, 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>35, 'index'=>1),
+        'bank' =>array('type'=>'varchar(60)', 'label'=>'Bank', 'enabled'=>1, 'visible'=>-1, 'position'=>40),
+        'code_banque' =>array('type'=>'varchar(128)', 'label'=>'Code banque', 'enabled'=>1, 'visible'=>-1, 'position'=>45),
+        'code_guichet' =>array('type'=>'varchar(6)', 'label'=>'Code guichet', 'enabled'=>1, 'visible'=>-1, 'position'=>50),
+        'number' =>array('type'=>'varchar(255)', 'label'=>'Number', 'enabled'=>1, 'visible'=>-1, 'position'=>55),
+        'cle_rib' =>array('type'=>'varchar(5)', 'label'=>'Cle rib', 'enabled'=>1, 'visible'=>-1, 'position'=>60),
+        'bic' =>array('type'=>'varchar(11)', 'label'=>'Bic', 'enabled'=>1, 'visible'=>-1, 'position'=>65),
+        'iban_prefix' =>array('type'=>'varchar(34)', 'label'=>'Iban prefix', 'enabled'=>1, 'visible'=>-1, 'position'=>70),
+        'country_iban' =>array('type'=>'varchar(2)', 'label'=>'Country iban', 'enabled'=>1, 'visible'=>-1, 'position'=>75),
+        'cle_iban' =>array('type'=>'varchar(2)', 'label'=>'Cle iban', 'enabled'=>1, 'visible'=>-1, 'position'=>80),
+        'domiciliation' =>array('type'=>'varchar(255)', 'label'=>'Domiciliation', 'enabled'=>1, 'visible'=>-1, 'position'=>85),
+        'state_id' =>array('type'=>'integer', 'label'=>'State id', 'enabled'=>1, 'visible'=>-1, 'position'=>90),
+        'fk_pays' =>array('type'=>'integer', 'label'=>'Fk pays', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>95),
+        'proprio' =>array('type'=>'varchar(60)', 'label'=>'Proprio', 'enabled'=>1, 'visible'=>-1, 'position'=>100),
+        'owner_address' =>array('type'=>'text', 'label'=>'Owner address', 'enabled'=>1, 'visible'=>-1, 'position'=>105),
+        'courant' =>array('type'=>'smallint(6)', 'label'=>'Courant', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>110),
+        'clos' =>array('type'=>'smallint(6)', 'label'=>'Clos', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>115),
+        'rappro' =>array('type'=>'smallint(6)', 'label'=>'Rappro', 'enabled'=>1, 'visible'=>-1, 'position'=>120),
+        'url' =>array('type'=>'varchar(128)', 'label'=>'Url', 'enabled'=>1, 'visible'=>-1, 'position'=>125),
+        'account_number' =>array('type'=>'varchar(32)', 'label'=>'Account number', 'enabled'=>1, 'visible'=>-1, 'position'=>130),
+        'fk_accountancy_journal' =>array('type'=>'integer', 'label'=>'Accountancy journal ID', 'enabled'=>1, 'visible'=>-1, 'position'=>132),
+        'accountancy_journal' =>array('type'=>'varchar(20)', 'label'=>'Accountancy journal', 'enabled'=>1, 'visible'=>-1, 'position'=>135),
+        'currency_code' =>array('type'=>'varchar(3)', 'label'=>'Currency code', 'enabled'=>1, 'visible'=>-1, 'notnull'=>1, 'position'=>140),
+        'min_allowed' =>array('type'=>'integer', 'label'=>'Min allowed', 'enabled'=>1, 'visible'=>-1, 'position'=>145),
+        'min_desired' =>array('type'=>'integer', 'label'=>'Min desired', 'enabled'=>1, 'visible' => -1, 'position' => 150),
+        'comment' => array('type' => 'text', 'label' => 'Comment', 'enabled' => 1, 'visible' => -1, 'position' => 155),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -1, 'position' => 156),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 157),
+        'fk_user_author' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'Fk user author', 'enabled' => 1, 'visible' => -1, 'position' => 160),
+        'fk_user_modif' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => 1, 'visible' => -2, 'notnull' => -1, 'position' => 165),
+        'note_public' => array('type' => 'text', 'label' => 'NotePrivate', 'enabled' => 1, 'visible' => 0, 'position' => 170),
+        'model_pdf' => array('type' => 'varchar(255)', 'label' => 'Model pdf', 'enabled' => 1, 'visible' => 0, 'position' => 175),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'position' => 180),
+        'extraparams' => array('type' => 'varchar(255)', 'label' => 'Extraparams', 'enabled' => 1, 'visible' => -1, 'position' => 185),
+    );
+    // END MODULEBUILDER PROPERTIES
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param	DoliDB		$db		Database handler
-	 */
-	public function __construct(DoliDB $db)
+    /**
+     * Current account
+     */
+    const TYPE_CURRENT = 1;
+    /**
+     * Cash account
+     */
+    const TYPE_CASH = 2;
+    /**
+     * Savings account
+     */
+    const TYPE_SAVINGS = 0;
+
+    const STATUS_OPEN = 0;
+    const STATUS_CLOSED = 1;
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct(DoliDB $db)
 	{
 		global $langs;
 
@@ -308,27 +345,6 @@ class Account extends CommonObject
 			self::STATUS_OPEN => $langs->trans("StatusAccountOpened"),
 			self::STATUS_CLOSED => $langs->trans("StatusAccountClosed")
 		);
-	}
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB 	$db 			Database handler
-	 * @param int 		$origin_id 		Old thirdparty id
-	 * @param int 		$dest_id 		New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty($db, $origin_id, $dest_id)
-	{
-		$sql = "UPDATE ".MAIN_DB_PREFIX."bank_url SET url_id = ".((int) $dest_id)." WHERE url_id = ".((int) $origin_id)." AND type='company'";
-
-		if (!$db->query($sql)) {
-			//if ($ignoreerrors) return true; // TODO Not enough. If there is A-B on kept thirdarty and B-C on old one, we must get A-B-C after merge. Not A-B.
-			//$this->errors = $db->lasterror();
-			return false;
-		} else {
-			return true;
-		}
 	}
 
 	/**
@@ -359,158 +375,6 @@ class Account extends CommonObject
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Returns the fields in order that this bank account should show to the user
-	 * Will return an array with the following values:
-	 * - BankAccountNumber
-	 * - BankCode
-	 * - BankAccountNumberKey
-	 * - DeskCode
-	 *
-	 * Some countries show less or more bank account properties to the user
-	 *
-	 * @param  int     $includeibanbic         1=Return also key for IBAN and BIC
-	 * @return array                           Array of fields to show
-	 * @see useDetailedBBAN()
-	 */
-	public function getFieldsToShow($includeibanbic = 0)
-	{
-		//Get the required properties depending on the country
-		$detailedBBAN = $this->useDetailedBBAN();
-
-		if ($detailedBBAN == 0) {
-			$fieldarray = array(
-					'BankAccountNumber'
-			);
-		} elseif ($detailedBBAN == 2) {
-			$fieldarray = array(
-					'BankCode',
-					'BankAccountNumber'
-			);
-		} else {
-			$fieldarray = self::getAccountNumberOrder();
-		}
-
-		//if ($this->needIBAN()) {    // return always IBAN and BIC (this was old behaviour)
-		if ($includeibanbic) {
-			$fieldarray[] = 'IBAN';
-			$fieldarray[] = 'BIC';
-		}
-		//}
-
-		//Get the order the properties are shown
-		return $fieldarray;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return if a bank account is defined with detailed information (bank code, desk code, number and key).
-	 * More information on codes used by countries on page http://en.wikipedia.org/wiki/Bank_code
-	 *
-	 * @return		int        0=No bank code need + Account number is enough
-	 *                         1=Need 2 fields for bank code: Bank, Desk (France, Spain, ...) + Account number and key
-	 *                         2=Need 1 field for bank code:  Bank only (Sort code for Great Britain, BSB for Australia) + Account number
-	 */
-	public function useDetailedBBAN()
-	{
-		$country_code = $this->getCountryCode();
-
-		if (in_array($country_code, array('FR', 'ES', 'GA', 'IT', 'NC'))) {
-			return 1; // France, Spain, Gabon, ... - Not valid for CH
-		}
-		if (in_array($country_code, array('AU', 'BE', 'CA', 'DE', 'DK', 'GR', 'GB', 'ID', 'IE', 'IR', 'KR', 'NL', 'NZ', 'UK', 'US'))) {
-			return 2; // Australia, England...
-		}
-		return 0;
-	}
-
-	/**
-	 * 	Return account country code
-	 *
-	 *	@return		string		country code
-	 */
-	public function getCountryCode()
-	{
-		global $mysoc;
-
-		// We return country code of bank account
-		if (!empty($this->country_code)) {
-			return $this->country_code;
-		}
-
-		// For backward compatibility, we try to guess country from other information
-		if (!empty($this->iban)) {
-			// If IBAN defined, we can know country of account from it
-			$reg = array();
-			if (preg_match("/^([a-zA-Z][a-zA-Z])/i", $this->iban, $reg)) {
-				return $reg[1];
-			}
-		}
-
-		// If this class is linked to a third party
-		if (!empty($this->socid)) {
-			require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-			$company = new Societe($this->db);
-			$result = $company->fetch($this->socid);
-			if (!empty($company->country_code)) {
-				return $company->country_code;
-			}
-		}
-
-		// We return country code of managed company
-		if (!empty($mysoc->country_code)) {
-			return $mysoc->country_code;
-		}
-
-		return '';
-	}
-
-	/**
-	 * Returns the components of the bank account in order.
-	 * Will return an array with the following values:
-	 * - BankAccountNumber
-	 * - BankCode
-	 * - BankAccountNumberKey
-	 * - DeskCode
-	 *
-	 * @return array
-	 */
-	public static function getAccountNumberOrder()
-	{
-		global $conf;
-
-		$fieldlists = array(
-				'BankCode',
-				'DeskCode',
-				'BankAccountNumber',
-				'BankAccountNumberKey'
-		);
-
-		if (!empty($conf->global->BANK_SHOW_ORDER_OPTION)) {
-			if (is_numeric($conf->global->BANK_SHOW_ORDER_OPTION)) {
-				if ($conf->global->BANK_SHOW_ORDER_OPTION == '1') {
-					$fieldlists = array(
-						'BankCode',
-						'DeskCode',
-						'BankAccountNumberKey',
-						'BankAccountNumber'
-					);
-				}
-			} else {
-				//Replace the old AccountNumber key with the new BankAccountNumber key
-				$fieldlists = explode(
-					' ',
-					preg_replace('/ ?[^Bank]AccountNumber ?/', 'BankAccountNumber', $conf->global->BANK_SHOW_ORDER_OPTION)
-				);
-			}
-		}
-
-		return $fieldlists;
-	}
-
 	/**
 	 *  Return if a bank account need to be conciliated
 	 *
@@ -534,7 +398,6 @@ class Account extends CommonObject
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *      Add a link between bank line record and its source
 	 *
@@ -568,10 +431,11 @@ class Account extends CommonObject
 			return $rowid;
 		} else {
 			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+            return -1;
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * 		TODO Move this into AccountLine
 	 *      Return array with links from llx_bank_url
@@ -1008,8 +872,8 @@ class Account extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Update BBAN (RIB) account fields
 	 *
@@ -1060,8 +924,6 @@ class Account extends CommonObject
 		}
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *      Load a bank account into memory from database
@@ -1226,26 +1088,68 @@ class Account extends CommonObject
 			} else {
 				$error++;
 				$this->error = "Error ".$this->db->lasterror();
-			}
-		}
+            }
+        }
 
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return -1;
-		}
-	}
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *  Return label of object status
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
+     *
+     * @return     string                    Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->LibStatut($this->clos, $mode);
+    }
 
-	/**
-	 *    Renvoi si un compte peut etre supprimer ou non (sans mouvements)
-	 *
-	 *    @return     boolean     vrai si peut etre supprime, faux sinon
-	 */
-	public function can_be_deleted()
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return label of given object status
+     *
+     * @param int $status Id status
+     * @param int $mode   0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
+     *
+     * @return  string                        Label
+     */
+    public function LibStatut($status, $mode = 0)
+    {
+        // phpcs:enable
+        global $langs;
+        $langs->load('banks');
+
+        if ($status == self::STATUS_OPEN) {
+            $label = $langs->trans("StatusAccountOpened");
+            $labelshort = $langs->trans("StatusAccountOpened");
+            $statusType = 'status4';
+        } else {
+            $label = $langs->trans("StatusAccountClosed");
+            $labelshort = $langs->trans("StatusAccountClosed");
+            $statusType = 'status5';
+        }
+
+        return dolGetStatus($label, $labelshort, '', $statusType, $mode);
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Renvoi si un compte peut etre supprimer ou non (sans mouvements)
+     *
+     * @return     boolean     vrai si peut etre supprime, faux sinon
+     */
+    public function can_be_deleted()
 	{
 		// phpcs:enable
 		$can_be_deleted = false;
@@ -1266,7 +1170,6 @@ class Account extends CommonObject
 		return $can_be_deleted;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *   Return error
@@ -1308,8 +1211,9 @@ class Account extends CommonObject
 		}
 
 		return price2num($solde, 'MU');
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
 	 *
@@ -1363,13 +1267,11 @@ class Account extends CommonObject
 		} else {
 			dol_print_error($this->db);
 			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            return -1;
+        }
+    }
 
-
-	// Method after here are common to Account and CompanyBankAccount
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *      Charge indicateurs this->nb de tableau de bord
 	 *		@param		int			$filteraccountid	To get info for a particular account id
@@ -1407,6 +1309,7 @@ class Account extends CommonObject
 			return -1;
 		}
 	}
+
 
 	/**
 	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
@@ -1515,45 +1418,12 @@ class Account extends CommonObject
 		}
 		$result .= $linkend;
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 *  Return label of object status
-	 *
-	 *  @param      int		$mode			0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
-	 *  @return     string        		    Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->LibStatut($this->clos, $mode);
-	}
 
-	/**
-	 *  Return label of given object status
-	 *
-	 *  @param	 int		$status        	Id status
-	 *  @param   int		$mode			0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=short label + picto, 6=Long label + picto
-	 *  @return  string        			    Label
-	 */
-	public function LibStatut($status, $mode = 0)
-	{
-		// phpcs:enable
-		global $langs;
-		$langs->load('banks');
+    // Method after here are common to Account and CompanyBankAccount
 
-		if ($status == self::STATUS_OPEN) {
-			$label = $langs->trans("StatusAccountOpened");
-			$labelshort = $langs->trans("StatusAccountOpened");
-			$statusType = 'status4';
-		} else {
-			$label = $langs->trans("StatusAccountClosed");
-			$labelshort = $langs->trans("StatusAccountClosed");
-			$statusType = 'status5';
-		}
-
-		return dolGetStatus($label, $labelshort, '', $statusType, $mode);
-	}
 
 	/**
 	 *     Return if an account has valid information for Direct debit payment
@@ -1578,20 +1448,82 @@ class Account extends CommonObject
 			$this->error_message = 'BANControlError';
 		}*/
 
-		if ($this->error_number == 0) {
-			return 1;
-		} else {
-			return 0;
-		}
-	}
+        if ($this->error_number == 0) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 
-	/**
-	 * Return 1 if IBAN / BIC is mandatory (otherwise option)
-	 *
-	 * @return		int        1 = mandatory / 0 = Not mandatory
-	 */
-	public function needIBAN()
-	{
+    /**
+     *    Return account country code
+     *
+     * @return        string        country code
+     */
+    public function getCountryCode()
+    {
+        global $mysoc;
+
+        // We return country code of bank account
+        if (!empty($this->country_code)) {
+            return $this->country_code;
+        }
+
+        // For backward compatibility, we try to guess country from other information
+        if (!empty($this->iban)) {
+            // If IBAN defined, we can know country of account from it
+            $reg = [];
+            if (preg_match("/^([a-zA-Z][a-zA-Z])/i", $this->iban, $reg)) {
+                return $reg[1];
+            }
+        }
+
+        // If this class is linked to a third party
+        if (!empty($this->socid)) {
+            require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+            $company = new Societe($this->db);
+            $result = $company->fetch($this->socid);
+            if (!empty($company->country_code)) {
+                return $company->country_code;
+            }
+        }
+
+        // We return country code of managed company
+        if (!empty($mysoc->country_code)) {
+            return $mysoc->country_code;
+        }
+
+        return '';
+    }
+
+    /**
+     * Return if a bank account is defined with detailed information (bank code, desk code, number and key).
+     * More information on codes used by countries on page http://en.wikipedia.org/wiki/Bank_code
+     *
+     * @return        int        0=No bank code need + Account number is enough
+     *                         1=Need 2 fields for bank code: Bank, Desk (France, Spain, ...) + Account number and key
+     *                         2=Need 1 field for bank code:  Bank only (Sort code for Great Britain, BSB for Australia) + Account number
+     */
+    public function useDetailedBBAN()
+    {
+        $country_code = $this->getCountryCode();
+
+        if (in_array($country_code, ['FR', 'ES', 'GA', 'IT', 'NC'])) {
+            return 1; // France, Spain, Gabon, ... - Not valid for CH
+        }
+        if (in_array($country_code, ['AU', 'BE', 'CA', 'DE', 'DK', 'GR', 'GB', 'ID', 'IE', 'IR', 'KR', 'NL', 'NZ', 'UK', 'US'])) {
+            return 2; // Australia, England...
+        }
+        return 0;
+    }
+
+    /**
+     * Return 1 if IBAN / BIC is mandatory (otherwise option)
+     *
+     * @return        int        1 = mandatory / 0 = Not mandatory
+     */
+    public function needIBAN()
+    {
 		global $conf;
 
 		if (!empty($conf->global->MAIN_IBAN_IS_NEVER_MANDATORY)) {
@@ -1639,45 +1571,155 @@ class Account extends CommonObject
 		if (in_array($country_code, $country_code_in_EEC)) {
 			return 1; // France, Spain, ...
 		}
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 *	Load miscellaneous information for tab "Info"
-	 *
-	 *	@param  int		$id		Id of object to load
-	 *	@return	void
-	 */
-	public function info($id)
-	{
-	}
+    /**
+     *    Load miscellaneous information for tab "Info"
+     *
+     * @param int $id Id of object to load
+     *
+     * @return    void
+     */
+    public function info($id)
+    {
+    }
 
-	/**
-	 *  Initialise an instance with random values.
-	 *  Used to build previews or test instances.
-	 *	id must be 0 if object instance is a specimen.
-	 *
-	 *  @return	void
-	 */
-	public function initAsSpecimen()
-	{
-		$this->specimen        = 1;
+    /**
+     * Returns the fields in order that this bank account should show to the user
+     * Will return an array with the following values:
+     * - BankAccountNumber
+     * - BankCode
+     * - BankAccountNumberKey
+     * - DeskCode
+     *
+     * Some countries show less or more bank account properties to the user
+     *
+     * @param int $includeibanbic 1=Return also key for IBAN and BIC
+     *
+     * @return array                           Array of fields to show
+     * @see useDetailedBBAN()
+     */
+    public function getFieldsToShow($includeibanbic = 0)
+    {
+        //Get the required properties depending on the country
+        $detailedBBAN = $this->useDetailedBBAN();
+
+        if ($detailedBBAN == 0) {
+            $fieldarray = [
+                'BankAccountNumber',
+            ];
+        } elseif ($detailedBBAN == 2) {
+            $fieldarray = [
+                'BankCode',
+                'BankAccountNumber',
+            ];
+        } else {
+            $fieldarray = self::getAccountNumberOrder();
+        }
+
+        //if ($this->needIBAN()) {    // return always IBAN and BIC (this was old behaviour)
+        if ($includeibanbic) {
+            $fieldarray[] = 'IBAN';
+            $fieldarray[] = 'BIC';
+        }
+        //}
+
+        //Get the order the properties are shown
+        return $fieldarray;
+    }
+
+    /**
+     * Returns the components of the bank account in order.
+     * Will return an array with the following values:
+     * - BankAccountNumber
+     * - BankCode
+     * - BankAccountNumberKey
+     * - DeskCode
+     *
+     * @return array
+     */
+    public static function getAccountNumberOrder()
+    {
+        global $conf;
+
+        $fieldlists = [
+            'BankCode',
+            'DeskCode',
+            'BankAccountNumber',
+            'BankAccountNumberKey',
+        ];
+
+        if (!empty($conf->global->BANK_SHOW_ORDER_OPTION)) {
+            if (is_numeric($conf->global->BANK_SHOW_ORDER_OPTION)) {
+                if ($conf->global->BANK_SHOW_ORDER_OPTION == '1') {
+                    $fieldlists = [
+                        'BankCode',
+                        'DeskCode',
+                        'BankAccountNumberKey',
+                        'BankAccountNumber',
+                    ];
+                }
+            } else {
+                //Replace the old AccountNumber key with the new BankAccountNumber key
+                $fieldlists = explode(
+                    ' ',
+                    preg_replace('/ ?[^Bank]AccountNumber ?/', 'BankAccountNumber', $conf->global->BANK_SHOW_ORDER_OPTION)
+                );
+            }
+        }
+
+        return $fieldlists;
+    }
+
+    /**
+     *  Initialise an instance with random values.
+     *  Used to build previews or test instances.
+     *    id must be 0 if object instance is a specimen.
+     *
+     * @return    void
+     */
+    public function initAsSpecimen()
+    {
+        $this->specimen        = 1;
 		$this->ref             = 'MBA';
 		$this->label           = 'My Big Company Bank account';
 		$this->bank            = 'MyBank';
 		$this->courant         = Account::TYPE_CURRENT;
 		$this->clos            = Account::STATUS_OPEN;
 		$this->code_banque     = '123';
-		$this->code_guichet    = '456';
-		$this->number          = 'ABC12345';
-		$this->cle_rib         = '50';
-		$this->bic             = 'AA12';
-		$this->iban            = 'FR999999999';
-		$this->domiciliation   = 'My bank address';
-		$this->proprio         = 'Owner';
-		$this->owner_address   = 'Owner address';
-		$this->country_id      = 1;
-	}
+        $this->code_guichet = '456';
+        $this->number = 'ABC12345';
+        $this->cle_rib = '50';
+        $this->bic = 'AA12';
+        $this->iban = 'FR999999999';
+        $this->domiciliation = 'My bank address';
+        $this->proprio = 'Owner';
+        $this->owner_address = 'Owner address';
+        $this->country_id = 1;
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty($db, $origin_id, $dest_id)
+    {
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "bank_url SET url_id = " . ((int) $dest_id) . " WHERE url_id = " . ((int) $origin_id) . " AND type='company'";
+
+        if (!$db->query($sql)) {
+            //if ($ignoreerrors) return true; // TODO Not enough. If there is A-B on kept thirdarty and B-C on old one, we must get A-B-C after merge. Not A-B.
+            //$this->errors = $db->lasterror();
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 
 
@@ -2138,21 +2180,6 @@ class AccountLine extends CommonObject
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	Increase value date of a rowid
-	 *
-	 *	@param	int		$id		Id of line to change
-	 *	@return	int				>0 if OK, 0 if KO
-	 */
-	public function datev_next($id)
-	{
-		// phpcs:enable
-		return $this->datev_change($id, 1);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Increase/decrease value date of a rowid
 	 *
@@ -2190,35 +2217,34 @@ class AccountLine extends CommonObject
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * 	Decrease value date of a rowid
-	 *
-	 *	@param	int		$id		Id of line to change
-	 *	@return	int				>0 if OK, 0 if KO
-	 */
-	public function datev_previous($id)
-	{
-		// phpcs:enable
-		return $this->datev_change($id, -1);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	Increase operation date of a rowid
-	 *
-	 *	@param	int		$id		Id of line to change
-	 *	@return	int				>0 if OK, 0 if KO
-	 */
-	public function dateo_next($id)
-	{
-		// phpcs:enable
-		return $this->dateo_change($id, 1);
+    /**
+     *    Increase value date of a rowid
+     *
+     * @param int $id Id of line to change
+     * @return    int                >0 if OK, 0 if KO
+     */
+    public function datev_next($id)
+    {
+        // phpcs:enable
+        return $this->datev_change($id, 1);
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+    /**
+     *    Decrease value date of a rowid
+     *
+     * @param int $id Id of line to change
+     * @return    int                >0 if OK, 0 if KO
+     */
+    public function datev_previous($id)
+    {
+        // phpcs:enable
+        return $this->datev_change($id, -1);
+	}
+
+
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * 	Increase/decrease operation date of a rowid
 	 *
@@ -2244,28 +2270,44 @@ class AccountLine extends CommonObject
 				if ($this->db->affected_rows($result)) {
 					return 1;
 				}
-			} else {
-				dol_print_error($this->db);
-				return 0;
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-		return 0;
-	}
+            } else {
+                dol_print_error($this->db);
+                return 0;
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+        return 0;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * 	Decrease operation date of a rowid
-	 *
-	 *	@param	int		$id		Id of line to change
-	 *	@return	int				>0 if OK, 0 if KO
-	 */
-	public function dateo_previous($id)
-	{
-		// phpcs:enable
-		return $this->dateo_change($id, -1);
+    /**
+     *    Increase operation date of a rowid
+     *
+     * @param int $id Id of line to change
+     *
+     * @return    int                >0 if OK, 0 if KO
+     */
+    public function dateo_next($id)
+    {
+        // phpcs:enable
+        return $this->dateo_change($id, 1);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Decrease operation date of a rowid
+     *
+     * @param int $id Id of line to change
+     *
+     * @return    int                >0 if OK, 0 if KO
+     */
+    public function dateo_previous($id)
+    {
+        // phpcs:enable
+        return $this->dateo_change($id, -1);
 	}
 
 

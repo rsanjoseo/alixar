@@ -55,6 +55,7 @@ $optioncss = GETPOST('optioncss', 'aZ'); // Option for the css output (always ''
 
 $id = GETPOST('id', 'int');
 $projectid = GETPOST('projectid', 'int');
+$projectref = GETPOST('ref');
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ? GETPOST('limit', 'int') : $conf->liste_limit;
@@ -152,17 +153,17 @@ if (!$permissiontoread) accessforbidden();
  * Actions
  */
 
-if (preg_match('/^set/', $action) && $projectid > 0 && !empty($user->rights->eventorganization->write)) {
-	$project = new Project($db);
-	//If "set" fields keys is in projects fields
-	$project_attr=preg_replace('/^set/', '', $action);
-	if (array_key_exists($project_attr, $project->fields)) {
-		$result = $project->fetch($projectid);
-		if ($result < 0) {
-			setEventMessages(null, $project->errors, 'errors');
-		} else {
-			$project->{$project_attr}=GETPOST($project_attr);
-			$result=$project->update($user);
+if (preg_match('/^set/', $action) && ($projectid > 0 || $projectref) && !empty($user->rights->eventorganization->write)) {
+    $project = new Project($db);
+    //If "set" fields keys is in projects fields
+    $project_attr = preg_replace('/^set/', '', $action);
+    if (array_key_exists($project_attr, $project->fields)) {
+        $result = $project->fetch($projectid, $projectref);
+        if ($result < 0) {
+            setEventMessages(null, $project->errors, 'errors');
+        } else {
+            $project->{$project_attr} = GETPOST($project_attr);
+            $result = $project->update($user);
 			if ($result < 0) {
 				setEventMessages(null, $project->errors, 'errors');
 			}
@@ -234,15 +235,17 @@ $now = dol_now();
 $help_url = '';
 $title = $langs->trans('ListOfConferencesOrBooths');
 
-if ($projectid > 0) {
-	$project = new Project($db);
-	$result = $project->fetch($projectid);
-	if ($result < 0) {
-		setEventMessages(null, $project->errors, 'errors');
-	}
-	$result = $project->fetch_thirdparty();
-	if ($result < 0) {
-		setEventMessages(null, $project->errors, 'errors');
+if ($projectid > 0 || $projectref) {
+    $project = new Project($db);
+    $result = $project->fetch($projectid, $projectref);
+    if ($result < 0) {
+        setEventMessages(null, $project->errors, 'errors');
+    } else {
+        $projectid = $project->id;
+    }
+    $result = $project->fetch_thirdparty();
+    if ($result < 0) {
+        setEventMessages(null, $project->errors, 'errors');
 	}
 	$result = $project->fetch_optionals();
 	if ($result < 0) {
@@ -420,45 +423,45 @@ if ($projectid > 0) {
 	// Show message
 	$message = '<a target="_blank" href="'.$urlwithroot.'/public/agenda/agendaexport.php?format=ical'.($conf->entity > 1 ? "&entity=".$conf->entity : "");
 	$message .= '&exportkey='.($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY ?urlencode($conf->global->MAIN_AGENDA_XCAL_EXPORTKEY) : '...');
-	$message .= "&project=".$projectid.'&module='.urlencode('@eventorganization').'&status='.ConferenceOrBooth::STATUS_CONFIRMED.'">'.$langs->trans('DownloadICSLink').img_picto('', 'download', 'class="paddingleft"').'</a>';
-	print $message;
-	print "</td></tr>";
+    $message .= "&project=" . $projectid . '&module=' . urlencode('@eventorganization') . '&status=' . ConferenceOrBooth::STATUS_CONFIRMED . '">' . $langs->trans('DownloadICSLink') . img_picto('', 'download', 'class="paddingleft"') . '</a>';
+    print $message;
+    print "</td></tr>";
 
-	// Link to the submit vote/register page
-	print '<tr><td>';
-	//print '<span class="opacitymedium">';
-	print $form->textwithpicto($langs->trans("SuggestOrVoteForConfOrBooth"), $langs->trans("EvntOrgRegistrationHelpMessage"));
-	//print '</span>';
-	print '</td><td>';
-	$linksuggest = $dolibarr_main_url_root.'/public/project/index.php?id='.$project->id;
-	$encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY.'conferenceorbooth'.$project->id, 'md5');
-	$linksuggest .= '&securekey='.urlencode($encodedsecurekey);
-	//print '<div class="urllink">';
-	//print '<input type="text" value="'.$linksuggest.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
-	print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="'.$linksuggest.'" class="quatrevingtpercent">'.$linksuggest.'</a></div>';
-	print '<a target="_blank" href="'.$linksuggest.'">'.img_picto('', 'globe').'</a>';
-	//print '</div>';
-	//print ajax_autoselect("linkregister");
-	print '</td></tr>';
+    // Link to the submit vote/register page
+    print '<tr><td>';
+    //print '<span class="opacitymedium">';
+    print $form->textwithpicto($langs->trans("SuggestOrVoteForConfOrBooth"), $langs->trans("EvntOrgRegistrationHelpMessage"));
+    //print '</span>';
+    print '</td><td>';
+    $linksuggest = $dolibarr_main_url_root . '/public/project/index.php?id=' . ((int) $project->id);
+    $encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY . 'conferenceorbooth' . ((int) $project->id), 'md5');
+    $linksuggest .= '&securekey=' . urlencode($encodedsecurekey);
+    //print '<div class="urllink">';
+    //print '<input type="text" value="'.$linksuggest.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
+    print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="' . $linksuggest . '" class="quatrevingtpercent">' . $linksuggest . '</a></div>';
+    print '<a target="_blank" href="' . $linksuggest . '">' . img_picto('', 'globe') . '</a>';
+    //print '</div>';
+    //print ajax_autoselect("linkregister");
+    print '</td></tr>';
 
-	// Link to the subscribe
-	print '<tr><td>';
-	//print '<span class="opacitymedium">';
-	print $langs->trans("PublicAttendeeSubscriptionGlobalPage");
-	//print '</span>';
-	print '</td><td>';
-	$link_subscription = $dolibarr_main_url_root.'/public/eventorganization/attendee_register.php?id='.$project->id.'&type=global';
-	$encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY.'conferenceorbooth'.$project->id, 'md5');
-	$link_subscription .= '&securekey='.urlencode($encodedsecurekey);
-	//print '<div class="urllink">';
-	//print '<input type="text" value="'.$linkregister.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
-	print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="'.$link_subscription.'" class="quatrevingtpercent">'.$link_subscription.'</a></div>';
-	print '<a target="_blank" href="'.$link_subscription.'">'.img_picto('', 'globe').'</a>';
-	//print '</div>';
-	//print ajax_autoselect("linkregister");
-	print '</td></tr>';
+    // Link to the subscribe
+    print '<tr><td>';
+    //print '<span class="opacitymedium">';
+    print $langs->trans("PublicAttendeeSubscriptionGlobalPage");
+    //print '</span>';
+    print '</td><td>';
+    $link_subscription = $dolibarr_main_url_root . '/public/eventorganization/attendee_register.php?id=' . ((int) $project->id) . '&type=global';
+    $encodedsecurekey = dol_hash($conf->global->EVENTORGANIZATION_SECUREKEY . 'conferenceorbooth' . ((int) $project->id), 'md5');
+    $link_subscription .= '&securekey=' . urlencode($encodedsecurekey);
+    //print '<div class="urllink">';
+    //print '<input type="text" value="'.$linkregister.'" id="linkregister" class="quatrevingtpercent paddingrightonly">';
+    print '<div class="tdoverflowmax200 inline-block valignmiddle"><a target="_blank" href="' . $link_subscription . '" class="quatrevingtpercent">' . $link_subscription . '</a></div>';
+    print '<a target="_blank" href="' . $link_subscription . '">' . img_picto('', 'globe') . '</a>';
+    //print '</div>';
+    //print ajax_autoselect("linkregister");
+    print '</td></tr>';
 
-	print '</table>';
+    print '</table>';
 
 	print '</div>';
 	print '</div>';
@@ -581,9 +584,9 @@ if (is_numeric($nbtotalofrecords) && ($limit > $nbtotalofrecords || empty($limit
 // Direct jump if only one record found
 if ($num == 1 && !empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && $search_all && !$page) {
 	$obj = $db->fetch_object($resql);
-	$id = $obj->rowid;
-	header("Location: ".dol_buildpath('/eventorganization/conferenceorbooth_card.php', 1).'?id='.$id);
-	exit;
+    $id = $obj->rowid;
+    header("Location: " . DOL_URL_ROOT . '/eventorganization/conferenceorbooth_card.php?id=' . ((int) $id));
+    exit;
 }
 
 $arrayofselected = is_array($toselect) ? $toselect : array();

@@ -30,19 +30,20 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 class DolibarrApi
 {
 
-	/**
-	 * @var Restler     $r	Restler object
-	 */
-	public $r;
-	/**
-	 * @var DoliDb        $db Database object
-	 */
-	protected $db;
+    /**
+     * @var DoliDb $db Database object
+     */
+    protected $db;
 
-	/**
-	 * Constructor
-	 *
-	 * @param	DoliDb	$db		        Database handler
+    /**
+     * @var Restler $r Restler object
+     */
+    public $r;
+
+    /**
+     * Constructor
+     *
+     * @param DoliDb    $db             Database handler
 	 * @param   string  $cachedir       Cache dir
 	 * @param   boolean $refreshCache   Update cache
 	 */
@@ -72,100 +73,6 @@ class DolibarrApi
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Check access by user to a given resource
-	 *
-	 * @param string	$resource		element to check
-	 * @param int		$resource_id	Object ID if we want to check a particular record (optional) is linked to a owned thirdparty (optional).
-	 * @param string	$dbtablename	'TableName&SharedElement' with Tablename is table where object is stored. SharedElement is an optional key to define where to check entity. Not used if objectid is null (optional)
-	 * @param string	$feature2		Feature to check, second level of permission (optional). Can be or check with 'level1|level2'.
-	 * @param string	$dbt_keyfield   Field name for socid foreign key if not fk_soc. Not used if objectid is null (optional)
-	 * @param string	$dbt_select     Field name for select if not rowid. Not used if objectid is null (optional)
-	 * @return bool
-	 * @throws RestException
-	 */
-	protected static function _checkAccessToResource($resource, $resource_id = 0, $dbtablename = '', $feature2 = '', $dbt_keyfield = 'fk_soc', $dbt_select = 'rowid')
-	{
-		// phpcs:enable
-		// Features/modules to check
-		$featuresarray = array($resource);
-		if (preg_match('/&/', $resource)) {
-			$featuresarray = explode("&", $resource);
-		} elseif (preg_match('/\|/', $resource)) {
-			$featuresarray = explode("|", $resource);
-		}
-
-		// More subfeatures to check
-		if (!empty($feature2)) {
-			$feature2 = explode("|", $feature2);
-		}
-
-		return checkUserAccessToObject(DolibarrApiAccess::$user, $featuresarray, $resource_id, $dbtablename, $feature2, $dbt_keyfield, $dbt_select);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Function to forge a SQL criteria
-	 *
-	 * @param  array    $matches    Array of found string by regex search.
-	 * 								Each entry is 1 and only 1 criteria.
-	 * 								Example: "t.ref:like:'SO-%'", "t.date_creation:<:'20160101'", "t.date_creation:<:'2016-01-01 12:30:00'", "t.nature:is:NULL", "t.field2:isnot:NULL"
-	 * @return string               Forged criteria. Example: "t.field like 'abc%'"
-	 */
-	protected static function _forge_criteria_callback($matches)
-	{
-		// phpcs:enable
-		global $db;
-
-		//dol_syslog("Convert matches ".$matches[1]);
-		if (empty($matches[1])) {
-			return '';
-		}
-		$tmp = explode(':', $matches[1], 3);
-
-		if (count($tmp) < 3) {
-			return '';
-		}
-
-		// Sanitize operand
-		$operand = preg_replace('/[^a-z0-9\._]/i', '', trim($tmp[0]));
-
-		// Sanitize operator
-		$operator = strtoupper(preg_replace('/[^a-z<>=]/i', '', trim($tmp[1])));
-		// Only some operators are allowed.
-		if (! in_array($operator, array('LIKE', 'ULIKE', '<', '>', '<=', '>=', '=', '<>', 'IS', 'ISNOT', 'IN'))) {
-			return '';
-		}
-		if ($operator == 'ISNOT') {
-			$operator = 'IS NOT';
-		}
-
-		// Sanitize value
-		$tmpescaped = trim($tmp[2]);
-		$regbis = array();
-		if ($operator == 'IN') {
-			$tmpescaped = "(".$db->sanitize($tmpescaped, 1).")";
-		} elseif (in_array($operator, array('<', '>', '<=', '>=', '=', '<>'))) {
-			if (preg_match('/^\'(.*)\'$/', $tmpescaped, $regbis)) {	// If 'YYYY-MM-DD HH:MM:SS+X'
-				$tmpescaped = "'".$db->escape($regbis[1])."'";
-			} else {
-				$tmpescaped = ((float) $tmpescaped);
-			}
-		} else {
-			if (preg_match('/^\'(.*)\'$/', $tmpescaped, $regbis)) {
-				$tmpescaped = "'".$db->escape($regbis[1])."'";
-			} else {
-				$tmpescaped = "'".$db->escape($tmpescaped)."'";
-			}
-		}
-
-		return $db->escape($operand).' '.$db->escape($operator)." ".$tmpescaped;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Check and convert a string depending on its type/name.
 	 *
@@ -188,7 +95,6 @@ class DolibarrApi
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Clean sensible object datas
 	 *
@@ -340,28 +246,62 @@ class DolibarrApi
 				unset($object->lines[$i]->civility_id);
 				unset($object->lines[$i]->fk_multicurrency);
 				unset($object->lines[$i]->multicurrency_code);
-				unset($object->lines[$i]->shipping_method_id);
-			}
-		}
+                unset($object->lines[$i]->shipping_method_id);
+            }
+        }
 
-		if (!empty($object->thirdparty) && is_object($object->thirdparty)) {
-			$this->_cleanObjectDatas($object->thirdparty);
-		}
-		return $object;
-	}
+        if (!empty($object->thirdparty) && is_object($object->thirdparty)) {
+            $this->_cleanObjectDatas($object->thirdparty);
+        }
+        return $object;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 * Return if a $sqlfilters parameter is valid
-	 *
-	 * @param  string   $sqlfilters     sqlfilter string
-	 * @return boolean                  True if valid, False if not valid
-	 */
-	protected function _checkFilters($sqlfilters)
-	{
-		// phpcs:enable
+    /**
+     * Check access by user to a given resource
+     *
+     * @param string $resource     element to check
+     * @param int    $resource_id  Object ID if we want to check a particular record (optional) is linked to a owned thirdparty (optional).
+     * @param string $dbtablename  'TableName&SharedElement' with Tablename is table where object is stored. SharedElement is an optional key to define where to check entity. Not used if objectid is null (optional)
+     * @param string $feature2     Feature to check, second level of permission (optional). Can be or check with 'level1|level2'.
+     * @param string $dbt_keyfield Field name for socid foreign key if not fk_soc. Not used if objectid is null (optional)
+     * @param string $dbt_select   Field name for select if not rowid. Not used if objectid is null (optional)
+     *
+     * @return bool
+     * @throws RestException
+     */
+    protected static function _checkAccessToResource($resource, $resource_id = 0, $dbtablename = '', $feature2 = '', $dbt_keyfield = 'fk_soc', $dbt_select = 'rowid')
+    {
+        // phpcs:enable
+        // Features/modules to check
+        $featuresarray = [$resource];
+        if (preg_match('/&/', $resource)) {
+            $featuresarray = explode("&", $resource);
+        } elseif (preg_match('/\|/', $resource)) {
+            $featuresarray = explode("|", $resource);
+        }
+
+        // More subfeatures to check
+        if (!empty($feature2)) {
+            $feature2 = explode("|", $feature2);
+        }
+
+        return checkUserAccessToObject(DolibarrApiAccess::$user, $featuresarray, $resource_id, $dbtablename, $feature2, $dbt_keyfield, $dbt_select);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Return if a $sqlfilters parameter is valid
+     *
+     * @param string $sqlfilters sqlfilter string
+     *
+     * @return boolean                  True if valid, False if not valid
+     */
+    protected function _checkFilters($sqlfilters)
+    {
+        // phpcs:enable
 		//$regexstring='\(([^:\'\(\)]+:[^:\'\(\)]+:[^:\(\)]+)\)';
 		//$tmp=preg_replace_all('/'.$regexstring.'/', '', $sqlfilters);
 		$tmp = $sqlfilters;
@@ -383,14 +323,75 @@ class DolibarrApi
 				return false;
 			}
 			$i++;
-		}
+        }
 
-		if ($counter > 0) {
-			$error = "Bad sqlfilters (too many opening parenthesis) = ".$sqlfilters;
-			dol_syslog($error, LOG_WARNING);
-			return false;
-		}
+        if ($counter > 0) {
+            $error = "Bad sqlfilters (too many opening parenthesis) = " . $sqlfilters;
+            dol_syslog($error, LOG_WARNING);
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     * Function to forge a SQL criteria
+     *
+     * @param array $matches          Array of found string by regex search.
+     *                                Each entry is 1 and only 1 criteria.
+     *                                Example: "t.ref:like:'SO-%'", "t.date_creation:<:'20160101'", "t.date_creation:<:'2016-01-01 12:30:00'", "t.nature:is:NULL", "t.field2:isnot:NULL"
+     *
+     * @return string               Forged criteria. Example: "t.field like 'abc%'"
+     */
+    protected static function _forge_criteria_callback($matches)
+    {
+        // phpcs:enable
+        global $db;
+
+        //dol_syslog("Convert matches ".$matches[1]);
+        if (empty($matches[1])) {
+            return '';
+        }
+        $tmp = explode(':', $matches[1], 3);
+
+        if (count($tmp) < 3) {
+            return '';
+        }
+
+        // Sanitize operand
+        $operand = preg_replace('/[^a-z0-9\._]/i', '', trim($tmp[0]));
+
+        // Sanitize operator
+        $operator = strtoupper(preg_replace('/[^a-z<>=]/i', '', trim($tmp[1])));
+        // Only some operators are allowed.
+        if (!in_array($operator, ['LIKE', 'ULIKE', '<', '>', '<=', '>=', '=', '<>', 'IS', 'ISNOT', 'IN'])) {
+            return '';
+        }
+        if ($operator == 'ISNOT') {
+            $operator = 'IS NOT';
+        }
+
+        // Sanitize value
+        $tmpescaped = trim($tmp[2]);
+        $regbis = [];
+        if ($operator == 'IN') {
+            $tmpescaped = "(" . $db->sanitize($tmpescaped, 1) . ")";
+        } elseif (in_array($operator, ['<', '>', '<=', '>=', '=', '<>'])) {
+            if (preg_match('/^\'(.*)\'$/', $tmpescaped, $regbis)) {    // If 'YYYY-MM-DD HH:MM:SS+X'
+                $tmpescaped = "'" . $db->escape($regbis[1]) . "'";
+            } else {
+                $tmpescaped = ((float) $tmpescaped);
+            }
+        } else {
+            if (preg_match('/^\'(.*)\'$/', $tmpescaped, $regbis)) {
+                $tmpescaped = "'" . $db->escape($regbis[1]) . "'";
+            } else {
+                $tmpescaped = "'" . $db->escape($tmpescaped) . "'";
+            }
+        }
+
+        return $db->escape($operand) . ' ' . $db->escape($operator) . " " . $tmpescaped;
+    }
 }

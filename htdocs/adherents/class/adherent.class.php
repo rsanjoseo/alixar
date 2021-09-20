@@ -45,272 +45,328 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 class Adherent extends CommonObject
 {
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = -1;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Resiliated
-	 */
-	const STATUS_RESILIATED = 0;
-	/**
-	 * Excluded
-	 */
-	const STATUS_EXCLUDED = -2;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'member';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'adherent';
+
 	/**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var string picto
 	 */
 	public $picto = 'member';
-	public $mesgs;
+
+    public $mesgs;
+
 	/**
 	 * @var string login of member
 	 */
 	public $login;
+
 	/**
 	 * @var string Clear password in memory
 	 */
 	public $pass;
+
 	/**
 	 * @var string Clear password in database (defined if DATABASE_PWD_ENCRYPTED=0)
 	 */
 	public $pass_indatabase;
+
 	/**
 	 * @var string Encrypted password in database (always defined)
 	 */
 	public $pass_indatabase_crypted;
+
 	/**
 	 * @var string company name
 	 * @deprecated
 	 */
 	public $societe;
+
 	/**
 	 * @var string company name
 	 */
 	public $company;
+
 	/**
 	 * @var int Thirdparty ID
 	 */
 	public $fk_soc;
 	public $socid;
+
 	/**
 	 * @var string Address
 	 */
 	public $address;
+
 	/**
 	 * @var string zipcode
 	 */
 	public $zip;
+
 	/**
 	 * @var string town
 	 */
 	public $town;
+
 	/**
 	 * @var int Id of state
 	 */
 	public $state_id;
+
 	/**
 	 * @var string Code of state
 	 */
 	public $state_code;
-	/**
+
+    /**
 	 * @var string Label of state
 	 */
 	public $state;
-	/**
+
+    /**
 	 * @var string email
 	 */
 	public $email;
-	/**
+
+    /**
 	 * @var string url
 	 */
 	public $url;
-	/**
+
+    /**
 	 * @var array array of socialnetworks
 	 */
 	public $socialnetworks;
-	/**
+
+    /**
 	 * @var string skype account
 	 * @deprecated
 	 */
 	public $skype;
-	/**
+
+    /**
 	 * @var string twitter account
 	 * @deprecated
 	 */
 	public $twitter;
-	/**
+
+    /**
 	 * @var string facebook account
 	 * @deprecated
 	 */
 	public $facebook;
-	/**
+
+    /**
 	 * @var string linkedin account
 	 * @deprecated
 	 */
 	public $linkedin;
-	/**
+
+    /**
 	 * @var string Phone number
 	 */
 	public $phone;
-	/**
+
+    /**
 	 * @var string Private Phone number
 	 */
 	public $phone_perso;
-	/**
+
+    /**
 	 * @var string Professional Phone number
 	 */
 	public $phone_pro;
-	/**
+
+    /**
 	 * @var string Mobile phone number
 	 */
 	public $phone_mobile;
-	/**
+
+    /**
 	 * @var string Fax number
 	 */
 	public $fax;
-	/**
+
+    /**
 	 * @var string Function
 	 */
 	public $poste;
-	/**
+
+    /**
 	 * @var string mor or phy
 	 */
 	public $morphy;
-	/**
+
+    /**
 	 * @var int Info can be public
 	 */
 	public $public;
-	/**
+
+    /**
 	 * @var string photo of member
 	 */
 	public $photo;
-	/**
+
+    /**
 	 * Date creation record (datec)
 	 *
 	 * @var integer
 	 */
 	public $datec;
-	/**
+
+    /**
 	 * Date modification record (tms)
 	 *
 	 * @var integer
 	 */
 	public $datem;
-	public $datevalid;
-	/**
+
+    public $datevalid;
+
+    /**
 	 * @var string gender
 	 */
 	public $gender;
-	public $birth;
-	/**
+
+    public $birth;
+
+    /**
 	 * @var int id type member
 	 */
 	public $typeid;
-	/**
+
+    /**
 	 * @var string label type member
-	 */
-	public $type;
+     */
+    public $type;
 
+    public $need_subscription;
 
-	// Fields loaded by fetch_subscriptions() from member table
-	public $need_subscription;
-	public $user_id;
-	public $user_login;
-	public $datefin;
-	public $first_subscription_date;
-	public $first_subscription_amount;
-	public $last_subscription_date;
+    public $user_id;
 
+    public $user_login;
 
-	// Fields loaded by fetchPartnerships() from partnership table
-	public $last_subscription_date_start;
-	public $last_subscription_date_end;
-	public $last_subscription_amount;
-	public $subscriptions = array();
-	public $partnerships = array();
-	/**
-	 * @var Adherent To contains a clone of this when we need to save old properties of object
-	 */
-	public $oldcopy;
-	/**
-	 * @var int Entity
+    public $datefin;
+
+    // Fields loaded by fetch_subscriptions() from member table
+
+    public $first_subscription_date;
+
+    public $first_subscription_amount;
+
+    public $last_subscription_date;
+
+    public $last_subscription_date_start;
+
+    public $last_subscription_date_end;
+
+    public $last_subscription_amount;
+
+    public $subscriptions = [];
+
+    // Fields loaded by fetchPartnerships() from partnership table
+
+    public $partnerships = [];
+
+    /**
+     * @var Adherent To contains a clone of this when we need to save old properties of object
+     */
+    public $oldcopy;
+
+    /**
+     * @var int Entity
 	 */
 	public $entity;
+
 	/**
 	 * @var array fields
 	 */
 	public $fields = array(
-		'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 10),
-		'ref' => array('type' => 'varchar(30)', 'label' => 'Ref', 'default' => 1, 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 12, 'index' => 1),
-		'entity' => array('type' => 'integer', 'label' => 'Entity', 'default' => 1, 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'position' => 15, 'index' => 1),
-		'ref_ext' => array('type' => 'varchar(128)', 'label' => 'Ref ext', 'enabled' => 1, 'visible' => 0, 'position' => 20),
-		'civility' => array('type' => 'varchar(6)', 'label' => 'Civility', 'enabled' => 1, 'visible' => -1, 'position' => 25),
-		'lastname' => array('type' => 'varchar(50)', 'label' => 'Lastname', 'enabled' => 1, 'visible' => -1, 'position' => 30, 'showoncombobox'=>1),
-		'firstname' => array('type' => 'varchar(50)', 'label' => 'Firstname', 'enabled' => 1, 'visible' => -1, 'position' => 35, 'showoncombobox'=>1),
-		'login' => array('type' => 'varchar(50)', 'label' => 'Login', 'enabled' => 1, 'visible' => -1, 'position' => 40),
-		'gender' => array('type' => 'varchar(10)', 'label' => 'Gender', 'enabled' => 1, 'visible' => -1, 'position' => 250),
-		'pass' => array('type' => 'varchar(50)', 'label' => 'Pass', 'enabled' => 1, 'visible' => -1, 'position' => 45),
-		'pass_crypted' => array('type' => 'varchar(128)', 'label' => 'Pass crypted', 'enabled' => 1, 'visible' => -1, 'position' => 50),
-		'fk_adherent_type' => array('type' => 'integer', 'label' => 'Fk adherent type', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 55),
-		'morphy' => array('type' => 'varchar(3)', 'label' => 'MorPhy', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 60),
-		'societe' => array('type' => 'varchar(128)', 'label' => 'Societe', 'enabled' => 1, 'visible' => -1, 'position' => 65, 'showoncombobox'=>2),
-		'fk_soc' => array('type' => 'integer:Societe:societe/class/societe.class.php', 'label' => 'ThirdParty', 'enabled' => 1, 'visible' => -1, 'position' => 70),
-		'address' => array('type' => 'text', 'label' => 'Address', 'enabled' => 1, 'visible' => -1, 'position' => 75),
-		'zip' => array('type' => 'varchar(10)', 'label' => 'Zip', 'enabled' => 1, 'visible' => -1, 'position' => 80),
-		'town' => array('type' => 'varchar(50)', 'label' => 'Town', 'enabled' => 1, 'visible' => -1, 'position' => 85),
-		'state_id' => array('type' => 'integer', 'label' => 'State id', 'enabled' => 1, 'visible' => -1, 'position' => 90),
-		'country' => array('type' => 'integer:Ccountry:core/class/ccountry.class.php', 'label' => 'Country', 'enabled' => 1, 'visible' => -1, 'position' => 95),
-		'email' => array('type' => 'varchar(255)', 'label' => 'Email', 'enabled' => 1, 'visible' => -1, 'position' => 100),
-		'url' =>array('type'=>'varchar(255)', 'label'=>'Url', 'enabled'=>1, 'visible'=>-1, 'position'=>110),
-		'socialnetworks' => array('type' => 'text', 'label' => 'Socialnetworks', 'enabled' => 1, 'visible' => -1, 'position' => 105),
-		'phone' => array('type' => 'varchar(30)', 'label' => 'Phone', 'enabled' => 1, 'visible' => -1, 'position' => 115),
-		'phone_perso' => array('type' => 'varchar(30)', 'label' => 'Phone perso', 'enabled' => 1, 'visible' => -1, 'position' => 120),
-		'phone_mobile' => array('type' => 'varchar(30)', 'label' => 'Phone mobile', 'enabled' => 1, 'visible' => -1, 'position' => 125),
-		'birth' => array('type' => 'date', 'label' => 'DateOfBirth', 'enabled' => 1, 'visible' => -1, 'position' => 130),
-		'photo' => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => 1, 'visible' => -1, 'position' => 135),
-		'public' => array('type' => 'smallint(6)', 'label' => 'Public', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 145),
-		'datefin' => array('type' => 'datetime', 'label' => 'DateEnd', 'enabled' => 1, 'visible' => -1, 'position' => 150),
-		'note_private' => array('type' => 'text', 'label' => 'NotePublic', 'enabled' => 1, 'visible' => 0, 'position' => 155),
-		'note_public' => array('type' => 'text', 'label' => 'NotePrivate', 'enabled' => 1, 'visible' => 0, 'position' => 160),
-		'datevalid' => array('type' => 'datetime', 'label' => 'DateValidation', 'enabled' => 1, 'visible' => -1, 'position' => 165),
-		'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -1, 'position' => 170),
-		'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 175),
-		'fk_user_author' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'Fk user author', 'enabled' => 1, 'visible' => -1, 'position' => 180),
-		'fk_user_mod' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'Fk user mod', 'enabled' => 1, 'visible' => -1, 'position' => 185),
-		'fk_user_valid' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserValidation', 'enabled' => 1, 'visible' => -1, 'position' => 190),
-		'canvas' => array('type' => 'varchar(32)', 'label' => 'Canvas', 'enabled' => 1, 'visible' => -1, 'position' => 195),
-		'statut' => array('type' => 'smallint(6)', 'label' => 'Statut', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 500,
-		'arrayofkeyval' => array(-1 => 'Draft', 1 => 'Validated', 0 => 'MemberStatusResiliatedShort', -2 => 'MemberStatusExcludedShort')),
-		'model_pdf' => array('type' => 'varchar(255)', 'label' => 'Model pdf', 'enabled' => 1, 'visible' => 0, 'position' => 800),
-		'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'position' => 805)
-	);
+        'rowid' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 10),
+        'ref' => array('type' => 'varchar(30)', 'label' => 'Ref', 'default' => 1, 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 12, 'index' => 1),
+        'entity' => array('type' => 'integer', 'label' => 'Entity', 'default' => 1, 'enabled' => 1, 'visible' => -2, 'notnull' => 1, 'position' => 15, 'index' => 1),
+        'ref_ext' => array('type' => 'varchar(128)', 'label' => 'Ref ext', 'enabled' => 1, 'visible' => 0, 'position' => 20),
+        'civility' => array('type' => 'varchar(6)', 'label' => 'Civility', 'enabled' => 1, 'visible' => -1, 'position' => 25),
+        'lastname' => array('type' => 'varchar(50)', 'label' => 'Lastname', 'enabled' => 1, 'visible' => -1, 'position' => 30, 'showoncombobox'=>1),
+        'firstname' => array('type' => 'varchar(50)', 'label' => 'Firstname', 'enabled' => 1, 'visible' => -1, 'position' => 35, 'showoncombobox'=>1),
+        'login' => array('type' => 'varchar(50)', 'label' => 'Login', 'enabled' => 1, 'visible' => -1, 'position' => 40),
+        'gender' => array('type' => 'varchar(10)', 'label' => 'Gender', 'enabled' => 1, 'visible' => -1, 'position' => 250),
+        'pass' => array('type' => 'varchar(50)', 'label' => 'Pass', 'enabled' => 1, 'visible' => -1, 'position' => 45),
+        'pass_crypted' => array('type' => 'varchar(128)', 'label' => 'Pass crypted', 'enabled' => 1, 'visible' => -1, 'position' => 50),
+        'fk_adherent_type' => array('type' => 'integer', 'label' => 'Fk adherent type', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 55),
+        'morphy' => array('type' => 'varchar(3)', 'label' => 'MorPhy', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 60),
+        'societe' => array('type' => 'varchar(128)', 'label' => 'Societe', 'enabled' => 1, 'visible' => -1, 'position' => 65, 'showoncombobox'=>2),
+        'fk_soc' => array('type' => 'integer:Societe:societe/class/societe.class.php', 'label' => 'ThirdParty', 'enabled' => 1, 'visible' => -1, 'position' => 70),
+        'address' => array('type' => 'text', 'label' => 'Address', 'enabled' => 1, 'visible' => -1, 'position' => 75),
+        'zip' => array('type' => 'varchar(10)', 'label' => 'Zip', 'enabled' => 1, 'visible' => -1, 'position' => 80),
+        'town' => array('type' => 'varchar(50)', 'label' => 'Town', 'enabled' => 1, 'visible' => -1, 'position' => 85),
+        'state_id' => array('type' => 'integer', 'label' => 'State id', 'enabled' => 1, 'visible' => -1, 'position' => 90),
+        'country' => array('type' => 'integer:Ccountry:core/class/ccountry.class.php', 'label' => 'Country', 'enabled' => 1, 'visible' => -1, 'position' => 95),
+        'email' => array('type' => 'varchar(255)', 'label' => 'Email', 'enabled' => 1, 'visible' => -1, 'position' => 100),
+        'url' =>array('type'=>'varchar(255)', 'label'=>'Url', 'enabled'=>1, 'visible'=>-1, 'position'=>110),
+        'socialnetworks' => array('type' => 'text', 'label' => 'Socialnetworks', 'enabled' => 1, 'visible' => -1, 'position' => 105),
+        'phone' => array('type' => 'varchar(30)', 'label' => 'Phone', 'enabled' => 1, 'visible' => -1, 'position' => 115),
+        'phone_perso' => array('type' => 'varchar(30)', 'label' => 'Phone perso', 'enabled' => 1, 'visible' => -1, 'position' => 120),
+        'phone_mobile' => array('type' => 'varchar(30)', 'label' => 'Phone mobile', 'enabled' => 1, 'visible' => -1, 'position' => 125),
+        'birth' => array('type' => 'date', 'label' => 'DateOfBirth', 'enabled' => 1, 'visible' => -1, 'position' => 130),
+        'photo' => array('type' => 'varchar(255)', 'label' => 'Photo', 'enabled' => 1, 'visible' => -1, 'position' => 135),
+        'public' => array('type' => 'smallint(6)', 'label' => 'Public', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 145),
+        'datefin' => array('type' => 'datetime', 'label' => 'DateEnd', 'enabled' => 1, 'visible' => -1, 'position' => 150),
+        'note_private' => array('type' => 'text', 'label' => 'NotePublic', 'enabled' => 1, 'visible' => 0, 'position' => 155),
+        'note_public' => array('type' => 'text', 'label' => 'NotePrivate', 'enabled' => 1, 'visible' => 0, 'position' => 160),
+        'datevalid' => array('type' => 'datetime', 'label' => 'DateValidation', 'enabled' => 1, 'visible' => -1, 'position' => 165),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => 1, 'visible' => -1, 'position' => 170),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 175),
+        'fk_user_author' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'Fk user author', 'enabled' => 1, 'visible' => -1, 'position' => 180),
+        'fk_user_mod' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'Fk user mod', 'enabled' => 1, 'visible' => -1, 'position' => 185),
+        'fk_user_valid' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserValidation', 'enabled' => 1, 'visible' => -1, 'position' => 190),
+        'canvas' => array('type' => 'varchar(32)', 'label' => 'Canvas', 'enabled' => 1, 'visible' => -1, 'position' => 195),
+        'statut' => array(
+            'type' => 'smallint(6)', 'label' => 'Statut', 'enabled' => 1, 'visible' => -1, 'notnull' => 1, 'position' => 500,
+            'arrayofkeyval' => array(-1 => 'Draft', 1 => 'Validated', 0 => 'MemberStatusResiliatedShort', -2 => 'MemberStatusExcludedShort'),
+        ),
+        'model_pdf' => array('type' => 'varchar(255)', 'label' => 'Model pdf', 'enabled' => 1, 'visible' => 0, 'position' => 800),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'position' => 805),
+    );
 
-	/**
-	 *	Constructor
-	 *
-	 *	@param 		DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->statut = self::STATUS_DRAFT;
-		$this->status = $this->statut;
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = -1;
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 1;
+    /**
+     * Resiliated
+     */
+    const STATUS_RESILIATED = 0;
+    /**
+     * Excluded
+     */
+    const STATUS_EXCLUDED = -2;
+
+    /**
+     *    Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->statut = self::STATUS_DRAFT;
+        $this->status = $this->statut;
 		// l'adherent n'est pas public par defaut
 		$this->public = 0;
 		// les champs optionnels sont vides
@@ -319,22 +375,6 @@ class Adherent extends CommonObject
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB 	$db 			Database handler
-	 * @param int 		$origin_id 		Old thirdparty id
-	 * @param int 		$dest_id 		New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty($db, $origin_id, $dest_id)
-	{
-		$tables = array('adherent');
-
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
 	/**
 	 *  Function sending an email to the current member with the text supplied in parameter.
 	 *
@@ -391,10 +431,12 @@ class Adherent extends CommonObject
 		}
 	}
 
+
 	/**
 	 * Make substitution of tags into text with value of current object.
 	 *
 	 * @param	string	$text       Text to make substitution to
+	 *
 	 * @return  string      		Value of input text string with substitutions done
 	 */
 	public function makeSubstitution($text)
@@ -463,22 +505,6 @@ class Adherent extends CommonObject
 		return make_substitutions($text, $substitutionarray, $langs);
 	}
 
-	/**
-	 *    Return civility label of a member
-	 *
-	 *    @return   string              	Translated name of civility (translated with transnoentitiesnoconv)
-	 */
-	public function getCivilityLabel()
-	{
-		global $langs;
-		$langs->load("dict");
-
-		$code = (empty($this->civility_id) ? '' : $this->civility_id);
-		if (empty($code)) {
-			return '';
-		}
-		return $langs->getLabelFromKey($this->db, "Civility".$code, "c_civility", "code", "label", $code);
-	}
 
 	/**
 	 *	Return translated label by the nature of a adherent (physical or moral)
@@ -500,9 +526,6 @@ class Adherent extends CommonObject
 		}
 		return $morphy;
 	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *	Create a member into database
@@ -614,8 +637,9 @@ class Adherent extends CommonObject
 		}
 	}
 
+
 	/**
-	 *	Update a member in database (standard information and password)
+     *    Update a member in database (standard information and password)
 	 *
 	 *	@param	User	$user				User making update
 	 *	@param	int		$notrigger			1=disable trigger UPDATE (when called by create)
@@ -623,6 +647,7 @@ class Adherent extends CommonObject
 	 *	@param	int		$nosyncuserpass		0=Synchronize linked user (password), 1=Do not synchronize linked user
 	 *	@param	int		$nosyncthirdparty	0=Synchronize linked thirdparty (standard info), 1=Do not synchronize linked thirdparty
 	 * 	@param	string	$action				Current action for hookmanager
+	 *
 	 * 	@return	int							<0 if KO, >0 if OK
 	 */
 	public function update($user, $notrigger = 0, $nosyncuser = 0, $nosyncuserpass = 0, $nosyncthirdparty = 0, $action = 'update')
@@ -873,115 +898,68 @@ class Adherent extends CommonObject
 				$this->db->commit();
 				return $nbrowsaffected;
 			} else {
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->db->rollback();
-			$this->error = $this->db->lasterror();
-			return -2;
-		}
-	}
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            $this->db->rollback();
+            $this->error = $this->db->lasterror();
+            return -2;
+        }
+    }
 
-	/**
-	 *    Change password of a user
-	 *
-	 *    @param	User	$user           Object user de l'utilisateur qui fait la modification
-	 *    @param 	string	$password       New password (to generate if empty)
-	 *    @param    int		$isencrypted    0 ou 1 si il faut crypter le mot de passe en base (0 par defaut)
-	 *	  @param	int		$notrigger		1=Ne declenche pas les triggers
-	 *    @param	int		$nosyncuser		Do not synchronize linked user
-	 *    @return   string           		If OK return clear password, 0 if no change, < 0 if error
-	 */
-	public function setPassword($user, $password = '', $isencrypted = 0, $notrigger = 0, $nosyncuser = 0)
-	{
-		global $conf, $langs;
 
-		$error = 0;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		dol_syslog(get_class($this)."::setPassword user=".$user->id." password=".preg_replace('/./i', '*', $password)." isencrypted=".$isencrypted);
+    /**
+     *    Update denormalized last subscription date.
+     *    This function is called when we delete a subscription for example.
+     *
+     * @param User $user User making change
+     *
+     * @return    int                        <0 if KO, >0 if OK
+     */
+    public function update_end_date($user)
+    {
+        // phpcs:enable
+        $this->db->begin();
 
-		// If new password not provided, we generate one
-		if (!$password) {
-			require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
-			$password = getRandomPassword(false);
-		}
+        // Search for last subscription id and end date
+        $sql = "SELECT rowid, datec as dateop, dateadh as datedeb, datef as datefin";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "subscription";
+        $sql .= " WHERE fk_adherent = " . ((int) $this->id);
+        $sql .= " ORDER by dateadh DESC"; // Sort by start subscription date
 
-		// Crypt password
-		$password_crypted = dol_hash($password);
+        dol_syslog(get_class($this) . "::update_end_date", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $obj = $this->db->fetch_object($resql);
+            $dateop = $this->db->jdate($obj->dateop);
+            $datedeb = $this->db->jdate($obj->datedeb);
+            $datefin = $this->db->jdate($obj->datefin);
 
-		$password_indatabase = '';
-		if (!$isencrypted) {
-			$password_indatabase = $password;
-		}
+            $sql = "UPDATE " . MAIN_DB_PREFIX . "adherent SET";
+            $sql .= " datefin=" . ($datefin != '' ? "'" . $this->db->idate($datefin) . "'" : "null");
+            $sql .= " WHERE rowid = " . ((int) $this->id);
 
-		$this->db->begin();
-
-		// Mise a jour
-		$sql = "UPDATE ".MAIN_DB_PREFIX."adherent";
-		$sql .= " SET pass_crypted = '".$this->db->escape($password_crypted)."'";
-		//if (! empty($conf->global->DATABASE_PWD_ENCRYPTED))
-		if ($isencrypted) {
-			$sql .= ", pass = null";
-		} else {
-			$sql .= ", pass = '".$this->db->escape($password_indatabase)."'";
-		}
-		$sql .= " WHERE rowid = ".((int) $this->id);
-
-		//dol_syslog("Adherent::Password sql=hidden");
-		dol_syslog(get_class($this)."::setPassword", LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$nbaffectedrows = $this->db->affected_rows($result);
-
-			if ($nbaffectedrows) {
-				$this->pass = $password;
-				$this->pass_indatabase = $password_indatabase;
-				$this->pass_indatabase_crypted = $password_crypted;
-
-				if ($this->user_id && !$nosyncuser) {
-					require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
-
-					// This member is linked with a user, so we also update users informations
-					// if this is an update.
-					$luser = new User($this->db);
-					$result = $luser->fetch($this->user_id);
-
-					if ($result >= 0) {
-						$result = $luser->setPassword($user, $this->pass, 0, 0, 1);
-						if ($result < 0) {
-							$this->error = $luser->error;
-							dol_syslog(get_class($this)."::setPassword ".$this->error, LOG_ERR);
-							$error++;
-						}
-					} else {
-						$this->error = $luser->error;
-						$error++;
-					}
-				}
-
-				if (!$error && !$notrigger) {
-					// Call trigger
-					$result = $this->call_trigger('MEMBER_NEW_PASSWORD', $user);
-					if ($result < 0) {
-						$error++;
-						$this->db->rollback();
-						return -1;
-					}
-					// End call triggers
-				}
-
-				$this->db->commit();
-				return $this->pass;
-			} else {
-				$this->db->rollback();
-				return 0;
-			}
-		} else {
-			$this->db->rollback();
-			dol_print_error($this->db);
-			return -1;
-		}
+            dol_syslog(get_class($this) . "::update_end_date", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if ($resql) {
+                $this->last_subscription_date = $dateop;
+                $this->last_subscription_date_start = $datedeb;
+                $this->last_subscription_date_end = $datefin;
+                $this->datefin = $datefin;
+                $this->db->commit();
+                return 1;
+            } else {
+                $this->db->rollback();
+                return -1;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            $this->db->rollback();
+            return -1;
+        }
 	}
 
 	/**
@@ -1068,26 +1046,129 @@ class Adherent extends CommonObject
 				$this->error .= $this->db->lasterror();
 				$errorflag = -5;
 			}
-		}
+        }
 
-		if (!$error) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return $errorflag;
-		}
-	}
+        if (!$error) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return $errorflag;
+        }
+    }
 
-	/**
-	 *    Set link to a user
-	 *
-	 *    @param     int	$userid        	Id of user to link to
-	 *    @return    int					1=OK, -1=KO
-	 */
-	public function setUserId($userid)
-	{
-		global $conf, $langs;
+    /**
+     *    Change password of a user
+     *
+     * @param User   $user        Object user de l'utilisateur qui fait la modification
+     * @param string $password    New password (to generate if empty)
+     * @param int    $isencrypted 0 ou 1 si il faut crypter le mot de passe en base (0 par defaut)
+     * @param int    $notrigger   1=Ne declenche pas les triggers
+     * @param int    $nosyncuser  Do not synchronize linked user
+     *
+     * @return   string                If OK return clear password, 0 if no change, < 0 if error
+     */
+    public function setPassword($user, $password = '', $isencrypted = 0, $notrigger = 0, $nosyncuser = 0)
+    {
+        global $conf, $langs;
+
+        $error = 0;
+
+        dol_syslog(get_class($this) . "::setPassword user=" . $user->id . " password=" . preg_replace('/./i', '*', $password) . " isencrypted=" . $isencrypted);
+
+        // If new password not provided, we generate one
+        if (!$password) {
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+            $password = getRandomPassword(false);
+        }
+
+        // Crypt password
+        $password_crypted = dol_hash($password);
+
+        $password_indatabase = '';
+        if (!$isencrypted) {
+            $password_indatabase = $password;
+        }
+
+        $this->db->begin();
+
+        // Mise a jour
+        $sql = "UPDATE " . MAIN_DB_PREFIX . "adherent";
+        $sql .= " SET pass_crypted = '" . $this->db->escape($password_crypted) . "'";
+        //if (! empty($conf->global->DATABASE_PWD_ENCRYPTED))
+        if ($isencrypted) {
+            $sql .= ", pass = null";
+        } else {
+            $sql .= ", pass = '" . $this->db->escape($password_indatabase) . "'";
+        }
+        $sql .= " WHERE rowid = " . ((int) $this->id);
+
+        //dol_syslog("Adherent::Password sql=hidden");
+        dol_syslog(get_class($this) . "::setPassword", LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $nbaffectedrows = $this->db->affected_rows($result);
+
+            if ($nbaffectedrows) {
+                $this->pass = $password;
+                $this->pass_indatabase = $password_indatabase;
+                $this->pass_indatabase_crypted = $password_crypted;
+
+                if ($this->user_id && !$nosyncuser) {
+                    require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+
+                    // This member is linked with a user, so we also update users informations
+                    // if this is an update.
+                    $luser = new User($this->db);
+                    $result = $luser->fetch($this->user_id);
+
+                    if ($result >= 0) {
+                        $result = $luser->setPassword($user, $this->pass, 0, 0, 1);
+                        if ($result < 0) {
+                            $this->error = $luser->error;
+                            dol_syslog(get_class($this) . "::setPassword " . $this->error, LOG_ERR);
+                            $error++;
+                        }
+                    } else {
+                        $this->error = $luser->error;
+                        $error++;
+                    }
+                }
+
+                if (!$error && !$notrigger) {
+                    // Call trigger
+                    $result = $this->call_trigger('MEMBER_NEW_PASSWORD', $user);
+                    if ($result < 0) {
+                        $error++;
+                        $this->db->rollback();
+                        return -1;
+                    }
+                    // End call triggers
+                }
+
+                $this->db->commit();
+                return $this->pass;
+            } else {
+                $this->db->rollback();
+                return 0;
+            }
+        } else {
+            $this->db->rollback();
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     *    Set link to a user
+     *
+     * @param int $userid Id of user to link to
+     *
+     * @return    int                    1=OK, -1=KO
+     */
+    public function setUserId($userid)
+    {
+        global $conf, $langs;
 
 		$this->db->begin();
 
@@ -1119,8 +1200,6 @@ class Adherent extends CommonObject
 		return 1;
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Set link to a third party
@@ -1159,8 +1238,8 @@ class Adherent extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *	Method to load member from its login
 	 *
@@ -1177,25 +1256,56 @@ class Adherent extends CommonObject
 		$sql .= " AND entity = ".$conf->entity;
 
 		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-				$this->fetch($obj->rowid);
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-	}
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
+                $this->fetch($obj->rowid);
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+    }
 
-	/**
-	 *	Load member from database
-	 *
-	 *	@param	int		$rowid      			Id of object to load
-	 * 	@param	string	$ref					To load member from its ref
-	 * 	@param	int		$fk_soc					To load member from its link to third party
-	 * 	@param	string	$ref_ext				External reference
-	 *  @param	bool	$fetch_optionals		To load optionals (extrafields)
-	 *  @param	bool	$fetch_subscriptions	To load member subscriptions
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Method to load member from its name
+     *
+     * @param string $firstname Firstname
+     * @param string $lastname  Lastname
+     *
+     * @return    void
+     */
+    public function fetch_name($firstname, $lastname)
+    {
+        // phpcs:enable
+        global $conf;
+
+        $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "adherent";
+        $sql .= " WHERE firstname='" . $this->db->escape($firstname) . "'";
+        $sql .= " AND lastname='" . $this->db->escape($lastname) . "'";
+        $sql .= " AND entity = " . $conf->entity;
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
+                $this->fetch($obj->rowid);
+            }
+        } else {
+            dol_print_error($this->db);
+        }
+    }
+
+    /**
+     *    Load member from database
+     *
+     * @param int    $rowid               Id of object to load
+     * @param string $ref                 To load member from its ref
+     * @param int    $fk_soc              To load member from its link to third party
+     * @param string $ref_ext             External reference
+     * @param bool   $fetch_optionals     To load optionals (extrafields)
+     * @param bool   $fetch_subscriptions To load member subscriptions
 	 *	@return int								>0 if OK, 0 if not found, <0 if KO
 	 */
 	public function fetch($rowid, $ref = '', $fk_soc = '', $ref_ext = '', $fetch_optionals = true, $fetch_subscriptions = true)
@@ -1402,33 +1512,6 @@ class Adherent extends CommonObject
 		}
 	}
 
-	/**
-	 *	Method to load member from its name
-	 *
-	 *	@param	string	$firstname	Firstname
-	 *	@param	string	$lastname	Lastname
-	 *	@return	void
-	 */
-	public function fetch_name($firstname, $lastname)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$sql = "SELECT rowid FROM ".MAIN_DB_PREFIX."adherent";
-		$sql .= " WHERE firstname='".$this->db->escape($firstname)."'";
-		$sql .= " AND lastname='".$this->db->escape($lastname)."'";
-		$sql .= " AND entity = ".$conf->entity;
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-				$this->fetch($obj->rowid);
-			}
-		} else {
-			dol_print_error($this->db);
-		}
-	}
 
 	/**
 	 *	Function to get partnerships array
@@ -1445,8 +1528,9 @@ class Adherent extends CommonObject
 
 		$this->partnerships[] = array();
 
-		return 1;
+        return 1;
 	}
+
 
 	/**
 	 *	Insert subscription into database and eventually add links to banks, mailman, etc...
@@ -1524,55 +1608,6 @@ class Adherent extends CommonObject
 		}
 	}
 
-	/**
-	 *	Update denormalized last subscription date.
-	 * 	This function is called when we delete a subscription for example.
-	 *
-	 *	@param	User	$user			User making change
-	 *	@return	int						<0 if KO, >0 if OK
-	 */
-	public function update_end_date($user)
-	{
-		// phpcs:enable
-		$this->db->begin();
-
-		// Search for last subscription id and end date
-		$sql = "SELECT rowid, datec as dateop, dateadh as datedeb, datef as datefin";
-		$sql .= " FROM ".MAIN_DB_PREFIX."subscription";
-		$sql .= " WHERE fk_adherent = ".((int) $this->id);
-		$sql .= " ORDER by dateadh DESC"; // Sort by start subscription date
-
-		dol_syslog(get_class($this)."::update_end_date", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$obj = $this->db->fetch_object($resql);
-			$dateop = $this->db->jdate($obj->dateop);
-			$datedeb = $this->db->jdate($obj->datedeb);
-			$datefin = $this->db->jdate($obj->datefin);
-
-			$sql = "UPDATE ".MAIN_DB_PREFIX."adherent SET";
-			$sql .= " datefin=".($datefin != '' ? "'".$this->db->idate($datefin)."'" : "null");
-			$sql .= " WHERE rowid = ".((int) $this->id);
-
-			dol_syslog(get_class($this)."::update_end_date", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if ($resql) {
-				$this->last_subscription_date = $dateop;
-				$this->last_subscription_date_start = $datedeb;
-				$this->last_subscription_date_end = $datefin;
-				$this->datefin = $datefin;
-				$this->db->commit();
-				return 1;
-			} else {
-				$this->db->rollback();
-				return -1;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -1;
-		}
-	}
 
 	/**
 	 *	Do complementary actions after subscription recording.
@@ -1843,6 +1878,7 @@ class Adherent extends CommonObject
 		}
 	}
 
+
 	/**
 	 *		Function that validate a member
 	 *
@@ -1895,7 +1931,6 @@ class Adherent extends CommonObject
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *		Fonction qui resilie un adherent
@@ -1944,9 +1979,6 @@ class Adherent extends CommonObject
 		}
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *		Functiun to exlude (set adherent.status to -2) a member
 	 *		TODO
@@ -1994,9 +2026,10 @@ class Adherent extends CommonObject
 			$this->error = $this->db->error();
 			$this->db->rollback();
 			return -1;
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Function to add member into external tools mailing-list, spip, etc.
 	 *
@@ -2037,25 +2070,28 @@ class Adherent extends CommonObject
 			$result = $mailmanspip->add_to_spip($this);
 			if ($result < 0) {
 				$this->errors[] = $mailmanspip->error;
-				$err += 1;
-			}
-		}
-		if ($err) {
-			return -$err;
-		} else {
-			return 1;
-		}
-	}
+                $err += 1;
+            }
+        }
+        if ($err) {
+            return -$err;
+        } else {
+            return 1;
+        }
+    }
 
-	/**
-	 *  Function to delete a member from external tools like mailing-list, spip, etc.
-	 *
-	 *  @return     int     <0 if KO, >0 if OK
-	 */
-	public function del_to_abo()
-	{
-		// phpcs:enable
-		global $conf, $langs;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Function to delete a member from external tools like mailing-list, spip, etc.
+     *
+     * @return     int     <0 if KO, >0 if OK
+     */
+    public function del_to_abo()
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		include_once DOL_DOCUMENT_ROOT.'/mailmanspip/class/mailmanspip.class.php';
 		$mailmanspip = new MailmanSpip($this->db);
@@ -2086,26 +2122,43 @@ class Adherent extends CommonObject
 			$result = $mailmanspip->del_to_spip($this);
 			if ($result < 0) {
 				$this->errors[] = $mailmanspip->error;
-				$err += 1;
-			}
-		}
-		if ($err) {
-			// error
-			return -$err;
-		} else {
-			return 1;
-		}
-	}
+                $err += 1;
+            }
+        }
+        if ($err) {
+            // error
+            return -$err;
+        } else {
+            return 1;
+        }
+    }
 
-	/**
-	 *  Return clicable name (with picto eventually)
-	 *
-	 *	@param	int		$withpictoimg				0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
-	 *	@param	int		$maxlen						length max label
-	 *	@param	string	$option						Page for link ('card', 'category', 'subscription', ...)
-	 *	@param  string  $mode           			''=Show firstname+lastname as label (using default order), 'firstname'=Show only firstname, 'lastname'=Show only lastname, 'login'=Show login, 'ref'=Show ref
-	 *	@param  string  $morecss        			Add more css on link
-	 *	@param  int		$save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+    /**
+     *    Return civility label of a member
+     *
+     * @return   string                Translated name of civility (translated with transnoentitiesnoconv)
+     */
+    public function getCivilityLabel()
+    {
+        global $langs;
+        $langs->load("dict");
+
+        $code = (empty($this->civility_id) ? '' : $this->civility_id);
+        if (empty($code)) {
+            return '';
+        }
+        return $langs->getLabelFromKey($this->db, "Civility" . $code, "c_civility", "code", "label", $code);
+    }
+
+    /**
+     *  Return clicable name (with picto eventually)
+     *
+     * @param int              $withpictoimg                 0=No picto, 1=Include picto into link, 2=Only picto, -1=Include photo into link, -2=Only picto photo, -3=Only photo very small)
+     * @param int              $maxlen                       length max label
+     * @param string           $option                       Page for link ('card', 'category', 'subscription', ...)
+     * @param string           $mode                         ''=Show firstname+lastname as label (using default order), 'firstname'=Show only firstname, 'lastname'=Show only lastname, 'login'=Show login, 'ref'=Show ref
+     * @param string           $morecss                      Add more css on link
+     * @param int              $save_lastsearch_value        -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
 	 *	@param	int		$notooltip					1=Disable tooltip
 	 *	@param  int		$addlinktonotes				1=Add link to notes
 	 *	@return	string								Chaine avec URL
@@ -2233,8 +2286,6 @@ class Adherent extends CommonObject
 		return $result;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Retourne le libelle du statut d'un adherent (brouillon, valide, resilie, exclu)
 	 *
@@ -2246,9 +2297,7 @@ class Adherent extends CommonObject
 		return $this->LibStatut($this->statut, $this->need_subscription, $this->datefin, $mode);
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Renvoi le libelle d'un statut donne
 	 *
@@ -2303,8 +2352,8 @@ class Adherent extends CommonObject
 		return dolGetStatus($labelStatus, $labelStatusShort, '', $statusType, $mode);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *      Charge indicateurs this->nb de tableau de bord
 	 *
@@ -2333,9 +2382,10 @@ class Adherent extends CommonObject
 			dol_print_error($this->db);
 			$this->error = $this->db->error();
 			return -1;
-		}
-	}
+        }
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
 	 *
@@ -2416,31 +2466,6 @@ class Adherent extends CommonObject
 		}
 	}
 
-	/**
-	 * Return if a member is late (subscription late) or not
-	 *
-	 * @return boolean     True if late, False if not late
-	 */
-	public function hasDelay()
-	{
-		global $conf;
-
-		//Only valid members
-		if ($this->statut != self::STATUS_VALIDATED) {
-			return false;
-		}
-		if (!$this->datefin) {
-			return false;
-		}
-
-		$now = dol_now();
-
-		return $this->datefin < ($now - $conf->adherent->subscription->warning_delay);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 *  Create a document onto disk according to template module.
@@ -2474,9 +2499,6 @@ class Adherent extends CommonObject
 		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams);
 	}
 
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
 	/**
 	 *  Initialise an instance with random values.
@@ -2535,51 +2557,58 @@ class Adherent extends CommonObject
 
 		$this->first_subscription_date = $now;
 		$this->first_subscription_date_start = $this->first_subscription_date;
-		$this->first_subscription_date_end = dol_time_plus_duree($this->first_subscription_date_start, 1, 'y');
-		$this->first_subscription_amount = 10;
+        $this->first_subscription_date_end = dol_time_plus_duree($this->first_subscription_date_start, 1, 'y');
+        $this->first_subscription_amount = 10;
 
-		$this->last_subscription_date = $this->first_subscription_date;
-		$this->last_subscription_date_start = $this->first_subscription_date;
-		$this->last_subscription_date_end = dol_time_plus_duree($this->last_subscription_date_start, 1, 'y');
-		$this->last_subscription_amount = 10;
-		return 1;
-	}
+        $this->last_subscription_date = $this->first_subscription_date;
+        $this->last_subscription_date_start = $this->first_subscription_date;
+        $this->last_subscription_date_end = dol_time_plus_duree($this->last_subscription_date_start, 1, 'y');
+        $this->last_subscription_amount = 10;
+        return 1;
+    }
 
-	/**
-	 *	Retourne chaine DN complete dans l'annuaire LDAP pour l'objet
-	 *
-	 *	@param	array	$info		Info array loaded by _load_ldap_info
-	 *	@param	int		$mode		0=Return full DN (uid=qqq,ou=xxx,dc=aaa,dc=bbb)
-	 *								1=Return DN without key inside (ou=xxx,dc=aaa,dc=bbb)
-	 *								2=Return key only (uid=qqq)
-	 *	@return	string				DN
-	 */
-	public function _load_ldap_dn($info, $mode = 0)
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     *    Retourne chaine DN complete dans l'annuaire LDAP pour l'objet
+     *
+     * @param array $info             Info array loaded by _load_ldap_info
+     * @param int   $mode             0=Return full DN (uid=qqq,ou=xxx,dc=aaa,dc=bbb)
+     *                                1=Return DN without key inside (ou=xxx,dc=aaa,dc=bbb)
+     *                                2=Return key only (uid=qqq)
+     *
+     * @return    string                DN
+     */
+    public function _load_ldap_dn($info, $mode = 0)
 	{
 		// phpcs:enable
 		global $conf;
 		$dn = '';
 		if ($mode == 0) {
 			$dn = $conf->global->LDAP_KEY_MEMBERS."=".$info[$conf->global->LDAP_KEY_MEMBERS].",".$conf->global->LDAP_MEMBER_DN;
-		}
-		if ($mode == 1) {
-			$dn = $conf->global->LDAP_MEMBER_DN;
-		}
-		if ($mode == 2) {
-			$dn = $conf->global->LDAP_KEY_MEMBERS."=".$info[$conf->global->LDAP_KEY_MEMBERS];
-		}
-		return $dn;
-	}
+        }
+        if ($mode == 1) {
+            $dn = $conf->global->LDAP_MEMBER_DN;
+        }
+        if ($mode == 2) {
+            $dn = $conf->global->LDAP_KEY_MEMBERS . "=" . $info[$conf->global->LDAP_KEY_MEMBERS];
+        }
+        return $dn;
+    }
 
-	/**
-	 *	Initialise tableau info (tableau des attributs LDAP)
-	 *
-	 *	@return		array		Tableau info des attributs
-	 */
-	public function _load_ldap_info()
-	{
-		// phpcs:enable
-		global $conf, $langs;
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     *    Initialise tableau info (tableau des attributs LDAP)
+     *
+     * @return        array        Tableau info des attributs
+     */
+    public function _load_ldap_info()
+    {
+        // phpcs:enable
+        global $conf, $langs;
 
 		$info = array();
 		$socialnetworks = getArrayOfSocialNetworks();
@@ -2717,8 +2746,9 @@ class Adherent extends CommonObject
 			$info[$conf->global->LDAP_FIELD_MEMBER_LASTSUBSCRIPTION_AMOUNT] = $this->last_subscription_amount;
 		}
 
-		return $info;
+        return $info;
 	}
+
 
 	/**
 	 *      Load type info information in the member object
@@ -2801,24 +2831,63 @@ class Adherent extends CommonObject
 	 * Deletes object from existing categories not supplied.
 	 * Adds it to non existing supplied categories.
 	 * Existing categories are left untouch.
-	 *
-	 * @param int[]|int $categories Category or categories IDs
-	 * @return void
-	 */
-	public function setCategories($categories)
-	{
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-		return parent::setCategoriesCommon($categories, Categorie::TYPE_MEMBER);
-	}
+     *
+     * @param int[]|int $categories Category or categories IDs
+     * @return void
+     */
+    public function setCategories($categories)
+    {
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        return parent::setCategoriesCommon($categories, Categorie::TYPE_MEMBER);
+    }
 
-	/**
-	 * Send reminders by emails before subscription end
-	 * CAN BE A CRON TASK
-	 *
-	 * @param	string		$daysbeforeendlist		Nb of days before end of subscription (negative number = after subscription). Can be a list of delay, separated by a semicolon, for example '10;5;0;-5'
-	 * @return	int									0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
-	 */
-	public function sendReminderForExpiredSubscription($daysbeforeendlist = '10')
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty($db, $origin_id, $dest_id)
+    {
+        $tables = ['adherent'];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Return if a member is late (subscription late) or not
+     *
+     * @return boolean     True if late, False if not late
+     */
+    public function hasDelay()
+    {
+        global $conf;
+
+        //Only valid members
+        if ($this->statut != self::STATUS_VALIDATED) {
+            return false;
+        }
+        if (!$this->datefin) {
+            return false;
+        }
+
+        $now = dol_now();
+
+        return $this->datefin < ($now - $conf->adherent->subscription->warning_delay);
+    }
+
+    /**
+     * Send reminders by emails before subscription end
+     * CAN BE A CRON TASK
+     *
+     * @param string $daysbeforeendlist Nb of days before end of subscription (negative number = after subscription). Can be a list of delay, separated by a semicolon, for example '10;5;0;-5'
+     *
+     * @return    int                                    0 if OK, <>0 if KO (this function is used also by cron so only 0 is OK)
+     */
+    public function sendReminderForExpiredSubscription($daysbeforeendlist = '10')
 	{
 		global $conf, $langs, $mysoc, $user;
 

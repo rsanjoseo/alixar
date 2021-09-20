@@ -44,92 +44,304 @@ class Task extends CommonObject
 	 */
 	public $table_element = 'projet_task';
 
-	/**
-	 * @var string Field with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_task';
+    /**
+     * @var string Field with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_task';
 
-	/**
-	 * @var string String with name of icon for myobject.
-	 */
-	public $picto = 'projecttask';
-	/**
-	 * @var int ID parent task
-	 */
-	public $fk_task_parent = 0;
-	/**
-	 * @var string Label of task
-	 */
-	public $label;
-	/**
-	 * @var string description
-	 */
-	public $description;
-public $duration_effective;
-	public $planned_workload; // total of time spent on this task
-	public $date_c;
-	public $date_start;
-	public $date_end;
-	public $progress;
-	/**
-	 * @var int ID
-	 */
-	public $fk_statut;
-	public $priority;
+    /**
+     * @var string String with name of icon for myobject.
+     */
+    public $picto = 'projecttask';
+
+    /**
+     * @var array    List of child tables. To test if we can delete object.
+     */
+    protected $childtables = ['projet_task_time'];
+
+    /**
+     * @var int ID parent task
+     */
+    public $fk_task_parent = 0;
+
+    /**
+     * @var string Label of task
+     */
+    public $label;
+
+    /**
+     * @var string description
+     */
+    public $description;
+
+    public $duration_effective; // total of time spent on this task
+    public $planned_workload;
+    public $date_c;
+    public $date_start;
+    public $date_end;
+    public $progress;
+
+    /**
+     * @var int ID
+     */
+    public $fk_statut;
+
+    public $priority;
+
 	/**
 	 * @var int ID
 	 */
 	public $fk_user_creat;
+
 	/**
 	 * @var int ID
 	 */
 	public $fk_user_valid;
+
 	public $rang;
+
 	public $timespent_min_date;
 	public $timespent_max_date;
 	public $timespent_total_duration;
 	public $timespent_total_amount;
-	public $timespent_nblinesnull;
-	public $timespent_nblines;
-	public $timespent_id;
-	// For detail of lines of timespent record, there is the property ->lines in common
+    public $timespent_nblinesnull;
+    public $timespent_nblines;
+    // For detail of lines of timespent record, there is the property ->lines in common
 
-	// Var used to call method addTimeSpent(). Bad practice.
-	public $timespent_duration;
-	public $timespent_old_duration;
-	public $timespent_date;
-public $timespent_datehour;
-	public $timespent_withhour; // More accurate start date (same than timespent_date but includes hours, minutes and seconds)
-		public $timespent_fk_user; // 1 = we entered also start hours for timesheet line
-	public $timespent_thm;
-	public $timespent_note;
-	public $comments = array();
-	public $oldcopy;
-	/**
-	 * @var array	List of child tables. To test if we can delete object.
-	 */
-	protected $childtables = array('projet_task_time');
+    // Var used to call method addTimeSpent(). Bad practice.
+    public $timespent_id;
+    public $timespent_duration;
+    public $timespent_old_duration;
+    public $timespent_date;
+    public $timespent_datehour; // More accurate start date (same than timespent_date but includes hours, minutes and seconds)
+    public $timespent_withhour; // 1 = we entered also start hours for timesheet line
+    public $timespent_fk_user;
+    public $timespent_thm;
+    public $timespent_note;
 
-	/**
-	 *  Constructor
-	 *
-	 *  @param      DoliDB		$db      Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-	}
+    public $comments = [];
 
-	/**
-	 *  Update database
-	 *
-	 *  @param	User	$user        	User that modify
-	 *  @param  int		$notrigger	    0=launch triggers after, 1=disable triggers
-	 *  @return int			         	<=0 if KO, >0 if OK
-	 */
-	public function update($user = null, $notrigger = 0)
-	{
-		global $conf, $langs;
+    public $oldcopy;
+
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     *  Create into database
+     *
+     * @param User $user      User that create
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                    <0 if KO, Id of created object if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs;
+
+        //For the date
+        $now = dol_now();
+
+        $error = 0;
+
+        // Clean parameters
+        $this->label = trim($this->label);
+        $this->description = trim($this->description);
+
+        // Check parameters
+        // Put here code to add control on parameters values
+
+        // Insert request
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "projet_task (";
+        $sql .= "entity";
+        $sql .= ", fk_projet";
+        $sql .= ", ref";
+        $sql .= ", fk_task_parent";
+        $sql .= ", label";
+        $sql .= ", description";
+        $sql .= ", datec";
+        $sql .= ", fk_user_creat";
+        $sql .= ", dateo";
+        $sql .= ", datee";
+        $sql .= ", planned_workload";
+        $sql .= ", progress";
+        $sql .= ") VALUES (";
+        $sql .= ((int) $conf->entity);
+        $sql .= ", " . ((int) $this->fk_project);
+        $sql .= ", " . (!empty($this->ref) ? "'" . $this->db->escape($this->ref) . "'" : 'null');
+        $sql .= ", " . ((int) $this->fk_task_parent);
+        $sql .= ", '" . $this->db->escape($this->label) . "'";
+        $sql .= ", '" . $this->db->escape($this->description) . "'";
+        $sql .= ", '" . $this->db->idate($now) . "'";
+        $sql .= ", " . ((int) $user->id);
+        $sql .= ", " . ($this->date_start != '' ? "'" . $this->db->idate($this->date_start) . "'" : 'null');
+        $sql .= ", " . ($this->date_end != '' ? "'" . $this->db->idate($this->date_end) . "'" : 'null');
+        $sql .= ", " . (($this->planned_workload != '' && $this->planned_workload >= 0) ? ((int) $this->planned_workload) : 'null');
+        $sql .= ", " . (($this->progress != '' && $this->progress >= 0) ? ((int) $this->progress) : 'null');
+        $sql .= ")";
+
+        $this->db->begin();
+
+        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $error++;
+            $this->errors[] = "Error " . $this->db->lasterror();
+        }
+
+        if (!$error) {
+            $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "projet_task");
+
+            if (!$notrigger) {
+                // Call trigger
+                $result = $this->call_trigger('TASK_CREATE', $user);
+                if ($result < 0) {
+                    $error++;
+                }
+                // End call triggers
+            }
+        }
+
+        // Update extrafield
+        if (!$error) {
+            if (!$error) {
+                $result = $this->insertExtraFields();
+                if ($result < 0) {
+                    $error++;
+                }
+            }
+        }
+
+        // Commit or rollback
+        if ($error) {
+            foreach ($this->errors as $errmsg) {
+                dol_syslog(get_class($this) . "::create " . $errmsg, LOG_ERR);
+                $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+            }
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return $this->id;
+        }
+    }
+
+    /**
+     *  Load object in memory from database
+     *
+     * @param int $id             Id object
+     * @param int $ref            ref object
+     * @param int $loadparentdata Also load parent data
+     *
+     * @return int                        <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id, $ref = '', $loadparentdata = 0)
+    {
+        global $langs, $conf;
+
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
+        $sql .= " t.ref,";
+        $sql .= " t.fk_projet as fk_project,";
+        $sql .= " t.fk_task_parent,";
+        $sql .= " t.label,";
+        $sql .= " t.description,";
+        $sql .= " t.duration_effective,";
+        $sql .= " t.planned_workload,";
+        $sql .= " t.datec,";
+        $sql .= " t.dateo,";
+        $sql .= " t.datee,";
+        $sql .= " t.fk_user_creat,";
+        $sql .= " t.fk_user_valid,";
+        $sql .= " t.fk_statut,";
+        $sql .= " t.progress,";
+        $sql .= " t.priority,";
+        $sql .= " t.note_private,";
+        $sql .= " t.note_public,";
+        $sql .= " t.rang";
+        if (!empty($loadparentdata)) {
+            $sql .= ", t2.ref as task_parent_ref";
+            $sql .= ", t2.rang as task_parent_position";
+        }
+        $sql .= " FROM " . MAIN_DB_PREFIX . "projet_task as t";
+        if (!empty($loadparentdata)) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "projet_task as t2 ON t.fk_task_parent = t2.rowid";
+        }
+        $sql .= " WHERE ";
+        if (!empty($ref)) {
+            $sql .= "entity IN (" . getEntity('project') . ")";
+            $sql .= " AND t.ref = '" . $this->db->escape($ref) . "'";
+        } else {
+            $sql .= "t.rowid = " . ((int) $id);
+        }
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num_rows = $this->db->num_rows($resql);
+
+            if ($num_rows) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->ref = $obj->ref;
+                $this->fk_project = $obj->fk_project;
+                $this->fk_task_parent = $obj->fk_task_parent;
+                $this->label = $obj->label;
+                $this->description = $obj->description;
+                $this->duration_effective = $obj->duration_effective;
+                $this->planned_workload = $obj->planned_workload;
+                $this->date_c = $this->db->jdate($obj->datec);
+                $this->date_start = $this->db->jdate($obj->dateo);
+                $this->date_end = $this->db->jdate($obj->datee);
+                $this->fk_user_creat = $obj->fk_user_creat;
+                $this->fk_user_valid = $obj->fk_user_valid;
+                $this->fk_statut = $obj->fk_statut;
+                $this->progress = $obj->progress;
+                $this->priority = $obj->priority;
+                $this->note_private = $obj->note_private;
+                $this->note_public = $obj->note_public;
+                $this->rang = $obj->rang;
+
+                if (!empty($loadparentdata)) {
+                    $this->task_parent_ref = $obj->task_parent_ref;
+                    $this->task_parent_position = $obj->task_parent_position;
+                }
+
+                // Retrieve all extrafield
+                $this->fetch_optionals();
+            }
+
+            $this->db->free($resql);
+
+            if ($num_rows) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    /**
+     *  Update database
+     *
+     * @param User $user      User that modify
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                        <=0 if KO, >0 if OK
+     */
+    public function update($user = null, $notrigger = 0)
+    {
+        global $conf, $langs;
 		$error = 0;
 
 		// Clean parameters
@@ -260,6 +472,7 @@ public $timespent_datehour;
 			return 1;
 		}
 	}
+
 
 	/**
 	 *	Delete task from database
@@ -443,6 +656,7 @@ public $timespent_datehour;
 			return -1;
 		}
 	}
+
 
 	/**
 	 *	Return clicable name (with picto eventually)
@@ -890,6 +1104,7 @@ public $timespent_datehour;
 		return $arrayroles;
 	}
 
+
 	/**
 	 * 	Return list of id of contacts of task
 	 *
@@ -913,6 +1128,7 @@ public $timespent_datehour;
 		}
 		return $contactAlreadySelected;
 	}
+
 
 	/**
 	 *  Add time spent
@@ -1669,200 +1885,6 @@ public $timespent_datehour;
 		}
 	}
 
-	/**
-	 *  Load object in memory from database
-	 *
-	 *  @param	int		$id					Id object
-	 *  @param	int		$ref				ref object
-	 *  @param	int		$loadparentdata		Also load parent data
-	 *  @return int 		        		<0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id, $ref = '', $loadparentdata = 0)
-	{
-		global $langs, $conf;
-
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
-		$sql .= " t.ref,";
-		$sql .= " t.fk_projet as fk_project,";
-		$sql .= " t.fk_task_parent,";
-		$sql .= " t.label,";
-		$sql .= " t.description,";
-		$sql .= " t.duration_effective,";
-		$sql .= " t.planned_workload,";
-		$sql .= " t.datec,";
-		$sql .= " t.dateo,";
-		$sql .= " t.datee,";
-		$sql .= " t.fk_user_creat,";
-		$sql .= " t.fk_user_valid,";
-		$sql .= " t.fk_statut,";
-		$sql .= " t.progress,";
-		$sql .= " t.priority,";
-		$sql .= " t.note_private,";
-		$sql .= " t.note_public,";
-		$sql .= " t.rang";
-		if (!empty($loadparentdata)) {
-			$sql .= ", t2.ref as task_parent_ref";
-			$sql .= ", t2.rang as task_parent_position";
-		}
-		$sql .= " FROM ".MAIN_DB_PREFIX."projet_task as t";
-		if (!empty($loadparentdata)) {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."projet_task as t2 ON t.fk_task_parent = t2.rowid";
-		}
-		$sql .= " WHERE ";
-		if (!empty($ref)) {
-			$sql .= "entity IN (".getEntity('project').")";
-			$sql .= " AND t.ref = '".$this->db->escape($ref)."'";
-		} else {
-			$sql .= "t.rowid = ".((int) $id);
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num_rows = $this->db->num_rows($resql);
-
-			if ($num_rows) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->ref = $obj->ref;
-				$this->fk_project = $obj->fk_project;
-				$this->fk_task_parent = $obj->fk_task_parent;
-				$this->label = $obj->label;
-				$this->description = $obj->description;
-				$this->duration_effective = $obj->duration_effective;
-				$this->planned_workload = $obj->planned_workload;
-				$this->date_c = $this->db->jdate($obj->datec);
-				$this->date_start = $this->db->jdate($obj->dateo);
-				$this->date_end				= $this->db->jdate($obj->datee);
-				$this->fk_user_creat		= $obj->fk_user_creat;
-				$this->fk_user_valid		= $obj->fk_user_valid;
-				$this->fk_statut			= $obj->fk_statut;
-				$this->progress				= $obj->progress;
-				$this->priority				= $obj->priority;
-				$this->note_private = $obj->note_private;
-				$this->note_public = $obj->note_public;
-				$this->rang = $obj->rang;
-
-				if (!empty($loadparentdata)) {
-					$this->task_parent_ref      = $obj->task_parent_ref;
-					$this->task_parent_position = $obj->task_parent_position;
-				}
-
-				// Retrieve all extrafield
-				$this->fetch_optionals();
-			}
-
-			$this->db->free($resql);
-
-			if ($num_rows) {
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Create into database
-	 *
-	 *  @param	User	$user        	User that create
-	 *  @param 	int		$notrigger	    0=launch triggers after, 1=disable triggers
-	 *  @return int 		        	<0 if KO, Id of created object if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-
-		//For the date
-		$now = dol_now();
-
-		$error = 0;
-
-		// Clean parameters
-		$this->label = trim($this->label);
-		$this->description = trim($this->description);
-
-		// Check parameters
-		// Put here code to add control on parameters values
-
-		// Insert request
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."projet_task (";
-		$sql .= "entity";
-		$sql .= ", fk_projet";
-		$sql .= ", ref";
-		$sql .= ", fk_task_parent";
-		$sql .= ", label";
-		$sql .= ", description";
-		$sql .= ", datec";
-		$sql .= ", fk_user_creat";
-		$sql .= ", dateo";
-		$sql .= ", datee";
-		$sql .= ", planned_workload";
-		$sql .= ", progress";
-		$sql .= ") VALUES (";
-		$sql .= ((int) $conf->entity);
-		$sql .= ", ".((int) $this->fk_project);
-		$sql .= ", ".(!empty($this->ref) ? "'".$this->db->escape($this->ref)."'" : 'null');
-		$sql .= ", ".((int) $this->fk_task_parent);
-		$sql .= ", '".$this->db->escape($this->label)."'";
-		$sql .= ", '".$this->db->escape($this->description)."'";
-		$sql .= ", '".$this->db->idate($now)."'";
-		$sql .= ", ".((int) $user->id);
-		$sql .= ", ".($this->date_start != '' ? "'".$this->db->idate($this->date_start)."'" : 'null');
-		$sql .= ", ".($this->date_end != '' ? "'".$this->db->idate($this->date_end)."'" : 'null');
-		$sql .= ", ".(($this->planned_workload != '' && $this->planned_workload >= 0) ? ((int) $this->planned_workload) : 'null');
-		$sql .= ", ".(($this->progress != '' && $this->progress >= 0) ? ((int) $this->progress) : 'null');
-		$sql .= ")";
-
-		$this->db->begin();
-
-		dol_syslog(get_class($this)."::create", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$error++; $this->errors[] = "Error ".$this->db->lasterror();
-		}
-
-		if (!$error) {
-			$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."projet_task");
-
-			if (!$notrigger) {
-				// Call trigger
-				$result = $this->call_trigger('TASK_CREATE', $user);
-				if ($result < 0) {
-					$error++;
-				}
-				// End call triggers
-			}
-		}
-
-		// Update extrafield
-		if (!$error) {
-			if (!$error) {
-				$result = $this->insertExtraFields();
-				if ($result < 0) {
-					$error++;
-				}
-			}
-		}
-
-		// Commit or rollback
-		if ($error) {
-			foreach ($this->errors as $errmsg) {
-				dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-				$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-			}
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return $this->id;
-		}
-	}
 
 	/**
 	 *	Return status label of object
@@ -2080,27 +2102,6 @@ public $timespent_datehour;
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Is the task delayed?
-	 *
-	 * @return bool
-	 */
-	public function hasDelay()
-	{
-		global $conf;
-
-		if (!($this->progress >= 0 && $this->progress < 100)) {
-			return false;
-		}
-
-		$now = dol_now();
-
-		$datetouse = ($this->date_end > 0) ? $this->date_end : ((isset($this->datee) && $this->datee > 0) ? $this->datee : 0);
-
-		return ($datetouse > 0 && ($datetouse < ($now - $conf->projet->task->warning_delay)));
-	}
-
 	/**
 	 *      Charge indicateurs this->nb de tableau de bord
 	 *
@@ -2142,14 +2143,34 @@ public $timespent_datehour;
 		if ($resql) {
 			// This assignment in condition is not a bug. It allows walking the results.
 			while ($obj = $this->db->fetch_object($resql)) {
-				$this->nb["tasks"] = $obj->nb;
-			}
-			$this->db->free($resql);
-			return 1;
-		} else {
-			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+                $this->nb["tasks"] = $obj->nb;
+            }
+            $this->db->free($resql);
+            return 1;
+        } else {
+            dol_print_error($this->db);
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    /**
+     * Is the task delayed?
+     *
+     * @return bool
+     */
+    public function hasDelay()
+    {
+        global $conf;
+
+        if (!($this->progress >= 0 && $this->progress < 100)) {
+            return false;
+        }
+
+        $now = dol_now();
+
+        $datetouse = ($this->date_end > 0) ? $this->date_end : ((isset($this->datee) && $this->datee > 0) ? $this->datee : 0);
+
+        return ($datetouse > 0 && ($datetouse < ($now - $conf->projet->task->warning_delay)));
+    }
 }

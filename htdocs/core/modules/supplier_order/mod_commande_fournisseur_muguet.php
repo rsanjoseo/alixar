@@ -128,22 +128,6 @@ class mod_commande_fournisseur_muguet extends ModeleNumRefSuppliersOrders
 	}
 
 	/**
-	 * 	Renvoie la reference de commande suivante non utilisee
-	 *
-	 *  @param	Societe		$objsoc     Object third party
-	 *  @param  Object	    $object		Object
-	 *  @return string      			Texte descripif
-	 */
-	public function commande_get_num($objsoc = 0, $object = '')
-	{
-		// phpcs:enable
-		return $this->getNextValue($objsoc, $object);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 * 	Return next value
 	 *
 	 *  @param	Societe		$objsoc     Object third party
@@ -176,14 +160,31 @@ class mod_commande_fournisseur_muguet extends ModeleNumRefSuppliersOrders
 		if (empty($date)) {
 			$date = $object->date; // Creation date is order date for suppliers orders
 		}
-		$yymm = strftime("%y%m", $date);
+        $yymm = strftime("%y%m", $date);
 
-		if ($max >= (pow(10, 4) - 1)) {
-			$num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
-		} else {
-			$num = sprintf("%04s", $max + 1);
-		}
+        if ($max >= (pow(10, 4) - 1)) {
+            $num = $max + 1; // If counter > 9999, we do not format on 4 chars, we take number as it is
+        } else {
+            $num = sprintf("%04s", $max + 1);
+        }
 
-		return $this->prefix.$yymm."-".$num;
-	}
+        return $this->prefix . $yymm . "-" . $num;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *    Renvoie la reference de commande suivante non utilisee
+     *
+     * @param Societe $objsoc Object third party
+     * @param Object  $object Object
+     *
+     * @return string                Texte descripif
+     */
+    public function commande_get_num($objsoc = 0, $object = '')
+    {
+        // phpcs:enable
+        return $this->getNextValue($objsoc, $object);
+    }
 }

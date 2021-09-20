@@ -43,58 +43,71 @@ use PHPUnit_Extensions_Selenium2TestCase_WebDriverException;
  */
 class MyModuleFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 {
-	// TODO: move to a global configuration file?
-	/** @var array Browsers to test with */
-	public static $browsers = array(
-		array(
-			'browser' => 'Google Chrome on Linux',
-			'browserName' => 'chrome',
-			'sessionStrategy' => 'shared',
-			'desiredCapabilities' => array()
-		),
-		// Geckodriver does not keep the session at the moment?!
-		// XPath selectors also don't seem to work
-		//array(
-		//    'browser' => 'Mozilla Firefox on Linux',
-		//    'browserName' => 'firefox',
-		//    'sessionStrategy' => 'shared',
-		//    'desiredCapabilities' => array(
-		//        'marionette' => true,
-		//    ),
-		//)
-	);
-	/** @var string Base URL of the webserver under test */
-	protected static $base_url = 'http://dev.zenfusion.fr';
-	/**
-	 * @var string Dolibarr admin username
-	 * @see authenticate
-	 */
-	protected static $dol_admin_user = 'admin';
-		/**
-	 * @var string Dolibarr admin password
-	 * @see authenticate
-	 */
-	protected static $dol_admin_pass = 'admin'; // TODO: autodetect?
-/** @var int Dolibarr module ID */
-	private static $module_id = 500000;
+    // TODO: move to a global configuration file?
+    /** @var string Base URL of the webserver under test */
+    protected static $base_url = 'http://dev.zenfusion.fr';
+    /**
+     * @var string Dolibarr admin username
+     * @see authenticate
+     */
+    protected static $dol_admin_user = 'admin';
+    /**
+     * @var string Dolibarr admin password
+     * @see authenticate
+     */
+    protected static $dol_admin_pass = 'admin';
+    /** @var int Dolibarr module ID */
+    private static $module_id = 500000; // TODO: autodetect?
 
-	/**
-	 * Global test setup
-	 * @return void
-	 */
-	public static function setUpBeforeClass()
-	{
-	}
+    /** @var array Browsers to test with */
+    public static $browsers = array(
+        array(
+            'browser' => 'Google Chrome on Linux',
+            'browserName' => 'chrome',
+            'sessionStrategy' => 'shared',
+            'desiredCapabilities' => array(),
+        ),
+        // Geckodriver does not keep the session at the moment?!
+        // XPath selectors also don't seem to work
+        //array(
+        //    'browser' => 'Mozilla Firefox on Linux',
+        //    'browserName' => 'firefox',
+        //    'sessionStrategy' => 'shared',
+        //    'desiredCapabilities' => array(
+        //        'marionette' => true,
+        //    ),
+        //)
+    );
 
-	/**
-	 * Global test teardown
-	 * @return void
-	 */
-	public static function tearDownAfterClass()
-	{
-	}
+    /**
+     * Helper function to select links by href
+     *
+     * @param string $value Href
+     *
+     * @return mixed               Helper string
+     */
+    protected function byHref($value)
+    {
+        $anchor = null;
+        $anchors = $this->elements($this->using('tag name')->value('a'));
+        foreach ($anchors as $anchor) {
+            if (strstr($anchor->attribute('href'), $value)) {
+                break;
+            }
+        }
+        return $anchor;
+    }
 
-	/**
+    /**
+     * Global test setup
+     *
+     * @return void
+     */
+    public static function setUpBeforeClass()
+    {
+    }
+
+    /**
 	 * Unit test setup
 	 * @return void
 	 */
@@ -102,24 +115,14 @@ class MyModuleFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 	{
 		$this->setSeleniumServerRequestsTimeout(3600);
 		$this->setBrowserUrl(self::$base_url);
-	}
+    }
 
-	/**
-	 * Test enabling developer mode
-	 * @return bool
-	 */
-	public function testEnableDeveloperMode()
+    /**
+     * Verify pre conditions
+     * @return void
+     */
+    protected function assertPreConditions()
 	{
-		$this->url('/admin/const.php');
-		$this->authenticate();
-		$main_features_level_path = '//input[@value="MAIN_FEATURES_LEVEL"]/following::input[@type="text"]';
-		$main_features_level = $this->byXPath($main_features_level_path);
-		$main_features_level->clear();
-		$main_features_level->value('2');
-		$this->byName('update')->click();
-		// Page reloaded, we need a new XPath
-		$main_features_level = $this->byXPath($main_features_level_path);
-		return $this->assertEquals('2', $main_features_level->value(), "MAIN_FEATURES_LEVEL value is 2");
 	}
 
 	/**
@@ -133,25 +136,44 @@ class MyModuleFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 				$login = $this->byId('username');
 				$login->clear();
 				$login->value('admin');
-				$password = $this->byId('password');
-				$password->clear();
-				$password->value('admin');
-				$this->byId('login')->submit();
-			}
-		} catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
-			// Login does not exist. Assume we are already authenticated
-		}
-	}
+                $password = $this->byId('password');
+                $password->clear();
+                $password->value('admin');
+                $this->byId('login')->submit();
+            }
+        } catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
+            // Login does not exist. Assume we are already authenticated
+        }
+    }
 
-	/**
-	 * Test enabling the module
-	 *
-	 * @depends testEnableDeveloperMode
-	 * @return bool
-	 */
-	public function testModuleEnabled()
-	{
-		$this->url('/admin/modules.php');
+    /**
+     * Test enabling developer mode
+     *
+     * @return bool
+     */
+    public function testEnableDeveloperMode()
+    {
+        $this->url('/admin/const.php');
+        $this->authenticate();
+        $main_features_level_path = '//input[@value="MAIN_FEATURES_LEVEL"]/following::input[@type="text"]';
+        $main_features_level = $this->byXPath($main_features_level_path);
+        $main_features_level->clear();
+        $main_features_level->value('2');
+        $this->byName('update')->click();
+        // Page reloaded, we need a new XPath
+        $main_features_level = $this->byXPath($main_features_level_path);
+        return $this->assertEquals('2', $main_features_level->value(), "MAIN_FEATURES_LEVEL value is 2");
+    }
+
+    /**
+     * Test enabling the module
+     *
+     * @depends testEnableDeveloperMode
+     * @return bool
+     */
+    public function testModuleEnabled()
+    {
+        $this->url('/admin/modules.php');
 		$this->authenticate();
 		$module_status_image_path = '//a[contains(@href, "'.self::$module_id.'")]/img';
 		$module_status_image = $this->byXPath($module_status_image_path);
@@ -167,24 +189,6 @@ class MyModuleFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 		// Page reloaded, we need a new Xpath
 		$module_status_image = $this->byXPath($module_status_image_path);
 		return $this->assertContains('switch_on.png', $module_status_image->attribute('src'), "Module enabled");
-	}
-
-	/**
-	 * Helper function to select links by href
-	 *
-	 * @param  string  $value      Href
-	 * @return mixed               Helper string
-	 */
-	protected function byHref($value)
-	{
-		$anchor = null;
-		$anchors = $this->elements($this->using('tag name')->value('a'));
-		foreach ($anchors as $anchor) {
-			if (strstr($anchor->attribute('href'), $value)) {
-				break;
-			}
-		}
-		return $anchor;
 	}
 
 	/**
@@ -267,37 +271,39 @@ class MyModuleFunctionalTest extends \PHPUnit_Extensions_Selenium2TestCase
 	 * @return bool
 	 */
 	public function testTriggerEnabled()
-	{
-		$this->url('/admin/triggers.php');
-		$this->authenticate();
-		return $this->assertContains(
-			'tick.png',
-			$this->byXPath('//td[text()="interface_99_modMyModule_MyTrigger.class.php"]/following::img')->attribute('src'),
-			"Trigger enabled"
-		);
-	}
+    {
+        $this->url('/admin/triggers.php');
+        $this->authenticate();
+        return $this->assertContains(
+            'tick.png',
+            $this->byXPath('//td[text()="interface_99_modMyModule_MyTrigger.class.php"]/following::img')->attribute('src'),
+            "Trigger enabled"
+        );
+    }
 
-	/**
-	 * Unit test teardown
-	 * @return void
-	 */
-	public function tearDown()
-	{
-	}
+    /**
+     * Verify post conditions
+     *
+     * @return void
+     */
+    protected function assertPostConditions()
+    {
+    }
 
-	/**
-	 * Verify pre conditions
-	 * @return void
-	 */
-	protected function assertPreConditions()
-	{
-	}
+    /**
+     * Unit test teardown
+     *
+     * @return void
+     */
+    public function tearDown()
+    {
+    }
 
-	/**
-	 * Verify post conditions
-	 * @return void
-	 */
-	protected function assertPostConditions()
+    /**
+     * Global test teardown
+     * @return void
+     */
+    public static function tearDownAfterClass()
 	{
 	}
 }

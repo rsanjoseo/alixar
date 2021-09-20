@@ -33,84 +33,99 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
 class Deplacement extends CommonObject
 {
 	/**
-	 * Draft status
-	 */
-	const STATUS_DRAFT = 0;
-	/**
-	 * Validated status
-	 */
-	const STATUS_VALIDATED = 1;
-	/**
-	 * Refunded status
-	 */
-	const STATUS_REFUNDED = 2;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'deplacement';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'deplacement';
-	/**
+
+    /**
 	 * @var string    Name of subtable line
 	 */
 	public $table_element_line = '';
-	/**
+
+    /**
 	 * @var string Fieldname with ID of parent key if this field has a parent
 	 */
 	public $fk_element = '';
-	/**
+
+    /**
 	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 * @var int
 	 */
 	public $ismultientitymanaged = 0;
-	/**
+
+    /**
 	 * Date creation record (datec)
 	 *
 	 * @var integer
 	 */
 	public $datec;
-	/**
+
+    /**
 	 * Date (dated)
 	 *
 	 * @var integer
 	 */
 	public $dated;
-	/**
+
+    /**
 	 * @var int ID
 	 */
 	public $fk_user_author;
-	/**
+
+    /**
 	 * @var int User ID
 	 */
 	public $fk_user;
-	/**
+
+    /**
 	 * @var string km value formatted
 	 */
 	public $km;
-	/**
+
+    /**
 	 * @var int Thirdparty id
 	 */
 	public $socid;
-	/**
-	 * @var int Status 0=draft, 1=validated, 2=Refunded
-	 */
-	public $statut;
-	public $extraparams = array();
-	public $statuts = array();
-	public $statuts_short = array();
 
-	/**
-	 * Constructor
-	 *
-	 * @param	DoliDB		$db		Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
+    /**
+     * @var int Status 0=draft, 1=validated, 2=Refunded
+     */
+    public $statut;
+    public $extraparams = [];
 
-		$this->statuts_short = array(0 => 'Draft', 1 => 'Validated', 2 => 'Refunded');
+    public $statuts = [];
+    public $statuts_short = [];
+
+    /**
+     * Draft status
+     */
+    const STATUS_DRAFT = 0;
+
+    /**
+     * Validated status
+     */
+    const STATUS_VALIDATED = 1;
+
+    /**
+     * Refunded status
+     */
+    const STATUS_REFUNDED = 2;
+
+    /**
+     * Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+
+        $this->statuts_short = array(0 => 'Draft', 1 => 'Validated', 2 => 'Refunded');
 		$this->statuts = array(0 => 'Draft', 1 => 'Validated', 2 => 'Refunded');
 	}
 

@@ -32,48 +32,53 @@ require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
  */
 class ConferenceOrBooth extends ActionComm
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_SUGGESTED = 1;
-	const STATUS_CONFIRMED = 2;
-	const STATUS_NOT_QUALIFIED = 3;
-	const STATUS_DONE = 4;
-	const STATUS_CANCELED = 9;
 	/**
 	 * @var string ID of module.
 	 */
 	public $module = 'eventorganization';
+
 	/**
 	 * @var string ID to identify managed object.
 	 */
 	public $element = 'conferenceorbooth';
+
 	/**
 	 * @var string Name of table without prefix where object is stored. This is also the key used for extrafields management.
 	 */
 	public $table_element = 'actioncomm';
+
 	/**
 	 * @var int  Does this object support multicompany module ?
 	 * 0=No test on entity, 1=Test with field entity, 'field@table'=Test with link by field@table
 	 */
 	public $ismultientitymanaged = 1;
-	/**
-	 * @var int  Does object support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for conferenceorbooth. Must be the part after the 'object_' into object_conferenceorbooth.png
-	 */
-	public $picto = 'conferenceorbooth';
 
+    /**
+     * @var int  Does object support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 1;
 
-	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+    /**
+     * @var string String with name of icon for conferenceorbooth. Must be the part after the 'object_' into object_conferenceorbooth.png
+     */
+    public $picto = 'conferenceorbooth';
+
+    const STATUS_DRAFT = 0;
+    const STATUS_SUGGESTED = 1;
+    const STATUS_CONFIRMED = 2;
+    const STATUS_NOT_QUALIFIED = 3;
+    const STATUS_DONE = 4;
+    const STATUS_CANCELED = 9;
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter[:Sortfield]]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
 	 *  'index' if we want an index in database.
@@ -95,22 +100,22 @@ class ConferenceOrBooth extends ActionComm
 	/**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
-	public $fields=array(
-		'id' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>0, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
-		'ref' => array('type'=>'integer', 'label'=>'Ref', 'enabled'=>'1', 'position'=>1, 'notnull'=>1, 'visible'=>2, 'noteditable'=>'1', 'index'=>1, 'css'=>'left', 'comment'=>"Id"),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>'1', 'position'=>30, 'notnull'=>0, 'visible'=>1, 'searchall'=>1, 'css'=>'minwidth300', 'help'=>"Help text", 'showoncombobox'=>'1',),
-		'fk_soc' => array('type'=>'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label'=>'ThirdParty', 'enabled'=>'1', 'position'=>50, 'notnull'=>-1, 'visible'=>1, 'index'=>1, 'help'=>"LinkToThirparty", 'picto'=>'company', 'css'=>'maxwidth500'),
-		'fk_project' => array('type'=>'integer:Project:projet/class/project.class.php:1:t.usage_organize_event=1', 'label'=>'Project', 'enabled'=>'1', 'position'=>52, 'notnull'=>-1, 'visible'=>-1, 'index'=>1, 'picto'=>'project'),
-		'note' => array('type'=>'text', 'label'=>'Description', 'enabled'=>'1', 'position'=>60, 'notnull'=>0, 'visible'=>1),
-		'fk_action' => array('type'=>'sellist:c_actioncomm:libelle:id::module LIKE (\'%@eventorganization\')', 'label'=>'Format', 'enabled'=>'1', 'position'=>60, 'notnull'=>1, 'visible'=>1, 'css'=>'width300'),
-		'datep' => array('type'=>'datetime', 'label'=>'DateStart', 'enabled'=>'1', 'position'=>70, 'notnull'=>0, 'visible'=>1, 'showoncombobox'=>'2',),
-		'datep2' => array('type'=>'datetime', 'label'=>'DateEnd', 'enabled'=>'1', 'position'=>71, 'notnull'=>0, 'visible'=>1, 'showoncombobox'=>'3',),
-		'datec' => array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>'1', 'position'=>500, 'notnull'=>1, 'visible'=>-2,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>'1', 'position'=>501, 'notnull'=>0, 'visible'=>-2,),
-		'fk_user_author' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserAuthor', 'enabled'=>'1', 'position'=>510, 'notnull'=>1, 'visible'=>-2, 'foreignkey'=>'user.rowid',),
-		'fk_user_mod' => array('type'=>'integer:User:user/class/user.class.php', 'label'=>'UserModif', 'enabled'=>'1', 'position'=>511, 'notnull'=>-1, 'visible'=>-2,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>'1', 'position'=>1000, 'notnull'=>-1, 'visible'=>-2,),
-		'status' => array('type'=>'smallint', 'label'=>'Status', 'enabled'=>'1', 'position'=>1000, 'notnull'=>1, 'visible'=>1, 'default'=>'0', 'index'=>1, 'arrayofkeyval'=>array('0'=>'EvntOrgDraft', '1'=>'EvntOrgSuggested', '2'=> 'EvntOrgConfirmed', '3' =>'EvntOrgNotQualified', '4' =>'EvntOrgDone', '9'=>'EvntOrgCancelled'),),
+	public $fields= array(
+        'id' => array('type' => 'integer', 'label' => 'TechnicalID', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 0, 'noteditable' => '1', 'index' => 1, 'css' => 'left', 'comment' => "Id"),
+        'ref' => array('type' => 'integer', 'label' => 'Ref', 'enabled' => '1', 'position' => 1, 'notnull' => 1, 'visible' => 2, 'noteditable' => '1', 'index' => 1, 'css' => 'left', 'comment' => "Id"),
+        'label' => array('type' => 'varchar(255)', 'label' => 'Label', 'enabled' => '1', 'position' => 30, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'help' => "Help text", 'showoncombobox' => '1',),
+        'fk_soc' => array('type' => 'integer:Societe:societe/class/societe.class.php:1:status=1 AND entity IN (__SHARED_ENTITIES__)', 'label' => 'ThirdParty', 'enabled' => '1', 'position' => 50, 'notnull' => -1, 'visible' => 1, 'index' => 1, 'help' => "LinkToThirparty", 'picto' => 'company', 'css' => 'tdoverflowmax150 maxwidth500'),
+        'fk_project' => array('type' => 'integer:Project:projet/class/project.class.php:1:t.usage_organize_event=1', 'label' => 'Project', 'enabled' => '1', 'position' => 52, 'notnull' => -1, 'visible' => -1, 'index' => 1, 'picto' => 'project', 'css' => 'tdoverflowmax150 maxwidth500'),
+        'note' => array('type' => 'text', 'label' => 'Description', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 1),
+        'fk_action' => array('type' => 'sellist:c_actioncomm:libelle:id::module LIKE (\'%@eventorganization\')', 'label' => 'Format', 'enabled' => '1', 'position' => 60, 'notnull' => 1, 'visible' => 1, 'css' => 'width300'),
+        'datep' => array('type' => 'datetime', 'label' => 'DateStart', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'showoncombobox' => '2',),
+        'datep2' => array('type' => 'datetime', 'label' => 'DateEnd', 'enabled' => '1', 'position' => 71, 'notnull' => 0, 'visible' => 1, 'showoncombobox' => '3',),
+        'datec' => array('type' => 'datetime', 'label' => 'DateCreation', 'enabled' => '1', 'position' => 500, 'notnull' => 1, 'visible' => -2,),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'enabled' => '1', 'position' => 501, 'notnull' => 0, 'visible' => -2,),
+        'fk_user_author' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserAuthor', 'enabled' => '1', 'position' => 510, 'notnull' => 1, 'visible' => -2, 'foreignkey' => 'user.rowid',),
+        'fk_user_mod' => array('type' => 'integer:User:user/class/user.class.php', 'label' => 'UserModif', 'enabled' => '1', 'position' => 511, 'notnull' => -1, 'visible' => -2,),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => '1', 'position' => 1000, 'notnull' => -1, 'visible' => -2,),
+        'status' => array('type' => 'smallint', 'label' => 'Status', 'enabled' => '1', 'position' => 1000, 'notnull' => 1, 'visible' => 1, 'default' => '0', 'index' => 1, 'arrayofkeyval' => array('0' => 'EvntOrgDraft', '1' => 'EvntOrgSuggested', '2' => 'EvntOrgConfirmed', '3' => 'EvntOrgNotQualified', '4' => 'EvntOrgDone', '9' => 'EvntOrgCancelled'),),
 		'num_vote' => array('type'=>'smallint', 'label'=>'NbVotes', 'enabled'=>'1', 'position'=>1001, 'notnull'=>-1, 'visible'=>5, 'default'=>'0', 'index'=>0),
 	);
 	public $rowid;
@@ -202,25 +207,38 @@ class ConferenceOrBooth extends ActionComm
 	 * @param User $user User
 	 * @return void
 	 */
-	protected function setActionCommFields(User $user)
-	{
-		$this->userownerid=$user->id;
-		$this->type_id=$this->fk_action;
-		$this->socid=$this->fk_soc;
-		$this->datef=$this->datep2;
-		$this->note_private=$this->note;
-		$this->fk_user_author=$this->fk_user_author;
-	}
+    protected function setActionCommFields(User $user)
+    {
+        $this->userownerid = $user->id;
+        $this->type_id = $this->fk_action;
+        $this->socid = $this->fk_soc;
+        $this->datef = $this->datep2;
+        $this->note_private = $this->note;
+        $this->fk_user_author = $this->fk_user_author;
+    }
 
-	/**
-	 * Load object in memory from the database
-	 *
-	 * @param int    $id   Id object
-	 * @param string $ref  Ref
-	 * @param  string	$ref_ext		Ref ext to get
-	 * @param	string	$email_msgid	Email msgid
-	 * @return int         <0 if KO, 0 if not found, >0 if OK
-	 */
+    /**
+     * Get action comm fields
+     *
+     * @return void
+     */
+    protected function getActionCommFields()
+    {
+        $this->fk_action = $this->type_id;
+        $this->fk_soc = $this->socid;
+        $this->datep2 = $this->datef;
+    }
+
+    /**
+     * Load object in memory from the database
+     *
+     * @param int    $id          Id object
+     * @param string $ref         Ref
+     * @param string $ref_ext     Ref ext to get
+     * @param string $email_msgid Email msgid
+     *
+     * @return int         <0 if KO, 0 if not found, >0 if OK
+     */
 	public function fetch($id, $ref = null, $ref_ext = '', $email_msgid = '')
 	{
 		global $dolibarr_main_url_root, $conf, $langs;
@@ -237,18 +255,6 @@ class ConferenceOrBooth extends ActionComm
 
 		$this->getActionCommFields();
 		return $result;
-	}
-
-	/**
-	 * Get action comm fields
-	 *
-	 * @return void
-	 */
-	protected function getActionCommFields()
-	{
-		$this->fk_action=$this->type_id;
-		$this->fk_soc=$this->socid;
-		$this->datep2=$this->datef;
 	}
 
 	/**

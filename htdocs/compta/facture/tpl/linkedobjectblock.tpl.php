@@ -93,8 +93,8 @@ foreach ($linkedObjectBlock as $key => $objectlink) {
 		print $objectlink->getLibStatut(3);
 	}
 	print '</td>';
-	print '<td class="linkedcol-action right"><a class="reposition" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&action=dellink&dellinkid='.$key.'">'.img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink').'</a></td>';
-	print "</tr>\n";
+    print '<td class="linkedcol-action right"><a class="reposition" href="' . $_SERVER["PHP_SELF"] . '?id=' . $object->id . '&action=dellink&token=' . newToken() . '&dellinkid=' . $key . '">' . img_picto($langs->transnoentitiesnoconv("RemoveLink"), 'unlink') . '</a></td>';
+    print "</tr>\n";
 }
 if (count($linkedObjectBlock) > 1) {
 	print '<tr class="liste_total '.(empty($noMoreLinkedObjectBlockAfter) ? 'liste_sub_total' : '').'">';

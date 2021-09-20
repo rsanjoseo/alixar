@@ -88,24 +88,6 @@ class FormAdvTargetEmailing extends Form
 	}
 
 	/**
-	 * Return multiselect list of entities.
-	 *
-	 * @param string $htmlname select
-	 * @param array $options_array to manage
-	 * @param array $selected_array to manage
-	 * @param int $showempty show empty
-	 * @return string HTML combo
-	 */
-	public function advMultiselectarray($htmlname, $options_array = array(), $selected_array = array(), $showempty = 0)
-	{
-		global $conf, $langs;
-
-		$form = new Form($this->db);
-		$return = $form->multiselectarray($htmlname, $options_array, $selected_array, 0, 0, '', 0, 295);
-		return $return;
-	}
-
-	/**
 	 * Return combo list of activated countries, into language of user
 	 *
 	 * @param string    $htmlname of html select object
@@ -327,27 +309,46 @@ class FormAdvTargetEmailing extends Form
 
 					$options_array[$obj->code] = $label;
 
-					$i++;
-				}
-			}
-		} else {
-			dol_print_error($this->db);
-		}
+                    $i++;
+                }
+            }
+        } else {
+            dol_print_error($this->db);
+        }
 
-		return $this->advMultiselectarray($htmlname, $options_array, $selected_array);
-	}
+        return $this->advMultiselectarray($htmlname, $options_array, $selected_array);
+    }
 
-	/**
-	 * Return a combo list to select emailing target selector
-	 *
-	 * @param	string 		$htmlname 		control name
-	 * @param	integer 	$selected  		defaut selected
-	 * @param	integer 	$showempty 		empty lines
-	 * @param	string		$type_element	Type element. Example: 'mailing'
-	 * @param	string		$morecss		More CSS
-	 * @return	string 						HTML combo
-	 */
-	public function selectAdvtargetemailingTemplate($htmlname = 'template_id', $selected = 0, $showempty = 0, $type_element = 'mailing', $morecss = '')
+    /**
+     * Return multiselect list of entities.
+     *
+     * @param string $htmlname       select
+     * @param array  $options_array  to manage
+     * @param array  $selected_array to manage
+     * @param int    $showempty      show empty
+     *
+     * @return string HTML combo
+     */
+    public function advMultiselectarray($htmlname, $options_array = [], $selected_array = [], $showempty = 0)
+    {
+        global $conf, $langs;
+
+        $form = new Form($this->db);
+        $return = $form->multiselectarray($htmlname, $options_array, $selected_array, 0, 0, '', 0, 295);
+        return $return;
+    }
+
+    /**
+     * Return a combo list to select emailing target selector
+     *
+     * @param string  $htmlname     control name
+     * @param integer $selected     defaut selected
+     * @param integer $showempty    empty lines
+     * @param string  $type_element Type element. Example: 'mailing'
+     * @param string  $morecss      More CSS
+     * @return    string                        HTML combo
+     */
+    public function selectAdvtargetemailingTemplate($htmlname = 'template_id', $selected = 0, $showempty = 0, $type_element = 'mailing', $morecss = '')
 	{
 		global $conf, $user, $langs;
 

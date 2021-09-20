@@ -307,23 +307,6 @@ class Setup extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param Object    $object    Object to clean
-	 * @return Object 				Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->error);
-		unset($object->errors);
-
-		return $object;
-	}
-
-	/**
 	 * Get state by ID.
 	 *
 	 * @param int       $id        ID of state
@@ -336,29 +319,6 @@ class Setup extends DolibarrApi
 	public function getStateByID($id)
 	{
 		return $this->_fetchCstate($id, '');
-	}
-
-	/**
-	 * Get state.
-	 *
-	 * @param int       $id        ID of state
-	 * @param string    $code      Code of state
-	 * @return array 			   Array of cleaned object properties
-	 *
-	 * @throws RestException
-	 */
-	private function _fetchCstate($id, $code = '')
-	{
-		$state = new Cstate($this->db);
-
-		$result = $state->fetch($id, $code);
-		if ($result < 0) {
-			throw new RestException(503, 'Error when retrieving state : '.$state->error);
-		} elseif ($result == 0) {
-			throw new RestException(404, 'State not found');
-		}
-
-		return $this->_cleanObjectDatas($state);
 	}
 
 	/**
@@ -451,36 +411,6 @@ class Setup extends DolibarrApi
 	}
 
 	/**
-	 * Translate the name of the object to the given language.
-	 *
-	 * @param object   $object    Object with label to translate
-	 * @param string   $lang      Code of the language the name of the object must be translated to
-	 * @param string   $prefix 	  Prefix for translation key
-	 *
-	 * @return void
-	 */
-	private function translateLabel($object, $lang, $prefix = 'Country')
-	{
-		if (!empty($lang)) {
-			// Load the translations if this is a new language.
-			if ($this->translations == null || $this->translations->getDefaultLang() !== $lang) {
-				global $conf;
-				$this->translations = new Translate('', $conf);
-				$this->translations->setDefaultLang($lang);
-				$this->translations->load('dict');
-			}
-			if ($object->code) {
-				$key = $prefix.$object->code;
-
-				$translation = $this->translations->trans($key);
-				if ($translation != $key) {
-					$object->label = html_entity_decode($translation);
-				}
-			}
-		}
-	}
-
-	/**
 	 * Get country by ID.
 	 *
 	 * @param int       $id        ID of country
@@ -495,35 +425,6 @@ class Setup extends DolibarrApi
 	public function getCountryByID($id, $lang = '')
 	{
 		return $this->_fetchCcountry($id, '', '', $lang);
-	}
-
-	/**
-	 * Get country.
-	 *
-	 * @param int       $id        ID of country
-	 * @param string    $code      Code of country (2 characters)
-	 * @param string    $iso       ISO of country (3 characters)
-	 * @param string    $lang      Code of the language the name of the
-	 *                             country must be translated to
-	 * @return array 			   Array of cleaned object properties
-	 *
-	 * @throws RestException
-	 */
-	private function _fetchCcountry($id, $code = '', $iso = '', $lang = '')
-	{
-		$country = new Ccountry($this->db);
-
-		$result = $country->fetch($id, $code, $iso);
-
-		if ($result < 0) {
-			throw new RestException(503, 'Error when retrieving country : '.$country->error);
-		} elseif ($result == 0) {
-			throw new RestException(404, 'Country not found');
-		}
-
-		$this->translateLabel($country, $lang, 'Country');
-
-		return $this->_cleanObjectDatas($country);
 	}
 
 	/**
@@ -543,8 +444,6 @@ class Setup extends DolibarrApi
 		return $this->_fetchCcountry('', $code, '', $lang);
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Get country by Iso.
 	 *
@@ -552,25 +451,79 @@ class Setup extends DolibarrApi
 	 * @param string    $lang      Code of the language the name of the
 	 *                             country must be translated to
 	 * @return array 			   Array of cleaned object properties
-	 *
-	 * @url     GET dictionary/countries/byISO/{iso}
-	 *
-	 * @throws RestException
-	 */
-	public function getCountryByISO($iso, $lang = '')
-	{
-		return $this->_fetchCcountry('', '', $iso, $lang);
-	}
+     *
+     * @url     GET dictionary/countries/byISO/{iso}
+     *
+     * @throws RestException
+     */
+    public function getCountryByISO($iso, $lang = '')
+    {
+        return $this->_fetchCcountry('', '', $iso, $lang);
+    }
 
-	/**
-	 * Get the list of delivery times.
-	 *
-	 * @param string    $sortfield  Sort field
-	 * @param string    $sortorder  Sort order
-	 * @param int       $limit      Number of items per page
-	 * @param int       $page       Page number {@min 0}
-	 * @param int       $active     Delivery times is active or not {@min 0} {@max 1}
-	 * @param string    $sqlfilters SQL criteria to filter with.
+    /**
+     * Get state.
+     *
+     * @param int    $id   ID of state
+     * @param string $code Code of state
+     *
+     * @return array               Array of cleaned object properties
+     *
+     * @throws RestException
+     */
+    private function _fetchCstate($id, $code = '')
+    {
+        $state = new Cstate($this->db);
+
+        $result = $state->fetch($id, $code);
+        if ($result < 0) {
+            throw new RestException(503, 'Error when retrieving state : ' . $state->error);
+        } elseif ($result == 0) {
+            throw new RestException(404, 'State not found');
+        }
+
+        return $this->_cleanObjectDatas($state);
+    }
+
+    /**
+     * Get country.
+     *
+     * @param int    $id           ID of country
+     * @param string $code         Code of country (2 characters)
+     * @param string $iso          ISO of country (3 characters)
+     * @param string $lang         Code of the language the name of the
+     *                             country must be translated to
+     *
+     * @return array               Array of cleaned object properties
+     *
+     * @throws RestException
+     */
+    private function _fetchCcountry($id, $code = '', $iso = '', $lang = '')
+    {
+        $country = new Ccountry($this->db);
+
+        $result = $country->fetch($id, $code, $iso);
+
+        if ($result < 0) {
+            throw new RestException(503, 'Error when retrieving country : ' . $country->error);
+        } elseif ($result == 0) {
+            throw new RestException(404, 'Country not found');
+        }
+
+        $this->translateLabel($country, $lang, 'Country');
+
+        return $this->_cleanObjectDatas($country);
+    }
+
+    /**
+     * Get the list of delivery times.
+     *
+     * @param string $sortfield  Sort field
+     * @param string $sortorder  Sort order
+     * @param int    $limit      Number of items per page
+     * @param int    $page       Page number {@min 0}
+     * @param int    $active     Delivery times is active or not {@min 0} {@max 1}
+     * @param string $sqlfilters SQL criteria to filter with.
 	 *
 	 * @url     GET dictionary/availability
 	 *
@@ -615,25 +568,75 @@ class Setup extends DolibarrApi
 		if ($result) {
 			$num = $this->db->num_rows($result);
 			$min = min($num, ($limit <= 0 ? $num : $limit));
-			for ($i = 0; $i < $min; $i++) {
-				$list[] = $this->db->fetch_object($result);
-			}
-		} else {
-			throw new RestException(400, $this->db->lasterror());
-		}
+            for ($i = 0; $i < $min; $i++) {
+                $list[] = $this->db->fetch_object($result);
+            }
+        } else {
+            throw new RestException(400, $this->db->lasterror());
+        }
 
-		return $list;
-	}
+        return $list;
+    }
 
-	/**
-	 * Get the list of events types.
-	 *
-	 * @param string    $sortfield  Sort field
-	 * @param string    $sortorder  Sort order
-	 * @param int       $limit      Number of items per page
-	 * @param int       $page       Page number (starting from zero)
-	 * @param string    $type       To filter on type of event
-	 * @param string    $module     To filter on module events
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return Object                Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->error);
+        unset($object->errors);
+
+        return $object;
+    }
+
+    /**
+     * Translate the name of the object to the given language.
+     *
+     * @param object $object Object with label to translate
+     * @param string $lang   Code of the language the name of the object must be translated to
+     * @param string $prefix Prefix for translation key
+     *
+     * @return void
+     */
+    private function translateLabel($object, $lang, $prefix = 'Country')
+    {
+        if (!empty($lang)) {
+            // Load the translations if this is a new language.
+            if ($this->translations == null || $this->translations->getDefaultLang() !== $lang) {
+                global $conf;
+                $this->translations = new Translate('', $conf);
+                $this->translations->setDefaultLang($lang);
+                $this->translations->load('dict');
+            }
+            if ($object->code) {
+                $key = $prefix . $object->code;
+
+                $translation = $this->translations->trans($key);
+                if ($translation != $key) {
+                    $object->label = html_entity_decode($translation);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the list of events types.
+     *
+     * @param string    $sortfield  Sort field
+     * @param string    $sortorder  Sort order
+     * @param int       $limit      Number of items per page
+     * @param int       $page       Page number (starting from zero)
+     * @param string    $type       To filter on type of event
+     * @param string    $module     To filter on module events
 	 * @param int       $active     Event's type is active or not {@min 0} {@max 1}
 	 * @param string    $sqlfilters Other criteria to filter answers separated by a comma. Syntax example "(t.code:like:'A%') and (t.active:>=:0)"
 	 * @return array				List of events types

@@ -358,26 +358,277 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 	 * @param DoliDB $db Database handler
 	 */
 	public function __construct($db)
-	{
-		$this->db = $db;
-	}
-	// We should but can't set this as abstract because this will make dolibarr hang
-	// after migration due to old module not implementing. We must wait PHP is able to make
-	// a try catch on Fatal error to manage this correctly.
-	// We need constructor into function unActivateModule into admin.lib.php
+    {
+        $this->db = $db;
+    }
+    // We should but can't set this as abstract because this will make dolibarr hang
+    // after migration due to old module not implementing. We must wait PHP is able to make
+    // a try catch on Fatal error to manage this correctly.
+    // We need constructor into function unActivateModule into admin.lib.php
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    /**
+     * Enables a module.
+     * Inserts all informations into database.
+     *
+     * @param array  $array_sql   SQL requests to be executed when enabling module
+     * @param string $options     String with options when disabling module:
+     *                            - 'noboxes' = Do all actions but do not insert boxes
+     *                            - 'newboxdefonly' = Do all actions but for boxes, insert def of boxes only and not boxes activation
+     *
+     * @return int                  1 if OK, 0 if KO
+     */
+    protected function _init($array_sql, $options = '')
+    {
+        // phpcs:enable
+        global $conf;
+        $err = 0;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+        $this->db->begin();
 
-	/**
-	 * Gives the long description of a module. First check README-la_LA.md then README.md
-	 * If no markdown files found, it returns translated value of the key ->descriptionlong.
-	 *
-	 * @return string     Long description of a module from README.md of from property.
-	 */
-	public function getDescLong()
-	{
-		global $langs;
+        // Insert activation module constant
+        if (!$err) {
+            $err += $this->_active();
+        }
+
+        // Insert new pages for tabs (into llx_const)
+        if (!$err) {
+            $err += $this->insert_tabs();
+        }
+
+        // Insert activation of module's parts
+        if (!$err) {
+            $err += $this->insert_module_parts();
+        }
+
+        // Insert constant defined by modules (into llx_const)
+        if (!$err && !preg_match('/newboxdefonly/', $options)) {
+            $err += $this->insert_const(); // Test on newboxdefonly to avoid to erase value during upgrade
+        }
+
+        // Insert boxes def (into llx_boxes_def) and boxes setup (into llx_boxes)
+        if (!$err && !preg_match('/noboxes/', $options)) {
+            $err += $this->insert_boxes($options);
+        }
+
+        // Insert cron job entries (entry in llx_cronjobs)
+        if (!$err) {
+            $err += $this->insert_cronjobs();
+        }
+
+        // Insert permission definitions of module into llx_rights_def. If user is admin, grant this permission to user.
+        if (!$err) {
+            $err += $this->insert_permissions(1, null, 1);
+        }
+
+        // Insert specific menus entries into database
+        if (!$err) {
+            $err += $this->insert_menus();
+        }
+
+        // Create module's directories
+        if (!$err) {
+            $err += $this->create_dirs();
+        }
+
+        // Execute addons requests
+        $num = count($array_sql);
+        for ($i = 0; $i < $num; $i++) {
+            if (!$err) {
+                $val = $array_sql[$i];
+                $sql = $val;
+                $ignoreerror = 0;
+                if (is_array($val)) {
+                    $sql = $val['sql'];
+                    $ignoreerror = $val['ignoreerror'];
+                }
+                // Add current entity id
+                $sql = str_replace('__ENTITY__', $conf->entity, $sql);
+
+                dol_syslog(get_class($this) . "::_init ignoreerror=" . $ignoreerror . "", LOG_DEBUG);
+                $result = $this->db->query($sql, $ignoreerror);
+                if (!$result) {
+                    if (!$ignoreerror) {
+                        $this->error = $this->db->lasterror();
+                        $err++;
+                    } else {
+                        dol_syslog(get_class($this) . "::_init Warning " . $this->db->lasterror(), LOG_WARNING);
+                    }
+                }
+            }
+        }
+
+        // Return code
+        if (!$err) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return 0;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Disable function. Deletes the module constants and boxes from the database.
+     *
+     * @param string[] $array_sql SQL requests to be executed when module is disabled
+     * @param string   $options   Options when disabling module:
+     *
+     * @return int                     1 if OK, 0 if KO
+     */
+    protected function _remove($array_sql, $options = '')
+    {
+        // phpcs:enable
+        $err = 0;
+
+        $this->db->begin();
+
+        // Remove activation module line (constant MAIN_MODULE_MYMODULE in llx_const)
+        if (!$err) {
+            $err += $this->_unactive();
+        }
+
+        // Remove activation of module's new tabs (MAIN_MODULE_MYMODULE_TABS_XXX in llx_const)
+        if (!$err) {
+            $err += $this->delete_tabs();
+        }
+
+        // Remove activation of module's parts (MAIN_MODULE_MYMODULE_XXX in llx_const)
+        if (!$err) {
+            $err += $this->delete_module_parts();
+        }
+
+        // Remove constants defined by modules
+        if (!$err) {
+            $err += $this->delete_const();
+        }
+
+        // Remove list of module's available boxes (entry in llx_boxes)
+        if (!$err && !preg_match('/(newboxdefonly|noboxes)/', $options)) {
+            $err += $this->delete_boxes(); // We don't have to delete if option ask to keep boxes safe or ask to add new box def only
+        }
+
+        // Remove list of module's cron job entries (entry in llx_cronjobs)
+        if (!$err) {
+            $err += $this->delete_cronjobs();
+        }
+
+        // Remove module's permissions from list of available permissions (entries in llx_rights_def)
+        if (!$err) {
+            $err += $this->delete_permissions();
+        }
+
+        // Remove module's menus (entries in llx_menu)
+        if (!$err) {
+            $err += $this->delete_menus();
+        }
+
+        // Remove module's directories
+        if (!$err) {
+            $err += $this->delete_dirs();
+        }
+
+        // Run complementary sql requests
+        $num = count($array_sql);
+        for ($i = 0; $i < $num; $i++) {
+            if (!$err) {
+                dol_syslog(get_class($this) . "::_remove", LOG_DEBUG);
+                $result = $this->db->query($array_sql[$i]);
+                if (!$result) {
+                    $this->error = $this->db->error();
+                    $err++;
+                }
+            }
+        }
+
+        // Return code
+        if (!$err) {
+            $this->db->commit();
+            return 1;
+        } else {
+            $this->db->rollback();
+            return 0;
+        }
+    }
+
+    /**
+     * Gives the translated module name if translation exists in admin.lang or into language files of module.
+     * Otherwise return the module key name.
+     *
+     * @return string  Translated module name
+     */
+    public function getName()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($langs->transnoentitiesnoconv("Module" . $this->numero . "Name") != ("Module" . $this->numero . "Name")) {
+            // If module name translation exists
+            return $langs->transnoentitiesnoconv("Module" . $this->numero . "Name");
+        } else {
+            // If module name translation using it's unique id does not exist, we try to use its name to find translation
+            if (is_array($this->langfiles)) {
+                foreach ($this->langfiles as $val) {
+                    if ($val) {
+                        $langs->load($val);
+                    }
+                }
+            }
+
+            if ($langs->trans("Module" . $this->name . "Name") != ("Module" . $this->name . "Name")) {
+                // If module name translation exists
+                return $langs->transnoentitiesnoconv("Module" . $this->name . "Name");
+            }
+
+            // Last chance with simple label
+            return $langs->transnoentitiesnoconv($this->name);
+        }
+    }
+
+    /**
+     * Gives the translated module description if translation exists in admin.lang or the default module description
+     *
+     * @return string  Translated module description
+     */
+    public function getDesc()
+    {
+        global $langs;
+        $langs->load("admin");
+
+        if ($langs->transnoentitiesnoconv("Module" . $this->numero . "Desc") != ("Module" . $this->numero . "Desc")) {
+            // If module description translation exists
+            return $langs->transnoentitiesnoconv("Module" . $this->numero . "Desc");
+        } else {
+            // If module description translation does not exist using its unique id, we can use its name to find translation
+            if (is_array($this->langfiles)) {
+                foreach ($this->langfiles as $val) {
+                    if ($val) {
+                        $langs->load($val);
+                    }
+                }
+            }
+
+            if ($langs->transnoentitiesnoconv("Module" . $this->name . "Desc") != ("Module" . $this->name . "Desc")) {
+                // If module name translation exists
+                return $langs->trans("Module" . $this->name . "Desc");
+            }
+
+            // Last chance with simple label
+            return $langs->trans($this->description);
+        }
+    }
+
+    /**
+     * Gives the long description of a module. First check README-la_LA.md then README.md
+     * If no markdown files found, it returns translated value of the key ->descriptionlong.
+     *
+     * @return string     Long description of a module from README.md of from property.
+     */
+    public function getDescLong()
+    {
+        global $langs;
 		$langs->load("admin");
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
@@ -422,8 +673,6 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 		return $content;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Return path of file if a README file was found.
 	 *
@@ -457,6 +706,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 
 		return ($filefound ? $pathoffile : '');
 	}
+
 
 	/**
 	 * Gives the changelog. First check ChangeLog-la_LA.md then ChangeLog.md
@@ -508,47 +758,104 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 	public function getPublisher()
 	{
 		return $this->editor_name;
-	}
+    }
 
-	/**
-	 * Gives the publisher url
-	 *
-	 * @return string  Publisher url
-	 */
-	public function getPublisherUrl()
-	{
-		return $this->editor_url;
-	}
+    /**
+     * Gives the publisher url
+     *
+     * @return string  Publisher url
+     */
+    public function getPublisherUrl()
+    {
+        return $this->editor_url;
+    }
 
-	/**
-	 * Gives the module position
-	 *
-	 * @return int  	Module position (an external module should never return a value lower than 100000. 1-100000 are reserved for core)
-	 */
-	public function getModulePosition()
-	{
-		if (in_array($this->version, array('dolibarr', 'experimental', 'development'))) {	// core module
-			return $this->module_position;
-		} else {																			// external module
-			if ($this->module_position >= 100000) {
-				return $this->module_position;
-			} else {
-				return $this->module_position + 100000;
-			}
-		}
-	}
+    /**
+     * Gives module version (translated if param $translated is on)
+     * For 'experimental' modules, gives 'experimental' translation
+     * For 'dolibarr' modules, gives Dolibarr version
+     *
+     * @param int $translated 1=Special version keys are translated, 0=Special version keys are not translated
+     *
+     * @return string                  Module version
+     */
+    public function getVersion($translated = 1)
+    {
+        global $langs;
+        $langs->load("admin");
 
-	/**
-	 * Gives module related language files list
-	 *
-	 * @return string[]    Language files list
-	 */
-	public function getLangFilesArray()
-	{
-		return $this->langfiles;
-	}
+        $ret = '';
 
-	/**
+        $newversion = preg_replace('/_deprecated/', '', $this->version);
+        if ($newversion == 'experimental') {
+            $ret = ($translated ? $langs->transnoentitiesnoconv("VersionExperimental") : $newversion);
+        } elseif ($newversion == 'development') {
+            $ret = ($translated ? $langs->transnoentitiesnoconv("VersionDevelopment") : $newversion);
+        } elseif ($newversion == 'dolibarr') {
+            $ret = DOL_VERSION;
+        } elseif ($newversion) {
+            $ret = $newversion;
+        } else {
+            $ret = ($translated ? $langs->transnoentitiesnoconv("VersionUnknown") : 'unknown');
+        }
+
+        if (preg_match('/_deprecated/', $this->version)) {
+            $ret .= ($translated ? ' (' . $langs->transnoentitiesnoconv("Deprecated") . ')' : $this->version);
+        }
+        return $ret;
+    }
+
+    /**
+     * Gives the module position
+     *
+     * @return int    Module position (an external module should never return a value lower than 100000. 1-100000 are reserved for core)
+     */
+    public function getModulePosition()
+    {
+        if (in_array($this->version, ['dolibarr', 'experimental', 'development'])) {    // core module
+            return $this->module_position;
+        } else {                                                                            // external module
+            if ($this->module_position >= 100000) {
+                return $this->module_position;
+            } else {
+                return $this->module_position + 100000;
+            }
+        }
+    }
+
+    /**
+     * Tells if module is core or external
+     *
+     * @return string  'core', 'external' or 'unknown'
+     */
+    public function isCoreOrExternalModule()
+    {
+        if ($this->version == 'dolibarr' || $this->version == 'dolibarr_deprecated') {
+            return 'core';
+        }
+        if (!empty($this->version) && !in_array($this->version, ['experimental', 'development'])) {
+            return 'external';
+        }
+        if (!empty($this->editor_name) || !empty($this->editor_url)) {
+            return 'external';
+        }
+        if ($this->numero >= 100000) {
+            return 'external';
+        }
+        return 'unknown';
+    }
+
+    /**
+     * Gives module related language files list
+     *
+     * @return string[]    Language files list
+     */
+    public function getLangFilesArray()
+    {
+        return $this->langfiles;
+    }
+
+    /**
 	 * Gives translated label of an export dataset
 	 *
 	 * @param int $r Dataset index
@@ -568,6 +875,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 			return $langs->trans($langstring);
 		}
 	}
+
 
 	/**
 	 * Gives translated label of an import dataset
@@ -590,6 +898,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 			return $langs->transnoentitiesnoconv($langstring);
 		}
 	}
+
 
 	/**
 	 * Gives the last date of activation
@@ -619,6 +928,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 
 		return '';
 	}
+
 
 	/**
 	 * Gives the last author of activation
@@ -653,121 +963,10 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 		return array();
 	}
 
-	/**
-	 * Function called when module is enabled.
-	 * The init function adds tabs, constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
-	 * It also creates data directories
-	 *
-	 * @param  string $options Options when enabling module ('', 'newboxdefonly', 'noboxes', 'menuonly')
-	 *                         'noboxes' = Do not insert boxes 'newboxdefonly' = For boxes, insert def of boxes only and not boxes activation
-	 * @return int                1 if OK, 0 if KO
-	 */
-	public function init($options = '')
-	{
-		return $this->_init(array(), $options);
-	}
 
-	/**
-	 * Enables a module.
-	 * Inserts all informations into database.
-	 *
-	 * @param array  $array_sql 	SQL requests to be executed when enabling module
-	 * @param string $options   	String with options when disabling module:
-	 *                          	- 'noboxes' = Do all actions but do not insert boxes
-	 *                          	- 'newboxdefonly' = Do all actions but for boxes, insert def of boxes only and not boxes activation
-	 * @return int                  1 if OK, 0 if KO
-	 */
-	protected function _init($array_sql, $options = '')
-	{
-		// phpcs:enable
-		global $conf;
-		$err = 0;
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-		$this->db->begin();
-
-		// Insert activation module constant
-		if (!$err) {
-			$err += $this->_active();
-		}
-
-		// Insert new pages for tabs (into llx_const)
-		if (!$err) {
-			$err += $this->insert_tabs();
-		}
-
-		// Insert activation of module's parts
-		if (!$err) {
-			$err += $this->insert_module_parts();
-		}
-
-		// Insert constant defined by modules (into llx_const)
-		if (!$err && !preg_match('/newboxdefonly/', $options)) {
-			$err += $this->insert_const(); // Test on newboxdefonly to avoid to erase value during upgrade
-		}
-
-		// Insert boxes def (into llx_boxes_def) and boxes setup (into llx_boxes)
-		if (!$err && !preg_match('/noboxes/', $options)) {
-			$err += $this->insert_boxes($options);
-		}
-
-		// Insert cron job entries (entry in llx_cronjobs)
-		if (!$err) {
-			$err += $this->insert_cronjobs();
-		}
-
-		// Insert permission definitions of module into llx_rights_def. If user is admin, grant this permission to user.
-		if (!$err) {
-			$err += $this->insert_permissions(1, null, 1);
-		}
-
-		// Insert specific menus entries into database
-		if (!$err) {
-			$err += $this->insert_menus();
-		}
-
-		// Create module's directories
-		if (!$err) {
-			$err += $this->create_dirs();
-		}
-
-		// Execute addons requests
-		$num = count($array_sql);
-		for ($i = 0; $i < $num; $i++) {
-			if (!$err) {
-				$val = $array_sql[$i];
-				$sql = $val;
-				$ignoreerror = 0;
-				if (is_array($val)) {
-					$sql = $val['sql'];
-					$ignoreerror = $val['ignoreerror'];
-				}
-				// Add current entity id
-				$sql = str_replace('__ENTITY__', $conf->entity, $sql);
-
-				dol_syslog(get_class($this)."::_init ignoreerror=".$ignoreerror."", LOG_DEBUG);
-				$result = $this->db->query($sql, $ignoreerror);
-				if (!$result) {
-					if (!$ignoreerror) {
-						 $this->error = $this->db->lasterror();
-						 $err++;
-					} else {
-						 dol_syslog(get_class($this)."::_init Warning ".$this->db->lasterror(), LOG_WARNING);
-					}
-				}
-			}
-		}
-
-		// Return code
-		if (!$err) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return 0;
-		}
-	}
-
-	/**
+    /**
 	 * Insert constants for module activation
 	 *
 	 * @return int Error count (0 if OK)
@@ -800,232 +999,171 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 		$sql .= ", 0, ".((int) $entity);
 		$sql .= ", '".$this->db->escape($note)."')";
 
-		dol_syslog(get_class($this)."::_active insert activation constant", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$err++;
-		}
+        dol_syslog(get_class($this) . "::_active insert activation constant", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $err++;
+        }
 
-		return $err;
-	}
-
-	/**
-	 * Adds tabs
-	 *
-	 * @return int  Error count (0 if ok)
-	 */
-	public function insert_tabs()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		if (!empty($this->tabs)) {
-			dol_syslog(get_class($this)."::insert_tabs", LOG_DEBUG);
-
-			$i = 0;
-			foreach ($this->tabs as $key => $value) {
-				if (is_array($value) && count($value) == 0) {
-					continue; // Discard empty arrays
-				}
-
-				$entity = $conf->entity;
-				$newvalue = $value;
-
-				if (is_array($value)) {
-					$newvalue = $value['data'];
-					if (isset($value['entity'])) {
-						$entity = $value['entity'];
-					}
-				}
-
-				if ($newvalue) {
-					$sql = "INSERT INTO ".MAIN_DB_PREFIX."const (";
-					$sql .= "name";
-					$sql .= ", type";
-					$sql .= ", value";
-					$sql .= ", note";
-					$sql .= ", visible";
-					$sql .= ", entity";
-					$sql .= ")";
-					$sql .= " VALUES (";
-					$sql .= $this->db->encrypt($this->const_name."_TABS_".$i);
-					$sql .= ", 'chaine'";
-					$sql .= ", ".$this->db->encrypt($newvalue);
-					$sql .= ", null";
-					$sql .= ", '0'";
-					$sql .= ", ".((int) $entity);
-					$sql .= ")";
-
-					$resql = $this->db->query($sql);
-					if (!$resql) {
-						 dol_syslog($this->db->lasterror(), LOG_ERR);
-						if ($this->db->lasterrno() != 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-							$this->error = $this->db->lasterror();
-							$this->errors[] = $this->db->lasterror();
-							$err++;
-							break;
-						}
-					}
-				}
-				$i++;
-			}
-		}
-		return $err;
-	}
-
-	/**
-	 * Adds generic parts
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function insert_module_parts()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$error = 0;
-
-		if (is_array($this->module_parts) && !empty($this->module_parts)) {
-			foreach ($this->module_parts as $key => $value) {
-				if (is_array($value) && count($value) == 0) {
-					continue; // Discard empty arrays
-				}
-
-				$entity = $conf->entity; // Reset the current entity
-				$newvalue = $value;
-
-				// Serialize array parameters
-				if (is_array($value)) {
-					// Can defined other parameters
-					// Example when $key='hooks', then $value is an array('data'=>array('hookcontext1','hookcontext2'), 'entity'=>X)
-					if (isset($value['data']) && is_array($value['data'])) {
-						$newvalue = json_encode($value['data']);
-						if (isset($value['entity'])) {
-							$entity = $value['entity'];
-						}
-					} elseif (isset($value['data']) && !is_array($value['data'])) {
-						$newvalue = $value['data'];
-						if (isset($value['entity'])) {
-							$entity = $value['entity'];
-						}
-					} else { // when hook is declared with syntax 'hook'=>array('hookcontext1','hookcontext2',...)
-						$newvalue = json_encode($value);
-					}
-				}
-
-				$sql = "INSERT INTO ".MAIN_DB_PREFIX."const (";
-				$sql .= "name";
-				$sql .= ", type";
-				$sql .= ", value";
-				$sql .= ", note";
-				$sql .= ", visible";
-				$sql .= ", entity";
-				$sql .= ")";
-				$sql .= " VALUES (";
-				$sql .= " ".$this->db->encrypt($this->const_name."_".strtoupper($key));
-				$sql .= ", 'chaine'";
-				$sql .= ", ".$this->db->encrypt($newvalue);
-				$sql .= ", null";
-				$sql .= ", '0'";
-				$sql .= ", ".((int) $entity);
-				$sql .= ")";
-
-				dol_syslog(get_class($this)."::insert_module_parts for key=".$this->const_name."_".strtoupper($key), LOG_DEBUG);
-
-				$resql = $this->db->query($sql, 1);
-				if (!$resql) {
-					if ($this->db->lasterrno() != 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-						 $error++;
-						 $this->error = $this->db->lasterror();
-					} else {
-						 dol_syslog(get_class($this)."::insert_module_parts for ".$this->const_name."_".strtoupper($key)." Record already exists.", LOG_WARNING);
-					}
-				}
-			}
-		}
-		return $error;
-	}
-
-	/**
-	 * Adds constants
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function insert_const()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		if (empty($this->const)) {
-			return 0;
-		}
-
-		dol_syslog(get_class($this)."::insert_const", LOG_DEBUG);
-
-		foreach ($this->const as $key => $value) {
-			$name      = $this->const[$key][0];
-			$type      = $this->const[$key][1];
-			$val       = $this->const[$key][2];
-			$note      = isset($this->const[$key][3]) ? $this->const[$key][3] : '';
-			$visible   = isset($this->const[$key][4]) ? $this->const[$key][4] : 0;
-			$entity    = (!empty($this->const[$key][5]) && $this->const[$key][5] != 'current') ? 0 : $conf->entity;
-
-			// Clean
-			if (empty($visible)) {
-				$visible = '0';
-			}
-			if (empty($val) && $val != '0') {
-				$val = '';
-			}
-
-			$sql = "SELECT count(*)";
-			$sql .= " FROM ".MAIN_DB_PREFIX."const";
-			$sql .= " WHERE ".$this->db->decrypt('name')." = '".$this->db->escape($name)."'";
-			$sql .= " AND entity = ".((int) $entity);
-
-			$result = $this->db->query($sql);
-			if ($result) {
-				$row = $this->db->fetch_row($result);
-
-				if ($row[0] == 0) {   // If not found
-					$sql = "INSERT INTO ".MAIN_DB_PREFIX."const (name,type,value,note,visible,entity)";
-					$sql .= " VALUES (";
-					$sql .= $this->db->encrypt($name);
-					$sql .= ",'".$this->db->escape($type)."'";
-					$sql .= ",".(($val != '') ? $this->db->encrypt($val) : "''");
-					$sql .= ",".($note ? "'".$this->db->escape($note)."'" : "null");
-					$sql .= ",'".$this->db->escape($visible)."'";
-					$sql .= ",".$entity;
-					$sql .= ")";
-
-					if (!$this->db->query($sql)) {
-						$err++;
-					}
-				} else {
-					dol_syslog(get_class($this)."::insert_const constant '".$name."' already exists", LOG_WARNING);
-				}
-			} else {
-				$err++;
-			}
-		}
-
-		return $err;
-	}
+        return $err;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 * Adds boxes
-	 *
-	 * @param string $option Options when disabling module ('newboxdefonly'=insert only boxes definition)
-	 *
-	 * @return int             Error count (0 if OK)
-	 */
+    /**
+     * Module deactivation
+     *
+     * @return int Error count (0 if OK)
+     */
+    protected function _unactive()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        // Common module
+        $entity = ((!empty($this->always_enabled) || !empty($this->core_enabled)) ? 0 : $conf->entity);
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
+        $sql .= " WHERE " . $this->db->decrypt('name') . " = '" . $this->db->escape($this->const_name) . "'";
+        $sql .= " AND entity IN (0, " . $entity . ")";
+
+        dol_syslog(get_class($this) . "::_unactive", LOG_DEBUG);
+        $this->db->query($sql);
+
+        return $err;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps,PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Create tables and keys required by module.
+     * Files module.sql and module.key.sql with create table and create keys
+     * commands must be stored in directory reldir='/module/sql/'
+     * This function is called by this->init
+     *
+     * @param string $reldir Relative directory where to scan files
+     *
+     * @return int             <=0 if KO, >0 if OK
+     */
+    protected function _load_tables($reldir)
+    {
+        // phpcs:enable
+        global $conf;
+
+        $error = 0;
+        $dirfound = 0;
+
+        if (empty($reldir)) {
+            return 1;
+        }
+
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
+
+        $ok = 1;
+        foreach ($conf->file->dol_document_root as $dirroot) {
+            if ($ok) {
+                $dir = $dirroot . $reldir;
+                $ok = 0;
+
+                $handle = @opendir($dir); // Dir may not exists
+                if (is_resource($handle)) {
+                    $dirfound++;
+
+                    // Run llx_mytable.sql files, then llx_mytable_*.sql
+                    $files = [];
+                    while (($file = readdir($handle)) !== false) {
+                        $files[] = $file;
+                    }
+                    sort($files);
+                    foreach ($files as $file) {
+                        if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'llx_' && substr($file, 0, 4) != 'data') {
+                            $result = run_sql($dir . $file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
+                            if ($result <= 0) {
+                                $error++;
+                            }
+                        }
+                    }
+
+                    rewinddir($handle);
+
+                    // Run llx_mytable.key.sql files (Must be done after llx_mytable.sql) then then llx_mytable_*.key.sql
+                    $files = [];
+                    while (($file = readdir($handle)) !== false) {
+                        $files[] = $file;
+                    }
+                    sort($files);
+                    foreach ($files as $file) {
+                        if (preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'llx_' && substr($file, 0, 4) != 'data') {
+                            $result = run_sql($dir . $file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
+                            if ($result <= 0) {
+                                $error++;
+                            }
+                        }
+                    }
+
+                    rewinddir($handle);
+
+                    // Run data_xxx.sql files (Must be done after llx_mytable.key.sql)
+                    $files = [];
+                    while (($file = readdir($handle)) !== false) {
+                        $files[] = $file;
+                    }
+                    sort($files);
+                    foreach ($files as $file) {
+                        if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'data') {
+                            $result = run_sql($dir . $file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
+                            if ($result <= 0) {
+                                $error++;
+                            }
+                        }
+                    }
+
+                    rewinddir($handle);
+
+                    // Run update_xxx.sql files
+                    $files = [];
+                    while (($file = readdir($handle)) !== false) {
+                        $files[] = $file;
+                    }
+                    sort($files);
+                    foreach ($files as $file) {
+                        if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 6) == 'update') {
+                            $result = run_sql($dir . $file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
+                            if ($result <= 0) {
+                                $error++;
+                            }
+                        }
+                    }
+
+                    closedir($handle);
+                }
+
+                if ($error == 0) {
+                    $ok = 1;
+                }
+            }
+        }
+
+        if (!$dirfound) {
+            dol_syslog("A module ask to load sql files into " . $reldir . " but this directory was not found.", LOG_WARNING);
+        }
+        return $ok;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds boxes
+     *
+     * @param string $option Options when disabling module ('newboxdefonly'=insert only boxes definition)
+     *
+     * @return int             Error count (0 if OK)
+     */
 	public function insert_boxes($option = '')
 	{
 		// phpcs:enable
@@ -1109,30 +1247,105 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 					// else box already registered into database
 				} else {
 					$this->error = $this->db->lasterror();
-					$err++;
-				}
-			}
-		}
+                    $err++;
+                }
+            }
+        }
 
-		return $err;
-	}
+        return $err;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Adds cronjobs
-	 *
-	 * @return int             Error count (0 if OK)
-	 */
-	public function insert_cronjobs()
-	{
-		// phpcs:enable
-		include_once DOL_DOCUMENT_ROOT.'/core/class/infobox.class.php';
+    /**
+     * Removes boxes
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function delete_boxes()
+    {
+        // phpcs:enable
+        global $conf;
 
-		global $conf;
+        $err = 0;
 
-		$err = 0;
+        if (is_array($this->boxes)) {
+            foreach ($this->boxes as $key => $value) {
+                //$titre = $this->boxes[$key][0];
+                if (empty($this->boxes[$key]['file'])) {
+                    $file = isset($this->boxes[$key][1]) ? $this->boxes[$key][1] : ''; // For backward compatibility
+                } else {
+                    $file = $this->boxes[$key]['file'];
+                }
+
+                //$note  = $this->boxes[$key][2];
+
+                // TODO If the box is also included by another module and the other module is still on, we should not remove it.
+                // For the moment, we manage this with hard coded exception
+                //print "Remove box ".$file.'<br>';
+                if ($file == 'box_graph_product_distribution.php') {
+                    if (!empty($conf->product->enabled) || !empty($conf->service->enabled)) {
+                        dol_syslog("We discard deleting module " . $file . " because another module still active requires it.");
+                        continue;
+                    }
+                }
+
+                if ($this->db->type == 'sqlite3') {
+                    // sqlite doesn't support "USING" syntax.
+                    // TODO: remove this dependency.
+                    $sql = "DELETE FROM " . MAIN_DB_PREFIX . "boxes ";
+                    $sql .= "WHERE " . MAIN_DB_PREFIX . "boxes.box_id IN (";
+                    $sql .= "SELECT " . MAIN_DB_PREFIX . "boxes_def.rowid ";
+                    $sql .= "FROM " . MAIN_DB_PREFIX . "boxes_def ";
+                    $sql .= "WHERE " . MAIN_DB_PREFIX . "boxes_def.file = '" . $this->db->escape($file) . "') ";
+                    $sql .= "AND " . MAIN_DB_PREFIX . "boxes.entity = " . $conf->entity;
+                } else {
+                    $sql = "DELETE FROM " . MAIN_DB_PREFIX . "boxes";
+                    $sql .= " USING " . MAIN_DB_PREFIX . "boxes, " . MAIN_DB_PREFIX . "boxes_def";
+                    $sql .= " WHERE " . MAIN_DB_PREFIX . "boxes.box_id = " . MAIN_DB_PREFIX . "boxes_def.rowid";
+                    $sql .= " AND " . MAIN_DB_PREFIX . "boxes_def.file = '" . $this->db->escape($file) . "'";
+                    $sql .= " AND " . MAIN_DB_PREFIX . "boxes.entity = " . $conf->entity;
+                }
+
+                dol_syslog(get_class($this) . "::delete_boxes", LOG_DEBUG);
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $this->error = $this->db->lasterror();
+                    $err++;
+                }
+
+                $sql = "DELETE FROM " . MAIN_DB_PREFIX . "boxes_def";
+                $sql .= " WHERE file = '" . $this->db->escape($file) . "'";
+                $sql .= " AND entity = " . $conf->entity;        // Do not use getEntity here, we want to delete only in current company
+
+                dol_syslog(get_class($this) . "::delete_boxes", LOG_DEBUG);
+                $resql = $this->db->query($sql);
+                if (!$resql) {
+                    $this->error = $this->db->lasterror();
+                    $err++;
+                }
+            }
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds cronjobs
+     *
+     * @return int             Error count (0 if OK)
+     */
+    public function insert_cronjobs()
+    {
+        // phpcs:enable
+        include_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
+
+        global $conf;
+
+        $err = 0;
 
 		if (is_array($this->cronjobs)) {
 			dol_syslog(get_class($this)."::insert_cronjobs", LOG_DEBUG);
@@ -1240,28 +1453,263 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 					// else box already registered into database
 				} else {
 					$this->error = $this->db->lasterror();
-					$err++;
-				}
-			}
-		}
+                    $err++;
+                }
+            }
+        }
 
-		return $err;
-	}
+        return $err;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps,PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Adds access rights
-	 *
-	 * @param  int $reinitadminperms If 1, we also grant them to all admin users
-	 * @param  int $force_entity     Force current entity
-	 * @param  int $notrigger        1=Does not execute triggers, 0= execute triggers
-	 * @return int                     Error count (0 if OK)
-	 */
-	public function insert_permissions($reinitadminperms = 0, $force_entity = null, $notrigger = 0)
-	{
-		// phpcs:enable
+    /**
+     * Removes boxes
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function delete_cronjobs()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        if (is_array($this->cronjobs)) {
+            $sql = "DELETE FROM " . MAIN_DB_PREFIX . "cronjob";
+            $sql .= " WHERE module_name = '" . $this->db->escape(empty($this->rights_class) ? strtolower($this->name) : $this->rights_class) . "'";
+            $sql .= " AND entity = " . $conf->entity;
+            $sql .= " AND test = '1'"; // We delete on lines that are not set with a complete test that is '$conf->module->enabled' so when module is disabled, the cron is also removed.
+            // For crons declared with a '$conf->module->enabled', there is no need to delete the line, so we don't loose setup if we reenable module.
+
+            dol_syslog(get_class($this) . "::delete_cronjobs", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $this->error = $this->db->lasterror();
+                $err++;
+            }
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Removes tabs
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function delete_tabs()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
+        $sql .= " WHERE " . $this->db->decrypt('name') . " like '" . $this->db->escape($this->const_name) . "_TABS_%'";
+        $sql .= " AND entity = " . $conf->entity;
+
+        dol_syslog(get_class($this) . "::delete_tabs", LOG_DEBUG);
+        if (!$this->db->query($sql)) {
+            $this->error = $this->db->lasterror();
+            $err++;
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds tabs
+     *
+     * @return int  Error count (0 if ok)
+     */
+    public function insert_tabs()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        if (!empty($this->tabs)) {
+            dol_syslog(get_class($this) . "::insert_tabs", LOG_DEBUG);
+
+            $i = 0;
+            foreach ($this->tabs as $key => $value) {
+                if (is_array($value) && count($value) == 0) {
+                    continue; // Discard empty arrays
+                }
+
+                $entity = $conf->entity;
+                $newvalue = $value;
+
+                if (is_array($value)) {
+                    $newvalue = $value['data'];
+                    if (isset($value['entity'])) {
+                        $entity = $value['entity'];
+                    }
+                }
+
+                if ($newvalue) {
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const (";
+                    $sql .= "name";
+                    $sql .= ", type";
+                    $sql .= ", value";
+                    $sql .= ", note";
+                    $sql .= ", visible";
+                    $sql .= ", entity";
+                    $sql .= ")";
+                    $sql .= " VALUES (";
+                    $sql .= $this->db->encrypt($this->const_name . "_TABS_" . $i);
+                    $sql .= ", 'chaine'";
+                    $sql .= ", " . $this->db->encrypt($newvalue);
+                    $sql .= ", null";
+                    $sql .= ", '0'";
+                    $sql .= ", " . ((int) $entity);
+                    $sql .= ")";
+
+                    $resql = $this->db->query($sql);
+                    if (!$resql) {
+                        dol_syslog($this->db->lasterror(), LOG_ERR);
+                        if ($this->db->lasterrno() != 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                            $this->error = $this->db->lasterror();
+                            $this->errors[] = $this->db->lasterror();
+                            $err++;
+                            break;
+                        }
+                    }
+                }
+                $i++;
+            }
+        }
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds constants
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function insert_const()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        if (empty($this->const)) {
+            return 0;
+        }
+
+        dol_syslog(get_class($this) . "::insert_const", LOG_DEBUG);
+
+        foreach ($this->const as $key => $value) {
+            $name = $this->const[$key][0];
+            $type = $this->const[$key][1];
+            $val = $this->const[$key][2];
+            $note = isset($this->const[$key][3]) ? $this->const[$key][3] : '';
+            $visible = isset($this->const[$key][4]) ? $this->const[$key][4] : 0;
+            $entity = (!empty($this->const[$key][5]) && $this->const[$key][5] != 'current') ? 0 : $conf->entity;
+
+            // Clean
+            if (empty($visible)) {
+                $visible = '0';
+            }
+            if (empty($val) && $val != '0') {
+                $val = '';
+            }
+
+            $sql = "SELECT count(*)";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "const";
+            $sql .= " WHERE " . $this->db->decrypt('name') . " = '" . $this->db->escape($name) . "'";
+            $sql .= " AND entity = " . ((int) $entity);
+
+            $result = $this->db->query($sql);
+            if ($result) {
+                $row = $this->db->fetch_row($result);
+
+                if ($row[0] == 0) {   // If not found
+                    $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const (name,type,value,note,visible,entity)";
+                    $sql .= " VALUES (";
+                    $sql .= $this->db->encrypt($name);
+                    $sql .= ",'" . $this->db->escape($type) . "'";
+                    $sql .= "," . (($val != '') ? $this->db->encrypt($val) : "''");
+                    $sql .= "," . ($note ? "'" . $this->db->escape($note) . "'" : "null");
+                    $sql .= ",'" . $this->db->escape($visible) . "'";
+                    $sql .= "," . $entity;
+                    $sql .= ")";
+
+                    if (!$this->db->query($sql)) {
+                        $err++;
+                    }
+                } else {
+                    dol_syslog(get_class($this) . "::insert_const constant '" . $name . "' already exists", LOG_WARNING);
+                }
+            } else {
+                $err++;
+            }
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Removes constants tagged 'deleteonunactive'
+     *
+     * @return int <0 if KO, 0 if OK
+     */
+    public function delete_const()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        if (empty($this->const)) {
+            return 0;
+        }
+
+        foreach ($this->const as $key => $value) {
+            $name = $this->const[$key][0];
+            $deleteonunactive = (!empty($this->const[$key][6])) ? 1 : 0;
+
+            if ($deleteonunactive) {
+                $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
+                $sql .= " WHERE " . $this->db->decrypt('name') . " = '" . $this->db->escape($name) . "'";
+                $sql .= " AND entity in (0, " . $conf->entity . ")";
+                dol_syslog(get_class($this) . "::delete_const", LOG_DEBUG);
+                if (!$this->db->query($sql)) {
+                    $this->error = $this->db->lasterror();
+                    $err++;
+                }
+            }
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds access rights
+     *
+     * @param int $reinitadminperms If 1, we also grant them to all admin users
+     * @param int $force_entity     Force current entity
+     * @param int $notrigger        1=Does not execute triggers, 0= execute triggers
+     *
+     * @return int                     Error count (0 if OK)
+     */
+    public function insert_permissions($reinitadminperms = 0, $force_entity = null, $notrigger = 0)
+    {
+        // phpcs:enable
 		global $conf, $user;
 
 		$err = 0;
@@ -1377,27 +1825,54 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 			}
 			$this->db->free($resql);
 		} else {
-			$this->error = $this->db->lasterror();
-			$err++;
-		}
+            $this->error = $this->db->lasterror();
+            $err++;
+        }
 
-		return $err;
-	}
+        return $err;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Adds menu entries
-	 *
-	 * @return int     Error count (0 if OK)
-	 */
-	public function insert_menus()
-	{
-		// phpcs:enable
-		global $user;
+    /**
+     * Removes access rights
+     *
+     * @return int                     Error count (0 if OK)
+     */
+    public function delete_permissions()
+    {
+        // phpcs:enable
+        global $conf;
 
-		if (!is_array($this->menu) || empty($this->menu)) {
+        $err = 0;
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "rights_def";
+        $sql .= " WHERE module = '" . $this->db->escape(empty($this->rights_class) ? strtolower($this->name) : $this->rights_class) . "'";
+        $sql .= " AND entity = " . $conf->entity;
+        dol_syslog(get_class($this) . "::delete_permissions", LOG_DEBUG);
+        if (!$this->db->query($sql)) {
+            $this->error = $this->db->lasterror();
+            $err++;
+        }
+
+        return $err;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Adds menu entries
+     *
+     * @return int     Error count (0 if OK)
+     */
+    public function insert_menus()
+    {
+        // phpcs:enable
+        global $user;
+
+        if (!is_array($this->menu) || empty($this->menu)) {
 			return 0;
 		}
 
@@ -1473,26 +1948,57 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 
 		if (!$err) {
 			$this->db->commit();
-		} else {
-			dol_syslog(get_class($this)."::insert_menus ".$this->error, LOG_ERR);
-			$this->db->rollback();
-		}
+        } else {
+            dol_syslog(get_class($this) . "::insert_menus " . $this->error, LOG_ERR);
+            $this->db->rollback();
+        }
 
-		return $err;
-	}
+        return $err;
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Creates directories
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function create_dirs()
-	{
-		// phpcs:enable
-		global $langs, $conf;
+    /**
+     * Removes menu entries
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function delete_menus()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $err = 0;
+
+        //$module=strtolower($this->name);        TODO When right_class will be same than module name
+        $module = empty($this->rights_class) ? strtolower($this->name) : $this->rights_class;
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "menu";
+        $sql .= " WHERE module = '" . $this->db->escape($module) . "'";
+        $sql .= " AND entity = " . $conf->entity;
+
+        dol_syslog(get_class($this) . "::delete_menus", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error = $this->db->lasterror();
+            $err++;
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Creates directories
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function create_dirs()
+    {
+        // phpcs:enable
+        global $langs, $conf;
 
 		$err = 0;
 
@@ -1547,8 +2053,8 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 		return $err;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Adds directories definitions
 	 *
@@ -1591,161 +2097,106 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 * Function called when module is disabled.
-	 * The remove function removes tabs, constants, boxes, permissions and menus from Dolibarr database.
-	 * Data directories are not deleted
-	 *
-	 * @param  string $options Options when enabling module ('', 'noboxes')
-	 * @return int                     1 if OK, 0 if KO
-	 */
-	public function remove($options = '')
-	{
-		return $this->_remove(array(), $options);
-	}
+	 * Removes directories
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function delete_dirs()
+    {
+        // phpcs:enable
+        global $conf;
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        $err = 0;
 
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
+        $sql .= " WHERE " . $this->db->decrypt('name') . " LIKE '" . $this->db->escape($this->const_name) . "_DIR_%'";
+        $sql .= " AND entity = " . $conf->entity;
+
+        dol_syslog(get_class($this) . "::delete_dirs", LOG_DEBUG);
+        if (!$this->db->query($sql)) {
+            $this->error = $this->db->lasterror();
+            $err++;
+        }
+
+        return $err;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 * Disable function. Deletes the module constants and boxes from the database.
-	 *
-	 * @param string[] $array_sql SQL requests to be executed when module is disabled
-	 * @param string   $options   Options when disabling module:
-	 *
-	 * @return int                     1 if OK, 0 if KO
-	 */
-	protected function _remove($array_sql, $options = '')
-	{
-		// phpcs:enable
-		$err = 0;
+	 * Adds generic parts
+     *
+     * @return int Error count (0 if OK)
+     */
+    public function insert_module_parts()
+    {
+        // phpcs:enable
+        global $conf;
 
-		$this->db->begin();
+        $error = 0;
 
-		// Remove activation module line (constant MAIN_MODULE_MYMODULE in llx_const)
-		if (!$err) {
-			$err += $this->_unactive();
-		}
+        if (is_array($this->module_parts) && !empty($this->module_parts)) {
+            foreach ($this->module_parts as $key => $value) {
+                if (is_array($value) && count($value) == 0) {
+                    continue; // Discard empty arrays
+                }
 
-		// Remove activation of module's new tabs (MAIN_MODULE_MYMODULE_TABS_XXX in llx_const)
-		if (!$err) {
-			$err += $this->delete_tabs();
-		}
+                $entity = $conf->entity; // Reset the current entity
+                $newvalue = $value;
 
-		// Remove activation of module's parts (MAIN_MODULE_MYMODULE_XXX in llx_const)
-		if (!$err) {
-			$err += $this->delete_module_parts();
-		}
+                // Serialize array parameters
+                if (is_array($value)) {
+                    // Can defined other parameters
+                    // Example when $key='hooks', then $value is an array('data'=>array('hookcontext1','hookcontext2'), 'entity'=>X)
+                    if (isset($value['data']) && is_array($value['data'])) {
+                        $newvalue = json_encode($value['data']);
+                        if (isset($value['entity'])) {
+                            $entity = $value['entity'];
+                        }
+                    } elseif (isset($value['data']) && !is_array($value['data'])) {
+                        $newvalue = $value['data'];
+                        if (isset($value['entity'])) {
+                            $entity = $value['entity'];
+                        }
+                    } else { // when hook is declared with syntax 'hook'=>array('hookcontext1','hookcontext2',...)
+                        $newvalue = json_encode($value);
+                    }
+                }
 
-		// Remove constants defined by modules
-		if (!$err) {
-			$err += $this->delete_const();
-		}
+                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const (";
+                $sql .= "name";
+                $sql .= ", type";
+                $sql .= ", value";
+                $sql .= ", note";
+                $sql .= ", visible";
+                $sql .= ", entity";
+                $sql .= ")";
+                $sql .= " VALUES (";
+                $sql .= " " . $this->db->encrypt($this->const_name . "_" . strtoupper($key));
+                $sql .= ", 'chaine'";
+                $sql .= ", " . $this->db->encrypt($newvalue);
+                $sql .= ", null";
+                $sql .= ", '0'";
+                $sql .= ", " . ((int) $entity);
+                $sql .= ")";
 
-		// Remove list of module's available boxes (entry in llx_boxes)
-		if (!$err && !preg_match('/(newboxdefonly|noboxes)/', $options)) {
-			$err += $this->delete_boxes(); // We don't have to delete if option ask to keep boxes safe or ask to add new box def only
-		}
+                dol_syslog(get_class($this) . "::insert_module_parts for key=" . $this->const_name . "_" . strtoupper($key), LOG_DEBUG);
 
-		// Remove list of module's cron job entries (entry in llx_cronjobs)
-		if (!$err) {
-			$err += $this->delete_cronjobs();
-		}
+                $resql = $this->db->query($sql, 1);
+                if (!$resql) {
+                    if ($this->db->lasterrno() != 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                        $error++;
+                        $this->error = $this->db->lasterror();
+                    } else {
+                        dol_syslog(get_class($this) . "::insert_module_parts for " . $this->const_name . "_" . strtoupper($key) . " Record already exists.", LOG_WARNING);
+                    }
+                }
+            }
+        }
+        return $error;
+    }
 
-		// Remove module's permissions from list of available permissions (entries in llx_rights_def)
-		if (!$err) {
-			$err += $this->delete_permissions();
-		}
-
-		// Remove module's menus (entries in llx_menu)
-		if (!$err) {
-			$err += $this->delete_menus();
-		}
-
-		// Remove module's directories
-		if (!$err) {
-			$err += $this->delete_dirs();
-		}
-
-		// Run complementary sql requests
-		$num = count($array_sql);
-		for ($i = 0; $i < $num; $i++) {
-			if (!$err) {
-				dol_syslog(get_class($this)."::_remove", LOG_DEBUG);
-				$result = $this->db->query($array_sql[$i]);
-				if (!$result) {
-					$this->error = $this->db->error();
-					$err++;
-				}
-			}
-		}
-
-		// Return code
-		if (!$err) {
-			$this->db->commit();
-			return 1;
-		} else {
-			$this->db->rollback();
-			return 0;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Module deactivation
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	protected function _unactive()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		// Common module
-		$entity = ((!empty($this->always_enabled) || !empty($this->core_enabled)) ? 0 : $conf->entity);
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."const";
-		$sql .= " WHERE ".$this->db->decrypt('name')." = '".$this->db->escape($this->const_name)."'";
-		$sql .= " AND entity IN (0, ".$entity.")";
-
-		dol_syslog(get_class($this)."::_unactive", LOG_DEBUG);
-		$this->db->query($sql);
-
-		return $err;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes tabs
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function delete_tabs()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."const";
-		$sql .= " WHERE ".$this->db->decrypt('name')." like '".$this->db->escape($this->const_name)."_TABS_%'";
-		$sql .= " AND entity = ".$conf->entity;
-
-		dol_syslog(get_class($this)."::delete_tabs", LOG_DEBUG);
-		if (!$this->db->query($sql)) {
-			$this->error = $this->db->lasterror();
-			$err++;
-		}
-
-		return $err;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 * Removes generic parts
 	 *
@@ -1770,261 +2221,56 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 				$sql .= " WHERE ".$this->db->decrypt('name')." LIKE '".$this->db->escape($this->const_name)."_".strtoupper($key)."'";
 				$sql .= " AND entity = ".((int) $entity);
 
-				dol_syslog(get_class($this)."::delete_const_".$key."", LOG_DEBUG);
-				if (!$this->db->query($sql)) {
-					$this->error = $this->db->lasterror();
-					$err++;
-				}
-			}
-		}
-		return $err;
-	}
+				dol_syslog(get_class($this) . "::delete_const_" . $key . "", LOG_DEBUG);
+                if (!$this->db->query($sql)) {
+                    $this->error = $this->db->lasterror();
+                    $err++;
+                }
+            }
+        }
+        return $err;
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * Function called when module is enabled.
+     * The init function adds tabs, constants, boxes, permissions and menus (defined in constructor) into Dolibarr database.
+     * It also creates data directories
+     *
+     * @param string $options  Options when enabling module ('', 'newboxdefonly', 'noboxes', 'menuonly')
+     *                         'noboxes' = Do not insert boxes 'newboxdefonly' = For boxes, insert def of boxes only and not boxes activation
+     *
+     * @return int                1 if OK, 0 if KO
+     */
+    public function init($options = '')
+    {
+        return $this->_init([], $options);
+    }
 
-	/**
-	 * Removes constants tagged 'deleteonunactive'
-	 *
-	 * @return int <0 if KO, 0 if OK
-	 */
-	public function delete_const()
-	{
-		// phpcs:enable
-		global $conf;
+    /**
+     * Function called when module is disabled.
+     * The remove function removes tabs, constants, boxes, permissions and menus from Dolibarr database.
+     * Data directories are not deleted
+     *
+     * @param string $options Options when enabling module ('', 'noboxes')
+     *
+     * @return int                     1 if OK, 0 if KO
+     */
+    public function remove($options = '')
+    {
+        return $this->_remove([], $options);
+    }
 
-		$err = 0;
-
-		if (empty($this->const)) {
-			return 0;
-		}
-
-		foreach ($this->const as $key => $value) {
-			$name = $this->const[$key][0];
-			$deleteonunactive = (!empty($this->const[$key][6])) ? 1 : 0;
-
-			if ($deleteonunactive) {
-				$sql = "DELETE FROM ".MAIN_DB_PREFIX."const";
-				$sql .= " WHERE ".$this->db->decrypt('name')." = '".$this->db->escape($name)."'";
-				$sql .= " AND entity in (0, ".$conf->entity.")";
-				dol_syslog(get_class($this)."::delete_const", LOG_DEBUG);
-				if (!$this->db->query($sql)) {
-					$this->error = $this->db->lasterror();
-					$err++;
-				}
-			}
-		}
-
-		return $err;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes boxes
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function delete_boxes()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		if (is_array($this->boxes)) {
-			foreach ($this->boxes as $key => $value) {
-				//$titre = $this->boxes[$key][0];
-				if (empty($this->boxes[$key]['file'])) {
-					$file = isset($this->boxes[$key][1]) ? $this->boxes[$key][1] : ''; // For backward compatibility
-				} else {
-					$file = $this->boxes[$key]['file'];
-				}
-
-				//$note  = $this->boxes[$key][2];
-
-				// TODO If the box is also included by another module and the other module is still on, we should not remove it.
-				// For the moment, we manage this with hard coded exception
-				//print "Remove box ".$file.'<br>';
-				if ($file == 'box_graph_product_distribution.php') {
-					if (!empty($conf->product->enabled) || !empty($conf->service->enabled)) {
-						dol_syslog("We discard deleting module ".$file." because another module still active requires it.");
-						continue;
-					}
-				}
-
-				if ($this->db->type == 'sqlite3') {
-					// sqlite doesn't support "USING" syntax.
-					// TODO: remove this dependency.
-					$sql = "DELETE FROM ".MAIN_DB_PREFIX."boxes ";
-					$sql .= "WHERE ".MAIN_DB_PREFIX."boxes.box_id IN (";
-					$sql .= "SELECT ".MAIN_DB_PREFIX."boxes_def.rowid ";
-					$sql .= "FROM ".MAIN_DB_PREFIX."boxes_def ";
-					$sql .= "WHERE ".MAIN_DB_PREFIX."boxes_def.file = '".$this->db->escape($file)."') ";
-					$sql .= "AND ".MAIN_DB_PREFIX."boxes.entity = ".$conf->entity;
-				} else {
-					$sql = "DELETE FROM ".MAIN_DB_PREFIX."boxes";
-					$sql .= " USING ".MAIN_DB_PREFIX."boxes, ".MAIN_DB_PREFIX."boxes_def";
-					$sql .= " WHERE ".MAIN_DB_PREFIX."boxes.box_id = ".MAIN_DB_PREFIX."boxes_def.rowid";
-					$sql .= " AND ".MAIN_DB_PREFIX."boxes_def.file = '".$this->db->escape($file)."'";
-					$sql .= " AND ".MAIN_DB_PREFIX."boxes.entity = ".$conf->entity;
-				}
-
-				dol_syslog(get_class($this)."::delete_boxes", LOG_DEBUG);
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					$this->error = $this->db->lasterror();
-					$err++;
-				}
-
-				$sql = "DELETE FROM ".MAIN_DB_PREFIX."boxes_def";
-				$sql .= " WHERE file = '".$this->db->escape($file)."'";
-				$sql .= " AND entity = ".$conf->entity;		// Do not use getEntity here, we want to delete only in current company
-
-				dol_syslog(get_class($this)."::delete_boxes", LOG_DEBUG);
-				$resql = $this->db->query($sql);
-				if (!$resql) {
-					$this->error = $this->db->lasterror();
-					$err++;
-				}
-			}
-		}
-
-		return $err;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes boxes
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function delete_cronjobs()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		if (is_array($this->cronjobs)) {
-			$sql = "DELETE FROM ".MAIN_DB_PREFIX."cronjob";
-			$sql .= " WHERE module_name = '".$this->db->escape(empty($this->rights_class) ?strtolower($this->name) : $this->rights_class)."'";
-			$sql .= " AND entity = ".$conf->entity;
-			$sql .= " AND test = '1'"; // We delete on lines that are not set with a complete test that is '$conf->module->enabled' so when module is disabled, the cron is also removed.
-			  // For crons declared with a '$conf->module->enabled', there is no need to delete the line, so we don't loose setup if we reenable module.
-
-			dol_syslog(get_class($this)."::delete_cronjobs", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if (!$resql) {
-				$this->error = $this->db->lasterror();
-				$err++;
-			}
-		}
-
-		return $err;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes access rights
-	 *
-	 * @return int                     Error count (0 if OK)
-	 */
-	public function delete_permissions()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."rights_def";
-		$sql .= " WHERE module = '".$this->db->escape(empty($this->rights_class) ?strtolower($this->name) : $this->rights_class)."'";
-		$sql .= " AND entity = ".$conf->entity;
-		dol_syslog(get_class($this)."::delete_permissions", LOG_DEBUG);
-		if (!$this->db->query($sql)) {
-			$this->error = $this->db->lasterror();
-			$err++;
-		}
-
-		return $err;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes menu entries
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function delete_menus()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		//$module=strtolower($this->name);        TODO When right_class will be same than module name
-		$module = empty($this->rights_class) ?strtolower($this->name) : $this->rights_class;
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."menu";
-		$sql .= " WHERE module = '".$this->db->escape($module)."'";
-		$sql .= " AND entity = ".$conf->entity;
-
-		dol_syslog(get_class($this)."::delete_menus", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$this->error = $this->db->lasterror();
-			$err++;
-		}
-
-		return $err;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Removes directories
-	 *
-	 * @return int Error count (0 if OK)
-	 */
-	public function delete_dirs()
-	{
-		// phpcs:enable
-		global $conf;
-
-		$err = 0;
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."const";
-		$sql .= " WHERE ".$this->db->decrypt('name')." LIKE '".$this->db->escape($this->const_name)."_DIR_%'";
-		$sql .= " AND entity = ".$conf->entity;
-
-		dol_syslog(get_class($this)."::delete_dirs", LOG_DEBUG);
-		if (!$this->db->query($sql)) {
-			$this->error = $this->db->lasterror();
-			$err++;
-		}
-
-		return $err;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return Kanban view of a module
-	 *
-	 * @param	string	$codeenabledisable		HTML code for button to enable/disable module
-	 * @param	string	$codetoconfig			HTML code to go to config page
-	 * @return 	string							HTML code of Kanban view
-	 */
-	public function getKanbanView($codeenabledisable = '', $codetoconfig = '')
-	{
-		global $conf, $langs;
+    /**
+     * Return Kanban view of a module
+     *
+     * @param string $codeenabledisable HTML code for button to enable/disable module
+     * @param string $codetoconfig      HTML code to go to config page
+     *
+     * @return    string                            HTML code of Kanban view
+     */
+    public function getKanbanView($codeenabledisable = '', $codetoconfig = '')
+    {
+        global $conf, $langs;
 
 		// Define imginfo
 		$imginfo = "info";
@@ -2104,133 +2350,6 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 	    </div>';
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Tells if module is core or external
-	 *
-	 * @return string  'core', 'external' or 'unknown'
-	 */
-	public function isCoreOrExternalModule()
-	{
-		if ($this->version == 'dolibarr' || $this->version == 'dolibarr_deprecated') {
-			return 'core';
-		}
-		if (!empty($this->version) && !in_array($this->version, array('experimental', 'development'))) {
-			return 'external';
-		}
-		if (!empty($this->editor_name) || !empty($this->editor_url)) {
-			return 'external';
-		}
-		if ($this->numero >= 100000) {
-			return 'external';
-		}
-		return 'unknown';
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Gives module version (translated if param $translated is on)
-	 * For 'experimental' modules, gives 'experimental' translation
-	 * For 'dolibarr' modules, gives Dolibarr version
-	 *
-	 * @param  int $translated 1=Special version keys are translated, 0=Special version keys are not translated
-	 * @return string                  Module version
-	 */
-	public function getVersion($translated = 1)
-	{
-		global $langs;
-		$langs->load("admin");
-
-		$ret = '';
-
-		$newversion = preg_replace('/_deprecated/', '', $this->version);
-		if ($newversion == 'experimental') {
-			$ret = ($translated ? $langs->transnoentitiesnoconv("VersionExperimental") : $newversion);
-		} elseif ($newversion == 'development') {
-			$ret = ($translated ? $langs->transnoentitiesnoconv("VersionDevelopment") : $newversion);
-		} elseif ($newversion == 'dolibarr') {
-			$ret = DOL_VERSION;
-		} elseif ($newversion) {
-			$ret = $newversion;
-		} else {
-			$ret = ($translated ? $langs->transnoentitiesnoconv("VersionUnknown") : 'unknown');
-		}
-
-		if (preg_match('/_deprecated/', $this->version)) {
-			$ret .= ($translated ? ' ('.$langs->transnoentitiesnoconv("Deprecated").')' : $this->version);
-		}
-		return $ret;
-	}
-
-	/**
-	 * Gives the translated module name if translation exists in admin.lang or into language files of module.
-	 * Otherwise return the module key name.
-	 *
-	 * @return string  Translated module name
-	 */
-	public function getName()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($langs->transnoentitiesnoconv("Module".$this->numero."Name") != ("Module".$this->numero."Name")) {
-			// If module name translation exists
-			return $langs->transnoentitiesnoconv("Module".$this->numero."Name");
-		} else {
-			// If module name translation using it's unique id does not exist, we try to use its name to find translation
-			if (is_array($this->langfiles)) {
-				foreach ($this->langfiles as $val) {
-					if ($val) {
-						$langs->load($val);
-					}
-				}
-			}
-
-			if ($langs->trans("Module".$this->name."Name") != ("Module".$this->name."Name")) {
-				// If module name translation exists
-				return $langs->transnoentitiesnoconv("Module".$this->name."Name");
-			}
-
-			// Last chance with simple label
-			return $langs->transnoentitiesnoconv($this->name);
-		}
-	}
-
-	/**
-	 * Gives the translated module description if translation exists in admin.lang or the default module description
-	 *
-	 * @return string  Translated module description
-	 */
-	public function getDesc()
-	{
-		global $langs;
-		$langs->load("admin");
-
-		if ($langs->transnoentitiesnoconv("Module".$this->numero."Desc") != ("Module".$this->numero."Desc")) {
-			// If module description translation exists
-			return $langs->transnoentitiesnoconv("Module".$this->numero."Desc");
-		} else {
-			// If module description translation does not exist using its unique id, we can use its name to find translation
-			if (is_array($this->langfiles)) {
-				foreach ($this->langfiles as $val) {
-					if ($val) {
-						$langs->load($val);
-					}
-				}
-			}
-
-			if ($langs->transnoentitiesnoconv("Module".$this->name."Desc") != ("Module".$this->name."Desc")) {
-				// If module name translation exists
-				return $langs->trans("Module".$this->name."Desc");
-			}
-
-			// Last chance with simple label
-			return $langs->trans($this->description);
-		}
-	}
-
 	/**
 	 * Check for module update
 	 * TODO : store results for $this->url_last_version and $this->needUpdate
@@ -2258,119 +2377,5 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 			}
 		}
 		return 0;
-	}
-
-	/**
-	 * Create tables and keys required by module.
-	 * Files module.sql and module.key.sql with create table and create keys
-	 * commands must be stored in directory reldir='/module/sql/'
-	 * This function is called by this->init
-	 *
-	 * @param  string $reldir Relative directory where to scan files
-	 * @return int             <=0 if KO, >0 if OK
-	 */
-	protected function _load_tables($reldir)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$error = 0;
-		$dirfound = 0;
-
-		if (empty($reldir)) {
-			return 1;
-		}
-
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
-
-		$ok = 1;
-		foreach ($conf->file->dol_document_root as $dirroot) {
-			if ($ok) {
-				$dir = $dirroot.$reldir;
-				$ok = 0;
-
-				$handle = @opendir($dir); // Dir may not exists
-				if (is_resource($handle)) {
-					$dirfound++;
-
-					// Run llx_mytable.sql files, then llx_mytable_*.sql
-					$files = array();
-					while (($file = readdir($handle)) !== false) {
-						$files[] = $file;
-					}
-					sort($files);
-					foreach ($files as $file) {
-						if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'llx_' && substr($file, 0, 4) != 'data') {
-							$result = run_sql($dir.$file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
-							if ($result <= 0) {
-								$error++;
-							}
-						}
-					}
-
-					rewinddir($handle);
-
-					// Run llx_mytable.key.sql files (Must be done after llx_mytable.sql) then then llx_mytable_*.key.sql
-					$files = array();
-					while (($file = readdir($handle)) !== false) {
-						$files[] = $file;
-					}
-					sort($files);
-					foreach ($files as $file) {
-						if (preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'llx_' && substr($file, 0, 4) != 'data') {
-							$result = run_sql($dir.$file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
-							if ($result <= 0) {
-								$error++;
-							}
-						}
-					}
-
-					rewinddir($handle);
-
-					// Run data_xxx.sql files (Must be done after llx_mytable.key.sql)
-					$files = array();
-					while (($file = readdir($handle)) !== false) {
-							   $files[] = $file;
-					}
-					sort($files);
-					foreach ($files as $file) {
-						if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 4) == 'data') {
-							$result = run_sql($dir.$file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
-							if ($result <= 0) {
-								$error++;
-							}
-						}
-					}
-
-					rewinddir($handle);
-
-					// Run update_xxx.sql files
-					$files = array();
-					while (($file = readdir($handle)) !== false) {
-							   $files[] = $file;
-					}
-					sort($files);
-					foreach ($files as $file) {
-						if (preg_match('/\.sql$/i', $file) && !preg_match('/\.key\.sql$/i', $file) && substr($file, 0, 6) == 'update') {
-							$result = run_sql($dir.$file, empty($conf->global->MAIN_DISPLAY_SQL_INSTALL_LOG) ? 1 : 0, '', 1);
-							if ($result <= 0) {
-								$error++;
-							}
-						}
-					}
-
-					closedir($handle);
-				}
-
-				if ($error == 0) {
-					$ok = 1;
-				}
-			}
-		}
-
-		if (!$dirfound) {
-			dol_syslog("A module ask to load sql files into ".$reldir." but this directory was not found.", LOG_WARNING);
-		}
-		return $ok;
 	}
 }

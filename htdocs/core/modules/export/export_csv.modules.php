@@ -233,53 +233,6 @@ class ExportCsv extends ModeleExports
 
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Clean a cell to respect rules of CSV file cells
-	 * Note: It uses $this->separator
-	 * Note: We keep this function public to be able to test
-	 *
-	 * @param 	string	$newvalue	String to clean
-	 * @param	string	$charset	Input AND Output character set
-	 * @return 	string				Value cleaned
-	 */
-	public function csvClean($newvalue, $charset)
-	{
-		global $conf;
-		$addquote = 0;
-
-		// Rule Dolibarr: No HTML
-		//print $charset.' '.$newvalue."\n";
-		//$newvalue=dol_string_nohtmltag($newvalue,0,$charset);
-		$newvalue = dol_htmlcleanlastbr($newvalue);
-		//print $charset.' '.$newvalue."\n";
-
-		// Rule 1 CSV: No CR, LF in cells (except if USE_STRICT_CSV_RULES is on, we can keep record as it is but we must add quotes)
-		$oldvalue = $newvalue;
-		$newvalue = str_replace("\r", '', $newvalue);
-		$newvalue = str_replace("\n", '\n', $newvalue);
-		if (!empty($conf->global->USE_STRICT_CSV_RULES) && $oldvalue != $newvalue) {
-			// If strict use of CSV rules, we just add quote
-			$newvalue = $oldvalue;
-			$addquote = 1;
-		}
-
-		// Rule 2 CSV: If value contains ", we must escape with ", and add "
-		if (preg_match('/"/', $newvalue)) {
-			$addquote = 1;
-			$newvalue = str_replace('"', '""', $newvalue);
-		}
-
-		// Rule 3 CSV: If value contains separator, we must add "
-		if (preg_match('/'.$this->separator.'/', $newvalue)) {
-			$addquote = 1;
-		}
-
-		return ($addquote ? '"' : '').$newvalue.($addquote ? '"' : '');
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *	Output record line into file
 	 *
@@ -339,7 +292,6 @@ class ExportCsv extends ModeleExports
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Output footer into file
 	 *
@@ -352,15 +304,61 @@ class ExportCsv extends ModeleExports
 		return 0;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 * 	Close file handle
-	 *
-	 * 	@return		int							<0 if KO, >0 if OK
-	 */
-	public function close_file()
-	{
-		// phpcs:enable
-		fclose($this->handle);
-		return 0;
-	}
+     *    Close file handle
+     *
+     * @return        int                            <0 if KO, >0 if OK
+     */
+    public function close_file()
+    {
+        // phpcs:enable
+        fclose($this->handle);
+        return 0;
+    }
+
+    /**
+     * Clean a cell to respect rules of CSV file cells
+     * Note: It uses $this->separator
+     * Note: We keep this function public to be able to test
+     *
+     * @param string $newvalue String to clean
+     * @param string $charset  Input AND Output character set
+     *
+     * @return    string                Value cleaned
+     */
+    public function csvClean($newvalue, $charset)
+    {
+        global $conf;
+        $addquote = 0;
+
+        // Rule Dolibarr: No HTML
+        //print $charset.' '.$newvalue."\n";
+        //$newvalue=dol_string_nohtmltag($newvalue,0,$charset);
+        $newvalue = dol_htmlcleanlastbr($newvalue);
+        //print $charset.' '.$newvalue."\n";
+
+        // Rule 1 CSV: No CR, LF in cells (except if USE_STRICT_CSV_RULES is on, we can keep record as it is but we must add quotes)
+        $oldvalue = $newvalue;
+        $newvalue = str_replace("\r", '', $newvalue);
+        $newvalue = str_replace("\n", '\n', $newvalue);
+        if (!empty($conf->global->USE_STRICT_CSV_RULES) && $oldvalue != $newvalue) {
+            // If strict use of CSV rules, we just add quote
+            $newvalue = $oldvalue;
+            $addquote = 1;
+        }
+
+        // Rule 2 CSV: If value contains ", we must escape with ", and add "
+        if (preg_match('/"/', $newvalue)) {
+            $addquote = 1;
+            $newvalue = str_replace('"', '""', $newvalue);
+        }
+
+        // Rule 3 CSV: If value contains separator, we must add "
+        if (preg_match('/' . $this->separator . '/', $newvalue)) {
+            $addquote = 1;
+        }
+
+        return ($addquote ? '"' : '') . $newvalue . ($addquote ? '"' : '');
+    }
 }

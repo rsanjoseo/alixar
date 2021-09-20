@@ -38,26 +38,55 @@ class ActionsAdherentCardDefault extends ActionsAdherentCardCommon
 	 *	@param	string	$targetmodule	Name of directory of module where canvas is stored
 	 *	@param	string	$canvas			Name of canvas
 	 *	@param	string	$card			Name of tab (sub-canvas)
-	 */
-	public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
-	{
-		$this->db               = $db;
-		$this->dirmodule = $dirmodule;
-		$this->targetmodule     = $targetmodule;
-		$this->canvas           = $canvas;
-		$this->card             = $card;
-	}
+     */
+    public function __construct($db, $dirmodule, $targetmodule, $canvas, $card)
+    {
+        $this->db = $db;
+        $this->dirmodule = $dirmodule;
+        $this->targetmodule = $targetmodule;
+        $this->canvas = $canvas;
+        $this->card = $card;
+    }
 
-	/**
-	 *  Assign custom values for canvas
-	 *
-	 *  @param	string		$action    	Type of action
-	 *  @param	int			$id				Id
-	 *  @return	void
-	 */
-	public function assign_values(&$action, $id)
-	{
-		// phpcs:enable
+    /**
+     *    Return the title of card
+     *
+     * @param string $action Action code
+     *
+     * @return    string                Title
+     */
+    private function getTitle($action)
+    {
+        global $langs, $conf;
+
+        $out = '';
+
+        if ($action == 'view') {
+            $out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("Adherent") : $langs->trans("ContactAddress"));
+        }
+        if ($action == 'edit') {
+            $out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("EditAdherent") : $langs->trans("EditAdherentAddress"));
+        }
+        if ($action == 'create') {
+            $out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("NewAdherent") : $langs->trans("NewAdherentAddress"));
+        }
+
+        return $out;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Assign custom values for canvas
+     *
+     * @param string $action Type of action
+     * @param int    $id     Id
+     *
+     * @return    void
+     */
+    public function assign_values(&$action, $id)
+    {
+        // phpcs:enable
 		global $limit, $offset, $sortfield, $sortorder;
 		global $conf, $db, $langs, $user;
 		global $form;
@@ -96,36 +125,8 @@ class ActionsAdherentCardDefault extends ActionsAdherentCardCommon
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * 	Return the title of card
-	 *
-	 * 	@param	string	$action		Action code
-	 * 	@return	string				Title
-	 */
-	private function getTitle($action)
-	{
-		global $langs, $conf;
-
-		$out = '';
-
-		if ($action == 'view') {
-			$out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("Adherent") : $langs->trans("ContactAddress"));
-		}
-		if ($action == 'edit') {
-			$out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("EditAdherent") : $langs->trans("EditAdherentAddress"));
-		}
-		if ($action == 'create') {
-			$out .= (!empty($conf->global->ADHERENT_ADDRESSES_MANAGEMENT) ? $langs->trans("NewAdherent") : $langs->trans("NewAdherentAddress"));
-		}
-
-		return $out;
-	}
-
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * 	Fetch datas list and save into ->list_datas
 	 *

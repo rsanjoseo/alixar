@@ -36,164 +36,198 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/ticket.lib.php';
 class Ticket extends CommonObject
 {
 	/**
-	 * Status
-	 */
-	const STATUS_NOT_READ = 0;
-	const STATUS_READ = 1;
-	const STATUS_ASSIGNED = 2;
-	const STATUS_IN_PROGRESS = 3;
-	const STATUS_NEED_MORE_INFO = 5;
-const STATUS_WAITING = 7;
-const STATUS_CLOSED = 8;
-const STATUS_CANCELED = 9;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'ticket';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'ticket';
+
 	/**
 	 * @var string Name of field for link to tickets
 	 */
 	public $fk_element = 'fk_ticket';
+
 	/**
 	 * @var int  Does ticketcore support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 1;
+
 	/**
 	 * @var int  Does ticketcore support extrafields ? 0=No, 1=Yes
 	 */
 	public $isextrafieldmanaged = 1;
+
 	/**
 	 * @var string String with name of icon for ticketcore. Must be the part after the 'object_' into object_ticketcore.png
 	 */
 	public $picto = 'ticket';
-	/**
+
+    /**
 	 * @var string Hash to identify ticket publically
 	 */
 	public $track_id;
+
 	/**
 	 * @var int Thirdparty ID
 	 */
 	public $fk_soc;
+
 	/**
 	 * @var int Project ID
 	 */
 	public $fk_project;
+
 	/**
 	 * @var string Person email who have create ticket
 	 */
 	public $origin_email;
+
 	/**
 	 * @var int User id who have create ticket
 	 */
 	public $fk_user_create;
+
 	/**
 	 * @var int User id who have ticket assigned
 	 */
 	public $fk_user_assign;
+
 	/**
 	 * var string Ticket subject
 	 */
 	public $subject;
+
 	/**
 	 * @var string Ticket message
 	 */
 	public $message;
-	/**
+
+    /**
 	 * @var int  Ticket statut
 	 * @deprecated
 	 */
 	public $fk_statut;
-	/**
+
+    /**
 	 * @var int  Ticket status
 	 */
 	public $status;
-	/**
+
+    /**
 	 * @var string State resolution
 	 */
 	public $resolution;
-	/**
+
+    /**
 	 * @var int Progress in percent
 	 */
 	public $progress;
-	/**
+
+    /**
 	 * @var string Duration for ticket
 	 */
 	public $timing;
-	/**
+
+    /**
 	 * @var string Type code
 	 */
 	public $type_code;
-	/**
+
+    /**
 	 * @var string Category code
 	 */
 	public $category_code;
-	/**
+
+    /**
 	 * @var string Severity code
 	 */
 	public $severity_code;
-	/**
+
+    /**
 	 * Type label
 	 */
 	public $type_label;
-	/**
+
+    /**
 	 * Category label
 	 */
 	public $category_label;
-	/**
+
+    /**
 	 * Severity label
 	 */
 	public $severity_label;
-	/**
+
+    /**
 	 * Email from user
 	 */
 	public $email_from;
-	/**
+
+    /**
 	 * @var int Creation date
 	 */
 	public $datec = '';
-	/**
+
+    /**
 	 * @var int Read date
 	 */
 	public $date_read = '';
-	/**
+
+    /**
 	 * @var int Close ticket date
 	 */
 	public $date_close = '';
-	/**
+
+    /**
 	 * @var array cache_types_tickets
 	 */
 	public $cache_types_tickets;
-	/**
-	 * @var array tickets categories
-	 */
-	public $cache_category_tickets;
-	/**
-	 * @var int Notify thirdparty at create
-	 */
-	public $notify_tiers_at_create;
-		/**
-	 * @var string msgid
-	 */
-	public $email_msgid;			// on hold
-		public $lines;			// Closed - Solved
-		/**
-	 * @var string Regex pour les images
-	 */
-	public $regeximgext = '\.jpg|\.jpeg|\.bmp|\.gif|\.png|\.tiff';			// Closed - Not solved
 
+    /**
+     * @var array tickets categories
+     */
+    public $cache_category_tickets;
 
-	/**
-	 *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'picto' is code of a picto to show before value in forms
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+    /**
+     * @var int Notify thirdparty at create
+     */
+    public $notify_tiers_at_create;
+
+    /**
+     * @var string msgid
+     */
+    public $email_msgid;
+
+    public $lines;
+
+    /**
+     * @var string Regex pour les images
+     */
+    public $regeximgext = '\.jpg|\.jpeg|\.bmp|\.gif|\.png|\.tiff';
+
+    /**
+     * Status
+     */
+    const STATUS_NOT_READ = 0;
+    const STATUS_READ = 1;
+    const STATUS_ASSIGNED = 2;
+    const STATUS_IN_PROGRESS = 3;
+    const STATUS_NEED_MORE_INFO = 5;
+    const STATUS_WAITING = 7;            // on hold
+    const STATUS_CLOSED = 8;            // Closed - Solved
+    const STATUS_CANCELED = 9;            // Closed - Not solved
+
+    /**
+     *  'type' field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'sellist:TableName:LabelFieldName[:KeyFieldName[:KeyFieldParent[:Filter]]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'text:none', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'picto' is code of a picto to show before value in forms
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
 	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
 	 *  'noteditable' says if field is not editable (1 or 0)
 	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
@@ -265,33 +299,353 @@ const STATUS_CANCELED = 9;
 			self::STATUS_CANCELED => 'Canceled'
 		);
 		$this->statuts = array(
-			self::STATUS_NOT_READ => 'Unread',
-			self::STATUS_READ => 'Read',
-			self::STATUS_ASSIGNED => 'Assigned',
-			self::STATUS_IN_PROGRESS => 'InProgress',
-			self::STATUS_WAITING => 'OnHold',
-			self::STATUS_NEED_MORE_INFO => 'NeedMoreInformation',
-			self::STATUS_CLOSED => 'SolvedClosed',
-			self::STATUS_CANCELED => 'Canceled'
-		);
-	}
+            self::STATUS_NOT_READ => 'Unread',
+            self::STATUS_READ => 'Read',
+            self::STATUS_ASSIGNED => 'Assigned',
+            self::STATUS_IN_PROGRESS => 'InProgress',
+            self::STATUS_WAITING => 'OnHold',
+            self::STATUS_NEED_MORE_INFO => 'NeedMoreInformation',
+            self::STATUS_CLOSED => 'SolvedClosed',
+            self::STATUS_CANCELED => 'Canceled',
+        );
+    }
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param DoliDB 	$db 			Database handler
-	 * @param int 		$origin_id 		Old thirdparty id
-	 * @param int 		$dest_id 		New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty($db, $origin_id, $dest_id)
-	{
-		$tables = array('ticket');
+    /**
+     *    Check properties of ticket are ok (like ref, track_id, ...).
+     *    All properties must be already loaded on object (this->ref, this->track_id, ...).
+     *
+     * @return int        0 if OK, <0 if KO
+     */
+    private function verify()
+    {
+        $this->errors = [];
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
+        $result = 0;
 
-	/**
+        // Clean parameters
+        if (isset($this->ref)) {
+            $this->ref = trim($this->ref);
+        }
+
+        if (isset($this->track_id)) {
+            $this->track_id = trim($this->track_id);
+        }
+
+        if (isset($this->fk_soc)) {
+            $this->fk_soc = (int) $this->fk_soc;
+        }
+
+        if (isset($this->fk_project)) {
+            $this->fk_project = (int) $this->fk_project;
+        }
+
+        if (isset($this->origin_email)) {
+            $this->origin_email = trim($this->origin_email);
+        }
+
+        if (isset($this->fk_user_create)) {
+            $this->fk_user_create = (int) $this->fk_user_create;
+        }
+
+        if (isset($this->fk_user_assign)) {
+            $this->fk_user_assign = (int) $this->fk_user_assign;
+        }
+
+        if (isset($this->subject)) {
+            $this->subject = trim($this->subject);
+        }
+
+        if (isset($this->message)) {
+            $this->message = trim($this->message);
+        }
+
+        if (isset($this->fk_statut)) {
+            $this->fk_statut = (int) $this->fk_statut;
+        }
+
+        if (isset($this->resolution)) {
+            $this->resolution = trim($this->resolution);
+        }
+
+        if (isset($this->progress)) {
+            $this->progress = trim($this->progress);
+        }
+
+        if (isset($this->timing)) {
+            $this->timing = trim($this->timing);
+        }
+
+        if (isset($this->type_code)) {
+            $this->type_code = trim($this->type_code);
+        }
+
+        if (isset($this->category_code)) {
+            $this->category_code = trim($this->category_code);
+        }
+
+        if (isset($this->severity_code)) {
+            $this->severity_code = trim($this->severity_code);
+        }
+
+        if (empty($this->ref)) {
+            $this->errors[] = 'ErrorTicketRefRequired';
+            dol_syslog(get_class($this) . "::create error -1 ref null", LOG_ERR);
+            $result = -1;
+        }
+
+        return $result;
+    }
+
+    /**
+     *  Create object into database
+     *
+     * @param User $user      User that creates
+     * @param int  $notrigger 0=launch triggers after, 1=disable triggers
+     *
+     * @return int                      <0 if KO, Id of created object if OK
+     */
+    public function create($user, $notrigger = 0)
+    {
+        global $conf, $langs;
+        $error = 0;
+
+        // Clean parameters
+        $this->datec = dol_now();
+        if (empty($this->track_id)) {
+            $this->track_id = generate_random_id(16);
+        }
+
+        // Check more parameters
+        // If error, this->errors[] is filled
+        $result = $this->verify();
+
+        if ($result >= 0) {
+            // Insert request
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "ticket(";
+            $sql .= "ref,";
+            $sql .= "track_id,";
+            $sql .= "fk_soc,";
+            $sql .= "fk_project,";
+            $sql .= "origin_email,";
+            $sql .= "fk_user_create,";
+            $sql .= "fk_user_assign,";
+            $sql .= "email_msgid,";
+            $sql .= "subject,";
+            $sql .= "message,";
+            $sql .= "fk_statut,";
+            $sql .= "resolution,";
+            $sql .= "progress,";
+            $sql .= "timing,";
+            $sql .= "type_code,";
+            $sql .= "category_code,";
+            $sql .= "severity_code,";
+            $sql .= "datec,";
+            $sql .= "date_read,";
+            $sql .= "date_close,";
+            $sql .= "entity,";
+            $sql .= "notify_tiers_at_create";
+            $sql .= ") VALUES (";
+            $sql .= " " . (!isset($this->ref) ? '' : "'" . $this->db->escape($this->ref) . "'") . ",";
+            $sql .= " " . (!isset($this->track_id) ? 'NULL' : "'" . $this->db->escape($this->track_id) . "'") . ",";
+            $sql .= " " . ($this->fk_soc > 0 ? $this->db->escape($this->fk_soc) : "null") . ",";
+            $sql .= " " . ($this->fk_project > 0 ? $this->db->escape($this->fk_project) : "null") . ",";
+            $sql .= " " . (!isset($this->origin_email) ? 'NULL' : "'" . $this->db->escape($this->origin_email) . "'") . ",";
+            $sql .= " " . ($this->fk_user_create > 0 ? $this->fk_user_create : ($user->id > 0 ? $user->id : 'NULL')) . ",";
+            $sql .= " " . ($this->fk_user_assign > 0 ? $this->fk_user_assign : 'NULL') . ",";
+            $sql .= " " . (empty($this->email_msgid) ? 'NULL' : "'" . $this->db->escape($this->email_msgid) . "'") . ",";
+            $sql .= " " . (!isset($this->subject) ? 'NULL' : "'" . $this->db->escape($this->subject) . "'") . ",";
+            $sql .= " " . (!isset($this->message) ? 'NULL' : "'" . $this->db->escape($this->message) . "'") . ",";
+            $sql .= " " . (!isset($this->fk_statut) ? '0' : "'" . $this->db->escape($this->fk_statut) . "'") . ",";
+            $sql .= " " . (!isset($this->resolution) ? 'NULL' : "'" . $this->db->escape($this->resolution) . "'") . ",";
+            $sql .= " " . (!isset($this->progress) ? '0' : "'" . $this->db->escape($this->progress) . "'") . ",";
+            $sql .= " " . (!isset($this->timing) ? 'NULL' : "'" . $this->db->escape($this->timing) . "'") . ",";
+            $sql .= " " . (!isset($this->type_code) ? 'NULL' : "'" . $this->db->escape($this->type_code) . "'") . ",";
+            $sql .= " " . (empty($this->category_code) || $this->category_code == '-1' ? 'NULL' : "'" . $this->db->escape($this->category_code) . "'") . ",";
+            $sql .= " " . (!isset($this->severity_code) ? 'NULL' : "'" . $this->db->escape($this->severity_code) . "'") . ",";
+            $sql .= " " . (!isset($this->datec) || dol_strlen($this->datec) == 0 ? 'NULL' : "'" . $this->db->idate($this->datec) . "'") . ",";
+            $sql .= " " . (!isset($this->date_read) || dol_strlen($this->date_read) == 0 ? 'NULL' : "'" . $this->db->idate($this->date_read) . "'") . ",";
+            $sql .= " " . (!isset($this->date_close) || dol_strlen($this->date_close) == 0 ? 'NULL' : "'" . $this->db->idate($this->date_close) . "'") . "";
+            $sql .= ", " . ((int) $conf->entity);
+            $sql .= ", " . (!isset($this->notify_tiers_at_create) ? '1' : "'" . $this->db->escape($this->notify_tiers_at_create) . "'");
+            $sql .= ")";
+
+            $this->db->begin();
+
+            dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+            $resql = $this->db->query($sql);
+            if (!$resql) {
+                $error++;
+                $this->errors[] = "Error " . $this->db->lasterror();
+            }
+
+            if (!$error) {
+                $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "ticket");
+
+                if (!$notrigger) {
+                    // Call trigger
+                    $result = $this->call_trigger('TICKET_CREATE', $user);
+                    if ($result < 0) {
+                        $error++;
+                    }
+                    // End call triggers
+                }
+            }
+
+            //Update extrafield
+            if (!$error) {
+                $result = $this->insertExtraFields();
+                if ($result < 0) {
+                    $error++;
+                }
+            }
+
+            // Commit or rollback
+            if ($error) {
+                foreach ($this->errors as $errmsg) {
+                    dol_syslog(get_class($this) . "::create " . $errmsg, LOG_ERR);
+                    $this->error .= ($this->error ? ', ' . $errmsg : $errmsg);
+                }
+                $this->db->rollback();
+                return -1 * $error;
+            } else {
+                $this->db->commit();
+                return $this->id;
+            }
+        } else {
+            $this->db->rollback();
+            dol_syslog(get_class($this) . "::Create fails verify " . join(',', $this->errors), LOG_WARNING);
+            return -3;
+        }
+    }
+
+    /**
+     *  Load object in memory from the database
+     *
+     * @param int    $id          Id object
+     * @param string $ref         Ref
+     * @param string $track_id    Track id, a hash like ref
+     * @param string $email_msgid Email msgid
+     *
+     * @return int                        <0 if KO, >0 if OK
+     */
+    public function fetch($id = '', $ref = '', $track_id = '', $email_msgid = '')
+    {
+        global $langs;
+
+        // Check parameters
+        if (empty($id) && empty($ref) && empty($track_id) && empty($email_msgid)) {
+            $this->error = 'ErrorWrongParameters';
+            dol_print_error(get_class($this) . "::fetch " . $this->error);
+            return -1;
+        }
+
+        $sql = "SELECT";
+        $sql .= " t.rowid,";
+        $sql .= " t.entity,";
+        $sql .= " t.ref,";
+        $sql .= " t.track_id,";
+        $sql .= " t.fk_soc,";
+        $sql .= " t.fk_project,";
+        $sql .= " t.origin_email,";
+        $sql .= " t.fk_user_create,";
+        $sql .= " t.fk_user_assign,";
+        $sql .= " t.email_msgid,";
+        $sql .= " t.subject,";
+        $sql .= " t.message,";
+        $sql .= " t.fk_statut as status,";
+        $sql .= " t.resolution,";
+        $sql .= " t.progress,";
+        $sql .= " t.timing,";
+        $sql .= " t.type_code,";
+        $sql .= " t.category_code,";
+        $sql .= " t.severity_code,";
+        $sql .= " t.datec,";
+        $sql .= " t.date_read,";
+        $sql .= " t.date_close,";
+        $sql .= " t.tms";
+        $sql .= ", type.code as type_code, type.label as type_label, category.code as category_code, category.label as category_label, severity.code as severity_code, severity.label as severity_label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "ticket as t";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_ticket_type as type ON type.code=t.type_code";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_ticket_category as category ON category.code=t.category_code";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "c_ticket_severity as severity ON severity.code=t.severity_code";
+
+        if ($id) {
+            $sql .= " WHERE t.rowid = " . ((int) $id);
+        } else {
+            $sql .= " WHERE t.entity IN (" . getEntity($this->element, 1) . ")";
+            if (!empty($ref)) {
+                $sql .= " AND t.ref = '" . $this->db->escape($ref) . "'";
+            } elseif ($track_id) {
+                $sql .= " AND t.track_id = '" . $this->db->escape($track_id) . "'";
+            } else {
+                $sql .= " AND t.email_msgid = '" . $this->db->escape($email_msgid) . "'";
+            }
+        }
+
+        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            if ($this->db->num_rows($resql)) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->ref = $obj->ref;
+                $this->track_id = $obj->track_id;
+                $this->fk_soc = $obj->fk_soc;
+                $this->socid = $obj->fk_soc; // for fetch_thirdparty() method
+                $this->fk_project = $obj->fk_project;
+                $this->origin_email = $obj->origin_email;
+                $this->fk_user_create = $obj->fk_user_create;
+                $this->fk_user_assign = $obj->fk_user_assign;
+                $this->email_msgid = $obj->email_msgid;
+                $this->subject = $obj->subject;
+                $this->message = $obj->message;
+
+                $this->status = $obj->status;
+                $this->fk_statut = $this->status; // For backward compatibility
+
+                $this->resolution = $obj->resolution;
+                $this->progress = $obj->progress;
+                $this->timing = $obj->timing;
+
+                $this->type_code = $obj->type_code;
+                // Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+                $label_type = ($langs->trans("TicketTypeShort" . $obj->type_code) != ("TicketTypeShort" . $obj->type_code) ? $langs->trans("TicketTypeShort" . $obj->type_code) : ($obj->type_label != '-' ? $obj->type_label : ''));
+                $this->type_label = $label_type;
+
+                $this->category_code = $obj->category_code;
+                // Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+                $label_category = ($langs->trans("TicketCategoryShort" . $obj->category_code) != ("TicketCategoryShort" . $obj->category_code) ? $langs->trans("TicketCategoryShort" . $obj->category_code) : ($obj->category_label != '-' ? $obj->category_label : ''));
+                $this->category_label = $label_category;
+
+                $this->severity_code = $obj->severity_code;
+                // Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+                $label_severity = ($langs->trans("TicketSeverityShort" . $obj->severity_code) != ("TicketSeverityShort" . $obj->severity_code) ? $langs->trans("TicketSeverityShort" . $obj->severity_code) : ($obj->severity_label != '-' ? $obj->severity_label : ''));
+                $this->severity_label = $label_severity;
+
+                $this->datec = $this->db->jdate($obj->datec);
+                $this->date_creation = $this->db->jdate($obj->datec);
+                $this->date_read = $this->db->jdate($obj->date_read);
+                $this->date_validation = $this->db->jdate($obj->date_read);
+                $this->date_close = $this->db->jdate($obj->date_close);
+                $this->tms = $this->db->jdate($obj->tms);
+                $this->date_modification = $this->db->jdate($obj->tms);
+
+                $this->fetch_optionals();
+
+                $this->db->free($resql);
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->error = "Error " . $this->db->lasterror();
+            dol_syslog(get_class($this) . "::fetch " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
+
+    /**
 	 * Load all objects in memory from database
 	 *
 	 * @param  User   $user      User for action
@@ -728,339 +1082,6 @@ const STATUS_CANCELED = 9;
 	}
 
 	/**
-	 *  Load object in memory from the database
-	 *
-	 *  @param  int        	$id    			Id object
-	 *  @param	string		$ref			Ref
-	 *  @param	string		$track_id		Track id, a hash like ref
-	 *  @param	string		$email_msgid	Email msgid
-	 *  @return int              			<0 if KO, >0 if OK
-	 */
-	public function fetch($id = '', $ref = '', $track_id = '', $email_msgid = '')
-	{
-		global $langs;
-
-		// Check parameters
-		if (empty($id) && empty($ref) && empty($track_id) && empty($email_msgid)) {
-			$this->error = 'ErrorWrongParameters';
-			dol_print_error(get_class($this)."::fetch ".$this->error);
-			return -1;
-		}
-
-		$sql = "SELECT";
-		$sql .= " t.rowid,";
-		$sql .= " t.entity,";
-		$sql .= " t.ref,";
-		$sql .= " t.track_id,";
-		$sql .= " t.fk_soc,";
-		$sql .= " t.fk_project,";
-		$sql .= " t.origin_email,";
-		$sql .= " t.fk_user_create,";
-		$sql .= " t.fk_user_assign,";
-		$sql .= " t.email_msgid,";
-		$sql .= " t.subject,";
-		$sql .= " t.message,";
-		$sql .= " t.fk_statut as status,";
-		$sql .= " t.resolution,";
-		$sql .= " t.progress,";
-		$sql .= " t.timing,";
-		$sql .= " t.type_code,";
-		$sql .= " t.category_code,";
-		$sql .= " t.severity_code,";
-		$sql .= " t.datec,";
-		$sql .= " t.date_read,";
-		$sql .= " t.date_close,";
-		$sql .= " t.tms";
-		$sql .= ", type.code as type_code, type.label as type_label, category.code as category_code, category.label as category_label, severity.code as severity_code, severity.label as severity_label";
-		$sql .= " FROM ".MAIN_DB_PREFIX."ticket as t";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_ticket_type as type ON type.code=t.type_code";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_ticket_category as category ON category.code=t.category_code";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."c_ticket_severity as severity ON severity.code=t.severity_code";
-
-		if ($id) {
-			$sql .= " WHERE t.rowid = ".((int) $id);
-		} else {
-			$sql .= " WHERE t.entity IN (".getEntity($this->element, 1).")";
-			if (!empty($ref)) {
-				$sql .= " AND t.ref = '".$this->db->escape($ref)."'";
-			} elseif ($track_id) {
-				$sql .= " AND t.track_id = '".$this->db->escape($track_id)."'";
-			} else {
-				$sql .= " AND t.email_msgid = '".$this->db->escape($email_msgid)."'";
-			}
-		}
-
-		dol_syslog(get_class($this)."::fetch", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			if ($this->db->num_rows($resql)) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->ref = $obj->ref;
-				$this->track_id = $obj->track_id;
-				$this->fk_soc = $obj->fk_soc;
-				$this->socid = $obj->fk_soc; // for fetch_thirdparty() method
-				$this->fk_project = $obj->fk_project;
-				$this->origin_email = $obj->origin_email;
-				$this->fk_user_create = $obj->fk_user_create;
-				$this->fk_user_assign = $obj->fk_user_assign;
-				$this->email_msgid = $obj->email_msgid;
-				$this->subject = $obj->subject;
-				$this->message = $obj->message;
-
-				$this->status = $obj->status;
-				$this->fk_statut = $this->status; // For backward compatibility
-
-				$this->resolution = $obj->resolution;
-				$this->progress = $obj->progress;
-				$this->timing = $obj->timing;
-
-				$this->type_code = $obj->type_code;
-				// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-				$label_type = ($langs->trans("TicketTypeShort".$obj->type_code) != ("TicketTypeShort".$obj->type_code) ? $langs->trans("TicketTypeShort".$obj->type_code) : ($obj->type_label != '-' ? $obj->type_label : ''));
-				$this->type_label = $label_type;
-
-				$this->category_code = $obj->category_code;
-				// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-				$label_category = ($langs->trans("TicketCategoryShort".$obj->category_code) != ("TicketCategoryShort".$obj->category_code) ? $langs->trans("TicketCategoryShort".$obj->category_code) : ($obj->category_label != '-' ? $obj->category_label : ''));
-				$this->category_label = $label_category;
-
-				$this->severity_code = $obj->severity_code;
-				// Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-				$label_severity = ($langs->trans("TicketSeverityShort".$obj->severity_code) != ("TicketSeverityShort".$obj->severity_code) ? $langs->trans("TicketSeverityShort".$obj->severity_code) : ($obj->severity_label != '-' ? $obj->severity_label : ''));
-				$this->severity_label = $label_severity;
-
-				$this->datec = $this->db->jdate($obj->datec);
-				$this->date_creation = $this->db->jdate($obj->datec);
-				$this->date_read = $this->db->jdate($obj->date_read);
-				$this->date_validation = $this->db->jdate($obj->date_read);
-				$this->date_close = $this->db->jdate($obj->date_close);
-				$this->tms = $this->db->jdate($obj->tms);
-				$this->date_modification = $this->db->jdate($obj->tms);
-
-				$this->fetch_optionals();
-
-				$this->db->free($resql);
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->error = "Error ".$this->db->lasterror();
-			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
-
-	/**
-	 *  Create object into database
-	 *
-	 *  @param  User $user      User that creates
-	 *  @param  int  $notrigger 0=launch triggers after, 1=disable triggers
-	 *  @return int                      <0 if KO, Id of created object if OK
-	 */
-	public function create($user, $notrigger = 0)
-	{
-		global $conf, $langs;
-		$error = 0;
-
-		// Clean parameters
-		$this->datec = dol_now();
-		if (empty($this->track_id)) {
-			$this->track_id = generate_random_id(16);
-		}
-
-		// Check more parameters
-		// If error, this->errors[] is filled
-		$result = $this->verify();
-
-		if ($result >= 0) {
-			// Insert request
-			$sql = "INSERT INTO ".MAIN_DB_PREFIX."ticket(";
-			$sql .= "ref,";
-			$sql .= "track_id,";
-			$sql .= "fk_soc,";
-			$sql .= "fk_project,";
-			$sql .= "origin_email,";
-			$sql .= "fk_user_create,";
-			$sql .= "fk_user_assign,";
-			$sql .= "email_msgid,";
-			$sql .= "subject,";
-			$sql .= "message,";
-			$sql .= "fk_statut,";
-			$sql .= "resolution,";
-			$sql .= "progress,";
-			$sql .= "timing,";
-			$sql .= "type_code,";
-			$sql .= "category_code,";
-			$sql .= "severity_code,";
-			$sql .= "datec,";
-			$sql .= "date_read,";
-			$sql .= "date_close,";
-			$sql .= "entity,";
-			$sql .= "notify_tiers_at_create";
-			$sql .= ") VALUES (";
-			$sql .= " ".(!isset($this->ref) ? '' : "'".$this->db->escape($this->ref)."'").",";
-			$sql .= " ".(!isset($this->track_id) ? 'NULL' : "'".$this->db->escape($this->track_id)."'").",";
-			$sql .= " ".($this->fk_soc > 0 ? $this->db->escape($this->fk_soc) : "null").",";
-			$sql .= " ".($this->fk_project > 0 ? $this->db->escape($this->fk_project) : "null").",";
-			$sql .= " ".(!isset($this->origin_email) ? 'NULL' : "'".$this->db->escape($this->origin_email)."'").",";
-			$sql .= " ".($this->fk_user_create > 0 ? $this->fk_user_create : ($user->id > 0 ? $user->id : 'NULL')).",";
-			$sql .= " ".($this->fk_user_assign > 0 ? $this->fk_user_assign : 'NULL').",";
-			$sql .= " ".(empty($this->email_msgid) ? 'NULL' : "'".$this->db->escape($this->email_msgid)."'").",";
-			$sql .= " ".(!isset($this->subject) ? 'NULL' : "'".$this->db->escape($this->subject)."'").",";
-			$sql .= " ".(!isset($this->message) ? 'NULL' : "'".$this->db->escape($this->message)."'").",";
-			$sql .= " ".(!isset($this->fk_statut) ? '0' : "'".$this->db->escape($this->fk_statut)."'").",";
-			$sql .= " ".(!isset($this->resolution) ? 'NULL' : "'".$this->db->escape($this->resolution)."'").",";
-			$sql .= " ".(!isset($this->progress) ? '0' : "'".$this->db->escape($this->progress)."'").",";
-			$sql .= " ".(!isset($this->timing) ? 'NULL' : "'".$this->db->escape($this->timing)."'").",";
-			$sql .= " ".(!isset($this->type_code) ? 'NULL' : "'".$this->db->escape($this->type_code)."'").",";
-			$sql .= " ".(empty($this->category_code) || $this->category_code == '-1' ? 'NULL' : "'".$this->db->escape($this->category_code)."'").",";
-			$sql .= " ".(!isset($this->severity_code) ? 'NULL' : "'".$this->db->escape($this->severity_code)."'").",";
-			$sql .= " ".(!isset($this->datec) || dol_strlen($this->datec) == 0 ? 'NULL' : "'".$this->db->idate($this->datec)."'").",";
-			$sql .= " ".(!isset($this->date_read) || dol_strlen($this->date_read) == 0 ? 'NULL' : "'".$this->db->idate($this->date_read)."'").",";
-			$sql .= " ".(!isset($this->date_close) || dol_strlen($this->date_close) == 0 ? 'NULL' : "'".$this->db->idate($this->date_close)."'")."";
-			$sql .= ", ".((int) $conf->entity);
-			$sql .= ", ".(!isset($this->notify_tiers_at_create) ? '1' : "'".$this->db->escape($this->notify_tiers_at_create)."'");
-			$sql .= ")";
-
-			$this->db->begin();
-
-			dol_syslog(get_class($this)."::create", LOG_DEBUG);
-			$resql = $this->db->query($sql);
-			if (!$resql) {
-				$error++;
-				$this->errors[] = "Error ".$this->db->lasterror();
-			}
-
-			if (!$error) {
-				$this->id = $this->db->last_insert_id(MAIN_DB_PREFIX."ticket");
-
-				if (!$notrigger) {
-					// Call trigger
-					$result = $this->call_trigger('TICKET_CREATE', $user);
-					if ($result < 0) {
-						$error++;
-					}
-					// End call triggers
-				}
-			}
-
-			//Update extrafield
-			if (!$error) {
-				$result = $this->insertExtraFields();
-				if ($result < 0) {
-					$error++;
-				}
-			}
-
-			// Commit or rollback
-			if ($error) {
-				foreach ($this->errors as $errmsg) {
-					dol_syslog(get_class($this)."::create ".$errmsg, LOG_ERR);
-					$this->error .= ($this->error ? ', '.$errmsg : $errmsg);
-				}
-				$this->db->rollback();
-				return -1 * $error;
-			} else {
-				$this->db->commit();
-				return $this->id;
-			}
-		} else {
-			$this->db->rollback();
-			dol_syslog(get_class($this)."::Create fails verify ".join(',', $this->errors), LOG_WARNING);
-			return -3;
-		}
-	}
-
-	/**
-	 *    Check properties of ticket are ok (like ref, track_id, ...).
-	 *    All properties must be already loaded on object (this->ref, this->track_id, ...).
-	 *
-	 *    @return int        0 if OK, <0 if KO
-	 */
-	private function verify()
-	{
-		$this->errors = array();
-
-		$result = 0;
-
-		// Clean parameters
-		if (isset($this->ref)) {
-			$this->ref = trim($this->ref);
-		}
-
-		if (isset($this->track_id)) {
-			$this->track_id = trim($this->track_id);
-		}
-
-		if (isset($this->fk_soc)) {
-			$this->fk_soc = (int) $this->fk_soc;
-		}
-
-		if (isset($this->fk_project)) {
-			$this->fk_project = (int) $this->fk_project;
-		}
-
-		if (isset($this->origin_email)) {
-			$this->origin_email = trim($this->origin_email);
-		}
-
-		if (isset($this->fk_user_create)) {
-			$this->fk_user_create = (int) $this->fk_user_create;
-		}
-
-		if (isset($this->fk_user_assign)) {
-			$this->fk_user_assign = (int) $this->fk_user_assign;
-		}
-
-		if (isset($this->subject)) {
-			$this->subject = trim($this->subject);
-		}
-
-		if (isset($this->message)) {
-			$this->message = trim($this->message);
-		}
-
-		if (isset($this->fk_statut)) {
-			$this->fk_statut = (int) $this->fk_statut;
-		}
-
-		if (isset($this->resolution)) {
-			$this->resolution = trim($this->resolution);
-		}
-
-		if (isset($this->progress)) {
-			$this->progress = trim($this->progress);
-		}
-
-		if (isset($this->timing)) {
-			$this->timing = trim($this->timing);
-		}
-
-		if (isset($this->type_code)) {
-			$this->type_code = trim($this->type_code);
-		}
-
-		if (isset($this->category_code)) {
-			$this->category_code = trim($this->category_code);
-		}
-
-		if (isset($this->severity_code)) {
-			$this->severity_code = trim($this->severity_code);
-		}
-
-		if (empty($this->ref)) {
-			$this->errors[] = 'ErrorTicketRefRequired';
-			dol_syslog(get_class($this)."::create error -1 ref null", LOG_ERR);
-			$result = -1;
-		}
-
-		return $result;
-	}
-
-	/**
 	 *     Initialise object with example values
 	 *     Id must be 0 if object instance is a specimen
 	 *
@@ -1101,7 +1122,8 @@ const STATUS_CANCELED = 9;
 	public function printSelectStatus($selected = "")
 	{
 		print Form::selectarray('search_fk_statut', $this->statuts_short, $selected, $show_empty = 1, $key_in_label = 0, $value_as_key = 0, $option = '', $translate = 1, $maxlen = 0, $disabled = 0, $sort = '', $morecss = '');
-	}
+    }
+
 
 	/**
 	 * Load into a cache the types of tickets (setup done into dictionaries)
@@ -1222,27 +1244,87 @@ const STATUS_CANCELED = 9;
 				$this->cache_severity_tickets[$obj->rowid]['label'] = $label;
 				$this->cache_severity_tickets[$obj->rowid]['use_default'] = $obj->use_default;
 				$this->cache_severity_tickets[$obj->rowid]['pos'] = $obj->pos;
-				$i++;
-			}
-			return $num;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+                $i++;
+            }
+            return $num;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     * Return status label of object
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     *
+     * @return     string                Label
+     */
+    public function getLibStatut($mode = 0)
+    {
+        return $this->libStatut($this->fk_statut, $mode);
+    }
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Return a link to the object card (with optionaly the picto)
-	 *
-	 *	@param	int		$withpicto					Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
-	 *	@param	string	$option						On what the link point to ('nolink', ...)
-	 *  @param	int  	$notooltip					1=Disable tooltip
-	 *  @param  string  $morecss            		Add more css on link
-	 *  @param  int     $save_lastsearch_value    	-1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 *	@return	string								String with URL
+    /**
+     *    Return status label of object
+     *
+     * @param string $status    Id status
+     * @param int    $mode      0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
+     * @param int    $notooltip 1=No tooltip
+     *
+     * @return     string                 Label
+     */
+    public function LibStatut($status, $mode = 0, $notooltip = 0)
+    {
+        // phpcs:enable
+        global $langs;
+
+        $labelStatus = $this->statuts[$status];
+        $labelStatusShort = $this->statuts_short[$status];
+
+        if ($status == self::STATUS_NOT_READ) {
+            $statusType = 'status0';
+        } elseif ($status == self::STATUS_READ) {
+            $statusType = 'status1';
+        } elseif ($status == self::STATUS_ASSIGNED) {
+            $statusType = 'status2';
+        } elseif ($status == self::STATUS_IN_PROGRESS) {
+            $statusType = 'status4';
+        } elseif ($status == self::STATUS_WAITING) {
+            $statusType = 'status7';
+        } elseif ($status == self::STATUS_NEED_MORE_INFO) {
+            $statusType = 'status3';
+        } elseif ($status == self::STATUS_CANCELED) {
+            $statusType = 'status9';
+        } elseif ($status == self::STATUS_CLOSED) {
+            $statusType = 'status6';
+        } else {
+            $labelStatus = $langs->trans('Unknown');
+            $labelStatusShort = $langs->trans('Unknown');
+            $statusType = 'status0';
+            $mode = 0;
+        }
+
+        $params = [];
+        if ($notooltip) {
+            $params = ['tooltip' => 'no'];
+        }
+
+        return dolGetStatus($langs->trans($labelStatus), $langs->trans($labelStatusShort), '', $statusType, $mode, '', $params);
+    }
+
+    /**
+     *  Return a link to the object card (with optionaly the picto)
+     *
+     * @param int    $withpicto             Include picto in link (0=No picto, 1=Include picto into link, 2=Only picto)
+     * @param string $option                On what the link point to ('nolink', ...)
+     * @param int    $notooltip             1=Disable tooltip
+     * @param string $morecss               Add more css on link
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     * @return	string								String with URL
 	 */
 	public function getNomUrl($withpicto = 0, $option = '', $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
 	{
@@ -1263,7 +1345,7 @@ const STATUS_CANCELED = 9;
 		$label .= '<b>'.$langs->trans('TicketTrackId').':</b> '.$this->track_id.'<br>';
 		$label .= '<b>'.$langs->trans('Subject').':</b> '.$this->subject;
 
-		$url = dol_buildpath('/ticket/card.php', 1).'?id='.$this->id;
+        $url = DOL_URL_ROOT . '/ticket/card.php?id=' . $this->id;
 
 		if ($option != 'nolink') {
 			// Add param to save lastsearch_values or not
@@ -1305,63 +1387,6 @@ const STATUS_CANCELED = 9;
 		return $result;
 	}
 
-	/**
-	 * Return status label of object
-	 *
-	 * @param      int		$mode     	0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 * @return     string    			Label
-	 */
-	public function getLibStatut($mode = 0)
-	{
-		return $this->libStatut($this->fk_statut, $mode);
-	}
-
-	/**
-	 *    Return status label of object
-	 *
-	 *    @param      string 	$status      Id status
-	 *    @param      int		$mode        0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto, 6=Long label + Picto
-	 *    @param	  int		$notooltip	 1=No tooltip
-	 *    @return     string     			 Label
-	 */
-	public function LibStatut($status, $mode = 0, $notooltip = 0)
-	{
-		// phpcs:enable
-		global $langs;
-
-		$labelStatus = $this->statuts[$status];
-		$labelStatusShort = $this->statuts_short[$status];
-
-		if ($status == self::STATUS_NOT_READ) {
-			$statusType = 'status0';
-		} elseif ($status == self::STATUS_READ) {
-			$statusType = 'status1';
-		} elseif ($status == self::STATUS_ASSIGNED) {
-			$statusType = 'status2';
-		} elseif ($status == self::STATUS_IN_PROGRESS) {
-			$statusType = 'status4';
-		} elseif ($status == self::STATUS_WAITING) {
-			$statusType = 'status7';
-		} elseif ($status == self::STATUS_NEED_MORE_INFO) {
-			$statusType = 'status3';
-		} elseif ($status == self::STATUS_CANCELED) {
-			$statusType = 'status9';
-		} elseif ($status == self::STATUS_CLOSED) {
-			$statusType = 'status6';
-		} else {
-			$labelStatus = $langs->trans('Unknown');
-			$labelStatusShort = $langs->trans('Unknown');
-			$statusType = 'status0';
-			$mode = 0;
-		}
-
-		$params = array();
-		if ($notooltip) {
-			$params = array('tooltip' => 'no');
-		}
-
-		return dolGetStatus($langs->trans($labelStatus), $langs->trans($labelStatusShort), '', $statusType, $mode, '', $params);
-	}
 
 	/**
 	 *    Mark a message as read
@@ -1462,26 +1487,121 @@ const STATUS_CANCELED = 9;
 				$this->db->rollback();
 				$this->error = join(',', $this->errors);
 				dol_syslog(get_class($this)."::assignUser ".$this->error, LOG_ERR);
-				return -1;
-			}
-		} else {
-			$this->db->rollback();
-			$this->error = $this->db->lasterror();
-			dol_syslog(get_class($this)."::assignUser ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
+                return -1;
+            }
+        } else {
+            $this->db->rollback();
+            $this->error = $this->db->lasterror();
+            dol_syslog(get_class($this) . "::assignUser " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
 
-	/**
-	 *      Charge la liste des actions sur le ticket
-	 *
-	 *      @return int             Number of lines loaded, 0 if already loaded, <0 if KO
-	 */
-	public function loadCacheLogsTicket()
-	{
-		global $langs;
+    /**
+     *  Send notification of changes by email
+     *
+     * @param User   $user    User that create
+     * @param string $message Log message
+     *
+     * @return int                    <0 if KO, >0 if OK (number of emails sent)
+     */
+    private function sendLogByEmail($user, $message)
+    {
+        global $conf, $langs;
 
-		if (is_array($this->cache_logs_ticket) && count($this->cache_logs_ticket)) {
+        $nb_sent = 0;
+
+        $langs->load('ticket');
+
+        // Retrieve email of all contacts (internal and external)
+        $contacts = $this->listeContact(-1, 'internal');
+        $contacts = array_merge($contacts, $this->listeContact(-1, 'external'));
+
+        /* If origin_email and no socid, we add email to the list * */
+        if (!empty($this->origin_email) && empty($this->fk_soc)) {
+            $array_ext = [['firstname' => '', 'lastname' => '', 'email' => $this->origin_email, 'libelle' => $langs->transnoentities('TicketEmailOriginIssuer'), 'socid' => "-1"]];
+            $contacts = array_merge($contacts, $array_ext);
+        }
+
+        if (!empty($this->fk_soc)) {
+            $this->fetch_thirdparty($this->fk_soc);
+            $array_company = [['firstname' => '', 'lastname' => $this->client->name, 'email' => $this->client->email, 'libelle' => $langs->transnoentities('Customer'), 'socid' => $this->client->id]];
+            $contacts = array_merge($contacts, $array_company);
+        }
+
+        // foreach contact send email with notification message
+        if (count($contacts) > 0) {
+            foreach ($contacts as $key => $info_sendto) {
+                $message = '';
+                $subject = '[' . $conf->global->MAIN_INFO_SOCIETE_NOM . '] ' . $langs->transnoentities('TicketNotificationEmailSubject', $this->track_id);
+                $message .= $langs->transnoentities('TicketNotificationEmailBody', $this->track_id) . "\n\n";
+                $message .= $langs->transnoentities('Title') . ' : ' . $this->subject . "\n";
+
+                $recipient_name = dolGetFirstLastname($info_sendto['firstname'], $info_sendto['lastname'], '-1');
+                $recipient = (!empty($recipient_name) ? $recipient_name : $info_sendto['email']) . ' (' . strtolower($info_sendto['libelle']) . ')';
+                $message .= $langs->transnoentities('TicketNotificationRecipient') . ' : ' . $recipient . "\n";
+                $message .= "\n";
+                $message .= '* ' . $langs->transnoentities('TicketNotificationLogMessage') . ' *' . "\n";
+                $message .= dol_html_entity_decode($log_message, ENT_QUOTES | ENT_HTML5) . "\n";
+
+                if ($info_sendto['source'] == 'internal') {
+                    $url_internal_ticket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $this->track_id;
+                    $message .= "\n" . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url_internal_ticket . '">' . $this->track_id . '</a>' . "\n";
+                } else {
+                    $url_public_ticket = ($conf->global->TICKET_URL_PUBLIC_INTERFACE ? $conf->global->TICKET_URL_PUBLIC_INTERFACE . '/' : dol_buildpath('/public/ticket/view.php', 2)) . '?track_id=' . $this->track_id;
+                    $message .= "\n" . $langs->transnoentities('TicketNewEmailBodyInfosTrackUrlCustomer') . ' : <a href="' . $url_public_ticket . '">' . $this->track_id . '</a>' . "\n";
+                }
+
+                $message .= "\n";
+                $message .= $langs->transnoentities('TicketEmailPleaseDoNotReplyToThisEmail') . "\n";
+
+                $from = $conf->global->MAIN_INFO_SOCIETE_NOM . '<' . $conf->global->TICKET_NOTIFICATION_EMAIL_FROM . '>';
+                $replyto = $from;
+
+                // Init to avoid errors
+                $filepath = [];
+                $filename = [];
+                $mimetype = [];
+
+                $message = dol_nl2br($message);
+
+                if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
+                    $old_MAIN_MAIL_AUTOCOPY_TO = $conf->global->MAIN_MAIL_AUTOCOPY_TO;
+                    $conf->global->MAIN_MAIL_AUTOCOPY_TO = '';
+                }
+                include_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
+                $sendtocc = '';
+                $deliveryreceipt = 0;
+                $mailfile = new CMailFile($subject, $info_sendto['email'], $from, $message, $filepath, $mimetype, $filename, $sendtocc, '', $deliveryreceipt, 0);
+                if ($mailfile->error || $mailfile->errors) {
+                    setEventMessages($mailfile->error, $mailfile->errors, 'errors');
+                } else {
+                    $result = $mailfile->sendfile();
+                    if ($result > 0) {
+                        $nb_sent++;
+                    }
+                }
+                if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
+                    $conf->global->MAIN_MAIL_AUTOCOPY_TO = $old_MAIN_MAIL_AUTOCOPY_TO;
+                }
+            }
+
+            setEventMessages($langs->trans('TicketNotificationNumberEmailSent', $nb_sent), null, 'mesgs');
+        }
+
+        return $nb_sent;
+    }
+
+    /**
+     *      Charge la liste des actions sur le ticket
+     *
+     * @return int             Number of lines loaded, 0 if already loaded, <0 if KO
+     */
+    public function loadCacheLogsTicket()
+    {
+        global $langs;
+
+        if (is_array($this->cache_logs_ticket) && count($this->cache_logs_ticket)) {
 			return 0;
 		}
 		// Cache deja charge
@@ -1512,23 +1632,99 @@ const STATUS_CANCELED = 9;
 			return -1;
 		}*/
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 *      Load the list of event on ticket into ->cache_msgs_ticket
-	 *
-	 *      @return int             Number of lines loaded, 0 if already loaded, <0 if KO
-	 */
-	public function loadCacheMsgsTicket()
-	{
-		if (is_array($this->cache_msgs_ticket) && count($this->cache_msgs_ticket)) {
-			return 0;
-		}
+    /**
+     * Add message into database
+     *
+     * @param User  $user              User that creates
+     * @param int   $notrigger         0=launch triggers after, 1=disable triggers
+     * @param array $filename_list     List of files to attach (full path of filename on file system)
+     * @param array $mimetype_list     List of MIME type of attached files
+     * @param array $mimefilename_list List of attached file name in message
+     *
+     * @return int                          <0 if KO, >0 if OK
+     */
+    public function createTicketMessage($user, $notrigger = 0, $filename_list = [], $mimetype_list = [], $mimefilename_list = [])
+    {
+        global $conf, $langs;
+        $error = 0;
 
-		// Cache already loaded
+        $now = dol_now();
 
-		$sql = "SELECT id as rowid, fk_user_author, datec, label, note as message, code";
+        // Clean parameters
+        if (isset($this->fk_track_id)) {
+            $this->fk_track_id = trim($this->fk_track_id);
+        }
+
+        if (isset($this->message)) {
+            $this->message = trim($this->message);
+        }
+
+        $this->db->begin();
+
+        // Insert entry into agenda with code 'TICKET_MSG'
+        include_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $actioncomm = new ActionComm($this->db);
+        $actioncomm->type_code = 'AC_OTH';
+        $actioncomm->code = 'TICKET_MSG';
+        if ($this->private) {
+            $actioncomm->code = 'TICKET_MSG_PRIVATE';
+        }
+        $actioncomm->socid = $this->socid;
+        $actioncomm->label = $this->subject;
+        $actioncomm->note_private = $this->message;
+        $actioncomm->userassigned = [$user->id];
+        $actioncomm->userownerid = $user->id;
+        $actioncomm->datep = $now;
+        $actioncomm->percentage = 100;
+        $actioncomm->elementtype = 'ticket';
+        $actioncomm->fk_element = $this->id;
+
+        $attachedfiles = [];
+        $attachedfiles['paths'] = $filename_list;
+        $attachedfiles['names'] = $mimefilename_list;
+        $attachedfiles['mimes'] = $mimetype_list;
+        if (is_array($attachedfiles) && count($attachedfiles) > 0) {
+            $actioncomm->attachedfiles = $attachedfiles;
+        }
+
+        if (!empty($mimefilename_list) && is_array($mimefilename_list)) {
+            $actioncomm->note_private = dol_concatdesc($actioncomm->note_private, "\n" . $langs->transnoentities("AttachedFiles") . ': ' . join(';', $mimefilename_list));
+        }
+
+        $actionid = $actioncomm->create($user);
+        if ($actionid <= 0) {
+            $error++;
+            $this->error = $actioncomm->error;
+            $this->errors = $actioncomm->errors;
+        }
+
+        // Commit or rollback
+        if ($error) {
+            $this->db->rollback();
+            return -1 * $error;
+        } else {
+            $this->db->commit();
+            return 1;
+        }
+    }
+
+    /**
+     *      Load the list of event on ticket into ->cache_msgs_ticket
+     *
+     * @return int             Number of lines loaded, 0 if already loaded, <0 if KO
+     */
+    public function loadCacheMsgsTicket()
+    {
+        if (is_array($this->cache_msgs_ticket) && count($this->cache_msgs_ticket)) {
+            return 0;
+        }
+
+        // Cache already loaded
+
+        $sql = "SELECT id as rowid, fk_user_author, datec, label, note as message, code";
 		$sql .= " FROM ".MAIN_DB_PREFIX."actioncomm";
 		$sql .= " WHERE fk_element = ".(int) $this->id;
 		$sql .= " AND elementtype = 'ticket'";
@@ -1845,94 +2041,222 @@ const STATUS_CANCELED = 9;
 		}
 	}
 
-	/**
-	 * Return id of all contacts for ticket
-	 *
-	 * @return	array		Array of contacts for tickets
-	 */
-	public function getTicketAllContacts()
-	{
-		$array_contact = array();
-
-		$array_contact = $this->getIdTicketInternalContact($exclude_self);
-
-		$array_contact = array_merge($array_contact, $this->getIdTicketCustomerContact($exclude_self));
-
-		$array_contact = array_merge($array_contact, $this->getIdTicketInternalInvolvedContact($exclude_self));
-		$array_contact = array_merge($array_contact, $this->getIdTicketCustomerInvolvedContact($exclude_self));
-
-		return $array_contact;
-	}
-
 	/* gestion des contacts d'un ticket */
 
 	/**
 	 *  Return id des contacts interne de suivi
-	 *
-	 *  @return array       Liste des id contacts suivi ticket
-	 */
-	public function getIdTicketInternalContact()
-	{
-		return $this->getIdContact('internal', 'SUPPORTTEC');
-	}
+     *
+     * @return array       Liste des id contacts suivi ticket
+     */
+    public function getIdTicketInternalContact()
+    {
+        return $this->getIdContact('internal', 'SUPPORTTEC');
+    }
 
-	/**
-	 *  Return id des contacts clients pour le suivi ticket
-	 *
-	 *  @return array       Liste des id contacts suivi ticket
-	 */
-	public function getIdTicketCustomerContact()
-	{
-		return $this->getIdContact('external', 'SUPPORTCLI');
-	}
+    /**
+     * Retrieve informations about internal contacts
+     *
+     * @return array       Array with datas : firstname, lastname, socid (-1 for internal users), email, code, libelle, status
+     */
+    public function getInfosTicketInternalContact()
+    {
+        return $this->listeContact(-1, 'internal');
+    }
 
-	/**
-	 *  Return id des contacts clients des intervenants
-	 *
-	 *  @return array       Liste des id contacts intervenants
-	 */
-	public function getIdTicketInternalInvolvedContact()
-	{
-		return $this->getIdContact('internal', 'CONTRIBUTOR');
-	}
+    /**
+     *  Return id des contacts clients pour le suivi ticket
+     *
+     * @return array       Liste des id contacts suivi ticket
+     */
+    public function getIdTicketCustomerContact()
+    {
+        return $this->getIdContact('external', 'SUPPORTCLI');
+    }
 
-	/**
-	 *  Return id des contacts clients des intervenants
-	 *
-	 *  @return array       Liste des id contacts intervenants
-	 */
-	public function getIdTicketCustomerInvolvedContact()
-	{
-		return $this->getIdContact('external', 'CONTRIBUTOR');
-	}
+    /**
+     * Retrieve informations about external contacts
+     *
+     * @return array       Array with datas : firstname, lastname, socid (-1 for internal users), email, code, libelle, status
+     */
+    public function getInfosTicketExternalContact()
+    {
+        return $this->listeContact(-1, 'external');
+    }
 
-	/**
-	 * Return id of all contacts for ticket
-	 *
-	 * @return	array		Array of contacts
-	 */
-	public function getTicketAllCustomerContacts()
-	{
-		$array_contact = array();
+    /**
+     *  Return id des contacts clients des intervenants
+     *
+     * @return array       Liste des id contacts intervenants
+     */
+    public function getIdTicketInternalInvolvedContact()
+    {
+        return $this->getIdContact('internal', 'CONTRIBUTOR');
+    }
 
-		$array_contact = array_merge($array_contact, $this->getIdTicketCustomerContact($exclude_self));
-		$array_contact = array_merge($array_contact, $this->getIdTicketCustomerInvolvedContact($exclude_self));
+    /**
+     *  Return id des contacts clients des intervenants
+     *
+     * @return array       Liste des id contacts intervenants
+     */
+    public function getIdTicketCustomerInvolvedContact()
+    {
+        return $this->getIdContact('external', 'CONTRIBUTOR');
+    }
 
-		return $array_contact;
-	}
+    /**
+     * Return id of all contacts for ticket
+     *
+     * @return    array        Array of contacts for tickets
+     */
+    public function getTicketAllContacts()
+    {
+        $array_contact = [];
 
-	/**
-	 * Get a default reference.
-	 *
-	 * @param	Societe		$thirdparty		Thirdparty
-	 * @return 	string   					Reference
-	 */
-	public function getDefaultRef($thirdparty = '')
-	{
-		global $conf;
+        $array_contact = $this->getIdTicketInternalContact($exclude_self);
 
-		$defaultref = '';
-		$modele = empty($conf->global->TICKET_ADDON) ? 'mod_ticket_simple' : $conf->global->TICKET_ADDON;
+        $array_contact = array_merge($array_contact, $this->getIdTicketCustomerContact($exclude_self));
+
+        $array_contact = array_merge($array_contact, $this->getIdTicketInternalInvolvedContact($exclude_self));
+        $array_contact = array_merge($array_contact, $this->getIdTicketCustomerInvolvedContact($exclude_self));
+
+        return $array_contact;
+    }
+
+    /**
+     * Return id of all contacts for ticket
+     *
+     * @return    array        Array of contacts
+     */
+    public function getTicketAllCustomerContacts()
+    {
+        $array_contact = [];
+
+        $array_contact = array_merge($array_contact, $this->getIdTicketCustomerContact($exclude_self));
+        $array_contact = array_merge($array_contact, $this->getIdTicketCustomerInvolvedContact($exclude_self));
+
+        return $array_contact;
+    }
+
+    /**
+     *    Get array of all contacts for a ticket
+     *    Override method of file commonobject.class.php to add phone number
+     *
+     * @param int    $status Status of lines to get (-1=all)
+     * @param string $source Source of contact: external or thirdparty (llx_socpeople) or internal (llx_user)
+     * @param int    $list   0:Return array contains all properties, 1:Return array contains just id
+     * @param string $code   Filter on this code of contact type ('SHIPPING', 'BILLING', ...)
+     *
+     * @return    array                Array of contacts
+     */
+    public function listeContact($status = -1, $source = 'external', $list = 0, $code = '')
+    {
+        global $langs;
+
+        $tab = [];
+
+        $sql = "SELECT ec.rowid, ec.statut  as statuslink, ec.fk_socpeople as id, ec.fk_c_type_contact"; // This field contains id of llx_socpeople or id of llx_user
+        if ($source == 'internal') {
+            $sql .= ", '-1' as socid, t.statut as statuscontact";
+        }
+
+        if ($source == 'external' || $source == 'thirdparty') {
+            $sql .= ", t.fk_soc as socid, t.statut as statuscontact";
+        }
+
+        $sql .= ", t.civility, t.lastname as lastname, t.firstname, t.email";
+        if ($source == 'internal') {
+            $sql .= ", t.office_phone as phone, t.user_mobile as phone_mobile";
+        }
+
+        if ($source == 'external') {
+            $sql .= ", t.phone as phone, t.phone_mobile as phone_mobile, t.phone_perso as phone_perso";
+        }
+
+        $sql .= ", tc.source, tc.element, tc.code, tc.libelle as type_contact_label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_type_contact tc";
+        $sql .= ", " . MAIN_DB_PREFIX . "element_contact ec";
+        if ($source == 'internal') {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "user t on ec.fk_socpeople = t.rowid";
+        }
+
+        if ($source == 'external' || $source == 'thirdparty') {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "socpeople t on ec.fk_socpeople = t.rowid";
+        }
+
+        $sql .= " WHERE ec.element_id = " . ((int) $this->id);
+        $sql .= " AND ec.fk_c_type_contact=tc.rowid";
+        $sql .= " AND tc.element='" . $this->db->escape($this->element) . "'";
+        if ($source == 'internal') {
+            $sql .= " AND tc.source = 'internal'";
+        }
+
+        if ($source == 'external' || $source == 'thirdparty') {
+            $sql .= " AND tc.source = 'external'";
+        }
+
+        $sql .= " AND tc.active=1";
+        if ($status >= 0) {
+            $sql .= " AND ec.statut = " . ((int) $status);
+        }
+
+        $sql .= " ORDER BY t.lastname ASC";
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            $num = $this->db->num_rows($resql);
+            $i = 0;
+            while ($i < $num) {
+                $obj = $this->db->fetch_object($resql);
+
+                if (!$list) {
+                    $transkey = "TypeContact_" . $obj->element . "_" . $obj->source . "_" . $obj->code;
+                    $libelle_type = ($langs->trans($transkey) != $transkey ? $langs->trans($transkey) : $obj->type_contact_label);
+                    $tab[$i] = [
+                        'source' => $obj->source,
+                        'socid' => $obj->socid,
+                        'id' => $obj->id,
+                        'nom' => $obj->lastname, // For backward compatibility
+                        'civility' => $obj->civility,
+                        'lastname' => $obj->lastname,
+                        'firstname' => $obj->firstname,
+                        'email' => $obj->email,
+                        'rowid' => $obj->rowid,
+                        'code' => $obj->code,
+                        'libelle' => $libelle_type,
+                        'status' => $obj->statuslink,
+                        'statuscontact' => $obj->statuscontact,
+                        'fk_c_type_contact' => $obj->fk_c_type_contact,
+                        'phone' => $obj->phone,
+                        'phone_mobile' => $obj->phone_mobile,
+                    ];
+                } else {
+                    $tab[$i] = $obj->id;
+                }
+
+                $i++;
+            }
+
+            return $tab;
+        } else {
+            $this->error = $this->db->error();
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
+
+    /**
+     * Get a default reference.
+     *
+     * @param Societe $thirdparty Thirdparty
+     *
+     * @return    string                    Reference
+     */
+    public function getDefaultRef($thirdparty = '')
+    {
+        global $conf;
+
+        $defaultref = '';
+        $modele = empty($conf->global->TICKET_ADDON) ? 'mod_ticket_simple' : $conf->global->TICKET_ADDON;
 
 		// Search template files
 		$file = '';
@@ -1953,32 +2277,36 @@ const STATUS_CANCELED = 9;
 			$modTicket = new $classname;
 
 			$defaultref = $modTicket->getNextValue($thirdparty, $this);
-		}
+        }
 
-		if (is_numeric($defaultref) && $defaultref <= 0) {
-			$defaultref = '';
-		}
+        if (is_numeric($defaultref) && $defaultref <= 0) {
+            $defaultref = '';
+        }
 
-		return $defaultref;
-	}
+        return $defaultref;
+    }
 
-	/**
-	 *  Return if at least one photo is available
-	 *
-	 *  @param      string      $sdir       Directory to scan
-	 *  @return     boolean                 True if at least one photo is available, False if not
-	 */
-	public function is_photo_available($sdir)
-	{
-		// phpcs:enable
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-		global $conf;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$dir = $sdir.'/';
-		$nbphoto = 0;
+    /**
+     *  Return if at least one photo is available
+     *
+     * @param string $sdir Directory to scan
+     *
+     * @return     boolean                 True if at least one photo is available, False if not
+     */
+    public function is_photo_available($sdir)
+    {
+        // phpcs:enable
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-		$dir_osencoded = dol_osencode($dir);
+        global $conf;
+
+        $dir = $sdir . '/';
+        $nbphoto = 0;
+
+        $dir_osencoded = dol_osencode($dir);
 		if (file_exists($dir_osencoded)) {
 			$handle = opendir($dir_osencoded);
 			if (is_resource($handle)) {
@@ -1987,28 +2315,97 @@ const STATUS_CANCELED = 9;
 						$file = utf8_encode($file);
 					}
 					// To be sure data is stored in UTF8 in memory
-					if (dol_is_file($dir.$file)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
+					if (dol_is_file($dir . $file)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Sets object to supplied categories.
-	 *
-	 * Deletes object from existing categories not supplied.
-	 * Adds it to non existing supplied categories.
-	 * Existing categories are left untouch.
-	 *
-	 * @param  int[]|int $categories Category or categories IDs
-	 * @return void
-	 */
-	public function setCategories($categories)
-	{
-		// Handle single category
+    /**
+     * Copy files defined into $_SESSION array into the ticket directory of attached files.
+     * Used for files linked into messages.
+     * Files may be renamed during copy to avoid overwriting existing files.
+     *
+     * @return    array        Array with final path/name/mime of files.
+     */
+    public function copyFilesForTicket()
+    {
+        global $conf;
+
+        // Create form object
+        include_once DOL_DOCUMENT_ROOT . '/core/class/html.formmail.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
+
+        $maxwidthsmall = 270;
+        $maxheightsmall = 150;
+        $maxwidthmini = 128;
+        $maxheightmini = 72;
+
+        $formmail = new FormMail($this->db);
+
+        $attachedfiles = $formmail->get_attached_files();
+
+        $filepath = $attachedfiles['paths'];
+        $filename = $attachedfiles['names'];
+        $mimetype = $attachedfiles['mimes'];
+
+        // Copy files into ticket directory
+        $destdir = $conf->ticket->dir_output . '/' . $this->ref;
+
+        if (!dol_is_dir($destdir)) {
+            dol_mkdir($destdir);
+        }
+
+        $listofpaths = [];
+        $listofnames = [];
+        foreach ($filename as $i => $val) {
+            $destfile = $destdir . '/' . $filename[$i];
+            // If destination file already exists, we add a suffix to avoid to overwrite
+            if (is_file($destfile)) {
+                $pathinfo = pathinfo($filename[$i]);
+                $now = dol_now();
+                $destfile = $destdir . '/' . $pathinfo['filename'] . ' - ' . dol_print_date($now, 'dayhourlog') . '.' . $pathinfo['extension'];
+            }
+
+            $res = dol_move($filepath[$i], $destfile, 0, 1);
+
+            if (image_format_supported($destfile) == 1) {
+                // Create small thumbs for image (Ratio is near 16/9)
+                // Used on logon for example
+                $imgThumbSmall = vignette($destfile, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
+                // Create mini thumbs for image (Ratio is near 16/9)
+                // Used on menu or for setup page for example
+                $imgThumbMini = vignette($destfile, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
+            }
+
+            $formmail->remove_attached_files($i);
+
+            // Fill array with new names
+            $listofpaths[$i] = $destfile;
+            $listofnames[$i] = basename($destfile);
+        }
+
+        return ['listofpaths' => $listofpaths, 'listofnames' => $listofnames, 'listofmimes' => $mimetype];
+    }
+
+    /**
+     * Sets object to supplied categories.
+     *
+     * Deletes object from existing categories not supplied.
+     * Adds it to non existing supplied categories.
+     * Existing categories are left untouch.
+     *
+     * @param int[]|int $categories Category or categories IDs
+     *
+     * @return void
+     */
+    public function setCategories($categories)
+    {
+        // Handle single category
 		if (!is_array($categories)) {
 			$categories = array($categories);
 		}
@@ -2359,151 +2756,6 @@ const STATUS_CANCELED = 9;
 		}
 	}
 
-	/**
-	 * Copy files defined into $_SESSION array into the ticket directory of attached files.
-	 * Used for files linked into messages.
-	 * Files may be renamed during copy to avoid overwriting existing files.
-	 *
-	 * @return	array		Array with final path/name/mime of files.
-	 */
-	public function copyFilesForTicket()
-	{
-		global $conf;
-
-		// Create form object
-		include_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
-
-		$maxwidthsmall = 270;
-		$maxheightsmall = 150;
-		$maxwidthmini = 128;
-		$maxheightmini = 72;
-
-		$formmail = new FormMail($this->db);
-
-		$attachedfiles = $formmail->get_attached_files();
-
-		$filepath = $attachedfiles['paths'];
-		$filename = $attachedfiles['names'];
-		$mimetype = $attachedfiles['mimes'];
-
-		// Copy files into ticket directory
-		$destdir = $conf->ticket->dir_output.'/'.$this->ref;
-
-		if (!dol_is_dir($destdir)) {
-			dol_mkdir($destdir);
-		}
-
-		$listofpaths = array();
-		$listofnames = array();
-		foreach ($filename as $i => $val) {
-			$destfile = $destdir.'/'.$filename[$i];
-			// If destination file already exists, we add a suffix to avoid to overwrite
-			if (is_file($destfile)) {
-				$pathinfo = pathinfo($filename[$i]);
-				$now = dol_now();
-				$destfile = $destdir.'/'.$pathinfo['filename'].' - '.dol_print_date($now, 'dayhourlog').'.'.$pathinfo['extension'];
-			}
-
-			$res = dol_move($filepath[$i], $destfile, 0, 1);
-
-			if (image_format_supported($destfile) == 1) {
-				// Create small thumbs for image (Ratio is near 16/9)
-				// Used on logon for example
-				$imgThumbSmall = vignette($destfile, $maxwidthsmall, $maxheightsmall, '_small', 50, "thumbs");
-				// Create mini thumbs for image (Ratio is near 16/9)
-				// Used on menu or for setup page for example
-				$imgThumbMini = vignette($destfile, $maxwidthmini, $maxheightmini, '_mini', 50, "thumbs");
-			}
-
-			$formmail->remove_attached_files($i);
-
-			// Fill array with new names
-			$listofpaths[$i] = $destfile;
-			$listofnames[$i] = basename($destfile);
-		}
-
-		return array('listofpaths'=>$listofpaths, 'listofnames'=>$listofnames, 'listofmimes'=>$mimetype);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Add message into database
-	 *
-	 * @param User 	 $user      		  User that creates
-	 * @param int  	 $notrigger 		  0=launch triggers after, 1=disable triggers
-	 * @param array	 $filename_list       List of files to attach (full path of filename on file system)
-	 * @param array	 $mimetype_list       List of MIME type of attached files
-	 * @param array	 $mimefilename_list   List of attached file name in message
-	 * @return int						  <0 if KO, >0 if OK
-	 */
-	public function createTicketMessage($user, $notrigger = 0, $filename_list = array(), $mimetype_list = array(), $mimefilename_list = array())
-	{
-		global $conf, $langs;
-		$error = 0;
-
-		$now = dol_now();
-
-		// Clean parameters
-		if (isset($this->fk_track_id)) {
-			$this->fk_track_id = trim($this->fk_track_id);
-		}
-
-		if (isset($this->message)) {
-			$this->message = trim($this->message);
-		}
-
-		$this->db->begin();
-
-		// Insert entry into agenda with code 'TICKET_MSG'
-		include_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-		$actioncomm = new ActionComm($this->db);
-		$actioncomm->type_code = 'AC_OTH';
-		$actioncomm->code = 'TICKET_MSG';
-		if ($this->private) {
-			$actioncomm->code = 'TICKET_MSG_PRIVATE';
-		}
-		$actioncomm->socid = $this->socid;
-		$actioncomm->label = $this->subject;
-		$actioncomm->note_private = $this->message;
-		$actioncomm->userassigned = array($user->id);
-		$actioncomm->userownerid = $user->id;
-		$actioncomm->datep = $now;
-		$actioncomm->percentage = 100;
-		$actioncomm->elementtype = 'ticket';
-		$actioncomm->fk_element = $this->id;
-
-		$attachedfiles = array();
-		$attachedfiles['paths'] = $filename_list;
-		$attachedfiles['names'] = $mimefilename_list;
-		$attachedfiles['mimes'] = $mimetype_list;
-		if (is_array($attachedfiles) && count($attachedfiles) > 0) {
-			$actioncomm->attachedfiles = $attachedfiles;
-		}
-
-		if (!empty($mimefilename_list) && is_array($mimefilename_list)) {
-			$actioncomm->note_private = dol_concatdesc($actioncomm->note_private, "\n".$langs->transnoentities("AttachedFiles").': '.join(';', $mimefilename_list));
-		}
-
-		$actionid = $actioncomm->create($user);
-		if ($actionid <= 0) {
-			$error++;
-			$this->error = $actioncomm->error;
-			$this->errors = $actioncomm->errors;
-		}
-
-		// Commit or rollback
-		if ($error) {
-			$this->db->rollback();
-			return -1 * $error;
-		} else {
-			$this->db->commit();
-			return 1;
-		}
-	}
 
 	/**
 	 * Send ticket by email to linked contacts
@@ -2583,28 +2835,10 @@ const STATUS_CANCELED = 9;
 		}
 	}
 
-	/**
-	 * Retrieve informations about internal contacts
-	 *
-	 *  @return array       Array with datas : firstname, lastname, socid (-1 for internal users), email, code, libelle, status
-	 */
-	public function getInfosTicketInternalContact()
-	{
-		return $this->listeContact(-1, 'internal');
-	}
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Retrieve informations about external contacts
-	 *
-	 *  @return array       Array with datas : firstname, lastname, socid (-1 for internal users), email, code, libelle, status
-	 */
-	public function getInfosTicketExternalContact()
-	{
-		return $this->listeContact(-1, 'external');
-	}
-
-	/**
-	 *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
+    /**
+     *      Load indicators for dashboard (this->nbtodo and this->nbtodolate)
 	 *
 	 *      @param          User	$user   Object user
 	 *      @param          int		$mode   "opened" for askprice to close, "signed" for proposal to invoice
@@ -2673,7 +2907,6 @@ const STATUS_CANCELED = 9;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *      Load indicator this->nb of global stats widget
 	 *
@@ -2707,222 +2940,36 @@ const STATUS_CANCELED = 9;
 			return 1;
 		} else {
 			dol_print_error($this->db);
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty($db, $origin_id, $dest_id)
+    {
+        $tables = ['ticket'];
 
-	/**
-	 *  Send notification of changes by email
-	 *
-	 * 	@param  User   $user    		User that create
-	 * 	@param  string $message 		Log message
-	 * 	@return int                 	<0 if KO, >0 if OK (number of emails sent)
-	 */
-	private function sendLogByEmail($user, $message)
-	{
-		global $conf, $langs;
-
-		$nb_sent = 0;
-
-		$langs->load('ticket');
-
-		// Retrieve email of all contacts (internal and external)
-		$contacts = $this->listeContact(-1, 'internal');
-		$contacts = array_merge($contacts, $this->listeContact(-1, 'external'));
-
-		/* If origin_email and no socid, we add email to the list * */
-		if (!empty($this->origin_email) && empty($this->fk_soc)) {
-			$array_ext = array(array('firstname' => '', 'lastname' => '', 'email' => $this->origin_email, 'libelle' => $langs->transnoentities('TicketEmailOriginIssuer'), 'socid' => "-1"));
-			$contacts = array_merge($contacts, $array_ext);
-		}
-
-		if (!empty($this->fk_soc)) {
-			$this->fetch_thirdparty($this->fk_soc);
-			$array_company = array(array('firstname' => '', 'lastname' => $this->client->name, 'email' => $this->client->email, 'libelle' => $langs->transnoentities('Customer'), 'socid' => $this->client->id));
-			$contacts = array_merge($contacts, $array_company);
-		}
-
-		// foreach contact send email with notification message
-		if (count($contacts) > 0) {
-			foreach ($contacts as $key => $info_sendto) {
-				$message = '';
-				$subject = '['.$conf->global->MAIN_INFO_SOCIETE_NOM.'] '.$langs->transnoentities('TicketNotificationEmailSubject', $this->track_id);
-				$message .= $langs->transnoentities('TicketNotificationEmailBody', $this->track_id)."\n\n";
-				$message .= $langs->transnoentities('Title').' : '.$this->subject."\n";
-
-				$recipient_name = dolGetFirstLastname($info_sendto['firstname'], $info_sendto['lastname'], '-1');
-				$recipient = (!empty($recipient_name) ? $recipient_name : $info_sendto['email']).' ('.strtolower($info_sendto['libelle']).')';
-				$message .= $langs->transnoentities('TicketNotificationRecipient').' : '.$recipient."\n";
-				$message .= "\n";
-				$message .= '* '.$langs->transnoentities('TicketNotificationLogMessage').' *'."\n";
-				$message .= dol_html_entity_decode($log_message, ENT_QUOTES | ENT_HTML5)."\n";
-
-				if ($info_sendto['source'] == 'internal') {
-					$url_internal_ticket = dol_buildpath('/ticket/card.php', 2).'?track_id='.$this->track_id;
-					$message .= "\n".$langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal').' : <a href="'.$url_internal_ticket.'">'.$this->track_id.'</a>'."\n";
-				} else {
-					$url_public_ticket = ($conf->global->TICKET_URL_PUBLIC_INTERFACE ? $conf->global->TICKET_URL_PUBLIC_INTERFACE.'/' : dol_buildpath('/public/ticket/view.php', 2)).'?track_id='.$this->track_id;
-					$message .= "\n".$langs->transnoentities('TicketNewEmailBodyInfosTrackUrlCustomer').' : <a href="'.$url_public_ticket.'">'.$this->track_id.'</a>'."\n";
-				}
-
-				$message .= "\n";
-				$message .= $langs->transnoentities('TicketEmailPleaseDoNotReplyToThisEmail')."\n";
-
-				$from = $conf->global->MAIN_INFO_SOCIETE_NOM.'<'.$conf->global->TICKET_NOTIFICATION_EMAIL_FROM.'>';
-				$replyto = $from;
-
-				// Init to avoid errors
-				$filepath = array();
-				$filename = array();
-				$mimetype = array();
-
-				$message = dol_nl2br($message);
-
-				if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-					$old_MAIN_MAIL_AUTOCOPY_TO = $conf->global->MAIN_MAIL_AUTOCOPY_TO;
-					$conf->global->MAIN_MAIL_AUTOCOPY_TO = '';
-				}
-				include_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
-				$sendtocc = '';
-				$deliveryreceipt = 0;
-				$mailfile = new CMailFile($subject, $info_sendto['email'], $from, $message, $filepath, $mimetype, $filename, $sendtocc, '', $deliveryreceipt, 0);
-				if ($mailfile->error || $mailfile->errors) {
-					setEventMessages($mailfile->error, $mailfile->errors, 'errors');
-				} else {
-					$result = $mailfile->sendfile();
-					if ($result > 0) {
-						$nb_sent++;
-					}
-				}
-				if (!empty($conf->global->TICKET_DISABLE_MAIL_AUTOCOPY_TO)) {
-					$conf->global->MAIN_MAIL_AUTOCOPY_TO = $old_MAIN_MAIL_AUTOCOPY_TO;
-				}
-			}
-
-			setEventMessages($langs->trans('TicketNotificationNumberEmailSent', $nb_sent), null, 'mesgs');
-		}
-
-		return $nb_sent;
-	}
-
-	/**
-	 *    Get array of all contacts for a ticket
-	 *    Override method of file commonobject.class.php to add phone number
-	 *
-	 *    @param	int    	$status 	Status of lines to get (-1=all)
-	 *    @param	string 	$source 	Source of contact: external or thirdparty (llx_socpeople) or internal (llx_user)
-	 *    @param	int    	$list   	0:Return array contains all properties, 1:Return array contains just id
-	 *    @param    string  $code       Filter on this code of contact type ('SHIPPING', 'BILLING', ...)
-	 *    @return 	array          		Array of contacts
-	 */
-	public function listeContact($status = -1, $source = 'external', $list = 0, $code = '')
-	{
-		global $langs;
-
-		$tab = array();
-
-		$sql = "SELECT ec.rowid, ec.statut  as statuslink, ec.fk_socpeople as id, ec.fk_c_type_contact"; // This field contains id of llx_socpeople or id of llx_user
-		if ($source == 'internal') {
-			$sql .= ", '-1' as socid, t.statut as statuscontact";
-		}
-
-		if ($source == 'external' || $source == 'thirdparty') {
-			$sql .= ", t.fk_soc as socid, t.statut as statuscontact";
-		}
-
-		$sql .= ", t.civility, t.lastname as lastname, t.firstname, t.email";
-		if ($source == 'internal') {
-			$sql .= ", t.office_phone as phone, t.user_mobile as phone_mobile";
-		}
-
-		if ($source == 'external') {
-			$sql .= ", t.phone as phone, t.phone_mobile as phone_mobile, t.phone_perso as phone_perso";
-		}
-
-		$sql .= ", tc.source, tc.element, tc.code, tc.libelle as type_contact_label";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_type_contact tc";
-		$sql .= ", ".MAIN_DB_PREFIX."element_contact ec";
-		if ($source == 'internal') {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."user t on ec.fk_socpeople = t.rowid";
-		}
-
-		if ($source == 'external' || $source == 'thirdparty') {
-			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."socpeople t on ec.fk_socpeople = t.rowid";
-		}
-
-		$sql .= " WHERE ec.element_id = ".((int) $this->id);
-		$sql .= " AND ec.fk_c_type_contact=tc.rowid";
-		$sql .= " AND tc.element='".$this->db->escape($this->element)."'";
-		if ($source == 'internal') {
-			$sql .= " AND tc.source = 'internal'";
-		}
-
-		if ($source == 'external' || $source == 'thirdparty') {
-			$sql .= " AND tc.source = 'external'";
-		}
-
-		$sql .= " AND tc.active=1";
-		if ($status >= 0) {
-			$sql .= " AND ec.statut = ".((int) $status);
-		}
-
-		$sql .= " ORDER BY t.lastname ASC";
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$num = $this->db->num_rows($resql);
-			$i = 0;
-			while ($i < $num) {
-				$obj = $this->db->fetch_object($resql);
-
-				if (!$list) {
-					$transkey = "TypeContact_".$obj->element."_".$obj->source."_".$obj->code;
-					$libelle_type = ($langs->trans($transkey) != $transkey ? $langs->trans($transkey) : $obj->type_contact_label);
-					$tab[$i] = array(
-							'source' => $obj->source,
-							'socid' => $obj->socid,
-							'id' => $obj->id,
-							'nom' => $obj->lastname, // For backward compatibility
-							'civility' => $obj->civility,
-							'lastname' => $obj->lastname,
-							'firstname' => $obj->firstname,
-							'email' => $obj->email,
-							'rowid' => $obj->rowid,
-							'code' => $obj->code,
-							'libelle' => $libelle_type,
-							'status' => $obj->statuslink,
-							'statuscontact'=>$obj->statuscontact,
-							'fk_c_type_contact' => $obj->fk_c_type_contact,
-							'phone' => $obj->phone,
-							'phone_mobile' => $obj->phone_mobile);
-				} else {
-					$tab[$i] = $obj->id;
-				}
-
-				$i++;
-			}
-
-			return $tab;
-		} else {
-			$this->error = $this->db->error();
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
 }
-
 
 /**
  * Ticket line Class
  */
 class TicketsLine
 {
-	/**
-	 * @var int ID
-	 * @deprecated
+    /**
+     * @var int ID
+     * @deprecated
 	 */
 	public $rowid;
 

@@ -46,207 +46,239 @@ require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 class Product extends CommonObject
 {
 	/**
-	 * Regular product
-	 */
-	const TYPE_PRODUCT = 0;
-	/**
-	 * Service
-	 */
-	const TYPE_SERVICE = 1;
-	/**
-	 * Advanced feature: assembly kit
-	 */
-	const TYPE_ASSEMBLYKIT = 2;
-	/**
-	 * Advanced feature: stock kit
-	 */
-	const TYPE_STOCKKIT = 3;
-	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'product';
-	/**
-	 * @var string Name of table without prefix where object is stored
-	 */
-	public $table_element = 'product';
-	/**
-	 * @var string Field with ID of parent key if this field has a parent
-	 */
-	public $fk_element = 'fk_product';
-	/**
-	 * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
-	 *
-	 * @var int
-	 */
-	public $ismultientitymanaged = 1; // See also into images.lib.php
-	/**
-	 * @var string picto
-	 */
-	public $picto = 'product';
-public $regeximgext = '\.gif|\.jpg|\.jpeg|\.png|\.bmp|\.webp|\.xpm|\.xbm';
-	/**
-	 * @deprecated
-	 * @see $label
-	 */
-	public $libelle;
-	/**
-	 * Product label
-	 *
-	 * @var string
+
+    /**
+     * @var string Name of table without prefix where object is stored
+     */
+    public $table_element = 'product';
+
+    /**
+     * @var string Field with ID of parent key if this field has a parent
+     */
+    public $fk_element = 'fk_product';
+
+    /**
+     * @var array    List of child tables. To test if we can delete object.
+     */
+    protected $childtables = [
+        'supplier_proposaldet',
+        'propaldet',
+        'commandedet',
+        'facturedet',
+        'contratdet',
+        'facture_fourn_det',
+        'commande_fournisseurdet',
+    ];
+
+    /**
+     * 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
+     *
+     * @var int
+     */
+    public $ismultientitymanaged = 1;
+
+    /**
+     * @var string picto
+     */
+    public $picto = 'product';
+
+    /**
+     * {@inheritdoc}
+     */
+    protected $table_ref_field = 'ref';
+
+    public $regeximgext = '\.gif|\.jpg|\.jpeg|\.png|\.bmp|\.webp|\.xpm|\.xbm'; // See also into images.lib.php
+
+    /**
+     * @deprecated
+     * @see $label
+     */
+    public $libelle;
+
+    /**
+     * Product label
+     *
+     * @var string
 	 */
 	public $label;
+
 	/**
 	 * Product description
 	 *
-	 * @var string
-	 */
-	public $description;
-	/**
-	 * Product other fields PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION
-	 *
-	 * @var string
-	 */
-	public $other; // Price net
-	/**
-	 * Check TYPE constants
-	 *
-	 * @var int
-	 */
-	public $type = self::TYPE_PRODUCT;
-/**
-	 * Selling price
-	 *
-	 * @var float
-	 */
-	public $price;
-	/**
-	 * Price with tax
-	 *
-	 * @var float
-	 */
-	public $price_ttc;
-	/**
-	 * Minimum price net
-	 *
-	 * @var float
+     * @var string
+     */
+    public $description;
+
+    /**
+     * Product other fields PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION
+     *
+     * @var string
+     */
+    public $other;
+
+    /**
+     * Check TYPE constants
+     *
+     * @var int
+     */
+    public $type = self::TYPE_PRODUCT;
+
+    /**
+     * Selling price
+     *
+     * @var float
+     */
+    public $price; // Price net
+
+    /**
+     * Price with tax
+     *
+     * @var float
+     */
+    public $price_ttc;
+
+    /**
+     * Minimum price net
+     *
+     * @var float
 	 */
 	public $price_min;
 
-	//! Arrays for multiprices
 	/**
 	 * Minimum price with tax
 	 *
-	 * @var float
-	 */
-	public $price_min_ttc;
-	/**
-	 * Base price ('TTC' for price including tax or 'HT' for net price)
-	 * @var string
-	 */
-	public $price_base_type;
-	public $multiprices = array();
-	public $multiprices_ttc = array();
-	public $multiprices_base_type = array();
-	public $multiprices_min = array();
-	public $multiprices_min_ttc = array();
+     * @var float
+     */
+    public $price_min_ttc;
 
-	//! Price by quantity arrays
-	public $multiprices_tva_tx = array();
-	public $multiprices_recuperableonly = array();
-	public $price_by_qty;
-	public $prices_by_qty = array();
+    /**
+     * Base price ('TTC' for price including tax or 'HT' for net price)
+     *
+     * @var string
+     */
+    public $price_base_type;
 
-	//! Array for multilangs
-	public $prices_by_qty_id = array();
+    //! Arrays for multiprices
+    public $multiprices = [];
+    public $multiprices_ttc = [];
+    public $multiprices_base_type = [];
+    public $multiprices_min = [];
+    public $multiprices_min_ttc = [];
+    public $multiprices_tva_tx = [];
+    public $multiprices_recuperableonly = [];
 
-	//! Default VAT code for product (link to code into llx_c_tva but without foreign keys)
-	public $prices_by_qty_list = array();
+    //! Price by quantity arrays
+    public $price_by_qty;
+    public $prices_by_qty = [];
+    public $prices_by_qty_id = [];
+    public $prices_by_qty_list = [];
 
-	//! Default VAT rate of product
-	public $multilangs = array();
+    //! Array for multilangs
+    public $multilangs = [];
 
-	//! French VAT NPR (0 or 1)
-	public $default_vat_code;
+    //! Default VAT code for product (link to code into llx_c_tva but without foreign keys)
+    public $default_vat_code;
 
-	//! Other local taxes
-	public $tva_tx;
-	public $tva_npr = 0;
-	public $localtax1_tx;
-	public $localtax2_tx;
-	public $localtax1_type;
-	public $localtax2_type;
-	public $lifetime;
-	public $qc_frequency;
-	/**
-	 * Stock real
-	 *
-	 * @var int
-	 */
-	public $stock_reel = 0;
+    //! Default VAT rate of product
+    public $tva_tx;
 
-	//! Average price value for product entry into stock (PMP)
+    //! French VAT NPR (0 or 1)
+    public $tva_npr = 0;
+
+    //! Other local taxes
+    public $localtax1_tx;
+    public $localtax2_tx;
+    public $localtax1_type;
+    public $localtax2_type;
+
+    public $lifetime;
+
+    public $qc_frequency;
+
+    /**
+     * Stock real
+     *
+     * @var int
+     */
+    public $stock_reel = 0;
+
 	/**
 	 * Stock virtual
 	 *
 	 * @var int
 	 */
 	public $stock_theorique;
+
 	/**
 	 * Cost price
-	 *
-	 * @var float
-	 */
-	public $cost_price;
-	public $pmp;
+     *
+     * @var float
+     */
+    public $cost_price;
 
-	/*
-	 * Service expiration
-	 */
-	/**
-	 * Stock alert
-	 *
-	 * @var float
-	 */
-	public $seuil_stock_alerte = 0;
-	/**
-	 * Ask for replenishment when $desiredstock < $stock_reel
-	 */
-	public $desiredstock = 0;
-	public $duration_value;
-	/**
-	 * Exoiration unit
-	 */
-	public $duration_unit;
-	/**
-	 * Status indicates whether the product is on sale '1' or not '0'
-	 *
-	 * @var int
-	 */
-	public $status = 0;
-	/**
-	 * Status indicate whether the product is available for purchase '1' or not '0'
+    //! Average price value for product entry into stock (PMP)
+    public $pmp;
+
+    /**
+     * Stock alert
+     *
+     * @var float
+     */
+    public $seuil_stock_alerte = 0;
+
+    /**
+     * Ask for replenishment when $desiredstock < $stock_reel
+     */
+    public $desiredstock = 0;
+
+    /*
+     * Service expiration
+     */
+    public $duration_value;
+
+    /**
+     * Exoiration unit
+     */
+    public $duration_unit;
+
+    /**
+     * Status indicates whether the product is on sale '1' or not '0'
+     *
+     * @var int
+     */
+    public $status = 0;
+
+    /**
+     * Status indicate whether the product is available for purchase '1' or not '0'
 	 *
 	 * @var int
 	 */
 	public $status_buy = 0;
+
 	/**
 	 * Status indicates whether the product is a finished product '1' or a raw material '0'
 	 *
 	 * @var int
 	 */
 	public $finished;
+
 		/**
 	 * fk_default_bom indicates the default bom
 	 *
 	 * @var int
 	 */
 	public $fk_default_bom;
+
 	/**
 	 * We must manage lot/batch number, sell-by date and so on : '1':yes '0':no
 	 *
 	 * @var int
 	 */
 	public $status_batch = 0;
+
 	/**
 	 * If allowed, we can edit batch or serial number mask for each product
 	 *
@@ -254,236 +286,238 @@ public $regeximgext = '\.gif|\.jpg|\.jpeg|\.png|\.bmp|\.webp|\.xpm|\.xbm';
 	 */
 	public $batch_mask = '';
 
-	//! Metric of products
 	/**
 	 * Customs code
-	 *
-	 * @var string
-	 */
-	public $customcode;
-		/**
-	 * Product URL
-	 *
-	 * @var string
-	 */
-	public $url;	// scale -3, 0, 3, 6
-	public $weight;
-	public $weight_units;	// scale -3, 0, 3, 6
-	public $length;
-	public $length_units;	// scale -3, 0, 3, 6
-	public $width;
-	public $width_units;	// scale -3, 0, 3, 6
-	public $height;
-	public $height_units;	// scale -3, 0, 3, 6
-	public $surface;
-	public $surface_units;	// scale -3, 0, 3, 6
-	public $volume;
-	public $volume_units;	// scale -3, 0, 3, 6
-	public $net_measure;
-public $net_measure_units;
-	public $accountancy_code_sell;
-	public $accountancy_code_sell_intra;
-	public $accountancy_code_sell_export;
-	public $accountancy_code_buy;
-	public $accountancy_code_buy_intra;
-	public $accountancy_code_buy_export;
-	/**
-	 * Main Barcode value
-	 *
-	 * @var string
-	 */
-	public $barcode;
-	/**
-	 * Main Barcode type ID
+     *
+     * @var string
+     */
+    public $customcode;
+
+    /**
+     * Product URL
+     *
+     * @var string
+     */
+    public $url;
+
+    //! Metric of products
+    public $weight;
+    public $weight_units;    // scale -3, 0, 3, 6
+    public $length;
+    public $length_units;    // scale -3, 0, 3, 6
+    public $width;
+    public $width_units;    // scale -3, 0, 3, 6
+    public $height;
+    public $height_units;    // scale -3, 0, 3, 6
+    public $surface;
+    public $surface_units;    // scale -3, 0, 3, 6
+    public $volume;
+    public $volume_units;    // scale -3, 0, 3, 6
+
+    public $net_measure;
+    public $net_measure_units;    // scale -3, 0, 3, 6
+
+    public $accountancy_code_sell;
+    public $accountancy_code_sell_intra;
+    public $accountancy_code_sell_export;
+    public $accountancy_code_buy;
+    public $accountancy_code_buy_intra;
+    public $accountancy_code_buy_export;
+
+    /**
+     * Main Barcode value
+     *
+     * @var string
+     */
+    public $barcode;
+
+    /**
+     * Main Barcode type ID
 	 *
 	 * @var int
 	 */
 	public $barcode_type;
+
 	/**
 	 * Main Barcode type code
 	 *
 	 * @var string
 	 */
 	public $barcode_type_code;
+
 	public $stats_propale = array();
-	public $stats_commande = array();
-	public $stats_contrat = array();
-	public $stats_facture = array();
-	public $stats_commande_fournisseur = array();
-	public $stats_reception = array();
+    public $stats_commande = [];
+    public $stats_contrat = [];
+    public $stats_facture = [];
+    public $stats_commande_fournisseur = [];
+    public $stats_reception = [];
+    public $stats_mrptoconsume = [];
+    public $stats_mrptoproduce = [];
 
-	//! Size of image
-	public $stats_mrptoconsume = array();
-	public $stats_mrptoproduce = array();
-	public $imgWidth;
-	public $imgHeight;
+    //! Size of image
+    public $imgWidth;
+    public $imgHeight;
 
-	//! Id du fournisseur
-	/**
-	 * @var integer|string date_creation
-	 */
-	public $date_creation;
+    /**
+     * @var integer|string date_creation
+     */
+    public $date_creation;
 
-	//! Product ID already linked to a reference supplier
-	/**
-	 * @var integer|string date_modification
-	 */
-	public $date_modification;
-	public $product_fourn_id;
+    /**
+     * @var integer|string date_modification
+     */
+    public $date_modification;
 
-	//! Contains detail of stock of product into each warehouse
-	public $product_id_already_linked;
-	public $nbphoto = 0;
-	public $stock_warehouse = array();
-	public $oldcopy;
+    //! Id du fournisseur
+    public $product_fourn_id;
 
-	/* To store supplier price found */
-	/**
-	 * @var int Default warehouse Id
-	 */
-	public $fk_default_warehouse;
-	/**
-	 * @var int ID
-	 */
-	public $fk_price_expression;
-	public $fourn_pu;
-	public $fourn_price_base_type;
-	public $fourn_socid;
-	/**
-	 * @deprecated
-	 * @see        $ref_supplier
-	 */
-	public $ref_fourn;
-	/**
-	 * @var string ref supplier
-	 */
-	public $ref_supplier;
-	/**
-	 * Unit code ('km', 'm', 'l', 'p', ...)
+    //! Product ID already linked to a reference supplier
+    public $product_id_already_linked;
+
+    public $nbphoto = 0;
+
+    //! Contains detail of stock of product into each warehouse
+    public $stock_warehouse = [];
+
+    public $oldcopy;
+
+    /**
+     * @var int Default warehouse Id
+     */
+    public $fk_default_warehouse;
+    /**
+     * @var int ID
+     */
+    public $fk_price_expression;
+
+    /* To store supplier price found */
+    public $fourn_pu;
+    public $fourn_price_base_type;
+    public $fourn_socid;
+
+    /**
+     * @deprecated
+     * @see        $ref_supplier
+     */
+    public $ref_fourn;
+
+    /**
+     * @var string ref supplier
+     */
+    public $ref_supplier;
+
+    /**
+     * Unit code ('km', 'm', 'l', 'p', ...)
 	 *
 	 * @var string
 	 */
 	public $fk_unit;
+
 	/**
 	 * Price is generated using multiprice rules
 	 *
 	 * @var int
 	 */
-	public $price_autogen = 0;
+    public $price_autogen = 0;
 
+    /**
+     * Array with list of supplier prices of product
+     *
+     * @var array
+     */
+    public $supplierprices;
 
-	/**
-	 *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
-	 *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
-	 *  'position' is the sort order of field.
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'noteditable' says if field is not editable (1 or 0)
-	 *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
-	 *  'index' if we want an index in database.
-	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
-	 *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
-	 *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
-	 *  'css' is the CSS style to use on field. For example: 'maxwidth200'
-	 *  'help' is a string visible as a tooltip on field
-	 *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
-	 *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
-	 *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
-	 *  'autofocusoncreate' to have field having the focus on a create form. Only 1 field should have this property set to 1.
-	 *  'comment' is not used. You can store here any text of your choice. It is not used by application.
-	 *
-	 *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
-	 */
-	/**
-	 * Array with list of supplier prices of product
-	 *
-	 * @var array
-	 */
-	public $supplierprices;
-	/**
-	 * Property set to save result of isObjectUsed(). Used for example by Product API.
-	 *
-	 * @var boolean
-	 */
-	public $is_object_used;
+    /**
+     * Property set to save result of isObjectUsed(). Used for example by Product API.
+     *
+     * @var boolean
+     */
+    public $is_object_used;
+
+    /**
+     *  'type' if the field format ('integer', 'integer:ObjectClass:PathToClass[:AddCreateButtonOrNot[:Filter]]', 'varchar(x)', 'double(24,8)', 'real', 'price', 'text', 'html', 'date', 'datetime', 'timestamp', 'duration', 'mail', 'phone', 'url', 'password')
+     *         Note: Filter can be a string like "(t.ref:like:'SO-%') or (t.date_creation:<:'20160101') or (t.nature:is:NULL)"
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed (Example: 1 or '$conf->global->MY_SETUP_PARAM)
+     *  'position' is the sort order of field.
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only, 3=Visible on create/update/view form only (not list), 4=Visible on list and update/view form only (not create). 5=Visible on list and view only (not create/not update). Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'noteditable' says if field is not editable (1 or 0)
+     *  'default' is a default value for creation (can still be overwrote by the Setup of Default Values if field is editable in creation form). Note: If default is set to '(PROV)' and field is 'ref', the default value will be set to '(PROVid)' where id is rowid when a new record is created.
+     *  'index' if we want an index in database.
+     *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
+     *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
+     *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
+     *  'css' is the CSS style to use on field. For example: 'maxwidth200'
+     *  'help' is a string visible as a tooltip on field
+     *  'showoncombobox' if value of the field must be visible into the label of the combobox that list record
+     *  'disabled' is 1 if we want to have the field locked by a 'disabled' attribute. In most cases, this is never set into the definition of $fields into class, but is set dynamically by some part of code.
+     *  'arrayofkeyval' to set list of value if type is a list of predefined values. For example: array("0"=>"Draft","1"=>"Active","-1"=>"Cancel")
+     *  'autofocusoncreate' to have field having the focus on a create form. Only 1 field should have this property set to 1.
+     *  'comment' is not used. You can store here any text of your choice. It is not used by application.
+     *
+     *  Note: To have value dynamic, you can set value to 0 in definition and edit the value on the fly into the constructor.
+     */
+
 	/**
 	 * @var array fields of object product
 	 */
 	public $fields = array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'index'=>1, 'position'=>1, 'comment'=>'Id'),
-		'ref'           =>array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'index'=>1, 'position'=>10, 'searchall'=>1, 'comment'=>'Reference of object'),
-		'entity'        =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'default'=>1, 'notnull'=>1, 'index'=>1, 'position'=>5),
-		'label'         =>array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>2, 'position'=>15),
-		'barcode'       =>array('type'=>'varchar(255)', 'label'=>'Barcode', 'enabled'=>'!empty($conf->barcode->enabled)', 'position'=>20, 'visible'=>-1, 'showoncombobox'=>3),
-		'fk_barcode_type' => array('type'=>'integer', 'label'=>'BarcodeType', 'enabled'=>'1', 'position'=>21, 'notnull'=>0, 'visible'=>-1,),
-		'note_public'   =>array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>61),
-		'note'          =>array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>62),
-		'datec'         =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>500),
-		'tms'           =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>501),
-		//'date_valid'    =>array('type'=>'datetime',     'label'=>'DateCreation',     'enabled'=>1, 'visible'=>-2, 'position'=>502),
-		'fk_user_author'=>array('type'=>'integer', 'label'=>'UserAuthor', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>510, 'foreignkey'=>'llx_user.rowid'),
-		'fk_user_modif' =>array('type'=>'integer', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'position'=>511),
-		//'fk_user_valid' =>array('type'=>'integer',      'label'=>'UserValidation',        'enabled'=>1, 'visible'=>-1, 'position'=>512),
-		'localtax1_tx' => array('type'=>'double(6,3)', 'label'=>'Localtax1tx', 'enabled'=>'1', 'position'=>150, 'notnull'=>0, 'visible'=>-1,),
-		'localtax1_type' => array('type'=>'varchar(10)', 'label'=>'Localtax1type', 'enabled'=>'1', 'position'=>155, 'notnull'=>1, 'visible'=>-1,),
-		'localtax2_tx' => array('type'=>'double(6,3)', 'label'=>'Localtax2tx', 'enabled'=>'1', 'position'=>160, 'notnull'=>0, 'visible'=>-1,),
-		'localtax2_type' => array('type'=>'varchar(10)', 'label'=>'Localtax2type', 'enabled'=>'1', 'position'=>165, 'notnull'=>1, 'visible'=>-1,),
-		'import_key'    =>array('type'=>'varchar(14)', 'label'=>'ImportId', 'enabled'=>1, 'visible'=>-2, 'notnull'=>-1, 'index'=>0, 'position'=>1000),
-		//'tosell'       =>array('type'=>'integer',      'label'=>'Status',           'enabled'=>1, 'visible'=>1,  'notnull'=>1, 'default'=>0, 'index'=>1,  'position'=>1000, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Active', -1=>'Cancel')),
-		//'tobuy'        =>array('type'=>'integer',      'label'=>'Status',           'enabled'=>1, 'visible'=>1,  'notnull'=>1, 'default'=>0, 'index'=>1,  'position'=>1000, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Active', -1=>'Cancel')),
-	);
-	/**
-	 * @var array	List of child tables. To test if we can delete object.
-	 */
-	protected $childtables = array(
-		'supplier_proposaldet',
-		'propaldet',
-		'commandedet',
-		'facturedet',
-		'contratdet',
-		'facture_fourn_det',
-		'commande_fournisseurdet'
-	);
-	/**
-	 * {@inheritdoc}
-	 */
-	protected $table_ref_field = 'ref';
+        'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'index'=>1, 'position'=>1, 'comment'=>'Id'),
+        'ref'           =>array('type'=>'varchar(128)', 'label'=>'Ref', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>1, 'index'=>1, 'position'=>10, 'searchall'=>1, 'comment'=>'Reference of object'),
+        'entity'        =>array('type'=>'integer', 'label'=>'Entity', 'enabled'=>1, 'visible'=>0, 'default'=>1, 'notnull'=>1, 'index'=>1, 'position'=>5),
+        'label'         =>array('type'=>'varchar(255)', 'label'=>'Label', 'enabled'=>1, 'visible'=>1, 'notnull'=>1, 'showoncombobox'=>2, 'position'=>15),
+        'barcode'       =>array('type'=>'varchar(255)', 'label'=>'Barcode', 'enabled'=>'!empty($conf->barcode->enabled)', 'position'=>20, 'visible'=>-1, 'showoncombobox'=>3),
+        'fk_barcode_type' => array('type'=>'integer', 'label'=>'BarcodeType', 'enabled'=>'1', 'position'=>21, 'notnull'=>0, 'visible'=>-1,),
+        'note_public'   =>array('type'=>'html', 'label'=>'NotePublic', 'enabled'=>1, 'visible'=>0, 'position'=>61),
+        'note'          =>array('type'=>'html', 'label'=>'NotePrivate', 'enabled'=>1, 'visible'=>0, 'position'=>62),
+        'datec'         =>array('type'=>'datetime', 'label'=>'DateCreation', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>500),
+        'tms'           =>array('type'=>'timestamp', 'label'=>'DateModification', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>501),
+        //'date_valid'    =>array('type'=>'datetime',     'label'=>'DateCreation',     'enabled'=>1, 'visible'=>-2, 'position'=>502),
+        'fk_user_author'=>array('type'=>'integer', 'label'=>'UserAuthor', 'enabled'=>1, 'visible'=>-2, 'notnull'=>1, 'position'=>510, 'foreignkey'=>'llx_user.rowid'),
+        'fk_user_modif' =>array('type'=>'integer', 'label'=>'UserModif', 'enabled'=>1, 'visible'=>-2, 'notnull' => -1, 'position' => 511),
+        //'fk_user_valid' =>array('type'=>'integer',      'label'=>'UserValidation',        'enabled'=>1, 'visible'=>-1, 'position'=>512),
+        'localtax1_tx' => array('type' => 'double(6,3)', 'label' => 'Localtax1tx', 'enabled' => '1', 'position' => 150, 'notnull' => 0, 'visible' => -1,),
+        'localtax1_type' => array('type' => 'varchar(10)', 'label' => 'Localtax1type', 'enabled' => '1', 'position' => 155, 'notnull' => 1, 'visible' => -1,),
+        'localtax2_tx' => array('type' => 'double(6,3)', 'label' => 'Localtax2tx', 'enabled' => '1', 'position' => 160, 'notnull' => 0, 'visible' => -1,),
+        'localtax2_type' => array('type' => 'varchar(10)', 'label' => 'Localtax2type', 'enabled' => '1', 'position' => 165, 'notnull' => 1, 'visible' => -1,),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'enabled' => 1, 'visible' => -2, 'notnull' => -1, 'index' => 0, 'position' => 1000),
+        //'tosell'       =>array('type'=>'integer',      'label'=>'Status',           'enabled'=>1, 'visible'=>1,  'notnull'=>1, 'default'=>0, 'index'=>1,  'position'=>1000, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Active', -1=>'Cancel')),
+        //'tobuy'        =>array('type'=>'integer',      'label'=>'Status',           'enabled'=>1, 'visible'=>1,  'notnull'=>1, 'default'=>0, 'index'=>1,  'position'=>1000, 'arrayofkeyval'=>array(0=>'Draft', 1=>'Active', -1=>'Cancel')),
+    );
 
-	/**
-	 *  Constructor
-	 *
-	 * @param DoliDB $db Database handler
-	 */
-	public function __construct($db)
-	{
-		$this->db = $db;
-		$this->canvas = '';
-	}
+    /**
+     * Regular product
+     */
+    const TYPE_PRODUCT = 0;
+    /**
+     * Service
+     */
+    const TYPE_SERVICE = 1;
+    /**
+     * Advanced feature: assembly kit
+     */
+    const TYPE_ASSEMBLYKIT = 2;
+    /**
+     * Advanced feature: stock kit
+     */
+    const TYPE_STOCKKIT = 3;
 
-	/**
-	 * Function used to replace a thirdparty id with another one.
-	 *
-	 * @param  DoliDB $db        Database handler
-	 * @param  int    $origin_id Old thirdparty id
-	 * @param  int    $dest_id   New thirdparty id
-	 * @return bool
-	 */
-	public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
-	{
-		$tables = array(
-			'product_customer_price',
-			'product_customer_price_log'
-		);
+    /**
+     *  Constructor
+     *
+     * @param DoliDB $db Database handler
+     */
+    public function __construct($db)
+    {
+        $this->db = $db;
+        $this->canvas = '';
+    }
 
-		return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
-	}
-
-	/**
-	 *    Check that ref and label are ok
-	 *
-	 * @return int         >1 if OK, <=0 if KO
+    /**
+     *    Check that ref and label are ok
+     *
+     * @return int         >1 if OK, <=0 if KO
 	 */
 	public function check()
 	{
@@ -805,39 +839,6 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Get a barcode from the module to generate barcode values.
-	 *  Return value is stored into this->barcode
-	 *
-	 * @param  Product $object Object product or service
-	 * @param  string  $type   Barcode type (ean, isbn, ...)
-	 * @return string
-	 */
-	public function get_barcode($object, $type = '')
-	{
-		// phpcs:enable
-		global $conf;
-
-		$result = '';
-		if (!empty($conf->global->BARCODE_PRODUCT_ADDON_NUM)) {
-			$dirsociete = array_merge(array('/core/modules/barcode/'), $conf->modules_parts['barcode']);
-			foreach ($dirsociete as $dirroot) {
-				$res = dol_include_once($dirroot.$conf->global->BARCODE_PRODUCT_ADDON_NUM.'.php');
-				if ($res) {
-					break;
-				}
-			}
-			$var = $conf->global->BARCODE_PRODUCT_ADDON_NUM;
-			$mod = new $var;
-
-			$result = $mod->getNextValue($object, $type);
-
-			dol_syslog(get_class($this)."::get_barcode barcode=".$result." module=".$var);
-		}
-		return $result;
-	}
 
 	/**
 	 *    Check properties of product are ok (like name, barcode, ...).
@@ -874,11 +875,13 @@ public $net_measure_units;
 		return $result;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Check barcode
+     *
+     * @param string $valuetotest Value to test
+     * @param string $typefortest Type of barcode (ISBN, EAN, ...)
 	 *
-	 * @param  string $valuetotest Value to test
-	 * @param  string $typefortest Type of barcode (ISBN, EAN, ...)
 	 * @return int                        0 if OK
 	 *                                     -1 ErrorBadBarCodeSyntax
 	 *                                     -2 ErrorBarCodeRequired
@@ -906,43 +909,6 @@ public $net_measure_units;
 			return $result;
 		} else {
 			return 0;
-		}
-	}
-
-	/**
-	 *  Insert a track that we changed a customer price
-	 *
-	 * @param  User $user  User making change
-	 * @param  int  $level price level to change
-	 * @return int                    <0 if KO, >0 if OK
-	 */
-	private function _log_price($user, $level = 0)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$now = dol_now();
-
-		// Clean parameters
-		if (empty($this->price_by_qty)) {
-			$this->price_by_qty = 0;
-		}
-
-		// Add new price
-		$sql = "INSERT INTO ".MAIN_DB_PREFIX."product_price(price_level,date_price, fk_product, fk_user_author, price, price_ttc, price_base_type,tosell, tva_tx, default_vat_code, recuperableonly,";
-		$sql .= " localtax1_tx, localtax2_tx, localtax1_type, localtax2_type, price_min,price_min_ttc,price_by_qty,entity,fk_price_expression) ";
-		$sql .= " VALUES(".($level ? ((int) $level) : 1).", '".$this->db->idate($now)."', ".((int) $this->id).", ".((int) $user->id).", ".((float) price2num($this->price)).", ".((float) price2num($this->price_ttc)).",'".$this->db->escape($this->price_base_type)."',".((int) $this->status).", ".((float) price2num($this->tva_tx)).", ".($this->default_vat_code ? ("'".$this->db->escape($this->default_vat_code)."'") : "null").", ".((int) $this->tva_npr).",";
-		$sql .= " ".price2num($this->localtax1_tx).", ".price2num($this->localtax2_tx).", '".$this->db->escape($this->localtax1_type)."', '".$this->db->escape($this->localtax2_type)."', ".price2num($this->price_min).", ".price2num($this->price_min_ttc).", ".price2num($this->price_by_qty).", ".((int) $conf->entity).",".($this->fk_price_expression > 0 ? ((int) $this->fk_price_expression) : 'null');
-		$sql .= ")";
-
-		dol_syslog(get_class($this)."::_log_price", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if (!$resql) {
-			$this->error = $this->db->lasterror();
-			dol_print_error($this->db);
-			return -1;
-		} else {
-			return 1;
 		}
 	}
 
@@ -1313,1228 +1279,6 @@ public $net_measure_units;
 	}
 
 	/**
-	 *  Load a product in memory from database
-	 *
-	 * @param  int    $id                Id of product/service to load
-	 * @param  string $ref               Ref of product/service to load
-	 * @param  string $ref_ext           Ref ext of product/service to load
-	 * @param  string $barcode           Barcode of product/service to load
-	 * @param  int    $ignore_expression When module dynamicprices is on, ignores the math expression for calculating price and uses the db value instead
-	 * @param  int    $ignore_price_load Load product without loading $this->multiprices... array (when we are sure we don't need them)
-	 * @param  int    $ignore_lang_load  Load product without loading $this->multilangs language arrays (when we are sure we don't need them)
-	 * @return int                       <0 if KO, 0 if not found, >0 if OK
-	 */
-	public function fetch($id = '', $ref = '', $ref_ext = '', $barcode = '', $ignore_expression = 0, $ignore_price_load = 0, $ignore_lang_load = 0)
-	{
-		include_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
-
-		global $langs, $conf;
-
-		dol_syslog(get_class($this)."::fetch id=".$id." ref=".$ref." ref_ext=".$ref_ext);
-
-		// Check parameters
-		if (!$id && !$ref && !$ref_ext && !$barcode) {
-			$this->error = 'ErrorWrongParameters';
-			dol_syslog(get_class($this)."::fetch ".$this->error, LOG_ERR);
-			return -1;
-		}
-
-		$sql = "SELECT p.rowid, p.ref, p.ref_ext, p.label, p.description, p.url, p.note_public, p.note as note_private, p.customcode, p.fk_country, p.fk_state, p.lifetime, p.qc_frequency, p.price, p.price_ttc,";
-		$sql .= " p.price_min, p.price_min_ttc, p.price_base_type, p.cost_price, p.default_vat_code, p.tva_tx, p.recuperableonly as tva_npr, p.localtax1_tx, p.localtax2_tx, p.localtax1_type, p.localtax2_type, p.tosell,";
-		$sql .= " p.tobuy, p.fk_product_type, p.duration, p.fk_default_warehouse, p.seuil_stock_alerte, p.canvas, p.net_measure, p.net_measure_units, p.weight, p.weight_units,";
-		$sql .= " p.length, p.length_units, p.width, p.width_units, p.height, p.height_units,";
-		$sql .= " p.surface, p.surface_units, p.volume, p.volume_units, p.barcode, p.fk_barcode_type, p.finished, p.fk_default_bom,";
-		if (empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
-			$sql .= " p.accountancy_code_buy, p.accountancy_code_buy_intra, p.accountancy_code_buy_export, p.accountancy_code_sell, p.accountancy_code_sell_intra, p.accountancy_code_sell_export,";
-		} else {
-			$sql .= " ppe.accountancy_code_buy, ppe.accountancy_code_buy_intra, ppe.accountancy_code_buy_export, ppe.accountancy_code_sell, ppe.accountancy_code_sell_intra, ppe.accountancy_code_sell_export,";
-		}
-
-		//For MultiCompany
-		//PMP per entity & Stocks Sharings stock_reel includes only stocks shared with this entity
-		$separatedEntityPMP = false;	// Set to true to get the AWP from table llx_product_perentity instead of field 'pmp' into llx_product.
-		$separatedStock = false;		// Set to true will count stock from subtable llx_product_stock. It is slower than using denormalized field 'stock', but it is required when using multientity and shared warehouses.
-		if (!empty($conf->global->MULTICOMPANY_PRODUCT_SHARING_ENABLED)) {
-			if (!empty($conf->global->MULTICOMPANY_PMP_PER_ENTITY_ENABLED)) {
-				$checkPMPPerEntity = $this->db->query("SELECT pmp FROM " . MAIN_DB_PREFIX . "product_perentity WHERE fk_product = ".((int) $id)." AND entity = ".(int) $conf->entity);
-				if ($this->db->num_rows($checkPMPPerEntity)>0) {
-					$separatedEntityPMP = true;
-				}
-			}
-			global $mc;
-			$separatedStock = true;
-			$visibleWarehousesEntities = $conf->entity;
-			if (isset($mc->sharings['stock']) && !empty($mc->sharings['stock'])) {
-				$visibleWarehousesEntities .= "," . implode(",", $mc->sharings['stock']);
-			}
-		}
-		if ($separatedEntityPMP) {
-			$sql .= " ppe.pmp,";
-		} else {
-			$sql .= " p.pmp,";
-		}
-		$sql .= " p.datec, p.tms, p.import_key, p.entity, p.desiredstock, p.tobatch, p.batch_mask, p.fk_unit,";
-		$sql .= " p.fk_price_expression, p.price_autogen, p.model_pdf,";
-		if ($separatedStock) {
-			$sql .= " SUM(sp.reel) as stock";
-		} else {
-			$sql .= " p.stock";
-		}
-		$sql .= " FROM ".MAIN_DB_PREFIX."product as p";
-		if (!empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED) || $separatedEntityPMP) {
-			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_perentity as ppe ON ppe.fk_product = p.rowid AND ppe.entity = " . ((int) $conf->entity);
-		}
-		if ($separatedStock) {
-			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_stock as sp ON sp.fk_product = p.rowid AND sp.fk_entrepot IN (SELECT rowid FROM ".MAIN_DB_PREFIX."entrepot WHERE entity IN (".$this->db->sanitize($visibleWarehousesEntities)."))";
-		}
-
-		if ($id) {
-			$sql .= " WHERE p.rowid = ".((int) $id);
-		} else {
-			$sql .= " WHERE p.entity IN (".getEntity($this->element).")";
-			if ($ref) {
-				$sql .= " AND p.ref = '".$this->db->escape($ref)."'";
-			} elseif ($ref_ext) {
-				$sql .= " AND p.ref_ext = '".$this->db->escape($ref_ext)."'";
-			} elseif ($barcode) {
-				$sql .= " AND p.barcode = '".$this->db->escape($barcode)."'";
-			}
-		}
-		if ($separatedStock) {
-			$sql .= " GROUP BY p.rowid, p.ref, p.ref_ext, p.label, p.description, p.url, p.note_public, p.note, p.customcode, p.fk_country, p.fk_state, p.lifetime, p.qc_frequency, p.price, p.price_ttc,";
-			$sql .= " p.price_min, p.price_min_ttc, p.price_base_type, p.cost_price, p.default_vat_code, p.tva_tx, p.recuperableonly, p.localtax1_tx, p.localtax2_tx, p.localtax1_type, p.localtax2_type, p.tosell,";
-			$sql .= " p.tobuy, p.fk_product_type, p.duration, p.fk_default_warehouse, p.seuil_stock_alerte, p.canvas, p.net_measure, p.net_measure_units, p.weight, p.weight_units,";
-			$sql .= " p.length, p.length_units, p.width, p.width_units, p.height, p.height_units,";
-			$sql .= " p.surface, p.surface_units, p.volume, p.volume_units, p.barcode, p.fk_barcode_type, p.finished,";
-			if (empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
-				$sql .= " p.accountancy_code_buy, p.accountancy_code_buy_intra, p.accountancy_code_buy_export, p.accountancy_code_sell, p.accountancy_code_sell_intra, p.accountancy_code_sell_export,";
-			} else {
-				$sql .= " ppe.accountancy_code_buy, ppe.accountancy_code_buy_intra, ppe.accountancy_code_buy_export, ppe.accountancy_code_sell, ppe.accountancy_code_sell_intra, ppe.accountancy_code_sell_export,";
-			}
-			if ($separatedEntityPMP) {
-				$sql .= " ppe.pmp,";
-			} else {
-				$sql .= " p.pmp,";
-			}
-			$sql .= " p.datec, p.tms, p.import_key, p.entity, p.desiredstock, p.tobatch, p.batch_mask, p.fk_unit,";
-			$sql .= " p.fk_price_expression, p.price_autogen, p.model_pdf";
-			if (!$separatedStock) {
-				$sql .= ", p.stock";
-			}
-		}
-
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			unset($this->oldcopy);
-
-			if ($this->db->num_rows($resql) > 0) {
-				$obj = $this->db->fetch_object($resql);
-
-				$this->id = $obj->rowid;
-				$this->ref                            = $obj->ref;
-				$this->ref_ext                        = $obj->ref_ext;
-				$this->label                          = $obj->label;
-				$this->description                    = $obj->description;
-				$this->url                            = $obj->url;
-				$this->note_public                    = $obj->note_public;
-				$this->note_private                   = $obj->note_private;
-				$this->note                           = $obj->note_private; // deprecated
-
-				$this->type                            = $obj->fk_product_type;
-				$this->status                        = $obj->tosell;
-				$this->status_buy                    = $obj->tobuy;
-				$this->status_batch                    = $obj->tobatch;
-				$this->batch_mask                    = $obj->batch_mask;
-
-				$this->customcode                    = $obj->customcode;
-				$this->country_id                    = $obj->fk_country;
-				$this->country_code = getCountry($this->country_id, 2, $this->db);
-				$this->state_id = $obj->fk_state;
-				$this->lifetime                     = $obj->lifetime;
-				$this->qc_frequency                 = $obj->qc_frequency;
-				$this->price                        = $obj->price;
-				$this->price_ttc                    = $obj->price_ttc;
-				$this->price_min                    = $obj->price_min;
-				$this->price_min_ttc                = $obj->price_min_ttc;
-				$this->price_base_type = $obj->price_base_type;
-				$this->cost_price                    = $obj->cost_price;
-				$this->default_vat_code = $obj->default_vat_code;
-				$this->tva_tx                        = $obj->tva_tx;
-				//! French VAT NPR
-				$this->tva_npr                        = $obj->tva_npr;
-				$this->recuperableonly                = $obj->tva_npr; // For backward compatibility
-				//! Local taxes
-				$this->localtax1_tx                    = $obj->localtax1_tx;
-				$this->localtax2_tx                    = $obj->localtax2_tx;
-				$this->localtax1_type                = $obj->localtax1_type;
-				$this->localtax2_type                = $obj->localtax2_type;
-
-				$this->finished                        = $obj->finished;
-				$this->fk_default_bom                  = $obj->fk_default_bom;
-
-				$this->duration                        = $obj->duration;
-				$this->duration_value                = substr($obj->duration, 0, dol_strlen($obj->duration) - 1);
-				$this->duration_unit = substr($obj->duration, -1);
-				$this->canvas                        = $obj->canvas;
-				$this->net_measure = $obj->net_measure;
-				$this->net_measure_units = $obj->net_measure_units;
-				$this->weight                        = $obj->weight;
-				$this->weight_units                    = $obj->weight_units;
-				$this->length                        = $obj->length;
-				$this->length_units                    = $obj->length_units;
-				$this->width = $obj->width;
-				$this->width_units = $obj->width_units;
-				$this->height = $obj->height;
-				$this->height_units = $obj->height_units;
-
-				$this->surface = $obj->surface;
-				$this->surface_units = $obj->surface_units;
-				$this->volume = $obj->volume;
-				$this->volume_units                    = $obj->volume_units;
-				$this->barcode = $obj->barcode;
-				$this->barcode_type                    = $obj->fk_barcode_type;
-
-				$this->accountancy_code_buy				= $obj->accountancy_code_buy;
-				$this->accountancy_code_buy_intra		= $obj->accountancy_code_buy_intra;
-				$this->accountancy_code_buy_export		= $obj->accountancy_code_buy_export;
-				$this->accountancy_code_sell			= $obj->accountancy_code_sell;
-				$this->accountancy_code_sell_intra		= $obj->accountancy_code_sell_intra;
-				$this->accountancy_code_sell_export		= $obj->accountancy_code_sell_export;
-
-				$this->fk_default_warehouse            = $obj->fk_default_warehouse;
-				$this->seuil_stock_alerte            = $obj->seuil_stock_alerte;
-				$this->desiredstock                    = $obj->desiredstock;
-				$this->stock_reel                    = $obj->stock;
-				$this->pmp = $obj->pmp;
-
-				$this->date_creation                = $obj->datec;
-				$this->date_modification            = $obj->tms;
-				$this->import_key                    = $obj->import_key;
-				$this->entity                        = $obj->entity;
-
-				$this->ref_ext                        = $obj->ref_ext;
-				$this->fk_price_expression            = $obj->fk_price_expression;
-				$this->fk_unit                        = $obj->fk_unit;
-				$this->price_autogen = $obj->price_autogen;
-				$this->model_pdf = $obj->model_pdf;
-
-				$this->db->free($resql);
-
-				// fetch optionals attributes and labels
-				$this->fetch_optionals();
-
-				// Multilangs
-				if (!empty($conf->global->MAIN_MULTILANGS) && empty($ignore_lang_load)) {
-					$this->getMultiLangs();
-				}
-
-				// Load multiprices array
-				if (!empty($conf->global->PRODUIT_MULTIPRICES) && empty($ignore_price_load)) {                // prices per segment
-					for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
-						$sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
-						$sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
-						$sql .= " FROM ".MAIN_DB_PREFIX."product_price";
-						$sql .= " WHERE entity IN (".getEntity('productprice').")";
-						$sql .= " AND price_level=".((int) $i);
-						$sql .= " AND fk_product = ".((int) $this->id);
-						$sql .= " ORDER BY date_price DESC, rowid DESC";	// Get the most recent line
-						$sql .= " LIMIT 1";									// Only the first one
-						$resql = $this->db->query($sql);
-						if ($resql) {
-							$result = $this->db->fetch_array($resql);
-
-							$this->multiprices[$i] = $result ? $result["price"] : null;
-							$this->multiprices_ttc[$i] = $result ? $result["price_ttc"] : null;
-							$this->multiprices_min[$i] =  $result ? $result["price_min"] : null;
-							$this->multiprices_min_ttc[$i] = $result ? $result["price_min_ttc"] : null;
-							$this->multiprices_base_type[$i] = $result ? $result["price_base_type"] : null;
-							// Next two fields are used only if PRODUIT_MULTIPRICES_USE_VAT_PER_LEVEL is on
-							$this->multiprices_tva_tx[$i] = $result ? $result["tva_tx"].($result ? ' ('.$result['default_vat_code'].')' : '') : null;
-							$this->multiprices_recuperableonly[$i] = $result ? $result["recuperableonly"] : null;
-
-							// Price by quantity
-							/*
-							 $this->prices_by_qty[$i]=$result["price_by_qty"];
-							 $this->prices_by_qty_id[$i]=$result["rowid"];
-							 // Récuperation de la liste des prix selon qty si flag positionné
-							 if ($this->prices_by_qty[$i] == 1)
-							 {
-							 $sql = "SELECT rowid, price, unitprice, quantity, remise_percent, remise, price_base_type";
-							 $sql.= " FROM ".MAIN_DB_PREFIX."product_price_by_qty";
-							 $sql.= " WHERE fk_product_price = ".((int) $this->prices_by_qty_id[$i]);
-							 $sql.= " ORDER BY quantity ASC";
-							 $resultat=array();
-							 $resql = $this->db->query($sql);
-							 if ($resql)
-							 {
-							 $ii=0;
-							 while ($result= $this->db->fetch_array($resql)) {
-							 $resultat[$ii]=array();
-							 $resultat[$ii]["rowid"]=$result["rowid"];
-							 $resultat[$ii]["price"]= $result["price"];
-							 $resultat[$ii]["unitprice"]= $result["unitprice"];
-							 $resultat[$ii]["quantity"]= $result["quantity"];
-							 $resultat[$ii]["remise_percent"]= $result["remise_percent"];
-							 $resultat[$ii]["remise"]= $result["remise"];                    // deprecated
-							 $resultat[$ii]["price_base_type"]= $result["price_base_type"];
-							 $ii++;
-							 }
-							 $this->prices_by_qty_list[$i]=$resultat;
-							 }
-							 else
-							 {
-							 dol_print_error($this->db);
-							 return -1;
-							 }
-							 }*/
-						} else {
-							$this->error = $this->db->lasterror;
-							return -1;
-						}
-					}
-				} elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES) && empty($ignore_price_load)) {            // prices per customers
-					// Nothing loaded by default. List may be very long.
-				} elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY) && empty($ignore_price_load)) {    // prices per quantity
-					$sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
-					$sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid";
-					$sql .= " FROM ".MAIN_DB_PREFIX."product_price";
-					$sql .= " WHERE fk_product = ".((int) $this->id);
-					$sql .= " ORDER BY date_price DESC, rowid DESC";
-					$sql .= " LIMIT 1";
-					$resql = $this->db->query($sql);
-					if ($resql) {
-						$result = $this->db->fetch_array($resql);
-
-						// Price by quantity
-						$this->prices_by_qty[0] = $result["price_by_qty"];
-						$this->prices_by_qty_id[0] = $result["rowid"];
-						// Récuperation de la liste des prix selon qty si flag positionné
-						if ($this->prices_by_qty[0] == 1) {
-							$sql = "SELECT rowid,price, unitprice, quantity, remise_percent, remise, remise, price_base_type";
-							$sql .= " FROM ".MAIN_DB_PREFIX."product_price_by_qty";
-							$sql .= " WHERE fk_product_price = ".((int) $this->prices_by_qty_id[0]);
-							$sql .= " ORDER BY quantity ASC";
-							$resultat = array();
-							$resql = $this->db->query($sql);
-							if ($resql) {
-								$ii = 0;
-								while ($result = $this->db->fetch_array($resql)) {
-									$resultat[$ii] = array();
-									$resultat[$ii]["rowid"] = $result["rowid"];
-									$resultat[$ii]["price"] = $result["price"];
-									$resultat[$ii]["unitprice"] = $result["unitprice"];
-									$resultat[$ii]["quantity"] = $result["quantity"];
-									$resultat[$ii]["remise_percent"] = $result["remise_percent"];
-									//$resultat[$ii]["remise"]= $result["remise"];                    // deprecated
-									$resultat[$ii]["price_base_type"] = $result["price_base_type"];
-									$ii++;
-								}
-								$this->prices_by_qty_list[0] = $resultat;
-							} else {
-								$this->error = $this->db->lasterror;
-								return -1;
-							}
-						}
-					} else {
-						$this->error = $this->db->lasterror;
-						return -1;
-					}
-				} elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY_MULTIPRICES) && empty($ignore_price_load)) {    // prices per customer and quantity
-					for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
-						$sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
-						$sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
-						$sql .= " FROM ".MAIN_DB_PREFIX."product_price";
-						$sql .= " WHERE entity IN (".getEntity('productprice').")";
-						$sql .= " AND price_level=".((int) $i);
-						$sql .= " AND fk_product = ".((int) $this->id);
-						$sql .= " ORDER BY date_price DESC, rowid DESC";
-						$sql .= " LIMIT 1";
-						$resql = $this->db->query($sql);
-						if ($resql) {
-							$result = $this->db->fetch_array($resql);
-
-							$this->multiprices[$i] = $result["price"];
-							$this->multiprices_ttc[$i] = $result["price_ttc"];
-							$this->multiprices_min[$i] = $result["price_min"];
-							$this->multiprices_min_ttc[$i] = $result["price_min_ttc"];
-							$this->multiprices_base_type[$i] = $result["price_base_type"];
-							// Next two fields are used only if PRODUIT_MULTIPRICES_USE_VAT_PER_LEVEL is on
-							$this->multiprices_tva_tx[$i] = $result["tva_tx"]; // TODO Add ' ('.$result['default_vat_code'].')'
-							$this->multiprices_recuperableonly[$i] = $result["recuperableonly"];
-
-							// Price by quantity
-							$this->prices_by_qty[$i] = $result["price_by_qty"];
-							$this->prices_by_qty_id[$i] = $result["rowid"];
-							// Récuperation de la liste des prix selon qty si flag positionné
-							if ($this->prices_by_qty[$i] == 1) {
-								$sql = "SELECT rowid, price, unitprice, quantity, remise_percent, remise, price_base_type";
-								$sql .= " FROM ".MAIN_DB_PREFIX."product_price_by_qty";
-								$sql .= " WHERE fk_product_price = ".((int) $this->prices_by_qty_id[$i]);
-								$sql .= " ORDER BY quantity ASC";
-								$resultat = array();
-								$resql = $this->db->query($sql);
-								if ($resql) {
-									$ii = 0;
-									while ($result = $this->db->fetch_array($resql)) {
-										$resultat[$ii] = array();
-										$resultat[$ii]["rowid"] = $result["rowid"];
-										$resultat[$ii]["price"] = $result["price"];
-										$resultat[$ii]["unitprice"] = $result["unitprice"];
-										$resultat[$ii]["quantity"] = $result["quantity"];
-										$resultat[$ii]["remise_percent"] = $result["remise_percent"];
-										$resultat[$ii]["remise"] = $result["remise"]; // deprecated
-										$resultat[$ii]["price_base_type"] = $result["price_base_type"];
-										$ii++;
-									}
-									$this->prices_by_qty_list[$i] = $resultat;
-								} else {
-									$this->error = $this->db->lasterror;
-									return -1;
-								}
-							}
-						} else {
-							$this->error = $this->db->lasterror;
-							return -1;
-						}
-					}
-				}
-
-				if (!empty($conf->dynamicprices->enabled) && !empty($this->fk_price_expression) && empty($ignore_expression)) {
-					include_once DOL_DOCUMENT_ROOT.'/product/dynamic_price/class/price_parser.class.php';
-					$priceparser = new PriceParser($this->db);
-					$price_result = $priceparser->parseProduct($this);
-					if ($price_result >= 0) {
-						$this->price = $price_result;
-						// Calculate the VAT
-						$this->price_ttc = price2num($this->price) * (1 + ($this->tva_tx / 100));
-						$this->price_ttc = price2num($this->price_ttc, 'MU');
-					}
-				}
-
-				// We should not load stock during the fetch. If someone need stock of product, he must call load_stock after fetching product.
-				// Instead we just init the stock_warehouse array
-				$this->stock_warehouse = array();
-
-				return 1;
-			} else {
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *    Load array this->multilangs
-	 *
-	 * @return int        <0 if KO, >0 if OK
-	 */
-	public function getMultiLangs()
-	{
-		global $langs;
-
-		$current_lang = $langs->getDefaultLang();
-
-		$sql = "SELECT lang, label, description, note as other";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_lang";
-		$sql .= " WHERE fk_product = ".((int) $this->id);
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			while ($obj = $this->db->fetch_object($result)) {
-				//print 'lang='.$obj->lang.' current='.$current_lang.'<br>';
-				if ($obj->lang == $current_lang) {  // si on a les traduct. dans la langue courante on les charge en infos principales.
-					$this->label        = $obj->label;
-					$this->description = $obj->description;
-					$this->other        = $obj->other;
-				}
-				$this->multilangs["$obj->lang"]["label"]        = $obj->label;
-				$this->multilangs["$obj->lang"]["description"] = $obj->description;
-				$this->multilangs["$obj->lang"]["other"]        = $obj->other;
-			}
-			return 1;
-		} else {
-			$this->error = "Error: ".$this->db->lasterror()." - ".$sql;
-			return -1;
-		}
-	}
-
-	/**
-	 *    Update or add a translation for a product
-	 *
-	 * @param  User $user Object user making update
-	 * @return int        <0 if KO, >0 if OK
-	 */
-	public function setMultiLangs($user)
-	{
-		global $conf, $langs;
-
-		$langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 0, 2);
-		$current_lang = $langs->getDefaultLang();
-
-		foreach ($langs_available as $key => $value) {
-			if ($key == $current_lang) {
-				$sql = "SELECT rowid";
-				$sql .= " FROM ".MAIN_DB_PREFIX."product_lang";
-				$sql .= " WHERE fk_product = ".((int) $this->id);
-				$sql .= " AND lang = '".$this->db->escape($key)."'";
-
-				$result = $this->db->query($sql);
-
-				if ($this->db->num_rows($result)) { // if there is already a description line for this language
-					$sql2 = "UPDATE ".MAIN_DB_PREFIX."product_lang";
-					$sql2 .= " SET ";
-					$sql2 .= " label='".$this->db->escape($this->label)."',";
-					$sql2 .= " description='".$this->db->escape($this->description)."'";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", note='".$this->db->escape($this->other)."'";
-					}
-					$sql2 .= " WHERE fk_product = ".((int) $this->id)." AND lang = '".$this->db->escape($key)."'";
-				} else {
-					$sql2 = "INSERT INTO ".MAIN_DB_PREFIX."product_lang (fk_product, lang, label, description";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", note";
-					}
-					$sql2 .= ")";
-					$sql2 .= " VALUES(".$this->id.",'".$this->db->escape($key)."','".$this->db->escape($this->label)."',";
-					$sql2 .= " '".$this->db->escape($this->description)."'";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", '".$this->db->escape($this->other)."'";
-					}
-					$sql2 .= ")";
-				}
-				dol_syslog(get_class($this).'::setMultiLangs key = current_lang = '.$key);
-				if (!$this->db->query($sql2)) {
-					$this->error = $this->db->lasterror();
-					return -1;
-				}
-			} elseif (isset($this->multilangs[$key])) {
-				if (empty($this->multilangs["$key"]["label"])) {
-					$this->error = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Label"));
-					return -1;
-				}
-
-				$sql = "SELECT rowid";
-				$sql .= " FROM ".MAIN_DB_PREFIX."product_lang";
-				$sql .= " WHERE fk_product = ".((int) $this->id);
-				$sql .= " AND lang = '".$this->db->escape($key)."'";
-
-				$result = $this->db->query($sql);
-
-				if ($this->db->num_rows($result)) { // if there is already a description line for this language
-					$sql2 = "UPDATE ".MAIN_DB_PREFIX."product_lang";
-					$sql2 .= " SET ";
-					$sql2 .= " label = '".$this->db->escape($this->multilangs["$key"]["label"])."',";
-					$sql2 .= " description = '".$this->db->escape($this->multilangs["$key"]["description"])."'";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", note = '".$this->db->escape($this->multilangs["$key"]["other"])."'";
-					}
-					$sql2 .= " WHERE fk_product = ".((int) $this->id)." AND lang = '".$this->db->escape($key)."'";
-				} else {
-					$sql2 = "INSERT INTO ".MAIN_DB_PREFIX."product_lang (fk_product, lang, label, description";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", note";
-					}
-					$sql2 .= ")";
-					$sql2 .= " VALUES(".$this->id.",'".$this->db->escape($key)."','".$this->db->escape($this->multilangs["$key"]["label"])."',";
-					$sql2 .= " '".$this->db->escape($this->multilangs["$key"]["description"])."'";
-					if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
-						$sql2 .= ", '".$this->db->escape($this->multilangs["$key"]["other"])."'";
-					}
-					$sql2 .= ")";
-				}
-
-				// We do not save if main fields are empty
-				if ($this->multilangs["$key"]["label"] || $this->multilangs["$key"]["description"]) {
-					if (!$this->db->query($sql2)) {
-						$this->error = $this->db->lasterror();
-						return -1;
-					}
-				}
-			} else {
-				// language is not current language and we didn't provide a multilang description for this language
-			}
-		}
-
-		// Call trigger
-		$result = $this->call_trigger('PRODUCT_SET_MULTILANGS', $user);
-		if ($result < 0) {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-		// End call triggers
-
-		return 1;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return if object has a sell-by date or eat-by date
-	 *
-	 * @return boolean     True if it's has
-	 */
-	public function hasbatch()
-	{
-		return ($this->status_batch > 0 ? true : false);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Load information about stock of a product into ->stock_reel, ->stock_warehouse[] (including stock_warehouse[idwarehouse]->detail_batch for batch products)
-	 * This function need a lot of load. If you use it on list, use a cache to execute it once for each product id.
-	 * If ENTREPOT_EXTRA_STATUS is set, filtering on warehouse status is possible.
-	 *
-	 * @param  	string 	$option 					'' = Load all stock info, also from closed and internal warehouses, 'nobatch', 'novirtual'
-	 * 												You can also filter on 'warehouseclosed', 'warehouseopen', 'warehouseinternal'
-	 * @param	int		$includedraftpoforvirtual	Include draft status of PO for virtual stock calculation
-	 * @return 	int                  				< 0 if KO, > 0 if OK
-	 * @see    	load_virtual_stock(), loadBatchInfo()
-	 */
-	public function load_stock($option = '', $includedraftpoforvirtual = null)
-	{
-		// phpcs:enable
-		global $conf;
-
-		$this->stock_reel = 0;
-		$this->stock_warehouse = array();
-		$this->stock_theorique = 0;
-
-		// Set filter on warehouse status
-		$warehouseStatus = array();
-		if (preg_match('/warehouseclosed/', $option)) {
-			$warehouseStatus[Entrepot::STATUS_CLOSED] = Entrepot::STATUS_CLOSED;
-		}
-		if (preg_match('/warehouseopen/', $option)) {
-			$warehouseStatus[Entrepot::STATUS_OPEN_ALL] = Entrepot::STATUS_OPEN_ALL;
-		}
-		if (preg_match('/warehouseinternal/', $option)) {
-			if (!empty($conf->global->ENTREPOT_EXTRA_STATUS)) {
-				$warehouseStatus[Entrepot::STATUS_OPEN_INTERNAL] = Entrepot::STATUS_OPEN_INTERNAL;
-			} else {
-				$warehouseStatus[Entrepot::STATUS_OPEN_ALL] = Entrepot::STATUS_OPEN_ALL;
-			}
-		}
-
-		$sql = "SELECT ps.rowid, ps.reel, ps.fk_entrepot";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_stock as ps";
-		$sql .= ", ".MAIN_DB_PREFIX."entrepot as w";
-		$sql .= " WHERE w.entity IN (".getEntity('stock').")";
-		$sql .= " AND w.rowid = ps.fk_entrepot";
-		$sql .= " AND ps.fk_product = ".((int) $this->id);
-		if (count($warehouseStatus)) {
-			$sql .= " AND w.statut IN (".$this->db->sanitize(implode(',', $warehouseStatus)).")";
-		}
-
-		$sql .= " ORDER BY ps.reel ".(!empty($conf->global->DO_NOT_TRY_TO_DEFRAGMENT_STOCKS_WAREHOUSE)?'DESC':'ASC'); // Note : qty ASC is important for expedition card, to avoid stock fragmentation;
-
-		dol_syslog(get_class($this)."::load_stock", LOG_DEBUG);
-		$result = $this->db->query($sql);
-		if ($result) {
-			$num = $this->db->num_rows($result);
-			$i = 0;
-			if ($num > 0) {
-				while ($i < $num) {
-					$row = $this->db->fetch_object($result);
-					$this->stock_warehouse[$row->fk_entrepot] = new stdClass();
-					$this->stock_warehouse[$row->fk_entrepot]->real = $row->reel;
-					$this->stock_warehouse[$row->fk_entrepot]->id = $row->rowid;
-					if ((!preg_match('/nobatch/', $option)) && $this->hasbatch()) {
-						$this->stock_warehouse[$row->fk_entrepot]->detail_batch = Productbatch::findAll($this->db, $row->rowid, 1, $this->id);
-					}
-					$this->stock_reel += $row->reel;
-					$i++;
-				}
-			}
-			$this->db->free($result);
-
-			if (!preg_match('/novirtual/', $option)) {
-				$this->load_virtual_stock($includedraftpoforvirtual); // This also load all arrays stats_xxx...
-			}
-
-			return 1;
-		} else {
-			$this->error = $this->db->lasterror();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Load value ->stock_theorique of a product. Property this->id must be defined.
-	 *  This function need a lot of load. If you use it on list, use a cache to execute it one for each product id.
-	 *
-	 * 	@param	int		$includedraftpoforvirtual	Include draft status and not yet approved Purchase Orders for virtual stock calculation
-	 *  @return int     							< 0 if KO, > 0 if OK
-	 *  @see	load_stock(), loadBatchInfo()
-	 */
-	public function load_virtual_stock($includedraftpoforvirtual = null)
-	{
-		// phpcs:enable
-		global $conf, $hookmanager, $action;
-
-		$stock_commande_client = 0;
-		$stock_commande_fournisseur = 0;
-		$stock_sending_client = 0;
-		$stock_reception_fournisseur = 0;
-		$stock_inproduction = 0;
-
-		//dol_syslog("load_virtual_stock");
-
-		if (!empty($conf->commande->enabled)) {
-			$result = $this->load_stats_commande(0, '1,2', 1);
-			if ($result < 0) {
-				dol_print_error($this->db, $this->error);
-			}
-			$stock_commande_client = $this->stats_commande['qty'];
-		}
-		if (!empty($conf->expedition->enabled)) {
-			require_once DOL_DOCUMENT_ROOT.'/expedition/class/expedition.class.php';
-			$filterShipmentStatus = '';
-			if (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT)) {
-				$filterShipmentStatus = Expedition::STATUS_VALIDATED.','.Expedition::STATUS_CLOSED;
-			} elseif (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
-				$filterShipmentStatus = Expedition::STATUS_CLOSED;
-			}
-			$result = $this->load_stats_sending(0, '1,2', 1, $filterShipmentStatus);
-			if ($result < 0) {
-				dol_print_error($this->db, $this->error);
-			}
-			$stock_sending_client = $this->stats_expedition['qty'];
-		}
-		if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled)) {
-			$filterStatus = empty($conf->global->SUPPLIER_ORDER_STATUS_FOR_VIRTUAL_STOCK) ? '2,3,4' : $conf->global->SUPPLIER_ORDER_STATUS_FOR_VIRTUAL_STOCK;
-			if (isset($includedraftpoforvirtual)) {
-				$filterStatus = '0,1,2,'.$filterStatus;	// 1,2 may have already been inside $filterStatus but it is better to have twice than missing $filterStatus does not include them
-			}
-			$result = $this->load_stats_commande_fournisseur(0, $filterStatus, 1);
-			if ($result < 0) {
-				dol_print_error($this->db, $this->error);
-			}
-			$stock_commande_fournisseur = $this->stats_commande_fournisseur['qty'];
-		}
-		if (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && empty($conf->reception->enabled)) {
-			$filterStatus = '4';
-			if (isset($includedraftpoforvirtual)) {
-				$filterStatus = '0,'.$filterStatus;
-			}
-			$result = $this->load_stats_reception(0, $filterStatus, 1); // Use same tables than when module reception is not used.
-			if ($result < 0) {
-				dol_print_error($this->db, $this->error);
-			}
-			$stock_reception_fournisseur = $this->stats_reception['qty'];
-		}
-		if (!empty($conf->mrp->enabled)) {
-			$result = $this->load_stats_inproduction(0, '1,2', 1);
-			if ($result < 0) {
-				dol_print_error($this->db, $this->error);
-			}
-			$stock_inproduction = $this->stats_mrptoproduce['qty'] - $this->stats_mrptoconsume['qty'];
-		}
-
-		$this->stock_theorique = $this->stock_reel + $stock_inproduction;
-
-		// Stock decrease mode
-		if (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT) || !empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
-			$this->stock_theorique -= ($stock_commande_client - $stock_sending_client);
-		} elseif (!empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) {
-			$this->stock_theorique += 0;
-		} elseif (!empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
-			$this->stock_theorique -= $stock_commande_client;
-		}
-		// Stock Increase mode
-		if (!empty($conf->global->STOCK_CALCULATE_ON_RECEPTION) || !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION_CLOSE)) {
-			$this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
-		} elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_DISPATCH_ORDER)) {
-			$this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
-		} elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_VALIDATE_ORDER)) {
-			$this->stock_theorique -= $stock_reception_fournisseur;
-		} elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
-			$this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
-		}
-
-		if (!is_object($hookmanager)) {
-			include_once DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php';
-			$hookmanager = new HookManager($this->db);
-		}
-		$hookmanager->initHooks(array('productdao'));
-		$parameters = array('id'=>$this->id, 'includedraftpoforvirtual' => $includedraftpoforvirtual);
-		// Note that $action and $object may have been modified by some hooks
-		$reshook = $hookmanager->executeHooks('loadvirtualstock', $parameters, $this, $action);
-		if ($reshook > 0) {
-			$this->stock_theorique = $hookmanager->resArray['stock_theorique'];
-		}
-
-		return 1;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Charge tableau des stats commande client pour le produit/service
-	 *
-	 * @param  int    $socid           Id societe pour filtrer sur une societe
-	 * @param  string $filtrestatut    Id statut pour filtrer sur un statut
-	 * @param  int    $forVirtualStock Ignore rights filter for virtual stock calculation.
-	 * @return integer                 Array of stats in $this->stats_commande (nb=nb of order, qty=qty ordered), <0 if ko or >0 if ok
-	 */
-	public function load_stats_commande($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager;
-
-		$sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_customers, COUNT(DISTINCT c.rowid) as nb,";
-		$sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
-		$sql .= " FROM ".MAIN_DB_PREFIX."commandedet as cd";
-		$sql .= ", ".MAIN_DB_PREFIX."commande as c";
-		$sql .= ", ".MAIN_DB_PREFIX."societe as s";
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE c.rowid = cd.fk_commande";
-		$sql .= " AND c.fk_soc = s.rowid";
-		$sql .= " AND c.entity IN (".getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'commande').")";
-		$sql .= " AND cd.fk_product = ".((int) $this->id);
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= " AND c.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND c.fk_soc = ".((int) $socid);
-		}
-		if ($filtrestatut <> '') {
-			$sql .= " AND c.fk_statut in (".$this->db->sanitize($filtrestatut).")";
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			$this->stats_commande['customers'] = $obj->nb_customers;
-			$this->stats_commande['nb'] = $obj->nb;
-			$this->stats_commande['rows'] = $obj->nb_rows;
-			$this->stats_commande['qty'] = $obj->qty ? $obj->qty : 0;
-
-			// if it's a virtual product, maybe it is in order by extension
-			if (!empty($conf->global->PRODUCT_STATS_WITH_PARENT_PROD_IF_INCDEC)) {
-				$TFather = $this->getFather();
-				if (is_array($TFather) && !empty($TFather)) {
-					foreach ($TFather as &$fatherData) {
-						$pFather = new Product($this->db);
-						$pFather->id = $fatherData['id'];
-						$qtyCoef = $fatherData['qty'];
-
-						if ($fatherData['incdec']) {
-							$pFather->load_stats_commande($socid, $filtrestatut);
-
-							$this->stats_commande['customers'] += $pFather->stats_commande['customers'];
-							$this->stats_commande['nb'] += $pFather->stats_commande['nb'];
-							$this->stats_commande['rows'] += $pFather->stats_commande['rows'];
-							$this->stats_commande['qty'] += $pFather->stats_commande['qty'] * $qtyCoef;
-						}
-					}
-				}
-			}
-
-			// If stock decrease is on invoice validation, the theorical stock continue to
-			// count the orders to ship in theorical stock when some are already removed b invoice validation.
-			// If option DECREASE_ONLY_UNINVOICEDPRODUCTS is on, we make a compensation.
-			if (!empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
-				if (!empty($conf->global->DECREASE_ONLY_UNINVOICEDPRODUCTS)) {
-					$adeduire = 0;
-					$sql = "SELECT sum(fd.qty) as count FROM ".MAIN_DB_PREFIX."facturedet fd ";
-					$sql .= " JOIN ".MAIN_DB_PREFIX."facture f ON fd.fk_facture = f.rowid ";
-					$sql .= " JOIN ".MAIN_DB_PREFIX."element_element el ON el.fk_target = f.rowid and el.targettype = 'facture' and sourcetype = 'commande'";
-					$sql .= " JOIN ".MAIN_DB_PREFIX."commande c ON el.fk_source = c.rowid ";
-					$sql .= " WHERE c.fk_statut IN (".$this->db->sanitize($filtrestatut).") AND c.facture = 0 AND fd.fk_product = ".((int) $this->id);
-					dol_syslog(__METHOD__.":: sql $sql", LOG_NOTICE);
-
-					$resql = $this->db->query($sql);
-					if ($resql) {
-						if ($this->db->num_rows($resql) > 0) {
-							$obj = $this->db->fetch_object($resql);
-							$adeduire += $obj->count;
-						}
-					}
-
-					$this->stats_commande['qty'] -= $adeduire;
-				}
-			}
-
-			$parameters = array('socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock);
-			$reshook = $hookmanager->executeHooks('loadStatsCustomerOrder', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_commande = $hookmanager->resArray['stats_commande'];
-			}
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Return all parent products for current product (first level only)
-	 *
-	 * @return array         Array of product
-	 * @see hasFatherOrChild()
-	 */
-	public function getFather()
-	{
-		$sql = "SELECT p.rowid, p.label as label, p.ref as ref, pa.fk_product_pere as id, p.fk_product_type, pa.qty, pa.incdec, p.entity";
-		$sql .= ", p.tosell as status, p.tobuy as status_buy";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_association as pa,";
-		$sql .= " ".MAIN_DB_PREFIX."product as p";
-		$sql .= " WHERE p.rowid = pa.fk_product_pere";
-		$sql .= " AND pa.fk_product_fils = ".((int) $this->id);
-
-		$res = $this->db->query($sql);
-		if ($res) {
-			$prods = array();
-			while ($record = $this->db->fetch_array($res)) {
-				// $record['id'] = $record['rowid'] = id of father
-				$prods[$record['id']]['id'] = $record['rowid'];
-				$prods[$record['id']]['ref'] = $record['ref'];
-				$prods[$record['id']]['label'] = $record['label'];
-				$prods[$record['id']]['qty'] = $record['qty'];
-				$prods[$record['id']]['incdec'] = $record['incdec'];
-				$prods[$record['id']]['fk_product_type'] = $record['fk_product_type'];
-				$prods[$record['id']]['entity'] = $record['entity'];
-				$prods[$record['id']]['status'] = $record['status'];
-				$prods[$record['id']]['status_buy'] = $record['status_buy'];
-			}
-			return $prods;
-		} else {
-			dol_print_error($this->db);
-			return -1;
-		}
-	}
-
-	/**
-	 *  Charge tableau des stats expedition client pour le produit/service
-	 *
-	 * @param   int         $socid                  Id societe pour filtrer sur une societe
-	 * @param   string      $filtrestatut           [=''] Ids order status separated by comma
-	 * @param   int         $forVirtualStock        Ignore rights filter for virtual stock calculation.
-	 * @param   string      $filterShipmentStatus   [=''] Ids shipment status separated by comma
-	 * @return  int                                 Array of stats in $this->stats_expedition, <0 if ko or >0 if ok
-	 */
-	public function load_stats_sending($socid = 0, $filtrestatut = '', $forVirtualStock = 0, $filterShipmentStatus = '')
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager;
-
-		$sql = "SELECT COUNT(DISTINCT e.fk_soc) as nb_customers, COUNT(DISTINCT e.rowid) as nb,";
-		$sql .= " COUNT(ed.rowid) as nb_rows, SUM(ed.qty) as qty";
-		$sql .= " FROM ".MAIN_DB_PREFIX."expeditiondet as ed";
-		$sql .= ", ".MAIN_DB_PREFIX."commandedet as cd";
-		$sql .= ", ".MAIN_DB_PREFIX."commande as c";
-		$sql .= ", ".MAIN_DB_PREFIX."expedition as e";
-		$sql .= ", ".MAIN_DB_PREFIX."societe as s";
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE e.rowid = ed.fk_expedition";
-		$sql .= " AND c.rowid = cd.fk_commande";
-		$sql .= " AND e.fk_soc = s.rowid";
-		$sql .= " AND e.entity IN (".getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'expedition').")";
-		$sql .= " AND ed.fk_origin_line = cd.rowid";
-		$sql .= " AND cd.fk_product = ".((int) $this->id);
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= " AND e.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND e.fk_soc = ".((int) $socid);
-		}
-		if ($filtrestatut <> '') {
-			$sql .= " AND c.fk_statut IN (".$this->db->sanitize($filtrestatut).")";
-		}
-		if (!empty($filterShipmentStatus)) {
-			$sql .= " AND e.fk_statut IN (".$this->db->sanitize($filterShipmentStatus).")";
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			$this->stats_expedition['customers'] = $obj->nb_customers;
-			$this->stats_expedition['nb'] = $obj->nb;
-			$this->stats_expedition['rows'] = $obj->nb_rows;
-			$this->stats_expedition['qty'] = $obj->qty ? $obj->qty : 0;
-
-			// if it's a virtual product, maybe it is in sending by extension
-			if (!empty($conf->global->PRODUCT_STATS_WITH_PARENT_PROD_IF_INCDEC)) {
-				$TFather = $this->getFather();
-				if (is_array($TFather) && !empty($TFather)) {
-					foreach ($TFather as &$fatherData) {
-						$pFather = new Product($this->db);
-						$pFather->id = $fatherData['id'];
-						$qtyCoef = $fatherData['qty'];
-
-						if ($fatherData['incdec']) {
-							$pFather->load_stats_sending($socid, $filtrestatut, $forVirtualStock);
-
-							$this->stats_expedition['customers'] += $pFather->stats_expedition['customers'];
-							$this->stats_expedition['nb'] += $pFather->stats_expedition['nb'];
-							$this->stats_expedition['rows'] += $pFather->stats_expedition['rows'];
-							$this->stats_expedition['qty'] += $pFather->stats_expedition['qty'] * $qtyCoef;
-						}
-					}
-				}
-			}
-
-			$parameters = array('socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock, 'filterShipmentStatus' => $filterShipmentStatus);
-			$reshook = $hookmanager->executeHooks('loadStatsSending', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_expedition = $hookmanager->resArray['stats_expedition'];
-			}
-
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	/**
-	 *  Charge tableau des stats commande fournisseur pour le produit/service
-	 *
-	 * @param  int    $socid           Id societe pour filtrer sur une societe
-	 * @param  string $filtrestatut    Id des statuts pour filtrer sur des statuts
-	 * @param  int    $forVirtualStock Ignore rights filter for virtual stock calculation.
-	 * @return int                     Array of stats in $this->stats_commande_fournisseur, <0 if ko or >0 if ok
-	 */
-	public function load_stats_commande_fournisseur($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager, $action;
-
-		$sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_suppliers, COUNT(DISTINCT c.rowid) as nb,";
-		$sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
-		$sql .= " FROM ".MAIN_DB_PREFIX."commande_fournisseurdet as cd";
-		$sql .= ", ".MAIN_DB_PREFIX."commande_fournisseur as c";
-		$sql .= ", ".MAIN_DB_PREFIX."societe as s";
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE c.rowid = cd.fk_commande";
-		$sql .= " AND c.fk_soc = s.rowid";
-		$sql .= " AND c.entity IN (".getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'supplier_order').")";
-		$sql .= " AND cd.fk_product = ".((int) $this->id);
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= " AND c.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND c.fk_soc = ".((int) $socid);
-		}
-		if ($filtrestatut != '') {
-			$sql .= " AND c.fk_statut in (".$this->db->sanitize($filtrestatut).")"; // Peut valoir 0
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			$this->stats_commande_fournisseur['suppliers'] = $obj->nb_suppliers;
-			$this->stats_commande_fournisseur['nb'] = $obj->nb;
-			$this->stats_commande_fournisseur['rows'] = $obj->nb_rows;
-			$this->stats_commande_fournisseur['qty'] = $obj->qty ? $obj->qty : 0;
-
-			$parameters = array('socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock);
-			$reshook = $hookmanager->executeHooks('loadStatsSupplierOrder', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_commande_fournisseur = $hookmanager->resArray['stats_commande_fournisseur'];
-			}
-
-			return 1;
-		} else {
-			$this->error = $this->db->error().' sql='.$sql;
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Charge tableau des stats réception fournisseur pour le produit/service
-	 *
-	 * @param  int    $socid           Id societe pour filtrer sur une societe
-	 * @param  string $filtrestatut    Id statut pour filtrer sur un statut
-	 * @param  int    $forVirtualStock Ignore rights filter for virtual stock calculation.
-	 * @return int                     Array of stats in $this->stats_reception, <0 if ko or >0 if ok
-	 */
-	public function load_stats_reception($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager, $action;
-
-		$sql = "SELECT COUNT(DISTINCT cf.fk_soc) as nb_suppliers, COUNT(DISTINCT cf.rowid) as nb,";
-		$sql .= " COUNT(fd.rowid) as nb_rows, SUM(fd.qty) as qty";
-		$sql .= " FROM ".MAIN_DB_PREFIX."commande_fournisseur_dispatch as fd";
-		$sql .= ", ".MAIN_DB_PREFIX."commande_fournisseur as cf";
-		$sql .= ", ".MAIN_DB_PREFIX."societe as s";
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE cf.rowid = fd.fk_commande";
-		$sql .= " AND cf.fk_soc = s.rowid";
-		$sql .= " AND cf.entity IN (".getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'supplier_order').")";
-		$sql .= " AND fd.fk_product = ".((int) $this->id);
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= " AND cf.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND cf.fk_soc = ".((int) $socid);
-		}
-		if ($filtrestatut <> '') {
-			$sql .= " AND cf.fk_statut IN (".$this->db->sanitize($filtrestatut).")";
-		}
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			$obj = $this->db->fetch_object($result);
-			$this->stats_reception['suppliers'] = $obj->nb_suppliers;
-			$this->stats_reception['nb'] = $obj->nb;
-			$this->stats_reception['rows'] = $obj->nb_rows;
-			$this->stats_reception['qty'] = $obj->qty ? $obj->qty : 0;
-
-			$parameters = array('socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock);
-			$reshook = $hookmanager->executeHooks('loadStatsReception', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_reception = $hookmanager->resArray['stats_reception'];
-			}
-
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Charge tableau des stats production pour le produit/service
-	 *
-	 * @param  int    $socid           Id societe pour filtrer sur une societe
-	 * @param  string $filtrestatut    Id statut pour filtrer sur un statut
-	 * @param  int    $forVirtualStock Ignore rights filter for virtual stock calculation.
-	 * @return integer                 Array of stats in $this->stats_mrptoproduce (nb=nb of order, qty=qty ordered), <0 if ko or >0 if ok
-	 */
-	public function load_stats_inproduction($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager;
-
-		$sql = "SELECT COUNT(DISTINCT m.fk_soc) as nb_customers, COUNT(DISTINCT m.rowid) as nb,";
-		$sql .= " COUNT(mp.rowid) as nb_rows, SUM(mp.qty) as qty, role";
-		$sql .= " FROM ".MAIN_DB_PREFIX."mrp_production as mp";
-		$sql .= ", ".MAIN_DB_PREFIX."mrp_mo as m";
-		$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON s.rowid = m.fk_soc";
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE m.rowid = mp.fk_mo";
-		$sql .= " AND m.entity IN (".getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'mrp').")";
-		$sql .= " AND mp.fk_product = ".((int) $this->id);
-		if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
-			$sql .= " AND m.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND m.fk_soc = ".((int) $socid);
-		}
-		if ($filtrestatut <> '') {
-			$sql .= " AND m.status IN (".$this->db->sanitize($filtrestatut).")";
-		}
-		$sql .= " GROUP BY role";
-
-		$this->stats_mrptoconsume['customers'] = 0;
-		$this->stats_mrptoconsume['nb'] = 0;
-		$this->stats_mrptoconsume['rows'] = 0;
-		$this->stats_mrptoconsume['qty'] = 0;
-		$this->stats_mrptoproduce['customers'] = 0;
-		$this->stats_mrptoproduce['nb'] = 0;
-		$this->stats_mrptoproduce['rows'] = 0;
-		$this->stats_mrptoproduce['qty'] = 0;
-
-		$result = $this->db->query($sql);
-		if ($result) {
-			while ($obj = $this->db->fetch_object($result)) {
-				if ($obj->role == 'toconsume') {
-					$this->stats_mrptoconsume['customers'] += $obj->nb_customers;
-					$this->stats_mrptoconsume['nb'] += $obj->nb;
-					$this->stats_mrptoconsume['rows'] += $obj->nb_rows;
-					$this->stats_mrptoconsume['qty'] += ($obj->qty ? $obj->qty : 0);
-				}
-				if ($obj->role == 'consumed') {
-					//$this->stats_mrptoconsume['customers'] += $obj->nb_customers;
-					//$this->stats_mrptoconsume['nb'] += $obj->nb;
-					//$this->stats_mrptoconsume['rows'] += $obj->nb_rows;
-					$this->stats_mrptoconsume['qty'] -= ($obj->qty ? $obj->qty : 0);
-				}
-				if ($obj->role == 'toproduce') {
-					$this->stats_mrptoproduce['customers'] += $obj->nb_customers;
-					$this->stats_mrptoproduce['nb'] += $obj->nb;
-					$this->stats_mrptoproduce['rows'] += $obj->nb_rows;
-					$this->stats_mrptoproduce['qty'] += ($obj->qty ? $obj->qty : 0);
-				}
-				if ($obj->role == 'produced') {
-					//$this->stats_mrptoproduce['customers'] += $obj->nb_customers;
-					//$this->stats_mrptoproduce['nb'] += $obj->nb;
-					//$this->stats_mrptoproduce['rows'] += $obj->nb_rows;
-					$this->stats_mrptoproduce['qty'] -= ($obj->qty ? $obj->qty : 0);
-				}
-			}
-
-			// Clean data
-			if ($this->stats_mrptoconsume['qty'] < 0) {
-				$this->stats_mrptoconsume['qty'] = 0;
-			}
-			if ($this->stats_mrptoproduce['qty'] < 0) {
-				$this->stats_mrptoproduce['qty'] = 0;
-			}
-
-			$parameters = array('socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock);
-			$reshook = $hookmanager->executeHooks('loadStatsInProduction', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_mrptoproduce = $hookmanager->resArray['stats_mrptoproduce'];
-			}
-
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return if object is a product
-	 *
-	 * @return boolean     True if it's a product
-	 */
-	public function isProduct()
-	{
-		return ($this->type == Product::TYPE_PRODUCT ? true : false);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Return if object is a product
-	 *
-	 * @return boolean     True if it's a service
-	 */
-	public function isService()
-	{
-		return ($this->type == Product::TYPE_SERVICE ? true : false);
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
 	 *  Delete a product from database (if not used)
 	 *
 	 * @param  User $user      User (object) deleting product
@@ -2682,24 +1426,131 @@ public $net_measure_units;
 			}
 		} else {
 			$this->error = "ErrorRecordIsUsedCantDelete";
-			return 0;
-		}
-	}
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Update or add a translation for a product
+     *
+     * @param User $user Object user making update
+     *
+     * @return int        <0 if KO, >0 if OK
+     */
+    public function setMultiLangs($user)
+    {
+        global $conf, $langs;
 
-	/**
-	 *    Delete a language for this product
-	 *
-	 * @param string $langtodelete Language code to delete
-	 * @param User   $user         Object user making delete
-	 *
-	 * @return int                            <0 if KO, >0 if OK
-	 */
-	public function delMultiLangs($langtodelete, $user)
-	{
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."product_lang";
-		$sql .= " WHERE fk_product = ".((int) $this->id)." AND lang = '".$this->db->escape($langtodelete)."'";
+        $langs_available = $langs->get_available_languages(DOL_DOCUMENT_ROOT, 0, 2);
+        $current_lang = $langs->getDefaultLang();
+
+        foreach ($langs_available as $key => $value) {
+            if ($key == $current_lang) {
+                $sql = "SELECT rowid";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "product_lang";
+                $sql .= " WHERE fk_product = " . ((int) $this->id);
+                $sql .= " AND lang = '" . $this->db->escape($key) . "'";
+
+                $result = $this->db->query($sql);
+
+                if ($this->db->num_rows($result)) { // if there is already a description line for this language
+                    $sql2 = "UPDATE " . MAIN_DB_PREFIX . "product_lang";
+                    $sql2 .= " SET ";
+                    $sql2 .= " label='" . $this->db->escape($this->label) . "',";
+                    $sql2 .= " description='" . $this->db->escape($this->description) . "'";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", note='" . $this->db->escape($this->other) . "'";
+                    }
+                    $sql2 .= " WHERE fk_product = " . ((int) $this->id) . " AND lang = '" . $this->db->escape($key) . "'";
+                } else {
+                    $sql2 = "INSERT INTO " . MAIN_DB_PREFIX . "product_lang (fk_product, lang, label, description";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", note";
+                    }
+                    $sql2 .= ")";
+                    $sql2 .= " VALUES(" . $this->id . ",'" . $this->db->escape($key) . "','" . $this->db->escape($this->label) . "',";
+                    $sql2 .= " '" . $this->db->escape($this->description) . "'";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", '" . $this->db->escape($this->other) . "'";
+                    }
+                    $sql2 .= ")";
+                }
+                dol_syslog(get_class($this) . '::setMultiLangs key = current_lang = ' . $key);
+                if (!$this->db->query($sql2)) {
+                    $this->error = $this->db->lasterror();
+                    return -1;
+                }
+            } elseif (isset($this->multilangs[$key])) {
+                if (empty($this->multilangs["$key"]["label"])) {
+                    $this->error = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Label"));
+                    return -1;
+                }
+
+                $sql = "SELECT rowid";
+                $sql .= " FROM " . MAIN_DB_PREFIX . "product_lang";
+                $sql .= " WHERE fk_product = " . ((int) $this->id);
+                $sql .= " AND lang = '" . $this->db->escape($key) . "'";
+
+                $result = $this->db->query($sql);
+
+                if ($this->db->num_rows($result)) { // if there is already a description line for this language
+                    $sql2 = "UPDATE " . MAIN_DB_PREFIX . "product_lang";
+                    $sql2 .= " SET ";
+                    $sql2 .= " label = '" . $this->db->escape($this->multilangs["$key"]["label"]) . "',";
+                    $sql2 .= " description = '" . $this->db->escape($this->multilangs["$key"]["description"]) . "'";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", note = '" . $this->db->escape($this->multilangs["$key"]["other"]) . "'";
+                    }
+                    $sql2 .= " WHERE fk_product = " . ((int) $this->id) . " AND lang = '" . $this->db->escape($key) . "'";
+                } else {
+                    $sql2 = "INSERT INTO " . MAIN_DB_PREFIX . "product_lang (fk_product, lang, label, description";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", note";
+                    }
+                    $sql2 .= ")";
+                    $sql2 .= " VALUES(" . $this->id . ",'" . $this->db->escape($key) . "','" . $this->db->escape($this->multilangs["$key"]["label"]) . "',";
+                    $sql2 .= " '" . $this->db->escape($this->multilangs["$key"]["description"]) . "'";
+                    if (!empty($conf->global->PRODUCT_USE_OTHER_FIELD_IN_TRANSLATION)) {
+                        $sql2 .= ", '" . $this->db->escape($this->multilangs["$key"]["other"]) . "'";
+                    }
+                    $sql2 .= ")";
+                }
+
+                // We do not save if main fields are empty
+                if ($this->multilangs["$key"]["label"] || $this->multilangs["$key"]["description"]) {
+                    if (!$this->db->query($sql2)) {
+                        $this->error = $this->db->lasterror();
+                        return -1;
+                    }
+                }
+            } else {
+                // language is not current language and we didn't provide a multilang description for this language
+            }
+        }
+
+        // Call trigger
+        $result = $this->call_trigger('PRODUCT_SET_MULTILANGS', $user);
+        if ($result < 0) {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+        // End call triggers
+
+        return 1;
+    }
+
+    /**
+     *    Delete a language for this product
+     *
+     * @param string $langtodelete Language code to delete
+     * @param User   $user         Object user making delete
+     *
+     * @return int                            <0 if KO, >0 if OK
+     */
+    public function delMultiLangs($langtodelete, $user)
+    {
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "product_lang";
+        $sql .= " WHERE fk_product = " .((int) $this->id)." AND lang = '".$this->db->escape($langtodelete)."'";
 
 		dol_syslog(get_class($this).'::delMultiLangs', LOG_DEBUG);
 		$result = $this->db->query($sql);
@@ -2719,8 +1570,6 @@ public $net_measure_units;
 			return -1;
 		}
 	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Sets an accountancy code for a product.
@@ -2780,24 +1629,134 @@ public $net_measure_units;
 			return 1;
 		} else {
 			$this->error = $this->db->lasterror();
-			$this->db->rollback();
-			return -1;
-		}
-	}
+            $this->db->rollback();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *    Load array this->multilangs
+     *
+     * @return int        <0 if KO, >0 if OK
+     */
+    public function getMultiLangs()
+    {
+        global $langs;
 
-	/**
-	 *  Delete a price line
-	 *
-	 * @param  User $user  Object user
-	 * @param  int  $rowid Line id to delete
-	 * @return int                <0 if KO, >0 if OK
-	 */
-	public function log_price_delete($user, $rowid)
-	{
-		// phpcs:enable
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."product_price_by_qty";
+        $current_lang = $langs->getDefaultLang();
+
+        $sql = "SELECT lang, label, description, note as other";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_lang";
+        $sql .= " WHERE fk_product = " . ((int) $this->id);
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            while ($obj = $this->db->fetch_object($result)) {
+                //print 'lang='.$obj->lang.' current='.$current_lang.'<br>';
+                if ($obj->lang == $current_lang) {  // si on a les traduct. dans la langue courante on les charge en infos principales.
+                    $this->label = $obj->label;
+                    $this->description = $obj->description;
+                    $this->other = $obj->other;
+                }
+                $this->multilangs["$obj->lang"]["label"] = $obj->label;
+                $this->multilangs["$obj->lang"]["description"] = $obj->description;
+                $this->multilangs["$obj->lang"]["other"] = $obj->other;
+            }
+            return 1;
+        } else {
+            $this->error = "Error: " . $this->db->lasterror() . " - " . $sql;
+            return -1;
+        }
+    }
+
+    /**
+     *  used to check if price have really change to avoid log pollution
+     *
+     * @param int $level price level to change
+     *
+     * @return array
+     */
+    private function getArrayForPriceCompare($level = 0)
+    {
+
+        $testExit = ['multiprices', 'multiprices_ttc', 'multiprices_base_type', 'multiprices_min', 'multiprices_min_ttc', 'multiprices_tva_tx', 'multiprices_recuperableonly'];
+
+        foreach ($testExit as $field) {
+            if (!isset($this->$field[$level])) {
+                return [];
+            }
+        }
+
+        $lastPrice = [
+            'level' => $level ? $level : 1,
+            'multiprices' => doubleval($this->multiprices[$level]),
+            'multiprices_ttc' => doubleval($this->multiprices_ttc[$level]),
+            'multiprices_base_type' => $this->multiprices_base_type[$level],
+            'multiprices_min' => doubleval($this->multiprices_min[$level]),
+            'multiprices_min_ttc' => doubleval($this->multiprices_min_ttc[$level]),
+            'multiprices_tva_tx' => doubleval($this->multiprices_tva_tx[$level]),
+            'multiprices_recuperableonly' => doubleval($this->multiprices_recuperableonly[$level]),
+        ];
+
+        return $lastPrice;
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Insert a track that we changed a customer price
+     *
+     * @param User $user  User making change
+     * @param int  $level price level to change
+     *
+     * @return int                    <0 if KO, >0 if OK
+     */
+    private function _log_price($user, $level = 0)
+    {
+        // phpcs:enable
+        global $conf;
+
+        $now = dol_now();
+
+        // Clean parameters
+        if (empty($this->price_by_qty)) {
+            $this->price_by_qty = 0;
+        }
+
+        // Add new price
+        $sql = "INSERT INTO " . MAIN_DB_PREFIX . "product_price(price_level,date_price, fk_product, fk_user_author, price, price_ttc, price_base_type,tosell, tva_tx, default_vat_code, recuperableonly,";
+        $sql .= " localtax1_tx, localtax2_tx, localtax1_type, localtax2_type, price_min,price_min_ttc,price_by_qty,entity,fk_price_expression) ";
+        $sql .= " VALUES(" . ($level ? ((int) $level) : 1) . ", '" . $this->db->idate($now) . "', " . ((int) $this->id) . ", " . ((int) $user->id) . ", " . ((float) price2num($this->price)) . ", " . ((float) price2num($this->price_ttc)) . ",'" . $this->db->escape($this->price_base_type) . "'," . ((int) $this->status) . ", " . ((float) price2num($this->tva_tx)) . ", " . ($this->default_vat_code ? ("'" . $this->db->escape($this->default_vat_code) . "'") : "null") . ", " . ((int) $this->tva_npr) . ",";
+        $sql .= " " . price2num($this->localtax1_tx) . ", " . price2num($this->localtax2_tx) . ", '" . $this->db->escape($this->localtax1_type) . "', '" . $this->db->escape($this->localtax2_type) . "', " . price2num($this->price_min) . ", " . price2num($this->price_min_ttc) . ", " . price2num($this->price_by_qty) . ", " . ((int) $conf->entity) . "," . ($this->fk_price_expression > 0 ? ((int) $this->fk_price_expression) : 'null');
+        $sql .= ")";
+
+        dol_syslog(get_class($this) . "::_log_price", LOG_DEBUG);
+        $resql = $this->db->query($sql);
+        if (!$resql) {
+            $this->error = $this->db->lasterror();
+            dol_print_error($this->db);
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Delete a price line
+     *
+     * @param User $user  Object user
+     * @param int  $rowid Line id to delete
+     *
+     * @return int                <0 if KO, >0 if OK
+     */
+    public function log_price_delete($user, $rowid)
+    {
+        // phpcs:enable
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX."product_price_by_qty";
 		$sql .= " WHERE fk_product_price = ".((int) $rowid);
 		$resql = $this->db->query($sql);
 
@@ -2812,7 +1771,6 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 * Return price of sell of a product for a seller/buyer/product.
@@ -2923,7 +1881,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Read price used by a provider.
 	 * We enter as input couple prodfournprice/qty or triplet qty/product_id/fourn_ref.
@@ -3074,7 +2031,6 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *    Modify customer price of a product/Service
@@ -3256,106 +2212,6 @@ public $net_measure_units;
 		return 1;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  used to check if price have really change to avoid log pollution
-	 *
-	 * @param  int  $level price level to change
-	 * @return array
-	 */
-	private function getArrayForPriceCompare($level = 0)
-	{
-
-		$testExit = array('multiprices','multiprices_ttc','multiprices_base_type','multiprices_min','multiprices_min_ttc','multiprices_tva_tx','multiprices_recuperableonly');
-
-		foreach ($testExit as $field) {
-			if (!isset($this->$field[$level])) {
-				return array();
-			}
-		}
-
-		$lastPrice = array(
-			'level' => $level ? $level : 1,
-			'multiprices' => doubleval($this->multiprices[$level]),
-			'multiprices_ttc' => doubleval($this->multiprices_ttc[$level]),
-			'multiprices_base_type' => $this->multiprices_base_type[$level],
-			'multiprices_min' => doubleval($this->multiprices_min[$level]),
-			'multiprices_min_ttc' => doubleval($this->multiprices_min_ttc[$level]),
-			'multiprices_tva_tx' => doubleval($this->multiprices_tva_tx[$level]),
-			'multiprices_recuperableonly' => doubleval($this->multiprices_recuperableonly[$level]),
-		);
-
-		return $lastPrice;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 * Generates prices for a product based on product multiprice generation rules
-	 *
-	 * @param  User   $user       User that updates the prices
-	 * @param  float  $baseprice  Base price
-	 * @param  string $price_type Base price type
-	 * @param  float  $price_vat  VAT % tax
-	 * @param  int    $npr        NPR
-	 * @param  string $psq        ¿?
-	 * @return int -1 KO, 1 OK
-	 */
-	public function generateMultiprices(User $user, $baseprice, $price_type, $price_vat, $npr, $psq)
-	{
-		global $conf, $db;
-
-		$sql = "SELECT rowid, level, fk_level, var_percent, var_min_percent FROM ".MAIN_DB_PREFIX."product_pricerules";
-		$query = $this->db->query($sql);
-
-		$rules = array();
-
-		while ($result = $this->db->fetch_object($query)) {
-			$rules[$result->level] = $result;
-		}
-
-		//Because prices can be based on other level's prices, we temporarily store them
-		$prices = array(
-			1 => $baseprice
-		);
-
-		for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
-			$price = $baseprice;
-			$price_min = $baseprice;
-
-			//We have to make sure it does exist and it is > 0
-			//First price level only allows changing min_price
-			if ($i > 1 && isset($rules[$i]->var_percent) && $rules[$i]->var_percent) {
-				$price = $prices[$rules[$i]->fk_level] * (1 + ($rules[$i]->var_percent / 100));
-			}
-
-			$prices[$i] = $price;
-
-			//We have to make sure it does exist and it is > 0
-			if (isset($rules[$i]->var_min_percent) && $rules[$i]->var_min_percent) {
-				$price_min = $price * (1 - ($rules[$i]->var_min_percent / 100));
-			}
-
-			//Little check to make sure the price is modified before triggering generation
-			$check_amount = (($price == $this->multiprices[$i]) && ($price_min == $this->multiprices_min[$i]));
-			$check_type = ($baseprice == $this->multiprices_base_type[$i]);
-
-			if ($check_amount && $check_type) {
-				continue;
-			}
-
-			if ($this->updatePrice($price, $price_type, $user, $price_vat, $price_min, $i, $npr, $psq, true) < 0) {
-				return -1;
-			}
-		}
-
-		return 1;
-	}
-
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Sets the supplier price expression
 	 *
@@ -3369,26 +2225,440 @@ public $net_measure_units;
 
 		$this->fk_price_expression = $expression_id;
 
-		return $this->update($this->id, $user);
-	}
+        return $this->update($this->id, $user);
+    }
 
+    /**
+     *  Load a product in memory from database
+     *
+     * @param int    $id                Id of product/service to load
+     * @param string $ref               Ref of product/service to load
+     * @param string $ref_ext           Ref ext of product/service to load
+     * @param string $barcode           Barcode of product/service to load
+     * @param int    $ignore_expression When module dynamicprices is on, ignores the math expression for calculating price and uses the db value instead
+     * @param int    $ignore_price_load Load product without loading $this->multiprices... array (when we are sure we don't need them)
+     * @param int    $ignore_lang_load  Load product without loading $this->multilangs language arrays (when we are sure we don't need them)
+     *
+     * @return int                       <0 if KO, 0 if not found, >0 if OK
+     */
+    public function fetch($id = '', $ref = '', $ref_ext = '', $barcode = '', $ignore_expression = 0, $ignore_price_load = 0, $ignore_lang_load = 0)
+    {
+        include_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+        global $langs, $conf;
 
-	/**
-	 *  Charge tableau des stats OF pour le produit/service
-	 *
-	 * @param  int $socid Id societe
-	 * @return int                     Array of stats in $this->stats_mo, <0 if ko or >0 if ok
-	 */
-	public function load_stats_mo($socid = 0)
-	{
-		// phpcs:enable
-		global $user, $hookmanager, $action;
+        dol_syslog(get_class($this) . "::fetch id=" . $id . " ref=" . $ref . " ref_ext=" . $ref_ext);
 
-		$error = 0;
+        // Check parameters
+        if (!$id && !$ref && !$ref_ext && !$barcode) {
+            $this->error = 'ErrorWrongParameters';
+            dol_syslog(get_class($this) . "::fetch " . $this->error, LOG_ERR);
+            return -1;
+        }
 
-		foreach (array('toconsume', 'consumed', 'toproduce', 'produced') as $role) {
+        $sql = "SELECT p.rowid, p.ref, p.ref_ext, p.label, p.description, p.url, p.note_public, p.note as note_private, p.customcode, p.fk_country, p.fk_state, p.lifetime, p.qc_frequency, p.price, p.price_ttc,";
+        $sql .= " p.price_min, p.price_min_ttc, p.price_base_type, p.cost_price, p.default_vat_code, p.tva_tx, p.recuperableonly as tva_npr, p.localtax1_tx, p.localtax2_tx, p.localtax1_type, p.localtax2_type, p.tosell,";
+        $sql .= " p.tobuy, p.fk_product_type, p.duration, p.fk_default_warehouse, p.seuil_stock_alerte, p.canvas, p.net_measure, p.net_measure_units, p.weight, p.weight_units,";
+        $sql .= " p.length, p.length_units, p.width, p.width_units, p.height, p.height_units,";
+        $sql .= " p.surface, p.surface_units, p.volume, p.volume_units, p.barcode, p.fk_barcode_type, p.finished, p.fk_default_bom,";
+        if (empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
+            $sql .= " p.accountancy_code_buy, p.accountancy_code_buy_intra, p.accountancy_code_buy_export, p.accountancy_code_sell, p.accountancy_code_sell_intra, p.accountancy_code_sell_export,";
+        } else {
+            $sql .= " ppe.accountancy_code_buy, ppe.accountancy_code_buy_intra, ppe.accountancy_code_buy_export, ppe.accountancy_code_sell, ppe.accountancy_code_sell_intra, ppe.accountancy_code_sell_export,";
+        }
+
+        //For MultiCompany
+        //PMP per entity & Stocks Sharings stock_reel includes only stocks shared with this entity
+        $separatedEntityPMP = false;    // Set to true to get the AWP from table llx_product_perentity instead of field 'pmp' into llx_product.
+        $separatedStock = false;        // Set to true will count stock from subtable llx_product_stock. It is slower than using denormalized field 'stock', but it is required when using multientity and shared warehouses.
+        if (!empty($conf->global->MULTICOMPANY_PRODUCT_SHARING_ENABLED)) {
+            if (!empty($conf->global->MULTICOMPANY_PMP_PER_ENTITY_ENABLED)) {
+                $checkPMPPerEntity = $this->db->query("SELECT pmp FROM " . MAIN_DB_PREFIX . "product_perentity WHERE fk_product = " . ((int) $id) . " AND entity = " . (int) $conf->entity);
+                if ($this->db->num_rows($checkPMPPerEntity) > 0) {
+                    $separatedEntityPMP = true;
+                }
+            }
+            global $mc;
+            $separatedStock = true;
+            $visibleWarehousesEntities = $conf->entity;
+            if (isset($mc->sharings['stock']) && !empty($mc->sharings['stock'])) {
+                $visibleWarehousesEntities .= "," . implode(",", $mc->sharings['stock']);
+            }
+        }
+        if ($separatedEntityPMP) {
+            $sql .= " ppe.pmp,";
+        } else {
+            $sql .= " p.pmp,";
+        }
+        $sql .= " p.datec, p.tms, p.import_key, p.entity, p.desiredstock, p.tobatch, p.batch_mask, p.fk_unit,";
+        $sql .= " p.fk_price_expression, p.price_autogen, p.model_pdf,";
+        if ($separatedStock) {
+            $sql .= " SUM(sp.reel) as stock";
+        } else {
+            $sql .= " p.stock";
+        }
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product as p";
+        if (!empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED) || $separatedEntityPMP) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_perentity as ppe ON ppe.fk_product = p.rowid AND ppe.entity = " . ((int) $conf->entity);
+        }
+        if ($separatedStock) {
+            $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_stock as sp ON sp.fk_product = p.rowid AND sp.fk_entrepot IN (SELECT rowid FROM " . MAIN_DB_PREFIX . "entrepot WHERE entity IN (" . $this->db->sanitize($visibleWarehousesEntities) . "))";
+        }
+
+        if ($id) {
+            $sql .= " WHERE p.rowid = " . ((int) $id);
+        } else {
+            $sql .= " WHERE p.entity IN (" . getEntity($this->element) . ")";
+            if ($ref) {
+                $sql .= " AND p.ref = '" . $this->db->escape($ref) . "'";
+            } elseif ($ref_ext) {
+                $sql .= " AND p.ref_ext = '" . $this->db->escape($ref_ext) . "'";
+            } elseif ($barcode) {
+                $sql .= " AND p.barcode = '" . $this->db->escape($barcode) . "'";
+            }
+        }
+        if ($separatedStock) {
+            $sql .= " GROUP BY p.rowid, p.ref, p.ref_ext, p.label, p.description, p.url, p.note_public, p.note, p.customcode, p.fk_country, p.fk_state, p.lifetime, p.qc_frequency, p.price, p.price_ttc,";
+            $sql .= " p.price_min, p.price_min_ttc, p.price_base_type, p.cost_price, p.default_vat_code, p.tva_tx, p.recuperableonly, p.localtax1_tx, p.localtax2_tx, p.localtax1_type, p.localtax2_type, p.tosell,";
+            $sql .= " p.tobuy, p.fk_product_type, p.duration, p.fk_default_warehouse, p.seuil_stock_alerte, p.canvas, p.net_measure, p.net_measure_units, p.weight, p.weight_units,";
+            $sql .= " p.length, p.length_units, p.width, p.width_units, p.height, p.height_units,";
+            $sql .= " p.surface, p.surface_units, p.volume, p.volume_units, p.barcode, p.fk_barcode_type, p.finished,";
+            if (empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
+                $sql .= " p.accountancy_code_buy, p.accountancy_code_buy_intra, p.accountancy_code_buy_export, p.accountancy_code_sell, p.accountancy_code_sell_intra, p.accountancy_code_sell_export,";
+            } else {
+                $sql .= " ppe.accountancy_code_buy, ppe.accountancy_code_buy_intra, ppe.accountancy_code_buy_export, ppe.accountancy_code_sell, ppe.accountancy_code_sell_intra, ppe.accountancy_code_sell_export,";
+            }
+            if ($separatedEntityPMP) {
+                $sql .= " ppe.pmp,";
+            } else {
+                $sql .= " p.pmp,";
+            }
+            $sql .= " p.datec, p.tms, p.import_key, p.entity, p.desiredstock, p.tobatch, p.batch_mask, p.fk_unit,";
+            $sql .= " p.fk_price_expression, p.price_autogen, p.model_pdf";
+            if (!$separatedStock) {
+                $sql .= ", p.stock";
+            }
+        }
+
+        $resql = $this->db->query($sql);
+        if ($resql) {
+            unset($this->oldcopy);
+
+            if ($this->db->num_rows($resql) > 0) {
+                $obj = $this->db->fetch_object($resql);
+
+                $this->id = $obj->rowid;
+                $this->ref = $obj->ref;
+                $this->ref_ext = $obj->ref_ext;
+                $this->label = $obj->label;
+                $this->description = $obj->description;
+                $this->url = $obj->url;
+                $this->note_public = $obj->note_public;
+                $this->note_private = $obj->note_private;
+                $this->note = $obj->note_private; // deprecated
+
+                $this->type = $obj->fk_product_type;
+                $this->status = $obj->tosell;
+                $this->status_buy = $obj->tobuy;
+                $this->status_batch = $obj->tobatch;
+                $this->batch_mask = $obj->batch_mask;
+
+                $this->customcode = $obj->customcode;
+                $this->country_id = $obj->fk_country;
+                $this->country_code = getCountry($this->country_id, 2, $this->db);
+                $this->state_id = $obj->fk_state;
+                $this->lifetime = $obj->lifetime;
+                $this->qc_frequency = $obj->qc_frequency;
+                $this->price = $obj->price;
+                $this->price_ttc = $obj->price_ttc;
+                $this->price_min = $obj->price_min;
+                $this->price_min_ttc = $obj->price_min_ttc;
+                $this->price_base_type = $obj->price_base_type;
+                $this->cost_price = $obj->cost_price;
+                $this->default_vat_code = $obj->default_vat_code;
+                $this->tva_tx = $obj->tva_tx;
+                //! French VAT NPR
+                $this->tva_npr = $obj->tva_npr;
+                $this->recuperableonly = $obj->tva_npr; // For backward compatibility
+                //! Local taxes
+                $this->localtax1_tx = $obj->localtax1_tx;
+                $this->localtax2_tx = $obj->localtax2_tx;
+                $this->localtax1_type = $obj->localtax1_type;
+                $this->localtax2_type = $obj->localtax2_type;
+
+                $this->finished = $obj->finished;
+                $this->fk_default_bom = $obj->fk_default_bom;
+
+                $this->duration = $obj->duration;
+                $this->duration_value = substr($obj->duration, 0, dol_strlen($obj->duration) - 1);
+                $this->duration_unit = substr($obj->duration, -1);
+                $this->canvas = $obj->canvas;
+                $this->net_measure = $obj->net_measure;
+                $this->net_measure_units = $obj->net_measure_units;
+                $this->weight = $obj->weight;
+                $this->weight_units = $obj->weight_units;
+                $this->length = $obj->length;
+                $this->length_units = $obj->length_units;
+                $this->width = $obj->width;
+                $this->width_units = $obj->width_units;
+                $this->height = $obj->height;
+                $this->height_units = $obj->height_units;
+
+                $this->surface = $obj->surface;
+                $this->surface_units = $obj->surface_units;
+                $this->volume = $obj->volume;
+                $this->volume_units = $obj->volume_units;
+                $this->barcode = $obj->barcode;
+                $this->barcode_type = $obj->fk_barcode_type;
+
+                $this->accountancy_code_buy = $obj->accountancy_code_buy;
+                $this->accountancy_code_buy_intra = $obj->accountancy_code_buy_intra;
+                $this->accountancy_code_buy_export = $obj->accountancy_code_buy_export;
+                $this->accountancy_code_sell = $obj->accountancy_code_sell;
+                $this->accountancy_code_sell_intra = $obj->accountancy_code_sell_intra;
+                $this->accountancy_code_sell_export = $obj->accountancy_code_sell_export;
+
+                $this->fk_default_warehouse = $obj->fk_default_warehouse;
+                $this->seuil_stock_alerte = $obj->seuil_stock_alerte;
+                $this->desiredstock = $obj->desiredstock;
+                $this->stock_reel = $obj->stock;
+                $this->pmp = $obj->pmp;
+
+                $this->date_creation = $obj->datec;
+                $this->date_modification = $obj->tms;
+                $this->import_key = $obj->import_key;
+                $this->entity = $obj->entity;
+
+                $this->ref_ext = $obj->ref_ext;
+                $this->fk_price_expression = $obj->fk_price_expression;
+                $this->fk_unit = $obj->fk_unit;
+                $this->price_autogen = $obj->price_autogen;
+                $this->model_pdf = $obj->model_pdf;
+
+                $this->db->free($resql);
+
+                // fetch optionals attributes and labels
+                $this->fetch_optionals();
+
+                // Multilangs
+                if (!empty($conf->global->MAIN_MULTILANGS) && empty($ignore_lang_load)) {
+                    $this->getMultiLangs();
+                }
+
+                // Load multiprices array
+                if (!empty($conf->global->PRODUIT_MULTIPRICES) && empty($ignore_price_load)) {                // prices per segment
+                    for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
+                        $sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
+                        $sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
+                        $sql .= " FROM " . MAIN_DB_PREFIX . "product_price";
+                        $sql .= " WHERE entity IN (" . getEntity('productprice') . ")";
+                        $sql .= " AND price_level=" . ((int) $i);
+                        $sql .= " AND fk_product = " . ((int) $this->id);
+                        $sql .= " ORDER BY date_price DESC, rowid DESC";    // Get the most recent line
+                        $sql .= " LIMIT 1";                                    // Only the first one
+                        $resql = $this->db->query($sql);
+                        if ($resql) {
+                            $result = $this->db->fetch_array($resql);
+
+                            $this->multiprices[$i] = $result ? $result["price"] : null;
+                            $this->multiprices_ttc[$i] = $result ? $result["price_ttc"] : null;
+                            $this->multiprices_min[$i] = $result ? $result["price_min"] : null;
+                            $this->multiprices_min_ttc[$i] = $result ? $result["price_min_ttc"] : null;
+                            $this->multiprices_base_type[$i] = $result ? $result["price_base_type"] : null;
+                            // Next two fields are used only if PRODUIT_MULTIPRICES_USE_VAT_PER_LEVEL is on
+                            $this->multiprices_tva_tx[$i] = $result ? $result["tva_tx"] . ($result ? ' (' . $result['default_vat_code'] . ')' : '') : null;
+                            $this->multiprices_recuperableonly[$i] = $result ? $result["recuperableonly"] : null;
+
+                            // Price by quantity
+                            /*
+                             $this->prices_by_qty[$i]=$result["price_by_qty"];
+                             $this->prices_by_qty_id[$i]=$result["rowid"];
+                             // Récuperation de la liste des prix selon qty si flag positionné
+                             if ($this->prices_by_qty[$i] == 1)
+                             {
+                             $sql = "SELECT rowid, price, unitprice, quantity, remise_percent, remise, price_base_type";
+                             $sql.= " FROM ".MAIN_DB_PREFIX."product_price_by_qty";
+                             $sql.= " WHERE fk_product_price = ".((int) $this->prices_by_qty_id[$i]);
+                             $sql.= " ORDER BY quantity ASC";
+                             $resultat=array();
+                             $resql = $this->db->query($sql);
+                             if ($resql)
+                             {
+                             $ii=0;
+                             while ($result= $this->db->fetch_array($resql)) {
+                             $resultat[$ii]=array();
+                             $resultat[$ii]["rowid"]=$result["rowid"];
+                             $resultat[$ii]["price"]= $result["price"];
+                             $resultat[$ii]["unitprice"]= $result["unitprice"];
+                             $resultat[$ii]["quantity"]= $result["quantity"];
+                             $resultat[$ii]["remise_percent"]= $result["remise_percent"];
+                             $resultat[$ii]["remise"]= $result["remise"];                    // deprecated
+                             $resultat[$ii]["price_base_type"]= $result["price_base_type"];
+                             $ii++;
+                             }
+                             $this->prices_by_qty_list[$i]=$resultat;
+                             }
+                             else
+                             {
+                             dol_print_error($this->db);
+                             return -1;
+                             }
+                             }*/
+                        } else {
+                            $this->error = $this->db->lasterror;
+                            return -1;
+                        }
+                    }
+                } elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES) && empty($ignore_price_load)) {            // prices per customers
+                    // Nothing loaded by default. List may be very long.
+                } elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY) && empty($ignore_price_load)) {    // prices per quantity
+                    $sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
+                    $sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid";
+                    $sql .= " FROM " . MAIN_DB_PREFIX . "product_price";
+                    $sql .= " WHERE fk_product = " . ((int) $this->id);
+                    $sql .= " ORDER BY date_price DESC, rowid DESC";
+                    $sql .= " LIMIT 1";
+                    $resql = $this->db->query($sql);
+                    if ($resql) {
+                        $result = $this->db->fetch_array($resql);
+
+                        // Price by quantity
+                        $this->prices_by_qty[0] = $result["price_by_qty"];
+                        $this->prices_by_qty_id[0] = $result["rowid"];
+                        // Récuperation de la liste des prix selon qty si flag positionné
+                        if ($this->prices_by_qty[0] == 1) {
+                            $sql = "SELECT rowid,price, unitprice, quantity, remise_percent, remise, remise, price_base_type";
+                            $sql .= " FROM " . MAIN_DB_PREFIX . "product_price_by_qty";
+                            $sql .= " WHERE fk_product_price = " . ((int) $this->prices_by_qty_id[0]);
+                            $sql .= " ORDER BY quantity ASC";
+                            $resultat = [];
+                            $resql = $this->db->query($sql);
+                            if ($resql) {
+                                $ii = 0;
+                                while ($result = $this->db->fetch_array($resql)) {
+                                    $resultat[$ii] = [];
+                                    $resultat[$ii]["rowid"] = $result["rowid"];
+                                    $resultat[$ii]["price"] = $result["price"];
+                                    $resultat[$ii]["unitprice"] = $result["unitprice"];
+                                    $resultat[$ii]["quantity"] = $result["quantity"];
+                                    $resultat[$ii]["remise_percent"] = $result["remise_percent"];
+                                    //$resultat[$ii]["remise"]= $result["remise"];                    // deprecated
+                                    $resultat[$ii]["price_base_type"] = $result["price_base_type"];
+                                    $ii++;
+                                }
+                                $this->prices_by_qty_list[0] = $resultat;
+                            } else {
+                                $this->error = $this->db->lasterror;
+                                return -1;
+                            }
+                        }
+                    } else {
+                        $this->error = $this->db->lasterror;
+                        return -1;
+                    }
+                } elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES_BY_QTY_MULTIPRICES) && empty($ignore_price_load)) {    // prices per customer and quantity
+                    for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
+                        $sql = "SELECT price, price_ttc, price_min, price_min_ttc,";
+                        $sql .= " price_base_type, tva_tx, default_vat_code, tosell, price_by_qty, rowid, recuperableonly";
+                        $sql .= " FROM " . MAIN_DB_PREFIX . "product_price";
+                        $sql .= " WHERE entity IN (" . getEntity('productprice') . ")";
+                        $sql .= " AND price_level=" . ((int) $i);
+                        $sql .= " AND fk_product = " . ((int) $this->id);
+                        $sql .= " ORDER BY date_price DESC, rowid DESC";
+                        $sql .= " LIMIT 1";
+                        $resql = $this->db->query($sql);
+                        if ($resql) {
+                            $result = $this->db->fetch_array($resql);
+
+                            $this->multiprices[$i] = $result["price"];
+                            $this->multiprices_ttc[$i] = $result["price_ttc"];
+                            $this->multiprices_min[$i] = $result["price_min"];
+                            $this->multiprices_min_ttc[$i] = $result["price_min_ttc"];
+                            $this->multiprices_base_type[$i] = $result["price_base_type"];
+                            // Next two fields are used only if PRODUIT_MULTIPRICES_USE_VAT_PER_LEVEL is on
+                            $this->multiprices_tva_tx[$i] = $result["tva_tx"]; // TODO Add ' ('.$result['default_vat_code'].')'
+                            $this->multiprices_recuperableonly[$i] = $result["recuperableonly"];
+
+                            // Price by quantity
+                            $this->prices_by_qty[$i] = $result["price_by_qty"];
+                            $this->prices_by_qty_id[$i] = $result["rowid"];
+                            // Récuperation de la liste des prix selon qty si flag positionné
+                            if ($this->prices_by_qty[$i] == 1) {
+                                $sql = "SELECT rowid, price, unitprice, quantity, remise_percent, remise, price_base_type";
+                                $sql .= " FROM " . MAIN_DB_PREFIX . "product_price_by_qty";
+                                $sql .= " WHERE fk_product_price = " . ((int) $this->prices_by_qty_id[$i]);
+                                $sql .= " ORDER BY quantity ASC";
+                                $resultat = [];
+                                $resql = $this->db->query($sql);
+                                if ($resql) {
+                                    $ii = 0;
+                                    while ($result = $this->db->fetch_array($resql)) {
+                                        $resultat[$ii] = [];
+                                        $resultat[$ii]["rowid"] = $result["rowid"];
+                                        $resultat[$ii]["price"] = $result["price"];
+                                        $resultat[$ii]["unitprice"] = $result["unitprice"];
+                                        $resultat[$ii]["quantity"] = $result["quantity"];
+                                        $resultat[$ii]["remise_percent"] = $result["remise_percent"];
+                                        $resultat[$ii]["remise"] = $result["remise"]; // deprecated
+                                        $resultat[$ii]["price_base_type"] = $result["price_base_type"];
+                                        $ii++;
+                                    }
+                                    $this->prices_by_qty_list[$i] = $resultat;
+                                } else {
+                                    $this->error = $this->db->lasterror;
+                                    return -1;
+                                }
+                            }
+                        } else {
+                            $this->error = $this->db->lasterror;
+                            return -1;
+                        }
+                    }
+                }
+
+                if (!empty($conf->dynamicprices->enabled) && !empty($this->fk_price_expression) && empty($ignore_expression)) {
+                    include_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+                    $priceparser = new PriceParser($this->db);
+                    $price_result = $priceparser->parseProduct($this);
+                    if ($price_result >= 0) {
+                        $this->price = $price_result;
+                        // Calculate the VAT
+                        $this->price_ttc = price2num($this->price) * (1 + ($this->tva_tx / 100));
+                        $this->price_ttc = price2num($this->price_ttc, 'MU');
+                    }
+                }
+
+                // We should not load stock during the fetch. If someone need stock of product, he must call load_stock after fetching product.
+                // Instead we just init the stock_warehouse array
+                $this->stock_warehouse = [];
+
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats OF pour le produit/service
+     *
+     * @param int $socid Id societe
+     *
+     * @return int                     Array of stats in $this->stats_mo, <0 if ko or >0 if ok
+     */
+    public function load_stats_mo($socid = 0)
+    {
+        // phpcs:enable
+        global $user, $hookmanager, $action;
+
+        $error = 0;
+
+        foreach (array('toconsume', 'consumed', 'toproduce', 'produced') as $role) {
 			$this->stats_mo['customers_'.$role] = 0;
 			$this->stats_mo['nb_'.$role] = 0;
 			$this->stats_mo['qty_'.$role] = 0;
@@ -3435,7 +2705,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Charge tableau des stats OF pour le produit/service
 	 *
@@ -3505,7 +2774,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Charge tableau des stats propale pour le produit/service
 	 *
@@ -3579,12 +2847,13 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Charge tableau des stats propale pour le produit/service
 	 *
 	 * @param  int $socid Id thirdparty
+	 *
 	 * @return int                     Array of stats in $this->stats_proposal_supplier, <0 if ko or >0 if ok
 	 */
 	public function load_stats_proposal_supplier($socid = 0)
@@ -3618,36 +2887,445 @@ public $net_measure_units;
 			$this->stats_proposal_supplier['suppliers'] = $obj->nb_suppliers;
 			$this->stats_proposal_supplier['nb'] = $obj->nb;
 			$this->stats_proposal_supplier['rows'] = $obj->nb_rows;
-			$this->stats_proposal_supplier['qty'] = $obj->qty ? $obj->qty : 0;
+            $this->stats_proposal_supplier['qty'] = $obj->qty ? $obj->qty : 0;
 
-			$parameters = array('socid' => $socid);
-			$reshook = $hookmanager->executeHooks('loadStatsSupplierProposal', $parameters, $this, $action);
-			if ($reshook > 0) {
-				$this->stats_proposal_supplier = $hookmanager->resArray['stats_proposal_supplier'];
-			}
+            $parameters = ['socid' => $socid];
+            $reshook = $hookmanager->executeHooks('loadStatsSupplierProposal', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_proposal_supplier = $hookmanager->resArray['stats_proposal_supplier'];
+            }
 
-			return 1;
-		} else {
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Charge tableau des stats contrat pour le produit/service
-	 *
-	 * @param  int $socid Id societe
-	 * @return int                     Array of stats in $this->stats_contrat, <0 if ko or >0 if ok
-	 */
-	public function load_stats_contrat($socid = 0)
-	{
-		// phpcs:enable
-		global $conf, $user, $hookmanager;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_customers, COUNT(DISTINCT c.rowid) as nb,";
-		$sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
+    /**
+     *  Charge tableau des stats commande client pour le produit/service
+     *
+     * @param int    $socid           Id societe pour filtrer sur une societe
+     * @param string $filtrestatut    Id statut pour filtrer sur un statut
+     * @param int    $forVirtualStock Ignore rights filter for virtual stock calculation.
+     *
+     * @return integer                 Array of stats in $this->stats_commande (nb=nb of order, qty=qty ordered), <0 if ko or >0 if ok
+     */
+    public function load_stats_commande($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager;
+
+        $sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_customers, COUNT(DISTINCT c.rowid) as nb,";
+        $sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "commandedet as cd";
+        $sql .= ", " . MAIN_DB_PREFIX . "commande as c";
+        $sql .= ", " . MAIN_DB_PREFIX . "societe as s";
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE c.rowid = cd.fk_commande";
+        $sql .= " AND c.fk_soc = s.rowid";
+        $sql .= " AND c.entity IN (" . getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'commande') . ")";
+        $sql .= " AND cd.fk_product = " . ((int) $this->id);
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= " AND c.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND c.fk_soc = " . ((int) $socid);
+        }
+        if ($filtrestatut <> '') {
+            $sql .= " AND c.fk_statut in (" . $this->db->sanitize($filtrestatut) . ")";
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            $this->stats_commande['customers'] = $obj->nb_customers;
+            $this->stats_commande['nb'] = $obj->nb;
+            $this->stats_commande['rows'] = $obj->nb_rows;
+            $this->stats_commande['qty'] = $obj->qty ? $obj->qty : 0;
+
+            // if it's a virtual product, maybe it is in order by extension
+            if (!empty($conf->global->PRODUCT_STATS_WITH_PARENT_PROD_IF_INCDEC)) {
+                $TFather = $this->getFather();
+                if (is_array($TFather) && !empty($TFather)) {
+                    foreach ($TFather as &$fatherData) {
+                        $pFather = new Product($this->db);
+                        $pFather->id = $fatherData['id'];
+                        $qtyCoef = $fatherData['qty'];
+
+                        if ($fatherData['incdec']) {
+                            $pFather->load_stats_commande($socid, $filtrestatut);
+
+                            $this->stats_commande['customers'] += $pFather->stats_commande['customers'];
+                            $this->stats_commande['nb'] += $pFather->stats_commande['nb'];
+                            $this->stats_commande['rows'] += $pFather->stats_commande['rows'];
+                            $this->stats_commande['qty'] += $pFather->stats_commande['qty'] * $qtyCoef;
+                        }
+                    }
+                }
+            }
+
+            // If stock decrease is on invoice validation, the theorical stock continue to
+            // count the orders to ship in theorical stock when some are already removed b invoice validation.
+            // If option DECREASE_ONLY_UNINVOICEDPRODUCTS is on, we make a compensation.
+            if (!empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
+                if (!empty($conf->global->DECREASE_ONLY_UNINVOICEDPRODUCTS)) {
+                    $adeduire = 0;
+                    $sql = "SELECT sum(fd.qty) as count FROM " . MAIN_DB_PREFIX . "facturedet fd ";
+                    $sql .= " JOIN " . MAIN_DB_PREFIX . "facture f ON fd.fk_facture = f.rowid ";
+                    $sql .= " JOIN " . MAIN_DB_PREFIX . "element_element el ON el.fk_target = f.rowid and el.targettype = 'facture' and sourcetype = 'commande'";
+                    $sql .= " JOIN " . MAIN_DB_PREFIX . "commande c ON el.fk_source = c.rowid ";
+                    $sql .= " WHERE c.fk_statut IN (" . $this->db->sanitize($filtrestatut) . ") AND c.facture = 0 AND fd.fk_product = " . ((int) $this->id);
+                    dol_syslog(__METHOD__ . ":: sql $sql", LOG_NOTICE);
+
+                    $resql = $this->db->query($sql);
+                    if ($resql) {
+                        if ($this->db->num_rows($resql) > 0) {
+                            $obj = $this->db->fetch_object($resql);
+                            $adeduire += $obj->count;
+                        }
+                    }
+
+                    $this->stats_commande['qty'] -= $adeduire;
+                }
+            }
+
+            $parameters = ['socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock];
+            $reshook = $hookmanager->executeHooks('loadStatsCustomerOrder', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_commande = $hookmanager->resArray['stats_commande'];
+            }
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats commande fournisseur pour le produit/service
+     *
+     * @param int    $socid           Id societe pour filtrer sur une societe
+     * @param string $filtrestatut    Id des statuts pour filtrer sur des statuts
+     * @param int    $forVirtualStock Ignore rights filter for virtual stock calculation.
+     *
+     * @return int                     Array of stats in $this->stats_commande_fournisseur, <0 if ko or >0 if ok
+     */
+    public function load_stats_commande_fournisseur($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager, $action;
+
+        $sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_suppliers, COUNT(DISTINCT c.rowid) as nb,";
+        $sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "commande_fournisseurdet as cd";
+        $sql .= ", " . MAIN_DB_PREFIX . "commande_fournisseur as c";
+        $sql .= ", " . MAIN_DB_PREFIX . "societe as s";
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE c.rowid = cd.fk_commande";
+        $sql .= " AND c.fk_soc = s.rowid";
+        $sql .= " AND c.entity IN (" . getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'supplier_order') . ")";
+        $sql .= " AND cd.fk_product = " . ((int) $this->id);
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= " AND c.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND c.fk_soc = " . ((int) $socid);
+        }
+        if ($filtrestatut != '') {
+            $sql .= " AND c.fk_statut in (" . $this->db->sanitize($filtrestatut) . ")"; // Peut valoir 0
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            $this->stats_commande_fournisseur['suppliers'] = $obj->nb_suppliers;
+            $this->stats_commande_fournisseur['nb'] = $obj->nb;
+            $this->stats_commande_fournisseur['rows'] = $obj->nb_rows;
+            $this->stats_commande_fournisseur['qty'] = $obj->qty ? $obj->qty : 0;
+
+            $parameters = ['socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock];
+            $reshook = $hookmanager->executeHooks('loadStatsSupplierOrder', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_commande_fournisseur = $hookmanager->resArray['stats_commande_fournisseur'];
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->error() . ' sql=' . $sql;
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats expedition client pour le produit/service
+     *
+     * @param int    $socid                Id societe pour filtrer sur une societe
+     * @param string $filtrestatut         [=''] Ids order status separated by comma
+     * @param int    $forVirtualStock      Ignore rights filter for virtual stock calculation.
+     * @param string $filterShipmentStatus [=''] Ids shipment status separated by comma
+     *
+     * @return  int                                 Array of stats in $this->stats_expedition, <0 if ko or >0 if ok
+     */
+    public function load_stats_sending($socid = 0, $filtrestatut = '', $forVirtualStock = 0, $filterShipmentStatus = '')
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager;
+
+        $sql = "SELECT COUNT(DISTINCT e.fk_soc) as nb_customers, COUNT(DISTINCT e.rowid) as nb,";
+        $sql .= " COUNT(ed.rowid) as nb_rows, SUM(ed.qty) as qty";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "expeditiondet as ed";
+        $sql .= ", " . MAIN_DB_PREFIX . "commandedet as cd";
+        $sql .= ", " . MAIN_DB_PREFIX . "commande as c";
+        $sql .= ", " . MAIN_DB_PREFIX . "expedition as e";
+        $sql .= ", " . MAIN_DB_PREFIX . "societe as s";
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE e.rowid = ed.fk_expedition";
+        $sql .= " AND c.rowid = cd.fk_commande";
+        $sql .= " AND e.fk_soc = s.rowid";
+        $sql .= " AND e.entity IN (" . getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'expedition') . ")";
+        $sql .= " AND ed.fk_origin_line = cd.rowid";
+        $sql .= " AND cd.fk_product = " . ((int) $this->id);
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= " AND e.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND e.fk_soc = " . ((int) $socid);
+        }
+        if ($filtrestatut <> '') {
+            $sql .= " AND c.fk_statut IN (" . $this->db->sanitize($filtrestatut) . ")";
+        }
+        if (!empty($filterShipmentStatus)) {
+            $sql .= " AND e.fk_statut IN (" . $this->db->sanitize($filterShipmentStatus) . ")";
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            $this->stats_expedition['customers'] = $obj->nb_customers;
+            $this->stats_expedition['nb'] = $obj->nb;
+            $this->stats_expedition['rows'] = $obj->nb_rows;
+            $this->stats_expedition['qty'] = $obj->qty ? $obj->qty : 0;
+
+            // if it's a virtual product, maybe it is in sending by extension
+            if (!empty($conf->global->PRODUCT_STATS_WITH_PARENT_PROD_IF_INCDEC)) {
+                $TFather = $this->getFather();
+                if (is_array($TFather) && !empty($TFather)) {
+                    foreach ($TFather as &$fatherData) {
+                        $pFather = new Product($this->db);
+                        $pFather->id = $fatherData['id'];
+                        $qtyCoef = $fatherData['qty'];
+
+                        if ($fatherData['incdec']) {
+                            $pFather->load_stats_sending($socid, $filtrestatut, $forVirtualStock);
+
+                            $this->stats_expedition['customers'] += $pFather->stats_expedition['customers'];
+                            $this->stats_expedition['nb'] += $pFather->stats_expedition['nb'];
+                            $this->stats_expedition['rows'] += $pFather->stats_expedition['rows'];
+                            $this->stats_expedition['qty'] += $pFather->stats_expedition['qty'] * $qtyCoef;
+                        }
+                    }
+                }
+            }
+
+            $parameters = ['socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock, 'filterShipmentStatus' => $filterShipmentStatus];
+            $reshook = $hookmanager->executeHooks('loadStatsSending', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_expedition = $hookmanager->resArray['stats_expedition'];
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats réception fournisseur pour le produit/service
+     *
+     * @param int    $socid           Id societe pour filtrer sur une societe
+     * @param string $filtrestatut    Id statut pour filtrer sur un statut
+     * @param int    $forVirtualStock Ignore rights filter for virtual stock calculation.
+     *
+     * @return int                     Array of stats in $this->stats_reception, <0 if ko or >0 if ok
+     */
+    public function load_stats_reception($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager, $action;
+
+        $sql = "SELECT COUNT(DISTINCT cf.fk_soc) as nb_suppliers, COUNT(DISTINCT cf.rowid) as nb,";
+        $sql .= " COUNT(fd.rowid) as nb_rows, SUM(fd.qty) as qty";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "commande_fournisseur_dispatch as fd";
+        $sql .= ", " . MAIN_DB_PREFIX . "commande_fournisseur as cf";
+        $sql .= ", " . MAIN_DB_PREFIX . "societe as s";
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE cf.rowid = fd.fk_commande";
+        $sql .= " AND cf.fk_soc = s.rowid";
+        $sql .= " AND cf.entity IN (" . getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'supplier_order') . ")";
+        $sql .= " AND fd.fk_product = " . ((int) $this->id);
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= " AND cf.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND cf.fk_soc = " . ((int) $socid);
+        }
+        if ($filtrestatut <> '') {
+            $sql .= " AND cf.fk_statut IN (" . $this->db->sanitize($filtrestatut) . ")";
+        }
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            $obj = $this->db->fetch_object($result);
+            $this->stats_reception['suppliers'] = $obj->nb_suppliers;
+            $this->stats_reception['nb'] = $obj->nb;
+            $this->stats_reception['rows'] = $obj->nb_rows;
+            $this->stats_reception['qty'] = $obj->qty ? $obj->qty : 0;
+
+            $parameters = ['socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock];
+            $reshook = $hookmanager->executeHooks('loadStatsReception', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_reception = $hookmanager->resArray['stats_reception'];
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats production pour le produit/service
+     *
+     * @param int    $socid           Id societe pour filtrer sur une societe
+     * @param string $filtrestatut    Id statut pour filtrer sur un statut
+     * @param int    $forVirtualStock Ignore rights filter for virtual stock calculation.
+     *
+     * @return integer                 Array of stats in $this->stats_mrptoproduce (nb=nb of order, qty=qty ordered), <0 if ko or >0 if ok
+     */
+    public function load_stats_inproduction($socid = 0, $filtrestatut = '', $forVirtualStock = 0)
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager;
+
+        $sql = "SELECT COUNT(DISTINCT m.fk_soc) as nb_customers, COUNT(DISTINCT m.rowid) as nb,";
+        $sql .= " COUNT(mp.rowid) as nb_rows, SUM(mp.qty) as qty, role";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "mrp_production as mp";
+        $sql .= ", " . MAIN_DB_PREFIX . "mrp_mo as m";
+        $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s ON s.rowid = m.fk_soc";
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE m.rowid = mp.fk_mo";
+        $sql .= " AND m.entity IN (" . getEntity($forVirtualStock && !empty($conf->global->STOCK_CALCULATE_VIRTUAL_STOCK_TRANSVERSE_MODE) ? 'stock' : 'mrp') . ")";
+        $sql .= " AND mp.fk_product = " . ((int) $this->id);
+        if (empty($user->rights->societe->client->voir) && !$socid && !$forVirtualStock) {
+            $sql .= " AND m.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND m.fk_soc = " . ((int) $socid);
+        }
+        if ($filtrestatut <> '') {
+            $sql .= " AND m.status IN (" . $this->db->sanitize($filtrestatut) . ")";
+        }
+        $sql .= " GROUP BY role";
+
+        $this->stats_mrptoconsume['customers'] = 0;
+        $this->stats_mrptoconsume['nb'] = 0;
+        $this->stats_mrptoconsume['rows'] = 0;
+        $this->stats_mrptoconsume['qty'] = 0;
+        $this->stats_mrptoproduce['customers'] = 0;
+        $this->stats_mrptoproduce['nb'] = 0;
+        $this->stats_mrptoproduce['rows'] = 0;
+        $this->stats_mrptoproduce['qty'] = 0;
+
+        $result = $this->db->query($sql);
+        if ($result) {
+            while ($obj = $this->db->fetch_object($result)) {
+                if ($obj->role == 'toconsume') {
+                    $this->stats_mrptoconsume['customers'] += $obj->nb_customers;
+                    $this->stats_mrptoconsume['nb'] += $obj->nb;
+                    $this->stats_mrptoconsume['rows'] += $obj->nb_rows;
+                    $this->stats_mrptoconsume['qty'] += ($obj->qty ? $obj->qty : 0);
+                }
+                if ($obj->role == 'consumed') {
+                    //$this->stats_mrptoconsume['customers'] += $obj->nb_customers;
+                    //$this->stats_mrptoconsume['nb'] += $obj->nb;
+                    //$this->stats_mrptoconsume['rows'] += $obj->nb_rows;
+                    $this->stats_mrptoconsume['qty'] -= ($obj->qty ? $obj->qty : 0);
+                }
+                if ($obj->role == 'toproduce') {
+                    $this->stats_mrptoproduce['customers'] += $obj->nb_customers;
+                    $this->stats_mrptoproduce['nb'] += $obj->nb;
+                    $this->stats_mrptoproduce['rows'] += $obj->nb_rows;
+                    $this->stats_mrptoproduce['qty'] += ($obj->qty ? $obj->qty : 0);
+                }
+                if ($obj->role == 'produced') {
+                    //$this->stats_mrptoproduce['customers'] += $obj->nb_customers;
+                    //$this->stats_mrptoproduce['nb'] += $obj->nb;
+                    //$this->stats_mrptoproduce['rows'] += $obj->nb_rows;
+                    $this->stats_mrptoproduce['qty'] -= ($obj->qty ? $obj->qty : 0);
+                }
+            }
+
+            // Clean data
+            if ($this->stats_mrptoconsume['qty'] < 0) {
+                $this->stats_mrptoconsume['qty'] = 0;
+            }
+            if ($this->stats_mrptoproduce['qty'] < 0) {
+                $this->stats_mrptoproduce['qty'] = 0;
+            }
+
+            $parameters = ['socid' => $socid, 'filtrestatut' => $filtrestatut, 'forVirtualStock' => $forVirtualStock];
+            $reshook = $hookmanager->executeHooks('loadStatsInProduction', $parameters, $this, $action);
+            if ($reshook > 0) {
+                $this->stats_mrptoproduce = $hookmanager->resArray['stats_mrptoproduce'];
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Charge tableau des stats contrat pour le produit/service
+     *
+     * @param int $socid Id societe
+     *
+     * @return int                     Array of stats in $this->stats_contrat, <0 if ko or >0 if ok
+     */
+    public function load_stats_contrat($socid = 0)
+    {
+        // phpcs:enable
+        global $conf, $user, $hookmanager;
+
+        $sql = "SELECT COUNT(DISTINCT c.fk_soc) as nb_customers, COUNT(DISTINCT c.rowid) as nb,";
+        $sql .= " COUNT(cd.rowid) as nb_rows, SUM(cd.qty) as qty";
 		$sql .= " FROM ".MAIN_DB_PREFIX."contratdet as cd";
 		$sql .= ", ".MAIN_DB_PREFIX."contrat as c";
 		$sql .= ", ".MAIN_DB_PREFIX."societe as s";
@@ -3709,7 +3387,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Charge tableau des stats facture pour le produit/service
 	 *
@@ -3784,7 +3461,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Charge tableau des stats facture pour le produit/service
 	 *
@@ -3838,60 +3514,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return nb of units or customers invoices in which product is included
-	 *
-	 * @param  int    $socid               Limit count on a particular third party id
-	 * @param  string $mode                'byunit'=number of unit, 'bynumber'=nb of entities
-	 * @param  int    $filteronproducttype 0=To filter on product only, 1=To filter on services only
-	 * @param  int    $year                Year (0=last 12 month, -1=all years)
-	 * @param  string $morefilter          More sql filters
-	 * @return array                       <0 if KO, result[month]=array(valuex,valuey) where month is 0 to 11
-	 */
-	public function get_nb_vente($socid, $mode, $filteronproducttype = -1, $year = 0, $morefilter = '')
-	{
-		// phpcs:enable
-		global $conf;
-		global $user;
-
-		$sql = "SELECT sum(d.qty), date_format(f.datef, '%Y%m')";
-		if ($mode == 'bynumber') {
-			$sql .= ", count(DISTINCT f.rowid)";
-		}
-		$sql .= " FROM ".MAIN_DB_PREFIX."facturedet as d, ".MAIN_DB_PREFIX."facture as f, ".MAIN_DB_PREFIX."societe as s";
-		if ($filteronproducttype >= 0) {
-			$sql .= ", ".MAIN_DB_PREFIX."product as p";
-		}
-		if (empty($user->rights->societe->client->voir) && !$socid) {
-			$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-		}
-		$sql .= " WHERE f.rowid = d.fk_facture";
-		if ($this->id > 0) {
-			$sql .= " AND d.fk_product = ".((int) $this->id);
-		} else {
-			$sql .= " AND d.fk_product > 0";
-		}
-		if ($filteronproducttype >= 0) {
-			$sql .= " AND p.rowid = d.fk_product AND p.fk_product_type = ".((int) $filteronproducttype);
-		}
-		$sql .= " AND f.fk_soc = s.rowid";
-		$sql .= " AND f.entity IN (".getEntity('invoice').")";
-		if (empty($user->rights->societe->client->voir) && !$socid) {
-			$sql .= " AND f.fk_soc = sc.fk_soc AND sc.fk_user = ".((int) $user->id);
-		}
-		if ($socid > 0) {
-			$sql .= " AND f.fk_soc = $socid";
-		}
-		$sql .= $morefilter;
-		$sql .= " GROUP BY date_format(f.datef,'%Y%m')";
-		$sql .= " ORDER BY date_format(f.datef,'%Y%m') DESC";
-
-		return $this->_get_stats($sql, $mode, $year);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return an array formated for showing graphs
 	 *
@@ -3961,21 +3583,78 @@ public $net_measure_units;
 		return array_reverse($result);
 	}
 
+
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Return nb of units or supplier invoices in which product is included
-	 *
-	 * @param  int    $socid               Limit count on a particular third party id
-	 * @param  string $mode                'byunit'=number of unit, 'bynumber'=nb of entities
-	 * @param  int    $filteronproducttype 0=To filter on product only, 1=To filter on services only
-	 * @param  int    $year                Year (0=last 12 month, -1=all years)
-	 * @param  string $morefilter          More sql filters
-	 * @return array                       <0 if KO, result[month]=array(valuex,valuey) where month is 0 to 11
-	 */
-	public function get_nb_achat($socid, $mode, $filteronproducttype = -1, $year = 0, $morefilter = '')
-	{
-		// phpcs:enable
+    /**
+     *  Return nb of units or customers invoices in which product is included
+     *
+     * @param int    $socid               Limit count on a particular third party id
+     * @param string $mode                'byunit'=number of unit, 'bynumber'=nb of entities
+     * @param int    $filteronproducttype 0=To filter on product only, 1=To filter on services only
+     * @param int    $year                Year (0=last 12 month, -1=all years)
+     * @param string $morefilter          More sql filters
+     *
+     * @return array                       <0 if KO, result[month]=array(valuex,valuey) where month is 0 to 11
+     */
+    public function get_nb_vente($socid, $mode, $filteronproducttype = -1, $year = 0, $morefilter = '')
+    {
+        // phpcs:enable
+        global $conf;
+        global $user;
+
+        $sql = "SELECT sum(d.qty), date_format(f.datef, '%Y%m')";
+        if ($mode == 'bynumber') {
+            $sql .= ", count(DISTINCT f.rowid)";
+        }
+        $sql .= " FROM " . MAIN_DB_PREFIX . "facturedet as d, " . MAIN_DB_PREFIX . "facture as f, " . MAIN_DB_PREFIX . "societe as s";
+        if ($filteronproducttype >= 0) {
+            $sql .= ", " . MAIN_DB_PREFIX . "product as p";
+        }
+        if (empty($user->rights->societe->client->voir) && !$socid) {
+            $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+        }
+        $sql .= " WHERE f.rowid = d.fk_facture";
+        if ($this->id > 0) {
+            $sql .= " AND d.fk_product = " . ((int) $this->id);
+        } else {
+            $sql .= " AND d.fk_product > 0";
+        }
+        if ($filteronproducttype >= 0) {
+            $sql .= " AND p.rowid = d.fk_product AND p.fk_product_type = " . ((int) $filteronproducttype);
+        }
+        $sql .= " AND f.fk_soc = s.rowid";
+        $sql .= " AND f.entity IN (" . getEntity('invoice') . ")";
+        if (empty($user->rights->societe->client->voir) && !$socid) {
+            $sql .= " AND f.fk_soc = sc.fk_soc AND sc.fk_user = " . ((int) $user->id);
+        }
+        if ($socid > 0) {
+            $sql .= " AND f.fk_soc = $socid";
+        }
+        $sql .= $morefilter;
+        $sql .= " GROUP BY date_format(f.datef,'%Y%m')";
+        $sql .= " ORDER BY date_format(f.datef,'%Y%m') DESC";
+
+        return $this->_get_stats($sql, $mode, $year);
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Return nb of units or supplier invoices in which product is included
+     *
+     * @param int    $socid               Limit count on a particular third party id
+     * @param string $mode                'byunit'=number of unit, 'bynumber'=nb of entities
+     * @param int    $filteronproducttype 0=To filter on product only, 1=To filter on services only
+     * @param int    $year                Year (0=last 12 month, -1=all years)
+     * @param string $morefilter          More sql filters
+     *
+     * @return array                       <0 if KO, result[month]=array(valuex,valuey) where month is 0 to 11
+     */
+    public function get_nb_achat($socid, $mode, $filteronproducttype = -1, $year = 0, $morefilter = '')
+    {
+        // phpcs:enable
 		global $conf;
 		global $user;
 
@@ -4015,7 +3694,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return nb of units in proposals in which product is included
 	 *
@@ -4066,9 +3744,7 @@ public $net_measure_units;
 		return $this->_get_stats($sql, $mode, $year);
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return nb of units in proposals in which product is included
 	 *
@@ -4120,9 +3796,7 @@ public $net_measure_units;
 		return $this->_get_stats($sql, $mode, $year);
 	}
 
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return nb of units in orders in which product is included
 	 *
@@ -4174,7 +3848,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return nb of units in orders in which product is included
 	 *
@@ -4226,7 +3899,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return nb of units in orders in which product is included
 	 *
@@ -4281,7 +3953,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Return nb of units in orders in which product is included
 	 *
@@ -4335,7 +4006,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Link a product/service to a parent product/service
 	 *
@@ -4392,37 +4062,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Retire le lien entre un sousproduit et un produit/service
-	 *
-	 * @param  int $fk_parent Id du produit auquel ne sera plus lie le produit lie
-	 * @param  int $fk_child  Id du produit a ne plus lie
-	 * @return int                    < 0 if KO, > 0 if OK
-	 */
-	public function del_sousproduit($fk_parent, $fk_child)
-	{
-		// phpcs:enable
-		if (!is_numeric($fk_parent)) {
-			$fk_parent = 0;
-		}
-		if (!is_numeric($fk_child)) {
-			$fk_child = 0;
-		}
-
-		$sql = "DELETE FROM ".MAIN_DB_PREFIX."product_association";
-		$sql .= " WHERE fk_product_pere  = ".((int) $fk_parent);
-		$sql .= " AND fk_product_fils = ".((int) $fk_child);
-
-		dol_syslog(get_class($this).'::del_sousproduit', LOG_DEBUG);
-		if (!$this->db->query($sql)) {
-			dol_print_error($this->db);
-			return -1;
-		}
-
-		return 1;
-	}
-
 	/**
 	 *  Modify composed product
 	 *
@@ -4454,26 +4093,62 @@ public $net_measure_units;
 		$sql .= ',incdec = '.price2num($incdec, 'MS');
 		$sql .= ' WHERE fk_product_pere = '.((int) $id_pere).' AND fk_product_fils = '.((int) $id_fils);
 
-		if (!$this->db->query($sql)) {
-			dol_print_error($this->db);
-			return -1;
-		} else {
-			return 1;
-		}
-	}
+        if (!$this->db->query($sql)) {
+            dol_print_error($this->db);
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 
-	/**
-	 *  Check if it is a sub-product into a kit
-	 *
-	 * @param  int 	$fk_parent 		Id of parent kit product
-	 * @param  int 	$fk_child  		Id of child product
-	 * @return int                  <0 if KO, >0 if OK
-	 */
-	public function is_sousproduit($fk_parent, $fk_child)
-	{
-		// phpcs:enable
-		$sql = "SELECT fk_product_pere, qty, incdec";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_association";
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Retire le lien entre un sousproduit et un produit/service
+     *
+     * @param int $fk_parent Id du produit auquel ne sera plus lie le produit lie
+     * @param int $fk_child  Id du produit a ne plus lie
+     *
+     * @return int                    < 0 if KO, > 0 if OK
+     */
+    public function del_sousproduit($fk_parent, $fk_child)
+    {
+        // phpcs:enable
+        if (!is_numeric($fk_parent)) {
+            $fk_parent = 0;
+        }
+        if (!is_numeric($fk_child)) {
+            $fk_child = 0;
+        }
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "product_association";
+        $sql .= " WHERE fk_product_pere  = " . ((int) $fk_parent);
+        $sql .= " AND fk_product_fils = " . ((int) $fk_child);
+
+        dol_syslog(get_class($this) . '::del_sousproduit', LOG_DEBUG);
+        if (!$this->db->query($sql)) {
+            dol_print_error($this->db);
+            return -1;
+        }
+
+        return 1;
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Check if it is a sub-product into a kit
+     *
+     * @param int $fk_parent Id of parent kit product
+     * @param int $fk_child  Id of child product
+     *
+     * @return int                  <0 if KO, >0 if OK
+     */
+    public function is_sousproduit($fk_parent, $fk_child)
+    {
+        // phpcs:enable
+        $sql = "SELECT fk_product_pere, qty, incdec";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_association";
 		$sql .= " WHERE fk_product_pere  = ".((int) $fk_parent);
 		$sql .= " AND fk_product_fils = ".((int) $fk_child);
 
@@ -4493,23 +4168,27 @@ public $net_measure_units;
 			}
 		} else {
 			dol_print_error($this->db);
-			return -1;
-		}
-	}
+            return -1;
+        }
+    }
 
-	/**
-	 *  Add a supplier price for the product.
-	 *  Note: Duplicate ref is accepted for different quantity only, or for different companies.
-	 *
-	 * @param  User   $user      User that make link
-	 * @param  int    $id_fourn  Supplier id
-	 * @param  string $ref_fourn Supplier ref
-	 * @param  float  $quantity  Quantity minimum for price
-	 * @return int               < 0 if KO, 0 if link already exists for this product, > 0 if OK
-	 */
-	public function add_fournisseur($user, $id_fourn, $ref_fourn, $quantity)
-	{
-		// phpcs:enable
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Add a supplier price for the product.
+     *  Note: Duplicate ref is accepted for different quantity only, or for different companies.
+     *
+     * @param User   $user      User that make link
+     * @param int    $id_fourn  Supplier id
+     * @param string $ref_fourn Supplier ref
+     * @param float  $quantity  Quantity minimum for price
+     *
+     * @return int               < 0 if KO, 0 if link already exists for this product, > 0 if OK
+     */
+    public function add_fournisseur($user, $id_fourn, $ref_fourn, $quantity)
+    {
+        // phpcs:enable
 		global $conf;
 
 		$now = dol_now();
@@ -4587,28 +4266,31 @@ public $net_measure_units;
 			} else {
 				// If the supplier price already exists for this product and quantity
 				$this->product_fourn_price_id = $obj->rowid;
-				return 0;
-			}
-		} else {
-			$this->error = $this->db->lasterror();
-			return -2;
-		}
-	}
+                return 0;
+            }
+        } else {
+            $this->error = $this->db->lasterror();
+            return -2;
+        }
+    }
 
-	/**
-	 * Return list of suppliers providing the product or service
-	 *
-	 * @return array        Array of vendor ids
-	 */
-	public function list_suppliers()
-	{
-		// phpcs:enable
-		global $conf;
 
-		$list = array();
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$sql = "SELECT DISTINCT p.fk_soc";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_fournisseur_price as p";
+    /**
+     * Return list of suppliers providing the product or service
+     *
+     * @return array        Array of vendor ids
+     */
+    public function list_suppliers()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $list = [];
+
+        $sql = "SELECT DISTINCT p.fk_soc";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_fournisseur_price as p";
 		$sql .= " WHERE p.fk_product = ".((int) $this->id);
 		$sql .= " AND p.entity = ".((int) $conf->entity);
 
@@ -4626,11 +4308,13 @@ public $net_measure_units;
 		return $list;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Recopie les prix d'un produit/service sur un autre
-	 *
-	 * @param  int $fromId Id product source
+     *
+     * @param int $fromId Id product source
 	 * @param  int $toId   Id product target
+	 *
 	 * @return int                     < 0 if KO, > 0 if OK
 	 */
 	public function clone_price($fromId, $toId)
@@ -4714,7 +4398,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Clone links between products
 	 *
@@ -4741,11 +4424,13 @@ public $net_measure_units;
 		return 1;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Recopie les fournisseurs et prix fournisseurs d'un produit/service sur un autre
-	 *
-	 * @param  int $fromId Id produit source
+     *
+     * @param  int $fromId Id produit source
 	 * @param  int $toId   Id produit cible
+	 *
 	 * @return int                 < 0 si erreur, > 0 si ok
 	 */
 	public function clone_fournisseurs($fromId, $toId)
@@ -4786,29 +4471,7 @@ public $net_measure_units;
 		}
 	}
 
-	/**
-	 *  Build the tree of subproducts into an array ->res and return it.
-	 *  this->sousprods must have been loaded by this->get_sousproduits_arbo()
-	 *
-	 * @param  int 		$multiply 			Because each sublevel must be multiplicated by parent nb
-	 * @param  int    	$ignore_stock_load 	Ignore stock load
-	 * @return array                    	$this->res
-	 */
-	public function get_arbo_each_prod($multiply = 1, $ignore_stock_load = 0)
-	{
-		// phpcs:enable
-		$this->res = array();
-		if (isset($this->sousprods) && is_array($this->sousprods)) {
-			foreach ($this->sousprods as $prod_name => $desc_product) {
-				if (is_array($desc_product)) {
-					$this->fetch_prod_arbo($desc_product, "", $multiply, 1, $this->id, $ignore_stock_load);
-				}
-			}
-		}
-		//var_dump($this->res);
-		return $this->res;
-	}
-
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Fonction recursive uniquement utilisee par get_arbo_each_prod, recompose l'arborescence des sousproduits
 	 *  Define value of this->res
@@ -4819,6 +4482,7 @@ public $net_measure_units;
 	 * @param  int    $level      			Init level
 	 * @param  int    $id_parent  			Id parent
 	 * @param  int    $ignore_stock_load 	Ignore stock load
+	 *
 	 * @return void
 	 */
 	public function fetch_prod_arbo($prod, $compl_path = '', $multiply = 1, $level = 1, $id_parent = 0, $ignore_stock_load = 0)
@@ -4869,28 +4533,53 @@ public $net_measure_units;
 
 				// Recursive call if there is childs to child
 				if (is_array($desc_pere['childs'])) {
-					//print 'YYY We go down for '.$desc_pere[3]." -> \n";
-					$this->fetch_prod_arbo($desc_pere['childs'], $compl_path.$desc_pere[3]." -> ", $desc_pere[1] * $multiply, $level + 1, $id, $ignore_stock_load);
-				}
-			}
-		}
-	}
+                    //print 'YYY We go down for '.$desc_pere[3]." -> \n";
+                    $this->fetch_prod_arbo($desc_pere['childs'], $compl_path . $desc_pere[3] . " -> ", $desc_pere[1] * $multiply, $level + 1, $id, $ignore_stock_load);
+                }
+            }
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 * Count all parent and children products for current product (first level only)
-	 *
-	 * @param	int		$mode	0=Both parent and child, -1=Parents only, 1=Children only
-	 * @return 	int            	Nb of father + child
-	 * @see getFather(), get_sousproduits_arbo()
-	 */
-	public function hasFatherOrChild($mode = 0)
-	{
-		$nb = 0;
+    /**
+     *  Build the tree of subproducts into an array ->res and return it.
+     *  this->sousprods must have been loaded by this->get_sousproduits_arbo()
+     *
+     * @param int $multiply          Because each sublevel must be multiplicated by parent nb
+     * @param int $ignore_stock_load Ignore stock load
+     *
+     * @return array                        $this->res
+     */
+    public function get_arbo_each_prod($multiply = 1, $ignore_stock_load = 0)
+    {
+        // phpcs:enable
+        $this->res = [];
+        if (isset($this->sousprods) && is_array($this->sousprods)) {
+            foreach ($this->sousprods as $prod_name => $desc_product) {
+                if (is_array($desc_product)) {
+                    $this->fetch_prod_arbo($desc_product, "", $multiply, 1, $this->id, $ignore_stock_load);
+                }
+            }
+        }
+        //var_dump($this->res);
+        return $this->res;
+    }
 
-		$sql = "SELECT COUNT(pa.rowid) as nb";
-		$sql .= " FROM ".MAIN_DB_PREFIX."product_association as pa";
+    /**
+     * Count all parent and children products for current product (first level only)
+     *
+     * @param int $mode 0=Both parent and child, -1=Parents only, 1=Children only
+     *
+     * @return    int                Nb of father + child
+     * @see getFather(), get_sousproduits_arbo()
+     */
+    public function hasFatherOrChild($mode = 0)
+    {
+        $nb = 0;
+
+        $sql = "SELECT COUNT(pa.rowid) as nb";
+        $sql .= " FROM " . MAIN_DB_PREFIX ."product_association as pa";
 		if ($mode == 0) {
 			$sql .= " WHERE pa.fk_product_fils = ".((int) $this->id)." OR pa.fk_product_pere = ".((int) $this->id);
 		} elseif ($mode == -1) {
@@ -4935,8 +4624,6 @@ public $net_measure_units;
 	}
 
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return if loaded product is a variant
 	 *
@@ -4964,33 +4651,47 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
-	 *     Return tree of all subproducts for product. Tree contains array of array(0=prodid, 1=>qty, 2=>product type, 3=>label, 4=>incdec, 5=>product ref)
-	 *     Set this->sousprods
+	 *  Return all parent products for current product (first level only)
 	 *
-	 * @return void
-	 */
-	public function get_sousproduits_arbo()
-	{
-		// phpcs:enable
-		$parent = array();
+     * @return array         Array of product
+     * @see hasFatherOrChild()
+     */
+    public function getFather()
+    {
+        $sql = "SELECT p.rowid, p.label as label, p.ref as ref, pa.fk_product_pere as id, p.fk_product_type, pa.qty, pa.incdec, p.entity";
+        $sql .= ", p.tosell as status, p.tobuy as status_buy";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_association as pa,";
+        $sql .= " " . MAIN_DB_PREFIX . "product as p";
+        $sql .= " WHERE p.rowid = pa.fk_product_pere";
+        $sql .= " AND pa.fk_product_fils = " . ((int) $this->id);
 
-		foreach ($this->getChildsArbo($this->id) as $keyChild => $valueChild) {    // Warning. getChildsArbo can call getChildsArbo recursively. Starting point is $value[0]=id of product
-			$parent[$this->label][$keyChild] = $valueChild;
-		}
-		foreach ($parent as $key => $value) {        // key=label, value is array of childs
-			$this->sousprods[$key] = $value;
-		}
-	}
+        $res = $this->db->query($sql);
+        if ($res) {
+            $prods = [];
+            while ($record = $this->db->fetch_array($res)) {
+                // $record['id'] = $record['rowid'] = id of father
+                $prods[$record['id']]['id'] = $record['rowid'];
+                $prods[$record['id']]['ref'] = $record['ref'];
+                $prods[$record['id']]['label'] = $record['label'];
+                $prods[$record['id']]['qty'] = $record['qty'];
+                $prods[$record['id']]['incdec'] = $record['incdec'];
+                $prods[$record['id']]['fk_product_type'] = $record['fk_product_type'];
+                $prods[$record['id']]['entity'] = $record['entity'];
+                $prods[$record['id']]['status'] = $record['status'];
+                $prods[$record['id']]['status_buy'] = $record['status_buy'];
+            }
+            return $prods;
+        } else {
+            dol_print_error($this->db);
+            return -1;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Return childs of product $id
-	 *
-	 * @param  int $id             		Id of product to search childs of
+    /**
+     *  Return childs of product $id
+     *
+     * @param int $id Id of product to search childs of
 	 * @param  int $firstlevelonly 		Return only direct child
 	 * @param  int $level          		Level of recursing call (start to 1)
 	 * @return array                    Return array(prodid=>array(0=prodid, 1=>qty, 2=>product type, 3=>label, 4=>incdec, 5=>product ref)
@@ -5053,22 +4754,41 @@ public $net_measure_units;
 			dol_print_error($this->db);
 			return -1;
 		}
-	}
+    }
 
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     *     Return tree of all subproducts for product. Tree contains array of array(0=prodid, 1=>qty, 2=>product type, 3=>label, 4=>incdec, 5=>product ref)
+     *     Set this->sousprods
+     *
+     * @return void
+     */
+    public function get_sousproduits_arbo()
+    {
+        // phpcs:enable
+        $parent = [];
 
-	/**
-	 *    Return clicable link of object (with eventually picto)
-	 *
-	 * @param  int    $withpicto             Add picto into link
-	 * @param  string $option                Where point the link ('stock', 'composition', 'category', 'supplier', '')
-	 * @param  int    $maxlength             Maxlength of ref
-	 * @param  int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
-	 * @param  int    $notooltip			 No tooltip
-	 * @return string                                String with URL
-	 */
-	public function getNomUrl($withpicto = 0, $option = '', $maxlength = 0, $save_lastsearch_value = -1, $notooltip = 0)
+        foreach ($this->getChildsArbo($this->id) as $keyChild => $valueChild) {    // Warning. getChildsArbo can call getChildsArbo recursively. Starting point is $value[0]=id of product
+            $parent[$this->label][$keyChild] = $valueChild;
+        }
+        foreach ($parent as $key => $value) {        // key=label, value is array of childs
+            $this->sousprods[$key] = $value;
+        }
+    }
+
+    /**
+     *    Return clicable link of object (with eventually picto)
+     *
+     * @param int    $withpicto             Add picto into link
+     * @param string $option                Where point the link ('stock', 'composition', 'category', 'supplier', '')
+     * @param int    $maxlength             Maxlength of ref
+     * @param int    $save_lastsearch_value -1=Auto, 0=No save of lastsearch_values when clicking, 1=Save lastsearch_values whenclicking
+     * @param int    $notooltip             No tooltip
+     *
+     * @return string                                String with URL
+     */
+    public function getNomUrl($withpicto = 0, $option = '', $maxlength = 0, $save_lastsearch_value = -1, $notooltip = 0)
 	{
 		global $conf, $langs, $hookmanager;
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php';
@@ -5215,27 +4935,60 @@ public $net_measure_units;
 		$hookmanager->initHooks(array('productdao'));
 		$parameters = array('id'=>$this->id, 'getnomurl'=>$result);
 		$reshook = $hookmanager->executeHooks('getNomUrl', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
-		if ($reshook > 0) {
-			$result = $hookmanager->resPrint;
-		} else {
-			$result .= $hookmanager->resPrint;
-		}
+        if ($reshook > 0) {
+            $result = $hookmanager->resPrint;
+        } else {
+            $result .= $hookmanager->resPrint;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 *    Return label of status of object
-	 *
-	 * @param  int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
-	 * @param  int $type 0=Sell, 1=Buy, 2=Batch Number management
-	 * @return string          Label of status
-	 */
-	public function getLibStatut($mode = 0, $type = 0)
-	{
-		switch ($type) {
-			case 0:
-				return $this->LibStatut($this->status, $mode, $type);
+    /**
+     *  Create a document onto disk according to template module.
+     *
+     * @param string    $modele      Force model to use ('' to not force)
+     * @param Translate $outputlangs Object langs to use for output
+     * @param int       $hidedetails Hide details of lines
+     * @param int       $hidedesc    Hide description
+     * @param int       $hideref     Hide ref
+     *
+     * @return int                         0 if KO, 1 if OK
+     */
+    public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
+    {
+        global $conf, $user, $langs;
+
+        $langs->load("products");
+        $outputlangs->load("products");
+
+        // Positionne le modele sur le nom du modele a utiliser
+        if (!dol_strlen($modele)) {
+            if (!empty($conf->global->PRODUCT_ADDON_PDF)) {
+                $modele = $conf->global->PRODUCT_ADDON_PDF;
+            } else {
+                $modele = 'strato';
+            }
+        }
+
+        $modelpath = "core/modules/product/doc/";
+
+        return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
+    }
+
+    /**
+     *    Return label of status of object
+     *
+     * @param int $mode 0=long label, 1=short label, 2=Picto + short label, 3=Picto, 4=Picto + long label, 5=Short label + Picto
+     * @param int $type 0=Sell, 1=Buy, 2=Batch Number management
+     *
+     * @return string          Label of status
+     */
+    public function getLibStatut($mode = 0, $type = 0)
+    {
+        switch ($type) {
+            case 0:
+                return $this->LibStatut($this->status, $mode, $type);
 			case 1:
 				return $this->LibStatut($this->status_buy, $mode, $type);
 			case 2:
@@ -5247,7 +5000,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *    Return label of a given status
 	 *
@@ -5327,40 +5079,6 @@ public $net_measure_units;
 		}
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
-	/**
-	 *  Create a document onto disk according to template module.
-	 *
-	 * @param  string    $modele      Force model to use ('' to not force)
-	 * @param  Translate $outputlangs Object langs to use for output
-	 * @param  int       $hidedetails Hide details of lines
-	 * @param  int       $hidedesc    Hide description
-	 * @param  int       $hideref     Hide ref
-	 * @return int                         0 if KO, 1 if OK
-	 */
-	public function generateDocument($modele, $outputlangs, $hidedetails = 0, $hidedesc = 0, $hideref = 0)
-	{
-		global $conf, $user, $langs;
-
-		$langs->load("products");
-		$outputlangs->load("products");
-
-		// Positionne le modele sur le nom du modele a utiliser
-		if (!dol_strlen($modele)) {
-			if (!empty($conf->global->PRODUCT_ADDON_PDF)) {
-				$modele = $conf->global->PRODUCT_ADDON_PDF;
-			} else {
-				$modele = 'strato';
-			}
-		}
-
-		$modelpath = "core/modules/product/doc/";
-
-		return $this->commonGenerateDocument($modelpath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
 	/**
 	 *  Retour label of nature of product
@@ -5390,9 +5108,10 @@ public $net_measure_units;
 		return '';
 	}
 
+
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
+    /**
 	 *  Adjust stock in a warehouse for product
 	 *
 	 * @param  User   $user           user asking change
@@ -5436,7 +5155,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 *  Adjust stock in a warehouse for product with batch number
 	 *
@@ -5477,26 +5195,219 @@ public $net_measure_units;
 				$this->error = $movementstock->error;
 				$this->errors = $movementstock->errors;
 
-				$this->db->rollback();
-				return -1;
-			}
-		}
-	}
+                $this->db->rollback();
+                return -1;
+            }
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-	/**
-	 *  Load existing information about a serial
-	 *
-	 * @param  string $batch Lot/serial number
-	 * @return array                    Array with record into product_batch
-	 * @see    load_stock(), load_virtual_stock()
-	 */
-	public function loadBatchInfo($batch)
-	{
-		$result = array();
+    /**
+     * Load information about stock of a product into ->stock_reel, ->stock_warehouse[] (including stock_warehouse[idwarehouse]->detail_batch for batch products)
+     * This function need a lot of load. If you use it on list, use a cache to execute it once for each product id.
+     * If ENTREPOT_EXTRA_STATUS is set, filtering on warehouse status is possible.
+     *
+     * @param string $option                          '' = Load all stock info, also from closed and internal warehouses, 'nobatch', 'novirtual'
+     *                                                You can also filter on 'warehouseclosed', 'warehouseopen', 'warehouseinternal'
+     * @param int    $includedraftpoforvirtual        Include draft status of PO for virtual stock calculation
+     *
+     * @return    int                                < 0 if KO, > 0 if OK
+     * @see        load_virtual_stock(), loadBatchInfo()
+     */
+    public function load_stock($option = '', $includedraftpoforvirtual = null)
+    {
+        // phpcs:enable
+        global $conf;
 
-		$sql = "SELECT pb.batch, pb.eatby, pb.sellby, SUM(pb.qty) AS qty FROM ".MAIN_DB_PREFIX."product_batch as pb, ".MAIN_DB_PREFIX."product_stock as ps";
+        $this->stock_reel = 0;
+        $this->stock_warehouse = [];
+        $this->stock_theorique = 0;
+
+        // Set filter on warehouse status
+        $warehouseStatus = [];
+        if (preg_match('/warehouseclosed/', $option)) {
+            $warehouseStatus[Entrepot::STATUS_CLOSED] = Entrepot::STATUS_CLOSED;
+        }
+        if (preg_match('/warehouseopen/', $option)) {
+            $warehouseStatus[Entrepot::STATUS_OPEN_ALL] = Entrepot::STATUS_OPEN_ALL;
+        }
+        if (preg_match('/warehouseinternal/', $option)) {
+            if (!empty($conf->global->ENTREPOT_EXTRA_STATUS)) {
+                $warehouseStatus[Entrepot::STATUS_OPEN_INTERNAL] = Entrepot::STATUS_OPEN_INTERNAL;
+            } else {
+                $warehouseStatus[Entrepot::STATUS_OPEN_ALL] = Entrepot::STATUS_OPEN_ALL;
+            }
+        }
+
+        $sql = "SELECT ps.rowid, ps.reel, ps.fk_entrepot";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "product_stock as ps";
+        $sql .= ", " . MAIN_DB_PREFIX . "entrepot as w";
+        $sql .= " WHERE w.entity IN (" . getEntity('stock') . ")";
+        $sql .= " AND w.rowid = ps.fk_entrepot";
+        $sql .= " AND ps.fk_product = " . ((int) $this->id);
+        if (count($warehouseStatus)) {
+            $sql .= " AND w.statut IN (" . $this->db->sanitize(implode(',', $warehouseStatus)) . ")";
+        }
+
+        $sql .= " ORDER BY ps.reel " . (!empty($conf->global->DO_NOT_TRY_TO_DEFRAGMENT_STOCKS_WAREHOUSE) ? 'DESC' : 'ASC'); // Note : qty ASC is important for expedition card, to avoid stock fragmentation;
+
+        dol_syslog(get_class($this) . "::load_stock", LOG_DEBUG);
+        $result = $this->db->query($sql);
+        if ($result) {
+            $num = $this->db->num_rows($result);
+            $i = 0;
+            if ($num > 0) {
+                while ($i < $num) {
+                    $row = $this->db->fetch_object($result);
+                    $this->stock_warehouse[$row->fk_entrepot] = new stdClass();
+                    $this->stock_warehouse[$row->fk_entrepot]->real = $row->reel;
+                    $this->stock_warehouse[$row->fk_entrepot]->id = $row->rowid;
+                    if ((!preg_match('/nobatch/', $option)) && $this->hasbatch()) {
+                        $this->stock_warehouse[$row->fk_entrepot]->detail_batch = Productbatch::findAll($this->db, $row->rowid, 1, $this->id);
+                    }
+                    $this->stock_reel += $row->reel;
+                    $i++;
+                }
+            }
+            $this->db->free($result);
+
+            if (!preg_match('/novirtual/', $option)) {
+                $this->load_virtual_stock($includedraftpoforvirtual); // This also load all arrays stats_xxx...
+            }
+
+            return 1;
+        } else {
+            $this->error = $this->db->lasterror();
+            return -1;
+        }
+    }
+
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Load value ->stock_theorique of a product. Property this->id must be defined.
+     *  This function need a lot of load. If you use it on list, use a cache to execute it one for each product id.
+     *
+     * @param int $includedraftpoforvirtual Include draft status and not yet approved Purchase Orders for virtual stock calculation
+     *
+     * @return int                                < 0 if KO, > 0 if OK
+     * @see    load_stock(), loadBatchInfo()
+     */
+    public function load_virtual_stock($includedraftpoforvirtual = null)
+    {
+        // phpcs:enable
+        global $conf, $hookmanager, $action;
+
+        $stock_commande_client = 0;
+        $stock_commande_fournisseur = 0;
+        $stock_sending_client = 0;
+        $stock_reception_fournisseur = 0;
+        $stock_inproduction = 0;
+
+        //dol_syslog("load_virtual_stock");
+
+        if (!empty($conf->commande->enabled)) {
+            $result = $this->load_stats_commande(0, '1,2', 1);
+            if ($result < 0) {
+                dol_print_error($this->db, $this->error);
+            }
+            $stock_commande_client = $this->stats_commande['qty'];
+        }
+        if (!empty($conf->expedition->enabled)) {
+            require_once DOL_DOCUMENT_ROOT . '/expedition/class/expedition.class.php';
+            $filterShipmentStatus = '';
+            if (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT)) {
+                $filterShipmentStatus = Expedition::STATUS_VALIDATED . ',' . Expedition::STATUS_CLOSED;
+            } elseif (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
+                $filterShipmentStatus = Expedition::STATUS_CLOSED;
+            }
+            $result = $this->load_stats_sending(0, '1,2', 1, $filterShipmentStatus);
+            if ($result < 0) {
+                dol_print_error($this->db, $this->error);
+            }
+            $stock_sending_client = $this->stats_expedition['qty'];
+        }
+        if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled)) {
+            $filterStatus = empty($conf->global->SUPPLIER_ORDER_STATUS_FOR_VIRTUAL_STOCK) ? '2,3,4' : $conf->global->SUPPLIER_ORDER_STATUS_FOR_VIRTUAL_STOCK;
+            if (isset($includedraftpoforvirtual)) {
+                $filterStatus = '0,1,2,' . $filterStatus;    // 1,2 may have already been inside $filterStatus but it is better to have twice than missing $filterStatus does not include them
+            }
+            $result = $this->load_stats_commande_fournisseur(0, $filterStatus, 1);
+            if ($result < 0) {
+                dol_print_error($this->db, $this->error);
+            }
+            $stock_commande_fournisseur = $this->stats_commande_fournisseur['qty'];
+        }
+        if (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && empty($conf->reception->enabled)) {
+            $filterStatus = '4';
+            if (isset($includedraftpoforvirtual)) {
+                $filterStatus = '0,' . $filterStatus;
+            }
+            $result = $this->load_stats_reception(0, $filterStatus, 1); // Use same tables than when module reception is not used.
+            if ($result < 0) {
+                dol_print_error($this->db, $this->error);
+            }
+            $stock_reception_fournisseur = $this->stats_reception['qty'];
+        }
+        if (!empty($conf->mrp->enabled)) {
+            $result = $this->load_stats_inproduction(0, '1,2', 1);
+            if ($result < 0) {
+                dol_print_error($this->db, $this->error);
+            }
+            $stock_inproduction = $this->stats_mrptoproduce['qty'] - $this->stats_mrptoconsume['qty'];
+        }
+
+        $this->stock_theorique = $this->stock_reel + $stock_inproduction;
+
+        // Stock decrease mode
+        if (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT) || !empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
+            $this->stock_theorique -= ($stock_commande_client - $stock_sending_client);
+        } elseif (!empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER)) {
+            $this->stock_theorique += 0;
+        } elseif (!empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
+            $this->stock_theorique -= $stock_commande_client;
+        }
+        // Stock Increase mode
+        if (!empty($conf->global->STOCK_CALCULATE_ON_RECEPTION) || !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION_CLOSE)) {
+            $this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
+        } elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_DISPATCH_ORDER)) {
+            $this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
+        } elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_VALIDATE_ORDER)) {
+            $this->stock_theorique -= $stock_reception_fournisseur;
+        } elseif (!empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
+            $this->stock_theorique += ($stock_commande_fournisseur - $stock_reception_fournisseur);
+        }
+
+        if (!is_object($hookmanager)) {
+            include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
+            $hookmanager = new HookManager($this->db);
+        }
+        $hookmanager->initHooks(['productdao']);
+        $parameters = ['id' => $this->id, 'includedraftpoforvirtual' => $includedraftpoforvirtual];
+        // Note that $action and $object may have been modified by some hooks
+        $reshook = $hookmanager->executeHooks('loadvirtualstock', $parameters, $this, $action);
+        if ($reshook > 0) {
+            $this->stock_theorique = $hookmanager->resArray['stock_theorique'];
+        }
+
+        return 1;
+    }
+
+    /**
+     *  Load existing information about a serial
+     *
+     * @param string $batch Lot/serial number
+     *
+     * @return array                    Array with record into product_batch
+     * @see    load_stock(), load_virtual_stock()
+     */
+    public function loadBatchInfo($batch)
+    {
+        $result = [];
+
+        $sql = "SELECT pb.batch, pb.eatby, pb.sellby, SUM(pb.qty) AS qty FROM " . MAIN_DB_PREFIX."product_batch as pb, ".MAIN_DB_PREFIX."product_stock as ps";
 		$sql .= " WHERE pb.fk_product_stock = ps.rowid AND ps.fk_product = ".((int) $this->id)." AND pb.batch = '".$this->db->escape($batch)."'";
 		$sql .= " GROUP BY pb.batch, pb.eatby, pb.sellby";
 		dol_syslog(get_class($this)."::loadBatchInfo load first entry found for lot/serial = ".$batch, LOG_DEBUG);
@@ -5517,11 +5428,13 @@ public $net_measure_units;
 		}
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Move an uploaded file described into $file array into target directory $sdir.
-	 *
-	 * @param  string $sdir Target directory
+     *
+     * @param  string $sdir Target directory
 	 * @param  string $file Array of file info of file to upload: array('name'=>..., 'tmp_name'=>...)
+	 *
 	 * @return int                    <0 if KO, >0 if OK
 	 */
 	public function add_photo($sdir, $file)
@@ -5563,10 +5476,12 @@ public $net_measure_units;
 		}
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
 	 *  Return if at least one photo is available
+     *
+     * @param string $sdir Directory to scan
 	 *
-	 * @param  string $sdir Directory to scan
 	 * @return boolean                 True if at least one photo is available, False if not
 	 */
 	public function is_photo_available($sdir)
@@ -5604,7 +5519,6 @@ public $net_measure_units;
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
-
 	/**
 	 * Return an array with all photos of product found on disk. There is no sorting criteria.
 	 *
@@ -5665,10 +5579,12 @@ public $net_measure_units;
 		return $tabobj;
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 *  Delete a photo and its thumbs
+     *  Delete a photo and its thumbs
+     *
+     * @param string $file Path to image file
 	 *
-	 * @param  string $file 	Path to image file
 	 * @return void
 	 */
 	public function delete_photo($file)
@@ -5698,11 +5614,13 @@ public $net_measure_units;
 		}
 	}
 
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 	/**
-	 *  Load size of image file
-	 *
-	 * @param  string $file Path to file
-	 * @return void
+     *  Load size of image file
+     *
+     * @param string $file Path to file
+     *
+     * @return void
 	 */
 	public function get_image_size($file)
 	{
@@ -5713,11 +5631,13 @@ public $net_measure_units;
 		$this->imgHeight = $infoImg[1]; // Hauteur de l'image
 	}
 
-	/**
-	 *  Load indicators this->nb for the dashboard
-	 *
-	 * @return int                 <0 if KO, >0 if OK
-	 */
+	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     *  Load indicators this->nb for the dashboard
+     *
+     * @return int                 <0 if KO, >0 if OK
+     */
 	public function load_state_board()
 	{
 		// phpcs:enable
@@ -5749,28 +5669,80 @@ public $net_measure_units;
 			return 1;
 		} else {
 			dol_print_error($this->db);
-			$this->error = $this->db->error();
-			return -1;
-		}
-	}
+            $this->error = $this->db->error();
+            return -1;
+        }
+    }
 
+    /**
+     * Return if object is a product
+     *
+     * @return boolean     True if it's a product
+     */
+    public function isProduct()
+    {
+        return ($this->type == Product::TYPE_PRODUCT ? true : false);
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+    /**
+     * Return if object is a product
+     *
+     * @return boolean     True if it's a service
+     */
+    public function isService()
+    {
+        return ($this->type == Product::TYPE_SERVICE ? true : false);
+    }
 
-	/**
-	 *  Initialise an instance with random values.
-	 *  Used to build previews or test instances.
-	 *    id must be 0 if object instance is a specimen.
-	 *
-	 * @return void
-	 */
-	public function initAsSpecimen()
-	{
-		global $user, $langs, $conf, $mysoc;
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
 
-		$now = dol_now();
+    /**
+     *  Get a barcode from the module to generate barcode values.
+     *  Return value is stored into this->barcode
+     *
+     * @param Product $object Object product or service
+     * @param string  $type   Barcode type (ean, isbn, ...)
+     *
+     * @return string
+     */
+    public function get_barcode($object, $type = '')
+    {
+        // phpcs:enable
+        global $conf;
 
-		// Initialize parameters
+        $result = '';
+        if (!empty($conf->global->BARCODE_PRODUCT_ADDON_NUM)) {
+            $dirsociete = array_merge(['/core/modules/barcode/'], $conf->modules_parts['barcode']);
+            foreach ($dirsociete as $dirroot) {
+                $res = dol_include_once($dirroot . $conf->global->BARCODE_PRODUCT_ADDON_NUM . '.php');
+                if ($res) {
+                    break;
+                }
+            }
+            $var = $conf->global->BARCODE_PRODUCT_ADDON_NUM;
+            $mod = new $var;
+
+            $result = $mod->getNextValue($object, $type);
+
+            dol_syslog(get_class($this) . "::get_barcode barcode=" . $result . " module=" . $var);
+        }
+        return $result;
+    }
+
+    /**
+     *  Initialise an instance with random values.
+     *  Used to build previews or test instances.
+     *    id must be 0 if object instance is a specimen.
+     *
+     * @return void
+     */
+    public function initAsSpecimen()
+    {
+        global $user, $langs, $conf, $mysoc;
+
+        $now = dol_now();
+
+        // Initialize parameters
 		$this->specimen = 1;
 		$this->id = 0;
 		$this->ref = 'PRODUCT_SPEC';
@@ -5829,29 +5801,42 @@ public $net_measure_units;
 		$resql = $this->db->query($sql);
 		if ($resql && $this->db->num_rows($resql) > 0) {
 			$res = $this->db->fetch_array($resql);
-			$label = ($label_type == 'short_label' ? $res[$label_type] : 'unit'.$res['code']);
-			$this->db->free($resql);
-			return $label;
-		} else {
-			$this->error = $this->db->error();
-			dol_syslog(get_class($this)."::getLabelOfUnit Error ".$this->error, LOG_ERR);
-			return -1;
-		}
-	}
+			$label = ($label_type == 'short_label' ? $res[$label_type] : 'unit'. $res['code']);
+            $this->db->free($resql);
+            return $label;
+        } else {
+            $this->error = $this->db->error();
+            dol_syslog(get_class($this) . "::getLabelOfUnit Error " . $this->error, LOG_ERR);
+            return -1;
+        }
+    }
 
-	/**
-	 * Return minimum product recommended price
-	 *
-	 * @return int            Minimum recommanded price that is higher price among all suppliers * PRODUCT_MINIMUM_RECOMMENDED_PRICE
-	 */
-	public function min_recommended_price()
-	{
-		// phpcs:enable
-		global $conf;
+    /**
+     * Return if object has a sell-by date or eat-by date
+     *
+     * @return boolean     True if it's has
+     */
+    public function hasbatch()
+    {
+        return ($this->status_batch > 0 ? true : false);
+    }
 
-		$maxpricesupplier = 0;
 
-		if (!empty($conf->global->PRODUCT_MINIMUM_RECOMMENDED_PRICE)) {
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps
+
+    /**
+     * Return minimum product recommended price
+     *
+     * @return int            Minimum recommanded price that is higher price among all suppliers * PRODUCT_MINIMUM_RECOMMENDED_PRICE
+     */
+    public function min_recommended_price()
+    {
+        // phpcs:enable
+        global $conf;
+
+        $maxpricesupplier = 0;
+
+        if (!empty($conf->global->PRODUCT_MINIMUM_RECOMMENDED_PRICE)) {
 			include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
 			$product_fourn = new ProductFournisseur($this->db);
 			$product_fourn_list = $product_fourn->list_product_fournisseur_price($this->id, '', '');
@@ -5870,6 +5855,7 @@ public $net_measure_units;
 		return $maxpricesupplier;
 	}
 
+
 	/**
 	 * Sets object to supplied categories.
 	 *
@@ -5878,30 +5864,113 @@ public $net_measure_units;
 	 * Existing categories are left untouch.
 	 *
 	 * @param  int[]|int $categories Category or categories IDs
-	 * @return void
-	 */
-	public function setCategories($categories)
-	{
-
-		require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
-		return parent::setCategoriesCommon($categories, Categorie::TYPE_PRODUCT);
-	}
-
-	/**
-	 * Returns the rights used for this class
 	 *
-	 * @return Object
-	 */
-	public function getRights()
-	{
-		global $user;
+	 * @return void
+     */
+    public function setCategories($categories)
+    {
 
-		if ($this->isProduct()) {
-			return $user->rights->produit;
-		} else {
-			return $user->rights->service;
-		}
-	}
+        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        return parent::setCategoriesCommon($categories, Categorie::TYPE_PRODUCT);
+    }
+
+    /**
+     * Function used to replace a thirdparty id with another one.
+     *
+     * @param DoliDB $db        Database handler
+     * @param int    $origin_id Old thirdparty id
+     * @param int    $dest_id   New thirdparty id
+     *
+     * @return bool
+     */
+    public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
+    {
+        $tables = [
+            'product_customer_price',
+            'product_customer_price_log',
+        ];
+
+        return CommonObject::commonReplaceThirdparty($db, $origin_id, $dest_id, $tables);
+    }
+
+    /**
+     * Generates prices for a product based on product multiprice generation rules
+     *
+     * @param User   $user       User that updates the prices
+     * @param float  $baseprice  Base price
+     * @param string $price_type Base price type
+     * @param float  $price_vat  VAT % tax
+     * @param int    $npr        NPR
+     * @param string $psq        ¿?
+     *
+     * @return int -1 KO, 1 OK
+     */
+    public function generateMultiprices(User $user, $baseprice, $price_type, $price_vat, $npr, $psq)
+    {
+        global $conf, $db;
+
+        $sql = "SELECT rowid, level, fk_level, var_percent, var_min_percent FROM " . MAIN_DB_PREFIX . "product_pricerules";
+        $query = $this->db->query($sql);
+
+        $rules = [];
+
+        while ($result = $this->db->fetch_object($query)) {
+            $rules[$result->level] = $result;
+        }
+
+        //Because prices can be based on other level's prices, we temporarily store them
+        $prices = [
+            1 => $baseprice,
+        ];
+
+        for ($i = 1; $i <= $conf->global->PRODUIT_MULTIPRICES_LIMIT; $i++) {
+            $price = $baseprice;
+            $price_min = $baseprice;
+
+            //We have to make sure it does exist and it is > 0
+            //First price level only allows changing min_price
+            if ($i > 1 && isset($rules[$i]->var_percent) && $rules[$i]->var_percent) {
+                $price = $prices[$rules[$i]->fk_level] * (1 + ($rules[$i]->var_percent / 100));
+            }
+
+            $prices[$i] = $price;
+
+            //We have to make sure it does exist and it is > 0
+            if (isset($rules[$i]->var_min_percent) && $rules[$i]->var_min_percent) {
+                $price_min = $price * (1 - ($rules[$i]->var_min_percent / 100));
+            }
+
+            //Little check to make sure the price is modified before triggering generation
+            $check_amount = (($price == $this->multiprices[$i]) && ($price_min == $this->multiprices_min[$i]));
+            $check_type = ($baseprice == $this->multiprices_base_type[$i]);
+
+            if ($check_amount && $check_type) {
+                continue;
+            }
+
+            if ($this->updatePrice($price, $price_type, $user, $price_vat, $price_min, $i, $npr, $psq, true) < 0) {
+                return -1;
+            }
+        }
+
+        return 1;
+    }
+
+    /**
+     * Returns the rights used for this class
+     *
+     * @return Object
+     */
+    public function getRights()
+    {
+        global $user;
+
+        if ($this->isProduct()) {
+            return $user->rights->produit;
+        } else {
+            return $user->rights->service;
+        }
+    }
 
 	/**
 	 *  Load information for tab info

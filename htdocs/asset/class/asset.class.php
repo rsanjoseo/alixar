@@ -29,39 +29,44 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/commonobject.class.php';
  */
 class Asset extends CommonObject
 {
-	const STATUS_DRAFT = 0;
-	const STATUS_VALIDATED = 1;
 	/**
 	 * @var string ID to identify managed object
 	 */
 	public $element = 'asset';
+
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
 	public $table_element = 'asset';
+
 	/**
 	 * @var int  Does module support multicompany module ? 0=No test on entity, 1=Test with field entity, 2=Test with link by societe
 	 */
 	public $ismultientitymanaged = 0;
-	/**
-	 * @var int  Does asset support extrafields ? 0=No, 1=Yes
-	 */
-	public $isextrafieldmanaged = 1;
-	/**
-	 * @var string String with name of icon for asset. Must be the part after the 'object_' into object_asset.png
-	 */
-	public $picto = 'asset';
 
+    /**
+     * @var int  Does asset support extrafields ? 0=No, 1=Yes
+     */
+    public $isextrafieldmanaged = 1;
 
-	/**
-	 *  'type' if the field format.
-	 *  'label' the translation key.
-	 *  'enabled' is a condition when the field must be managed.
-	 *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only. Using a negative value means field is not shown by default on list but can be selected for viewing)
-	 *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
-	 *  'index' if we want an index in database.
-	 *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
-	 *  'position' is the sort order of field.
+    /**
+     * @var string String with name of icon for asset. Must be the part after the 'object_' into object_asset.png
+     */
+    public $picto = 'asset';
+
+    const STATUS_DRAFT = 0;
+    const STATUS_VALIDATED = 1;
+    const STATUS_CANCELED = 9;
+
+    /**
+     *  'type' if the field format.
+     *  'label' the translation key.
+     *  'enabled' is a condition when the field must be managed.
+     *  'visible' says if field is visible in list (Examples: 0=Not visible, 1=Visible on list and create/update/view forms, 2=Visible on list only. Using a negative value means field is not shown by default on list but can be selected for viewing)
+     *  'notnull' is set to 1 if not null in database. Set to -1 if we must set data to null if empty ('' or 0).
+     *  'index' if we want an index in database.
+     *  'foreignkey'=>'tablename.field' if the field is a foreign key (it is recommanded to name the field fk_...).
+     *  'position' is the sort order of field.
 	 *  'searchall' is 1 if we want to search in this field when making a search from the quick search button.
 	 *  'isameasure' must be set to 1 if you want to have a total on list for this field. Field type must be summable like integer or double(24,8).
 	 *  'help' is a string visible as a tooltip on field
@@ -69,27 +74,28 @@ class Asset extends CommonObject
 	 *  'default' is a default value for creation (can still be replaced by the global setup of default values)
 	 *  'showoncombobox' if field must be shown into the label of combobox
 	 */
-	/**
+
+    /**
 	 * @var array  Array with all fields and their property. Do not use it as a static var. It may be modified by constructor.
 	 */
 	public $fields = array(
-		'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'visible'=>-1, 'enabled'=>1, 'position'=>1, 'notnull'=>1, 'index'=>1, 'comment'=>"Id",),
-		'ref' => array('type'=>'varchar(10)', 'label'=>'Ref', 'visible'=>1, 'enabled'=>1, 'position'=>10, 'notnull'=>1, 'index'=>1, 'searchall'=>1, 'comment'=>"Reference of object", 'showoncombobox'=>1),
-		'entity' => array('type'=>'integer', 'label'=>'Entity', 'visible'=>0, 'enabled'=>1, 'position'=>20, 'notnull'=>1, 'index'=>1,),
-		'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'visible'=>1, 'enabled'=>1, 'position'=>30, 'notnull'=>-1, 'searchall'=>1),
-		'fk_asset_type' => array('type'=>'integer:AssetType:asset/class/asset_type.class.php', 'label'=>'AssetsType', 'visible'=>1, 'enabled'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'searchall'=>1),
-		'amount_ht' => array('type'=>'double(24,8)', 'label'=>'AmountHTShort', 'visible'=>1, 'enabled'=>1, 'position'=>40, 'notnull'=>-1, 'isameasure'=>'1', 'help'=>"Help text",),
-		'amount_vat' => array('type'=>'double(24,8)', 'label'=>'AmountVAT', 'visible'=>1, 'enabled'=>1, 'position'=>41, 'notnull'=>-1, 'isameasure'=>'1', 'help'=>"Help text",),
-		'description' => array('type'=>'text', 'label'=>'Description', 'visible'=>-1, 'enabled'=>1, 'position'=>90, 'notnull'=>-1,),
-		'note_public' => array('type'=>'html', 'label'=>'NotePublic', 'visible'=>-1, 'enabled'=>1, 'position'=>91, 'notnull'=>-1,),
-		'note_private' => array('type'=>'html', 'label'=>'NotePrivate', 'visible'=>-1, 'enabled'=>1, 'position'=>92, 'notnull'=>-1,),
-		'date_creation' => array('type'=>'datetime', 'label'=>'DateCreation', 'visible'=>-2, 'enabled'=>1, 'position'=>500, 'notnull'=>1,),
-		'tms' => array('type'=>'timestamp', 'label'=>'DateModification', 'visible'=>-2, 'enabled'=>1, 'position'=>501, 'notnull'=>1,),
-		'fk_user_creat' => array('type'=>'integer', 'label'=>'UserAuthor', 'visible'=>-2, 'enabled'=>1, 'position'=>510, 'notnull'=>1,),
-		'fk_user_modif' => array('type'=>'integer', 'label'=>'UserModif', 'visible'=>-2, 'enabled'=>1, 'position'=>511, 'notnull'=>-1,),
-		'import_key' => array('type'=>'varchar(14)', 'label'=>'ImportId', 'visible'=>-2, 'enabled'=>1, 'position'=>1000, 'notnull'=>-1,),
-		'status' => array('type'=>'integer', 'label'=>'Status', 'visible'=>1, 'enabled'=>1, 'position'=>1000, 'notnull'=>1, 'index'=>1, 'arrayofkeyval'=>array('0'=>'Draft', '1'=>'Active', '-1'=>'Cancel')),
-	);
+        'rowid' => array('type'=>'integer', 'label'=>'TechnicalID', 'visible'=>-1, 'enabled'=>1, 'position'=>1, 'notnull'=>1, 'index'=>1, 'comment'=>"Id",),
+        'ref' => array('type'=>'varchar(10)', 'label'=>'Ref', 'visible'=>1, 'enabled'=>1, 'position'=>10, 'notnull'=>1, 'index'=>1, 'searchall'=>1, 'comment'=>"Reference of object", 'showoncombobox'=>1),
+        'entity' => array('type'=>'integer', 'label'=>'Entity', 'visible'=>0, 'enabled'=>1, 'position'=>20, 'notnull'=>1, 'index'=>1,),
+        'label' => array('type'=>'varchar(255)', 'label'=>'Label', 'visible'=>1, 'enabled'=>1, 'position'=>30, 'notnull'=>-1, 'searchall'=>1),
+        'fk_asset_type' => array('type'=>'integer:AssetType:asset/class/asset_type.class.php', 'label'=>'AssetsType', 'visible'=>1, 'enabled'=>1, 'position'=>35, 'notnull'=>1, 'index'=>1, 'searchall'=>1),
+        'amount_ht' => array('type' => 'double(24,8)', 'label' => 'AmountHTShort', 'visible' => 1, 'enabled' => 1, 'position' => 40, 'notnull' => -1, 'isameasure' => '1', 'help' => "Help text",),
+        'amount_vat' => array('type' => 'double(24,8)', 'label' => 'AmountVAT', 'visible' => 1, 'enabled' => 1, 'position' => 41, 'notnull' => -1, 'isameasure' => '1', 'help' => "Help text",),
+        'description' => array('type' => 'text', 'label' => 'Description', 'visible' => -1, 'enabled' => 1, 'position' => 90, 'notnull' => -1,),
+        'note_public' => array('type' => 'html', 'label' => 'NotePublic', 'visible' => -1, 'enabled' => 1, 'position' => 91, 'notnull' => -1,),
+        'note_private' => array('type' => 'html', 'label' => 'NotePrivate', 'visible' => -1, 'enabled' => 1, 'position' => 92, 'notnull' => -1,),
+        'date_creation' => array('type' => 'datetime', 'label' => 'DateCreation', 'visible' => -2, 'enabled' => 1, 'position' => 500, 'notnull' => 1,),
+        'tms' => array('type' => 'timestamp', 'label' => 'DateModification', 'visible' => -2, 'enabled' => 1, 'position' => 501, 'notnull' => 1,),
+        'fk_user_creat' => array('type' => 'integer', 'label' => 'UserAuthor', 'visible' => -2, 'enabled' => 1, 'position' => 510, 'notnull' => 1,),
+        'fk_user_modif' => array('type' => 'integer', 'label' => 'UserModif', 'visible' => -2, 'enabled' => 1, 'position' => 511, 'notnull' => -1,),
+        'import_key' => array('type' => 'varchar(14)', 'label' => 'ImportId', 'visible' => -2, 'enabled' => 1, 'position' => 1000, 'notnull' => -1,),
+        'status' => array('type' => 'integer', 'label' => 'Status', 'visible' => 1, 'enabled' => 1, 'position' => 1000, 'notnull' => 1, 'index' => 1, 'arrayofkeyval' => array('0' => 'Draft', '1' => 'Active', '9' => 'Cancel')),
+    );
 
 	/**
 	 * @var int ID

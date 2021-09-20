@@ -43,25 +43,55 @@ class SupplierInvoices extends DolibarrApi
 	 */
 	public $invoice;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
-	{
-		global $db;
-		$this->db = $db;
-		$this->invoice = new FactureFournisseur($this->db);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        global $db;
+        $this->db = $db;
+        $this->invoice = new FactureFournisseur($this->db);
+    }
 
-	/**
-	 * List invoices
-	 *
-	 * Get a list of supplier invoices
-	 *
-	 * @param string	$sortfield	      Sort field
-	 * @param string	$sortorder	      Sort order
-	 * @param int		$limit		      Limit for list
-	 * @param int		$page		      Page number
+    /**
+     * Get properties of a supplier invoice object
+     *
+     * Return an array with supplier invoice information
+     *
+     * @param int $id ID of supplier invoice
+     *
+     * @return    array|mixed data without useless information
+     *
+     * @throws    RestException
+     */
+    public function get($id)
+    {
+        if (!DolibarrApiAccess::$user->rights->fournisseur->facture->lire) {
+            throw new RestException(401);
+        }
+
+        $result = $this->invoice->fetch($id);
+        if (!$result) {
+            throw new RestException(404, 'Supplier invoice not found');
+        }
+
+        if (!DolibarrApi::_checkAccessToResource('fournisseur', $this->invoice->id, 'facture_fourn', 'facture')) {
+            throw new RestException(401, 'Access not allowed for login ' . DolibarrApiAccess::$user->login);
+        }
+
+        $this->invoice->fetchObjectLinked();
+        return $this->_cleanObjectDatas($this->invoice);
+    }
+
+    /**
+     * List invoices
+     *
+     * Get a list of supplier invoices
+     *
+     * @param string    $sortfield           Sort field
+     * @param string    $sortorder           Sort order
+     * @param int       $limit               Limit for list
+     * @param int       $page                Page number
 	 * @param string   	$thirdparty_ids	  Thirdparty ids to filter invoices of (example '1' or '1,2,3') {@pattern /^[0-9,]*$/i}
 	 * @param string	$status		      Filter by invoice status : draft | unpaid | paid | cancelled
 	 * @param string    $sqlfilters       Other criteria to filter answers separated by a comma. Syntax example "(t.ref:like:'SO-%') and (t.datec:<:'20160101')"
@@ -170,26 +200,6 @@ class SupplierInvoices extends DolibarrApi
 	}
 
 	/**
-	 * Clean sensible object datas
-	 *
-	 * @param   Object  $object     Object to clean
-	 * @return  Object              Object with cleaned properties
-	 */
-	protected function _cleanObjectDatas($object)
-	{
-		// phpcs:enable
-		$object = parent::_cleanObjectDatas($object);
-
-		unset($object->rowid);
-		unset($object->barcode_type);
-		unset($object->barcode_type_code);
-		unset($object->barcode_type_label);
-		unset($object->barcode_type_coder);
-
-		return $object;
-	}
-
-	/**
 	 * Create supplier invoice object
 	 *
 	 * @param array $request_data Request datas
@@ -218,26 +228,6 @@ class SupplierInvoices extends DolibarrApi
 			throw new RestException(500, "Error creating order", array_merge(array($this->invoice->error), $this->invoice->errors));
 		}
 		return $this->invoice->id;
-	}
-
-	/**
-	 * Validate fields before create or update object
-	 *
-	 * @param array $data   Datas to validate
-	 * @return array
-	 *
-	 * @throws RestException
-	 */
-	private function _validate($data)
-	{
-		$invoice = array();
-		foreach (SupplierInvoices::$FIELDS as $field) {
-			if (!isset($data[$field])) {
-				throw new RestException(400, "$field field missing");
-			}
-			$invoice[$field] = $data[$field];
-		}
-		return $invoice;
 	}
 
 	/**
@@ -278,35 +268,6 @@ class SupplierInvoices extends DolibarrApi
 		}
 
 		return false;
-	}
-
-	/**
-	 * Get properties of a supplier invoice object
-	 *
-	 * Return an array with supplier invoice information
-	 *
-	 * @param 	int 	$id ID of supplier invoice
-	 * @return 	array|mixed data without useless information
-	 *
-	 * @throws 	RestException
-	 */
-	public function get($id)
-	{
-		if (!DolibarrApiAccess::$user->rights->fournisseur->facture->lire) {
-			throw new RestException(401);
-		}
-
-		$result = $this->invoice->fetch($id);
-		if (!$result) {
-			throw new RestException(404, 'Supplier invoice not found');
-		}
-
-		if (!DolibarrApi::_checkAccessToResource('fournisseur', $this->invoice->id, 'facture_fourn', 'facture')) {
-			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
-
-		$this->invoice->fetchObjectLinked();
-		return $this->_cleanObjectDatas($this->invoice);
 	}
 
 	/**
@@ -431,6 +392,7 @@ class SupplierInvoices extends DolibarrApi
 
 		return $result;
 	}
+
 
 	/**
 	 * Add payment line to a specific supplier invoice with the remain to pay as amount.
@@ -623,8 +585,6 @@ class SupplierInvoices extends DolibarrApi
 		return $updateRes;
 	}
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 * Update a line to a given supplier invoice
 	 *
@@ -723,15 +683,59 @@ class SupplierInvoices extends DolibarrApi
 
 		if (!DolibarrApi::_checkAccessToResource('fournisseur', $this->invoice->id, 'facture_fourn', 'facture')) {
 			throw new RestException(401, 'Access not allowed for login '.DolibarrApiAccess::$user->login);
-		}
+        }
 
-		// TODO Check the lineid $lineid is a line of ojbect
+        // TODO Check the lineid $lineid is a line of ojbect
 
-		$updateRes = $this->invoice->deleteline($lineid);
-		if ($updateRes > 0) {
-			return $this->get($id);
-		} else {
-			throw new RestException(405, $this->invoice->error);
-		}
-	}
+        $updateRes = $this->invoice->deleteline($lineid);
+        if ($updateRes > 0) {
+            return $this->get($id);
+        } else {
+            throw new RestException(405, $this->invoice->error);
+        }
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     * Clean sensible object datas
+     *
+     * @param Object $object Object to clean
+     *
+     * @return  Object              Object with cleaned properties
+     */
+    protected function _cleanObjectDatas($object)
+    {
+        // phpcs:enable
+        $object = parent::_cleanObjectDatas($object);
+
+        unset($object->rowid);
+        unset($object->barcode_type);
+        unset($object->barcode_type_code);
+        unset($object->barcode_type_label);
+        unset($object->barcode_type_coder);
+
+        return $object;
+    }
+
+    /**
+     * Validate fields before create or update object
+     *
+     * @param array $data Datas to validate
+     *
+     * @return array
+     *
+     * @throws RestException
+     */
+    private function _validate($data)
+    {
+        $invoice = [];
+        foreach (SupplierInvoices::$FIELDS as $field) {
+            if (!isset($data[$field])) {
+                throw new RestException(400, "$field field missing");
+            }
+            $invoice[$field] = $data[$field];
+        }
+        return $invoice;
+    }
 }

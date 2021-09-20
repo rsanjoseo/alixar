@@ -69,29 +69,6 @@ class DolibarrApiAccess implements iAuthenticate
 	}
 
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName
-
-	/**
-	 * Verify access
-	 *
-	 * @param   array $m Properties of method
-	 *
-	 * @access private
-	 * @return bool
-	 */
-	public static function verifyAccess(array $m)
-	{
-		$requires = isset($m['class']['DolibarrApiAccess']['properties']['requires'])
-				? $m['class']['DolibarrApiAccess']['properties']['requires']
-				: false;
-
-
-		return $requires
-			? static::$role == 'admin' || in_array(static::$role, (array) $requires)
-			: true;
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName
-
 	/**
 	 * Check access
 	 *
@@ -199,12 +176,33 @@ class DolibarrApiAccess implements iAuthenticate
 		return in_array(static::$role, (array) $requirefortest) || static::$role == 'admin';
 	}
 
-	/**
-	 * @return string string to be used with WWW-Authenticate header
-	 */
-	public function __getWWWAuthenticateString()
-	{
-		// phpcs:enable
-		return '';
-	}
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName
+
+    /**
+     * @return string string to be used with WWW-Authenticate header
+     */
+    public function __getWWWAuthenticateString()
+    {
+        // phpcs:enable
+        return '';
+    }
+
+    /**
+     * Verify access
+     *
+     * @param array $m Properties of method
+     *
+     * @access private
+     * @return bool
+     */
+    public static function verifyAccess(array $m)
+    {
+        $requires = isset($m['class']['DolibarrApiAccess']['properties']['requires'])
+            ? $m['class']['DolibarrApiAccess']['properties']['requires']
+            : false;
+
+        return $requires
+            ? static::$role == 'admin' || in_array(static::$role, (array) $requires)
+            : true;
+    }
 }

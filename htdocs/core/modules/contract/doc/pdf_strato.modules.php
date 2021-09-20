@@ -494,27 +494,113 @@ class pdf_strato extends ModelePDFContract
 
 				return 1;
 			} else {
-				$this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
-				return 0;
-			}
-		} else {
-			$this->error = $langs->trans("ErrorConstantNotDefined", "CONTRACT_OUTPUTDIR");
-			return 0;
-		}
-	}
+                $this->error = $langs->trans("ErrorCanNotCreateDir", $dir);
+                return 0;
+            }
+        } else {
+            $this->error = $langs->trans("ErrorConstantNotDefined", "CONTRACT_OUTPUTDIR");
+            return 0;
+        }
+    }
 
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
 
-	/**
-	 *  Show top header of page.
-	 *
-	 *  @param	TCPDF		$pdf     		Object PDF
-	 *  @param  Contrat		$object     	Object to show
-	 *  @param  int	    	$showaddress    0=no, 1=yes
-	 *  @param  Translate	$outputlangs	Object lang for output
-	 *  @return	void
-	 */
-	protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
+    /**
+     *   Show table for lines
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param string    $tab_top     Top position of table
+     * @param string    $tab_height  Height of table (rectangle)
+     * @param int       $nexY        Y
+     * @param Translate $outputlangs Langs object
+     * @param int       $hidetop     Hide top bar of array
+     * @param int       $hidebottom  Hide bottom bar of array
+     *
+     * @return    void
+     */
+    protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
+    {
+        global $conf;
+
+        // Force to disable hidetop and hidebottom
+        $hidebottom = 0;
+        if ($hidetop) {
+            $hidetop = -1;
+        }
+
+        $default_font_size = pdf_getPDFFontSize($outputlangs);
+        /*
+        $pdf->SetXY($this->marge_gauche, $tab_top);
+        $pdf->MultiCell(190,8,$outputlangs->transnoentities("Description"),0,'L',0);
+        $pdf->line($this->marge_gauche, $tab_top + 8, $this->page_largeur-$this->marge_droite, $tab_top + 8);
+
+        $pdf->SetFont('','', $default_font_size - 1);
+
+        $pdf->MultiCell(0, 3, '');		// Set interline to 3
+        $pdf->SetXY($this->marge_gauche, $tab_top + 8);
+        $text=$object->description;
+        if ($object->duree > 0)
+        {
+            $totaltime=convertSecondToTime($object->duree,'all',$conf->global->MAIN_DURATION_OF_WORKDAY);
+            $text.=($text?' - ':'').$langs->trans("Total").": ".$totaltime;
+        }
+        $desc=dol_htmlentitiesbr($text,1);
+        //print $outputlangs->convToOutputCharset($desc); exit;
+
+        $pdf->writeHTMLCell(180, 3, 10, $tab_top + 8, $outputlangs->convToOutputCharset($desc), 0, 1);
+        $nexY = $pdf->GetY();
+
+        $pdf->line($this->marge_gauche, $nexY, $this->page_largeur-$this->marge_droite, $nexY);
+
+        $pdf->MultiCell(0, 3, '');		// Set interline to 3. Then writeMultiCell must use 3 also.
+        */
+
+        // Output Rect
+        $this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height + 3); // Rect takes a length in 3rd parameter and 4th parameter
+    }
+
+    /**
+     * Show footer signature of page
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param int       $tab_top     tab height position
+     * @param int       $tab_height  tab height
+     * @param Translate $outputlangs Object language for output
+     *
+     * @return void
+     */
+    protected function tabSignature(&$pdf, $tab_top, $tab_height, $outputlangs)
+    {
+        $pdf->SetDrawColor(128, 128, 128);
+        $posmiddle = $this->marge_gauche + round(($this->page_largeur - $this->marge_gauche - $this->marge_droite) / 2);
+        $posy = $tab_top + $tab_height + 3 + 3;
+
+        $pdf->SetXY($this->marge_gauche, $posy);
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 5, $outputlangs->transnoentities("ContactNameAndSignature", $this->emetteur->name), 0, 'L', 0);
+
+        $pdf->SetXY($this->marge_gauche, $posy + 5);
+        $pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 20, '', 1);
+
+        $pdf->SetXY($posmiddle + 5, $posy);
+        $pdf->MultiCell($this->page_largeur - $this->marge_droite - $posmiddle - 5, 5, $outputlangs->transnoentities("ContactNameAndSignature", $this->recipient->name), 0, 'L', 0);
+
+        $pdf->SetXY($posmiddle + 5, $posy + 5);
+        $pdf->MultiCell($this->page_largeur - $this->marge_droite - $posmiddle - 5, 20, '', 1);
+    }
+
+    // phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
+
+    /**
+     *  Show top header of page.
+     *
+     * @param TCPDF     $pdf         Object PDF
+     * @param Contrat   $object      Object to show
+     * @param int       $showaddress 0=no, 1=yes
+     * @param Translate $outputlangs Object lang for output
+     *
+     * @return    void
+     */
+    protected function _pagehead(&$pdf, $object, $showaddress, $outputlangs)
 	{
 		global $conf, $langs;
 
@@ -684,61 +770,7 @@ class pdf_strato extends ModelePDFContract
 		}
 	}
 
-	/**
-	 *   Show table for lines
-	 *
-	 *   @param		TCPDF		$pdf     		Object PDF
-	 *   @param		string		$tab_top		Top position of table
-	 *   @param		string		$tab_height		Height of table (rectangle)
-	 *   @param		int			$nexY			Y
-	 *   @param		Translate	$outputlangs	Langs object
-	 *   @param		int			$hidetop		Hide top bar of array
-	 *   @param		int			$hidebottom		Hide bottom bar of array
-	 *   @return	void
-	 */
-	protected function _tableau(&$pdf, $tab_top, $tab_height, $nexY, $outputlangs, $hidetop = 0, $hidebottom = 0)
-	{
-		global $conf;
-
-		// Force to disable hidetop and hidebottom
-		$hidebottom = 0;
-		if ($hidetop) {
-			$hidetop = -1;
-		}
-
-		$default_font_size = pdf_getPDFFontSize($outputlangs);
-		/*
-		$pdf->SetXY($this->marge_gauche, $tab_top);
-		$pdf->MultiCell(190,8,$outputlangs->transnoentities("Description"),0,'L',0);
-		$pdf->line($this->marge_gauche, $tab_top + 8, $this->page_largeur-$this->marge_droite, $tab_top + 8);
-
-		$pdf->SetFont('','', $default_font_size - 1);
-
-		$pdf->MultiCell(0, 3, '');		// Set interline to 3
-		$pdf->SetXY($this->marge_gauche, $tab_top + 8);
-		$text=$object->description;
-		if ($object->duree > 0)
-		{
-			$totaltime=convertSecondToTime($object->duree,'all',$conf->global->MAIN_DURATION_OF_WORKDAY);
-			$text.=($text?' - ':'').$langs->trans("Total").": ".$totaltime;
-		}
-		$desc=dol_htmlentitiesbr($text,1);
-		//print $outputlangs->convToOutputCharset($desc); exit;
-
-		$pdf->writeHTMLCell(180, 3, 10, $tab_top + 8, $outputlangs->convToOutputCharset($desc), 0, 1);
-		$nexY = $pdf->GetY();
-
-		$pdf->line($this->marge_gauche, $nexY, $this->page_largeur-$this->marge_droite, $nexY);
-
-		$pdf->MultiCell(0, 3, '');		// Set interline to 3. Then writeMultiCell must use 3 also.
-		*/
-
-		// Output Rect
-		$this->printRect($pdf, $this->marge_gauche, $tab_top, $this->page_largeur - $this->marge_gauche - $this->marge_droite, $tab_height + 3); // Rect takes a length in 3rd parameter and 4th parameter
-	}
-
 	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
 	/**
 	 *   	Show footer of page. Need this->emetteur object
 	 *
@@ -753,34 +785,5 @@ class pdf_strato extends ModelePDFContract
 		global $conf;
 		$showdetails = empty($conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS) ? 0 : $conf->global->MAIN_GENERATE_DOCUMENTS_SHOW_FOOT_DETAILS;
 		return pdf_pagefoot($pdf, $outputlangs, 'CONTRACT_FREE_TEXT', $this->emetteur, $this->marge_basse, $this->marge_gauche, $this->page_hauteur, $object, $showdetails, $hidefreetext);
-	}
-
-	// phpcs:disable PEAR.NamingConventions.ValidFunctionName.PublicUnderscore
-
-	/**
-	 * Show footer signature of page
-	 * @param   TCPDF       $pdf            Object PDF
-	 * @param   int         $tab_top        tab height position
-	 * @param   int         $tab_height     tab height
-	 * @param   Translate   $outputlangs    Object language for output
-	 * @return void
-	 */
-	protected function tabSignature(&$pdf, $tab_top, $tab_height, $outputlangs)
-	{
-		$pdf->SetDrawColor(128, 128, 128);
-		$posmiddle = $this->marge_gauche + round(($this->page_largeur - $this->marge_gauche - $this->marge_droite) / 2);
-		$posy = $tab_top + $tab_height + 3 + 3;
-
-		$pdf->SetXY($this->marge_gauche, $posy);
-		$pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 5, $outputlangs->transnoentities("ContactNameAndSignature", $this->emetteur->name), 0, 'L', 0);
-
-		$pdf->SetXY($this->marge_gauche, $posy + 5);
-		$pdf->MultiCell($posmiddle - $this->marge_gauche - 5, 20, '', 1);
-
-		$pdf->SetXY($posmiddle + 5, $posy);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $posmiddle - 5, 5, $outputlangs->transnoentities("ContactNameAndSignature", $this->recipient->name), 0, 'L', 0);
-
-		$pdf->SetXY($posmiddle + 5, $posy + 5);
-		$pdf->MultiCell($this->page_largeur - $this->marge_droite - $posmiddle - 5, 20, '', 1);
 	}
 }
