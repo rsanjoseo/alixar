@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Alxarafe\Modules\Main\Controllers;
+namespace Alxarafe\Core\Controllers;
 
 use Alxarafe\Core\Base\BasicController;
 use Alxarafe\Core\Base\View;
 use Alxarafe\Core\Singletons\Config;
-use Alxarafe\Modules\Main\Views\ConfigView;
+use Alxarafe\Core\Views\ConfigView;
 use DebugBar\DebugBarException;
 
 /**

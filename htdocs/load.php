@@ -27,6 +27,7 @@
 
 const BASE_FOLDER = __DIR__;
 
+use Alxarafe\Core\Controllers\EditConfig;
 use Alxarafe\Core\Providers\Constants;
 use Alxarafe\Core\Providers\RegionalInfo;
 use Alxarafe\Core\Providers\Translator;
@@ -43,10 +44,10 @@ if (!defined('APP_URI')) {
     Constants::defineConstants();
     $hasConfig = Constants::loadConstants();
     if (!$hasConfig) {
-        die('EditConfig not yet implemented!');
-        // $data = new EditConfig();
-        // $data->main();
-        // die();
+        //        die('EditConfig not yet implemented!');
+        $data = new EditConfig();
+        $data->main();
+        die();
     }
 }
 

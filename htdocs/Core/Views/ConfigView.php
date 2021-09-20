@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Alxarafe\Modules\Main\Views;
+namespace Alxarafe\Core\Views;
 
 use Alxarafe\Core\Base\View;
 use Alxarafe\Core\Singletons\Config;
