@@ -1,0 +1,44 @@
+<!-- Start top horizontal -->
+{% block menu %}
+    <div class="side-nav-vert">
+        <div id="id-top">
+            <div id="tmenu_tooltip" class="tmenu">
+                <div class="tmenudiv">
+                    <ul role="navigation" class="tmenu">
+                        <li class="tmenu menuhider" id="mainmenutd_menu">
+                            <div class="tmenucenter"><a class="tmenuimage" tabindex="-1" href="#" title="">
+                                    <div class="mainmenu menu topmenuimage"><span class="mainmenu tmenuimage"
+                                                                                  id="mainmenuspan_menu"></span></div>
+                                </a><a class="tmenu menuhider" id="mainmenua_menu" href="#" title=""><span
+                                            class="mainmenuaspan"></span></a></div>
+                        </li>
+
+                        {% for item in view.menu %}
+                            <li class="tmenu{% if item.active %}sel{% endif %}" id="mainmenutd_{{ item.id }}">
+                                <div class="tmenucenter"><a class="tmenuimage" tabindex="-1"
+                                                            href="{{ item.href }}"
+                                                            title="{{ item.title }}">
+                                        <div class="mainmenu {{ item.id }} topmenuimage"><span
+                                                    class="mainmenu tmenuimage"
+                                                    id="mainmenuspan_{{ item.id }}"></span></div>
+                                    </a><a class="tmenusel" id="mainmenua_{{ item.id }}"
+                                           href="/dolibarr/htdocs/index.php?mainmenu=home&amp;leftmenu=home"
+                                           title="{{ item.title }}"><span
+                                                class="mainmenuaspan">{{ item.title }}</span></a></div>
+                            </li>
+                        {% endfor %}
+
+                        <li class="tmenuend" id="mainmenutd_">
+                            <div class="tmenucenter"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="login_block usedropdown">
+                {% block menu_info %}{% include 'master/menu_info.twig' %}{% endblock %}
+                {% block menu_user %}{% include 'master/menu_user.twig' %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+<!-- End top horizontal -->

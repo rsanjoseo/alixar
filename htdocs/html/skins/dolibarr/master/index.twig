@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% block header %}{% include 'master/header.twig' %}{% endblock %}
+</head>
+<body{% if view.bodyId %} id="{{ view.bodyId }}"{% endif %}
+        class="sidebar-collapse"{% if view.protectClose %} onBeforeUnload='return iCanClose()'{% endif %}>
+
+{% block menu %}{% include 'master/menu.twig' %}{% endblock %}
+
+<div style="clear: both;"></div><!-- End top horizontal menu -->
+
+<!-- Begin div id-container -->
+<div id="id-container" class="id-container">
+    {% block sidenav %}{% include 'master/sidenav.twig' %}{% endblock %}
+    {% block errors %}{% include 'master/errors.twig' %}{% endblock %}
+    {% block body %}{% endblock %}
+</div> <!-- End div id-container -->
+
+<hr>
+{% block footer %}{% include 'master/footer.twig' %}{% endblock %}
+</body>

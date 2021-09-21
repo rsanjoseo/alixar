@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta content="noindex" name="robots">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Dolibarr Development Team" name="author">
+    <link href="/dolibarr/htdocs/theme/dolibarr_256x256_color.png" rel="shortcut icon" type="image/x-icon"/>
+    <link href="/dolibarr/htdocs/theme/eldy/manifest.json.php" rel="manifest"/>
+    <title>Login @ 15.0.0-alpha</title>
+    <!-- Includes CSS for JQuery (Ajax library) -->
+    <link href="/dolibarr/htdocs/includes/jquery/css/base/jquery-ui.css?layout=classic&amp;version=15.0.0-alpha"
+          rel="stylesheet" type="text/css">
+    <link href="/dolibarr/htdocs/includes/jquery/plugins/jnotify/jquery.jnotify-alt.min.css?layout=classic&amp;version=15.0.0-alpha"
+          rel="stylesheet" type="text/css">
+    <link href="/dolibarr/htdocs/includes/jquery/plugins/select2/dist/css/select2.css?layout=classic&amp;version=15.0.0-alpha"
+          rel="stylesheet" type="text/css">
+    <!-- Includes CSS for font awesome -->
+    <link href="/dolibarr/htdocs/theme/common/fontawesome-5/css/all.min.css?layout=classic&amp;version=15.0.0-alpha"
+          rel="stylesheet" type="text/css">
+    <link href="/dolibarr/htdocs/theme/common/fontawesome-5/css/v4-shims.min.css?layout=classic&amp;version=15.0.0-alpha"
+          rel="stylesheet" type="text/css">
+    <!-- Includes CSS for Dolibarr theme -->
+    <link href="/dolibarr/htdocs/theme/eldy/style.css.php?lang=es_ES&amp;theme=eldy&amp;userid=0&amp;entity=1&amp;layout=classic&amp;version=15.0.0-alpha&amp;revision=4"
+          rel="stylesheet" type="text/css">
+    <!-- Includes JS for JQuery -->
+    <script src="/dolibarr/htdocs/includes/jquery/js/jquery.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/jquery/js/jquery-ui.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/jquery/plugins/tablednd/jquery.tablednd.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/jquery/plugins/jnotify/jquery.jnotify.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/nnnick/chartjs/dist/Chart.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/jquery/plugins/select2/dist/js/select2.full.min.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <script src="/dolibarr/htdocs/includes/jquery/plugins/multiselect/jquery.multi-select.js?layout=classic&amp;version=15.0.0-alpha"></script>
+    <!-- Includes JS of Dolibarr -->
+    <script src="/dolibarr/htdocs/core/js/lib_head.js.php?lang=es_ES&amp;layout=classic&amp;version=15.0.0-alpha"></script>
+    <!-- Includes JS added by page -->
+    <script src="/dolibarr/htdocs/includes/jstz/jstz.min.js?lang=es_ES"></script>
+    <script src="/dolibarr/htdocs/core/js/dst.js?lang=es_ES"></script>
+</head>
+
+<!-- BEGIN PHP TEMPLATE LOGIN.TPL.PHP -->
+<body class="body bodylogin">
+
+<script>
+    $(document).ready(function () {
+        /* Set focus on correct field */
+        $('#username').focus(); 		// Warning to use this only on visible element
+    });
+</script>
+
+<div class="login_center center"
+     style="background-size: cover; background-position: center center; background-attachment: fixed; background-repeat: no-repeat; background-image: linear-gradient(rgb(60,70,100,0.3), rgb(240,240,240));">
+    <div class="login_vertical_align">
+
+        <form action="/dolibarr/htdocs/index.php?x&mainmenu=home" id="login" method="post" name="login">
+            <input name="token" type="hidden" value="e35b578d433f7b9041b0c8c663235560"/>
+            <input name="actionlogin" type="hidden" value="login">
+            <input name="loginfunction" type="hidden" value="loginfunction"/>
+            <!-- Add fields to send local user information -->
+            <input id="tz" name="tz" type="hidden" value=""/>
+            <input id="tz_string" name="tz_string" type="hidden" value=""/>
+            <input id="dst_observed" name="dst_observed" type="hidden" value=""/>
+            <input id="dst_first" name="dst_first" type="hidden" value=""/>
+            <input id="dst_second" name="dst_second" type="hidden" value=""/>
+            <input id="screenwidth" name="screenwidth" type="hidden" value=""/>
+            <input id="screenheight" name="screenheight" type="hidden" value=""/>
+            <input id="dol_hide_topmenu" name="dol_hide_topmenu" type="hidden" value=""/>
+            <input id="dol_hide_leftmenu" name="dol_hide_leftmenu" type="hidden" value=""/>
+            <input id="dol_optimize_smallscreen" name="dol_optimize_smallscreen" type="hidden" value=""/>
+            <input id="dol_no_mouse_hover" name="dol_no_mouse_hover" type="hidden" value=""/>
+            <input id="dol_use_jmobile" name="dol_use_jmobile" type="hidden" value=""/>
+
+
+            <!-- Title with version -->
+            <div class="login_table_title center" title="Dolibarr 15.0.0-alpha">
+                <a class="login_table_title" href="https://www.dolibarr.org" target="_blank">Dolibarr 15.0.0-alpha</a>
+            </div>
+
+
+            <div class="login_table">
+
+                <div id="login_line1">
+
+                    <div id="login_left">
+                        <img alt="" id="img_logo" src="/dolibarr/htdocs/theme/dolibarr_logo.svg"/>
+                    </div>
+
+                    <br>
+
+                    <div id="login_right">
+
+                        <div class="tagtable left centpercent" title="Introduzca los datos de inicio de sesi&oacute;n">
+
+                            <!-- Login -->
+                            <div class="trinputlogin">
+                                <div class="tagtd nowraponall center valignmiddle tdinputlogin">
+                                    <!-- <span class="span-icon-user">-->
+                                    <span class="fa fa-user"></span>
+                                    <input autofocus="autofocus" class="flat input-icon-user minwidth150" id="username"
+                                           maxlength="255" name="username" placeholder="Login" tabindex="1" type="text"
+                                           value=""/>
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="trinputlogin">
+                                <div class="tagtd nowraponall center valignmiddle tdinputlogin">
+                                    <!--<span class="span-icon-password">-->
+                                    <span class="fa fa-key"></span>
+                                    <input autocomplete="off" class="flat input-icon-password minwidth150" id="password"
+                                           maxlength="128" name="password" placeholder="Contrase&ntilde;a" tabindex="2"
+                                           type="password" value=""/>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div> <!-- end div login_right -->
+
+                </div> <!-- end div login_line1 -->
+
+
+                <div id="login_line2" style="clear: both">
+
+                    <!-- Button Connection -->
+                    <br>
+                    <div id="login-submit-wrapper">
+                        <input class="button" tabindex="5" type="submit" value="&nbsp; Conexi&oacute;n &nbsp;"/>
+                    </div>
+
+                    <br>
+                    <div class="center" style="margin-top: 5px;"><a class="alogin"
+                                                                    href="/dolibarr/htdocs/user/passwordforgotten.php">&iquest;Olvid&oacute;
+                        su contrase&ntilde;a?</a>&nbsp;-&nbsp;<a class="alogin"
+                                                                 href="/dolibarr/htdocs/support/index.php"
+                                                                 target="_blank">&iquest;Necesita ayuda o soporte?</a>
+                    </div>
+                </div> <!-- end login line 2 -->
+
+            </div> <!-- end login table -->
+
+
+        </form>
+
+
+        <!-- authentication mode = dolibarr -->
+        <!-- cookie name used for this session = DOLSESSID_89806024fdd26cc753b02ba2fcad4675 -->
+        <!-- urlfrom in this session =  -->
+
+        <!-- Common footer is not used for login page, this is same than footer but inside login tpl -->
+
+
+    </div>
+</div><!-- end of center -->
+
+
+</body>
+</html>
+<!-- END PHP TEMPLATE -->

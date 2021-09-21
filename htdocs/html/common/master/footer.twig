@@ -1,0 +1,11 @@
+<!-- Including jsCode -->
+{% block javascriptsFooter %}
+    {% for js in jsCode %}
+        <script type="text/javascript" src="{{ js }}"></script>
+    {% endfor %}
+    <!-- start of getFooter -->
+    {{ view.getFooter() | raw }}
+    <!-- end of getFooter -->
+{% endblock %}
+<!-- End of jsCode inclusion -->
+</html>

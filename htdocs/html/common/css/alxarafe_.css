@@ -1,0 +1,248 @@
+/**
+ * Alxarafe. Development of PHP applications in a flash!
+ * Copyright (C) 2018 Alxarafe <info@alxarafe.com>
+ */
+html,
+body {
+    overflow-x: hidden; /* Prevent scroll on narrow devices */
+}
+
+body {
+    padding-top: 70px;
+}
+
+footer {
+    padding: 30px 0;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: 767px) {
+    .row-offcanvas {
+        position: relative;
+        -webkit-transition: all .25s ease-out;
+        -o-transition: all .25s ease-out;
+        transition: all .25s ease-out;
+    }
+
+    .row-offcanvas-right {
+        right: 0;
+    }
+
+    .row-offcanvas-left {
+        left: 0;
+    }
+
+    .row-offcanvas-right
+    .sidebar-offcanvas {
+        right: -50%; /* 6 columns */
+    }
+
+    .row-offcanvas-left
+    .sidebar-offcanvas {
+        left: -50%; /* 6 columns */
+    }
+
+    .row-offcanvas-right.active {
+        right: 50%; /* 6 columns */
+    }
+
+    .row-offcanvas-left.active {
+        left: 50%; /* 6 columns */
+    }
+
+    .sidebar-offcanvas {
+        position: absolute;
+        top: 0;
+        width: 50%; /* 6 columns */
+    }
+}
+
+/* jumbotron.css */
+
+body {
+    padding-top: 50px;
+    /* padding: 0px; */
+    margin: 0px;
+    color: #000015;
+    font-family: 'Roboto';
+}
+
+textarea {
+    resize: none;
+}
+
+#top-bar {
+    background: GoldenRod;
+    opacity: 0.95;
+}
+
+#top-bar:a:active {
+    background: Yellow;
+    color: #0066AA;
+}
+
+/* search bar */
+
+.search-bar input {
+    width: 100%;
+}
+
+.search-bar {
+    background-color: #CCCCCC;
+    /*float: left;*/
+    width: 100%;
+    border-color: #080808;
+    min-height: 26px;
+    margin-bottom: 0px;
+    border-radius: 0px;
+    padding: 2px 0px 3px 0px;
+    margin-bottom: 10px;
+}
+
+.ui-autocomplete {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    border: 1px solid gray;
+    background-color: GoldenRod;
+    width: 90%;
+    font-size: 0.9em
+}
+
+.ui-menu-item {
+    background-color: #EEEEEE;
+}
+
+.ui-menu-item a {
+    display: block;
+    width: 100%;
+}
+
+.ui-state-focus {
+    background-color: GoldenRod;
+    cursor: pointer;
+    color: white;
+}
+
+.nav.navbar-nav a {
+    color: black;
+    font-size: 110%;
+}
+
+li.active {
+    background: White;
+}
+
+.dropdown-menu {
+    background: White;
+}
+
+.dropdown-menu li > a:hover {
+    background: GoldenRod;
+}
+
+.dropdown-menu li:hover {
+    background: LightGray;
+}
+
+/* Fondos de submenú
+.dropdown-menu > .active > a {
+        background: green;
+}
+
+.dropdown-menu > .active > a:hover {
+        background: black;
+}
+*/
+
+.cortar {
+    /*
+width:200px;
+height:20px;
+padding:20px;
+border:1px solid blue;
+    */
+    padding: 6px 1px 3px 1px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.cortar:hover {
+    width: auto;
+    white-space: initial;
+    overflow: visible;
+    cursor: pointer;
+}
+
+/*
+.top-bar-fixed {
+        background-color: #FFFF15;
+        width: 100%;
+        / * min-height: 0px; * /
+        height: 30px;
+}
+
+#top-bar2 {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+        / *min-height: 0px;* /
+        height: 30px;
+}
+
+.navbar-item>a {
+        background: white;
+}
+
+.navbar-item {
+        background: pink;
+        height: 20px;
+        margin-top: 5px;
+        padding: 5px;
+}
+
+.navbar-toggle {
+        background-color: #FFA500;
+}
+*/
+.icon-bar {
+    background: #000015;
+}
+
+#logo {
+    margin-right: 5px;
+}
+
+.radio {
+    left: 10%;
+    right: 10%;
+}
+
+.copyright {
+    margin: 0px;
+    padding: 0px;
+    background: GoldenRod;
+    border-color: #080808;
+    color: #333;
+    opacity: 0.95;
+    /* padding-left: -150px; */
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: -12px;
+}
+
+.copyright a {
+    color: 0066 AA;
+    text-decoration: none;
+}
+
+.copyright a:hover {
+    color: Blue;
+    text-decoration: none;
+}

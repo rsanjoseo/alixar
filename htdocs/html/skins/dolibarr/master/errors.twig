@@ -1,0 +1,10 @@
+<!-- Including Error messages -->
+{% block errors %}
+    {% for error in view.getErrors() %}
+        <div class="center login_main_message">
+            <div class="{{ error.type }}">
+                {{ error.msg }}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

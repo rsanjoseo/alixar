@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ view.lang }}">
+<head>
+    {% block header %}{% include 'master/header.twig' %}{% endblock %}
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ view.addResource('/plugins/fontawesome-free/css/all.min', 'css') }}">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="{{ view.addResource('/plugins/icheck-bootstrap/icheck-bootstrap.min') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ view.addResource('/dist/css/adminlte.min', 'css') }}">
+    <!-- AdminLTE for demo purposes -->
+    {# <script src="{{ view.addResource('/modules/main/js/config','js') }}"></script> #}
+</head>
+<body class="hold-transition login-page">
+{% block body %}{% endblock %}
+{% block footer %}{% include 'master/footer.twig' %}{% endblock %}
+</body>
+</html>

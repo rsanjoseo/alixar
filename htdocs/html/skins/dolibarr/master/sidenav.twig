@@ -1,0 +1,66 @@
+<!-- Begin side-nav id-left -->
+{% block sidenav %}
+    <div class="side-nav">
+        <div id="id-left">
+
+            <!-- Begin left menu -->
+            <div class="vmenu">
+
+
+                <!-- Begin SearchForm -->
+                <div id="blockvmenusearch" class="blockvmenusearch">
+                    <select type="text" class="searchselectcombo vmenusearchselectcombo" name="searchselectcombo">
+                        <option></option>
+                    </select></div>
+                <!-- End SearchForm -->
+                <div class="blockvmenu blockvmenupair blockvmenufirst">
+                    <!-- Process menu entry with mainmenu=home, leftmenu=home, level=0 enabled=1, position=0 -->
+                    <div class="menu_titre"><a class="vmenu" title="Mi panel de control"
+                                               href="/dolibarr/htdocs/index.php?mainmenu=home&amp;leftmenu=home"><i
+                                    class="fa fa-bar-chart fa-fw paddingright pictofixedwidth"></i>Mi panel de
+                            control</a></div>
+                    <div class="menu_top"></div>
+                    <div class="menu_end"></div>
+                </div>
+                <div class="blockvmenu blockvmenuimpair">
+                    <!-- Process menu entry with mainmenu=home, leftmenu=setup, level=0 enabled=1, position=0 -->
+                    <div class="menu_titre"><a class="vmenu" title="Configuraci&oacute;n"
+                                               href="/dolibarr/htdocs/admin/index.php?mainmenu=home&amp;leftmenu=setup"><i
+                                    class="fa fa-tools fa-fw paddingright pictofixedwidth"></i>Configuraci&oacute;n</a>
+                    </div>
+                    <div class="menu_top"></div>
+                    <div class="menu_end"></div>
+                </div>
+                <div class="blockvmenu blockvmenupair">
+                    <!-- Process menu entry with mainmenu=home, leftmenu=admintools, level=0 enabled=1, position=0 -->
+                    <div class="menu_titre"><a class="vmenu" title="Herramientas de administraci&oacute;n"
+                                               href="/dolibarr/htdocs/admin/tools/index.php?mainmenu=home&amp;leftmenu=admintools"><i
+                                    class="fa fa-server fa-fw paddingright pictofixedwidth"></i>Herramientas de
+                            administraci&oacute;n</a>
+                    </div>
+                    <div class="menu_top"></div>
+                    <div class="menu_end"></div>
+                </div>
+                <div class="blockvmenu blockvmenuimpair blockvmenulast">
+                    <!-- Process menu entry with mainmenu=home, leftmenu=users, level=0 enabled=1, position=0 -->
+                    <div class="menu_titre"><a class="vmenu" title="Usuarios y grupos"
+                                               href="/dolibarr/htdocs/user/home.php?leftmenu=users"><span
+                                    class="fas fa-user infobox-adherent paddingright pictofixedwidth" style=""></span>Usuarios
+                            y
+                            grupos</a></div>
+                    <div class="menu_top"></div>
+                    <div class="menu_end"></div>
+                </div>
+                <div class="blockvmenuend"></div>
+                <!-- Begin Help Block-->
+                <div id="blockvmenuhelp" class="blockvmenuhelp">
+                </div>
+                <!-- End Help Block-->
+
+            </div>
+            <!-- End left menu -->
+
+        </div>
+    </div>
+{% endblock %}
+<!-- End side-nav id-left -->

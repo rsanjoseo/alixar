@@ -22,12 +22,13 @@
  * In Alixar it would not be necessary, since they would be attributes of the Globals abstract class
  * from which the rest of the classes descend.
  *
- * @deprecated: It's not necessary in Alixar
+ * @deprecated It's not necessary in Alixar
  */
 
 const BASE_FOLDER = __DIR__;
 
 use Alxarafe\Core\Controllers\EditConfig;
+use Alxarafe\Core\Controllers\Install;
 use Alxarafe\Core\Providers\Constants;
 use Alxarafe\Core\Providers\RegionalInfo;
 use Alxarafe\Core\Providers\Translator;
@@ -39,12 +40,17 @@ use Alxarafe\Core\Singletons\Session;
 use Alxarafe\Core\Singletons\TemplateRender;
 
 require_once 'vendor/autoload.php';
+
 // Load constants and configuration file, if they are not already loaded.
 if (!defined('APP_URI')) {
     Constants::defineConstants();
     $hasConfig = Constants::loadConstants();
     if (!$hasConfig) {
-        //        die('EditConfig not yet implemented!');
+        if ($_GET['module'] === 'install') {
+            $install = new Install();
+            $install->main();
+            die();
+        }
         $data = new EditConfig();
         $data->main();
         die();

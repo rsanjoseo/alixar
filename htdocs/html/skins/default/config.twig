@@ -1,0 +1,135 @@
+{% extends "master/index.twig" %}
+
+{% block title %}Configuración de la base de aplicación{% endblock %}
+
+{% block body %}
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>{{ view.trans('appconfig') }}</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">{{ view.trans('TODO: module_name? Home?') }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ view.trans('appconfig') }}</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <form action='' method='post' accept-charset="utf-8">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- left column -->
+                        <div class="col-md-6">
+                            <!-- general form elements -->
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">{{ view.trans('generalconfig') }}</h3>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for "language">{{ view.trans('language') }}</label>
+                                        <select id="language" name="language" class="form-control">
+                                            {% for lang,language in view.languages %}
+                                                <option value="{{ lang }}" {{ lang==view.language ? "selected":"" }}>{{ language }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    {% if view.skins|length > 0 %}
+                                        <div class="form-group">
+                                            <label for="skin">{{ view.trans('skin') }}</label>
+                                            <select id="skin" name="skin" class="form-control">
+                                                {% for skin in view.skins %}
+                                                    <option {{ skin==view.skin ? "selected":"" }}>{{ skin }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="debug" name="debug"
+                                               value="true"{% if view.checkDebug %} checked{% endif %}>
+                                        <label class="form-check-label"
+                                               for="debug">{{ view.trans('debugmode') }}</label>
+                                    </div>
+                                </div>
+                                <!-- /.card-body -->
+                                <div class="card-footer">
+                                    <button name="action" value="save" type="submit" class="btn btn-primary">
+                                        {{ view.trans('save') }}</button>
+                                    <!-- <button name="clear" type="submit" class="btn btn-default">Borrar los campos</button> -->
+                                    <button name="action" value="exit" type="submit"
+                                            class="btn btn-danger">{{ view.trans('cancel') }}</button>
+                                </div>
+
+                            </div>
+                            <!-- /.card -->
+                        </div>
+                        <!--/.col (left) -->
+                        <!-- right column -->
+                        <div class="col-md-6">
+                            <!-- Form Element sizes -->
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h3 class="card-title">{{ view.trans('dbconfig') }}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <h4>Custom Select</h4>
+                                    <div class="form-group">
+                                        <label for="dbEngineName">{{ view.trans('dbEngineName') }}</label>
+                                        <select id="dbEngineName" name="dbEngineName" class="form-control">
+                                            {% for dbEngine in view.dbEngines %}
+                                                <option {{ dbEngine==view.dbEngineName ? "selected":"" }}>{{ dbEngine }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    {% for key,var in view.dbConfig %}
+                                        <div class="form-group">
+                                            <label for="{{ key }}">{{ view.trans(key) }}</label>
+                                            <input id="{{ key }}" name="{{ key }}" class="form-control" type="text"
+                                                   value="{{ var }}"/>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <!-- /.card-body -->
+                            </div>
+                            <!-- /.card -->
+                            <!--/.col (right) -->
+                        </div>
+                    </div>
+                    <!-- /.row -->
+                </div><!-- /.container-fluid -->
+            </form>
+        </section>
+        <!-- /.content -->
+
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer">
+        <div class="float-right d-none d-sm-block">
+            <b>Version</b> 3.1.0
+        </div>
+        <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    </footer>
+
+    {#
+    <!-- Page specific script -->
+    <script>
+        $(function () {
+            bsCustomFileInput.init();
+        });
+    </script>
+    #}
+
+{% endblock %}

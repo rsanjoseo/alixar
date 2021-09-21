@@ -1,0 +1,6 @@
+<!-- Including Error messages -->
+{% block errors %}
+    {% for error in view.getErrors() %}
+        <div class="alert alert-{{ error.type }}" role="alert">{{ error.msg }}</div>
+    {% endfor %}
+{% endblock %}

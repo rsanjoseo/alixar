@@ -1,0 +1,151 @@
+/**
+ * Alxarafe. Development of PHP applications in a flash!
+ * Copyright (C) 2018 Alxarafe <info@alxarafe.com>
+ */
+.pull-left {
+    margin-left: 22px;
+}
+
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-signin-heading, .form-signin .checkbox {
+    margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    font-size: 16px;
+    height: auto;
+    padding: 10px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="text"] {
+    margin-bottom: -1px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.account-wall {
+    margin-top: 20px;
+    padding: 40px 0px 20px 0px;
+    background-color: #f7f7f7;
+    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.login-title {
+    color: #555;
+    font-size: 18px;
+    font-weight: 400;
+    display: block;
+}
+
+.profile-img {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
+    display: block;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.need-help {
+    margin-top: 10px;
+}
+
+.new-account {
+    display: block;
+    margin-top: 10px;
+}
+
+div.info {
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.navmenubar {
+    border-radius: 0;
+    background-color: #333;
+    min-height: 24px;
+}
+
+.blog-image {
+    margin: 0 auto;
+    opacity: 1;
+    box-shadow: 5px black;
+    /*
+        padding:0 15px 0 15px;
+    */
+}
+
+.btn-company img {
+    margin: 0 auto;
+    opacity: 1;
+    transition: all 0.3s ease-in;
+    box-shadow: 5px black;
+    margin-top: 10px;
+    box-shadow: 0 0 30px black;
+    /*
+        padding:0 15px 0 15px;
+    */
+}
+
+.codigo {
+    font-family: "Courier New";
+    border: 1px solid #A2A2A2;
+    background-color: #F1F1F1;
+    padding: 8px;
+    color: #0150c7;
+}
+
+div.codigo p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 5px;
+    margin-right: 5px;
+    line-height: 18px;
+}
+
+/**
+.btn-company .mask {
+        cursor:pointer;
+        opacity:1;
+        visibility:visible;
+        border:100px solid rgba(0,0,0,0.7);
+        box-sizing:border-box;
+        transition: all 0.4s cubic-bezier(0.940, 0.850, 0.100, 0.620);
+}
+
+.btn-company:hover .mask {
+        border:0px double rgba(0,0,0,0.7);
+        opacity:0;
+        visibility:hidden;
+}
+*/
+
+.btn-company:hover img {
+    opacity: 0.7;
+}

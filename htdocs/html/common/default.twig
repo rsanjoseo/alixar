@@ -1,0 +1,11 @@
+{% extends "master/index.twig" %}
+
+{% block title %}Plantilla por defecto{% endblock %}
+
+{% block body %}
+    <h1>{{ view.title }}</h1>
+    {% if user=="" %}
+        <h2><a href="{{ ctrl.url('Main','Login') }}">Login</a></h2>
+    {% endif %}
+    <h2><a href="{{ ctrl.url('Main','EditConfig') }}">Editar configuración</a></h2>
+{% endblock %}

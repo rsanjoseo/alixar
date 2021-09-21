@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="{{ view.lang }}">
+<head>
+    {% block header %}{% include 'master/header.twig' %}{% endblock %}
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ view.addResource('/plugins/fontawesome-free/css/all.min', 'css') }}">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="{{ view.addResource('/plugins/icheck-bootstrap/icheck-bootstrap.min') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ view.addResource('/dist/css/adminlte.min', 'css') }}">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="{{ view.addResource('/plugins/select2/css/select2.min', 'css') }}">
+</head>
+<body class="hold-transition sidebar-mini"{% if view.protectClose %} onBeforeUnload='return iCanClose()'{% endif %}>
+
+{% if view.hasMenu %}
+    <div class="wrapper">
+        {% block topmenu %}{% include 'master/topmenu.twig' %}{% endblock %}
+        {% block sidenav %}{% include 'master/sidenav.twig' %}{% endblock %}
+        {% block ctrlsidebar %}{% include 'master/ctrlsidebar.twig' %}{% endblock %}
+    </div>
+
+    {% block menu %}{% include 'master/menu.twig' %}{% endblock %}
+{% endif %}
+
+<div class="container-fluid">
+    {% block errors %}{% include 'master/errors.twig' %}{% endblock %}
+    {% block body %}{% endblock %}
+    <hr>
+</div>
+{% block footer %}{% include 'master/footer.twig' %}{% endblock %}
+</body>
+</html>

@@ -45,3 +45,9 @@ yarn.lock
 package-lock.json
 
 doc/install.lock
+
+# Fully or partially migrated code
+htdocs/install/
+htdocs/install_old/
+htdocs/core/db/
+htdocs/core/db_old/

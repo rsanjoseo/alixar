@@ -1,0 +1,936 @@
+{% extends "master/index.twig" %}
+
+{% block title %}Plantilla por defecto{% endblock %}
+
+{% block body %}
+    <!-- Begin right area -->
+    <div id="id-right">
+        <!-- Begin div class="fiche" -->
+        <div class="fiche">
+
+            <table class="centpercent notopnoleftnoright table-fiche-title titleforhome">
+                <tr class="titre">
+                    <td class="nobordernopadding valignmiddle col-title">
+                        <div class="titre inline-block">&nbsp;</div>
+                    </td>
+                    <td class="nobordernopadding titre_right wordbreakimp right valignmiddle">
+                        <script type="text/javascript" language="javascript">
+
+                            // To update list of activated boxes
+                            function updateBoxOrder(closing) {
+                                var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
+                                var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
+                                var boxorder = 'A:' + left_list + '-B:' + right_list;
+                                if (boxorder == 'A:A-B:B' && closing == 1)	// There is no more boxes on screen, and we are after a delete of a box so we must hide title
+                                {
+                                    jQuery.ajax({
+                                        url: '/dolibarr/htdocs/core/ajax/box.php?closing=1&boxorder=' + boxorder + '&zone=0&userid=' + 1,
+                                        async: false
+                                    });
+                                    // We force reload to be sure to get all boxes into list
+                                    window.location.search = 'mainmenu=home&leftmenu=&action=delbox';
+                                } else {
+                                    jQuery.ajax({
+                                        url: '/dolibarr/htdocs/core/ajax/box.php?closing=' + closing + '&boxorder=' + boxorder + '&zone=0&userid=' + 1,
+                                        async: true
+                                    });
+                                }
+                            }
+
+                            jQuery(document).ready(function () {
+                                jQuery("#boxcombo").change(function () {
+                                    var boxid = jQuery("#boxcombo").val();
+                                    if (boxid > 0) {
+                                        console.log("A box widget has been selected for addition, we call ajax page to add it.")
+                                        var left_list = cleanSerialize(jQuery("#boxhalfleft").sortable("serialize"));
+                                        var right_list = cleanSerialize(jQuery("#boxhalfright").sortable("serialize"));
+                                        var boxorder = 'A:' + left_list + '-B:' + right_list;
+                                        jQuery.ajax({
+                                            url: '/dolibarr/htdocs/core/ajax/box.php?boxorder=' + boxorder + '&boxid=' + boxid + '&zone=0&userid=1'
+                                        }).done(function () {
+                                            window.location.search = 'mainmenu=home&leftmenu=';
+                                        });
+                                    }
+                                });
+                                jQuery("#boxcombo").hide();
+
+                                jQuery("#boxhalfleft, #boxhalfright").sortable({
+                                    handle: '.boxhandle',
+                                    revert: 'invalid',
+                                    items: '.boxdraggable',
+                                    containment: 'document',
+                                    connectWith: '#boxhalfleft, #boxhalfright',
+                                    stop: function (event, ui) {
+                                        updateBoxOrder(1);  /* 1 to avoid message after a move */
+                                    }
+                                });
+
+                                jQuery(".boxclose").click(function () {
+                                    var self = this;	// because JQuery can modify this
+                                    var boxid = self.id.substring(8);
+                                    var label = jQuery('#boxlabelentry' + boxid).val();
+                                    console.log("We close box " + boxid);
+                                    jQuery('#boxto_' + boxid).remove();
+                                    if (boxid > 0) jQuery('#boxcombo').append(new Option(label, boxid));
+                                    updateBoxOrder(1);  /* 1 to avoid message after a remove */
+                                });
+
+                            });
+                        </script>
+                    </td>
+                </tr>
+            </table>
+            <div class="info hideonsmartphone clearboth"><span class="fa fa-info-circle"
+                                                               title="Informaci&oacute;n para los administradores"></span>
+                Atenci&oacute;n: Una vez terminada la instalaci&oacute;n, deben desactivarse las herramientas de
+                instalaci&oacute;n/actualizaci&oacute;n a&ntilde;adiendo el archivo <b>install.lock</b> en el directorio
+                <b>/srv/http/dolibarr/documents</b>. La ausencia de este archivo representa un fallo grave de seguridad.
+                Las alertas de seguridad s&oacute;lo son visibles a los administradores y permanecen activas hasta que
+                el problema sea resuelto (o si la constante MAIN_REMOVE_INSTALL_WARNING es definida en Configuraci&oacute;n->Varios)
+            </div>
+            <div class="info hideonsmartphone clearboth"><span class="fa fa-info-circle"
+                                                               title="Informaci&oacute;n para los administradores"></span>
+                Atención, su archivo (<b>htdocs/conf/conf.php</b>) es accesible en escritura al servidor Web. Esto
+                representa un fallo serio de seguridad. Modifique los permisos para ser leído únicamente por la cuenta
+                que ejecuta el servidor Web.<br>Si está ejecutando Windows en un disco con formato FAT, sea consciente
+                que este sistema de archivos no protege los archivos y no ofrece ninguna solución para reducir los
+                riesgos de manipulación de este fichero. Las alertas de seguridad s&oacute;lo son visibles a los
+                administradores y permanecen activas hasta que el problema sea resuelto (o si la constante
+                MAIN_REMOVE_INSTALL_WARNING es definida en Configuraci&oacute;n->Varios)
+            </div>
+            <div class="fichecenter">
+                <div class="opened-dash-board-wrap">
+                    <div class="box-flex-container">
+                        <div class="box-flex-item ">
+                            <div class="box-flex-item-with-margin">
+                                <div class="info-box info-box-sm info-box-weather info-box-weather-level0">
+                                    <span class="info-box-icon"><i class="fa fa-weather-level0"></i>       </span>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title">Vista global</div>
+                                        <span class="info-box-number">0 en retraso</span>
+                                    </div><!-- /.info-box-content -->
+                                </div><!-- /.info-box -->
+                            </div><!-- /.box-flex-item-with-margin -->
+                        </div><!-- /.box-flex-item -->
+
+                        <div class="box-flex-item">
+                            <div class="box-flex-item-with-margin">
+                                <div class="info-box info-box-sm">
+		<span class="info-box-icon bg-infobox-order_supplier">
+		<i class="fa fa-dol-order_supplier"></i>
+</span>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title" title="Pedidos a proveedor">Pedidos a proveedor
+                                        </div>
+                                        <div class="info-box-lines">
+                                            <div class="info-box-line"><a
+                                                        href="/dolibarr/htdocs/fourn/commande/list.php?search_status=1,2&mainmenu=commercial&leftmenu=orders_suppliers"
+                                                        class="info-box-text info-box-text-a"><span
+                                                            title="Pedidos a proveedores a procesar">Activo</span> :
+                                                    <span
+                                                            class=" classfortooltip"
+                                                            title="Pedidos a proveedores a procesar">0</span></a>
+                                            </div>
+                                            <div class="info-box-line"><a
+                                                        href="/dolibarr/htdocs/fourn/commande/list.php?search_status=3,4&mainmenu=commercial&leftmenu=orders_suppliers"
+                                                        class="info-box-text info-box-text-a"><span
+                                                            title="Pedidos a proveedores en espera de recepci&oacute;n">En espera de recepci&oacute;n</span>
+                                                    : <span class=" classfortooltip"
+                                                            title="Pedidos a proveedores en espera de recepci&oacute;n">0</span></a>
+                                            </div>
+                                        </div><!-- /.info-box-lines --></div><!-- /.info-box-content -->
+                                </div><!-- /.info-box -->
+                            </div><!-- /.box-flex-item-with-margin -->
+                        </div><!-- /.box-flex-item -->
+
+                        <div class="box-flex-item">
+                            <div class="box-flex-item-with-margin">
+                                <div class="info-box info-box-sm">
+		<span class="info-box-icon bg-infobox-invoice_supplier">
+		<i class="fa fa-dol-invoice_supplier"></i>
+</span>
+                                    <div class="info-box-content">
+                                        <div class="info-box-title" title="Facturas proveedor">Facturas proveedor</div>
+                                        <div class="info-box-lines">
+                                            <div class="info-box-line"><a
+                                                        href="/dolibarr/htdocs/fourn/facture/list.php?search_status=1&amp;mainmenu=billing&amp;leftmenu=suppliers_bills"
+                                                        class="info-box-text info-box-text-a"><span
+                                                            title="Facturas de proveedor pendientes de pago">A pagar</span>
+                                                    :
+                                                    <span class=" classfortooltip"
+                                                          title="Facturas de proveedor pendientes de pago">0</span></a>
+                                            </div>
+                                        </div><!-- /.info-box-lines --></div><!-- /.info-box-content -->
+                                </div><!-- /.info-box -->
+                            </div><!-- /.box-flex-item-with-margin -->
+                        </div><!-- /.box-flex-item -->
+
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                        <div class="box-flex-item filler"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearboth"></div>
+            <div class="fichecenter fichecenterbis">
+                <div class="twocolumns">
+                    <div class="firstcolumn fichehalfleft boxhalfleft" id="boxhalfleft">
+                        <!-- Box left container -->
+
+                        <!-- Box box_clients start -->
+                        <div class="box boxdraggable" id="boxto_4">
+                            <table summary="boxtable4" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">&Uacute;ltimos 5
+                                            clientes modificados
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose4"></span><input type="hidden" id="boxlabelentry4"
+                                                                                 value="&Uacute;ltimos 5 clientes modificados">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center opacitymedium">
+                                        Ning&uacute;n cliente registrado
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_clients end -->
+
+
+                        <!-- Box box_birthdays start -->
+                        <div class="box boxdraggable" id="boxto_17">
+                            <table summary="boxtable17" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Cumplea&ntilde;os de
+                                            este mes (usuarios)
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose17"></span><input type="hidden" id="boxlabelentry17"
+                                                                                  value="Cumplea&ntilde;os de este mes (usuarios)">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center opacitymedium">
+                                        Nada
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_birthdays end -->
+
+
+                        <!-- Box box_lastlogin start -->
+                        <div class="box boxdraggable" id="boxto_16">
+                            <table summary="boxtable16" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="2">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Informaci&oacute;n
+                                            login
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose16"></span><input type="hidden" id="boxlabelentry16"
+                                                                                  value="Informaci&oacute;n login">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="tdoverflowmax150 maxwidth150onsmartphone">
+                                        Usuario
+                                    </td>
+                                    <td class="tdoverflowmax150 maxwidth150onsmartphone">
+                                        <a href="/dolibarr/htdocs/user/card.php?id=1"
+                                           title="&lt;div class=&quot;centpercent&quot;&gt;&lt;span class=&quot;fas fa-user infobox-adherent&quot; style=&quot;&quot;&gt;&lt;/span&gt; &lt;u class=&quot;paddingrightonly&quot;&gt;Usuario&lt;/u&gt; &lt;span class=&quot;badge  badge-status4 badge-status&quot; title=&quot;Activado&quot;&gt;Activado&lt;/span&gt;&lt;br&gt;&lt;b&gt;Nombre:&lt;/b&gt; SuperAdmin&lt;br&gt;&lt;b&gt;Login:&lt;/b&gt; rsanjose&lt;br&gt;&lt;b&gt;Correo:&lt;/b&gt; &lt;br&gt;&lt;b&gt;Administrador&lt;/b&gt;: S&iacute;&lt;br&gt;&lt;b&gt;Tipo:&lt;/b&gt; Interno&lt;/div&gt;"
+                                           class="classfortooltip"><!-- picto photo user --><span
+                                                    class="nopadding userimg" style="margin-right: 3px;"><img
+                                                        class="photouserphoto userphoto" alt="No photo"
+                                                        src="/dolibarr/htdocs/public/theme/common/user_anonymous.png"></span><span
+                                                    class="nopadding usertext">SuperAdmin</span></a></td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td>
+                                        Conexi&oacute;n anterior
+                                    </td>
+                                    <td>
+                                        16/08/2021 22:16
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_lastlogin end -->
+
+
+                        <!-- Box box_supplier_orders_awaiting_reception start -->
+                        <div class="box boxdraggable" id="boxto_15">
+                            <table summary="boxtable15" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Pedidos a
+                                            proveedores en espera de recepci&oacute;n
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose15"></span><input type="hidden" id="boxlabelentry15"
+                                                                                  value="Pedidos a proveedores en espera de recepci&oacute;n">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center">
+                                        Sin pedidos a proveedores
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_supplier_orders_awaiting_reception end -->
+
+
+                        <!-- Box box_supplier_orders start -->
+                        <div class="box boxdraggable" id="boxto_14">
+                            <table summary="boxtable14" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">&Uacute;ltimos 5
+                                            pedidos de clientes modificados
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose14"></span><input type="hidden" id="boxlabelentry14"
+                                                                                  value="&Uacute;ltimos 5 pedidos de clientes modificados">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center">
+                                        Sin pedidos a proveedores
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_supplier_orders end -->
+
+
+                        <!-- Box box_fournisseurs start -->
+                        <div class="box boxdraggable" id="boxto_11">
+                            <table summary="boxtable11" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">&Uacute;ltimos
+                                            5proveedores modificados
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose11"></span><input type="hidden" id="boxlabelentry11"
+                                                                                  value="&Uacute;ltimos 5proveedores modificados">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center opacitymedium">
+                                        Sin proveedores registrados
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_fournisseurs end -->
+
+
+                        <!-- Box ModeleBoxes start -->
+                        <div class="box boxdraggable" id="boxto_A">
+                            <br>
+                        </div>
+                        <!-- Box ModeleBoxes end -->
+
+                        <!-- End box left container -->
+                    </div>
+                    <div class="secondcolumn fichehalfright boxhalfright" id="boxhalfright">
+                        <!-- Box right container -->
+
+                        <!-- Box box_graph_orders_supplier_permonth start -->
+                        <div class="box boxdraggable" id="boxto_10">
+                            <table summary="boxtable10" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Pedidos a
+                                            proveedores por mes
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-filter opacitymedium marginleftonly linkobject boxfilter"
+                                                    style="" title="Filtro"
+                                                    id="idsubimgorderssupplierpermonth"></span><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose10"></span><input type="hidden" id="boxlabelentry10"
+                                                                                  value="Pedidos a proveedores por mes &lt;span class=&quot;opacitymedium fa fa-bar-chart&quot;&gt;&lt;/span&gt;">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven nohover">
+                                    <td class="nohover center">
+
+                                        <script type="text/javascript" language="javascript">
+                                            jQuery(document).ready(function () {
+                                                jQuery("#idsubimgorderssupplierpermonth").click(function () {
+                                                    jQuery("#idfilterorderssupplierpermonth").toggle();
+                                                });
+                                            });
+                                        </script>
+                                        <div class="center hideobject" id="idfilterorderssupplierpermonth">
+                                            <form class="flat formboxfilter" method="POST"
+                                                  action="/dolibarr/htdocs/index.php"><input type="hidden" name="token"
+                                                                                             value="d5cf06b89ba0ebc8c4241495198647f4"><input
+                                                        type="hidden" name="action"
+                                                        value="refresh_orderssupplierpermonth"><input type="hidden"
+                                                                                                      name="page_y"
+                                                                                                      value=""><input
+                                                        type="hidden" name="DOL_AUTOSET_COOKIE"
+                                                        value="DOLUSERCOOKIE_box_orderssupplierpermonth:year,shownb,showtot"><input
+                                                        type="checkbox"
+                                                        name="DOLUSERCOOKIE_box_orderssupplierpermonth_shownb" checked>
+                                                N&uacute;mero
+                                                de pedidos por mes &nbsp; <input type="checkbox"
+                                                                                 name="DOLUSERCOOKIE_box_orderssupplierpermonth_showtot"
+                                                                                 checked> Importe total de pedidos por
+                                                mes (sin IVA)<br>A&ntilde;o <input class="flat" size="4" type="text"
+                                                                                   name="DOLUSERCOOKIE_box_orderssupplierpermonth_year"
+                                                                                   value="2021"><input type="image"
+                                                                                                       class="reposition inline-block valigntextbottom"
+                                                                                                       alt="Refrescar"
+                                                                                                       src="/dolibarr/htdocs/theme/eldy/img/refresh.png">
+                                            </form>
+                                        </div>
+                                        <div class="fichecenter">
+                                            <div class="fichehalfleft"><!-- Build using chart -->
+                                                <div class="center dolgraphtitle dolgraphtitlecssboxes">N&uacute;mero de
+                                                    pedidos por mes
+                                                </div>
+                                                <div id="placeholder_orderssuppliernbinyear_2021_png"
+                                                     style="min-height: 192px; width:256px;"
+                                                     class="dolgraphchart dolgraph dolgraphcssboxes center">
+                                                    <canvas id="canvas_orderssuppliernbinyear_2021_png"></canvas>
+                                                </div>
+                                                <script id="orderssuppliernbinyear_2021_png">
+
+                                                    var options = {
+                                                        maintainAspectRatio: false,
+                                                        aspectRatio: 2.5,
+                                                        scales: {
+                                                            xAxes: [{distribution: 'linear'}],
+                                                            yAxes: [{ticks: {beginAtZero: true}}]
+                                                        }
+                                                    };
+                                                    var ctx = document.getElementById("canvas_orderssuppliernbinyear_2021_png").getContext("2d");
+                                                    var chart = new Chart(ctx, {
+                                                        // The type of chart we want to create
+                                                        type: 'bar',
+                                                        // Configuration options go here
+                                                        options: options,
+                                                        data: {
+                                                            labels: ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+                                                            datasets: [
+                                                                {
+                                                                    dolibarrinfo: 'y_0',
+                                                                    label: '2019',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    backgroundColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_1',
+                                                                    label: '2020',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    backgroundColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_2',
+                                                                    label: '2021',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    backgroundColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                            ]
+                                                        }
+                                                    });
+                                                </script>
+                                            </div>
+                                            <div class="fichehalfright"><!-- Build using chart -->
+                                                <div class="center dolgraphtitle dolgraphtitlecssboxes">Importe total de
+                                                    pedidos por mes (sin IVA)
+                                                </div>
+                                                <div id="placeholder_orderssupplieramountinyear_2021_png"
+                                                     style="min-height: 192px; width:256px;"
+                                                     class="dolgraphchart dolgraph dolgraphcssboxes center">
+                                                    <canvas id="canvas_orderssupplieramountinyear_2021_png"></canvas>
+                                                </div>
+                                                <script id="orderssupplieramountinyear_2021_png">
+
+                                                    var options = {
+                                                        maintainAspectRatio: false,
+                                                        aspectRatio: 2.5,
+                                                        scales: {
+                                                            xAxes: [{distribution: 'linear'}],
+                                                            yAxes: [{ticks: {beginAtZero: true}}]
+                                                        }
+                                                    };
+                                                    var ctx = document.getElementById("canvas_orderssupplieramountinyear_2021_png").getContext("2d");
+                                                    var chart = new Chart(ctx, {
+                                                        // The type of chart we want to create
+                                                        type: 'bar',
+                                                        // Configuration options go here
+                                                        options: options,
+                                                        data: {
+                                                            labels: ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+                                                            datasets: [
+                                                                {
+                                                                    dolibarrinfo: 'y_0',
+                                                                    label: '2019',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    backgroundColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_1',
+                                                                    label: '2020',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    backgroundColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_2',
+                                                                    label: '2021',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    backgroundColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                            ]
+                                                        }
+                                                    });
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_graph_orders_supplier_permonth end -->
+
+
+                        <!-- Box box_graph_invoices_supplier_permonth start -->
+                        <div class="box boxdraggable" id="boxto_9">
+                            <table summary="boxtable9" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Facturas de
+                                            proveedores por mes
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-filter opacitymedium marginleftonly linkobject boxfilter"
+                                                    style="" title="Filtro"
+                                                    id="idsubimginvoicessupplierpermonth"></span><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose9"></span><input type="hidden" id="boxlabelentry9"
+                                                                                 value="Facturas de proveedores por mes &lt;span class=&quot;opacitymedium fa fa-bar-chart&quot;&gt;&lt;/span&gt;">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven nohover">
+                                    <td class="nohover center">
+
+                                        <script type="text/javascript" language="javascript">
+                                            jQuery(document).ready(function () {
+                                                jQuery("#idsubimginvoicessupplierpermonth").click(function () {
+                                                    jQuery("#idfilterinvoicessupplierpermonth").toggle();
+                                                });
+                                            });
+                                        </script>
+                                        <div class="center hideobject" id="idfilterinvoicessupplierpermonth">
+                                            <form class="flat formboxfilter" method="POST"
+                                                  action="/dolibarr/htdocs/index.php"><input type="hidden" name="token"
+                                                                                             value="d5cf06b89ba0ebc8c4241495198647f4"><input
+                                                        type="hidden" name="action"
+                                                        value="refresh_invoicessupplierpermonth"><input type="hidden"
+                                                                                                        name="page_y"
+                                                                                                        value=""><input
+                                                        type="hidden" name="DOL_AUTOSET_COOKIE"
+                                                        value="DOLUSERCOOKIE_box_invoicessupplierpermonth:year,shownb,showtot"><input
+                                                        type="checkbox"
+                                                        name="DOLUSERCOOKIE_box_invoicessupplierpermonth_shownb"
+                                                        checked> N&ordm;
+                                                de facturas por mes &nbsp; <input type="checkbox"
+                                                                                  name="DOLUSERCOOKIE_box_invoicessupplierpermonth_showtot"
+                                                                                  checked> Importe de las facturas por
+                                                mes (Sin IVA)<br>A&ntilde;o <input class="flat" size="4" type="text"
+                                                                                   name="DOLUSERCOOKIE_box_invoicessupplierpermonth_year"
+                                                                                   value="2021"><input type="image"
+                                                                                                       class="reposition inline-block valigntextbottom"
+                                                                                                       alt="Refrescar"
+                                                                                                       src="/dolibarr/htdocs/theme/eldy/img/refresh.png">
+                                            </form>
+                                        </div>
+                                        <div class="fichecenter">
+                                            <div class="fichehalfleft"><!-- Build using chart -->
+                                                <div class="center dolgraphtitle dolgraphtitlecssboxes">N&ordm; de
+                                                    facturas por mes
+                                                </div>
+                                                <div id="placeholder_invoicessuppliernbinyear_2021_png"
+                                                     style="min-height: 192px; width:256px;"
+                                                     class="dolgraphchart dolgraph dolgraphcssboxes center">
+                                                    <canvas id="canvas_invoicessuppliernbinyear_2021_png"></canvas>
+                                                </div>
+                                                <script id="invoicessuppliernbinyear_2021_png">
+
+                                                    var options = {
+                                                        maintainAspectRatio: false,
+                                                        aspectRatio: 2.5,
+                                                        scales: {
+                                                            xAxes: [{distribution: 'linear'}],
+                                                            yAxes: [{ticks: {beginAtZero: true}}]
+                                                        }
+                                                    };
+                                                    var ctx = document.getElementById("canvas_invoicessuppliernbinyear_2021_png").getContext("2d");
+                                                    var chart = new Chart(ctx, {
+                                                        // The type of chart we want to create
+                                                        type: 'bar',
+                                                        // Configuration options go here
+                                                        options: options,
+                                                        data: {
+                                                            labels: ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+                                                            datasets: [
+                                                                {
+                                                                    dolibarrinfo: 'y_0',
+                                                                    label: '2019',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    backgroundColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_1',
+                                                                    label: '2020',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    backgroundColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_2',
+                                                                    label: '2021',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    backgroundColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                            ]
+                                                        }
+                                                    });
+                                                </script>
+                                            </div>
+                                            <div class="fichehalfright"><!-- Build using chart -->
+                                                <div class="center dolgraphtitle dolgraphtitlecssboxes">Importe de las
+                                                    facturas por mes (Sin IVA)
+                                                </div>
+                                                <div id="placeholder_invoicessupplieramountinyear_2021_png"
+                                                     style="min-height: 192px; width:256px;"
+                                                     class="dolgraphchart dolgraph dolgraphcssboxes center">
+                                                    <canvas id="canvas_invoicessupplieramountinyear_2021_png"></canvas>
+                                                </div>
+                                                <script id="invoicessupplieramountinyear_2021_png">
+
+                                                    var options = {
+                                                        maintainAspectRatio: false,
+                                                        aspectRatio: 2.5,
+                                                        scales: {
+                                                            xAxes: [{distribution: 'linear'}],
+                                                            yAxes: [{ticks: {beginAtZero: true}}]
+                                                        }
+                                                    };
+                                                    var ctx = document.getElementById("canvas_invoicessupplieramountinyear_2021_png").getContext("2d");
+                                                    var chart = new Chart(ctx, {
+                                                        // The type of chart we want to create
+                                                        type: 'bar',
+                                                        // Configuration options go here
+                                                        options: options,
+                                                        data: {
+                                                            labels: ['E', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'],
+                                                            datasets: [
+                                                                {
+                                                                    dolibarrinfo: 'y_0',
+                                                                    label: '2019',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    backgroundColor: 'rgb(137, 86, 161, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_1',
+                                                                    label: '2020',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    backgroundColor: 'rgb(60, 147, 183, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                                ,
+                                                                {
+                                                                    dolibarrinfo: 'y_2',
+                                                                    label: '2021',
+                                                                    pointStyle: 'circle',
+                                                                    fill: true,
+                                                                    borderWidth: '1',
+                                                                    borderColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    backgroundColor: 'rgb(250, 190, 80, 0.9)',
+                                                                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                                                                }
+                                                            ]
+                                                        }
+                                                    });
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_graph_invoices_supplier_permonth end -->
+
+
+                        <!-- Box box_contacts start -->
+                        <div class="box boxdraggable" id="boxto_6">
+                            <table summary="boxtable6" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">&Uacute;ltimos 5
+                                            contactos/direcciones modificados
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose6"></span><input type="hidden" id="boxlabelentry6"
+                                                                                 value="&Uacute;ltimos 5 contactos/direcciones modificados">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center">
+                                        <span class="opacitymedium">Ning&uacute;n contacto registrado</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_contacts end -->
+
+
+                        <!-- Box box_prospect start -->
+                        <div class="box boxdraggable" id="boxto_5">
+                            <table summary="boxtable5" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">&Uacute;ltimos 5
+                                            presupuestos modificados
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose5"></span><input type="hidden" id="boxlabelentry5"
+                                                                                 value="&Uacute;ltimos 5 presupuestos modificados">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="oddeven">
+                                    <td class="center opacitymedium">
+                                        Sin clientes potenciales registrados
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_prospect end -->
+
+
+                        <!-- Box box_dolibarr_state_board start -->
+                        <div class="box boxdraggable" id="boxto_18">
+                            <table summary="boxtable18" width="100%" class="noborder boxtable">
+                                <tr class="liste_titre box_titre">
+                                    <td colspan="1">
+                                        <div class="tdoverflowmax400 maxwidth250onsmartphone float">Estad&iacute;sticas
+                                            de la base de datos
+                                        </div>
+                                        <div class="nocellnopadd boxclose floatright nowraponall"><span
+                                                    class="fas fa-arrows-alt opacitymedium boxhandle hideonsmartphone cursormove marginleftonly"
+                                                    style="" title="Mover panel"></span><span
+                                                    class="fas fa-times opacitymedium boxclose cursorpointer marginleftonly"
+                                                    style="" title="Eliminar panel de su  tablero" rel="x:y"
+                                                    id="imgclose18"></span><input type="hidden" id="boxlabelentry18"
+                                                                                  value="Estad&iacute;sticas de la base de datos">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="nohover">
+                                    <td>
+
+                                        <a href="/dolibarr/htdocs/user/list.php"
+                                           class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Usuarios">Usuarios</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-user infobox-adherent inline-block"
+                                                            style=""></span> 1</span>
+                                            </div>
+                                        </a><a href="/dolibarr/htdocs/societe/list.php?type=c&mainmenu=companies"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Clientes">Clientes</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-building inline-block"
+                                                            style=" color: #6c6aa8;"></span> 0</span>
+                                            </div>
+                                        </a><a href="/dolibarr/htdocs/societe/list.php?type=p&mainmenu=companies"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Clientes potenciales">Clientes potenciales</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-building inline-block"
+                                                            style=" color: #6c6aa8;"></span> 0</span>
+                                            </div>
+                                        </a><a href="/dolibarr/htdocs/societe/list.php?type=f&mainmenu=companies"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Proveedores">Proveedores</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-building inline-block"
+                                                            style=" color: #6c6aa8;"></span> 0</span>
+                                            </div>
+                                        </a><a href="/dolibarr/htdocs/contact/list.php?mainmenu=companies"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Contactos">Contactos</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-address-book inline-block"
+                                                            style=" color: #6c6aa8;"></span> 0</span>
+                                            </div>
+                                        </a><a href="/dolibarr/htdocs/fourn/commande/list.php?mainmenu=commercial&leftmenu=orders_suppliers"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext"
+                                                                        title="Pedidos a proveedor">Pedidos a proveedor</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-dol-order_supplier infobox-order_supplier inline-block"
+                                                            style=""></span> 0</span></div>
+                                        </a><a href="/dolibarr/htdocs/fourn/facture/list.php?mainmenu=billing&leftmenu=suppliers_bills"
+                                               class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstats"><span class="boxstatstext" title="Facturas proveedor">Facturas proveedor</span><br><span
+                                                        class="boxstatsindicator"><span
+                                                            class="fas fa-file-invoice-dollar infobox-order_supplier inline-block"
+                                                            style=""></span> 0</span></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a><a class="boxstatsindicator thumbstat nobold nounderline">
+                                            <div class="boxstatsempty"></div>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- Box box_dolibarr_state_board end -->
+
+
+                        <!-- Box ModeleBoxes start -->
+                        <div class="box boxdraggable" id="boxto_B">
+                            <br>
+                        </div>
+                        <!-- Box ModeleBoxes end -->
+
+                        <!-- End box right container -->
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End div class="fiche" -->
+    </div> <!-- End div id-right -->
+{% endblock %}

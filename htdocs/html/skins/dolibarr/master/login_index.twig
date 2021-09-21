@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% block header %}{% include 'master/header.twig' %}{% endblock %}
+</head>
+
+<script>
+    $(document).ready(function () {
+        /* Set focus on correct field */
+        $('#username').focus(); 		// Warning to use this only on visible element
+    });
+</script>
+
+<body{% if view.bodyId %} id="{{ view.bodyId }}"{% endif %}
+        class="body bodylogin"{% if view.protectClose %} onBeforeUnload='return iCanClose()'{% endif %}>
+{% block body %}{% endblock %}
+
+{% block footer %}{% include 'master/footer.twig' %}{% endblock %}
+</body>
