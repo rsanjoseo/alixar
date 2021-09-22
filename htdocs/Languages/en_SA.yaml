@@ -1,0 +1,24 @@
+DIRECTION: ltr
+FONTFORPDF: DejaVuSans
+FONTSIZEFORPDF: '9'
+SeparatorDecimal: .
+SeparatorThousand: ','
+FormatDateShort: '%d/%m/%Y'
+FormatDateShortInput: '%d/%m/%Y'
+FormatDateShortJava: dd/MM/yyyy
+FormatDateShortJavaInput: dd/MM/yyyy
+FormatDateShortJQuery: dd/mm/yy
+FormatDateShortJQueryInput: dd/mm/yy
+FormatHourShortJQuery: 'HH:MI'
+FormatHourShort: '%I:%M %p'
+FormatHourShortDuration: '%H:%M'
+FormatDateTextShort: '%d %b %Y'
+FormatDateText: '%d %B %Y'
+FormatDateHourShort: '%d/%m/%Y %I:%M %p'
+FormatDateHourSecShort: '%m/%d/%Y %I:%M:%S %p'
+FormatDateHourTextShort: '%d %b %Y, %I:%M %p'
+FormatDateHourText: '%d %B %Y, %I:%M %p'
+Proposals: 'Commercial Proposals'
+Proposal: 'Commercial Proposal'
+CommercialProposal: 'Commercial Proposal'
+DateEndPropal: 'Validity Ending Date'

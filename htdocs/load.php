@@ -46,7 +46,8 @@ if (!defined('APP_URI')) {
     Constants::defineConstants();
     $hasConfig = Constants::loadConstants();
     if (!$hasConfig) {
-        if ($_GET['module'] === 'install') {
+        $module = $_GET['module'] ?? null;
+        if ($module === 'install') {
             $install = new Install();
             $install->main();
             die();

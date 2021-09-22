@@ -71,6 +71,8 @@ class Install extends BasicController
     public function setView(): View
     {
         // Clone here the functionality of each of the views of the Dolibarr installation.
-        return new ConfigView($this);
+        new InstallLang($this);
+        new InstallCheck($this);
+        new InstallFileConf($this);
     }
 }

@@ -1,0 +1,106 @@
+ACCOUNTING_EXPORT_SEPARATORCSV: 'Séparateur de colonne pour le fichier export'
+ACCOUNTING_EXPORT_PIECE: 'Exporter le nombre de pièces'
+Selectformat: 'Sélectionner le format pour le fichier'
+ACCOUNTING_EXPORT_FORMAT: 'Sélectionner le format pour le fichier'
+ACCOUNTING_EXPORT_ENDLINE: 'Sélectionner le type de retour à la ligne'
+ACCOUNTING_EXPORT_PREFIX_SPEC: 'Spécifiez le préfixe du nom de fichier'
+CantSuggest: 'Impossible de suggérer'
+AccountancySetupDoneFromAccountancyMenu: 'La plupart des réglages de la comptabilité se font à partir du menu %s'
+ConfigAccountingExpert: 'Paramétrage du module comptabilité (en partie double)'
+Journalization: Journalisation
+CurrentDedicatedAccountingAccount: 'Compte dédié actuel'
+InvoiceLabel: 'Libellé de facture'
+OverviewOfAmountOfLinesNotBound: 'Aperçu du nombre de lignes non liées à un compte comptable'
+OverviewOfAmountOfLinesBound: 'Aperçu du nombre de lignes déjà liées à un compte comptable'
+TotalVente: 'Chiffre d''affaires total avant taxes'
+Module310Name: Membres
+NotificationsDescGlobal: '* or by setting global email addresses in this setup page.'
+LDAPMembersSynchro: Membres
+LDAPMembersTypesSynchro: 'Types de membres'
+MailToMember: Membres
+OperationParamDesc: 'Define the values to use for the object of the action, or how to extract values. For example:<br>objproperty1=SET:the value to set<br>objproperty2=SET:a value with replacement of __objproperty1__<br>objproperty3=SETIFEMPTY:value used if objproperty3 is not already defined<br>objproperty4=EXTRACT:HEADER:X-Myheaderkey:\\s*([^\\s]*)<br>options_myextrafield1=EXTRACT:SUBJECT:([^&#92;n]*)<br>object.objproperty5=EXTRACT:BODY:My company name is\\s([^\\s]*)<br><br>Use a ; char as separator to extract or set several properties.'
+EmailCollectorLoadThirdPartyHelp: 'You can use this action to use the email content to find and load an existing thirdparty in your database. The found (or created) thirdparty will be used for following actions that need it.<br>For example, if you want to create a thirdparty with a name extracted a string ''Name: name to find'' found into the body, use sender email as email, you can set the parameter field like this:<br>''email=HEADER:^From:(.*);name=EXTRACT:BODY:Name:\\s([^\\s]*);client=SET:2;''<br>'
+BillShortStatusValidated: Validé
+PaymentTypeShortTRA: Brouillon
+NotAvailableWithBrowserPrinter: 'Not available when printer for receipt is set to browser:'
+DonationStatusPromiseNotValidatedShort: Brouillon
+DonationStatusPromiseValidatedShort: Validé
+EventOrganizationDescriptionLong: 'Manage Event organization for conference, attendees, speaker, and attendees, with public subcription page'
+IntracommReportPeriod: 'Period of nalysis'
+DIRECTION: ltr
+FONTFORPDF: helvetica
+FONTSIZEFORPDF: '10'
+SeparatorDecimal: .
+SeparatorThousand: Space
+FormatDateShort: '%d.%m.%Y'
+FormatDateShortInput: '%d.%m.%Y'
+FormatDateShortJava: dd.MM.yyyy
+FormatDateShortJavaInput: dd.MM.yyyy
+FormatDateShortJQuery: dd.mm.yy
+FormatDateShortJQueryInput: dd.mm.yy
+FormatHourShortJQuery: 'HH:MI'
+FormatHourShort: '%H:%M %p'
+FormatHourShortDuration: '%H:%M'
+FormatDateTextShort: '%d %b %Y'
+FormatDateText: '%d %B %Y'
+FormatDateHourShort: '%d.%m.%Y %H:%M %p'
+FormatDateHourSecShort: '%d.%m.%Y %H:%M:%S %p'
+FormatDateHourTextShort: '%d %b %Y, %H:%M %p'
+FormatDateHourText: '%d %B %Y, %H:%M %p'
+MenuMembers: Membres
+SearchIntoMembers: Membres
+MembersArea: 'Espace membres'
+MemberCard: 'Fiche membre'
+Member: Membre
+Members: Membres
+ShowMember: 'Afficher la fiche membre'
+UserNotLinkedToMember: 'Utilisateur non lié à un membre'
+ThirdpartyNotLinkedToMember: 'Tiers non lié à un membre'
+ListOfValidatedPublicMembers: 'Liste des membres publics validés'
+ErrorThisMemberIsNotPublic: 'Ce membre n''est pas public'
+ErrorMemberIsAlreadyLinkedToThisThirdParty: 'Un autre membre (nom: <b> %s</b>, connexion: <b>%s</b>) est déjà lié à un tiers <b>%s</b>. Supprimez ce lien en premier parce qu''un tiers ne peut être lié qu''à un membre (et vice versa).'
+ErrorUserPermissionAllowsToLinksToItselfOnly: 'Pour des raisons de sécurité, vous devez être autorisé à modifier tous les utilisateurs pour pouvoir lier un membre à un utilisateur qui n''est pas le vôtre.'
+MembersCards: 'Cartes de visite pour les membres'
+MembersList: 'Liste des membres'
+MembersListToValid: 'Liste des brouillons de membres (à valider)'
+MembersListValid: 'Liste des membres validés'
+MembersListUpToDate: 'Liste des membres validés avec cotisation à jour'
+MembersListNotUpToDate: 'Liste des membres validés dont la cotisation est expirée'
+MembersListExcluded: 'Liste des membres exclus'
+MembersListResiliated: 'Liste des membres résiliés'
+MembersListQualified: 'Liste des membres qualifiés'
+MenuMembersToValidate: 'Brouillons de membres'
+MenuMembersValidated: 'Membres validés'
+MenuMembersExcluded: 'Membres exclus'
+MenuMembersResiliated: 'Membres résiliés'
+MembersWithSubscriptionToReceive: 'Membres avec cotisation à recevoir'
+DateSubscription: 'Date de cotisation'
+DateEndSubscription: 'Date de fin de cotisation'
+SubscriptionId: 'No de cotisation'
+WithoutSubscription: 'Sans cotisation'
+MemberId: 'No membres'
+NewMember: 'Nouveau membre'
+MemberType: 'Type de membre'
+MemberTypeId: 'No du type de membre'
+MemberTypeLabel: 'Libellé du type de membre'
+MembersTypes: 'Types de membres'
+MemberStatusActive: 'Validé (en attente de cotisation)'
+MemberStatusActiveLate: 'Cotisation expirée'
+MemberStatusActiveLateShort: Expirée
+MemberStatusPaid: 'Cotisation à jour'
+MemberStatusPaidShort: 'À jour'
+MemberStatusExcluded: 'Membre exclu'
+MemberStatusResiliated: 'Membre résilié'
+MembersStatusToValid: 'Brouillons de membres'
+MembersStatusExcluded: 'Membres exclus'
+MembersStatusResiliated: 'Membres résiliés'
+MemberStatusNoSubscription: 'Validé (cotisation non requise)'
+SubscriptionNotNeeded: 'Cotisation non requise'
+NewCotisation: 'Nouvelle cotisation'
+PaymentSubscription: 'Nouveau paiement de cotisation'
+SubscriptionEndDate: 'Date de fin de cotisation'
+MembersTypeSetup: 'Configuration du type de membres'
+ImportDataset_member_1: Membres
+StatusOrderValidatedShort: Validé
+StatusOrderValidated: Validé
+StatusSendingValidatedShort: Validé
