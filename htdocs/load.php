@@ -66,4 +66,7 @@ $logger = Logger::getInstance();
 $alxConfig = Config::getInstance();
 $render = TemplateRender::getInstance();
 $session = Session::getInstance();
-$translator = Translator::getInstance();
+$langs = Translator::getInstance();
+
+$alxConfig->loadConfig();
+$langs->setlocale(Config::getVar('translator', 'main', 'language'));
