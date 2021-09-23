@@ -71,7 +71,7 @@ class box_dolibarr_state_board extends ModeleBoxes
 	public function loadBox($max = 5)
 	{
 		global $user, $langs, $conf;
-		$langs->load("boxes");
+//		$langs->load("boxes");
 
 		$this->max = $max;
 		$this->info_box_head = array('text' => $langs->trans("DolibarrStateBoard"));

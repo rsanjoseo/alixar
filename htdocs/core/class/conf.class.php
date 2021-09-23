@@ -31,15 +31,16 @@
  */
 class Conf
 {
-    /**
-     * @var Object    Associative array with properties found in conf file
-     */
     public $file;
 
     /**
-     * @var Object    Associative array with some properties ->type, ->db, ...
+     * Use the global variable $db directly, or the $db attribute of the Globals class.
+     * You can also get an instance with Config::getInstance()->getEngine();
+     *
+     * @var stdClass
+     * @deprecated Use the global variable $db directly, or the $db attribute of the Globals class.
      */
-    public $db;
+    private stdClass $db;
 
     //! To store properties found into database
     public $global;

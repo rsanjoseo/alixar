@@ -25,7 +25,7 @@
  *    \brief      Dolibarr home page
  */
 
-require 'main.inc.php';
+require 'main.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 
 // If not defined, we select menu "home"
@@ -40,17 +40,13 @@ $hookmanager->initHooks(['index']);
 
 // Check if company name is defined (first install)
 if (!isset($conf->global->MAIN_INFO_SOCIETE_NOM) || empty($conf->global->MAIN_INFO_SOCIETE_NOM)) {
-    die("Location 1: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
 if (count($conf->modules) <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only user module enabled
-    die("Location 2: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     header("Location: " . DOL_URL_ROOT . "/admin/index.php?mainmenu=home&leftmenu=setup&mesg=setupnotcomplete");
     exit;
 }
-
-die('here');
 
 if (GETPOST('addbox')) {    // Add box (when submit is done from a form when ajax disabled)
     require_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
@@ -70,7 +66,8 @@ if (GETPOST('addbox')) {    // Add box (when submit is done from a form when aja
  */
 
 if (!isset($form) || !is_object($form)) {
-	$form = new Form($db);
+    require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
+    $form = new Form($db);
 }
 
 // Title
@@ -81,9 +78,7 @@ if (!empty($conf->global->MAIN_APPLICATION_TITLE)) {
 
 llxHeader('', $title);
 
-
 $resultboxes = FormOther::getBoxesArea($user, "0"); // Load $resultboxes (selectboxlist + boxactivated + boxlista + boxlistb)
-
 
 print load_fiche_titre('&nbsp;', $resultboxes['selectboxlist'], '', 0, '', 'titleforhome');
 
@@ -142,7 +137,7 @@ $boxstatItems = [];
 $boxstatFromHook = '';
 
 // Load translation files required by page
-$langs->loadLangs(['commercial', 'bills', 'orders', 'contracts']);
+//$langs->loadLangs(['commercial', 'bills', 'orders', 'contracts']);
 
 // Dolibarr Working Board with weather
 
@@ -450,14 +445,17 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
     $boxwork .= '<th class="liste_titre"><div class="inline-block valignmiddle">' . $langs->trans("DolibarrWorkBoard") . '</div>';
     if ($showweather) {
         if ($totallate > 0) {
-            $text = $langs->transnoentitiesnoconv("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->transnoentitiesnoconv(
+            //            $text = $langs->transnoentitiesnoconv("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->transnoentitiesnoconv(
+            $text = $langs->trans("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->trans(
                     "NActionsLate",
                     $totallate . (!empty($conf->global->MAIN_USE_METEO_WITH_PERCENTAGE) ? '%' : '')
                 ) . ')';
         } else {
-            $text = $langs->transnoentitiesnoconv("NoItemLate");
+            //            $text = $langs->transnoentitiesnoconv("NoItemLate");
+            $text = $langs->trans("NoItemLate");
         }
-        $text .= '. ' . $langs->transnoentitiesnoconv("LateDesc");
+        //        $text .= '. ' . $langs->transnoentitiesnoconv("LateDesc");
+        $text .= '. ' . $langs->trans("LateDesc");
         //$text.=$form->textwithpicto('',$langs->trans("LateDesc"));
         $options = 'height="24px" style="float: right"';
         $boxwork .= showWeather($totallate, $text, $options, 'inline-block valignmiddle');

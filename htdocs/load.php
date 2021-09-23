@@ -70,3 +70,11 @@ $langs = Translator::getInstance();
 
 $alxConfig->loadConfig();
 $langs->setlocale(Config::getVar('translator', 'main', 'language'));
+
+$result = $alxConfig->connectToDatabase();
+if (!$result) {
+    dump($alxConfig);
+    die('database_not_found');
+}
+$db = $alxConfig->getEngine();
+$debugbar = $alxDebug;

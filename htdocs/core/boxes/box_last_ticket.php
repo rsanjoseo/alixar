@@ -53,10 +53,9 @@ class box_last_ticket extends ModeleBoxes
 	public function __construct($db, $param = '')
 	{
 		global $langs;
-		$langs->load("boxes");
+//		$langs->load("boxes");
 		$this->db = $db;
-
-		$this->boxlabel = $langs->transnoentitiesnoconv("BoxLastTicket");
+        //		$this->boxlabel = $langs->transnoentitiesnoconv("BoxLastTicket");
 	}
 
 	/**
@@ -66,25 +65,26 @@ class box_last_ticket extends ModeleBoxes
 	 *     @return void
 	 */
 	public function loadBox($max = 5)
-	{
-		global $conf, $user, $langs;
+    {
+        global $conf, $user, $langs;
 
-		$this->max = $max;
+        $this->max = $max;
 
-		require_once DOL_DOCUMENT_ROOT."/ticket/class/ticket.class.php";
+        require_once DOL_DOCUMENT_ROOT . "/ticket/class/ticket.class.php";
 
-		$text = $langs->trans("BoxLastTicketDescription", $max);
-		$this->info_box_head = array(
-			'text' => $text,
-			'limit' => dol_strlen($text),
-		);
+        //		$text = $langs->trans("BoxLastTicketDescription", $max);
+        $text = $langs->trans("BoxLastTicketDescription", ['s' => $max]);
+        $this->info_box_head = [
+            'text' => $text,
+            'limit' => dol_strlen($text),
+        ];
 
-		$this->info_box_contents[0][0] = array(
-			'td' => 'class="left"',
-			'text' => $langs->trans("BoxLastTicketContent"),
-		);
+        $this->info_box_contents[0][0] = [
+            'td' => 'class="left"',
+            'text' => $langs->trans("BoxLastTicketContent"),
+        ];
 
-		if ($user->rights->ticket->read) {
+        if ($user->rights->ticket->read) {
 			$sql = "SELECT t.rowid as id, t.ref, t.track_id, t.fk_soc, t.fk_user_create, t.fk_user_assign, t.subject, t.message, t.fk_statut, t.type_code, t.category_code, t.severity_code, t.datec, t.date_read, t.date_close, t.origin_email ";
 			$sql .= ", type.label as type_label, category.label as category_label, severity.label as severity_label";
 			$sql .= ", s.nom as company_name, s.email as socemail, s.client, s.fournisseur";

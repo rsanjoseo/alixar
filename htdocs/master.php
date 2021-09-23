@@ -1,54 +1,6 @@
 <?php
-/* Copyright (C) 2002-2007	Rodolphe Quiedeville	<rodolphe@quiedeville.org>
- * Copyright (C) 2003		Xavier Dutoit			<doli@sydesy.com>
- * Copyright (C) 2004-2012	Laurent Destailleur		<eldy@users.sourceforge.net>
- * Copyright (C) 2004		Sebastien Di Cintio		<sdicintio@ressource-toi.org>
- * Copyright (C) 2004		Benoit Mortier			<benoit.mortier@opensides.be>
- * Copyright (C) 2005-2017	Regis Houssin			<regis.houssin@inodbox.com>
- * Copyright (C) 2005		Simon Tosser			<simon@kornog-computing.com>
- * Copyright (C) 2006		Andre Cianfarani		<andre.cianfarani@acdeveloppement.net>
- * Copyright (C) 2010		Juanjo Menent			<jmenent@2byte.es>
- * Copyright (C) 2011		Philippe Grand			<philippe.grand@atoo-net.com>
- * Copyright (C) 2014		Teddy Andreotti			<125155@supinfo.com>
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
-/**
- *    \file       htdocs/master.inc.php
- *    \ingroup    core
- *  \brief      File that defines environment for all Dolibarr process (pages or scripts)
- *                This script reads the conf file, init $lang, $db and and empty $user
- */
-
 // Declaration of variables. May have been already require by main.inc.php. But may not by scripts. So, here the require_once must be kept.
-require_once 'filefunc.inc.php';
-
-
-if (!function_exists('is_countable')) {
-    /**
-     * function is_countable (to remove when php version supported will be >= 7.3)
-     *
-     * @param mixed $c data to check if countable
-     *
-     * @return bool
-     */
-    function is_countable($c)
-    {
-        return is_array($c) || $c instanceof Countable;
-    }
-}
+require_once 'filefunc.php';
 
 /*
  * Create $conf object
@@ -59,6 +11,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/conf.class.php';
 $conf = new Conf();
 
 // Set properties specific to database
+/*
 $conf->db->host = $dolibarr_main_db_host;
 $conf->db->port = $dolibarr_main_db_port;
 $conf->db->name = $dolibarr_main_db_name;
@@ -73,6 +26,7 @@ $conf->db->dolibarr_main_db_cryptkey = $dolibarr_main_db_cryptkey;
 if (defined('TEST_DB_FORCE_TYPE')) {
 	$conf->db->type = constant('TEST_DB_FORCE_TYPE'); // Force db type (for test purpose, by PHP unit for example)
 }
+*/
 
 // Set properties specific to conf file
 $conf->file->main_limit_users = $dolibarr_main_limit_users;
@@ -135,6 +89,7 @@ if (!defined('NOREQUIRETRAN')) {
 /*
  * Object $db
  */
+/*
 $db = null;
 if (!defined('NOREQUIREDB')) {
 	$db = getDoliDBInstance($conf->db->type, $conf->db->host, $conf->db->user, $conf->db->pass, $conf->db->name, $conf->db->port);
@@ -161,10 +116,11 @@ if (!defined('NOREQUIREDB')) {
 		exit;
 	}
 }
+*/
 
 // Now database connexion is known, so we can forget password
 //unset($dolibarr_main_db_pass); 	// We comment this because this constant is used in a lot of pages
-unset($conf->db->pass); // This is to avoid password to be shown in memory/swap dump
+// unset($conf->db->pass); // This is to avoid password to be shown in memory/swap dump
 
 /*
  * Object $user

@@ -59,7 +59,7 @@ class box_task extends ModeleBoxes
 		global $conf, $user, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array('boxes', 'projects'));
+        //		$langs->loadLangs(array('boxes', 'projects'));
 
 		$this->boxlabel = "Tasks";
 		$this->db = $db;
