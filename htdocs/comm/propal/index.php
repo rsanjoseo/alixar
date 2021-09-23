@@ -35,7 +35,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('proposalindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('propal', 'companies'));
+// $langs->loadLangs(array('propal', 'companies'));
 
 $now = dol_now();
 $max = 5;

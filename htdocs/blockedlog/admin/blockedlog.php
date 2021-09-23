@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/blockedlog/class/blockedlog.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "other", "blockedlog"));
+// $langs->loadLangs(array("admin", "other", "blockedlog"));
 
 if (!$user->admin || empty($conf->blockedlog->enabled)) {
 	accessforbidden();

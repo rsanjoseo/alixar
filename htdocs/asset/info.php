@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/asset/class/asset.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("asset"));
+// $langs->loadLangs(array("asset"));
 
 $id = GETPOSTINT('id');
 $ref = GETPOST('ref', 'alpha');

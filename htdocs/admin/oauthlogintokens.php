@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 use OAuth\Common\Storage\DoliStorage;
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'printing', 'oauth'));
+// $langs->loadLangs(array('admin', 'printing', 'oauth'));
 
 if (!$user->admin) {
 	accessforbidden();

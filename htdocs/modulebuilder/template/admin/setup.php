@@ -58,7 +58,7 @@ require_once '../lib/mymodule.lib.php';
 //require_once "../class/myclass.class.php";
 
 // Translations
-$langs->loadLangs(array("admin", "mymodule@mymodule"));
+// $langs->loadLangs(array("admin", "mymodule@mymodule"));
 
 // Access control
 if (!$user->admin) {

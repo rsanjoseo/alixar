@@ -29,7 +29,7 @@ require_once '../lib/partnership.lib.php';
 //require_once "../class/myclass.class.php";
 
 // Translations
-$langs->loadLangs(array("admin", "partnership"));
+// $langs->loadLangs(array("admin", "partnership"));
 
 // Security check
 if (!$user->admin) {

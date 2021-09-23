@@ -43,7 +43,7 @@ if (!$user->admin) {
 	accessforbidden();
 }
 
-$langs->loadLangs(array("admin", "cashdesk"));
+// $langs->loadLangs(array("admin", "cashdesk"));
 
 global $db, $mysoc;
 

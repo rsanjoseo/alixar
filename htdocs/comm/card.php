@@ -64,7 +64,7 @@ if (!empty($conf->ficheinter->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'banks'));
+// $langs->loadLangs(array('companies', 'banks'));
 
 if (!empty($conf->contrat->enabled)) {
 	$langs->load("contracts");
@@ -1391,7 +1391,7 @@ if ($object->id > 0) {
 				if (empty($user->rights->facture->creer)) {
 					print '<div class="inline-block divButAction"><a class="butActionRefused classfortooltip" title="'.dol_escape_js($langs->trans("NotAllowed")).'" href="#">'.$langs->trans("AddBill").'</a></div>';
 				} else {
-					$langs->loadLangs(array("orders", "bills"));
+                    // $langs->loadLangs(array("orders", "bills"));
 
 					if (!empty($conf->commande->enabled)) {
 						if ($object->client != 0 && $object->client != 2) {

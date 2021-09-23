@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'ticket'));
+// $langs->loadLangs(array('companies', 'ticket'));
 
 // Get parameters
 $socid = GETPOST("socid", 'int');

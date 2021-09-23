@@ -32,7 +32,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "donations"));
+// $langs->loadLangs(array("companies", "donations"));
 
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'sclist';
 

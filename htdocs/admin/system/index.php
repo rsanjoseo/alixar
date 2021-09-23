@@ -26,7 +26,7 @@ require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "user", "install"));
+// $langs->loadLangs(array("admin", "user", "install"));
 
 if (!$user->admin) {
 	accessforbidden();

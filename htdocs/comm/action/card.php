@@ -48,7 +48,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "other", "commercial", "bills", "orders", "agenda", "mails"));
+// $langs->loadLangs(array("companies", "other", "commercial", "bills", "orders", "agenda", "mails"));
 
 $action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel', 'alpha');

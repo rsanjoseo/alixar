@@ -42,7 +42,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('ordersindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'bills'));
+// $langs->loadLangs(array('orders', 'bills'));
 
 // Security check
 $socid = GETPOST('socid', 'int');

@@ -43,7 +43,7 @@ if (!empty($conf->eventorganization->enabled)) {
 	$langsLoad[]='eventorganization';
 }
 
-$langs->loadLangs($langsLoad);
+// $langs->loadLangs($langsLoad);
 
 $action		= GETPOST('action', 'alpha');
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)

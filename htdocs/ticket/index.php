@@ -35,7 +35,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('ticketsindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'ticket'));
+// $langs->loadLangs(array('companies', 'other', 'ticket'));
 
 $WIDTH = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');

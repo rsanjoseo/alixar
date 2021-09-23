@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/expensereport.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'errors', 'trips', 'other'));
+// $langs->loadLangs(array('admin', 'errors', 'trips', 'other'));
 
 if (!$user->admin) {
 	accessforbidden();

@@ -40,7 +40,7 @@ if (!defined('NOIPCHECK')) {
 require '../../main.inc.php';
 require_once '../../core/lib/functions2.lib.php';
 
-$langs->loadLangs(array("main", "install", "other"));
+// $langs->loadLangs(array("main", "install", "other"));
 
 $conf->dol_hide_topmenu = GETPOST('dol_hide_topmenu', 'int');
 $conf->dol_hide_leftmenu = GETPOST('dol_hide_leftmenu', 'int');

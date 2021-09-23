@@ -32,7 +32,7 @@ $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'usernote'; // To manage different context of search
 
 // Load translation files required by page
-$langs->loadLangs(array('companies', 'members', 'bills', 'users'));
+// $langs->loadLangs(array('companies', 'members', 'bills', 'users'));
 
 $object = new User($db);
 $object->fetch($id, '', '', 1);

@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/contract.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'admin', 'contracts'));
+// $langs->loadLangs(array('companies', 'admin', 'contracts'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

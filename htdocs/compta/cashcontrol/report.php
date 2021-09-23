@@ -46,7 +46,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/cashcontrol/class/cashcontrol.class.php'
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 
-$langs->loadLangs(array("bills", "banks"));
+// $langs->loadLangs(array("bills", "banks"));
 
 $id = GETPOST('id', 'int');
 

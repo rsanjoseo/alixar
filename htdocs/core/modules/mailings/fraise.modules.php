@@ -116,7 +116,7 @@ class mailing_fraise extends MailingTargets
 		global $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("members", "companies", "categories"));
+        // $langs->loadLangs(array("members", "companies", "categories"));
 
 		$form = new Form($this->db);
 
@@ -233,8 +233,8 @@ class mailing_fraise extends MailingTargets
         // phpcs:enable
         global $langs, $_POST;
 
-		// Load translation files required by the page
-		$langs->loadLangs(array("members", "companies"));
+        // Load translation files required by the page
+        // $langs->loadLangs(array("members", "companies"));
 
 		$cibles = array();
 		$now = dol_now();

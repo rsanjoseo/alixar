@@ -46,7 +46,7 @@ if (empty($user->rights->loan->calc)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "loan"));
+// $langs->loadLangs(array("compta", "bills", "loan"));
 
 $object = new Loan($db);
 $object->fetch($loanid);
@@ -150,7 +150,7 @@ $morehtmlref .= $form->editfieldkey("Label", 'label', $object->label, $object, 0
 $morehtmlref .= $form->editfieldval("Label", 'label', $object->label, $object, 0, 'string', '', null, null, '', 1);
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->loadLangs(array("projects"));
+    // $langs->loadLangs(array("projects"));
 	$morehtmlref .= '<br>'.$langs->trans('Project').' : ';
 	if ($user->rights->loan->write) {
 		if ($action != 'classify') {

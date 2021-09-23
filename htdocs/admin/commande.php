@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/order.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'errors', 'orders', 'other'));
+// $langs->loadLangs(array('admin', 'errors', 'orders', 'other'));
 
 if (!$user->admin) {
 	accessforbidden();

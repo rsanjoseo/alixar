@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/lib/knowledgemanagement_kno
 
 
 // Load translation files required by the page
-$langs->loadLangs(array("knowledgemanagement", "other"));
+// $langs->loadLangs(array("knowledgemanagement", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 dol_include_once('/emailcollector/class/emailcollector.class.php');
 
 // Load translation files required by page
-$langs->loadLangs(array("admin", "other"));
+// $langs->loadLangs(array("admin", "other"));
 
 $action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)

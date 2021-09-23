@@ -27,7 +27,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/resource/class/dolresource.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("resource", "companies", "other"));
+// $langs->loadLangs(array("resource", "companies", "other"));
 
 // Get parameters
 $id             = GETPOST('id', 'int');

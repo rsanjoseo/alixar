@@ -47,7 +47,7 @@ if (!empty($conf->contrat->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("interventions", "admin", "compta", "bills"));
+// $langs->loadLangs(array("interventions", "admin", "compta", "bills"));
 
 // Security check
 $id = (GETPOST('fichinterid', 'int') ?GETPOST('fichinterid', 'int') : GETPOST('id', 'int'));

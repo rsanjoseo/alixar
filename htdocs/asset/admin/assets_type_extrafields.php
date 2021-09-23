@@ -26,7 +26,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/asset.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('assets', 'admin'));
+// $langs->loadLangs(array('assets', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

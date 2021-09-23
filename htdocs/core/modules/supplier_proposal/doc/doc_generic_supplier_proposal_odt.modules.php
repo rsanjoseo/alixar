@@ -67,7 +67,7 @@ class doc_generic_supplier_proposal_odt extends ModelePDFSupplierProposal
 		global $conf, $langs, $mysoc;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("main", "companies"));
+        // $langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
 		$this->name = "ODT templates";
@@ -113,8 +113,8 @@ class doc_generic_supplier_proposal_odt extends ModelePDFSupplierProposal
 	{
 		global $conf, $langs;
 
-		// Load translation files required by the page
-		$langs->loadLangs(array('companies', 'errors'));
+        // Load translation files required by the page
+        // $langs->loadLangs(array('companies', 'errors'));
 
 		$form = new Form($this->db);
 

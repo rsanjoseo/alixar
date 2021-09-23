@@ -39,7 +39,7 @@ if (!empty($conf->global->PRODUIT_PDF_MERGE_PROPAL)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('other', 'products'));
+// $langs->loadLangs(array('other', 'products'));
 
 $id     = GETPOST('id', 'int');
 $ref    = GETPOST('ref', 'alpha');

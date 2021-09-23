@@ -36,7 +36,7 @@ if (!$user->rights->commande->lire) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'sendings', 'bills'));
+// $langs->loadLangs(array('orders', 'sendings', 'bills'));
 
 $socid = 0;
 $comid = GETPOST("id", 'int');

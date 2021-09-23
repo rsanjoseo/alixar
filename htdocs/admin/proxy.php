@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("other", "users", "admin"));
+// $langs->loadLangs(array("other", "users", "admin"));
 
 if (!$user->admin) {
 	accessforbidden();

@@ -57,7 +57,7 @@ if (empty($conf->adherent->enabled)) {
 }
 
 
-$langs->loadLangs(array("main", "members", "companies", "other"));
+// $langs->loadLangs(array("main", "members", "companies", "other"));
 
 $id = GETPOST('id', 'int');
 $object = new Adherent($db);

@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/tva/class/tva.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/localtax/class/localtax.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("other", "compta", "banks", "bills", "companies", "product", "trips", "admin"));
+// $langs->loadLangs(array("other", "compta", "banks", "bills", "companies", "product", "trips", "admin"));
 
 $refresh = GETPOSTISSET('submit') ? true : false;
 $year_current = GETPOSTISSET('year') ? GETPOST('year', 'int') : dol_print_date($now, '%Y', 'tzserver');

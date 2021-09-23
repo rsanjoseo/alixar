@@ -35,7 +35,7 @@ require_once $path."../../htdocs/master.inc.php";
 require_once DOL_DOCUMENT_ROOT.'/core/lib/report.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
-$langs->loadLangs(array("companies", "compta", "main", "accountancy"));
+// $langs->loadLangs(array("companies", "compta", "main", "accountancy"));
 
 // Security check
 if (!$user->admin) {

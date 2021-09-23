@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/vat.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'banks', 'bills'));
+// $langs->loadLangs(array('compta', 'banks', 'bills'));
 
 $id = GETPOST("id", 'int');
 $action = GETPOST("action", "alpha");

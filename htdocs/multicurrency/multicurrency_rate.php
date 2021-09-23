@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/multicurrency.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('multicurrency'));
+// $langs->loadLangs(array('multicurrency'));
 
 $action				= GETPOST('action', 'alpha');
 $massaction			= GETPOST('massaction', 'alpha');

@@ -59,7 +59,7 @@ if (!empty($conf->variants->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'sendings', 'companies', 'bills', 'propal', 'deliveries', 'products', 'other'));
+// $langs->loadLangs(array('orders', 'sendings', 'companies', 'bills', 'propal', 'deliveries', 'products', 'other'));
 if (!empty($conf->incoterm->enabled)) {
 	$langs->load('incoterm');
 }

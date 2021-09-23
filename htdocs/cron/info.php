@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/cron.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'cron'));
+// $langs->loadLangs(array('admin', 'cron'));
 
 // Security check
 if (!$user->rights->cron->read) {

@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/eventorganization.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 // Translations
-$langs->loadLangs(array("admin", "eventorganization"));
+// $langs->loadLangs(array("admin", "eventorganization"));
 
 // Parameters
 $action = GETPOST('action', 'aZ09');

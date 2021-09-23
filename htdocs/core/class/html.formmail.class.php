@@ -366,7 +366,7 @@ class FormMail extends Form
 		}
 
 		// Load translation files required by the page
-		$langs->loadLangs(array('other', 'mails'));
+        // $langs->loadLangs(array('other', 'mails'));
 
 		// Clear temp files. Must be done before call of triggers, at beginning (mode = init), or when we select a new template
 		if (GETPOST('mode', 'alpha') == 'init' || (GETPOST('modelselected') && GETPOST('modelmailselected', 'alpha') && GETPOST('modelmailselected', 'alpha') != '-1')) {
@@ -851,7 +851,7 @@ class FormMail extends Form
 				} else {
 					// Set the online payment url link into __ONLINE_PAYMENT_URL__ key
 					require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
-					$langs->loadLangs(array('paypal', 'other'));
+                    // $langs->loadLangs(array('paypal', 'other'));
 					$typeforonlinepayment = 'free';
 					if ($this->param["models"] == 'order' || $this->param["models"] == 'order_send') {
 						$typeforonlinepayment = 'order'; // TODO use detection on something else than template

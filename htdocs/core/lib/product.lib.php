@@ -222,7 +222,7 @@ function productlot_prepare_head($object)
 	global $db, $langs, $conf, $user;
 
 	// Load translation files required by the page
-	$langs->loadLangs(array("products", "productbatch"));
+    // $langs->loadLangs(array("products", "productbatch"));
 
 	$h = 0;
 	$head = array();

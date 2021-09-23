@@ -59,7 +59,7 @@ class box_funnel_of_prospection extends ModeleBoxes
 		global $user, $langs, $conf;
 
 		// Load translation files required by the page
-        //		$langs->loadLangs(array('boxes', 'projects'));
+        //		// $langs->loadLangs(array('boxes', 'projects'));
 
 		$this->db = $db;
 

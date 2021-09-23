@@ -678,7 +678,7 @@ class AccountingAccount extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->loadLangs(array("users"));
+		// $langs->loadLangs(array("users"));
 
 		if ($mode == 0) {
 			if ($status == 1) {

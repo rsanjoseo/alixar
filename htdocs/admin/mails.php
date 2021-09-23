@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "products", "admin", "mails", "other", "errors"));
+// $langs->loadLangs(array("companies", "products", "admin", "mails", "other", "errors"));
 
 $action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel', 'aZ09');

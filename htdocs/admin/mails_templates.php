@@ -52,7 +52,7 @@ if (!empty($conf->eventorganization->enabled)) {
 	$langsArray[]='eventorganization';
 }
 
-$langs->loadLangs($langsArray);
+// $langs->loadLangs($langsArray);
 
 $action = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view';
 $massaction = GETPOST('massaction', 'alpha');

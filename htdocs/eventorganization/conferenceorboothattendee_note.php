@@ -78,7 +78,7 @@ dol_include_once('/eventorganization/class/conferenceorboothattendee.class.php')
 dol_include_once('/eventorganization/lib/eventorganization_conferenceorboothattendee.lib.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("eventorganization@eventorganization", "companies"));
+// $langs->loadLangs(array("eventorganization@eventorganization", "companies"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

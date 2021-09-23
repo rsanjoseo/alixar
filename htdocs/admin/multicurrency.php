@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/multicurrency/class/multicurrency.class.php';
 
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'multicurrency'));
+// $langs->loadLangs(array('admin', 'multicurrency'));
 
 // Access control
 if (!$user->admin || empty($conf->multicurrency->enabled)) {

@@ -49,7 +49,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 //  accessforbidden();
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'bills'));
+// $langs->loadLangs(array('compta', 'bills'));
 if (!empty($conf->commande->enabled)) {
 	$langs->load("orders");
 }

@@ -124,7 +124,7 @@ class mailing_contacts1 extends MailingTargets
 		global $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("commercial", "companies", "suppliers", "categories"));
+        // $langs->loadLangs(array("commercial", "companies", "suppliers", "categories"));
 
 		$s = '';
 

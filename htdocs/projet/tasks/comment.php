@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/project/task/modules_task.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'companies'));
+// $langs->loadLangs(array('projects', 'companies'));
 
 $id = GETPOST('id', 'int');
 $idcomment = GETPOST('idcomment', 'int');

@@ -137,7 +137,7 @@ $boxstatItems = [];
 $boxstatFromHook = '';
 
 // Load translation files required by page
-//$langs->loadLangs(['commercial', 'bills', 'orders', 'contracts']);
+//// $langs->loadLangs(['commercial', 'bills', 'orders', 'contracts']);
 
 // Dolibarr Working Board with weather
 

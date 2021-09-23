@@ -26,7 +26,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
 
 // Load translation files required by page
-$langs->loadLangs(array('users', 'admin'));
+// $langs->loadLangs(array('users', 'admin'));
 
 $action = (string) GETPOST('action', 'aZ09');
 $id = (int) GETPOST('id', 'int');

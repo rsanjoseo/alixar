@@ -39,7 +39,7 @@ if (!empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 }
 
-$langs->loadLangs(array('bills', 'other', 'companies'));
+// $langs->loadLangs(array('bills', 'other', 'companies'));
 
 $id = GETPOST('facid', 'int') ?GETPOST('facid', 'int') : GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

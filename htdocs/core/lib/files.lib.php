@@ -1169,7 +1169,7 @@ function dol_delete_file($file, $disableglob = 0, $nophperrors = 0, $nohook = 0,
 	global $hookmanager;
 
 	// Load translation files required by the page
-	$langs->loadLangs(array('other', 'errors'));
+    // $langs->loadLangs(array('other', 'errors'));
 
 	if (empty($nolog)) {
 		dol_syslog("dol_delete_file file=".$file." disableglob=".$disableglob." nophperrors=".$nophperrors." nohook=".$nohook);

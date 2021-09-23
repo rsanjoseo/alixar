@@ -42,7 +42,7 @@ if ($type == '' && empty($user->rights->service->lire)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks'));
+// $langs->loadLangs(array('products', 'stocks'));
 
 // Initialize technical object to manage hooks. Note that conf->hooks_modules contains array of hooks
 $hookmanager->initHooks(array('productindex'));

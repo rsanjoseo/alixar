@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT . '/workstation/lib/workstation.lib.php';
 //require_once "../class/myclass.class.php";
 
 // Translations
-$langs->loadLangs(array("admin", "workstation"));
+// $langs->loadLangs(array("admin", "workstation"));
 
 // Parameters
 $action = GETPOST('action', 'aZ09');

@@ -76,26 +76,27 @@ class box_clients extends ModeleBoxes
 	 */
 	public function loadBox($max = 5)
 	{
-		global $user, $langs, $conf;
-		$langs->load("boxes");
+        global $user, $langs, $conf;
+        //		$langs->load("boxes");
 
-		$this->max = $max;
+        $this->max = $max;
 
-		include_once DOL_DOCUMENT_ROOT.'/societe/class/client.class.php';
-		$thirdpartystatic = new Client($this->db);
+        include_once DOL_DOCUMENT_ROOT . '/societe/class/client.class.php';
+        $thirdpartystatic = new Client($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedCustomers", $max));
+        //		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedCustomers", $max));
+        $this->info_box_head = ['text' => $langs->trans("BoxTitleLastModifiedCustomers", ['s' => $max])];
 
-		if ($user->rights->societe->lire) {
-			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
-			$sql .= ", s.code_client, s.code_compta, s.client";
-			$sql .= ", s.logo, s.email, s.entity";
-			$sql .= ", s.datec, s.tms, s.status";
-			$sql .= " FROM ".MAIN_DB_PREFIX."societe as s";
-			if (!$user->rights->societe->client->voir && !$user->socid) {
-				$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-			}
-			$sql .= " WHERE s.client IN (1, 3)";
+        if ($user->rights->societe->lire) {
+            $sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
+            $sql .= ", s.code_client, s.code_compta, s.client";
+            $sql .= ", s.logo, s.email, s.entity";
+            $sql .= ", s.datec, s.tms, s.status";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "societe as s";
+            if (!$user->rights->societe->client->voir && !$user->socid) {
+                $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+            }
+            $sql .= " WHERE s.client IN (1, 3)";
 			$sql .= " AND s.entity IN (".getEntity('societe').")";
 			if (!$user->rights->societe->client->voir && !$user->socid) {
 				$sql .= " AND s.rowid = sc.fk_soc AND sc.fk_user = ".((int) $user->id);

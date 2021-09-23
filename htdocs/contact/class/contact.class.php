@@ -956,7 +956,7 @@ class Contact extends CommonObject
 			return -1;
 		}
 
-		$langs->loadLangs(array("dict", "companies"));
+		// $langs->loadLangs(array("dict", "companies"));
 
 		$sql = "SELECT c.rowid, c.entity, c.fk_soc, c.ref_ext, c.civility as civility_code, c.lastname, c.firstname,";
 		$sql .= " c.address, c.statut, c.zip, c.town,";

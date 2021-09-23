@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/loan/class/paymentloan.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/loan.lib.php';
 
-$langs->loadLangs(array("bills", "loan"));
+// $langs->loadLangs(array("bills", "loan"));
 
 $chid = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

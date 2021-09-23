@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'orders', 'bills'));
+// $langs->loadLangs(array('companies', 'orders', 'bills'));
 
 $id = GETPOST("id", 'int');
 

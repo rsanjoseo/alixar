@@ -38,7 +38,7 @@ $WIDTH = DolGraph::getDefaultGraphSizeForStats('width', 380);
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height', 160);
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'products', 'stocks', 'bills', 'other'));
+// $langs->loadLangs(array('companies', 'products', 'stocks', 'bills', 'other'));
 
 $id		= GETPOST('id', 'int'); // For this page, id can also be 'all'
 $ref	= GETPOST('ref', 'alpha');

@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 
-$langs->loadLangs(array("products", "suppliers"));
+// $langs->loadLangs(array("products", "suppliers"));
 
 if (!$user->rights->produit->lire && !$user->rights->service->lire) {
 	accessforbidden();

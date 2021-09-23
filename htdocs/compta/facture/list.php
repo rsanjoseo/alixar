@@ -57,7 +57,7 @@ if (!empty($conf->commande->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'companies', 'products', 'categories'));
+// $langs->loadLangs(array('bills', 'companies', 'products', 'categories'));
 
 $sall = trim((GETPOST('search_all', 'alphanohtml') != '') ?GETPOST('search_all', 'alphanohtml') : GETPOST('sall', 'alphanohtml'));
 $projectid = (GETPOST('projectid') ?GETPOST('projectid', 'int') : 0);

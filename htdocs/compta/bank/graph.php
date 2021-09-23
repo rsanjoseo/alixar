@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/dolgraph.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories'));
+// $langs->loadLangs(array('banks', 'categories'));
 
 $WIDTH = DolGraph::getDefaultGraphSizeForStats('width', 768);
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height', 200);

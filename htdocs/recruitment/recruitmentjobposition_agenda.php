@@ -61,7 +61,7 @@ dol_include_once('/recruitment/lib/recruitment_recruitmentjobposition.lib.php');
 
 
 // Load translation files required by the page
-$langs->loadLangs(array("recruitment", "other"));
+// $langs->loadLangs(array("recruitment", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

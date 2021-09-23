@@ -120,7 +120,7 @@ class pdf_standard extends ModelePDFStock
 		global $conf, $langs, $mysoc;
 
 		// Load traductions files required by page
-		$langs->loadLangs(array("main", "companies"));
+        // $langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
 		$this->name = "standard";

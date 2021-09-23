@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/intracommreport.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "intracommreport"));
+// $langs->loadLangs(array("admin", "intracommreport"));
 
 if (!$user->admin) {
 	accessforbidden();

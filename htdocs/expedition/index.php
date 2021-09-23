@@ -35,7 +35,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('sendingindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'sendings'));
+// $langs->loadLangs(array('orders', 'sendings'));
 
 /*
  *	View

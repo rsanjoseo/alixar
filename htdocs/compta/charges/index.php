@@ -44,7 +44,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('specialexpensesindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'bills'));
+// $langs->loadLangs(array('compta', 'bills'));
 
 // Security check
 if ($user->socid) {

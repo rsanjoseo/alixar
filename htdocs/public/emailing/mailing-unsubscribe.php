@@ -69,7 +69,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
 global $user, $conf, $langs;
 
-$langs->loadLangs(array("main", "mails"));
+// $langs->loadLangs(array("main", "mails"));
 
 $mtid = GETPOST('mtid');
 $email = GETPOST('email');

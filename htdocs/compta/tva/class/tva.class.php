@@ -859,7 +859,7 @@ class Tva extends CommonObject
 		global $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("customers", "bills"));
+        // $langs->loadLangs(array("customers", "bills"));
 
 		// We reinit status array to force to redefine them because label may change according to properties values.
 		$this->labelStatus = array();

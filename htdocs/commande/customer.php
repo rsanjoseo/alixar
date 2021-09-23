@@ -43,7 +43,7 @@ if (!$user->rights->facture->creer) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "orders"));
+// $langs->loadLangs(array("companies", "orders"));
 
 $limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
 $sortfield = GETPOST("sortfield", 'alpha');

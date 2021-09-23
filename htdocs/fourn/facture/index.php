@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 restrictedArea($user, 'fournisseur', 0, '', 'facture');
 
 // Load translation files required by the page
-$langs->loadLangs(['bills', 'boxes']);
+// $langs->loadLangs(['bills', 'boxes']);
 
 // Filter to show only result of one supplier
 $socid = GETPOST('socid', 'int');

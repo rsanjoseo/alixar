@@ -51,7 +51,7 @@ require_once DOL_DOCUMENT_ROOT.'/loan/class/paymentloan.class.php';
 const PAY_DEBIT = 0;
 const PAY_CREDIT = 1;
 
-$langs->loadLangs(array("accountancy", "bills", "companies", "salaries", "compta", "trips", "banks", "loan"));
+// $langs->loadLangs(array("accountancy", "bills", "companies", "salaries", "compta", "trips", "banks", "loan"));
 
 $date_start = GETPOST('date_start', 'alpha');
 $date_startDay = GETPOST('date_startday', 'int');

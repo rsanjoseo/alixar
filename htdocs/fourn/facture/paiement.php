@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'bills', 'banks', 'compta'));
+// $langs->loadLangs(array('companies', 'bills', 'banks', 'compta'));
 
 $action = GETPOST('action', 'alpha');
 $confirm = GETPOST('confirm', 'alpha');

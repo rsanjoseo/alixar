@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/vat.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'bills'));
+// $langs->loadLangs(array('compta', 'bills'));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/partnership/class/partnership.class.php';
 require_once DOL_DOCUMENT_ROOT.'/partnership/lib/partnership.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "partnership", "other"));
+// $langs->loadLangs(array("companies", "partnership", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

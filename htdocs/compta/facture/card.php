@@ -67,7 +67,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'companies', 'compta', 'products', 'banks', 'main', 'withdrawals'));
+// $langs->loadLangs(array('bills', 'companies', 'compta', 'products', 'banks', 'main', 'withdrawals'));
 if (!empty($conf->incoterm->enabled)) {
 	$langs->load('incoterm');
 }
@@ -3732,7 +3732,7 @@ if ($action == 'create') {
 
 	// Lines from source (TODO Show them also when creating invoice from template invoice)
 	if (!empty($origin) && !empty($originid) && is_object($objectsrc)) {
-		$langs->loadLangs(array('orders', 'propal'));
+        // $langs->loadLangs(array('orders', 'propal'));
 
 		// TODO for compatibility
 		if ($origin == 'contrat') {

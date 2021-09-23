@@ -65,17 +65,17 @@ class InterfaceContactRoles extends DolibarrTriggers
 	 * @param conf $conf		Object conf
 	 * @return int <0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if ($action === 'PROPAL_CREATE' || $action === 'ORDER_CREATE' || $action === 'BILL_CREATE'
-			|| $action === 'ORDER_SUPPLIER_CREATE' || $action === 'BILL_SUPPLIER_CREATE' || $action === 'PROPOSAL_SUPPLIER_CREATE'
-			|| $action === 'CONTRACT_CREATE' || $action === 'FICHINTER_CREATE' || $action === 'PROJECT_CREATE' || $action === 'TICKET_CREATE') {
-			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if ($action === 'PROPAL_CREATE' || $action === 'ORDER_CREATE' || $action === 'BILL_CREATE'
+            || $action === 'ORDER_SUPPLIER_CREATE' || $action === 'BILL_SUPPLIER_CREATE' || $action === 'PROPOSAL_SUPPLIER_CREATE'
+            || $action === 'CONTRACT_CREATE' || $action === 'FICHINTER_CREATE' || $action === 'PROJECT_CREATE' || $action === 'TICKET_CREATE') {
+            dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 
-			$socid = (property_exists($object, 'socid') ? $object->socid : $object->fk_soc);
+            $socid = (property_exists($object, 'socid') ? $object->socid : $object->fk_soc);
 
-			if (!empty($socid) && $socid > 0) {
-				require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
+            if (!empty($socid) && $socid > 0) {
+                require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
 				$contactdefault = new Contact($this->db);
 				$contactdefault->socid = $socid;
 				$TContact = $contactdefault->getContactRoles($object->element);

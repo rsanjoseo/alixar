@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/dolgraph.class.php';
 require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereportstats.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('trips', 'companies'));
+// $langs->loadLangs(array('trips', 'companies'));
 
 $WIDTH = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');

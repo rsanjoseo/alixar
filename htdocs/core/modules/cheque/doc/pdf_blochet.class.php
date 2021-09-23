@@ -50,7 +50,7 @@ class BordereauChequeBlochet extends ModeleChequeReceipts
 		global $conf, $langs, $mysoc;
 
 		// Load traductions files required by page
-		$langs->loadLangs(array("main", "bills"));
+        // $langs->loadLangs(array("main", "bills"));
 
 		$this->db = $db;
 		$this->name = "blochet";

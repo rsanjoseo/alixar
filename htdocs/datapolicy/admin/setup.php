@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once '../lib/datapolicy.lib.php';
 
 // Translations
-$langs->loadLangs(array('admin', 'companies', 'members', 'datapolicy@datapolicy'));
+// $langs->loadLangs(array('admin', 'companies', 'members', 'datapolicy@datapolicy'));
 
 // Parameters
 $action = GETPOST('action', 'aZ09');

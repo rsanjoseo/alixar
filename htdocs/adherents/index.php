@@ -39,7 +39,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('membersindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "members"));
+// $langs->loadLangs(array("companies", "members"));
 
 // Security check
 $result = restrictedArea($user, 'adherent');

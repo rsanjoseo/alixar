@@ -62,7 +62,7 @@ if (! empty($conf->eventorganization->enabled)) {
 }
 
 
-$langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
+// $langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
 if (!empty($conf->adherent->enabled)) {
 	$langs->load("members");
 }

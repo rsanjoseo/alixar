@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/societe/class/companybankaccount.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "companies", "bills", "other", "banks"));
+// $langs->loadLangs(array("admin", "companies", "bills", "other", "banks"));
 
 if (!$user->admin) {
 	accessforbidden();

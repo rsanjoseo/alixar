@@ -143,7 +143,7 @@ class pdf_sponge extends ModelePDFFactures
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills"));
+        // $langs->loadLangs(array("main", "bills"));
 
 		$this->db = $db;
 		$this->name = "sponge";
@@ -1203,7 +1203,7 @@ class pdf_sponge extends ModelePDFFactures
 					require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 					global $langs;
 
-					$langs->loadLangs(array('payment', 'paybox'));
+                    // $langs->loadLangs(array('payment', 'paybox'));
 					$servicename = $langs->transnoentities('Online');
 					$paiement_url = getOnlinePaymentUrl('', 'invoice', $object->ref, '', '', '');
 					$linktopay = $langs->trans("ToOfferALinkForOnlinePayment", $servicename).' <a href="'.$paiement_url.'">'.$outputlangs->transnoentities("ClickHere").'</a>';

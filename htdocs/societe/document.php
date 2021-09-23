@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/images.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
-$langs->loadLangs(array("companies", "other"));
+// $langs->loadLangs(array("companies", "other"));
 
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm');

@@ -39,7 +39,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('propal', 'compta', 'other', 'bills', 'companies'));
+// $langs->loadLangs(array('propal', 'compta', 'other', 'bills', 'companies'));
 
 
 $id = (GETPOST('id', 'int') ?GETPOST('id', 'int') : GETPOST('facid', 'int')); // For backward compatibility

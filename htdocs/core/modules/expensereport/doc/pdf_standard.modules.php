@@ -133,7 +133,7 @@ class pdf_standard extends ModeleExpenseReport
 		global $conf, $langs, $mysoc, $user;
 
 		// Translations
-		$langs->loadLangs(array("main", "trips", "projects"));
+        // $langs->loadLangs(array("main", "trips", "projects"));
 
 		$this->db = $db;
 		$this->name = "";

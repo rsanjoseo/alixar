@@ -1335,7 +1335,7 @@ class Thirdparties extends DolibarrApi
 	{
 		global $conf, $langs;
 
-		$langs->loadLangs(array("main", "dict", "commercial", "products", "companies", "banks", "bills", "withdrawals"));
+		// $langs->loadLangs(array("main", "dict", "commercial", "products", "companies", "banks", "bills", "withdrawals"));
 
 		if ($this->company->fetch($id) <= 0) {
 			throw new RestException(404, 'Thirdparty not found');

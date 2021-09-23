@@ -1454,7 +1454,7 @@ abstract class CommonObject
 		// phpcs:enable
 		global $langs, $conf;
 
-		$langs->loadLangs(array('bills', 'contracts', 'interventions', 'orders', 'projects', 'propal', 'ticket', 'agenda'));
+		// $langs->loadLangs(array('bills', 'contracts', 'interventions', 'orders', 'projects', 'propal', 'ticket', 'agenda'));
 
 		$tab = array();
 
@@ -1492,7 +1492,7 @@ abstract class CommonObject
 		if ($resql) {
 			$num = $this->db->num_rows($resql);
 			if ($num > 0) {
-				$langs->loadLangs(array("propal", "orders", "bills", "suppliers", "contracts", "supplier_proposal"));
+                // $langs->loadLangs(array("propal", "orders", "bills", "suppliers", "contracts", "supplier_proposal"));
 
 				while ($obj = $this->db->fetch_object($resql)) {
 					$modulename = $obj->element;

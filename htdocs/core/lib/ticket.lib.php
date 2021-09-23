@@ -561,7 +561,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
 	$out = '';
 
 	if (empty($conf->agenda->enabled)) {
-		$langs->loadLangs(array("admin", "errors"));
+		// $langs->loadLangs(array("admin", "errors"));
 		$out = info_admin($langs->trans("WarningModuleXDisabledSoYouMayMissEventHere", $langs->transnoentitiesnoconv("Module2400Name")), 0, 0, 'warning');
 	}
 

@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/resource/class/dolresource.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/resource.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'interventions'));
+// $langs->loadLangs(array('companies', 'interventions'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

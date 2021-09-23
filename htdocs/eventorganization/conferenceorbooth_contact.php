@@ -60,7 +60,7 @@ require_once DOL_DOCUMENT_ROOT.'/eventorganization/lib/eventorganization_confere
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
 // Load translation files required by the page
-$langs->loadLangs(array("eventorganization@eventorganization", "companies", "other", "mails"));
+// $langs->loadLangs(array("eventorganization@eventorganization", "companies", "other", "mails"));
 
 $id     = (GETPOST('id') ?GETPOST('id', 'int') : GETPOST('facid', 'int')); // For backward compatibility
 $ref    = GETPOST('ref', 'alpha');

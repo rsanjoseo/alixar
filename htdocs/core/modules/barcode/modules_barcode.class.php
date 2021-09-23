@@ -142,7 +142,7 @@ abstract class ModeleNumRefBarCode
 	{
 		global $conf;
 
-		$langs->loadLangs(array("admin", "companies"));
+		// $langs->loadLangs(array("admin", "companies"));
 
 		$s = '';
 		$s .= $langs->trans("Name").': <b>'.$this->name.'</b><br>';

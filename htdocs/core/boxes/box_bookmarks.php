@@ -68,15 +68,16 @@ class box_bookmarks extends ModeleBoxes
 	public function loadBox($max = 5)
 	{
 		global $user, $langs, $conf;
-		$langs->load("boxes");
+//		$langs->load("boxes");
 
 		$this->max = $max;
 
-		$this->info_box_head = array(
-			'text' => $langs->trans("BoxMyLastBookmarks", $max),
-			'sublink' => DOL_URL_ROOT.'/bookmarks/list.php',
-		);
-		if ($user->rights->bookmark->creer) {
+		$this->info_box_head = [
+            //			'text' => $langs->trans("BoxMyLastBookmarks", $max),
+            'text' => $langs->trans("BoxMyLastBookmarks", ['s' => $max]),
+            'sublink' => DOL_URL_ROOT . '/bookmarks/list.php',
+        ];
+        if ($user->rights->bookmark->creer) {
 			$this->info_box_head['subpicto'] = 'bookmark';
 			$this->info_box_head['subtext'] = $langs->trans("BookmarksManagement");
 		} else {

@@ -41,9 +41,9 @@ if (!empty($conf->categorie->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'companies', 'commercial'));
+// $langs->loadLangs(array('projects', 'companies', 'commercial'));
 if (!empty($conf->eventorganization->enabled) && $conf->eventorganization->enabled) {
-	$langs->loadLangs(array('eventorganization'));
+    // $langs->loadLangs(array('eventorganization'));
 }
 
 $action = GETPOST('action', 'aZ09');

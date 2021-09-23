@@ -164,7 +164,7 @@ if (GETPOST('viewyear', 'alpha') || $action == 'show_year') {
 }                                  // View by year
 
 // Load translation files required by the page
-$langs->loadLangs(array('users', 'agenda', 'other', 'commercial'));
+// $langs->loadLangs(array('users', 'agenda', 'other', 'commercial'));
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('agenda'));

@@ -25,7 +25,7 @@
 require '../main.inc.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "other"));
+// $langs->loadLangs(array("companies", "other"));
 
 // Security check
 $socid = 0;

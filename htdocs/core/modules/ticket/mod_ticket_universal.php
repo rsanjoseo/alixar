@@ -62,7 +62,7 @@ class mod_ticket_universal extends ModeleNumRefTicket
 		global $db, $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("ticket", "admin"));
+        // $langs->loadLangs(array("ticket", "admin"));
 
 		$form = new Form($db);
 

@@ -41,7 +41,7 @@ if (!empty($conf->contrat->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'bills', 'interventions'));
+// $langs->loadLangs(array('companies', 'bills', 'interventions'));
 if (!empty($conf->projet->enabled)) {
 	$langs->load("projects");
 }

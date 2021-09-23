@@ -35,7 +35,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'sendings', 'companies'));
+// $langs->loadLangs(array('orders', 'sendings', 'companies'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

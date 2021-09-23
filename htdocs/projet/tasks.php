@@ -41,7 +41,7 @@ if (!empty($conf->eventorganization->enabled)) {
 	$langsLoad[]='eventorganization';
 }
 
-$langs->loadLangs($langsLoad);
+// $langs->loadLangs($langsLoad);
 
 $action = GETPOST('action', 'aZ09');
 $massaction = GETPOST('massaction', 'alpha');

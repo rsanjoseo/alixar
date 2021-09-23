@@ -31,7 +31,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "loan"));
+// $langs->loadLangs(array("compta", "bills", "loan"));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

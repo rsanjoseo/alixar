@@ -35,7 +35,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'donations', 'accountancy', 'other'));
+// $langs->loadLangs(array('admin', 'donations', 'accountancy', 'other'));
 
 if (!$user->admin) {
 	accessforbidden();

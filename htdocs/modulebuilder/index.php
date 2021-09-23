@@ -40,7 +40,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/doleditor.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/utils.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "modulebuilder", "other", "cron", "errors"));
+// $langs->loadLangs(array("admin", "modulebuilder", "other", "cron", "errors"));
 
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');

@@ -50,7 +50,7 @@ $endyear = $year;
 $object_status = GETPOST('object_status', 'intcomma');
 
 // Load translation files required by the page
-$langs->loadLangs(array('interventions', 'companies', 'other', 'suppliers'));
+// $langs->loadLangs(array('interventions', 'companies', 'other', 'suppliers'));
 
 
 /*

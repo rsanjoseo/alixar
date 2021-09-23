@@ -39,7 +39,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "banks", "bills", "users", "salaries", "hrm", "trips"));
+// $langs->loadLangs(array("compta", "banks", "bills", "users", "salaries", "hrm", "trips"));
 if (!empty($conf->projet->enabled)) {
 	$langs->load("projects");
 }

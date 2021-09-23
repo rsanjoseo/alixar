@@ -77,7 +77,7 @@ if ($setcurrency != "") {
 
 $_SESSION["urlfrom"] = '/takepos/index.php';
 
-$langs->loadLangs(array("bills", "orders", "commercial", "cashdesk", "receiptprinter", "banks"));
+// $langs->loadLangs(array("bills", "orders", "commercial", "cashdesk", "receiptprinter", "banks"));
 
 $categorie = new Categorie($db);
 

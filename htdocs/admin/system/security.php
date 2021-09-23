@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/events.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("install", "other", "admin", "errors"));
+// $langs->loadLangs(array("install", "other", "admin", "errors"));
 
 if (!$user->admin) {
 	accessforbidden();

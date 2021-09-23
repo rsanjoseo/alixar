@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/stock.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "stocks"));
+// $langs->loadLangs(array("admin", "stocks"));
 
 // Securit check
 if (!$user->admin) {

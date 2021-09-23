@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/ecm.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by page
-$langs->loadLangs(array('ecm', 'companies', 'other'));
+// $langs->loadLangs(array('ecm', 'companies', 'other'));
 
 $action     = GETPOST('action', 'alpha');
 $cancel     = GETPOST('cancel', 'aZ09');

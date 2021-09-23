@@ -40,7 +40,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('other', 'companies', 'compta', 'bills'));
+// $langs->loadLangs(array('other', 'companies', 'compta', 'bills'));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

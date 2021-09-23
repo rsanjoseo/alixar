@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'bills', 'companies', 'withdrawals'));
+// $langs->loadLangs(array('banks', 'categories', 'bills', 'companies', 'withdrawals'));
 
 // Securite acces client
 if ($user->socid > 0) {

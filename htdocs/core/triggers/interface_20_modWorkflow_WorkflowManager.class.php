@@ -60,17 +60,17 @@ class InterfaceWorkflowManager extends DolibarrTriggers
 	 * @param conf		    $conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (empty($conf->workflow) || empty($conf->workflow->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (empty($conf->workflow) || empty($conf->workflow->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
 
-		$ret = 0;
+        $ret = 0;
 
-		// Proposals to order
-		if ($action == 'PROPAL_CLOSE_SIGNED') {
-			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+        // Proposals to order
+        if ($action == 'PROPAL_CLOSE_SIGNED') {
+            dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 			if (!empty($conf->commande->enabled) && !empty($conf->global->WORKFLOW_PROPAL_AUTOCREATE_ORDER)) {
 				include_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 				$newobject = new Commande($this->db);

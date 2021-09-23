@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "accountancy"));
+// $langs->loadLangs(array("compta", "accountancy"));
 
 $action     = GETPOST('action', 'aZ09');
 $massaction = GETPOST('massaction', 'alpha');

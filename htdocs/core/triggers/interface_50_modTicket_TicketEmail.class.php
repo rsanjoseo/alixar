@@ -57,17 +57,17 @@ class InterfaceTicketEmail extends DolibarrTriggers
 	 *      @param  conf      $conf   Object conf
 	 *      @return int                     <0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		$ok = 0;
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        $ok = 0;
 
-		if (empty($conf->ticket) || empty($conf->ticket->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
+        if (empty($conf->ticket) || empty($conf->ticket->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
 
-		switch ($action) {
-			case 'TICKET_ASSIGNED':
-				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+        switch ($action) {
+            case 'TICKET_ASSIGNED':
+                dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 
 				if ($object->fk_user_assign > 0 && $object->fk_user_assign != $user->id) {
 					$userstat = new User($this->db);

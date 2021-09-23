@@ -63,7 +63,7 @@ if ($setterminal > 0) {
 	$_SESSION["takeposterminal"] = $setterminal;
 }
 
-$langs->loadLangs(array("bills", "orders", "commercial", "cashdesk", "receiptprinter"));
+// $langs->loadLangs(array("bills", "orders", "commercial", "cashdesk", "receiptprinter"));
 
 if (empty($user->rights->takepos->run) && !defined('INCLUDE_PHONEPAGE_FROM_PUBLIC_PAGE')) {
 	accessforbidden();
@@ -90,7 +90,7 @@ if ($action == "productinfo") {
 			</div>';
 	print '<br>';
 } elseif ($action == "publicpayment") {
-	$langs->loadLangs(array("orders"));
+    // $langs->loadLangs(array("orders"));
 	print '<h1>'.$langs->trans('StatusOrderDelivered').'</h1>';
 	print '<button type="button" class="publicphonebutton2 phoneblue total" onclick="CheckPlease();">'.$langs->trans('Payment').'</button>';
 	print '<br>';

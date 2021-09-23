@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'bills'));
+// $langs->loadLangs(array('banks', 'categories', 'bills'));
 
 // Security check
 if ($user->socid) {

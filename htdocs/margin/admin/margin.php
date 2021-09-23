@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT."/compta/facture/class/facture.class.php";
 
-$langs->loadLangs(array("admin", "bills", "margins", "stocks"));
+// $langs->loadLangs(array("admin", "bills", "margins", "stocks"));
 
 if (!$user->admin) {
 	accessforbidden();

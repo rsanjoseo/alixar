@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/partnership/class/partnership.class.php';
 //dol_include_once('/othermodule/class/otherobject.class.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("partnership", "members", "other"));
+// $langs->loadLangs(array("partnership", "members", "other"));
 
 $action = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)

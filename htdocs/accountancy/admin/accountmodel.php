@@ -44,7 +44,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("errors", "admin", "companies", "resource", "holiday", "compta", "accountancy", "hrm"));
+// $langs->loadLangs(array("errors", "admin", "companies", "resource", "holiday", "compta", "accountancy", "hrm"));
 
 $action = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view';
 $confirm = GETPOST('confirm', 'alpha');

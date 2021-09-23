@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("accountancy", "compta"));
+// $langs->loadLangs(array("accountancy", "compta"));
 
 $socid = GETPOST('socid', 'int');
 
@@ -1081,7 +1081,7 @@ while ($i < min($num, $limit)) {
 	// Document ref
 	if (!empty($arrayfields['t.doc_ref']['checked'])) {
 		if ($line->doc_type == 'customer_invoice') {
-			$langs->loadLangs(array('bills'));
+            // $langs->loadLangs(array('bills'));
 
 			require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 			$objectstatic = new Facture($db);
@@ -1093,7 +1093,7 @@ while ($i < min($num, $limit)) {
 			$urlsource = $_SERVER['PHP_SELF'].'?id='.$objectstatic->id;
 			$documentlink = $formfile->getDocumentsLink($objectstatic->element, $filename, $filedir);
 		} elseif ($line->doc_type == 'supplier_invoice') {
-			$langs->loadLangs(array('bills'));
+            // $langs->loadLangs(array('bills'));
 
 			require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 			$objectstatic = new FactureFournisseur($db);
@@ -1105,7 +1105,7 @@ while ($i < min($num, $limit)) {
 			$subdir = get_exdir($objectstatic->id, 2, 0, 0, $objectstatic, $modulepart).dol_sanitizeFileName($line->doc_ref);
 			$documentlink = $formfile->getDocumentsLink($objectstatic->element, $subdir, $filedir);
 		} elseif ($line->doc_type == 'expense_report') {
-			$langs->loadLangs(array('trips'));
+            // $langs->loadLangs(array('trips'));
 
 			require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport.class.php';
 			$objectstatic = new ExpenseReport($db);

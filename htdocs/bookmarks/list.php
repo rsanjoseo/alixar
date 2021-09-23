@@ -25,7 +25,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/bookmarks/class/bookmark.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bookmarks', 'admin'));
+// $langs->loadLangs(array('bookmarks', 'admin'));
 
 $action = GETPOST('action', 'aZ09');
 $massaction = GETPOST('massaction', 'alpha');

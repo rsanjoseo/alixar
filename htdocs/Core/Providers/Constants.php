@@ -27,7 +27,7 @@ class Constants extends Provider
         'NOSCANGETFORINJECTION' => '1',        // Do not check injection attack on GET parameters
         'NOSCANPOSTFORINJECTION' => '1',        // Do not check injection attack on POST parameters
         'NOCSRFCHECK' => '1',                // Do not check CSRF attack (test on referer + on token if option MAIN_SECURITY_CSRF_WITH_TOKEN is on).
-        'NOTOKENRENEWAL' => '1',                // Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
+        //        'NOTOKENRENEWAL' => '1',                // Do not roll the Anti CSRF token (used if MAIN_SECURITY_CSRF_WITH_TOKEN is on)
         'NOSTYLECHECK' => '1',                // Do not check style html tag into posted data
         'NOREQUIREMENU' => '1',                // If there is no need to load and show top and left menu
         'NOREQUIREHTML' => '1',                // If we don't need to load the html.form.class.php
@@ -35,8 +35,8 @@ class Constants extends Provider
         "NOLOGIN", '1',                    // If this page is public (can be called outside logged session). This include the NOIPCHECK too.
         'NOIPCHECK' => '1',                    // Do not check IP defined into conf $dolibarr_main_restrict_ip
         'MAIN_LANG_DEFAULT' => 'auto',                    // Force lang to a particular value
-        'MAIN_AUTHENTICATION_MODE' => 'aloginmodule',    // Force authentication handler
-        'NOREDIRECTBYMAINTOLOGIN' => 1,        // The main.inc.php does not make a redirect if not logged, instead show simple error message
+        'MAIN_AUTHENTICATION_MODE' => 'dolibarr',    // Force authentication handler
+        'NOREDIRECTBYMAINTOLOGIN' => 0,        // The main.inc.php does not make a redirect if not logged, instead show simple error message
         'FORCECSP' => 'none',                // Disable all Content Security Policies
         'CSRFCHECK_WITH_TOKEN' => '1',        // Force use of CSRF protection with tokens even for GET
         'NOBROWSERNOTIF' => '1',                // Disable browser notification

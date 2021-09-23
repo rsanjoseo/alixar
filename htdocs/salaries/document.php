@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/salaries.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/salaries/class/salary.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "users", "salaries", "hrm"));
+// $langs->loadLangs(array("compta", "bills", "users", "salaries", "hrm"));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

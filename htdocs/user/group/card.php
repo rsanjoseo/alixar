@@ -46,7 +46,7 @@ if (!empty($conf->global->MAIN_USE_ADVANCED_PERMS)) {
 }
 
 // Load translation files required by page
-$langs->loadLangs(array('users', 'other'));
+// $langs->loadLangs(array('users', 'other'));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

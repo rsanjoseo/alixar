@@ -32,7 +32,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'objects', 'companies', 'products'));
+// $langs->loadLangs(array('admin', 'objects', 'companies', 'products'));
 
 if (!$user->admin) {
 	accessforbidden();

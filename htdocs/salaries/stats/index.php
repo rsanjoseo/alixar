@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/dolgraph.class.php';
 require_once DOL_DOCUMENT_ROOT.'/salaries/class/salariesstats.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("salaries", "companies", "bills"));
+// $langs->loadLangs(array("salaries", "companies", "bills"));
 
 $WIDTH = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');

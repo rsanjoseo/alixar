@@ -44,7 +44,7 @@ if (!defined('NOREQUIREAJAX')) {
 require '../main.inc.php'; // Load $user and permissions
 require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 
-$langs->loadLangs(array("main", "bills", "cashdesk", "banks"));
+// $langs->loadLangs(array("main", "bills", "cashdesk", "banks"));
 
 $place = (GETPOST('place', 'aZ09') ? GETPOST('place', 'aZ09') : '0'); // $place is id of table for Bar or Restaurant
 
@@ -417,7 +417,7 @@ if ($conf->global->TAKEPOS_ENABLE_SUMUP) {
 	if (!empty($conf->global->$keyforsumupbank)) {
 		print '<button type="button" class="calcbutton2" onclick="ValidateSumup();">Sumup</button>';
 	} else {
-		$langs->loadLangs(array("errors", "admin"));
+        // $langs->loadLangs(array("errors", "admin"));
 		print '<button type="button" class="calcbutton2 disabled" title="'.$langs->trans("SetupNotComplete").'">Sumup</button>';
 	}
 }

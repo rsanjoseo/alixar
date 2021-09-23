@@ -42,7 +42,7 @@ if (!$user->admin) {
 	accessforbidden();
 }
 
-$langs->loadLangs(array("admin", "cashdesk", "printing", "receiptprinter"));
+// $langs->loadLangs(array("admin", "cashdesk", "printing", "receiptprinter"));
 
 global $db;
 

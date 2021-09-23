@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/member/modules_cards.php';
 require_once DOL_DOCUMENT_ROOT.'/core/modules/printsheet/modules_labels.php';
 
-$langs->loadLangs(array("members", "errors"));
+// $langs->loadLangs(array("members", "errors"));
 
 // Choice of printing year or current year.
 $now = dol_now();

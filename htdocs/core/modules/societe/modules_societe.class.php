@@ -201,7 +201,7 @@ abstract class ModeleThirdPartyCode
 	{
 		global $conf;
 
-		$langs->loadLangs(array("admin", "companies"));
+		// $langs->loadLangs(array("admin", "companies"));
 
 		$strikestart = '';
 		$strikeend = '';

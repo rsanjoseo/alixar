@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/eventorganization/class/conferenceorbooth.class
 require_once DOL_DOCUMENT_ROOT.'/eventorganization/lib/eventorganization_conferenceorbooth.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("eventorganization", "companies", "other", "mails"));
+// $langs->loadLangs(array("eventorganization", "companies", "other", "mails"));
 
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm');

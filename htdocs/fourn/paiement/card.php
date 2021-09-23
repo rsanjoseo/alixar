@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 
-$langs->loadLangs(array('bills', 'banks', 'companies', 'suppliers'));
+// $langs->loadLangs(array('bills', 'banks', 'companies', 'suppliers'));
 
 $id = GETPOST('id', 'int');
 $action		= GETPOST('action', 'alpha');

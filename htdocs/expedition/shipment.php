@@ -48,7 +48,7 @@ if (!empty($conf->product->enabled) || !empty($conf->service->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'sendings', 'companies', 'bills', 'propal', 'deliveries', 'stocks', 'productbatch', 'incoterm', 'other'));
+// $langs->loadLangs(array('orders', 'sendings', 'companies', 'bills', 'propal', 'deliveries', 'stocks', 'productbatch', 'incoterm', 'other'));
 
 $id     = GETPOST('id', 'int'); // id of order
 $ref    = GETPOST('ref', 'alpha');

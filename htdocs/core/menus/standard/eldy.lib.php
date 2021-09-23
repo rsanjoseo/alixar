@@ -449,7 +449,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
 
 			// Load Langue
 			if (!empty($smenu->loadLangs)) {
-				$langs->loadLangs($smenu->loadLangs);
+				// $langs->loadLangs($smenu->loadLangs);
 			}
 
 			// Trans title
@@ -748,8 +748,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 			$newmenu->add("/admin/index.php?mainmenu=home&amp;leftmenu=setup", $langs->trans("Setup"), 0, $user->admin, '', $mainmenu, 'setup', 0, '', '', '', '<i class="fa fa-tools fa-fw paddingright pictofixedwidth"></i>');
 
 			if ($usemenuhider || empty($leftmenu) || $leftmenu == "setup") {
-				// Load translation files required by the page
-				$langs->loadLangs(array("admin", "help"));
+                // Load translation files required by the page
+                // $langs->loadLangs(array("admin", "help"));
 
 				$warnpicto = '';
 				if (empty($conf->global->MAIN_INFO_SOCIETE_NOM) || empty($conf->global->MAIN_INFO_SOCIETE_COUNTRY)) {
@@ -794,8 +794,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 			// System tools
 			$newmenu->add("/admin/tools/index.php?mainmenu=home&amp;leftmenu=admintools", $langs->trans("AdminTools"), 0, $user->admin, '', $mainmenu, 'admintools', 0, '', '', '', '<i class="fa fa-server fa-fw paddingright pictofixedwidth"></i>');
 			if ($usemenuhider || empty($leftmenu) || preg_match('/^admintools/', $leftmenu)) {
-				// Load translation files required by the page
-				$langs->loadLangs(array('admin', 'help'));
+                // Load translation files required by the page
+                // $langs->loadLangs(array('admin', 'help'));
 
 				$newmenu->add('/admin/system/dolibarr.php?mainmenu=home&amp;leftmenu=admintools_info', $langs->trans('InfoDolibarr'), 1);
 				if ($usemenuhider || empty($leftmenu) || $leftmenu == 'admintools_info') {
@@ -1513,8 +1513,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 		 * Menu BANK
 		 */
 		if ($mainmenu == 'bank') {
-			// Load translation files required by the page
-			$langs->loadLangs(array("withdrawals", "banks", "bills", "categories"));
+            // Load translation files required by the page
+            // $langs->loadLangs(array("withdrawals", "banks", "bills", "categories"));
 
 			// Bank-Cash account
 			if (!empty($conf->banque->enabled)) {
@@ -1797,8 +1797,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
 			// Leave/Holiday/Vacation module
 			if (!empty($conf->holiday->enabled)) {
-				// Load translation files required by the page
-				$langs->loadLangs(array("holiday", "trips"));
+                // Load translation files required by the page
+                // $langs->loadLangs(array("holiday", "trips"));
 
 				$newmenu->add("/holiday/list.php?mainmenu=hrm&leftmenu=hrm", $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
 				$newmenu->add("/holiday/card.php?mainmenu=hrm&leftmenu=holiday&action=create", $langs->trans("New"), 1, $user->rights->holiday->write);
@@ -1887,8 +1887,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 		 */
 		if ($mainmenu == 'members') {
 			if (!empty($conf->adherent->enabled)) {
-				// Load translation files required by the page
-				$langs->loadLangs(array("members", "compta"));
+                // Load translation files required by the page
+                // $langs->loadLangs(array("members", "compta"));
 
 				$newmenu->add("/adherents/index.php?leftmenu=members&amp;mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
 				$newmenu->add("/adherents/card.php?leftmenu=members&amp;action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);

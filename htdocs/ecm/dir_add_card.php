@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/ecm/class/htmlecm.form.class.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts", "categories"));
+// $langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts", "categories"));
 
 // Get parameters
 $socid      = GETPOST('socid', 'int');

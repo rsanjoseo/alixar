@@ -44,7 +44,7 @@ if (!empty($conf->contrat->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "other", "ticket"));
+// $langs->loadLangs(array("companies", "other", "ticket"));
 
 // Get parameters
 $id        = GETPOST('id', 'int');

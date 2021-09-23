@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/stripe/class/stripe.class.php';
 $servicename = 'Stripe';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'other', 'paypal', 'paybox', 'stripe'));
+// $langs->loadLangs(array('admin', 'other', 'paypal', 'paybox', 'stripe'));
 
 if (empty($user->admin)) {
 	accessforbidden();

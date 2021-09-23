@@ -32,7 +32,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'salaries'));
+// $langs->loadLangs(array('admin', 'salaries'));
 
 // Security check
 if (!$user->admin) {

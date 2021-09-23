@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'bills', 'products', 'companies', 'supplier_proposal'));
+// $langs->loadLangs(array('companies', 'bills', 'products', 'companies', 'supplier_proposal'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

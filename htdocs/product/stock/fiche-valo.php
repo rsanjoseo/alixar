@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/stock.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks', 'companies'));
+// $langs->loadLangs(array('products', 'stocks', 'companies'));
 
 $id = GETPOST('id', 'int');
 

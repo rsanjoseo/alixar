@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadlangs(array('companies', 'admin', 'bills'));
+// $langs->loadLangs(array('companies', 'admin', 'bills'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

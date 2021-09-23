@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT."/product/class/product.class.php";
 require_once DOL_DOCUMENT_ROOT."/societe/class/societe.class.php";
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'contracts', 'companies'));
+// $langs->loadLangs(array('products', 'contracts', 'companies'));
 
 $optioncss = GETPOST('optioncss', 'aZ09');
 

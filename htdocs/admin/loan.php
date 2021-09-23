@@ -31,7 +31,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'loan'));
+// $langs->loadLangs(array('admin', 'loan'));
 
 // Security check
 if (!$user->admin) {

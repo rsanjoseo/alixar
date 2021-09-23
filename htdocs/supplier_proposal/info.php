@@ -33,7 +33,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('supplier_proposal', 'compta'));
+// $langs->loadLangs(array('supplier_proposal', 'compta'));
 
 $id = GETPOST('id', 'int');
 $socid = GETPOST('socid', 'int');

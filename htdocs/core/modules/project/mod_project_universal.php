@@ -64,7 +64,7 @@ class mod_project_universal extends ModeleNumRefProjects
 		global $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("projects", "admin"));
+        // $langs->loadLangs(array("projects", "admin"));
 
 		$form = new Form($this->db);
 

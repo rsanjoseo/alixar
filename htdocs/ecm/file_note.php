@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmfiles.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('ecm'));
+// $langs->loadLangs(array('ecm'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

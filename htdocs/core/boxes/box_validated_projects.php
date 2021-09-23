@@ -60,7 +60,7 @@ class box_validated_projects extends ModeleBoxes
 		global $conf, $user, $langs;
 
 		// Load translation files required by the page
-        //		$langs->loadLangs(array('boxes', 'projects'));
+        //		// $langs->loadLangs(array('boxes', 'projects'));
 
 		$this->db = $db;
 		$this->boxlabel = "ProjectsWithTask";

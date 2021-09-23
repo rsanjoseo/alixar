@@ -36,7 +36,7 @@ if (!empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 }
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'supplier_proposal', 'other'));
+// $langs->loadLangs(array('compta', 'supplier_proposal', 'other'));
 
 $action		= GETPOST('action', 'alpha');
 $confirm	= GETPOST('confirm', 'alpha');

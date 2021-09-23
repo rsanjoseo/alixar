@@ -28,7 +28,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/bookmarks/class/bookmark.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bookmarks', 'other'));
+// $langs->loadLangs(array('bookmarks', 'other'));
 
 // Security check
 if (!$user->rights->bookmark->lire) {

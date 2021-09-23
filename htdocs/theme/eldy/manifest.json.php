@@ -25,6 +25,7 @@
  *		\brief      File for The Web App
  */
 
+/*
 if (!defined('NOREQUIREUSER')) {
 	define('NOREQUIREUSER', '1');
 }
@@ -40,6 +41,7 @@ if (!defined('NOCSRFCHECK')) {
 if (!defined('NOTOKENRENEWAL')) {
 	define('NOTOKENRENEWAL', '1');
 }
+*/
 if (!defined('NOLOGIN')) {
 	define('NOLOGIN', '1');
 }
@@ -49,14 +51,16 @@ if (!defined('NOREQUIREMENU')) {
 if (!defined('NOREQUIREHTML')) {
 	define('NOREQUIREHTML', '1');
 }
+/*
 if (!defined('NOREQUIREAJAX')) {
 	define('NOREQUIREAJAX', '1');
 }
 if (!defined('NOSESSION')) {
 	define('NOSESSION', '1');
 }
+*/
 
-require_once __DIR__.'/../../main.inc.php';
+require_once __DIR__ . '/../../main.php';
 
 
 top_httphead('text/json');

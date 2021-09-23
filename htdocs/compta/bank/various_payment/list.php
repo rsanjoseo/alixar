@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/accountancy/class/accountingjournal.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "banks", "bills", "accountancy"));
+// $langs->loadLangs(array("compta", "banks", "bills", "accountancy"));
 
 // Security check
 $socid = GETPOST("socid", "int");

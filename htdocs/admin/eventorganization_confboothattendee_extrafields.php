@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/eventorganization.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('eventorganization', 'admin'));
+// $langs->loadLangs(array('eventorganization', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

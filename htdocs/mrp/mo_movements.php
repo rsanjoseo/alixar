@@ -36,7 +36,7 @@ dol_include_once('/mrp/class/mo.class.php');
 dol_include_once('/mrp/lib/mrp_mo.lib.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("mrp", "stocks", "other"));
+// $langs->loadLangs(array("mrp", "stocks", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

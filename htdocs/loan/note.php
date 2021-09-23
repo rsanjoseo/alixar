@@ -37,7 +37,7 @@ if (!empty($conf->projet->enabled)) {
 $action = GETPOST('action', 'aZ09');
 
 // Load translation files required by the page
-$langs->loadLangs(array("loan"));
+// $langs->loadLangs(array("loan"));
 
 // Security check
 $id = GETPOST('id', 'int');
@@ -93,7 +93,7 @@ if ($id > 0) {
 	$morehtmlref .= $form->editfieldval("Label", 'label', $object->label, $object, 0, 'string', '', null, null, '', 1);
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->loadLangs(array("projects"));
+        // $langs->loadLangs(array("projects"));
 		$morehtmlref .= '<br>'.$langs->trans('Project').' : ';
 		if ($user->rights->loan->write) {
 			//if ($action != 'classify')

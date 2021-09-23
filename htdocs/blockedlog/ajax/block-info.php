@@ -47,7 +47,7 @@ if ((!$user->admin && !$user->rights->blockedlog->read) || empty($conf->blockedl
 	accessforbidden();
 }
 
-$langs->loadLangs(array("admin"));
+// $langs->loadLangs(array("admin"));
 
 
 /*

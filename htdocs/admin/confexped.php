@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/expedition.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'sendings', 'deliveries'));
+// $langs->loadLangs(array('admin', 'sendings', 'deliveries'));
 
 if (!$user->admin) {
 	accessforbidden();

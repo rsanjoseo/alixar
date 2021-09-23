@@ -45,7 +45,7 @@ require_once DOL_DOCUMENT_ROOT.'/website/class/website.class.php';
 require_once DOL_DOCUMENT_ROOT.'/website/class/websitepage.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
-$langs->loadLangs(array("admin", "other", "website", "errors"));
+// $langs->loadLangs(array("admin", "other", "website", "errors"));
 
 if (!$user->rights->website->read) {
 	accessforbidden();

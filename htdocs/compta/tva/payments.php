@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/salaries/class/paymentsalary.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'bills'));
+// $langs->loadLangs(array('compta', 'bills'));
 
 $mode = GETPOST("mode", 'alpha');
 $year = GETPOST("year", 'int');

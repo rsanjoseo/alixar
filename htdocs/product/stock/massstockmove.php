@@ -38,7 +38,7 @@ $confirm = GETPOST('confirm', 'alpha');
 $filetoimport = GETPOST('filetoimport');
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks', 'orders', 'productbatch'));
+// $langs->loadLangs(array('products', 'stocks', 'orders', 'productbatch'));
 
 //init Hook
 $hookmanager->initHooks(array('massstockmove'));

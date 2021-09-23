@@ -59,17 +59,17 @@ class InterfaceLdapsynchro extends DolibarrTriggers
 	 * @param conf		    $conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (empty($conf->ldap) || empty($conf->ldap->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
-		if (defined('DISABLE_LDAP_SYNCHRO')) {
-			return 0; // If constant defined, we do nothing
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (empty($conf->ldap) || empty($conf->ldap->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
+        if (defined('DISABLE_LDAP_SYNCHRO')) {
+            return 0; // If constant defined, we do nothing
+        }
 
-		if (!function_exists('ldap_connect')) {
-			dol_syslog("Warning, module LDAP is enabled but LDAP functions not available in this PHP", LOG_WARNING);
+        if (!function_exists('ldap_connect')) {
+            dol_syslog("Warning, module LDAP is enabled but LDAP functions not available in this PHP", LOG_WARNING);
 			return 0;
 		}
 

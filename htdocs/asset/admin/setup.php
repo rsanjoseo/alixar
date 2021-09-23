@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 global $langs, $user;
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "assets"));
+// $langs->loadLangs(array("admin", "assets"));
 
 // Access control
 if (!$user->admin) {

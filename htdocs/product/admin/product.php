@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbarcode.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "products"));
+// $langs->loadLangs(array("admin", "products"));
 
 // Security check
 if (!$user->admin || (empty($conf->product->enabled) && empty($conf->service->enabled))) {

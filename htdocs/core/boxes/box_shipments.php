@@ -72,7 +72,7 @@ class box_shipments extends ModeleBoxes
 	public function loadBox($max = 5)
 	{
 		global $user, $langs, $conf;
-		$langs->loadLangs(array('orders', 'sendings'));
+		// $langs->loadLangs(array('orders', 'sendings'));
 
 		$this->max = $max;
 

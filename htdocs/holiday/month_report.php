@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("holiday"));
+// $langs->loadLangs(array("holiday"));
 
 // Security check
 $socid = 0;

@@ -33,7 +33,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('propal', 'compta'));
+// $langs->loadLangs(array('propal', 'compta'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

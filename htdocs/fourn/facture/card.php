@@ -60,7 +60,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 
-$langs->loadLangs(array('bills', 'compta', 'suppliers', 'companies', 'products', 'banks', 'admin'));
+// $langs->loadLangs(array('bills', 'compta', 'suppliers', 'companies', 'products', 'banks', 'admin'));
 if (!empty($conf->incoterm->enabled)) {
 	$langs->load('incoterm');
 }
@@ -2269,7 +2269,7 @@ if ($action == 'create') {
 
 	// Intracomm report
 	if (!empty($conf->intracommreport->enabled)) {
-		$langs->loadLangs(array("intracommreport"));
+        // $langs->loadLangs(array("intracommreport"));
 		print '<tr><td>'.$langs->trans('IntracommReportTransportMode').'</td><td>';
 		$form->selectTransportMode(isset($_POST['transport_mode_id']) ? $_POST['transport_mode_id'] : $transport_mode_id, 'transport_mode_id');
 		print '</td></tr>';
@@ -2904,7 +2904,7 @@ if ($action == 'create') {
 
 		// Intracomm report
 		if (!empty($conf->intracommreport->enabled)) {
-			$langs->loadLangs(array("intracommreport"));
+            // $langs->loadLangs(array("intracommreport"));
 			print '<tr><td>';
 			print '<table width="100%" class="nobordernopadding"><tr><td>';
 			print $langs->trans('IntracommReportTransportMode');

@@ -26,7 +26,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/hrm/class/establishment.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'hrm'));
+// $langs->loadLangs(array('admin', 'hrm'));
 
 // Get parameters
 $id = GETPOST('id', 'int');

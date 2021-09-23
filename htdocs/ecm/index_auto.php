@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/treeview.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/ecm/class/ecmdirectory.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts"));
+// $langs->loadLangs(array("ecm", "companies", "other", "users", "orders", "propal", "bills", "contracts"));
 
 // Security check
 if ($user->socid) {

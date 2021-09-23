@@ -75,13 +75,13 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
 				$now = dol_now();
 				if ($obj->datestartvalidity && $db->jdate($obj->datestartvalidity) > $now) {
 					// Load translation files required by the page
-					$langs->loadLangs(array('main', 'errors'));
+                    // $langs->loadLangs(array('main', 'errors'));
 					$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 					return '--bad-login-validity--';
 				}
 				if ($obj->dateendvalidity && $db->jdate($obj->dateendvalidity) < dol_get_first_hour($now)) {
-					// Load translation files required by the page
-					$langs->loadLangs(array('main', 'errors'));
+                    // Load translation files required by the page
+                    // $langs->loadLangs(array('main', 'errors'));
 					$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 					return '--bad-login-validity--';
 				}
@@ -126,8 +126,8 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
 					sleep(2); // Anti brut force protection
 					dol_syslog("functions_dolibarr::check_user_password_dolibarr Authentication KO bad password for '".$usertotest."', cryptType=".$cryptType, LOG_NOTICE);
 
-					// Load translation files required by the page
-					$langs->loadLangs(array('main', 'errors'));
+                    // Load translation files required by the page
+                    // $langs->loadLangs(array('main', 'errors'));
 
 					$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorBadLoginPassword");
 				}
@@ -150,8 +150,8 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
 				dol_syslog("functions_dolibarr::check_user_password_dolibarr Authentication KO user not found for '".$usertotest."'", LOG_NOTICE);
 				sleep(1);
 
-				// Load translation files required by the page
-				$langs->loadLangs(array('main', 'errors'));
+                // Load translation files required by the page
+                // $langs->loadLangs(array('main', 'errors'));
 
 				$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorBadLoginPassword");
 			}

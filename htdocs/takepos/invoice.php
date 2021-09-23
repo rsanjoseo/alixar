@@ -52,7 +52,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
 global $mysoc;
 
-$langs->loadLangs(array("companies", "commercial", "bills", "cashdesk", "stocks", "banks"));
+// $langs->loadLangs(array("companies", "commercial", "bills", "cashdesk", "stocks", "banks"));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

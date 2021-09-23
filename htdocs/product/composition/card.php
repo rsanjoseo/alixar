@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'products', 'stocks'));
+// $langs->loadLangs(array('bills', 'products', 'stocks'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

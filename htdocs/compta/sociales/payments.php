@@ -44,7 +44,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('specialexpensesindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'bills', 'hrm'));
+// $langs->loadLangs(array('compta', 'bills', 'hrm'));
 
 $year = GETPOST("year", 'int');
 $search_sc_type = GETPOST('search_sc_type', 'int');

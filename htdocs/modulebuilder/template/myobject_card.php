@@ -81,7 +81,7 @@ dol_include_once('/mymodule/class/myobject.class.php');
 dol_include_once('/mymodule/lib/mymodule_myobject.lib.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("mymodule@mymodule", "other"));
+// $langs->loadLangs(array("mymodule@mymodule", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

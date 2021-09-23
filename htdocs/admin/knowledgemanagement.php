@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT."/knowledgemanagement/lib/knowledgemanagement.lib.php";
 
 // Translations
-$langs->loadLangs(array("admin", "knowledgemanagement"));
+// $langs->loadLangs(array("admin", "knowledgemanagement"));
 
 // Parameters
 $action = GETPOST('action', 'aZ09');

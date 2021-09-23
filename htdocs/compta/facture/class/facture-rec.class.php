@@ -1232,7 +1232,7 @@ class FactureRec extends CommonInvoice
 		$nb_create = 0;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("main", "bills"));
+        // $langs->loadLangs(array("main", "bills"));
 
 		$now = dol_now();
 		$tmparray = dol_getdate($now);

@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/prelevement/class/ligneprelevement.class
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'withdrawals', 'companies', 'categories'));
+// $langs->loadLangs(array('banks', 'withdrawals', 'companies', 'categories'));
 
 $action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)

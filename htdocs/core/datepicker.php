@@ -58,7 +58,7 @@ if (GETPOST('lang', 'aZ09')) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("main", "agenda"));
+// $langs->loadLangs(array("main", "agenda"));
 
 $right = ($langs->trans("DIRECTION") == 'rtl' ? 'left' : 'right');
 $left = ($langs->trans("DIRECTION") == 'rtl' ? 'right' : 'left');

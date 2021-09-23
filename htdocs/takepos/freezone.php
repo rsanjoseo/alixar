@@ -49,7 +49,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
 global $mysoc;
 
-$langs->loadLangs(array("bills", "cashdesk"));
+// $langs->loadLangs(array("bills", "cashdesk"));
 
 $place = (GETPOST('place', 'aZ09') ? GETPOST('place', 'aZ09') : '0'); // $place is id of table for Bar or Restaurant
 

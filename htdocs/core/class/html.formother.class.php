@@ -1275,7 +1275,7 @@ class FormOther
 
         if ($nbboxactivated) {
             // Load translation files required by the page
-            //            $langs->loadLangs(["boxes", "projects"]);
+            //            // $langs->loadLangs(["boxes", "projects"]);
 
             $emptybox = new ModeleBoxes($db);
 

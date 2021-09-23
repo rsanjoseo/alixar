@@ -153,7 +153,7 @@ if (GETPOST('viewday', 'int') || GETPOST('action', 'alpha') == 'show_day') {
 $object = new ActionComm($db);
 
 // Load translation files required by the page
-$langs->loadLangs(array('agenda', 'other', 'commercial'));
+// $langs->loadLangs(array('agenda', 'other', 'commercial'));
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('agenda'));

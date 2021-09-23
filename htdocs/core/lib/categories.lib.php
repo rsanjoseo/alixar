@@ -34,7 +34,7 @@ function categories_prepare_head(Categorie $object, $type)
 	global $langs, $conf, $user;
 
 	// Load translation files required by the page
-	$langs->loadLangs(array('categories', 'products'));
+    // $langs->loadLangs(array('categories', 'products'));
 
 	$h = 0;
 	$head = array();

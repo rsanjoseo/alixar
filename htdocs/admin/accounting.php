@@ -32,7 +32,7 @@ $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminaccoutant'; // To manage different context of search
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'companies', 'accountancy'));
+// $langs->loadLangs(array('admin', 'companies', 'accountancy'));
 
 if (!$user->admin) {
 	accessforbidden();

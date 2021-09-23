@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once '../lib/partnership.lib.php';
 
 // Translations
-$langs->loadLangs(array("errors", "admin", "partnership@partnership"));
+// $langs->loadLangs(array("errors", "admin", "partnership@partnership"));
 
 // Access control
 if (!$user->admin) {

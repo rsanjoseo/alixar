@@ -263,7 +263,7 @@ class modMrp extends DolibarrModules
 		/* BEGIN MODULEBUILDER TOPMENU */
 		/* END MODULEBUILDER LEFTMENU MO */
 
-		$langs->loadLangs(array("mrp", "stocks"));
+		// $langs->loadLangs(array("mrp", "stocks"));
 
 		// Exports profiles provided by this module
 		$r = 1;

@@ -44,7 +44,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'companies', 'compta', 'admin', 'other', 'products', 'banks'));
+// $langs->loadLangs(array('bills', 'companies', 'compta', 'admin', 'other', 'products', 'banks'));
 
 $action     = GETPOST('action', 'alpha');
 $massaction = GETPOST('massaction', 'alpha');
@@ -1332,7 +1332,7 @@ if ($action == 'create') {
 				print '</td><td>';
 				if ($action == 'editmulticurrencyrate' || $action == 'actualizemulticurrencyrate') {
 					if ($action == 'actualizemulticurrencyrate') {
-						list($object->fk_multicurrency, $object->multicurrency_tx) = MultiCurrency::getIdAndTxFromCode($object->db, $object->multicurrency_code);
+						[$object->fk_multicurrency, $object->multicurrency_tx] = MultiCurrency::getIdAndTxFromCode($object->db, $object->multicurrency_code);
 					}
 					$form->form_multicurrency_rate($_SERVER['PHP_SELF'].'?id='.$object->id, $object->multicurrency_tx, ($usercancreate ? 'multicurrency_tx' : 'none'), $object->multicurrency_code);
 				} else {

@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/treeview.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
-$langs->loadLangs(array("main"), "categories", "takepos", "printing");
+// $langs->loadLangs(array("main"), "categories", "takepos", "printing");
 
 if (!$user->rights->categorie->lire) {
 	accessforbidden();

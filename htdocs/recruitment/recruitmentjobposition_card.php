@@ -80,7 +80,7 @@ dol_include_once('/recruitment/class/recruitmentjobposition.class.php');
 dol_include_once('/recruitment/lib/recruitment_recruitmentjobposition.lib.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("recruitment", "other"));
+// $langs->loadLangs(array("recruitment", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');
@@ -543,8 +543,8 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		// Show link to public job page
 		if ($object->status != RecruitmentJobPosition::STATUS_DRAFT) {
 			print '<br><!-- Link to go on public job page -->'."\n";
-			// Load translation files required by the page
-			$langs->loadLangs(array('recruitment'));
+            // Load translation files required by the page
+            // $langs->loadLangs(array('recruitment'));
 
 			$out = img_picto('', 'globe').' <span class="opacitymedium">'.$langs->trans("PublicUrl").'</span><br>';
 

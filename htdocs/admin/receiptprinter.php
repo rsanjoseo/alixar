@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/receiptprinter.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/dolreceiptprinter.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "receiptprinter"));
+// $langs->loadLangs(array("admin", "receiptprinter"));
 
 if (!$user->admin) {
 	accessforbidden();
@@ -482,7 +482,7 @@ if ($mode == 'template' && $user->admin) {
 	print '<th>'.$langs->trans("Description").'</th>';
 	print "</tr>\n";
 
-	$langs->loadLangs(array("bills", "companies"));
+    // $langs->loadLangs(array("bills", "companies"));
 	foreach ($printer->tags as $key => $val) {
 		print '<tr class="oddeven">';
 		print '<td>{'.$key.'}</td><td>'.$langs->trans($val).'</td>';

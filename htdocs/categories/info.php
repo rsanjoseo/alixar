@@ -33,7 +33,7 @@ if (!$user->rights->categorie->lire) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('categories', 'sendings'));
+// $langs->loadLangs(array('categories', 'sendings'));
 
 $socid = 0;
 $id = GETPOST('id', 'int');

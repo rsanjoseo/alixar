@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'companies'));
+// $langs->loadLangs(array('banks', 'categories', 'companies'));
 
 $id = GETPOST("rowid", 'int');
 $ref = GETPOST('ref', 'alpha');

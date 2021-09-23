@@ -50,7 +50,7 @@ $ref = GETPOST('ref', 'alpha');
 $fuserid = (GETPOST('fuserid', 'int') ?GETPOST('fuserid', 'int') : $user->id);
 
 // Load translation files required by the page
-$langs->loadLangs(array("other", "holiday", "mails", "trips"));
+// $langs->loadLangs(array("other", "holiday", "mails", "trips"));
 
 $error = 0;
 

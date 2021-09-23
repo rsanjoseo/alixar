@@ -57,7 +57,7 @@ $startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 :
 $endyear = $year;
 
 // Load translation files required by the page
-$langs->loadLangs(array('orders', 'companies', 'other', 'suppliers', 'supplier_proposal'));
+// $langs->loadLangs(array('orders', 'companies', 'other', 'suppliers', 'supplier_proposal'));
 
 if ($mode == 'customer' && !$user->rights->propale->lire) {
 	accessforbidden();
@@ -76,7 +76,7 @@ $formpropal = new FormPropal($db);
 $formcompany = new FormCompany($db);
 $formother = new FormOther($db);
 
-$langs->loadLangs(array('propal', 'other', 'companies'));
+// $langs->loadLangs(array('propal', 'other', 'companies'));
 
 if ($mode == 'customer') {
 	$picto = 'propal';

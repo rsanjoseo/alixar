@@ -34,7 +34,7 @@ $urlwithroot = $urlwithouturlroot.DOL_URL_ROOT; // This is to use external domai
 //$urlwithroot=DOL_MAIN_URL_ROOT;					// This is to use same domain name than current
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'oauth'));
+// $langs->loadLangs(array('admin', 'oauth'));
 
 // Security check
 if (!$user->admin) {

@@ -49,7 +49,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("trips", "bills", "mails"));
+// $langs->loadLangs(array("trips", "bills", "mails"));
 
 $action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel', 'alpha');

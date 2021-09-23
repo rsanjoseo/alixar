@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/tva/class/tva.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/deplacement/class/deplacement.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'users', 'trips'));
+// $langs->loadLangs(array('companies', 'users', 'trips'));
 
 // Security check
 $socid = GETPOST('socid', 'int');

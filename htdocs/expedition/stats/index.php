@@ -45,7 +45,7 @@ $startyear = $year - (empty($conf->global->MAIN_STATS_GRAPHS_SHOW_N_YEARS) ? 2 :
 $endyear = $year;
 
 // Load translation files required by the page
-$langs->loadLangs(array('sendings', 'other', 'companies'));
+// $langs->loadLangs(array('sendings', 'other', 'companies'));
 
 // Security check
 if ($user->socid) {

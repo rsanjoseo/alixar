@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/bankcateg.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories'));
+// $langs->loadLangs(array('banks', 'categories'));
 
 $action = GETPOST('action', 'aZ09');
 $optioncss = GETPOST('optioncss', 'aZ'); // Option for the css output (always '' except when 'print')

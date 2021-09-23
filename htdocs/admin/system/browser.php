@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/memory.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("install", "other", "admin"));
+// $langs->loadLangs(array("install", "other", "admin"));
 
 if (!$user->admin) {
 	accessforbidden();

@@ -48,7 +48,7 @@ if (!isset($action)) {
 }
 include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 
-$langs->loadLangs(array("main", "cashdesk", "companies"));
+// $langs->loadLangs(array("main", "cashdesk", "companies"));
 
 $place = (GETPOST('place', 'aZ09') ? GETPOST('place', 'aZ09') : 0); // $place is id of table for Bar or Restaurant
 

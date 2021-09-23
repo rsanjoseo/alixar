@@ -40,7 +40,7 @@ $WIDTH = DolGraph::getDefaultGraphSizeForStats('width');
 $HEIGHT = DolGraph::getDefaultGraphSizeForStats('height');
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'companies', 'other'));
+// $langs->loadLangs(array('bills', 'companies', 'other'));
 
 $mode = GETPOST("mode") ?GETPOST("mode") : 'customer';
 if ($mode == 'customer' && !$user->rights->facture->lire) {

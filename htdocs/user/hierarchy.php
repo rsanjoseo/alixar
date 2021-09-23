@@ -34,7 +34,7 @@ if (!$user->rights->user->user->lire && !$user->admin) {
 }
 
 // Load translation files required by page
-$langs->loadLangs(array('users', 'companies'));
+// $langs->loadLangs(array('users', 'companies'));
 
 // Security check (for external users)
 $socid = 0;

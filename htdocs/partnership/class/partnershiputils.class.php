@@ -73,7 +73,7 @@ class PartnershipUtils
 		$partnership = new Partnership($this->db);
 		$MAXPERCALL = (empty($conf->global->PARTNERSHIP_MAX_EXPIRATION_CANCEL_PER_CALL) ? 25 : $conf->global->PARTNERSHIP_MAX_EXPIRATION_CANCEL_PER_CALL); // Limit to 25 per call
 
-		$langs->loadLangs(array("partnership", "member"));
+		// $langs->loadLangs(array("partnership", "member"));
 
 		$error = 0;
 		$erroremail = '';
@@ -224,7 +224,7 @@ class PartnershipUtils
 		$partnership = new Partnership($this->db);
 		$MAXPERCALL = (empty($conf->global->PARTNERSHIP_MAX_WARNING_BACKLINK_PER_CALL) ? 10 : $conf->global->PARTNERSHIP_MAX_WARNING_BACKLINK_PER_CALL); // Limit to 10 per call
 
-		$langs->loadLangs(array("partnership", "member"));
+        // $langs->loadLangs(array("partnership", "member"));
 
 		$error = 0;
 		$erroremail = '';

@@ -63,7 +63,7 @@ if (!empty($conf->paypal->enabled)) {
 
 global $dolibarr_main_instance_unique_id;
 
-$langs->loadLangs(array("main", "other", "dict", "bills", "companies", "paybox", "paypal"));
+// $langs->loadLangs(array("main", "other", "dict", "bills", "companies", "paybox", "paypal"));
 
 // Clean parameters
 if (!empty($conf->paypal->enabled)) {

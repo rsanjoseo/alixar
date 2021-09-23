@@ -29,7 +29,7 @@ if (!empty($conf->banque->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("bills", "banks", "companies", "loan"));
+// $langs->loadLangs(array("bills", "banks", "companies", "loan"));
 
 // Security check
 $id = GETPOST("id", 'int');

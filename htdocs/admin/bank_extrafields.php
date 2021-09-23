@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/bank.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'admin'));
+// $langs->loadLangs(array('banks', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

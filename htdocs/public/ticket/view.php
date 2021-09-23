@@ -51,7 +51,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "other", "ticket"));
+// $langs->loadLangs(array("companies", "other", "ticket"));
 
 // Get parameters
 $track_id = GETPOST('track_id', 'alpha');

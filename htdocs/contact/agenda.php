@@ -45,7 +45,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'users', 'other', 'commercial'));
+// $langs->loadLangs(array('companies', 'users', 'other', 'commercial'));
 
 $mesg = ''; $error = 0; $errors = array();
 

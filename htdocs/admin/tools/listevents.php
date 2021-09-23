@@ -42,7 +42,7 @@ if ($user->socid > 0) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "admin", "users", "other","withdrawals"));
+// $langs->loadLangs(array("companies", "admin", "users", "other","withdrawals"));
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;

@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/mrp/lib/mrp_mo.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/bom/class/bom.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("mrp", "other"));
+// $langs->loadLangs(array("mrp", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

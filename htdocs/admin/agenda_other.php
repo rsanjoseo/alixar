@@ -37,7 +37,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'other', 'agenda', 'users'));
+// $langs->loadLangs(array('admin', 'other', 'agenda', 'users'));
 
 $action = GETPOST('action', 'aZ09');
 $value = GETPOST('value', 'alpha');

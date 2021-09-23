@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/class/knowledgerecord.class
 require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/lib/knowledgemanagement_knowledgerecord.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("knowledgemanagement", "companies", "other", "mails"));
+// $langs->loadLangs(array("knowledgemanagement", "companies", "other", "mails"));
 
 
 $action = GETPOST('action', 'aZ09');

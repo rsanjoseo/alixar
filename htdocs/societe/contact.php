@@ -46,7 +46,7 @@ if (!empty($conf->adherent->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 }
 
-$langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
+// $langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
 if (!empty($conf->categorie->enabled)) {
 	$langs->load("categories");
 }

@@ -28,7 +28,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/loan/class/loan.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("loan", "compta", "banks", "bills"));
+// $langs->loadLangs(array("loan", "compta", "banks", "bills"));
 
 // Security check
 $socid = GETPOST('socid', 'int');

@@ -25,7 +25,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
 require_once '../lib/datapolicy.lib.php';
 
 // Translations
-$langs->loadLangs(array('admin', 'companies', 'members', 'datapolicy'));
+// $langs->loadLangs(array('admin', 'companies', 'members', 'datapolicy'));
 
 
 // Parameters

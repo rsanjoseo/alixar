@@ -38,7 +38,7 @@ if (!empty($conf->product->enabled) || !empty($conf->service->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('resource', 'other', 'interventions'));
+// $langs->loadLangs(array('resource', 'other', 'interventions'));
 
 /*
 $sortorder                      = GETPOST('sortorder','alpha');

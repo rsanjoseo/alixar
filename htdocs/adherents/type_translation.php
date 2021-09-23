@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent_type.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('members', 'languages'));
+// $langs->loadLangs(array('members', 'languages'));
 
 $id = GETPOST('rowid', 'int');
 $action = GETPOST('action', 'aZ09');

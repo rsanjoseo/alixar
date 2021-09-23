@@ -48,7 +48,7 @@ if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'bills', 'companies', 'other'));
+// $langs->loadLangs(array('products', 'bills', 'companies', 'other'));
 
 $error = 0;
 $errors = array();

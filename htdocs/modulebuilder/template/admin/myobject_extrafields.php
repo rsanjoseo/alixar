@@ -58,7 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once '../lib/mymodule.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('mymodule@mymodule', 'admin'));
+// $langs->loadLangs(array('mymodule@mymodule', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

@@ -34,7 +34,7 @@ if (!empty($conf->ldap->enabled)) {
 }
 
 // Load translation files required by page
-$langs->loadLangs(array('errors', 'users', 'companies', 'ldap', 'other'));
+// $langs->loadLangs(array('errors', 'users', 'companies', 'ldap', 'other'));
 
 // Security check
 if (!empty($conf->global->MAIN_SECURITY_DISABLEFORGETPASSLINK)) {

@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.facture.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/discount.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(['orders', 'bills', 'companies']);
+// $langs->loadLangs(['orders', 'bills', 'companies']);
 
 $id = GETPOST('id', 'int');
 

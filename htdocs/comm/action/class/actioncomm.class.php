@@ -387,7 +387,7 @@ class ActionComm extends CommonObject
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct(DoliDB $db)
+    public function __construct($db)
     {
         $this->db = $db;
     }

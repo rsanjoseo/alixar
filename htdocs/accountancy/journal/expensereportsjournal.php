@@ -39,7 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 require_once DOL_DOCUMENT_ROOT.'/accountancy/class/bookkeeping.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("commercial", "compta", "bills", "other", "accountancy", "trips", "errors"));
+// $langs->loadLangs(array("commercial", "compta", "bills", "other", "accountancy", "trips", "errors"));
 
 $id_journal = GETPOST('id_journal', 'int');
 $action = GETPOST('action', 'aZ09');

@@ -128,7 +128,7 @@ class pdf_canelle extends ModelePDFSuppliersInvoices
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills"));
+        // $langs->loadLangs(array("main", "bills"));
 
 		$this->db = $db;
 		$this->name = "canelle";

@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT."/core/class/html.formfile.class.php";
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'companies', 'other'));
+// $langs->loadLangs(array('banks', 'companies', 'other'));
 
 $id = (GETPOST('id', 'int') ? GETPOST('id', 'int') : GETPOST('account', 'int'));
 $ref = GETPOST('ref', 'alpha');

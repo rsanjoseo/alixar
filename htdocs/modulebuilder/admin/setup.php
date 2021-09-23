@@ -24,7 +24,7 @@ require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 global $conf, $langs, $user, $db;
-$langs->loadLangs(array("admin", "other", "modulebuilder"));
+// $langs->loadLangs(array("admin", "other", "modulebuilder"));
 
 if (!$user->admin || empty($conf->modulebuilder->enabled)) {
 	accessforbidden();

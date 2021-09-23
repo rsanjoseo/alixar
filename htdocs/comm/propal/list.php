@@ -48,9 +48,9 @@ require_once DOL_DOCUMENT_ROOT.'/comm/propal/class/propal.class.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'propal', 'compta', 'bills', 'orders', 'products', 'deliveries', 'categories'));
+// $langs->loadLangs(array('companies', 'propal', 'compta', 'bills', 'orders', 'products', 'deliveries', 'categories'));
 if (!empty($conf->expedition->enabled)) {
-	$langs->loadLangs(array('sendings'));
+    // $langs->loadLangs(array('sendings'));
 }
 
 $socid = GETPOST('socid', 'int');

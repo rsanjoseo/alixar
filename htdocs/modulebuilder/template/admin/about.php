@@ -56,7 +56,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once '../lib/mymodule.lib.php';
 
 // Translations
-$langs->loadLangs(array("errors", "admin", "mymodule@mymodule"));
+// $langs->loadLangs(array("errors", "admin", "mymodule@mymodule"));
 
 // Access control
 if (!$user->admin) {

@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/accountancy/class/accountingaccount.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formaccounting.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "admin", "accountancy", "salaries"));
+// $langs->loadLangs(array("compta", "bills", "admin", "accountancy", "salaries"));
 
 $mesg = '';
 $action = GETPOST('action', 'aZ09');

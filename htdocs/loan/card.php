@@ -38,7 +38,7 @@ require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "loan"));
+// $langs->loadLangs(array("compta", "bills", "loan"));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');
@@ -312,8 +312,8 @@ if ($action == 'create') {
 	if (!empty($conf->projet->enabled)) {
 		$formproject = new FormProjets($db);
 
-		// Projet associe
-		$langs->loadLangs(array("projects"));
+        // Projet associe
+        // $langs->loadLangs(array("projects"));
 
 		print '<tr><td>'.$langs->trans("Project").'</td><td>';
 
@@ -425,7 +425,7 @@ if ($id > 0) {
 		$morehtmlref .= $form->editfieldval("Label", 'label', $object->label, $object, $user->rights->loan->write, 'string', '', null, null, '', 1);
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->loadLangs(array("projects"));
+            // $langs->loadLangs(array("projects"));
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($user->rights->loan->write) {
 				if ($action != 'classify') {

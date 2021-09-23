@@ -80,7 +80,7 @@ if (!$user->rights->holiday->readall) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('users', 'other', 'holiday'));
+// $langs->loadLangs(array('users', 'other', 'holiday'));
 
 // Initialize technical objects
 $object = new Holiday($db);

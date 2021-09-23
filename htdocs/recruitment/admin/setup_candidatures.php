@@ -58,7 +58,7 @@ require_once DOL_DOCUMENT_ROOT.'/recruitment/lib/recruitment.lib.php';
 require_once DOL_DOCUMENT_ROOT."/recruitment/class/recruitmentjobposition.class.php";
 
 // Translations
-$langs->loadLangs(array("admin", "recruitment"));
+// $langs->loadLangs(array("admin", "recruitment"));
 
 // Access control
 if (!$user->admin) {

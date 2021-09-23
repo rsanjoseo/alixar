@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 require_once './lib/replenishment.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks', 'orders'));
+// $langs->loadLangs(array('products', 'stocks', 'orders'));
 
 // Security check
 if ($user->socid) {

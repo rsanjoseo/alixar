@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/dynamic_price/class/price_global_variab
 require_once DOL_DOCUMENT_ROOT.'/product/dynamic_price/class/price_parser.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'accountancy')); //"Back" translation is on this accountancy file
+// $langs->loadLangs(array('products', 'accountancy')); //"Back" translation is on this accountancy file
 
 $id = GETPOST('id', 'int');
 $eid = GETPOST('eid', 'int');

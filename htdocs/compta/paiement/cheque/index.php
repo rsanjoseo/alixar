@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/paiement/cheque/class/remisecheque.class
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'compta', 'bills'));
+// $langs->loadLangs(array('banks', 'categories', 'compta', 'bills'));
 
 // Security check
 if ($user->socid) {

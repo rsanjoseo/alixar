@@ -63,17 +63,17 @@ class InterfaceStripe extends DolibarrTriggers
 	 * @param 	Conf 			$conf 		Object conf
 	 * @return 	int              			<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		// Put here code you want to execute when a Dolibarr business event occurs.
-		// Data and type of action are stored into $object and $action
-		global $langs, $db, $conf;
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        // Put here code you want to execute when a Dolibarr business event occurs.
+        // Data and type of action are stored into $object and $action
+        global $langs, $db, $conf;
 
-		if (empty($conf->stripe) || empty($conf->stripe->enabled)) {
-			return 0;
-		}
+        if (empty($conf->stripe) || empty($conf->stripe->enabled)) {
+            return 0;
+        }
 
-		require_once DOL_DOCUMENT_ROOT.'/stripe/class/stripe.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/stripe/class/stripe.class.php';
 		$stripe = new Stripe($db);
 
 		$ok = 1;

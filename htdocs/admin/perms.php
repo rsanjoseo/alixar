@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'users', 'other'));
+// $langs->loadLangs(array('admin', 'users', 'other'));
 
 $action = GETPOST('action', 'aZ09');
 

@@ -231,7 +231,7 @@ function pHeader($soutitre, $next, $action = 'none')
 {
 	global $conf, $langs;
 
-	$langs->loadLangs(array("main", "admin"));
+	// $langs->loadLangs(array("main", "admin"));
 
 	// On force contenu dans format sortie
 	header("Content-type: text/html; charset=".$conf->file->character_set_client);

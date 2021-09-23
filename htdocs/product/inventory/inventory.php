@@ -30,7 +30,7 @@ include_once DOL_DOCUMENT_ROOT.'/product/inventory/lib/inventory.lib.php';
 include_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("stocks", "other", "productbatch"));
+// $langs->loadLangs(array("stocks", "other", "productbatch"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

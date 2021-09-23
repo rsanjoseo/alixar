@@ -34,7 +34,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('suppliersproposalsindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('supplier_proposal', 'companies'));
+// $langs->loadLangs(array('supplier_proposal', 'companies'));
 
 // Security check
 $socid = GETPOST('socid', 'int');

@@ -80,13 +80,13 @@ function check_user_password_openid($usertotest, $passwordtotest, $entitytotest)
 					$now = dol_now();
 					if ($obj->datestartvalidity && $db->jdate($obj->datestartvalidity) > $now) {
 						// Load translation files required by the page
-						$langs->loadLangs(array('main', 'errors'));
+                        // $langs->loadLangs(array('main', 'errors'));
 						$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 						return '--bad-login-validity--';
 					}
 					if ($obj->dateendvalidity && $db->jdate($obj->dateendvalidity) < dol_get_first_hour($now)) {
-						// Load translation files required by the page
-						$langs->loadLangs(array('main', 'errors'));
+                        // Load translation files required by the page
+                        // $langs->loadLangs(array('main', 'errors'));
 						$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 						return '--bad-login-validity--';
 					}

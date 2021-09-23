@@ -57,7 +57,7 @@ class box_project extends ModeleBoxes
 		global $user, $langs;
 
 		// Load translation files required by the page
-        //		$langs->loadLangs(array('boxes', 'projects'));
+        //		// $langs->loadLangs(array('boxes', 'projects'));
 
 		$this->db = $db;
 		$this->boxlabel = "OpenedProjects";

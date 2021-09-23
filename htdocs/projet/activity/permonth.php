@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/holiday/class/holiday.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'users', 'companies'));
+// $langs->loadLangs(array('projects', 'users', 'companies'));
 $hookmanager->initHooks(array('timesheetpermonthcard'));
 
 $action = GETPOST('action', 'aZ09');

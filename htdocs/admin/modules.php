@@ -41,7 +41,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/admin/dolistore/class/dolistore.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(["errors", "admin", "modulebuilder"]);
+// $langs->loadLangs(["errors", "admin", "modulebuilder"]);
 
 $mode = GETPOSTISSET('mode') ? GETPOST('mode', 'alpha') : (empty($conf->global->MAIN_MODULE_SETUP_ON_LIST_BY_DEFAULT) ? 'commonkanban' : 'common');
 if (empty($mode)) {
@@ -451,7 +451,7 @@ if ($action == 'reset_confirm' && $user->admin) {
 		$objMod = $modules[$value];
 
 		if (!empty($objMod->langfiles)) {
-			$langs->loadLangs($objMod->langfiles);
+            // $langs->loadLangs($objMod->langfiles);
 		}
 
 		$form = new Form($db);

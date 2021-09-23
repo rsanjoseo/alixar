@@ -38,7 +38,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('expensereportindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'users', 'trips'));
+// $langs->loadLangs(array('companies', 'users', 'trips'));
 
 // Security check
 $socid = GETPOST('socid', 'int');

@@ -59,7 +59,7 @@ if (!empty($conf->paypal->enabled)) {
 
 global $dolibarr_main_instance_unique_id, $dolibarr_main_url_root, $mysoc;
 
-$langs->loadLangs(array("main", "companies", "install", "other", "eventorganization"));
+// $langs->loadLangs(array("main", "companies", "install", "other", "eventorganization"));
 
 $object = new stdClass(); // For triggers
 

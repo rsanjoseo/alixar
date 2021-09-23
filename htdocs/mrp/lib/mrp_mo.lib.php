@@ -31,7 +31,7 @@ function moPrepareHead($object)
 {
 	global $db, $langs, $conf;
 
-	$langs->loadLangs(array("mrp", "stocks"));
+	// $langs->loadLangs(array("mrp", "stocks"));
 
 	$h = 0;
 	$head = array();

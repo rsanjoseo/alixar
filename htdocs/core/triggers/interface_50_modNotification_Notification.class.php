@@ -79,17 +79,17 @@ class InterfaceNotification extends DolibarrTriggers
 	 * @param conf		    $conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (empty($conf->notification) || empty($conf->notification->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (empty($conf->notification) || empty($conf->notification->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
 
-		require_once DOL_DOCUMENT_ROOT.'/core/class/notify.class.php';
-		$notify = new Notify($this->db);
+        require_once DOL_DOCUMENT_ROOT . '/core/class/notify.class.php';
+        $notify = new Notify($this->db);
 
-		if (!in_array($action, $notify->arrayofnotifsupported)) {
-			return 0;
+        if (!in_array($action, $notify->arrayofnotifsupported)) {
+            return 0;
 		}
 
 		dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);

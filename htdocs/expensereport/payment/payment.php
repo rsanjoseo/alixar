@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/expensereport/class/paymentexpensereport.class.
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'banks', 'trips'));
+// $langs->loadLangs(array('bills', 'banks', 'trips'));
 
 $id = GETPOST("id", 'int');
 $ref = GETPOST('ref', 'alpha');

@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/ldap.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/ldap.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'ldap'));
+// $langs->loadLangs(array('companies', 'ldap'));
 $langs->load("admin");
 
 $action = GETPOST('action', 'aZ09');

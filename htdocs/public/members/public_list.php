@@ -53,7 +53,7 @@ if (empty($conf->adherent->enabled)) {
 }
 
 
-$langs->loadLangs(array("main", "members", "companies", "other"));
+// $langs->loadLangs(array("main", "members", "companies", "other"));
 
 
 /**

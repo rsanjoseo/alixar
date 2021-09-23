@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/fiscalyear.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/fiscalyear.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "compta"));
+// $langs->loadLangs(array("admin", "compta"));
 
 // Security check
 if ($user->socid > 0) {

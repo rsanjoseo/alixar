@@ -66,7 +66,7 @@ class mod_commande_fournisseur_orchidee extends ModeleNumRefSuppliersOrders
 		global $db, $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("bills", "admin"));
+        // $langs->loadLangs(array("bills", "admin"));
 
 		$form = new Form($db);
 

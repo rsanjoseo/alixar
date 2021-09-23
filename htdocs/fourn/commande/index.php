@@ -43,7 +43,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('orderssuppliersindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array("suppliers", "orders"));
+// $langs->loadLangs(array("suppliers", "orders"));
 
 
 /*

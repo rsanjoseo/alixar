@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php";
 require_once DOL_DOCUMENT_ROOT.'/zapier/lib/zapier.lib.php';
 
 // Translations
-$langs->loadLangs(array("admin", "zapier"));
+// $langs->loadLangs(array("admin", "zapier"));
 
 // Access control
 if (!$user->admin) {

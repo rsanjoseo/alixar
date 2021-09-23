@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "banks", "bills", "users", "accountancy"));
+// $langs->loadLangs(array("compta", "banks", "bills", "users", "accountancy"));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

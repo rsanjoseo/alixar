@@ -38,7 +38,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('agenda', 'admin', 'other'));
+// $langs->loadLangs(array('agenda', 'admin', 'other'));
 
 $def = array();
 $action = GETPOST('action', 'alpha');

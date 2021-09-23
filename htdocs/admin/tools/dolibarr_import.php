@@ -29,7 +29,7 @@ if (!defined('CSRFCHECK_WITH_TOKEN')) {
 require '../../main.inc.php';
 
 // Load translation files required by the page
-$langs->loadLangs(["other", "admin"]);
+// $langs->loadLangs(["other", "admin"]);
 
 if (!$user->admin) {
 	accessforbidden();

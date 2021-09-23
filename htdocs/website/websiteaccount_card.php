@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/societe/class/societeaccount.class.php';
 require_once DOL_DOCUMENT_ROOT.'/website/lib/websiteaccount.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("website", "other"));
+// $langs->loadLangs(array("website", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

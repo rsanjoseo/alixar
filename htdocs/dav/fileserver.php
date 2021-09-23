@@ -59,7 +59,7 @@ if (isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] != '') {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("main", "other"));
+// $langs->loadLangs(array("main", "other"));
 
 
 if (empty($conf->dav->enabled)) {

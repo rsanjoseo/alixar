@@ -34,7 +34,7 @@ if (!$user->admin) {
 	accessforbidden();
 }
 
-$langs->loadLangs(array("admin", "cashdesk", "printing"));
+// $langs->loadLangs(array("admin", "cashdesk", "printing"));
 
 $res = 0;
 

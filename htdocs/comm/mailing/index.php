@@ -34,7 +34,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('mailingindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('commercial', 'orders', 'mails'));
+// $langs->loadLangs(array('commercial', 'orders', 'mails'));
 
 $object = new Mailing($db);
 

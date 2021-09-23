@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/trip.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('other', 'trips', 'companies', 'interventions'));
+// $langs->loadLangs(array('other', 'trips', 'companies', 'interventions'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

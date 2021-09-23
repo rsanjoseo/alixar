@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/ldap.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "errors"));
+// $langs->loadLangs(array("admin", "errors"));
 
 if (!$user->admin) {
 	accessforbidden();

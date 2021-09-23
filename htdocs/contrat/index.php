@@ -35,7 +35,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('contractindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'companies', 'contracts'));
+// $langs->loadLangs(array('products', 'companies', 'contracts'));
 
 $sortfield = GETPOST('sortfield', 'aZ09comma');
 $sortorder = GETPOST('sortorder', 'aZ09comma');

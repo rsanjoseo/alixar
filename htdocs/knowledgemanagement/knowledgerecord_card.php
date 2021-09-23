@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/lib/knowledgemanagement_kno
 require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("knowledgemanagement", "ticket", "other"));
+// $langs->loadLangs(array("knowledgemanagement", "ticket", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

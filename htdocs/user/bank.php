@@ -45,7 +45,7 @@ if (!empty($conf->salaries->enabled)) {
 }
 
 // Load translation files required by page
-$langs->loadLangs(array('companies', 'commercial', 'banks', 'bills', 'trips', 'holiday', 'salaries'));
+// $langs->loadLangs(array('companies', 'commercial', 'banks', 'bills', 'trips', 'holiday', 'salaries'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alphanohtml');

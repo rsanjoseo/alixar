@@ -43,7 +43,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks', 'companies', 'categories'));
+// $langs->loadLangs(array('products', 'stocks', 'companies', 'categories'));
 
 $action = GETPOST('action', 'aZ09');
 $cancel = GETPOST('cancel', 'alpha');

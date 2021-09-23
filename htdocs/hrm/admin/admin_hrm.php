@@ -25,7 +25,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/hrm.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'hrm'));
+// $langs->loadLangs(array('admin', 'hrm'));
 
 $action = GETPOST('action', 'aZ09');
 

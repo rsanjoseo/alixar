@@ -43,7 +43,7 @@ if (!empty($conf->categorie->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'accountancy', 'compta'));
+// $langs->loadLangs(array('banks', 'categories', 'accountancy', 'compta'));
 
 $action = GETPOST('action', 'aZ09');
 $massaction = GETPOST('massaction', 'alpha');

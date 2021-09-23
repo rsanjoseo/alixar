@@ -76,7 +76,7 @@ class CommActionRapport
 		global $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("commercial", "projects"));
+        // $langs->loadLangs(array("commercial", "projects"));
 
 		$this->db = $db;
 		$this->description = "";

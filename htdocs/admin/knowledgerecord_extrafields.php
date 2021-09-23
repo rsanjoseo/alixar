@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/lib/knowledgemanagement.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('knowledgemanagement', 'admin'));
+// $langs->loadLangs(array('knowledgemanagement', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

@@ -100,7 +100,7 @@ if (!empty($conf->mrp->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'companies', 'suppliers', 'compta'));
+// $langs->loadLangs(array('projects', 'companies', 'suppliers', 'compta'));
 if (!empty($conf->facture->enabled)) {
 	$langs->load("bills");
 }
@@ -707,7 +707,7 @@ if (!$showdatefilter) {
 
 // Show balance for whole project
 
-$langs->loadLangs(array("suppliers", "bills", "orders", "proposals", "margins"));
+// $langs->loadLangs(array("suppliers", "bills", "orders", "proposals", "margins"));
 
 if (!empty($conf->stock->enabled)) {
 	$langs->load('stocks');

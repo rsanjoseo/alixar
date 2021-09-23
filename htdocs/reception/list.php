@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
-$langs->loadLangs(array("sendings", "receptions", "deliveries", 'companies', 'bills', 'orders'));
+// $langs->loadLangs(array("sendings", "receptions", "deliveries", 'companies', 'bills', 'orders'));
 
 $socid = GETPOST('socid', 'int');
 $massaction = GETPOST('massaction', 'alpha');

@@ -170,7 +170,7 @@ if (GETPOST('viewday', 'alpha') || $action == 'show_day') {
 }                                  // View by day
 
 // Load translation files required by the page
-$langs->loadLangs(array('users', 'agenda', 'other', 'commercial'));
+// $langs->loadLangs(array('users', 'agenda', 'other', 'commercial'));
 
 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
 $hookmanager->initHooks(array('agenda'));

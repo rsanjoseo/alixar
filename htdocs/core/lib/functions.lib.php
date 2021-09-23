@@ -4532,7 +4532,7 @@ function dol_print_error($db = '', $error = '', $errors = null)
     }
 
     // Load translation files required by the error messages
-    $langs->loadLangs(['main', 'errors']);
+    // $langs->loadLangs(['main', 'errors']);
 
     if ($_SERVER['DOCUMENT_ROOT']) {    // Mode web
         $out .= $langs->trans("DolibarrHasDetectedError") . ".<br>\n";
@@ -4637,7 +4637,7 @@ function dol_print_error($db = '', $error = '', $errors = null)
         if (empty($langs->defaultlang)) {
             $langs->setDefaultLang();
         }
-        $langs->loadLangs(["main", "errors"]); // Reload main because language may have been set only on previous line so we have to reload files we need.
+        // $langs->loadLangs(["main", "errors"]); // Reload main because language may have been set only on previous line so we have to reload files we need.
         // This should not happen, except if there is a bug somewhere. Enabled and check log in such case.
         print 'This website or feature is currently temporarly not available or failed after a technical error.<br><br>This may be due to a maintenance operation. Current status of operation (' . dol_print_date(dol_now(), 'dayhourrfc') . ') are on next line...<br><br>' . "\n";
         print $langs->trans("DolibarrHasDetectedError") . '. ';
@@ -7782,7 +7782,7 @@ function get_htmloutput_mesg($mesgstring = '', $mesgarray = '', $style = 'ok', $
     }
 
     if ((is_array($mesgarray) && count($mesgarray)) || $mesgstring) {
-        $langs->load("errors");
+        //        $langs->load("errors");
         $out .= $divstart;
         if (is_array($mesgarray) && count($mesgarray)) {
             foreach ($mesgarray as $message) {

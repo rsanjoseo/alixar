@@ -39,7 +39,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'other', 'sendings'));
+// $langs->loadLangs(array('admin', 'other', 'sendings'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

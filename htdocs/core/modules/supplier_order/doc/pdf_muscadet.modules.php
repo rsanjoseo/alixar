@@ -130,7 +130,7 @@ class pdf_muscadet extends ModelePDFSuppliersOrders
 		global $conf, $langs, $mysoc;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("main", "bills"));
+        // $langs->loadLangs(array("main", "bills"));
 
 		$this->db = $db;
 		$this->name = "muscadet";

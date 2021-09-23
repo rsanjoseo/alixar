@@ -49,13 +49,13 @@ function check_user_password_http($usertotest, $passwordtotest, $entitytotest)
 		$now = dol_now();
 		if ($tmpuser->datestartvalidity && $db->jdate($tmpuser->datestartvalidity) >= $now) {
 			// Load translation files required by the page
-			$langs->loadLangs(array('main', 'errors'));
+            // $langs->loadLangs(array('main', 'errors'));
 			$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 			return '--bad-login-validity--';
 		}
 		if ($tmpuser->dateendvalidity && $db->jdate($tmpuser->dateendvalidity) <= dol_get_first_hour($now)) {
-			// Load translation files required by the page
-			$langs->loadLangs(array('main', 'errors'));
+            // Load translation files required by the page
+            // $langs->loadLangs(array('main', 'errors'));
 			$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorLoginDateValidity");
 			return '--bad-login-validity--';
 		}

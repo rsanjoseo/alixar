@@ -141,7 +141,7 @@ class pdf_eratosthene extends ModelePDFCommandes
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills", "products"));
+        // $langs->loadLangs(array("main", "bills", "products"));
 
 		$this->db = $db;
 		$this->name = "eratosthene";

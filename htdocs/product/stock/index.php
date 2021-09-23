@@ -36,7 +36,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('stockindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('stocks', 'productbatch'));
+// $langs->loadLangs(array('stocks', 'productbatch'));
 
 // Security check
 $result = restrictedArea($user, 'stock');

@@ -30,7 +30,7 @@ if (empty($user->admin)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("install", "other", "admin"));
+// $langs->loadLangs(array("install", "other", "admin"));
 
 $optioncss = GETPOST('optioncss', 'alpha');
 $contextpage		= GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'moduleoverview';

@@ -34,7 +34,7 @@ $hookmanager = new HookManager($db);
 // Initialize technical object to manage hooks. Note that conf->hooks_modules contains array
 $hookmanager->initHooks(array('receptionindex'));
 
-$langs->loadLangs(array("orders", "receptions"));
+// $langs->loadLangs(array("orders", "receptions"));
 
 $reception = new Reception($db);
 

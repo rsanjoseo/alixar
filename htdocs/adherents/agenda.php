@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent_type.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "members"));
+// $langs->loadLangs(array("companies", "members"));
 
 $id = GETPOST('id', 'int') ?GETPOST('id', 'int') : GETPOST('rowid', 'int');
 

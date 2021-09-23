@@ -20,7 +20,7 @@ require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php';
 
-$langs->loadLangs(array("admin", "products"));
+// $langs->loadLangs(array("admin", "products"));
 
 $action = GETPOST('action', 'alphanohtml');
 

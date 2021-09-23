@@ -53,7 +53,7 @@ $socid = 0;
 $result = restrictedArea($user, 'projet', $id, 'projet&project');
 
 // Load translation files required by the page
-$langs->loadlangs(array('users', 'projects'));
+// $langs->loadLangs(array('users', 'projects'));
 
 
 /*

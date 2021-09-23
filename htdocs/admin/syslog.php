@@ -34,7 +34,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "other"));
+// $langs->loadLangs(array("admin", "other"));
 
 $error = 0;
 $action = GETPOST('action', 'aZ09');

@@ -70,7 +70,7 @@ class mod_facture_fournisseur_tulip extends ModeleNumRefSuppliersInvoices
 		global $conf, $langs;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("bills", "admin"));
+        // $langs->loadLangs(array("bills", "admin"));
 
 		$form = new Form($this->db);
 

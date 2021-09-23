@@ -43,7 +43,7 @@ class pdf_paiement
 		global $langs, $conf;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("bills", "compta", "main"));
+        // $langs->loadLangs(array("bills", "compta", "main"));
 
 		$this->db = $db;
 		$this->description = $langs->transnoentities("ListOfCustomerPayments");

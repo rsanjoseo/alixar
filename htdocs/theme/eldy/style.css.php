@@ -27,6 +27,7 @@
 
 //if (! defined('NOREQUIREUSER')) define('NOREQUIREUSER','1');	// Not disabled because need to load personalized language
 //if (! defined('NOREQUIREDB'))   define('NOREQUIREDB','1');	// Not disabled to increase speed. Language code is found on url.
+/*
 if (!defined('NOREQUIRESOC')) {
 	define('NOREQUIRESOC', '1');
 }
@@ -37,6 +38,7 @@ if (!defined('NOCSRFCHECK')) {
 if (!defined('NOTOKENRENEWAL')) {
 	define('NOTOKENRENEWAL', 1);
 }
+*/
 if (!defined('NOLOGIN')) {
 	define('NOLOGIN', 1); // File must be accessed by logon page so without login.
 }
@@ -47,7 +49,6 @@ if (!defined('NOREQUIREHTML')) {
 if (!defined('NOREQUIREAJAX')) {
 	define('NOREQUIREAJAX', '1');
 }
-
 
 define('ISLOADEDBYSTEELSHEET', '1');
 
@@ -60,7 +61,7 @@ if (defined('THEME_ONLY_CONSTANT')) {
 
 session_cache_limiter('public');
 
-require_once __DIR__.'/../../main.inc.php'; // __DIR__ allow this script to be included in custom themes
+require_once __DIR__.'/../../main.php'; // __DIR__ allow this script to be included in custom themes
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load user to have $user->conf loaded (not done into main because of NOLOGIN constant defined)
@@ -94,7 +95,7 @@ if (GETPOST('THEME_DARKMODEENABLED', 'int')) {
 	$conf->global->THEME_DARKMODEENABLED = GETPOST('THEME_DARKMODEENABLED', 'int'); // If darkmode was forced on URL
 }
 
-$langs->load("main", 0, 1);
+//$langs->load("main", 0, 1);
 $right = ($langs->trans("DIRECTION") == 'rtl' ? 'left' : 'right');
 $left = ($langs->trans("DIRECTION") == 'rtl' ? 'right' : 'left');
 

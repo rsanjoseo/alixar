@@ -54,7 +54,7 @@ if (empty($user->rights->takepos->run)) {
 	accessforbidden();
 }
 
-$langs->loadLangs(array("main", "bills", "cashdesk"));
+// $langs->loadLangs(array("main", "bills", "cashdesk"));
 
 $invoice = new Facture($db);
 $invoice->fetch($facid);

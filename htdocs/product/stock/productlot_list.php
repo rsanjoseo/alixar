@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/product/stock/class/productlot.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('stocks', 'productbatch', 'other', 'users'));
+// $langs->loadLangs(array('stocks', 'productbatch', 'other', 'users'));
 
 // Get parameters
 $id = GETPOST('id', 'int');

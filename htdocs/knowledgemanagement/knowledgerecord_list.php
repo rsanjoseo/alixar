@@ -37,7 +37,7 @@ require_once DOL_DOCUMENT_ROOT.'/knowledgemanagement/class/knowledgerecord.class
 //dol_include_once('/othermodule/class/otherobject.class.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("knowledgemanagement", "other"));
+// $langs->loadLangs(array("knowledgemanagement", "other"));
 
 $action     = GETPOST('action', 'aZ09') ?GETPOST('action', 'aZ09') : 'view'; // The action 'add', 'create', 'edit', 'update', 'view', ...
 $massaction = GETPOST('massaction', 'alpha'); // The bulk action (combo box choice into lists)

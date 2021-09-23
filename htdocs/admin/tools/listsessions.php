@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 
 
 // Load translation files required by the page
-$langs->loadLangs(["companies", "install", "users", "other"]);
+// $langs->loadLangs(["companies", "install", "users", "other"]);
 
 if (!$user->admin) {
 	accessforbidden();

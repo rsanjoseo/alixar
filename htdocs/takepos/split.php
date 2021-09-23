@@ -44,7 +44,7 @@ if (!defined('NOREQUIREAJAX')) {
 require '../main.inc.php'; // Load $user and permissions
 require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 
-$langs->loadLangs(array("main", "bills", "cashdesk", "banks"));
+// $langs->loadLangs(array("main", "bills", "cashdesk", "banks"));
 
 $action = GETPOST('action', 'aZ09');
 $place = (GETPOST('place', 'aZ09') ? GETPOST('place', 'aZ09') : 0);

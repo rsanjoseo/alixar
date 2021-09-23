@@ -117,7 +117,7 @@ class FormSms
 		}
 
 		// Load translation files required by the page
-		$langs->loadLangs(array('other', 'mails', 'sms'));
+        // $langs->loadLangs(array('other', 'mails', 'sms'));
 
 		$soc = new Societe($this->db);
 		if (!empty($this->withtosocid) && $this->withtosocid > 0) {

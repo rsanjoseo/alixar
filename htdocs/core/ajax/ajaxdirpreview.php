@@ -113,7 +113,7 @@ if (empty($url)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("ecm", "companies", "other"));
+// $langs->loadLangs(array("ecm", "companies", "other"));
 
 // Security check
 if ($user->socid > 0) {

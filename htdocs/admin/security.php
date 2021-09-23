@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/security2.lib.php';
 $action = GETPOST('action', 'aZ09');
 
 // Load translation files required by the page
-$langs->loadLangs(array("users", "admin", "other"));
+// $langs->loadLangs(array("users", "admin", "other"));
 
 if (!$user->admin) {
 	accessforbidden();

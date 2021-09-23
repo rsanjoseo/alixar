@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/inventory/class/inventory.class.php';
 require_once DOL_DOCUMENT_ROOT.'/product/inventory/lib/inventory.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("stocks", "other"));
+// $langs->loadLangs(array("stocks", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

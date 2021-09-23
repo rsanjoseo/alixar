@@ -81,7 +81,7 @@ require_once DOL_DOCUMENT_ROOT.'/recruitment/class/recruitmentcandidature.class.
 require_once DOL_DOCUMENT_ROOT.'/recruitment/lib/recruitment_recruitmentcandidature.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("recruitment", "other", "users"));
+// $langs->loadLangs(array("recruitment", "other", "users"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

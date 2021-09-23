@@ -72,7 +72,7 @@ if (!empty($conf->bom->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'other'));
+// $langs->loadLangs(array('products', 'other'));
 if (!empty($conf->stock->enabled)) {
 	$langs->load("stocks");
 }

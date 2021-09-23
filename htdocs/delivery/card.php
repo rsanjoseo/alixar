@@ -49,7 +49,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("sendings", "bills", 'deliveries', 'orders'));
+// $langs->loadLangs(array("sendings", "bills", 'deliveries', 'orders'));
 
 if (!empty($conf->incoterm->enabled)) {
 	$langs->load('incoterm');

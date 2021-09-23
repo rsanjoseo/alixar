@@ -29,7 +29,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("eventorganization"));
+// $langs->loadLangs(array("eventorganization"));
 
 $action = GETPOST('action', 'aZ09');
 

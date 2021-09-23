@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formadmin.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/menubase.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("other", "admin"));
+// $langs->loadLangs(array("other", "admin"));
 
 $cancel = GETPOST('cancel', 'alphanohtml'); // We click on a Cancel button
 $confirm = GETPOST('confirm');

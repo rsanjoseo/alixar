@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/holiday/class/holiday.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/holiday.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "errors", "holiday"));
+// $langs->loadLangs(array("admin", "errors", "holiday"));
 
 if (!$user->admin) {
 	accessforbidden();

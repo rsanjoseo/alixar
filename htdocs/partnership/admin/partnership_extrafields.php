@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once '../lib/partnership.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('partnership', 'admin'));
+// $langs->loadLangs(array('partnership', 'admin'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

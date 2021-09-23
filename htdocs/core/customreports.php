@@ -81,7 +81,7 @@ require_once DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php";
 require_once DOL_DOCUMENT_ROOT."/core/class/html.formother.class.php";
 
 // Load traductions files requiredby by page
-$langs->loadLangs(array("companies", "other", "exports", "sendings"));
+// $langs->loadLangs(array("companies", "other", "exports", "sendings"));
 
 $extrafields = new ExtraFields($db);
 

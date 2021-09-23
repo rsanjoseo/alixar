@@ -463,7 +463,7 @@ class pdf_merou extends ModelePdfExpedition
         $default_font_size = pdf_getPDFFontSize($outputlangs);
 
         // Translations
-        $langs->loadLangs(["main", "bills", "orders"]);
+        // $langs->loadLangs(["main", "bills", "orders"]);
 
         if (empty($hidetop)) {
             $pdf->SetFont('', 'B', $default_font_size - 2);

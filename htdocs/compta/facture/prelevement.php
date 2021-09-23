@@ -39,7 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('bills', 'banks', 'withdrawals', 'companies'));
+// $langs->loadLangs(array('bills', 'banks', 'withdrawals', 'companies'));
 
 $id = (GETPOST('id', 'int') ?GETPOST('id', 'int') : GETPOST('facid', 'int')); // For backward compatibility
 $ref = GETPOST('ref', 'alpha');

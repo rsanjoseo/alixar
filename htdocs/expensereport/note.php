@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('trips', 'companies', 'bills', 'orders'));
+// $langs->loadLangs(array('trips', 'companies', 'bills', 'orders'));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

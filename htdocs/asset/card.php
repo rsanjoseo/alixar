@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("asset"));
+// $langs->loadLangs(array("asset"));
 
 // Get parameters
 $id         = GETPOST('id', 'int');

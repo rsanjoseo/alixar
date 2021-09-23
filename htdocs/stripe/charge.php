@@ -31,7 +31,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('compta', 'salaries', 'bills', 'hrm', 'stripe'));
+// $langs->loadLangs(array('compta', 'salaries', 'bills', 'hrm', 'stripe'));
 
 // Security check
 $socid = GETPOST("socid", "int");

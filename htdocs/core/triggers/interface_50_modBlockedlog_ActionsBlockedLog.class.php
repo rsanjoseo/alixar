@@ -57,19 +57,19 @@ class InterfaceActionsBlockedLog extends DolibarrTriggers
 	 * @param conf		    $conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (empty($conf->blockedlog) || empty($conf->blockedlog->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (empty($conf->blockedlog) || empty($conf->blockedlog->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
 
-		// Test if event/record is qualified
-		$listofqualifiedelement = array('facture', 'don', 'payment', 'payment_donation', 'subscription', 'payment_various', 'cashcontrol');
-		if (!in_array($object->element, $listofqualifiedelement)) {
-			return 1;
-		}
+        // Test if event/record is qualified
+        $listofqualifiedelement = ['facture', 'don', 'payment', 'payment_donation', 'subscription', 'payment_various', 'cashcontrol'];
+        if (!in_array($object->element, $listofqualifiedelement)) {
+            return 1;
+        }
 
-		dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+        dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
 		require_once DOL_DOCUMENT_ROOT.'/blockedlog/class/blockedlog.class.php';
 		$b = new BlockedLog($this->db);

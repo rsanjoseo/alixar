@@ -150,7 +150,7 @@ class pdf_beluga extends ModelePDFProjects
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "projects", "companies"));
+        // $langs->loadLangs(array("main", "projects", "companies"));
 
 		$this->db = $db;
 		$this->name = "beluga";

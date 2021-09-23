@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/fourn.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "other", "bills", "orders", "suppliers"));
+// $langs->loadLangs(array("admin", "other", "bills", "orders", "suppliers"));
 
 if (!$user->admin) {
 	accessforbidden();

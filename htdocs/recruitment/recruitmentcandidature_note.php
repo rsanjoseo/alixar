@@ -57,7 +57,7 @@ dol_include_once('/recruitment/class/recruitmentcandidature.class.php');
 dol_include_once('/recruitment/lib/recruitment_recruitmentcandidature.lib.php');
 
 // Load translation files required by the page
-$langs->loadLangs(array("recruitment", "companies"));
+// $langs->loadLangs(array("recruitment", "companies"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

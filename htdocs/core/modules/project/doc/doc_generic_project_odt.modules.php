@@ -103,7 +103,7 @@ class doc_generic_project_odt extends ModelePDFProjects
 		global $conf, $langs, $mysoc;
 
 		// Load traductions files required by page
-		$langs->loadLangs(array("companies", "main"));
+        // $langs->loadLangs(array("companies", "main"));
 
 		$this->db = $db;
 		$this->name = "ODT templates";
@@ -422,7 +422,7 @@ class doc_generic_project_odt extends ModelePDFProjects
         global $conf, $langs;
 
         // Load translation files required by the page
-		$langs->loadLangs(array("companies", "errors"));
+        // $langs->loadLangs(array("companies", "errors"));
 
 		$form = new Form($this->db);
 

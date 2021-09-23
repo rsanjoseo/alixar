@@ -33,7 +33,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("users", "admin", "other"));
+// $langs->loadLangs(array("users", "admin", "other"));
 
 $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ? GETPOST('contextpage', 'aZ') : 'auditeventslist'; // To manage different context of search

@@ -57,17 +57,17 @@ class InterfaceMailmanSpipsynchro extends DolibarrTriggers
 	 * @param conf		    $conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (empty($conf->mailmanspip) || empty($conf->mailmanspip->enabled)) {
-			return 0; // Module not active, we do nothing
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (empty($conf->mailmanspip) || empty($conf->mailmanspip->enabled)) {
+            return 0; // Module not active, we do nothing
+        }
 
-		require_once DOL_DOCUMENT_ROOT."/mailmanspip/class/mailmanspip.class.php";
-		require_once DOL_DOCUMENT_ROOT."/user/class/usergroup.class.php";
+        require_once DOL_DOCUMENT_ROOT . "/mailmanspip/class/mailmanspip.class.php";
+        require_once DOL_DOCUMENT_ROOT . "/user/class/usergroup.class.php";
 
-		if ($action == 'CATEGORY_LINK') {
-			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+        if ($action == 'CATEGORY_LINK') {
+            dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
 
 			// We add subscription if we change category (new category may means more mailing-list to subscribe)
 			if (is_object($object->context['linkto']) && method_exists($object->context['linkto'], 'add_to_abo') && $object->context['linkto']->add_to_abo() < 0) {

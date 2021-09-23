@@ -127,7 +127,7 @@ class pdf_storm extends ModelePDFDeliveryOrder
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills", "sendings", "companies"));
+        // $langs->loadLangs(array("main", "bills", "sendings", "companies"));
 
 		$this->db = $db;
 		$this->name = "Storm";

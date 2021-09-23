@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/recruitment/class/recruitmentcandidature.class.
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("recruitment", "boxes"));
+// $langs->loadLangs(array("recruitment", "boxes"));
 
 $action = GETPOST('action', 'aZ09');
 

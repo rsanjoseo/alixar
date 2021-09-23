@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/accounting.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formaccounting.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("compta", "bills", "admin", "accountancy", "salaries", "loan"));
+// $langs->loadLangs(array("compta", "bills", "admin", "accountancy", "salaries", "loan"));
 
 // Security check
 if (empty($user->rights->accounting->chartofaccount)) {

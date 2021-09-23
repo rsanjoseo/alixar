@@ -68,7 +68,7 @@ class doc_generic_order_odt extends ModelePDFCommandes
 		global $conf, $langs, $mysoc;
 
 		// Load translation files required by the page
-		$langs->loadLangs(array("main", "companies"));
+        // $langs->loadLangs(array("main", "companies"));
 
 		$this->db = $db;
 		$this->name = "ODT templates";
@@ -114,8 +114,8 @@ class doc_generic_order_odt extends ModelePDFCommandes
 	{
 		global $conf, $langs;
 
-		// Load translation files required by the page
-		$langs->loadLangs(array("errors", "companies"));
+        // Load translation files required by the page
+        // $langs->loadLangs(array("errors", "companies"));
 
 		$form = new Form($this->db);
 

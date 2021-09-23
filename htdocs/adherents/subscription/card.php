@@ -32,7 +32,7 @@ if (!empty($conf->banque->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("companies", "members", "bills", "users"));
+// $langs->loadLangs(array("companies", "members", "bills", "users"));
 
 $adh = new Adherent($db);
 $adht = new AdherentType($db);

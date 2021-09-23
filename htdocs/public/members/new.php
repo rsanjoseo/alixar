@@ -77,7 +77,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $action = GETPOST('action', 'aZ09');
 
 // Load translation files
-$langs->loadLangs(array("main", "members", "companies", "install", "other"));
+// $langs->loadLangs(array("main", "members", "companies", "install", "other"));
 
 // Security check
 if (empty($conf->adherent->enabled)) {

@@ -554,4 +554,40 @@ abstract class Engine
         return true;
     }
 
+    public function jdate($string, $gm = 'tzserver')
+    {
+        // TODO $string should be converted into a GMT timestamp, so param gm should be set to true by default instead of false
+        if ($string == 0 || $string == "0000-00-00 00:00:00") {
+            return '';
+        }
+        $string = preg_replace('/([^0-9])/i', '', $string);
+        $tmp = $string . '000000';
+        $date = dol_mktime((int) substr($tmp, 8, 2), (int) substr($tmp, 10, 2), (int) substr($tmp, 12, 2), (int) substr($tmp, 4, 2), (int) substr($tmp, 6, 2), (int) substr($tmp, 0, 4), $gm);
+        return $date;
+    }
+
+    public function sanitize($stringtosanitize, $allowsimplequote = 0)
+    {
+        if ($allowsimplequote) {
+            return preg_replace('/[^a-z0-9_\-\.,\']/i', '', $stringtosanitize);
+        } else {
+            return preg_replace('/[^a-z0-9_\-\.,]/i', '', $stringtosanitize);
+        }
+    }
+
+    public function plimit($limit = 0, $offset = 0)
+    {
+        global $conf;
+        if (empty($limit)) {
+            return "";
+        }
+        if ($limit < 0) {
+            $limit = $conf->liste_limit;
+        }
+        if ($offset > 0) {
+            return " LIMIT " . ((int) $offset) . "," . ((int) $limit) . " ";
+        } else {
+            return " LIMIT " . ((int) $limit) . " ";
+        }
+    }
 }

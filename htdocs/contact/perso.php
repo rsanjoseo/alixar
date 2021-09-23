@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/contact.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other'));
+// $langs->loadLangs(array('companies', 'other'));
 
 $id = GETPOST('id', 'int');
 $action = GETPOST('action', 'aZ09');

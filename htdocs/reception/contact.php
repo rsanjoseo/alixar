@@ -35,7 +35,7 @@ if (!empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/core/class/html.formprojet.class.php';
 }
 
-$langs->loadLangs(array("orders", "receptions", "companies"));
+// $langs->loadLangs(array("orders", "receptions", "companies"));
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

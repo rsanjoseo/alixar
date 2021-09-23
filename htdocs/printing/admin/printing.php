@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/printing/lib/printing.lib.php';
 use OAuth\Common\Storage\DoliStorage;
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'printing', 'oauth'));
+// $langs->loadLangs(array('admin', 'printing', 'oauth'));
 
 $action = GETPOST('action', 'aZ09');
 $mode = GETPOST('mode', 'alpha');

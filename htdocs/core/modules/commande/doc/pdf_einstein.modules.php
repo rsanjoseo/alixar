@@ -136,7 +136,7 @@ class pdf_einstein extends ModelePDFCommandes
 		global $conf, $langs, $mysoc;
 
 		// Translations
-		$langs->loadLangs(array("main", "bills", "products"));
+        // $langs->loadLangs(array("main", "bills", "products"));
 
 		$this->db = $db;
 		$this->name = "einstein";

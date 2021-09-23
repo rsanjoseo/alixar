@@ -26,7 +26,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/intracommreport/class/intracommreport.class.php';
 
-$langs->loadLangs(array("intracommreport"));
+// $langs->loadLangs(array("intracommreport"));
 
 $action = GETPOST('action');
 $exporttype = GETPOSTISSET('exporttype') ? GETPOST('exporttype', 'alphanohtml') : 'deb'; // DEB ou DES

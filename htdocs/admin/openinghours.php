@@ -29,7 +29,7 @@ $action = GETPOST('action', 'aZ09');
 $contextpage = GETPOST('contextpage', 'aZ') ?GETPOST('contextpage', 'aZ') : 'adminaccoutant'; // To manage different context of search
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'companies', 'other'));
+// $langs->loadLangs(array('admin', 'companies', 'other'));
 
 if (!$user->admin) {
 	accessforbidden();

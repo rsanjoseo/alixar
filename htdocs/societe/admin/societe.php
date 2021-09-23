@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php';
 
-$langs->loadLangs(array("admin", "companies", "other"));
+// $langs->loadLangs(array("admin", "companies", "other"));
 
 $action = GETPOST('action', 'aZ09');
 $value = GETPOST('value', 'alpha');

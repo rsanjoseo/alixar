@@ -44,7 +44,7 @@ if (!empty($conf->categorie->enabled)) {
 }
 
 // Load translation files required by page
-$langs->loadLangs(array(
+// $langs->loadLangs(array(
 	'companies',
 	'suppliers',
 	'products',
@@ -586,7 +586,7 @@ if ($object->id > 0) {
 	$proposalstatic = new SupplierProposal($db);
 
 	if (!empty($user->rights->supplier_proposal->lire)) {
-		$langs->loadLangs(array("supplier_proposal"));
+        // $langs->loadLangs(array("supplier_proposal"));
 
 		$sql = "SELECT p.rowid, p.ref, p.date_valid as dc, p.fk_statut, p.total_ht, p.total_tva, p.total_ttc";
 		$sql .= " FROM ".MAIN_DB_PREFIX."supplier_proposal as p ";

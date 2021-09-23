@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 // Load translation files required by page
-$langs->loadLangs(array('agenda', 'admin', 'other'));
+// $langs->loadLangs(array('agenda', 'admin', 'other'));
 
 $def = array();
 $actiontest = GETPOST('test', 'alpha');

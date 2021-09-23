@@ -303,7 +303,7 @@ class AccountingJournal extends CommonObject
 		// phpcs:enable
 		global $langs;
 
-		$langs->loadLangs(array("accountancy"));
+		// $langs->loadLangs(array("accountancy"));
 
 		if ($mode == 0) {
 			$prefix = '';

@@ -37,7 +37,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('projectsindex'));
 
 // Load translation files required by the page
-$langs->loadLangs(array('projects', 'companies'));
+// $langs->loadLangs(array('projects', 'companies'));
 
 $action = GETPOST('action', 'aZ09');
 $search_project_user = GETPOST('search_project_user', 'int');

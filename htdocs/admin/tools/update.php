@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/geturl.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(["admin", "other"]);
+// $langs->loadLangs(["admin", "other"]);
 
 $action = GETPOST('action', 'aZ09');
 

@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('companies', 'other', 'ticket'));
+// $langs->loadLangs(array('companies', 'other', 'ticket'));
 
 // Get parameters
 $id       = GETPOST('id', 'int');

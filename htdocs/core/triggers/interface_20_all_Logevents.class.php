@@ -59,17 +59,17 @@ class InterfaceLogevents extends DolibarrTriggers
 	 * @param conf			$conf       Object conf
 	 * @return int         				<0 if KO, 0 if no triggered ran, >0 if OK
 	 */
-	public function runTrigger($action, $object, User $user, Translate $langs, Conf $conf)
-	{
-		if (!empty($conf->global->MAIN_LOGEVENTS_DISABLE_ALL)) {
-			return 0; // Log events is disabled (hidden features)
-		}
+	public function runTrigger($action, $object, User $user, $langs, $conf)
+    {
+        if (!empty($conf->global->MAIN_LOGEVENTS_DISABLE_ALL)) {
+            return 0; // Log events is disabled (hidden features)
+        }
 
-		$key = 'MAIN_LOGEVENTS_'.$action;
-		//dol_syslog("xxxxxxxxxxx".$key);
-		if (empty($conf->global->$key)) {
-			return 0; // Log events not enabled for this action
-		}
+        $key = 'MAIN_LOGEVENTS_' . $action;
+        //dol_syslog("xxxxxxxxxxx".$key);
+        if (empty($conf->global->$key)) {
+            return 0; // Log events not enabled for this action
+        }
 
 		if (empty($conf->entity)) {
 			$conf->entity = $entity; // forcing of the entity if it's not defined (ex: in login form)
@@ -96,8 +96,8 @@ class InterfaceLogevents extends DolibarrTriggers
 		} elseif ($action == 'USER_LOGOUT') {
 			dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
-			$langs->load("users");
-			// Initialisation donnees (date,duree,texte,desc)
+            //			$langs->load("users");
+            // Initialisation donnees (date,duree,texte,desc)
 			$text = "(UserLogoff,".$object->login.")";
 			$desc = "(UserLogoff,".$object->login.")";
 		} elseif ($action == 'USER_CREATE') {

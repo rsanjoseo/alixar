@@ -30,7 +30,7 @@
 // Protection to understand what happen when submitting files larger than post_max_size
 if (GETPOST('uploadform', 'int') && empty($_POST) && empty($_FILES)) {
 	dol_syslog("The PHP parameter 'post_max_size' is too low. All POST parameters and FILES were set to empty.");
-	$langs->loadLangs(array("errors", "install"));
+	// $langs->loadLangs(array("errors", "install"));
 	print $langs->trans("ErrorFileSizeTooLarge").' ';
 	print $langs->trans("ErrorGoBackAndCorrectParameters");
 	die;

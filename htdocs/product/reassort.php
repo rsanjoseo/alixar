@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('products', 'stocks'));
+// $langs->loadLangs(array('products', 'stocks'));
 
 $action = GETPOST('action', 'aZ09');
 $sref = GETPOST("sref", 'alpha');

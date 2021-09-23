@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/reception.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/reception/class/reception.class.php';
 
-$langs->loadLangs(array("admin", "receptions", 'other'));
+// $langs->loadLangs(array("admin", "receptions", 'other'));
 
 
 if (!$user->admin) {

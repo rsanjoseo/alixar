@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/categories/class/categorie.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array('banks', 'categories', 'compta', 'bills', 'other'));
+// $langs->loadLangs(array('banks', 'categories', 'compta', 'bills', 'other'));
 if (!empty($conf->adherent->enabled)) {
 	$langs->load("members");
 }

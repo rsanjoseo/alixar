@@ -65,7 +65,7 @@ $backtopage = GETPOST('backtopage', 'alpha');
 $action = GETPOST('action', 'aZ09');
 
 // Load translation files
-$langs->loadLangs(array("members", "companies", "install", "other"));
+// $langs->loadLangs(array("members", "companies", "install", "other"));
 
 if (empty($conf->global->PROJECT_ENABLE_PUBLIC)) {
 	print $langs->trans("Form for public lead registration has not been enabled");

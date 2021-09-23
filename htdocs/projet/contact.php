@@ -38,7 +38,7 @@ if (!empty($conf->eventorganization->enabled)) {
 	$langsLoad[]='eventorganization';
 }
 
-$langs->loadLangs($langsLoad);
+// $langs->loadLangs($langsLoad);
 
 $id     = GETPOST('id', 'int');
 $ref    = GETPOST('ref', 'alpha');

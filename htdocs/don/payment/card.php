@@ -32,7 +32,7 @@ if (!empty($conf->banque->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array("bills", "banks", "companies", "donations"));
+// $langs->loadLangs(array("bills", "banks", "companies", "donations"));
 
 // Security check
 $id = GETPOST('rowid') ? GETPOST('rowid', 'int') : GETPOST('id', 'int');

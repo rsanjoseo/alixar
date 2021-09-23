@@ -73,27 +73,28 @@ class box_actions extends ModeleBoxes
 	 */
 	public function loadBox($max = 5)
 	{
-		global $user, $langs, $conf;
+        global $user, $langs, $conf;
 
-		$this->max = $max;
+        $this->max = $max;
 
-		include_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-		include_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-		$societestatic = new Societe($this->db);
-		$actionstatic = new ActionComm($this->db);
+        include_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        $societestatic = new Societe($this->db);
+        $actionstatic = new ActionComm($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastActionsToDo", $max));
+        //		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastActionsToDo", $max));
+        $this->info_box_head = ['text' => $langs->trans("BoxTitleLastActionsToDo", ['s' => $max])];
 
-		if ($user->rights->agenda->myactions->read) {
-			$sql = "SELECT a.id, a.label, a.datep as dp, a.percent as percentage";
-			$sql .= ", ta.code";
-			$sql .= ", ta.libelle as type_label";
-			$sql .= ", s.rowid as socid, s.nom as name, s.name_alias";
-			$sql .= ", s.code_client, s.code_compta, s.client";
-			$sql .= ", s.logo, s.email, s.entity";
-			$sql .= " FROM ".MAIN_DB_PREFIX."c_actioncomm AS ta, ".MAIN_DB_PREFIX."actioncomm AS a";
-			if (!$user->rights->societe->client->voir && !$user->socid) {
-				$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe_commerciaux as sc ON a.fk_soc = sc.fk_soc";
+        if ($user->rights->agenda->myactions->read) {
+            $sql = "SELECT a.id, a.label, a.datep as dp, a.percent as percentage";
+            $sql .= ", ta.code";
+            $sql .= ", ta.libelle as type_label";
+            $sql .= ", s.rowid as socid, s.nom as name, s.name_alias";
+            $sql .= ", s.code_client, s.code_compta, s.client";
+            $sql .= ", s.logo, s.email, s.entity";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "c_actioncomm AS ta, " . MAIN_DB_PREFIX . "actioncomm AS a";
+            if (!$user->rights->societe->client->voir && !$user->socid) {
+                $sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe_commerciaux as sc ON a.fk_soc = sc.fk_soc";
 			}
 			$sql .= " LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON a.fk_soc = s.rowid";
 			$sql .= " WHERE a.fk_action = ta.id";

@@ -34,7 +34,7 @@ if (!empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 }
 
-$langs->loadLangs(array("bills", "companies"));
+// $langs->loadLangs(array("bills", "companies"));
 
 $id = (GETPOST('id', 'int') ? GETPOST('id', 'int') : GETPOST('facid', 'int'));
 $ref = GETPOST('ref', 'alpha');

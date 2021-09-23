@@ -41,7 +41,7 @@ if (empty($conf->emailcollector->enabled)) {
 }
 
 // Load traductions files required by page
-$langs->loadLangs(array("admin", "mails", "other"));
+// $langs->loadLangs(array("admin", "mails", "other"));
 
 // Get parameters
 $id = GETPOST('id', 'int');

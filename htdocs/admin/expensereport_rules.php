@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport.class.php';
 require_once DOL_DOCUMENT_ROOT.'/expensereport/class/expensereport_rule.class.php';
 
 // Load translation files required by the page
-$langs->loadLangs(array("admin", "other", "trips", "errors", "dict"));
+// $langs->loadLangs(array("admin", "other", "trips", "errors", "dict"));
 
 if (!$user->admin) {
 	accessforbidden();

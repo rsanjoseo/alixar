@@ -38,7 +38,7 @@ if (!$user->admin) {
 }
 
 // Load translation files required by the page
-$langs->loadLangs(array('admin', 'other', 'bills', 'orders', 'suppliers'));
+// $langs->loadLangs(array('admin', 'other', 'bills', 'orders', 'suppliers'));
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);

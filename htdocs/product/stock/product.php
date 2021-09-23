@@ -55,7 +55,7 @@ if (!empty($conf->variants->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->loadlangs(array('products', 'suppliers', 'orders', 'bills', 'stocks', 'sendings', 'margins'));
+// $langs->loadLangs(array('products', 'suppliers', 'orders', 'bills', 'stocks', 'sendings', 'margins'));
 if (!empty($conf->productbatch->enabled)) {
 	$langs->load("productbatch");
 }
