@@ -1,0 +1,318 @@
+ACCOUNTING_EXPORT_SEPARATORCSV: 'Separador de columna de archivo a exportar'
+ACCOUNTING_EXPORT_DATE: 'Formato de fecha de archivo a exportar'
+ACCOUNTING_EXPORT_PIECE: 'Exportar el número de pieza'
+ACCOUNTING_EXPORT_GLOBAL_ACCOUNT: 'Exportar con cuenta global'
+ACCOUNTING_EXPORT_LABEL: 'Etiqueta de exportación'
+ACCOUNTING_EXPORT_AMOUNT: 'Monto de exportación'
+ACCOUNTING_EXPORT_DEVISE: 'Moneda de exportación'
+ACCOUNTING_EXPORT_PREFIX_SPEC: 'Especifique el prefijo del nombre del fichero'
+DefaultForService: 'Servicio por defecto'
+DefaultForProduct: 'Producto por defecto'
+Journals: Revistas
+JournalFinancial: 'Revistas financieras'
+BackToChartofaccounts: 'Retornar gráfico de cuentas'
+Selectchartofaccounts: 'Seleccione el plan de cuentas activo'
+Addanaccount: 'Agregar una cuenta contable'
+Binding: 'Vinculación a cuentas'
+CustomersVentilation: 'Fijación de la factura del cliente'
+CreateMvts: 'Crear nueva transacción'
+UpdateMvts: 'Modificación de una transacción'
+InvoiceLines: 'Líneas de facturas para enlazar'
+InvoiceLinesDone: 'Líneas de facturas vinculadas'
+IntoAccount: 'Vincular la línea con la cuenta de contabilidad'
+Ventilate: Vincular
+Processing: Procesando
+EndProcessing: 'Proceso finalizado.'
+Lineofinvoice: 'Línea de factura'
+VentilatedinAccount: 'Vinculado con éxito a la cuenta contable'
+NotVentilatedinAccount: 'No vinculado a la cuenta contable'
+ACCOUNTING_LIST_SORT_VENTILATION_TODO: 'Comienza la clasificación de la página "Vinculación a hacer" por los elementos más recientes'
+ACCOUNTING_LIST_SORT_VENTILATION_DONE: 'Comienza la clasificación de la página "Encuadernación realizada" por los elementos más recientes'
+ACCOUNTING_LENGTH_DESCRIPTION: 'Truncar la descripción de los productos y servicios en los listados después de los caracteres x (mejor = 50)'
+ACCOUNTING_LENGTH_DESCRIPTION_ACCOUNT: 'Truncar el formulario de descripción de la cuenta de producto y servicios en los listados después de los caracteres x (mejor = 50)'
+ACCOUNTING_LENGTH_GACCOUNT: 'Longitud de las cuentas de contabilidad general (si establece el valor a 6 aquí, la cuenta ''706'' aparecerá como ''706000'' en la pantalla)'
+ACCOUNTING_SELL_JOURNAL: 'Diario de Venta'
+ACCOUNTING_PURCHASE_JOURNAL: 'Diario de Compra'
+ACCOUNTING_MISCELLANEOUS_JOURNAL: 'Diario diverso'
+ACCOUNTING_EXPENSEREPORT_JOURNAL: 'Informe de Gastos Diario'
+ACCOUNTING_SOCIAL_JOURNAL: 'Diario Social'
+ACCOUNTING_ACCOUNT_SUSPENSE: 'Cuenta contable de espera'
+Codejournal: Periódico
+FinanceJournal: 'Periodo Financiero'
+TotalMarge: 'Margen total de ventas'
+VersionProgram: 'Versión del programa'
+VersionLastInstall: 'Instalar versión inicial'
+Module30Name: Facturas
+Permission91: 'Consultar impuestos e IGV'
+Permission92: 'Crear/modificar impuestos e IGV'
+Permission93: 'Eliminar impuestos e IGV'
+DictionaryVAT: 'Tasa de IGV o tasa de impuesto a las ventas'
+UnitPriceOfProduct: 'Precio unitario sin IGV de un producto'
+NotificationsDescGlobal: '* or by setting global email addresses in this setup page.'
+OptionVatMode: 'IGV adeudado'
+MailToSendInvoice: 'Facturas de Clientes'
+OperationParamDesc: 'Define the values to use for the object of the action, or how to extract values. For example:<br>objproperty1=SET:the value to set<br>objproperty2=SET:a value with replacement of __objproperty1__<br>objproperty3=SETIFEMPTY:value used if objproperty3 is not already defined<br>objproperty4=EXTRACT:HEADER:X-Myheaderkey:\\s*([^\\s]*)<br>options_myextrafield1=EXTRACT:SUBJECT:([^&#92;n]*)<br>object.objproperty5=EXTRACT:BODY:My company name is\\s([^\\s]*)<br><br>Use a ; char as separator to extract or set several properties.'
+EmailCollectorLoadThirdPartyHelp: 'You can use this action to use the email content to find and load an existing thirdparty in your database. The found (or created) thirdparty will be used for following actions that need it.<br>For example, if you want to create a thirdparty with a name extracted a string ''Name: name to find'' found into the body, use sender email as email, you can set the parameter field like this:<br>''email=HEADER:^From:(.*);name=EXTRACT:BODY:Name:\\s([^\\s]*);client=SET:2;''<br>'
+ListOfActions: 'Lista de eventos'
+DeleteType: Borrar
+Settings: Configuración
+MenuListAssets: Lista
+MenuListTypeAssets: Lista
+StatusAccountOpened: Abrir
+StatusAccountClosed: Cerrado
+BillsCustomers: 'Facturas de clientes'
+BillsCustomer: 'Factura de cliente'
+InvoiceAvoir: 'Nota de crédito'
+InvoiceAvoirAsk: 'Nota de crédito para corregir factura'
+InvoiceCustomer: 'Factura de cliente'
+CustomerInvoice: 'Factura de cliente'
+CustomersInvoices: 'Facturas de clientes'
+BillShortStatusClosedUnpaid: Cerrado
+ConfirmClassifyPaidPartiallyReasonDiscountNoVat: 'El resto a pagar <b>(%s %s)</b> es un descuento acordado después de la factura. Acepto perder el IGV de este descuento'
+AmountOfBillsByMonthHT: 'Importe de las facturas por mes (Sin IGV)'
+CreditNote: 'Nota de crédito'
+VATIsNotUsedForInvoice: '* IGV no aplicable  art-293B del CGI'
+AddThisPageToBookmarks: 'Agregar página actual a marcadores'
+CashDeskMenu: 'Punto de venta'
+CashDesk: 'Punto de venta'
+NotAvailableWithBrowserPrinter: 'Not available when printer for receipt is set to browser:'
+ActionAC_CLO: Cerrado
+ProfId1ES: 'Registro Único de Contribuyente Id 1 (RUC)'
+ProfId3DZ: RUC
+InActivity: Abrir
+VATCollected: 'IGV recuperado'
+PaymentVat: 'Pago IGV'
+ShowVatPayment: 'Ver pagos IGV'
+VATReportByCustomersInInputOutputMode: 'Informe por cliente del IGV repercutido y pagado (IGV pagado)'
+SeeVATReportInInputOutputMode: 'Ver el informe <b>%sIGV pagado%s</b> para un modo de cálculo estandard'
+SeeVATReportInDueDebtMode: 'Ver el informe <b>%sIGV debido%s</b> para un modo de cálculo con la opción sobre lo debido'
+CronStatusInactiveBtn: Inhabilitar
+DonationStatusPromiseNotValidatedShort: Borrador
+DonationStatusPaidShort: Recibido
+EventOrganizationDescriptionLong: 'Manage Event organization for conference, attendees, speaker, and attendees, with public subcription page'
+ExternalSiteSetup: 'Configurar enlace al sitio web externo'
+ExternalSiteModuleNotComplete: 'El modulo Sitio Web Externo no esta configurado apropiadamente'
+ExampleMyMenuEntry: 'Mi entrada al menú'
+CommunitySupport: 'Foro / Soporte Wiki'
+EMailSupport: 'Soporte de correos electrónicos.'
+RemoteControlSupport: 'En linea, tiempo real / Soporte remoto'
+OtherSupport: 'Otro Soporte'
+ToSeeListOfAvailableRessources: 'Para contacto / ver fuentes disponibles'
+HelpCenter: 'Centro de ayuda'
+DolibarrHelpCenter: 'Dolibarr Ayuda y Centro de Soporte'
+ToGoBackToDolibarr: 'De otra manera, <a href="%s">click aquí para continuar usando Dolibarr </a>.'
+TypeSupportCommunauty: 'Comunidad (libre)'
+NeedHelpCenter: 'Necesita ayuda o soporte?'
+Efficiency: Eficiencia
+TypeHelpOnly: 'Solo ayuda'
+TypeHelpDev: Ayudar+Desarrollar
+TypeHelpDevForm: Ayuda+Desarrollo+Entrenamiento
+BackToHelpCenter: 'De otra manera, <a href="%s">volver al centro de ayuda de la página principal </a>.'
+LinkToGoldMember: 'Puede llamar a uno de los entrenadores preseleccionados por Dolibarr para su idioma (%s) haciendo clic en su Widget (estado y precio máximo son actualizados automáticamente):'
+PossibleLanguages: 'Idiomas soportados'
+SubscribeToFoundation: 'Ayuda al proyecto Dolibarr, suscríbete a la fundación'
+SeeOfficalSupport: 'Para el soporte oficial de Dolibarr en su idioma: <br><b><a href="%s" target="_blank">%s</a></b>'
+EditCP: Editar
+DeleteCP: Borrar
+ActionCancelCP: Cancelar
+InterventionCard: 'Ficha de intervención'
+NewIntervention: 'Nueva intervención'
+ChangeIntoRepeatableIntervention: 'Cambiar a intervención frecuente'
+ActionsOnFicheInter: 'Acciones sobre la intervención'
+LastInterventions: 'Últimas %sintervenciones'
+InterventionContact: 'Contacto de intervención'
+DeleteIntervention: 'Borrar intervención'
+InterDuration: 'Duración de intervención'
+MenuIntracommReportList: Lista
+KnowledgeManagementAbout: 'Acerca de Gestión del Conocimiento'
+KnowledgeManagementAboutPage: 'Sobre la página de Gestión del Conocimiento'
+MailingStatusRead: Leer
+DIRECTION: ltr
+FONTFORPDF: helvetica
+FONTSIZEFORPDF: '10'
+SeparatorDecimal: .
+SeparatorThousand: ','
+FormatDateShort: '%d/%m/%Y'
+FormatDateShortInput: '%d/%m/%Y'
+FormatDateShortJava: dd/MM/yyyy
+FormatDateShortJavaInput: dd/MM/yyyy
+FormatDateShortJQuery: dd/mm/yy
+FormatDateShortJQueryInput: dd/mm/yy
+FormatHourShortJQuery: 'HH:MI'
+FormatHourShort: '%H:%M'
+FormatHourShortDuration: '%H:%M'
+FormatDateTextShort: '%d %b %Y'
+FormatDateText: '%d %B %Y'
+FormatDateHourShort: '%d/%m/%Y %H:%M'
+FormatDateHourSecShort: '%d/%m/%Y %H:%M:%S'
+FormatDateHourTextShort: '%d %b %Y %H:%M'
+FormatDateHourText: '%d %B %Y %H:%M'
+DatabaseConnection: 'Conexión a Base de Datos'
+NoTemplateDefined: 'No hay plantilla disponible para este tipo de email'
+AvailableVariables: 'Variables de sustitución disponible'
+EmptySearchString: 'No ingrese criterios de búsqueda vacíos'
+NoRecordFound: 'No se encontró registro'
+NoRecordDeleted: 'No se borró el registro'
+NoError: 'Sin error'
+ErrorFieldRequired: 'Campo ''%s'' es requerido'
+ErrorFieldFormat: 'Campo ''%s'' es un valor incorrecto'
+ErrorFileDoesNotExists: 'Archivo %s no existe'
+ErrorFailedToOpenFile: 'Falló al brir el archivo %s'
+ErrorNoVATRateDefinedForSellerCountry: 'Error, no hay tasas de IGV definidas para el país ''%s''.'
+NotClosed: 'No se ha cerrado'
+AddLink: 'Añadir enlace'
+RemoveLink: 'Remover enlace'
+Update: Actualizar
+CloseBox: 'Remover el widget del panel de control'
+Delete: Borrar
+Remove: Remover
+Resiliate: Terminar
+Cancel: Cancelar
+Save: Guardar
+SaveAs: 'Guardar Como'
+TestConnection: 'Prueba de conexión'
+ToClone: Duplicar
+NoCloneOptionsSpecified: 'No ha definido los datos a duplicar.'
+Run: Ejecutar
+Show: Mostrar
+Hide: Ocultar
+SearchOf: Buscar
+Upload: Subir
+AmountVAT: 'Importe impuesto'
+MulticurrencyAmountVAT: 'Importe impuesto, moneda original'
+TotalVAT: 'Total impuesto'
+TTC: 'Inc. impuesto'
+INCVATONLY: 'Inc. IGV'
+VAT: IGV
+VATs: 'Impuesto a las ventas'
+LT1: 'Impuesto 2'
+LT1Type: 'Tipo de impuesto 2'
+LT2: 'Impuesto 3'
+LT2Type: 'Tipo de impuesto 3'
+VATRate: 'Tasa Impuesto'
+VATCode: 'Código de la Tasa del Impuesto'
+List: Lista
+Opened: Abrir
+SearchIntoMO: 'Órdenes de Fabricación'
+SearchIntoCustomerInvoices: 'Facturas de Clientes'
+ContactDefault_invoice_supplier: 'Factura de Proveedor'
+ContactDefault_order_supplier: 'Orden de Compra'
+ContactDefault_propal: Cotización
+ContactDefault_supplier_proposal: 'Cotización de Proveedor'
+MarginRate: 'Ratio de margen'
+DisplayMarginRates: 'Mostrar ratios de margen'
+InputPrice: 'Precio de entrada'
+UserMargins: 'Margenes de usuario'
+ProductService: 'Producto o Servicio'
+AllProducts: 'Todos los Productos y Servicios'
+ChooseProduct/Service: 'Escoge producto o servicio'
+UseDiscountOnTotal: 'En subtotal'
+CostPrice: 'Precio de costo'
+UnitCharges: 'Cargos unitarios'
+Charges: Cargos
+CheckMargins: 'Detalles de los márgenes'
+Mrp: 'Órdenes de Fabricación'
+MOs: 'Órdenes de Fabricación'
+ManufacturingOrder: 'Orden de Fabricación'
+MRPDescription: 'Modulo para gestionar la producción y órdenes de fabricación (OF).'
+MRPArea: 'Área PRM'
+MrpSetupPage: 'Configuración del modulo PRM'
+MenuBOM: 'Lista de materiales'
+LatestBOMModified: 'Últimas%s Lista de materiales modificados'
+LatestMOModified: 'Últimas %s Órdenes de Fabricación modificadas'
+ListOfBOMs: 'Listado de Lista De Material - BOM'
+ListOfManufacturingOrders: 'Lista de Órdenes de Fabricación'
+BOMsNumberingModules: 'Plantillas de numeración BOM'
+BOMsModelModule: 'Plantillas de documento BOM'
+MOsNumberingModules: 'Numeración de plantillas MO'
+MOsModelModule: 'Plantillas de documento MO'
+FreeLegalTextOnBOMs: 'Texto libre en documento BOM'
+WatermarkOnDraftBOMs: 'Marca de agua en BOM borrador'
+FreeLegalTextOnMOs: 'Texto libre en documento MO'
+WatermarkOnDraftMOs: 'Marca de agua en borrador MO'
+ConfirmCloneMo: 'Está seguro de clonar la Orden de Fabricación %s?'
+ValueOfMeansLoss: 'Valor de 0.95 significa un promedio de 5%% pérdidas durante la producción'
+ValueOfMeansLossForProductProduced: 'Valor de 0.95 significa un promedio de 5 %% de pérdidas del producto producido'
+DeleteBillOfMaterials: 'Eliminar Lista De Materiales'
+NewMO: 'Nueva Orden de Fabricación'
+QtyToProduce: 'Cantidad a producir'
+DateEndPlannedMo: 'Fecha de fin planeada'
+KeepEmptyForAsap: 'Vacío si es ''Tan pronto como sea posible'''
+ConfirmValidateBom: 'Está seguro de validar el BOM con la referencia <strong>%s</strong> (Usted podrá usarlo para crear nuevas órdenes de fabricación)'
+ConfirmCloseBom: 'Está seguro de cancelar este BOM (Ya no podrá usarlo para crear nuevas órdenes de fabricación)'
+ConfirmReopenBom: 'Está seguro de re-abrir este BOM (Podrá usarlo para crear nuevas órdenes de fabricación)'
+QtyFrozen: 'Cant. Congelada'
+QuantityFrozen: 'Cantidad congelada'
+QuantityConsumedInvariable: 'Cuando está marcada, la cantidad consumida es siempre el valor asignado y no depende de la cantidad producida'
+DisableStockChangeHelp: 'Cuando está marcada, el stock no cambia en este producto, cualquiera que sea la cantidad consumida.'
+BomAndBomLines: 'Lista de materiales y lineas'
+BOMLine: 'Linea de BOM'
+CreateMO: 'Crear MO'
+ToConsume: Consumir
+ToProduce: Producir
+QtyAlreadyConsumed: 'Cant. consumida'
+QtyAlreadyProduced: 'Cant. producida'
+QtyRequiredIfNoLoss: 'Si la cantidad requerida no tiene pérdidas (Eficiencia de fabricación es del 100%%)'
+ConsumeOrProduce: 'Consumir o Producir'
+ConsumeAndProduceAll: 'Consumir y Producir Todo'
+TheProductXIsAlreadyTheProductToProduce: 'El producto a agregar es el producto a producir'
+ConfirmValidateMo: 'Está seguro de validar esta Orden de Fabricación?'
+ConfirmProductionDesc: 'Al hacer click en ''%s'', validará el consumo y / o producción para las cantidades establecidas. Esto también actualizará el stock y registrará los movimientos de stock.'
+AutoCloseMO: 'Cerrar automáticamente la Orden de Fabricación si se completa las cantidades para consumir y producir'
+NoStockChangeOnServices: 'Sin cambios de stock en servicios'
+ProductQtyToConsumeByMO: 'Cantidad de producto pendiente para consumir por MO abierto.'
+AddNewConsumeLines: 'Agregar nueva linea para consumir'
+TotalCost: 'Costo total'
+BOMTotalCost: 'El costo a producir este BOM es basado sobre el costo de cantidad y producto a consumir (Se usa si el precio de costo está definido, de lo contario usa el precio promedio ponderado, o en todo caso el mejor precio de compra)'
+GoOnTabProductionToProduceFirst: 'Debe primero empezar la producción para cerrar una orden de fabricación (Ver tab ''%s''). Pero puede cancelarlo.'
+DeleteWorkstation: Borrar
+MultiCurrency: Multimoneda
+ErrorAddRateFail: 'Error al añadir el tipo'
+ErrorAddCurrencyFail: 'Error al añadir la moneda'
+ErrorDeleteCurrencyFail: 'Fallo al eliminar'
+multicurrency_syncronize_error: 'Error de sincronización:%s'
+MULTICURRENCY_USE_RATE_ON_DOCUMENT_DATE: 'Usar la fecha del documento para encontrar el tipo de cambio, en lugar de usar el último tipo cambio conocido'
+multicurrency_useOriginTx: 'Cuando un objeto es creado desde otro, mantener el tipo de cambio original desde el objeto fuente (otro usar el último cambio conocido)'
+CurrencyLayerAccount: 'API Módulo Monedas'
+CurrencyLayerAccount_help_to_synchronize: 'Debe crear una cuenta en el sitio web %s para usar esta funcionalidad.<br> Obtenga su <b> Llave API </b>.<br> Si usa una cuenta libre, no puede cambiar la <b> moneda origen </b> (USD predeterminado). <br> Si su moneda principal no es USD, la aplicación lo recalculará automáticamente. <br> <br> Está limitado a 1000 sincronizaciones por mes.'
+multicurrency_appId: 'Llave API'
+multicurrency_appCurrencySource: 'Moneda origen'
+multicurrency_alternateCurrencySource: 'Moneda origen alterna'
+CurrenciesUsed: 'Monedas usadas'
+CurrenciesUsed_help_to_add: 'Añadir las diferentes monedas y tipos de cambio que necesita usar en sus <b> propuestas </b>, <b> ordenes </b> etc.'
+rate: 'tipo de cambio'
+MulticurrencyReceived: 'Recibido, moneda original'
+MulticurrencyRemainderToTake: 'Monto pendiente, moneda original'
+MulticurrencyPaymentAmount: 'Monto pagado, moneda original'
+AmountToOthercurrency: 'Monto (en moneda de la cuenta receptora)'
+ProductRef: 'Ref. de producto'
+ProductLabel: 'Etiqueta del producto'
+ProductServiceCard: 'Ficha Productos/Servicios'
+ProductOrService: 'Producto o Servicio'
+ListOfStockMovements: 'Lista de movimientos de stock'
+ExportDataset_produit_1: Productos
+OppStatusPROPO: Cotización
+NewInter: 'Nueva intervención'
+ProposalShort: Cotización
+PropalsOpened: Abrir
+SALARIES_ACCOUNTING_ACCOUNT_PAYMENT: 'Cuenta contable usada por el usuario del tercero'
+MovementId: 'ID de Movimiento'
+StockMovementForId: 'ID de Movimiento %d'
+ListMouvementStockProject: 'Lista de movimientos de stock asociados al proyecto'
+QtyDispatchedShort: 'Cant. despachada'
+MassMovement: 'Movimiento masivo'
+StockMovementRecorded: 'Movimiento de stock grabado'
+MovementLabel: 'Etiqueta de movimiento'
+MovementCorrectStock: 'Corrección de stock del producto %s'
+inventoryEdit: Editar
+AddProduct: Agregar
+ListInventory: Lista
+DisableStockChangeOfSubProduct: 'Desactiva el cambio de stock para todos los productos de este Kit durante este movimiento.'
+Read: Leer
+Type: Tipo
+TicketSettings: Configuración
+TicketNewEmailBodyInfosTrackUrl: 'Puedes ver la progresión del ticket haciendo click sobre el seguimiento del ticket.'
+EX_SUO: 'Suministros de oficina'
+DisableUser: Inhabilitar
+DeleteUser: Borrar
+DeleteGroup: Borrar

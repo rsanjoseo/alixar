@@ -1,0 +1,368 @@
+Foundation: مؤسسة
+Version: إصدار
+VersionLastInstall: 'أول إصدار ثبت'
+VersionLastUpgrade: 'أخر تحديث'
+VersionExperimental: تجريبي
+VersionDevelopment: تطوير
+VersionRecommanded: 'موصى به'
+FileCheck: 'تدقيق سلامة مجموعة الملفات'
+FileCheckDesc: 'تتيح لك هذه الأداة التحقق من سلامة الملفات وإعدادات التطبيق الخاص بك ، مقارنة كل ملف بالملف الرسمي. يمكن أيضًا التحقق من قيمة بعض ثوابت الإعدادات. يمكنك استخدام هذه الأداة لتحديد ما إذا تم تعديل أي ملفات (على سبيل المثال بواسطة مخترق).'
+FileIntegrityIsStrictlyConformedWithReference: 'يجب ان تتوافق سلامة الملفات تمامًا مع المرجع.'
+FileIntegrityIsOkButFilesWereAdded: 'اجتاز فحص تكامل الملفات ، ولكن تمت إضافة بعض الملفات الجديدة.'
+FileIntegritySomeFilesWereRemovedOrModified: 'فشل التحقق من تكامل الملفات. تم تعديل بعض الملفات أو إزالتها أو إضافتها.'
+MakeIntegrityAnalysisFrom: 'عمل تحليل سلامة ملفات التطبيق من'
+LocalSignature: 'توقيع محلي مضمن (أقل موثوقية)'
+RemoteSignature: 'التوقيع عن بعد (أكثر موثوقية)'
+FilesMissing: 'الملفات المفقودة'
+FilesUpdated: 'الملفات المحدثة'
+FilesModified: 'الملفات المعدلة'
+FilesAdded: 'الملفات المضافة'
+AvailableOnlyOnPackagedVersions: 'لا يتوفر الملف المحلي لفحص السلامة إلا عندما يتم تثبيت التطبيق من حزمة رسمية'
+XmlNotFound: 'لم يتم العثور على ملف تكامل Xml للتطبيق'
+SessionId: 'هوية المتصل'
+SessionSaveHandler: 'معالج لتوفير دورات'
+SessionSavePath: 'مكان حفظ الجلسة'
+PurgeSessions: 'مسح الجلسات'
+ConfirmPurgeSessions: 'هل تريد حقًا تطهير جميع الجلسات؟ سيؤدي هذا إلى فصل كل مستخدم (باستثناء نفسك).'
+NoSessionListWithThisHandler: 'لا يسمح معالج حفظ الجلسة الذي تم تكوينه في PHP بإدراج جميع الجلسات الجارية.'
+LockNewSessions: 'اغلاق الدخول للمتصلين الجدد'
+ConfirmLockNewSessions: 'هل أنت متأكد من أنك تريد تقييد أي اتصال Dolibarr جديد لنفسك؟ سيتمكن المستخدم <b> %s </b> فقط من الاتصال بعد ذلك.'
+UnlockNewSessions: 'الغاء حظر الاتصال'
+YourSession: جلستك
+WebUserGroup: 'مستخدم\\مجموعة خادم الويب'
+NoSessionFound: 'يبدو أن تكوين PHP الخاص بك لا يسمح بإدراج الجلسات النشطة. قد يتم حماية الدليل المستخدم لحفظ الجلسات (<b> %s </b>) (على سبيل المثال عن طريق أذونات نظام التشغيل أو عن طريق توجيه PHP open_basedir).'
+DBStoringCharset: 'ضبط الحروف في قاعدة البيانات لحفظ المعلومات'
+DBSortingCharset: 'ضبط الحروف في قاعدة البيانات لحفظ المعلومات'
+ClientCharset: 'مجموع حروف العميل'
+WarningModuleNotActive: 'إن الوحدة <b>%s</b> لابد أن تكون مفعلة'
+WarningOnlyPermissionOfActivatedModules: 'أن الصلاحيات المرتبطة بالوحدات المفعلة فقط تظهر هنا. تستطيع تفعيل وحدات أخرى من: الرئيسية ثم التنصيب ثم صفحة الوحدات'
+DolibarrSetup: 'تثبيت أو ترقية البرنامج'
+InternalUsers: 'مستخدمون داخليون'
+ExternalUsers: 'مستخدمون خارجيون'
+FormToTestFileUploadForm: 'نموذج تجربة رفع الملفات (تبعا للتنصيب)'
+FeatureAvailableOnlyOnStable: 'الميزة متوفرة فقط في الإصدارات الثابتة الرسمية'
+Module40Name: موردين
+Module700Name: تبرعات
+Module1780Name: الأوسمة/التصنيفات
+Permission81: 'قراءة أوامر الشراء'
+MailToSendInvoice: 'فواتير العميل'
+MailToSendSupplierOrder: 'أوامر الشراء'
+MailToSendSupplierInvoice: 'فواتير المورد'
+Recommended: 'موصى به'
+AddEvent: 'عمل حدث'
+Settings: الإعدادات
+StatusAccountOpened: افتح
+StatusAccountClosed: مقفول
+SupplierInvoicePayment: 'دفعة مورد'
+BillsCustomers: 'فواتير العميل'
+BillsSuppliers: 'فواتير المورد'
+BillsCustomersUnpaid: 'فواتير العميل غير المدفوعة'
+BillsCustomersUnpaidForCompany: 'فواتير العملاء غير المدفوعة ل %s'
+BillsSuppliersUnpaid: 'فواتير المورد غير المدفوعة'
+BillsSuppliersUnpaidForCompany: 'فواتير الموردين غير المدفوعة لـ %s'
+BillsStatistics: 'احصائيات فواتير العملاء'
+BillsStatisticsSuppliers: 'احصائيات فواتير الموردين'
+InvoiceDeposit: 'فاتورة دفعة أولى'
+InvoiceDepositAsk: 'فاتورة دفعة أولى'
+InvoiceReplacement: 'فاتورة استبدال'
+ReplacementInvoice: 'فاتورة استبدال'
+CustomersInvoices: 'فواتير العميل'
+SuppliersInvoices: 'فواتير المورد'
+SupplierBills: 'فواتير المورد'
+CancelBill: 'إلغ فاتورة'
+SendRemindByMail: 'إرسل تذكير عن طريق البريد الإلكتروني'
+BillStatusDraft: 'مسودة(مطلوب الاعتماد)'
+BillShortStatusClosedUnpaid: مقفول
+SendReminderBillByMail: 'إرسل تذكير عن طريق البريد الإلكتروني'
+SupplierBillsToPay: 'فواتير المورد غير المدفوعة'
+CustomerBillsUnpaid: 'فواتير العميل غير المدفوعة'
+Billed: مفوتر
+PaymentConditionShortPT_ORDER: طلب
+PaymentTypeShortTRA: مسودة
+BoxTitleLastModifiedPropals: 'أحدث العروض المعدلة %s'
+History: تاريخ
+Rubrique: الوسام/التصنيف
+Rubriques: الأوسمة/التصنيفات
+categories: الأوسمة/التصنيفات
+CreateCat: 'إنشاء وسام/تصنيف'
+CreateThisCat: 'إنشاء هذا الوسام/التصنيف'
+NoSubCat: 'لايوجد تصنيف فرعي'
+SubCatOf: 'تصنيف فرعي'
+FoundCats: 'تم العثور علي تصنيفات/أوسمة'
+Customers: عملاء
+Prospects: فرص
+DeleteAction: 'حذف الحدث'
+AddAction: 'عمل حدث'
+AddAnAction: 'عمل حدث'
+AddActionRendezVous: 'تحديد مقابلة'
+ConfirmDeleteAction: 'هل انت واثق من حذف هذا الحدث؟'
+CardAction: 'كارتة حدث'
+TaskRDVWith: 'مقابلة مع %s'
+ShowTask: 'إفتح المهمة'
+ShowAction: 'إفتح الحدث'
+ActionsReport: 'تقرير الاحداث'
+ThirdPartiesOfSaleRepresentative: 'الجهات الخارجية و ممثلي المبيعات'
+SaleRepresentativesOfThirdParty: 'ممثلي المبيعات عن الجهة الخارجية'
+SalesRepresentative: 'ممثل المبيعات'
+SalesRepresentatives: 'ممثلي المبيعات'
+SalesRepresentativeFollowUp: 'ممثل المبيعات (متبعة)'
+SalesRepresentativeSignature: 'ممثلي المبيعات (الامضاء)'
+NoSalesRepresentativeAffected: 'لا يوجد ممثل مبيعات محدد'
+ShowCustomer: 'إفتح العميل'
+ShowProspect: 'إفتح الفرصة'
+ListOfProspects: 'قائمة الفرص'
+LastDoneTasks: 'أحدث %s خطوات مكتملة'
+LastActionsToDo: 'أقدم %s خطوات غير مكتملة'
+DraftPropals: 'مسودة العروض التجارية'
+ThirdPartyCustomers: عملاء
+ThirdPartyCustomersStats: عملاء
+ThirdPartySuppliers: موردين
+OverAllOrders: الطلبات
+OverAllSupplierProposals: 'طلبات عروض اسعار'
+Customer: عميل
+InActivity: افتح
+ActivityCeased: مقفول
+ContractStatusValidated: معتمد
+ContractStatusClosed: مقفول
+ServiceStatusClosed: مقفول
+DeliveryDate: 'تاريخ التوريد'
+DemandReasonTypeSRC_EMPLOYEE: موظف
+Donations: تبرعات
+DonationRef: 'مرجع التبرع'
+Donor: المتبرع
+AddDonation: 'أنشاء تبرع'
+NewDonation: 'تبرع جديد'
+PublicDonation: 'تبرع عام'
+DonationsArea: 'منطقة التبرعات'
+DonationStatusPromiseValidatedShort: معتمد
+EvntOrgDraft: مسودة
+RefuseCP: مرفوض
+Employee: موظف
+StatusInterInvoiced: مفوتر
+MailingStatusValidated: معتمد
+DIRECTION: rtl
+FONTFORPDF: DejaVuSans
+FONTSIZEFORPDF: '9'
+SeparatorDecimal: .
+SeparatorThousand: None
+FormatDateShort: '%m/%d/%Y'
+FormatDateShortInput: '%m/%d/%Y'
+FormatDateShortJava: MM/dd/yyyy
+FormatDateShortJavaInput: MM/dd/yyyy
+FormatDateShortJQuery: mm/dd/yy
+FormatDateShortJQueryInput: mm/dd/yy
+FormatHourShortJQuery: 'HH:MI'
+FormatHourShort: '%I:%M %p'
+FormatHourShortDuration: '%H:%M'
+FormatDateTextShort: '%b %d, %Y'
+FormatDateText: '%B %d, %Y'
+FormatDateHourShort: '%m/%d/%Y %I:%M %p'
+FormatDateHourSecShort: '%m/%d/%Y %I:%M:%S %p'
+FormatDateHourTextShort: '%b %d, %Y, %I:%M %p'
+FormatDateHourText: '%B %d, %Y, %I:%M %p'
+Closed: مقفول
+Closed2: مقفول
+CloseAs: 'اضبط الحالة على'
+RefSupplier: 'المرجع. مورد'
+CommercialProposalsShort: 'عروض تجارية'
+Refused: مرفوض
+Opened: افتح
+SearchIntoCustomerInvoices: 'فواتير العميل'
+SearchIntoSupplierInvoices: 'فواتير المورد'
+SearchIntoSupplierOrders: 'أوامر الشراء'
+SearchIntoSupplierProposals: 'عرود الموردين'
+ContactDefault_commande: طلب
+MemberStatusDraft: 'مسودة(مطلوب الاعتماد)'
+MemberStatusActiveShort: معتمد
+MemberStatusNoSubscriptionShort: معتمد
+multicurrency_syncronize_error: 'Synchronisation error: %s'
+MULTICURRENCY_USE_RATE_ON_DOCUMENT_DATE: 'Use date of document to find currency rate, instead of using latest known rate'
+multicurrency_useOriginTx: 'When an object is created from another, keep the original rate of source object (otherwise use the latest known rate)'
+CurrencyLayerAccount_help_to_synchronize: 'You sould create an account on their website to use this functionnality<br>Get your <b>API key</b><br />If you use a free account you can''t change the <b>currency source</b> (USD by default)<br />But if your main currency isn''t USD you can use the <b>alternate currency source</b> to force you main currency<br /><br />You are limited at 1000 synchronizations per month'
+multicurrency_appCurrencySource: 'Currency source'
+multicurrency_alternateCurrencySource: 'Alternate currency source'
+CurrenciesUsed_help_to_add: 'Add the differents currencies and rates you need to use on you <b>proposals</b>, <b>orders</b>, etc.'
+MulticurrencyRemainderToTake: 'Remaining amout, original currency'
+OrdersArea: 'منطقة طلبات العملاء'
+OrderCard: 'بطاقة الأمر'
+OrderId: 'رقم التعريف الخاص بالأمر'
+Order: طلب
+PdfOrderTitle: طلب
+Orders: الطلبات
+OrderDateShort: 'تاريخ الأمر'
+OrderToProcess: 'طلب تحت التشغيل'
+NewOrder: 'أمر جديد'
+NewSupplierOrderShort: 'أمر جديد'
+ToOrder: 'إصدار أمر'
+MakeOrder: 'إصدار أمر'
+SuppliersOrders: 'أوامر الشراء'
+StatusOrderValidatedShort: معتمد
+StatusOrderRefusedShort: مرفوض
+StatusOrderDraft: 'مسودة(مطلوب الاعتماد)'
+StatusOrderRefused: مرفوض
+StatusSupplierOrderRefusedShort: مرفوض
+StatusSupplierOrderDraft: 'مسودة(مطلوب الاعتماد)'
+StatusSupplierOrderValidated: معتمد
+StatusSupplierOrderRefused: مرفوض
+PartnershipDraft: مسودة
+PartnershipAccepted: مقبول
+PartnershipRefused: مرفوض
+OppStatusPROPO: عرض
+Proposals: 'عروض تجارية'
+Proposal: 'عرض تجاري'
+ProposalShort: عرض
+ProposalsDraft: 'مسودة العروض التجارية'
+ProposalsOpened: 'العروض التجارية المفتوحة'
+CommercialProposal: 'عرض تجاري'
+PdfCommercialProposalTitle: 'عرض تجاري'
+ProposalCard: 'بطاقة العرض'
+NewProp: 'عرض تجاري جديد'
+NewPropal: 'عرض جديد'
+Prospect: فرصة
+DeleteProp: 'حذف العرض التجاري'
+ValidateProp: 'اعتماد العرض التجاري'
+AddProp: 'إنشاء عرض'
+ConfirmDeleteProp: 'هل أنت متأكد أنك تريد حذف هذا العرض التجاري؟'
+ConfirmValidateProp: 'هل أنت متأكد أنك تريد اعتماد هذا العرض التجاري تحت الاسم <b> %s </b>؟'
+LastPropals: 'أحدث عروض %s'
+LastModifiedProposals: 'أحدث العروض المعدلة %s'
+AllPropals: 'جميع العروض'
+SearchAProposal: 'ابحث عن عرض'
+NoProposal: 'لا يوجد عرض'
+ProposalsStatistics: 'إحصائيات العروض التجارية'
+NumberOfProposalsByMonth: 'الرقم بالشهر'
+AmountOfProposalsByMonthHT: 'المبلغ حسب الشهر (بدون الضريبة)'
+NbOfProposals: 'عدد العروض التجارية'
+ShowPropal: 'إظهار العرض'
+PropalsOpened: افتح
+PropalStatusDraft: 'مسودة(مطلوب الاعتماد)'
+PropalStatusValidated: 'تم الاعتماد (العرض مفتوح)'
+PropalStatusSigned: 'موقّع (يحتاج إلى فواتير)'
+PropalStatusNotSigned: 'غير موقّع (مغلق)'
+PropalStatusBilled: مفوتر
+PropalStatusValidatedShort: 'معتمد (مفتوح)'
+PropalStatusClosedShort: مقفول
+PropalStatusSignedShort: موقع
+PropalStatusNotSignedShort: 'لم توقع'
+PropalStatusBilledShort: مفوتر
+PropalsToClose: 'عروض التجارية للغلق'
+PropalsToBill: 'عروض تجارية موقعة للفوترة'
+ListOfProposals: 'قائمة العروض التجارية'
+ActionsOnPropal: 'الأحداث على العرض'
+RefProposal: 'مرجع العرض تجاري'
+SendPropalByMail: 'إرسال عرض تجاري عن طريق البريد'
+DatePropal: 'تاريخ العرض'
+ValidityDuration: 'مدة الصلاحية'
+SetAcceptedRefused: 'مقبول / مرفوض'
+ErrorPropalNotFound: 'العرض %s غير موجود'
+AddToDraftProposals: 'أضف إلى مسودة العرض'
+NoDraftProposals: 'لا توجد مسودات عروض'
+CopyPropalFrom: 'إنشاء عرض تجاري عن طريق نسخ العرض الحالي'
+CreateEmptyPropal: 'إنشاء عرض تجاري فارغ أو من قائمة المنتجات / الخدمات'
+DefaultProposalDurationValidity: 'مدة صلاحية العرض التجاري الافتراضي (بالأيام)'
+ConfirmClonePropal: 'هل أنت متأكد أنك تريد استنساخ العرض التجاري <b> %s </b>؟'
+ConfirmReOpenProp: 'هل أنت متأكد أنك تريد إعادة فتح العرض التجاري <b> %s </b>؟'
+AfterOrder: 'بعد الطلب'
+OtherProposals: 'عروض أخرى'
+AvailabilityTypeAV_1W: 'أسبوع 1'
+AvailabilityTypeAV_1M: 'شهر 1'
+TypeContact_propal_internal_SALESREPFOLL: 'الممثل المتابع للعرض'
+TypeContact_propal_external_BILLING: 'جهة اتصال فاتورة العميل'
+DocModelCyanDescription: 'نموذج عرض كامل'
+DefaultModelPropalCreate: 'إنشاء النموذج الافتراضي'
+DefaultModelPropalToBill: 'النموذج الافتراضي عند إغلاق عرض الأعمال (سيتم إصدار فاتورة به)'
+ProposalCustomerSignature: 'قبول خطي وختم الشركة والتاريخ والتوقيع'
+ProposalsStatisticsSuppliers: 'إحصاءات مقترحات البائعين'
+StatusReceptionValidatedShort: معتمد
+ModuleRecruitmentName: توظيف
+ModuleRecruitmentDesc: 'إدارة ومتابعة حملات التوظيف لشغل وظائف جديدة'
+RecruitmentSetup: 'إعداد التوظيف'
+StatusSendingValidatedShort: معتمد
+SmsStatusValidated: معتمد
+inventoryValidate: معتمد
+SupplierProposal: 'عروض المورد التجارية'
+supplier_proposalDESC: 'إدارة طلبات عروض الأسعار من موردين'
+SupplierProposalNew: 'طلب عرض سعر جديد'
+CommRequest: 'طلب عرض السعر'
+CommRequests: 'طلبات عروض اسعار'
+SearchRequest: 'البحث عن عرض سعر'
+DraftRequests: 'مسودة طلب عرض سعر'
+SupplierProposalsDraft: 'مسودة عروض موردين'
+LastModifiedRequests: 'أحدث طلبات السعر المعدلة %s'
+RequestsOpened: 'طلبات عروض اسعار مفتوحة'
+SupplierProposalArea: 'منطقة عروض الموردين'
+SupplierProposalShort: 'عرض المورد'
+SupplierProposals: 'عروض الموردين'
+SupplierProposalsShort: 'عروض الموردين'
+NewAskPrice: 'طلب عرض سعر جديد'
+ShowSupplierProposal: 'فتح عرض السعر'
+AddSupplierProposal: 'عمل طلب عرض سعر'
+SupplierProposalRefFourn: 'مرجع المورد'
+SupplierProposalDate: 'تاريخ التوريد'
+SupplierProposalRefFournNotice: 'قبل الإغلاق إلى "مقبول" ، فكر في فهم مراجع الموردين.'
+ConfirmValidateAsk: 'هل أنت متأكد أنك تريد اعتماد طلب السعر هذا تحت الاسم <b> %s </b>؟'
+ValidateAsk: 'اعتماد الطلب'
+SupplierProposalStatusDraft: 'مسودة(مطلوب الاعتماد)'
+SupplierProposalStatusValidated: 'معتمد(الطلب مفتوح)'
+SupplierProposalStatusClosed: مقفول
+SupplierProposalStatusSigned: مقبول
+SupplierProposalStatusNotSigned: مرفوض
+SupplierProposalStatusValidatedShort: معتمد
+SupplierProposalStatusClosedShort: مقفول
+SupplierProposalStatusSignedShort: مقبول
+SupplierProposalStatusNotSignedShort: مرفوض
+CopyAskFrom: 'قم بإنشاء طلب سعر عن طريق نسخ طلب موجود'
+CreateEmptyAsk: 'إنشاء طلب فارغ'
+ConfirmCloneAsk: 'هل أنت متأكد أنك تريد استنساخ طلب السعر <b> %s </b>؟'
+ConfirmReOpenAsk: 'هل أنت متأكد أنك تريد فتح طلب السعر مرة أخرى <b> %s </b>؟'
+SendAskRef: 'إرسال طلب السعر %s'
+SupplierProposalCard: 'بطاقة الطلب'
+ConfirmDeleteAsk: 'هل أنت متأكد أنك تريد حذف طلب السعر هذا <b> %s </b>؟'
+DefaultModelSupplierProposalCreate: 'إنشاء النموذج الافتراضي'
+DefaultModelSupplierProposalClosed: 'القالب الافتراضي عند إغلاق طلب السعر (مرفوض)'
+ListOfSupplierProposals: 'قائمة طلبات عروض البائعين'
+ListSupplierProposalsAssociatedProject: 'قائمة عروض الموردين المرتبطة بالمشروع'
+SupplierProposalsToClose: 'عروض موردين لإغلاق'
+SupplierProposalsToProcess: 'عروض موردين لمعالجة'
+LastSupplierProposals: 'أحدث طلبات أسعار %s'
+AllPriceRequests: 'جميع الطلبات'
+Suppliers: موردين
+SupplierInvoices: 'فواتير المورد'
+ShowSupplierInvoice: 'إظهار فاتورة المورد'
+ListOfSuppliers: 'قائمة موردين'
+ShowSupplier: 'فتح صفحة المورد'
+OrderDate: 'تاريخ الأمر'
+TotalBuyingPriceMinShort: 'إجمالي أسعار الشراء'
+TotalSellingPriceMinShort: 'إجمالي أسعار البيع'
+SomeSubProductHaveNoPrices: 'بعض المنتجات غير مسعره'
+AddSupplierPrice: 'إضافة سعر الشراء'
+ReferenceSupplierIsAlreadyAssociatedWithAProduct: 'مرجع المورد هذا مرتبط بالفعل بمنتج: %s'
+NoRecordedSuppliers: 'لم يتم تسجيل مورد'
+SupplierPayment: 'دفعة مورد'
+RefSupplierShort: 'المرجع. مورد'
+ExportDataset_fournisseur_1: 'فواتير المورد و تفاصيلها'
+ExportDataset_fournisseur_2: 'فواتير و دفعات المورد'
+ExportDataset_fournisseur_3: 'تفاصيل أوامر الشراء'
+ApproveThisOrder: 'إعتماد الأمر'
+ConfirmApproveThisOrder: 'هل أنت متأكد أنك تريد الموافقة على الطلب <b> %s </b>؟'
+ConfirmDenyingThisOrder: 'هل أنت متأكد أنك تريد رفض هذا الطلب <b> %s </b>؟'
+ConfirmCancelThisOrder: 'هل أنت متأكد أنك تريد إلغاء هذا الطلب <b> %s </b>؟'
+AddSupplierInvoice: 'إنشاء فاتورة المورد'
+ListOfSupplierProductForSupplier: 'قائمة المنتجات والأسعار الخاصة بالمورد <b> %s </b>'
+SentToSuppliers: 'مرسلة إلى المورديين'
+MenuOrdersSupplierToBill: 'أوامر الشراء للفاتورة'
+DescNbDaysToDelivery: 'أطول تأخير لتسليم المنتجات من هذا الطلب'
+DoNotOrderThisProductToThisSupplier: 'لا تتعامل'
+AllProductServicePrices: 'أسعار جميع المنتجات / الخدمات'
+TicketSettings: الإعدادات
+WebsiteSetupDesc: 'أنشئ هنا مواقع الويب التي ترغب في استخدامها. ثم انتقل إلى قائمة مواقع الويب القائمة لعمل التعديلات.'
+DeleteWebsite: 'حذف موقع الويب'
+ConfirmDeleteWebsite: 'هل أنت متأكد أنك تريد حذف هذا الموقع؟ سيتم أيضًا إزالة جميع صفحاته ومحتواه. ستبقى الملفات التي تم تحميلها (مثل في دليل الصور ، وحدة ECM ، ...).'
+WEBSITE_TYPE_CONTAINER: 'نوع الصفحة / الحاوية'
+WEBSITE_PAGE_EXAMPLE: 'صفحة ويب لاستخدامها كمثال'
+WEBSITE_PAGENAME: 'اسم الصفحة / الاسم المستعار'
+WEBSITE_ALIASALT: 'أسماء الصفحات / الأسماء المستعارة البديلة'
+WEBSITE_ALIASALTDesc: 'استخدم هنا قائمة بأسماء / أسماء مستعارة أخرى بحيث يمكن الوصول إلى الصفحة أيضًا باستخدام هذه الأسماء / الأسماء المستعارة الأخرى (على سبيل المثال ، الاسم القديم بعد إعادة تسمية الاسم المستعار للحفاظ على الرابط الخلفي في عمل الرابط / الاسم القديم). النحو هو: <br> Alternativename1 ، و Alternativename2 ، ...'
+WEBSITE_CSS_URL: 'عنوان URL لملف CSS الخارجي'
+WEBSITE_CSS_INLINE: 'محتوى ملف CSS (مشترك لجميع الصفحات)'
+StatusRefused: مرفوض

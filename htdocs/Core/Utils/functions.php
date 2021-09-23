@@ -108,17 +108,51 @@ function createConfigFromDolibarr(): bool
     return Constants::loadConstants();
 }
 
-if (!function_exists('basePath')) {
-    /**
-     * Returns the app base path.
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    function basePath(string $path = ''): string
-    {
-        return realpath(constant('BASE_FOLDER')) .
-            (empty($path) ? $path : constant('DIRECTORY_SEPARATOR') . trim($path, constant('DIRECTORY_SEPARATOR')));
-    }
+/**
+ * Returns the app base path.
+ *
+ * @param string $path
+ *
+ * @return string
+ */
+function basePath(string $path = ''): string
+{
+    return realpath(constant('BASE_FOLDER')) .
+        (empty($path) ? $path : constant('DIRECTORY_SEPARATOR') . trim($path, constant('DIRECTORY_SEPARATOR')));
+}
+
+/**
+ * Translate a literal in CamelCase format to snake_case format
+ *
+ * @param string $string
+ * @param string $us
+ *
+ * @return string
+ */
+function camelToSnake(string $string, string $us = '_'): string
+{
+    $patterns = [
+        '/([a-z]+)([0-9]+)/i',
+        '/([a-z]+)([A-Z]+)/',
+        '/([0-9]+)([a-z]+)/i',
+    ];
+    $string = preg_replace($patterns, '$1' . $us . '$2', $string);
+
+    // Lowercase
+    $string = strtolower($string);
+
+    return $string;
+}
+
+/**
+ * Translate a literal in snake_case format to CamelCase format
+ *
+ * @param string $string
+ * @param string $us
+ *
+ * @return string
+ */
+function snakeToCamel(string $string, string $us = '_'): string
+{
+    return str_replace($us, '', ucwords($string, $us));
 }

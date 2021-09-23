@@ -1,0 +1,126 @@
+ACCOUNTING_EXPORT_SEPARATORCSV: 'Separador de columna de archivo a exportar'
+ACCOUNTING_EXPORT_DATE: 'Formato de fecha de archivo a exportar'
+ACCOUNTING_EXPORT_PIECE: 'Exportar el número de pieza'
+ACCOUNTING_EXPORT_GLOBAL_ACCOUNT: 'Exportar con cuenta global'
+ACCOUNTING_EXPORT_LABEL: 'Etiqueta de exportación'
+ACCOUNTING_EXPORT_AMOUNT: 'Monto de exportación'
+ACCOUNTING_EXPORT_DEVISE: 'Moneda de exportación'
+ACCOUNTING_EXPORT_PREFIX_SPEC: 'Especifique el prefijo del nombre del fichero'
+DefaultForService: 'Servicio por defecto'
+DefaultForProduct: 'Producto por defecto'
+Journals: Revistas
+JournalFinancial: 'Revistas financieras'
+BackToChartofaccounts: 'Retornar gráfico de cuentas'
+Selectchartofaccounts: 'Seleccione el plan de cuentas activo'
+Addanaccount: 'Agregar una cuenta contable'
+Binding: 'Vinculación a cuentas'
+CustomersVentilation: 'Fijación de la factura del cliente'
+CreateMvts: 'Crear nueva transacción'
+UpdateMvts: 'Modificación de una transacción'
+InvoiceLines: 'Líneas de facturas para enlazar'
+InvoiceLinesDone: 'Líneas de facturas vinculadas'
+IntoAccount: 'Vincular la línea con la cuenta de contabilidad'
+Ventilate: Vincular
+Processing: Procesando
+EndProcessing: 'Proceso finalizado.'
+Lineofinvoice: 'Línea de factura'
+VentilatedinAccount: 'Vinculado con éxito a la cuenta contable'
+NotVentilatedinAccount: 'No vinculado a la cuenta contable'
+ACCOUNTING_LIST_SORT_VENTILATION_TODO: 'Comienza la clasificación de la página "Vinculación a hacer" por los elementos más recientes'
+ACCOUNTING_LIST_SORT_VENTILATION_DONE: 'Comienza la clasificación de la página "Encuadernación realizada" por los elementos más recientes'
+ACCOUNTING_LENGTH_DESCRIPTION: 'Truncar la descripción de los productos y servicios en los listados después de los caracteres x (mejor = 50)'
+ACCOUNTING_LENGTH_DESCRIPTION_ACCOUNT: 'Truncar el formulario de descripción de la cuenta de producto y servicios en los listados después de los caracteres x (mejor = 50)'
+ACCOUNTING_LENGTH_GACCOUNT: 'Longitud de las cuentas de contabilidad general (si establece el valor a 6 aquí, la cuenta ''706'' aparecerá como ''706000'' en la pantalla)'
+ACCOUNTING_SELL_JOURNAL: 'Diario de Venta'
+ACCOUNTING_PURCHASE_JOURNAL: 'Diario de Compra'
+ACCOUNTING_MISCELLANEOUS_JOURNAL: 'Diario diverso'
+ACCOUNTING_EXPENSEREPORT_JOURNAL: 'Informe de Gastos Diario'
+ACCOUNTING_SOCIAL_JOURNAL: 'Diario Social'
+ACCOUNTING_ACCOUNT_SUSPENSE: 'Cuenta contable de espera'
+Codejournal: Periódico
+FinanceJournal: 'Periodo Financiero'
+TotalMarge: 'Margen total de ventas'
+VersionProgram: 'Versión del programa'
+VersionLastInstall: 'Instalar versión inicial'
+Module30Name: Facturas
+Permission91: 'Consultar impuestos e IGV'
+Permission92: 'Crear/modificar impuestos e IGV'
+Permission93: 'Eliminar impuestos e IGV'
+DictionaryVAT: 'Tasa de IGV o tasa de impuesto a las ventas'
+UnitPriceOfProduct: 'Precio unitario sin IGV de un producto'
+NotificationsDescGlobal: '* or by setting global email addresses in this setup page.'
+OptionVatMode: 'IGV adeudado'
+MailToSendInvoice: 'Facturas de Clientes'
+OperationParamDesc: 'Define the values to use for the object of the action, or how to extract values. For example:<br>objproperty1=SET:the value to set<br>objproperty2=SET:a value with replacement of __objproperty1__<br>objproperty3=SETIFEMPTY:value used if objproperty3 is not already defined<br>objproperty4=EXTRACT:HEADER:X-Myheaderkey:\\s*([^\\s]*)<br>options_myextrafield1=EXTRACT:SUBJECT:([^&#92;n]*)<br>object.objproperty5=EXTRACT:BODY:My company name is\\s([^\\s]*)<br><br>Use a ; char as separator to extract or set several properties.'
+EmailCollectorLoadThirdPartyHelp: 'You can use this action to use the email content to find and load an existing thirdparty in your database. The found (or created) thirdparty will be used for following actions that need it.<br>For example, if you want to create a thirdparty with a name extracted a string ''Name: name to find'' found into the body, use sender email as email, you can set the parameter field like this:<br>''email=HEADER:^From:(.*);name=EXTRACT:BODY:Name:\\s([^\\s]*);client=SET:2;''<br>'
+ListOfActions: 'Lista de eventos'
+DeleteType: Borrar
+Settings: Configuración
+MenuListAssets: Lista
+MenuListTypeAssets: Lista
+StatusAccountOpened: Abrir
+StatusAccountClosed: Cerrado
+BillsCustomers: 'Facturas de clientes'
+BillsCustomer: 'Factura de cliente'
+InvoiceAvoir: 'Nota de crédito'
+InvoiceAvoirAsk: 'Nota de crédito para corregir factura'
+InvoiceCustomer: 'Factura de cliente'
+CustomerInvoice: 'Factura de cliente'
+CustomersInvoices: 'Facturas de clientes'
+BillShortStatusClosedUnpaid: Cerrado
+ConfirmClassifyPaidPartiallyReasonDiscountNoVat: 'El resto a pagar <b>(%s %s)</b> es un descuento acordado después de la factura. Acepto perder el IGV de este descuento'
+AmountOfBillsByMonthHT: 'Importe de las facturas por mes (Sin IGV)'
+CreditNote: 'Nota de crédito'
+VATIsNotUsedForInvoice: '* IGV no aplicable  art-293B del CGI'
+AddThisPageToBookmarks: 'Agregar página actual a marcadores'
+CashDeskMenu: 'Punto de venta'
+CashDesk: 'Punto de venta'
+NotAvailableWithBrowserPrinter: 'Not available when printer for receipt is set to browser:'
+ActionAC_CLO: Cerrado
+ProfId1ES: 'Registro Único de Contribuyente Id 1 (RUC)'
+ProfId3DZ: RUC
+InActivity: Abrir
+VATCollected: 'IGV recuperado'
+PaymentVat: 'Pago IGV'
+ShowVatPayment: 'Ver pagos IGV'
+VATReportByCustomersInInputOutputMode: 'Informe por cliente del IGV repercutido y pagado (IGV pagado)'
+SeeVATReportInInputOutputMode: 'Ver el informe <b>%sIGV pagado%s</b> para un modo de cálculo estandard'
+SeeVATReportInDueDebtMode: 'Ver el informe <b>%sIGV debido%s</b> para un modo de cálculo con la opción sobre lo debido'
+CronStatusInactiveBtn: Inhabilitar
+DonationStatusPromiseNotValidatedShort: Borrador
+DonationStatusPaidShort: Recibido
+EventOrganizationDescriptionLong: 'Manage Event organization for conference, attendees, speaker, and attendees, with public subcription page'
+ExternalSiteSetup: 'Configurar enlace al sitio web externo'
+ExternalSiteModuleNotComplete: 'El modulo Sitio Web Externo no esta configurado apropiadamente'
+ExampleMyMenuEntry: 'Mi entrada al menú'
+CommunitySupport: 'Foro / Soporte Wiki'
+EMailSupport: 'Soporte de correos electrónicos.'
+RemoteControlSupport: 'En linea, tiempo real / Soporte remoto'
+OtherSupport: 'Otro Soporte'
+ToSeeListOfAvailableRessources: 'Para contacto / ver fuentes disponibles'
+HelpCenter: 'Centro de ayuda'
+DolibarrHelpCenter: 'Dolibarr Ayuda y Centro de Soporte'
+ToGoBackToDolibarr: 'De otra manera, <a href="%s">click aquí para continuar usando Dolibarr </a>.'
+TypeSupportCommunauty: 'Comunidad (libre)'
+NeedHelpCenter: 'Necesita ayuda o soporte?'
+Efficiency: Eficiencia
+TypeHelpOnly: 'Solo ayuda'
+TypeHelpDev: Ayudar+Desarrollar
+TypeHelpDevForm: Ayuda+Desarrollo+Entrenamiento
+BackToHelpCenter: 'De otra manera, <a href="%s">volver al centro de ayuda de la página principal </a>.'
+LinkToGoldMember: 'Puede llamar a uno de los entrenadores preseleccionados por Dolibarr para su idioma (%s) haciendo clic en su Widget (estado y precio máximo son actualizados automáticamente):'
+PossibleLanguages: 'Idiomas soportados'
+SubscribeToFoundation: 'Ayuda al proyecto Dolibarr, suscríbete a la fundación'
+SeeOfficalSupport: 'Para el soporte oficial de Dolibarr en su idioma: <br><b><a href="%s" target="_blank">%s</a></b>'
+EditCP: Editar
+DeleteCP: Borrar
+ActionCancelCP: Cancelar
+InterventionCard: 'Ficha de intervención'
+NewIntervention: 'Nueva intervención'
+ChangeIntoRepeatableIntervention: 'Cambiar a intervención frecuente'
+ActionsOnFicheInter: 'Acciones sobre la intervención'
+LastInterventions: 'Últimas %sintervenciones'
+InterventionContact: 'Contacto de intervención'
+DeleteIntervention: 'Borrar intervención'
+InterDuration: 'Duración de intervención'
+MenuIntracommReportList: Lista

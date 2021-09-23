@@ -48,8 +48,15 @@ foreach ($directories as $directory) {
                 }
             }
         }
+        $new_name = substr($file_name, 0, -5); // Delete extension .lang.
+        if ($new_name === 'languages') {
+            $target_dir = 'Languages';
+        } else {
+            $target_dir = 'Modules/' . snakeToCamel($new_name) . '/Languages';
+            mkdir($target_dir, 0664, true);
+        }
+        $target_file = $target_dir . "/$directory.yaml";
+        echo "<p>Creating $target_file file.";
+        file_put_contents($target_file, Yaml::dump($data));
     }
-    $target_file = 'Languages/' . $directory . '.yaml';
-    echo "<p>Creating $target_file file.";
-    file_put_contents($target_file, Yaml::dump($data));
 }
