@@ -78,9 +78,9 @@ class box_ficheinter extends ModeleBoxes
 		$ficheinterstatic = new Fichinter($this->db);
 		$thirdpartystatic = new Societe($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastFicheInter", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastFicheInter", ['s' => $max])];
 
-		if (!empty($user->rights->ficheinter->lire)) {
+        if (!empty($user->rights->ficheinter->lire)) {
 			$sql = "SELECT f.rowid, f.ref, f.fk_soc, f.fk_statut as status";
 			$sql .= ", f.datec";
 			$sql .= ", f.date_valid as datev";

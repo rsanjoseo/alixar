@@ -82,9 +82,9 @@ class box_mos extends ModeleBoxes
 		$productstatic = new Product($this->db);
 		$userstatic = new User($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLatestModifiedMos", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLatestModifiedMos", ['s' => $max])];
 
-		if ($user->rights->mrp->read) {
+        if ($user->rights->mrp->read) {
 			$sql = "SELECT p.ref as product_ref";
 			$sql .= ", p.rowid as productid";
 			$sql .= ", p.tosell";
