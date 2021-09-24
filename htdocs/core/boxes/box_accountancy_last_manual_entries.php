@@ -77,9 +77,9 @@ class box_accountancy_last_manual_entries extends ModeleBoxes
 
 		$bookkeepingstatic = new BookKeeping($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastManualEntries", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastManualEntries", ['s', $max])];
 
-		if ($user->rights->accounting->mouvements->lire) {
+        if ($user->rights->accounting->mouvements->lire) {
 			$sql = "SELECT DISTINCT b.piece_num";
 			$sql .= ", b.doc_date as date_movement";
 			$sql .= ", b.label_operation";

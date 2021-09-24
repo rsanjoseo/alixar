@@ -278,7 +278,22 @@ class Translator extends Provider
         return self::$translator->getLocale();
     }
 
-    /**
+    /**    public function getCurrencySymbol($currency_code, $forceloadall = 0)
+     * {
+     * $currency_sign = ''; // By default return iso code
+     *
+     * if (function_exists("mb_convert_encoding")) {
+     * $this->loadCacheCurrencies($forceloadall ? '' : $currency_code);
+     *
+     * if (isset($this->cache_currencies[$currency_code]) && !empty($this->cache_currencies[$currency_code]['unicode']) && is_array($this->cache_currencies[$currency_code]['unicode'])) {
+     * foreach ($this->cache_currencies[$currency_code]['unicode'] as $unicode) {
+     * $currency_sign .= mb_convert_encoding("&#{$unicode};", "UTF-8", 'HTML-ENTITIES');
+     * }
+     * }
+     * }
+     *
+     * return ($currency_sign ? $currency_sign : $currency_code);
+     * }
      * Returns the missing strings.
      *
      * @return array
@@ -320,5 +335,23 @@ class Translator extends Provider
     public function transnoentitiesnoconv(string $txt, array $parameters = []): string
     {
         return self::trans($txt, $parameters);
+    }
+
+    public function getCurrencySymbol($currency_code, $forceloadall = 0)
+    {
+        return '€'; // TODO Cambiar por el símbolo que correspoda según la configuración
+    }
+
+    public function convToOutputCharset($str, $pagecodefrom = 'UTF-8')
+    {
+        $this->charset_output = 'UTF-8'; // TODO: Move db to UTF8_mb4?
+
+        if ($pagecodefrom == 'ISO-8859-1' && $this->charset_output == 'UTF-8') {
+            $str = utf8_encode($str);
+        }
+        if ($pagecodefrom == 'UTF-8' && $this->charset_output == 'ISO-8859-1') {
+            $str = utf8_decode(str_replace('€', chr(128), $str));
+        }
+        return $str;
     }
 }

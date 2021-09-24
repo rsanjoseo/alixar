@@ -86,9 +86,9 @@ class box_members extends ModeleBoxes
 		include_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 		$memberstatic = new Adherent($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedMembers", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastModifiedMembers", ['s' => $max])];
 
-		if ($user->rights->adherent->lire) {
+        if ($user->rights->adherent->lire) {
 			$sql = "SELECT a.rowid, a.ref, a.lastname, a.firstname, a.societe as company, a.fk_soc,";
 			$sql .= " a.datec, a.tms, a.statut as status, a.datefin as date_end_subscription,";
 			$sql .= ' a.photo, a.email, a.gender, a.morphy,';

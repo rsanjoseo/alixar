@@ -113,7 +113,7 @@ class mod_delivery_jade extends ModeleNumRefDeliveryOrder
 		}
 		if ($fayymm && !preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $fayymm)) {
             // $langs->load("errors");
-			$this->error = $langs->trans('ErrorNumRefModel', $max);
+			$this->error = $langs->trans('ErrorNumRefModel', ['s' => $max]);
 			return false;
 		}
 

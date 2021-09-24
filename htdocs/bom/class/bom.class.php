@@ -228,17 +228,17 @@ class BOM extends CommonObject
 	 *
 	 * @param DoliDb $db Database handler
 	 */
-	public function __construct(DoliDB $db)
-	{
-		global $conf, $langs;
+	public function __construct($db)
+    {
+        global $conf, $langs;
 
-		$this->db = $db;
+        $this->db = $db;
 
-		if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) {
-			$this->fields['rowid']['visible'] = 0;
-		}
-		if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) {
-			$this->fields['entity']['enabled'] = 0;
+        if (empty($conf->global->MAIN_SHOW_TECHNICAL_ID) && isset($this->fields['rowid'])) {
+            $this->fields['rowid']['visible'] = 0;
+        }
+        if (empty($conf->multicompany->enabled) && isset($this->fields['entity'])) {
+            $this->fields['entity']['enabled'] = 0;
 		}
 
 		// Unset fields that are disabled

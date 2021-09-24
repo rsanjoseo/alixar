@@ -79,9 +79,9 @@ class box_services_contracts extends ModeleBoxes
 
 		$form = new Form($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxLastProductsInContract", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxLastProductsInContract", ['s' => $max])];
 
-		if ($user->rights->service->lire && $user->rights->contrat->lire) {
+        if ($user->rights->service->lire && $user->rights->contrat->lire) {
 			$contractstatic = new Contrat($this->db);
 			$contractlinestatic = new ContratLigne($this->db);
 			$thirdpartytmp = new Societe($this->db);

@@ -305,12 +305,12 @@ if ((!empty($conf->product->enabled) || !empty($conf->service->enabled)) && ($us
 		$i = 0;
 
 		if ($num > 0) {
-			$transRecordedType = $langs->trans("LastModifiedProductsAndServices", $max);
+			$transRecordedType = $langs->trans("LastModifiedProductsAndServices", ['s' => $max]);
 			if (isset($_GET["type"]) && $_GET["type"] == 0) {
-				$transRecordedType = $langs->trans("LastRecordedProducts", $max);
+                $transRecordedType = $langs->trans("LastRecordedProducts", ['s' => $max]);
 			}
 			if (isset($_GET["type"]) && $_GET["type"] == 1) {
-				$transRecordedType = $langs->trans("LastRecordedServices", $max);
+                $transRecordedType = $langs->trans("LastRecordedServices", ['s' => $max]);
 			}
 
 			print '<div class="div-table-responsive-no-min">';

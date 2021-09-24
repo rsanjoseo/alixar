@@ -81,7 +81,7 @@ class box_factures_fourn extends ModeleBoxes
 		$thirdpartystatic = new Fournisseur($this->db);
 
 		$this->info_box_head = array(
-			'text' => $langs->trans("BoxTitleLast".(!empty($conf->global->MAIN_LASTBOX_ON_OBJECT_DATE) ? "" : "Modified")."SupplierBills", $max)
+            'text' => $langs->trans("BoxTitleLast" . (!empty($conf->global->MAIN_LASTBOX_ON_OBJECT_DATE) ? "" : "Modified") . "SupplierBills", ['s' => $max]),
 		);
 
 		if ($user->rights->fournisseur->facture->lire) {

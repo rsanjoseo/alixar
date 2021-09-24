@@ -90,13 +90,13 @@ class box_graph_ticket_by_severity extends ModeleBoxes
 
 		require_once DOL_DOCUMENT_ROOT."/ticket/class/ticket.class.php";
 
-		$text = $langs->trans("BoxTicketSeverity", $max);
-		$this->info_box_head = array(
-			'text' => $text,
-			'limit' => dol_strlen($text)
-		);
+		$text = $langs->trans("BoxTicketSeverity", ['s' => $max]);
+        $this->info_box_head = [
+            'text' => $text,
+            'limit' => dol_strlen($text),
+        ];
 
-		$listofopplabel = array();
+        $listofopplabel = array();
 		$listofoppcode = array();
 		$colorseriesstat = array();
 		if ($user->rights->ticket->read) {

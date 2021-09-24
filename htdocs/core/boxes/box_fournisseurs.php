@@ -79,9 +79,9 @@ class box_fournisseurs extends ModeleBoxes
 		include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 		$thirdpartystatic = new Fournisseur($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedSuppliers", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastModifiedSuppliers", ['s' => $max])];
 
-		if ($user->rights->societe->lire) {
+        if ($user->rights->societe->lire) {
 			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
 			$sql .= ", s.code_fournisseur, s.code_compta_fournisseur, s.fournisseur";
 			$sql .= ", s.logo, s.email, s.entity";

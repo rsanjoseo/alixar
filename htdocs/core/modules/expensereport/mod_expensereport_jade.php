@@ -106,7 +106,7 @@ class mod_expensereport_jade extends ModeleNumRefExpenseReport
 		}
 		if ($coyymm && !preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $coyymm)) {
 			// $langs->load("errors");
-			$this->error = $langs->trans('ErrorNumRefModel', $max);
+			$this->error = $langs->trans('ErrorNumRefModel', ['s' => $max]);
 			return false;
 		}
 

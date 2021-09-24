@@ -84,9 +84,9 @@ class box_customers_outstanding_bill_reached extends ModeleBoxes
 		include_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 		$thirdpartystatic = new Societe($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastOutstandingBillReached", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastOutstandingBillReached", ['s' => $max])];
 
-		if ($user->rights->societe->lire) {
+        if ($user->rights->societe->lire) {
 			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
 			$sql .= ", s.code_client, s.code_compta, s.client";
 			$sql .= ", s.logo, s.email, s.entity";

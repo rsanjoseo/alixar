@@ -90,9 +90,9 @@ class box_members_last_subscriptions extends ModeleBoxes
 		$statictype = new AdherentType($this->db);
 		$subscriptionstatic = new Subscription($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("LastSubscriptionsModified", $max));
+		$this->info_box_head = ['text' => $langs->trans("LastSubscriptionsModified", ['s' => $max])];
 
-		if ($user->rights->adherent->lire) {
+        if ($user->rights->adherent->lire) {
 			$sql = "SELECT a.rowid, a.statut as status, a.lastname, a.firstname, a.societe as company, a.fk_soc,";
 			$sql .= " a.gender, a.email, a.photo, a.morphy,";
 			$sql .= " a.datefin as date_end_subscription,";

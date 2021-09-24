@@ -267,11 +267,11 @@ class box_graph_product_distribution extends ModeleBoxes
 					$px3->SetHorizTickIncrement(1);
 					$px3->SetCssPrefix("cssboxes");
 					//$px3->mode='depth';
-					$px3->SetType(array('pie'));
-					$px3->SetTitle($langs->trans("ForObject", $langs->transnoentitiesnoconv("Orders")));
-					$px3->combine = 0.05;
+					$px3->SetType(['pie']);
+                    $px3->SetTitle($langs->trans("ForObject", ['s' => $langs->transnoentitiesnoconv("Orders")]));
+                    $px3->combine = 0.05;
 
-					$px3->draw($filenamenb, $fileurlnb);
+                    $px3->draw($filenamenb, $fileurlnb);
 				}
 			}
 		}
@@ -331,11 +331,11 @@ class box_graph_product_distribution extends ModeleBoxes
 					$px1->SetHorizTickIncrement(1);
 					$px1->SetCssPrefix("cssboxes");
 					//$px1->mode='depth';
-					$px1->SetType(array('pie'));
-					$px1->SetTitle($langs->trans("ForObject", $langs->transnoentitiesnoconv("Invoices")));
-					$px1->combine = 0.05;
+					$px1->SetType(['pie']);
+                    $px1->SetTitle($langs->trans("ForObject", ['s' => $langs->transnoentitiesnoconv("Invoices")]));
+                    $px1->combine = 0.05;
 
-					$px1->draw($filenamenb, $fileurlnb);
+                    $px1->draw($filenamenb, $fileurlnb);
 				}
 			}
 		}

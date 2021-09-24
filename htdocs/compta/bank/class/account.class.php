@@ -327,17 +327,17 @@ class Account extends CommonObject
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct(DoliDB $db)
-	{
-		global $langs;
+    public function __construct($db)
+    {
+        global $langs;
 
-		$this->db = $db;
+        $this->db = $db;
 
-		$this->solde = 0;
+        $this->solde = 0;
 
-		$this->type_lib = array(
-			self::TYPE_SAVINGS => $langs->trans("BankType0"),
-			self::TYPE_CURRENT => $langs->trans("BankType1"),
+        $this->type_lib = array(
+            self::TYPE_SAVINGS => $langs->trans("BankType0"),
+            self::TYPE_CURRENT => $langs->trans("BankType1"),
 			self::TYPE_CASH => $langs->trans("BankType2"),
 		);
 

@@ -84,9 +84,9 @@ class box_factures_imp extends ModeleBoxes
 
 		// $langs->load("bills");
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleOldestUnpaidCustomerBills", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleOldestUnpaidCustomerBills", ['s' => $max])];
 
-		if ($user->rights->facture->lire) {
+        if ($user->rights->facture->lire) {
 			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
 			$sql .= ", s.code_client, s.code_compta, s.client";
 			$sql .= ", s.logo, s.email, s.entity";

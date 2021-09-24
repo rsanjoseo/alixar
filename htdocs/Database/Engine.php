@@ -344,10 +344,10 @@ abstract class Engine
         global $conf;
 
         // Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
-        $cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
+        $cryptType = (!empty($this->db->dolibarr_main_db_encryption) ? $this->db->dolibarr_main_db_encryption : 0);
 
         //Encryption key
-        $cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
+        $cryptKey = (!empty($this->db->dolibarr_main_db_cryptkey) ? $this->db->dolibarr_main_db_cryptkey : '');
 
         $return = $value;
 
@@ -594,5 +594,10 @@ abstract class Engine
     public function idate($param, $gm = 'tzserver')
     {
         return date('Y-m-d H:i:s', $$param);
+    }
+
+    public function ifsql($test, $resok, $resko)
+    {
+        return 'IF(' . $test . ',' . $resok . ',' . $resko . ')';
     }
 }

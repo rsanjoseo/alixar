@@ -88,9 +88,9 @@ class box_members_subscriptions_by_year extends ModeleBoxes
 		$memberstatic = new Adherent($this->db);
 		$statictype = new AdherentType($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleMembersSubscriptionsByYear", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleMembersSubscriptionsByYear", ['s' => $max])];
 
-		if ($user->rights->adherent->lire) {
+        if ($user->rights->adherent->lire) {
 			$num = 0;
 			$line = 0;
 			// List of subscription by year

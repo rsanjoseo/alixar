@@ -76,9 +76,9 @@ class box_contracts extends ModeleBoxes
 
 		include_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastContracts", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastContracts", ['s' => $max])];
 
-		if ($user->rights->contrat->lire) {
+        if ($user->rights->contrat->lire) {
 			$contractstatic = new Contrat($this->db);
 			$thirdpartytmp = new Societe($this->db);
 

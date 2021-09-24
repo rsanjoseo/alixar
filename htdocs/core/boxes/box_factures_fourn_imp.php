@@ -78,9 +78,9 @@ class box_factures_fourn_imp extends ModeleBoxes
 		include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
 		$thirdpartystatic = new Fournisseur($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleOldestUnpaidSupplierBills", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleOldestUnpaidSupplierBills", ['s' => $max])];
 
-		if ($user->rights->fournisseur->facture->lire) {
+        if ($user->rights->fournisseur->facture->lire) {
 			// $langs->load("bills");
 
 			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";

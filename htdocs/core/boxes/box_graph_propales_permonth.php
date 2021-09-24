@@ -83,19 +83,19 @@ class box_graph_propales_permonth extends ModeleBoxes
 
 		// $langs->load("propal");
 
-		$text = $langs->trans("BoxProposalsPerMonth", $max);
-		$this->info_box_head = array(
-				'text' => $text,
-				'limit'=> dol_strlen($text),
-				'graph'=> 1, // Set to 1 if it's a box graph
-				'sublink'=>'',
-				'subtext'=>$langs->trans("Filter"),
-				'subpicto'=>'filter.png',
-				'subclass'=>'linkobject boxfilter',
-				'target'=>'none'	// Set '' to get target="_blank"
-		);
+		$text = $langs->trans("BoxProposalsPerMonth", ['s' => $max]);
+        $this->info_box_head = [
+            'text' => $text,
+            'limit' => dol_strlen($text),
+            'graph' => 1, // Set to 1 if it's a box graph
+            'sublink' => '',
+            'subtext' => $langs->trans("Filter"),
+            'subpicto' => 'filter.png',
+            'subclass' => 'linkobject boxfilter',
+            'target' => 'none'    // Set '' to get target="_blank"
+        ];
 
-		$dir = ''; // We don't need a path because image file will not be saved into disk
+        $dir = ''; // We don't need a path because image file will not be saved into disk
 		$prefix = '';
 		$socid = 0;
 		if ($user->socid) {

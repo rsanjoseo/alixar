@@ -88,9 +88,9 @@ class box_members_last_modified extends ModeleBoxes
 		$memberstatic = new Adherent($this->db);
 		$statictype = new AdherentType($this->db);
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedMembers", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastModifiedMembers", ['s' => $max])];
 
-		if ($user->rights->adherent->lire) {
+        if ($user->rights->adherent->lire) {
 			$sql = "SELECT a.rowid, a.ref, a.lastname, a.firstname, a.societe as company, a.fk_soc,";
 			$sql .= " a.datec, a.tms, a.statut as status, a.datefin as date_end_subscription,";
 			$sql .= ' a.photo, a.email, a.gender, a.morphy,';

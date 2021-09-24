@@ -354,8 +354,8 @@ if (!empty($conf->recruitment->enabled) && $user->rights->recruitment->recruitme
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
 		print '<th colspan="2">';
-		print $langs->trans("BoxTitleLatestModifiedJobPositions", $max);
-		print '</th>';
+        print $langs->trans("BoxTitleLatestModifiedJobPositions", ['s' => $max]);
+        print '</th>';
 		print '<th class="right">';
 		print $langs->trans("Applications");
 		print '</th>';
@@ -423,9 +423,9 @@ if (!empty($conf->recruitment->enabled) && $user->rights->recruitment->recruitme
 		print '<div class="div-table-responsive-no-min">';
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
-		print '<th colspan="2">';
-		print $langs->trans("BoxTitleLatestModifiedCandidatures", $max);
-		print '</th>';
+        print '<th colspan="2">';
+        print $langs->trans("BoxTitleLatestModifiedCandidatures", ['s' => $max]);
+        print '</th>';
 		print '<th class="right" colspan="2"><a href="'.DOL_URL_ROOT.'/recruitment/recruitmentcandidature_list.php?sortfield=t.tms&sortorder=DESC">'.$langs->trans("FullList").'</th>';
 		print '</tr>';
 		if ($num) {

@@ -79,9 +79,9 @@ class box_contacts extends ModeleBoxes
 
 		$this->max = $max;
 
-		$this->info_box_head = array('text' => $langs->trans("BoxTitleLastModifiedContacts", $max));
+		$this->info_box_head = ['text' => $langs->trans("BoxTitleLastModifiedContacts", ['s' => $max])];
 
-		if ($user->rights->societe->lire && $user->rights->societe->contact->lire) {
+        if ($user->rights->societe->lire && $user->rights->societe->contact->lire) {
 			$sql = "SELECT sp.rowid as id, sp.lastname, sp.firstname, sp.civility as civility_id, sp.datec, sp.tms, sp.fk_soc, sp.statut as status";
 
 			$sql .= ", sp.address, sp.zip, sp.town, sp.phone, sp.phone_perso, sp.phone_mobile, sp.email as spemail";

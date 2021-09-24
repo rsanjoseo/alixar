@@ -81,13 +81,13 @@ class box_factures extends ModeleBoxes
 
 		// $langs->load("bills");
 
-		$text = $langs->trans("BoxTitleLast".(!empty($conf->global->MAIN_LASTBOX_ON_OBJECT_DATE) ? "" : "Modified")."CustomerBills", $max);
-		$this->info_box_head = array(
-			'text' => $text,
-			'limit'=> dol_strlen($text)
-		);
+		$text = $langs->trans("BoxTitleLast" . (!empty($conf->global->MAIN_LASTBOX_ON_OBJECT_DATE) ? "" : "Modified") . "CustomerBills", ['s' => $max]);
+        $this->info_box_head = [
+            'text' => $text,
+            'limit' => dol_strlen($text),
+        ];
 
-		if ($user->rights->facture->lire) {
+        if ($user->rights->facture->lire) {
 			$sql = "SELECT f.rowid as facid";
 			$sql .= ", f.ref, f.type, f.total_ht";
 			$sql .= ", f.total_tva";

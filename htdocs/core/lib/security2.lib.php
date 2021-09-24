@@ -91,8 +91,6 @@ function checkLoginPassEntity($usertotest, $passwordtotest, $entitytotest, $auth
                 }
 
                 $result = false;
-                dump($authfile);
-                dump($fullauthfile);
                 if ($fullauthfile) {
                     $result = include_once $fullauthfile;
                 }

@@ -210,7 +210,7 @@ $resql = $db->query($sql);
 if ($resql) {
 	print '<table class="noborder centpercent">';
 	print '<tr class="liste_titre">';
-	print '<th colspan="5">'.$langs->trans("LastModifiedDonations", $max).'</th></tr>';
+    print '<th colspan="5">' . $langs->trans("LastModifiedDonations", ['s' => $max]) . '</th></tr>';
 
 	$num = $db->num_rows($resql);
 	if ($num) {
