@@ -307,4 +307,18 @@ class Translator extends Provider
     {
         return self::$translator;
     }
+
+    /**
+     * @param string      $txt
+     * @param array       $parameters
+     * @param string|null $domain
+     * @param string|null $locale
+     *
+     * @return string
+     * @deprecated Do not use
+     */
+    public function transnoentitiesnoconv(string $txt, array $parameters = []): string
+    {
+        return self::trans($txt, $parameters);
+    }
 }

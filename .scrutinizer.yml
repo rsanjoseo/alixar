@@ -8,7 +8,14 @@ build:
                 override:
                     - php-scrutinizer-run
                         idle_timeout: 3000     # 60 minutes
-
+    dependencies:
+        override:
+            - npm rebuild
+            - npm install
+            - yes | pecl install zip
+            - yes | pecl install phar
+            - sudo apt-get -y install libmagickwand-dev libmagickcore-dev && yes | pecl install imagick
+                idle_timeout: 3000     # 60 minutes
 imports:
     - javascript
     - php

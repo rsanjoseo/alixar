@@ -133,20 +133,19 @@ class box_graph_product_distribution extends ModeleBoxes
 			$nbofgraph++;
 		}
 
-		$text = $langs->trans("BoxProductDistribution", $max).' - '.$langs->trans("Year").': '.$year;
-		$this->info_box_head = array(
-				'text' => $text,
-				'limit'=> dol_strlen($text),
-				'graph'=> 1,
-				'sublink'=>'',
-				'subtext'=>$langs->trans("Filter"),
-				'subpicto'=>'filter.png',
-				'subclass'=>'linkobject boxfilter',
-				'target'=>'none'	// Set '' to get target="_blank"
-		);
+		$text = $langs->trans("BoxProductDistribution", ['s' => $max]) . ' - ' . $langs->trans("Year") . ': ' . $year;
+        $this->info_box_head = [
+            'text' => $text,
+            'limit' => dol_strlen($text),
+            'graph' => 1,
+            'sublink' => '',
+            'subtext' => $langs->trans("Filter"),
+            'subpicto' => 'filter.png',
+            'subclass' => 'linkobject boxfilter',
+            'target' => 'none'    // Set '' to get target="_blank"
+        ];
 
-
-		$socid = empty($user->socid) ? 0 : $user->socid;
+        $socid = empty($user->socid) ? 0 : $user->socid;
 		$userid = 0; // No filter on user creation
 
 		$WIDTH = ($nbofgraph >= 2 || !empty($conf->dol_optimize_smallscreen)) ? '300' : '320';
@@ -205,11 +204,11 @@ class box_graph_product_distribution extends ModeleBoxes
 					$px2->SetHorizTickIncrement(1);
 					$px2->SetCssPrefix("cssboxes");
 					//$px2->mode='depth';
-					$px2->SetType(array('pie'));
-					$px2->SetTitle($langs->trans("ForObject", $langs->transnoentitiesnoconv("Proposals")));
-					$px2->combine = 0.05;
+					$px2->SetType(['pie']);
+                    $px2->SetTitle($langs->trans("ForObject", ['s' => $langs->transnoentitiesnoconv("Proposals")]));
+                    $px2->combine = 0.05;
 
-					$px2->draw($filenamenb, $fileurlnb);
+                    $px2->draw($filenamenb, $fileurlnb);
 				}
 			}
 		}
