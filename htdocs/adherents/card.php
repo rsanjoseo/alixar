@@ -59,7 +59,7 @@ $socid = GETPOST('socid', 'int');
 if (!empty($conf->mailmanspip->enabled)) {
 	include_once DOL_DOCUMENT_ROOT.'/mailmanspip/class/mailmanspip.class.php';
 
-	$langs->load('mailmanspip');
+	// $langs->load('mailmanspip');
 
 	$mailmanspip = new MailmanSpip($db);
 }
@@ -211,7 +211,7 @@ if (empty($reshook)) {
 			$result = $nuser->create_from_member($tmpuser, GETPOST('login', 'alphanohtml'));
 
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans($nuser->error), null, 'errors');
 			} else {
 				setEventMessages($langs->trans("NewUserCreated", $nuser->login), null, 'mesgs');
@@ -230,7 +230,7 @@ if (empty($reshook)) {
 			$result = $company->create_from_member($object, GETPOST('companyname', 'alpha'), GETPOST('companyalias', 'alpha'));
 
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans($company->error), null, 'errors');
 				setEventMessages($company->error, $company->errors, 'errors');
 			}
@@ -254,17 +254,17 @@ if (empty($reshook)) {
 		$login = GETPOST("login", 'alphanohtml');
 		if ($morphy != 'mor' && empty($lastname)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Lastname")), null, 'errors');
 		}
 		if ($morphy != 'mor' && (!isset($firstname) || $firstname == '')) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Firstname")), null, 'errors');
 		}
 		if ($morphy == 'mor' && empty($societe)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Company")), null, 'errors');
 		}
 		// Check if the login already exists
@@ -522,7 +522,7 @@ if (empty($reshook)) {
 				}
 				if ($num) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorLoginAlreadyExists", $login), null, 'errors');
 				}
 			}
@@ -533,17 +533,17 @@ if (empty($reshook)) {
 		}
 		if ($morphy == 'mor' && empty($societe)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Company")), null, 'errors');
 		}
 		if ($morphy != 'mor' && empty($lastname)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Lastname")), null, 'errors');
 		}
 		if ($morphy != 'mor' && (!isset($firstname) || $firstname == '')) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Firstname")), null, 'errors');
 		}
 		if (!($typeid > 0)) {	// Keep () before !
@@ -552,11 +552,11 @@ if (empty($reshook)) {
 		}
 		if (!empty($conf->global->ADHERENT_MAIL_REQUIRED) && !isValidEMail($email)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorBadEMail", $email), null, 'errors');
 		}
 		if (!empty($object->url) && !isValidUrl($object->url)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages('', $langs->trans("ErrorBadUrl", $object->url), 'errors');
 		}
 		$public = 0;
@@ -610,7 +610,7 @@ if (empty($reshook)) {
 					$result = $company->create_from_member($object, $companyname, $companyalias);
 
 					if ($result < 0) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($langs->trans($company->error), null, 'errors');
 						setEventMessages($company->error, $company->errors, 'errors');
 					}
@@ -942,7 +942,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 			}
 
 			if (!($object->id > 0)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print($langs->trans('ErrorRecordNotFound'));
 				exit;
 			}
@@ -1494,7 +1494,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Confirm validate member
 		if ($action == 'valid') {
-			$langs->load("mails");
+            // $langs->load("mails");
 
 			$adht = new AdherentType($db);
 			$adht->fetch($object->typeid);
@@ -1557,7 +1557,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Confirm resiliate
 		if ($action == 'resiliate') {
-			$langs->load("mails");
+            // $langs->load("mails");
 
 			$adht = new AdherentType($db);
 			$adht->fetch($object->typeid);
@@ -1617,7 +1617,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Confirm exclude
 		if ($action == 'exclude') {
-			$langs->load("mails");
+            // $langs->load("mails");
 
 			$adht = new AdherentType($db);
 			$adht->fetch($object->typeid);
@@ -1744,7 +1744,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 				print '<span class="opacitymedium"'.$langs->trans("Hidden").'</span>';
 			}
 			if ((!empty($object->pass) || !empty($object->pass_crypted)) && empty($object->user_id)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$htmltext = $langs->trans("WarningPasswordSetWithNoAccount");
 				print ' '.$form->textwithpicto('', $htmltext, 1, 'warning');
 			}

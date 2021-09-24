@@ -110,7 +110,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 
 	foreach ($arrayofimages as $varforimage) {
 		if ($_FILES[$varforimage]["name"] && !preg_match('/(\.jpeg|\.jpg|\.png)$/i', $_FILES[$varforimage]["name"])) {	// Logo can be used on a lot of different places. Only jpg and png can be supported.
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorBadImageFormat"), null, 'errors');
 			break;
 		}
@@ -162,7 +162,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 						}
 					} elseif (preg_match('/^ErrorFileIsInfectedWithAVirus/', $result)) {
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$tmparray = explode(':', $result);
 						setEventMessages($langs->trans('ErrorFileIsInfectedWithAVirus', $tmparray[1]), null, 'errors');
 					} else {
@@ -171,7 +171,7 @@ if (($action == 'update' && !GETPOST("cancel", 'alpha'))
 					}
 				} else {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorBadImageFormat"), null, 'errors');
 				}
 			}
@@ -281,13 +281,13 @@ if ($action == 'addthumb' || $action == 'addthumbsquarred') {  // Regenerate thu
 			exit;
 		} else {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorBadImageFormat"), null, 'errors');
 			dol_syslog($langs->transnoentities("ErrorBadImageFormat"), LOG_INFO);
 		}
 	} else {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFileDoesNotExists", GETPOST("file")), null, 'errors');
 		dol_syslog($langs->transnoentities("ErrorFileDoesNotExists", GETPOST("file")), LOG_WARNING);
 	}
@@ -561,7 +561,7 @@ print '<div class="div-table-responsive-no-min">';
 print '<table class="noborder centpercent editmode">';
 print '<tr class="liste_titre"><td class="titlefieldcreate wordbreak">'.$langs->trans("CompanyIds").'</td><td>'.$langs->trans("Value").'</td></tr>';
 
-$langs->load("companies");
+// $langs->load("companies");
 
 // Managing Director(s)
 print '<tr class="oddeven"><td><label for="director">'.$langs->trans("ManagingDirectors").'</label></td><td>';

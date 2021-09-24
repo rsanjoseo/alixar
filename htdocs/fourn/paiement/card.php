@@ -382,7 +382,7 @@ if ($result > 0) {
 
 	print '</div></div></div>';
 } else {
-	$langs->load("errors");
+	// $langs->load("errors");
 	print $langs->trans("ErrorRecordNotFound");
 }
 

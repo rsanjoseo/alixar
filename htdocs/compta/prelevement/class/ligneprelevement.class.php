@@ -57,7 +57,7 @@ class LignePrelevement
 
 		// List of language codes for status
 
-		$langs->load("withdrawals");
+		// $langs->load("withdrawals");
 		$this->statuts[0] = $langs->trans("StatusWaiting");
 		$this->statuts[2] = $langs->trans("StatusPaid");
 		$this->statuts[3] = $langs->trans("StatusRefused");

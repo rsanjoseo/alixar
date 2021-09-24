@@ -610,7 +610,7 @@ class Hook extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+			//// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Disabled');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->trans('Disabled');

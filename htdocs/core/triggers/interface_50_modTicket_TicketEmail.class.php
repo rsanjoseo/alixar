@@ -131,7 +131,7 @@ class InterfaceTicketEmail extends DolibarrTriggers
 			case 'TICKET_CREATE':
 				dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
-				$langs->load('ticket');
+				// $langs->load('ticket');
 
 				// Send email to notification email
 				if (!empty($conf->global->TICKET_NOTIFICATION_EMAIL_TO) && empty($object->context['disableticketemail'])) {

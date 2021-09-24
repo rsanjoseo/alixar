@@ -425,7 +425,7 @@ class FormOther
 			}
         }
         if ($nocateg) {
-            $langs->load("categories");
+            // $langs->load("categories");
             $moreforfilter .= '<option value="-2"' . ($selected == -2 ? ' selected' : '') . '>- ' . $langs->trans("NotCategorized") . ' -</option>';
         }
         $moreforfilter .= '</select>';
@@ -453,7 +453,7 @@ class FormOther
 		// phpcs:enable
 		global $conf, $langs, $hookmanager;
 
-		$langs->load('users');
+        // $langs->load('users');
 
 		$out = '';
 		// Enhance with select2
@@ -600,7 +600,7 @@ class FormOther
 		}
 
 		if ($norepresentative) {
-			$langs->load("companies");
+            // $langs->load("companies");
 			$out .= '<option value="-2"'.($selected == -2 ? ' selected' : '').'>- '.$langs->trans("NoSalesRepresentativeAffected").' -</option>';
 		}
 
@@ -823,7 +823,7 @@ class FormOther
 		$out = '';
 
 		if (!is_array($arrayofcolors) || count($arrayofcolors) < 1) {
-			$langs->load("other");
+            // $langs->load("other");
 			if (empty($conf->dol_use_jmobile) && !empty($conf->use_javascript_ajax)) {
 				$out .= '<link rel="stylesheet" media="screen" type="text/css" href="'.DOL_URL_ROOT.'/includes/jquery/plugins/jpicker/css/jPicker-1.1.6.css" />';
 				$out .= '<script type="text/javascript" src="'.DOL_URL_ROOT.'/includes/jquery/plugins/jpicker/jpicker-1.1.6.js"></script>';
@@ -1155,7 +1155,7 @@ class FormOther
         $arrayboxtoactivatelabel = [];
         if (!empty($user->conf->$confuserzone)) {
             $boxorder = '';
-            $langs->load("boxes"); // Load label of boxes
+            // $langs->load("boxes"); // Load label of boxes
             foreach ($boxactivated as $box) {
                 if (!empty($boxidactivatedforuser[$box->id])) {
                     continue; // Already visible for user
@@ -1366,7 +1366,7 @@ class FormOther
 		// phpcs:enable
 		global $langs, $conf;
 
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		$sql = "SELECT rowid, ".$keyfield.", ".$labelfield;
 		$sql .= " FROM ".MAIN_DB_PREFIX.$dictionarytable;

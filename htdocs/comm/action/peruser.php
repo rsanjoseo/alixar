@@ -1026,7 +1026,7 @@ while ($currentdaytoshow < $lastdaytoshow) {
 echo '</div>';
 
 if (!empty($conf->global->AGENDA_USE_EVENT_TYPE) && !empty($conf->global->AGENDA_USE_COLOR_PER_EVENT_TYPE)) {
-	$langs->load("commercial");
+	// $langs->load("commercial");
 	print '<br>'.$langs->trans("Legend").': <br>';
 	foreach ($colorsbytype as $code => $color) {
 		if ($color) {

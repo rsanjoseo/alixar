@@ -1604,7 +1604,7 @@ function dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotupdatesess
 
 				$filenameto = basename($destfile);
 				if (preg_match('/^\./', $filenameto)) {
-					$langs->load("errors"); // key must be loaded because we can't rely on loading during output, we need var substitution to be done now.
+					// $langs->load("errors"); // key must be loaded because we can't rely on loading during output, we need var substitution to be done now.
 					setEventMessages($langs->trans("ErrorFilenameCantStartWithDot", $filenameto), null, 'errors');
 					break;
 				}
@@ -1665,7 +1665,7 @@ function dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotupdatesess
 
 					$nbok++;
 				} else {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					if ($resupload < 0) {	// Unknown error
 						setEventMessages($langs->trans("ErrorFileNotUploaded"), null, 'errors');
 					} elseif (preg_match('/ErrorFileIsInfectedWithAVirus/', $resupload)) {	// Files infected by a virus
@@ -1692,14 +1692,14 @@ function dol_add_file_process($upload_dir, $allowoverwrite = 0, $donotupdatesess
 		$linkObject->objectid = GETPOST('objectid', 'int');
 		$linkObject->label = GETPOST('label', 'alpha');
 		$res = $linkObject->create($user);
-		$langs->load('link');
+        // $langs->load('link');
 		if ($res > 0) {
 			setEventMessages($langs->trans("LinkComplete"), null, 'mesgs');
 		} else {
 			setEventMessages($langs->trans("ErrorFileNotLinked"), null, 'errors');
 		}
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("File")), null, 'errors');
 	}
 
@@ -1749,7 +1749,7 @@ function dol_remove_file_process($filenb, $donotupdatesession = 0, $donotdeletef
 		}
 		if ($result >= 0) {
 			if (empty($donotdeletefile)) {
-				$langs->load("other");
+                // $langs->load("other");
 				setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
 			}
 			if (empty($donotupdatesession)) {
@@ -2058,7 +2058,7 @@ function dol_compress_file($inputfile, $outputfile, $mode = "gz", &$errorstring 
 		}
 	} catch (Exception $e) {
 		global $langs, $errormsg;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errormsg = $langs->trans("ErrorFailedToWriteInDir");
 
 		$errorstring = "Failed to open file ".$outputfile;
@@ -2094,7 +2094,7 @@ function dol_uncompress($inputfile, $outputdir)
 			// Loop on each file to check result for unzipping file
 			foreach ($result as $key => $val) {
 				if ($val['status'] == 'path_creation_fail') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$ok = 0;
 					$errmsg = $langs->trans("ErrorFailToCreateDir", $val['filename']);
 					break;
@@ -2156,7 +2156,7 @@ function dol_compress_dir($inputdir, $outputfile, $mode = "zip", $excludefiles =
 
 	if (!dol_is_dir(dirname($outputfile)) || !is_writable(dirname($outputfile))) {
 		global $langs, $errormsg;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errormsg = $langs->trans("ErrorFailedToWriteInDir", $outputfile);
 		return -3;
 	}
@@ -2187,7 +2187,7 @@ function dol_compress_dir($inputdir, $outputfile, $mode = "zip", $excludefiles =
 				$result = $zip->open($outputfile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 				if (!$result) {
 					global $langs, $errormsg;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$errormsg = $langs->trans("ErrorFailedToWriteInFile", $outputfile);
 					return -4;
 				}
@@ -2228,7 +2228,7 @@ function dol_compress_dir($inputdir, $outputfile, $mode = "zip", $excludefiles =
 		}
 	} catch (Exception $e) {
 		global $langs, $errormsg;
-		$langs->load("errors");
+        // $langs->load("errors");
 		dol_syslog("Failed to open file ".$outputfile, LOG_ERR);
 		dol_syslog($e->getMessage(), LOG_ERR);
 		$errormsg = $langs->trans("ErrorFailedToWriteInDir", $outputfile);

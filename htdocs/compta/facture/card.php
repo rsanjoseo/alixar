@@ -69,10 +69,10 @@ if (!empty($conf->accounting->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('bills', 'companies', 'compta', 'products', 'banks', 'main', 'withdrawals'));
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 if (!empty($conf->margin->enabled)) {
-	$langs->load('margins');
+    // $langs->load('margins');
 }
 
 $projectid = (GETPOST('projectid', 'int') ? GETPOST('projectid', 'int') : 0);
@@ -212,7 +212,7 @@ if (empty($reshook)) {
 			header("Location: ".$_SERVER['PHP_SELF'].'?facid='.$result);
 			exit();
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($objectutil->error, $objectutil->errors, 'errors');
 			$action = '';
 		}
@@ -341,8 +341,8 @@ if (empty($reshook)) {
 
 				if (($tmp_total_ht < 0 || $tmp_total_ht_devise < 0) && empty($conf->global->FACTURE_ENABLE_NEGATIVE_LINES)) {
 					if ($object->type == $object::TYPE_DEPOSIT) {
-						$langs->load("errors");
-						// Using negative lines on deposit lead to headach and blocking problems when you want to consume them.
+                        // $langs->load("errors");
+                        // Using negative lines on deposit lead to headach and blocking problems when you want to consume them.
 						setEventMessages($langs->trans("ErrorLinesCantBeNegativeOnDeposits"), null, 'errors');
 						$error++;
 						$action = '';
@@ -351,7 +351,7 @@ if (empty($reshook)) {
 						$tmpvatratetoshow[0] = round($tmpvatratetoshow[0], 2);
 
 						if ($tmpvatratetoshow[0] != 0) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							setEventMessages($langs->trans("ErrorLinesCantBeNegativeForOneVATRate", $tmpvatratetoshow[0]), null, 'errors');
 							$error++;
 							$action = '';
@@ -607,7 +607,7 @@ if (empty($reshook)) {
 					if ($mysoc->country_id > 0 && $object->thirdparty->country_id == $mysoc->country_id) {
 						$idprof_mandatory = 'SOCIETE_'.$key.'_INVOICE_MANDATORY';
 						if (!$vallabel && !empty($conf->global->$idprof_mandatory)) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$error++;
 							setEventMessages($langs->trans('ErrorProdIdIsMandatory', $langs->transcountry('ProfId'.$i, $object->thirdparty->country_code)).' ('.$langs->trans("ForbiddenBySetupRules").')', null, 'errors');
 						}
@@ -618,7 +618,7 @@ if (empty($reshook)) {
 				if ($key == 'EMAIL') {
 					// Check for mandatory
 					if (!empty($conf->global->SOCIETE_EMAIL_INVOICE_MANDATORY) && !isValidEMail($object->thirdparty->email)) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$error++;
 						setEventMessages($langs->trans("ErrorBadEMail", $object->thirdparty->email).' ('.$langs->trans("ForbiddenBySetupRules").')', null, 'errors');
 					}
@@ -635,7 +635,7 @@ if (empty($reshook)) {
 			// Check for mandatory
 			$keymandatory = 'INVOICE_'.$key.'_MANDATORY_FOR_VALIDATION';
 			if (!$vallabel && !empty($conf->global->$keymandatory)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$error++;
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv($val)), null, 'errors');
 			}
@@ -1983,8 +1983,8 @@ if (empty($reshook)) {
 		foreach ($object->lines as $line) {
 			$result = $object->updateline($line->id, $line->desc, $line->subprice, $line->qty, $line->remise_percent, $line->date_start, $line->date_end, $vat_rate, $localtax1_rate, $localtax2_rate, 'HT', $line->info_bits, $line->product_type, $line->fk_parent_line, 0, $line->fk_fournprice, $line->pa_ht, $line->label, $line->special_code, $line->array_options, $line->situation_percent, $line->fk_unit, $line->multicurrency_subprice);
 		}
-	} elseif ($action == 'addline' && $usercancreate) {		// Add a new line
-		$langs->load('errors');
+	} elseif ($action == 'addline' && $usercancreate) {        // Add a new line
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -2031,7 +2031,7 @@ if (empty($reshook)) {
 		}
 		if (($prod_entry_mode == 'free' && (empty($idprod) || $idprod < 0) && (($price_ht < 0 && empty($conf->global->FACTURE_ENABLE_NEGATIVE_LINES)) || $price_ht == '') && $price_ht_devise == '') && $object->type != Facture::TYPE_CREDIT_NOTE) { 	// Unit price can be 0 but not ''
 			if ($price_ht < 0 && empty($conf->global->FACTURE_ENABLE_NEGATIVE_LINES)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				if ($object->type == $object::TYPE_DEPOSIT) {
 					// Using negative lines on deposit lead to headach and blocking problems when you want to consume them.
 					setEventMessages($langs->trans("ErrorLinesCantBeNegativeOnDeposits"), null, 'errors');
@@ -2053,7 +2053,7 @@ if (empty($reshook)) {
 			$error++;
 		}
 		if ($qty < 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorQtyForCustomerInvoiceCantBeNegative'), null, 'errors');
 			$error++;
 		}
@@ -2254,7 +2254,7 @@ if (empty($reshook)) {
 			} else {
 				// Add batchinfo if the detail_batch array is defined
 				if (!empty($conf->productbatch->enabled) && !empty($lines[$i]->detail_batch) && is_array($lines[$i]->detail_batch) && !empty($conf->global->INVOICE_INCUDE_DETAILS_OF_LOTS_SERIALS)) {
-					$langs->load('productbatch');
+                    // $langs->load('productbatch');
 					foreach ($lines[$i]->detail_batch as $batchline) {
 						$desc .= ' '.$langs->trans('Batch').' '.$batchline->batch.' '.$langs->trans('printQty', $batchline->qty).' ';
 					}
@@ -2437,13 +2437,13 @@ if (empty($reshook)) {
 			}
 		}
 		if ($qty < 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorQtyForCustomerInvoiceCantBeNegative'), null, 'errors');
 			$error++;
 		}
 		if ((empty($productid) && (($pu_ht < 0 && empty($conf->global->FACTURE_ENABLE_NEGATIVE_LINES)) || $pu_ht == '') && $pu_ht_devise == '') && $object->type != Facture::TYPE_CREDIT_NOTE) { 	// Unit price can be 0 but not ''
 			if ($pu_ht < 0 && empty($conf->global->FACTURE_ENABLE_NEGATIVE_LINES)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				if ($object->type == $object::TYPE_DEPOSIT) {
 					// Using negative lines on deposit lead to headach and blocking problems when you want to consume them.
 					setEventMessages($langs->trans("ErrorLinesCantBeNegativeOnDeposits"), null, 'errors');
@@ -2810,7 +2810,7 @@ if (empty($reshook)) {
 				exit();
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -3021,7 +3021,7 @@ if ($action == 'create') {
 	}
 
 	if ($origin == 'contrat') {
-		$langs->load("admin");
+        // $langs->load("admin");
 		$text = $langs->trans("ToCreateARecurringInvoice");
 		$text .= ' '.$langs->trans("ToCreateARecurringInvoiceGene", $langs->transnoentitiesnoconv("MenuFinancial"), $langs->transnoentitiesnoconv("BillsCustomers"), $langs->transnoentitiesnoconv("ListOfTemplates"));
 		if (empty($conf->global->INVOICE_DISABLE_AUTOMATIC_RECURRING_INVOICE)) {
@@ -3616,7 +3616,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load('projects');
+        // $langs->load('projects');
 		print '<tr><td>'.$langs->trans('Project').'</td><td colspan="2">';
 		print img_picto('', 'project').$formproject->select_projects(($socid > 0 ? $socid : -1), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
 		print ' <a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.$soc->id.'&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create&socid='.$soc->id.($fac_rec ? '&fac_rec='.$fac_rec : '')).'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
@@ -3916,7 +3916,7 @@ if ($action == 'create') {
 			}
 
 			if ($qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				$formproduct = new FormProduct($db);
 				$label = $object->type == Facture::TYPE_CREDIT_NOTE ? $langs->trans("SelectWarehouseForStockDecrease") : $langs->trans("SelectWarehouseForStockIncrease");
@@ -3989,7 +3989,7 @@ if ($action == 'create') {
 			}
 
 			if ($qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 				$formproduct = new FormProduct($db);
@@ -4031,7 +4031,7 @@ if ($action == 'create') {
 			}
 
 			if ($qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 				$formproduct = new FormProduct($db);
@@ -4198,7 +4198,7 @@ if ($action == 'create') {
 	}
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($usercancreate) {
 			if ($action != 'classify') {
@@ -5366,7 +5366,7 @@ if ($action == 'create') {
 
 			// POS Ticket
 			if (!empty($conf->takepos->enabled) && $object->module_source == 'takepos') {
-				$langs->load("cashdesk");
+                // $langs->load("cashdesk");
 				$receipt_url = DOL_URL_ROOT."/takepos/receipt.php";
 				print '<a target="_blank" class="butAction" href="'.$receipt_url.'?facid='.$object->id.'">'.$langs->trans('POSTicket').'</a>';
 			}

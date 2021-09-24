@@ -95,7 +95,7 @@ class ModelNumRefContracts
 	public function info()
 	{
 		global $langs;
-		$langs->load("contracts");
+		// $langs->load("contracts");
 		return $langs->trans("NoDescription");
 	}
 
@@ -107,7 +107,7 @@ class ModelNumRefContracts
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("contracts");
+        // $langs->load("contracts");
 		return $langs->trans("NoExample");
 	}
 
@@ -142,7 +142,7 @@ class ModelNumRefContracts
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

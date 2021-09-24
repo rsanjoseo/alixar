@@ -67,25 +67,25 @@ if (!empty($conf->ficheinter->enabled)) {
 // $langs->loadLangs(array('companies', 'banks'));
 
 if (!empty($conf->contrat->enabled)) {
-	$langs->load("contracts");
+	// $langs->load("contracts");
 }
 if (!empty($conf->commande->enabled)) {
-	$langs->load("orders");
+    // $langs->load("orders");
 }
 if (!empty($conf->expedition->enabled)) {
-	$langs->load("sendings");
+    // $langs->load("sendings");
 }
 if (!empty($conf->facture->enabled)) {
-	$langs->load("bills");
+    // $langs->load("bills");
 }
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+    // $langs->load("projects");
 }
 if (!empty($conf->ficheinter->enabled)) {
-	$langs->load("interventions");
+    // $langs->load("interventions");
 }
 if (!empty($conf->notification->enabled)) {
-	$langs->load("mails");
+    // $langs->load("mails");
 }
 
 $action = GETPOST('action', 'aZ09');
@@ -344,7 +344,7 @@ if ($object->id > 0) {
 	}
 
 	if ($object->client) {
-		$langs->load("compta");
+        // $langs->load("compta");
 
 		print '<tr><td>';
 		print $langs->trans('CustomerCode').'</td><td>';
@@ -399,8 +399,8 @@ if ($object->id > 0) {
 	print showValueWithClipboardCPButton(dol_escape_htmltag($object->tva_intra));
 	print '</td></tr>';
 
-	// default terms of the settlement
-	$langs->load('bills');
+    // default terms of the settlement
+    // $langs->load('bills');
 	print '<tr><td>';
 	print '<table width="100%" class="nobordernopadding"><tr><td>';
 	print $langs->trans('PaymentConditions');
@@ -543,7 +543,7 @@ if ($object->id > 0) {
 
 	// Warehouse
 	if (!empty($conf->stock->enabled) && !empty($conf->global->SOCIETE_ASK_FOR_WAREHOUSE)) {
-		$langs->load('stocks');
+        // $langs->load('stocks');
 		require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 		$formproduct = new FormProduct($db);
 		print '<tr class="nowrap">';
@@ -604,7 +604,7 @@ if ($object->id > 0) {
 
 	// Categories
 	if (!empty($conf->categorie->enabled) && !empty($user->rights->categorie->lire)) {
-		$langs->load("categories");
+        // $langs->load("categories");
 		print '<tr><td>'.$langs->trans("CustomersCategoriesShort").'</td>';
 		print '<td>';
 		print $form->showCategories($object->id, Categorie::TYPE_CUSTOMER, 1);
@@ -620,18 +620,18 @@ if ($object->id > 0) {
 
 	// Module Adherent
 	if (!empty($conf->adherent->enabled)) {
-		$langs->load("members");
-		$langs->load("users");
+        // $langs->load("members");
+        // $langs->load("users");
 
-		print '<tr><td class="titlefield">'.$langs->trans("LinkedToDolibarrMember").'</td>';
-		print '<td>';
-		$adh = new Adherent($db);
-		$result = $adh->fetch('', '', $object->id);
-		if ($result > 0) {
-			$adh->ref = $adh->getFullName($langs);
-			print $adh->getNomUrl(-1);
-		} else {
-			print '<span class="opacitymedium">'.$langs->trans("ThirdpartyNotLinkedToMember").'</span>';
+        print '<tr><td class="titlefield">' . $langs->trans("LinkedToDolibarrMember") . '</td>';
+        print '<td>';
+        $adh = new Adherent($db);
+        $result = $adh->fetch('', '', $object->id);
+        if ($result > 0) {
+            $adh->ref = $adh->getFullName($langs);
+            print $adh->getNomUrl(-1);
+        } else {
+            print '<span class="opacitymedium">' . $langs->trans("ThirdpartyNotLinkedToMember") . '</span>';
 		}
 		print '</td>';
 		print "</tr>\n";
@@ -817,7 +817,7 @@ if ($object->id > 0) {
 	 * Latest proposals
 	 */
 	if (!empty($conf->propal->enabled) && $user->rights->propal->lire) {
-		$langs->load("propal");
+        // $langs->load("propal");
 
 		$sql = "SELECT s.nom, s.rowid, p.rowid as propalid, p.fk_statut, p.total_ht";
 		$sql .= ", p.total_tva";
@@ -1361,29 +1361,29 @@ if ($object->id > 0) {
 		}
 
 		if (!empty($conf->propal->enabled) && $user->rights->propal->creer && $object->status == 1) {
-			$langs->load("propal");
+            // $langs->load("propal");
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/comm/propal/card.php?socid='.$object->id.'&amp;action=create">'.$langs->trans("AddProp").'</a></div>';
 		}
 
 		if (!empty($conf->commande->enabled) && $user->rights->commande->creer && $object->status == 1) {
-			$langs->load("orders");
+            // $langs->load("orders");
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/commande/card.php?socid='.$object->id.'&amp;action=create">'.$langs->trans("AddOrder").'</a></div>';
 		}
 
 		if (!empty($user->rights->contrat->creer) && $object->status == 1) {
-			$langs->load("contracts");
+            // $langs->load("contracts");
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/contrat/card.php?socid='.$object->id.'&amp;action=create">'.$langs->trans("AddContract").'</a></div>';
 		}
 
 		if (!empty($conf->ficheinter->enabled) && $user->rights->ficheinter->creer && $object->status == 1) {
-			$langs->load("fichinter");
+            // $langs->load("fichinter");
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/fichinter/card.php?socid='.$object->id.'&amp;action=create">'.$langs->trans("AddIntervention").'</a></div>';
 		}
 
 		// Add invoice
 		if ($user->socid == 0) {
 			if (!empty($conf->deplacement->enabled) && $object->status == 1) {
-				$langs->load("trips");
+                // $langs->load("trips");
 				print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/compta/deplacement/card.php?socid='.$object->id.'&amp;action=create">'.$langs->trans("AddTrip").'</a></div>';
 			}
 
@@ -1441,7 +1441,7 @@ if ($object->id > 0) {
 		show_actions_done($conf, $langs, $db, $object);
 	}
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print $langs->trans('ErrorRecordNotFound');
 }
 

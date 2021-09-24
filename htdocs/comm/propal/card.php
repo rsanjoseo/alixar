@@ -61,10 +61,10 @@ if (!empty($conf->variants->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('companies', 'propal', 'compta', 'bills', 'orders', 'products', 'deliveries', 'sendings', 'other'));
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 if (!empty($conf->margin->enabled)) {
-	$langs->load('margins');
+    // $langs->load('margins');
 }
 
 $error = 0;
@@ -239,7 +239,7 @@ if (empty($reshook)) {
 			header('Location: '.DOL_URL_ROOT.'/comm/propal/list.php?restore_lastsearch_values=1');
 			exit();
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($object->error, $object->errors, 'errors');
 		}
 	} elseif ($action == 'confirm_deleteline' && $confirm == 'yes' && $usercancreate) {
@@ -294,7 +294,7 @@ if (empty($reshook)) {
 				$object->generateDocument($model, $outputlangs, $hidedetails, $hidedesc, $hideref);
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			if (count($object->errors) > 0) {
 				setEventMessages($object->error, $object->errors, 'errors');
 			} else {
@@ -1414,7 +1414,7 @@ if (empty($reshook)) {
 				exit();
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -1715,7 +1715,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		print '<tr>';
 		print '<td>'.$langs->trans("Project").'</td><td>';
 		print img_picto('', 'project', 'class="pictofixedwidth"').$formproject->select_projects(($soc->id > 0 ? $soc->id : -1), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
@@ -1876,7 +1876,7 @@ if ($action == 'create') {
 
 	print dol_get_fiche_end();
 
-	$langs->load("bills");
+    // $langs->load("bills");
 
 	print $form->buttonsSaveCancel("CreateDraft");
 
@@ -2007,7 +2007,7 @@ if ($action == 'create') {
 	}
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($usercancreate) {
 			if ($action != 'classify') {
@@ -2165,8 +2165,8 @@ if ($action == 'create') {
 	}
 	print '</td></tr>';
 
-	// Delivery date
-	$langs->load('deliveries');
+    // Delivery date
+    // $langs->load('deliveries');
 	print '<tr><td>';
 	print $form->editfieldkey($langs->trans('DeliveryDate'), 'date_livraison', $object->delivery_date, $object, $usercancreate, 'datepicker');
 	print '</td><td class="valuefield">';
@@ -2218,7 +2218,7 @@ if ($action == 'create') {
 
 	// Warehouse
 	if (!empty($conf->stock->enabled) && !empty($conf->global->WAREHOUSE_ASK_WAREHOUSE_DURING_PROPAL)) {
-		$langs->load('stocks');
+        // $langs->load('stocks');
 		require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 		$formproduct = new FormProduct($db);
 		print '<tr><td>';
@@ -2578,14 +2578,14 @@ if ($action == 'create') {
 				// Create an intervention
 				if (!empty($conf->service->enabled) && !empty($conf->ficheinter->enabled) && $object->statut == Propal::STATUS_SIGNED) {
 					if ($usercancreateintervention) {
-						$langs->load("interventions");
+                        // $langs->load("interventions");
 						print '<a class="butAction" href="'.DOL_URL_ROOT.'/fichinter/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->socid.'">'.$langs->trans("AddIntervention").'</a>';
 					}
 				}
 
 				// Create contract
 				if ($conf->contrat->enabled && $object->statut == Propal::STATUS_SIGNED) {
-					$langs->load("contracts");
+                    // $langs->load("contracts");
 
 					if ($usercancreatecontract) {
 						print '<a class="butAction" href="'.DOL_URL_ROOT.'/contrat/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->socid.'">'.$langs->trans('AddContract').'</a>';

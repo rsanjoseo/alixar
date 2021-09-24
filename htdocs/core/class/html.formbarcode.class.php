@@ -153,7 +153,7 @@ class FormBarCode
 				$out .= '<select class="flat minwidth75imp" name="'.$htmlname.'" id="select_'.$htmlname.'">';
 				$out .= '<option value="0">&nbsp;</option>';
 			} else {
-				$langs->load("errors");
+				// $langs->load("errors");
 				$out .= '<select disabled class="flat minwidth75imp" name="'.$htmlname.'" id="select_'.$htmlname.'">';
 				$out .= '<option value="0" selected>'.$langs->trans('ErrorNoActivatedBarcode').'</option>';
 			}

@@ -673,7 +673,7 @@ class ProductFournisseurPrice extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("buypricehistory@buypricehistory");
+			//// $langs->load("buypricehistory@buypricehistory");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->trans('Disabled');
@@ -754,7 +754,7 @@ class ProductFournisseurPrice extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("buypricehistory@buypricehistory");
+        // $langs->load("buypricehistory@buypricehistory");
 
         if (empty($conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON)) {
             $conf->global->BUYPRICEHISTORY_PRODUCTFOURNISSEURPRICE_ADDON = 'mod_productfournisseurprice_standard';
@@ -819,7 +819,7 @@ class ProductFournisseurPrice extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("buypricehistory@buypricehistory");
+        // $langs->load("buypricehistory@buypricehistory");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_productfournisseurprice';

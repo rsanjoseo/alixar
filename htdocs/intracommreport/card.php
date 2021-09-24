@@ -101,7 +101,7 @@ if ($action == 'add' && $user->rights->intracommreport->write) {
 		}
 		if ($num) {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($langs->trans("ErrorLabelAlreadyExists", $login), null, 'errors');
 		}
 	}

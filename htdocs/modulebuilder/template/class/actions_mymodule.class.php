@@ -248,7 +248,7 @@ class ActionsMyModule
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("mymodule@mymodule");
+		// $langs->load("mymodule@mymodule");
 
 		$this->results = array();
 
@@ -325,8 +325,8 @@ class ActionsMyModule
 			// utilisé si on veut faire disparaitre des onglets.
 			return 0;
 		} elseif ($parameters['mode'] == 'add') {
-			$langs->load('mymodule@mymodule');
-			// utilisé si on veut ajouter des onglets.
+            // $langs->load('mymodule@mymodule');
+            // utilisé si on veut ajouter des onglets.
 			$counter = count($parameters['head']);
 			$element = $parameters['object']->element;
 			$id = $parameters['object']->id;

@@ -2086,7 +2086,7 @@ function dol_banner_tab($object, $paramid, $morehtml = '', $shownav = 1, $fieldi
         // Note: For 'chargesociales', 'salaries'... this is the payments that are dispatched (so element = 'bank')
         if (method_exists($object, 'getVentilExportCompta')) {
             $accounted = $object->getVentilExportCompta();
-            $langs->load("accountancy");
+            // $langs->load("accountancy");
             $morehtmlstatus .= '</div><div class="statusref statusrefbis"><span class="opacitymedium">' . ($accounted > 0 ? $langs->trans("Accounted") : $langs->trans("NotYetAccounted")) . '</span>';
         }
     }
@@ -2245,7 +2245,7 @@ function dol_format_address($object, $withcountry = 0, $sep = "\n", $outputlangs
         $outputlangs = $langs;
     }
     if ($withcountry) {
-        $langs->load("dict");
+        // $langs->load("dict");
         $ret .= (empty($object->country_code) ? '' : ($ret ? $sep : '') . $outputlangs->convToOutputCharset($outputlangs->transnoentitiesnoconv("Country" . $object->country_code)));
     }
 
@@ -2747,7 +2747,7 @@ function dol_print_email($email, $cid = 0, $socid = 0, $addlink = 0, $max = 64, 
         $newemail .= dol_trunc($email, $max);
         $newemail .= '</a>';
         if ($showinvalid && !isValidEmail($email)) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $newemail .= img_warning($langs->trans("ErrorBadEMail", $email));
         }
 
@@ -2763,7 +2763,7 @@ function dol_print_email($email, $cid = 0, $socid = 0, $addlink = 0, $max = 64, 
         }
     } else {
         if ($showinvalid && !isValidEmail($email)) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $newemail .= img_warning($langs->trans("ErrorBadEMail", $email));
         }
     }
@@ -2874,7 +2874,7 @@ function dol_print_socialnetworks($value, $cid, $socid, $type, $dictsocialnetwor
         }
         $htmllink .= '</div>';
     } else {
-        $langs->load("errors");
+        // $langs->load("errors");
         $htmllink .= img_warning($langs->trans("ErrorBadSocialNetworkValue", $value));
     }
     return $htmllink;
@@ -4528,7 +4528,7 @@ function dol_print_error($db = '', $error = '', $errors = null)
     if (!$langs) {
 		require_once DOL_DOCUMENT_ROOT.'/core/class/translate.class.php';
         $langs = new Translate('', $conf);
-        $langs->load("main");
+        // $langs->load("main");
     }
 
     // Load translation files required by the error messages
@@ -4591,7 +4591,7 @@ function dol_print_error($db = '', $error = '', $errors = null)
     }
 
     if ($error || $errors) {
-        $langs->load("errors");
+        // $langs->load("errors");
 
         // Merge all into $errors array
         if (is_array($error) && is_array($errors)) {
@@ -4666,7 +4666,7 @@ function dol_print_error_email($prefixcode, $errormessage = '', $errormessages =
         $email = $conf->global->MAIN_INFO_SOCIETE_MAIL;
     }
 
-    $langs->load("errors");
+    // $langs->load("errors");
     $now = dol_now();
 
     print '<br><div class="center login_main_message"><div class="' . $morecss . '">';
@@ -7782,7 +7782,7 @@ function get_htmloutput_mesg($mesgstring = '', $mesgarray = '', $style = 'ok', $
     }
 
     if ((is_array($mesgarray) && count($mesgarray)) || $mesgstring) {
-        //        $langs->load("errors");
+        //        // $langs->load("errors");
         $out .= $divstart;
         if (is_array($mesgarray) && count($mesgarray)) {
             foreach ($mesgarray as $message) {
@@ -7794,7 +7794,7 @@ function get_htmloutput_mesg($mesgstring = '', $mesgarray = '', $style = 'ok', $
             }
         }
         if ($mesgstring) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $ret++;
             $out .= $langs->trans($mesgstring);
         }
@@ -8547,7 +8547,7 @@ function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, 
 
                     if (verifCond($values[4])) {
                         if ($values[3]) {
-                            $langs->load($values[3]);
+                            // $langs->load($values[3]);
                         }
                         if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
                             $substitutionarray = [];
@@ -8569,7 +8569,7 @@ function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, 
                         continue;
                     }
                     if ($values[3]) {
-                        $langs->load($values[3]);
+                        // $langs->load($values[3]);
                     }
                     if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
                         $substitutionarray = [];

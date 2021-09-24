@@ -765,7 +765,7 @@ class Mo extends CommonObject
     public function getNextNumRef($prod)
     {
         global $langs, $conf;
-        $langs->load("mrp");
+        // $langs->load("mrp");
 
         if (!empty($conf->global->MRP_MO_ADDON)) {
             $mybool = false;
@@ -1105,7 +1105,7 @@ class Mo extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus)) {
 			global $langs;
-			//$langs->load("mrp");
+            //// $langs->load("mrp");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ValidatedToProduce');
 			$this->labelStatus[self::STATUS_INPROGRESS] = $langs->transnoentitiesnoconv('InProgress');
@@ -1232,7 +1232,7 @@ class Mo extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("mrp");
+        // $langs->load("mrp");
 
 		if (!dol_strlen($modele)) {
 			//$modele = 'standard';

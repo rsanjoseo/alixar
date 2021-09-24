@@ -95,7 +95,7 @@ abstract class ModeleNumRefDeliveryOrder
 	public function info()
 	{
 		global $langs;
-		$langs->load("deliveries");
+		// $langs->load("deliveries");
 		return $langs->trans("NoDescription");
 	}
 
@@ -107,7 +107,7 @@ abstract class ModeleNumRefDeliveryOrder
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("deliveries");
+        // $langs->load("deliveries");
 		return $langs->trans("NoExample");
 	}
 
@@ -143,7 +143,7 @@ abstract class ModeleNumRefDeliveryOrder
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

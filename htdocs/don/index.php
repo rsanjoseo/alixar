@@ -32,7 +32,7 @@ $hookmanager = new HookManager($db);
 // Initialize technical object to manage hooks. Note that conf->hooks_modules contains array
 $hookmanager->initHooks(array('donationindex'));
 
-$langs->load("donations");
+// $langs->load("donations");
 
 // Security check
 $result = restrictedArea($user, 'don');

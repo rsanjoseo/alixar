@@ -64,7 +64,7 @@ abstract class ModeleNumRefBarCode
      */
     public function info($langs)
     {
-        $langs->load("bills");
+        // $langs->load("bills");
         return $langs->trans("NoDescription");
     }
 
@@ -87,7 +87,7 @@ abstract class ModeleNumRefBarCode
      */
     public function getExample($langs)
     {
-        $langs->load("bills");
+        // $langs->load("bills");
         return $langs->trans("NoExample");
     }
 
@@ -112,7 +112,7 @@ abstract class ModeleNumRefBarCode
     public function getVersion()
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         if ($this->version == 'development') {
             return $langs->trans("VersionDevelopment");

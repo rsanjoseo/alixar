@@ -403,7 +403,7 @@ class Categorie extends CommonObject
     public function create($user)
 	{
 		global $conf, $langs, $hookmanager;
-		$langs->load('categories');
+		// $langs->load('categories');
 
 		$type = $this->type;
 

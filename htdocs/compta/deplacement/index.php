@@ -146,7 +146,7 @@ print '</div><div class="fichetwothirdright"><div class="ficheaddleft">';
 
 $max = 10;
 
-$langs->load("boxes");
+// $langs->load("boxes");
 
 $sql = "SELECT u.rowid as uid, u.lastname, u.firstname, d.rowid, d.dated as date, d.tms as dm, d.km, d.fk_statut";
 $sql .= " FROM ".MAIN_DB_PREFIX."deplacement as d, ".MAIN_DB_PREFIX."user as u";

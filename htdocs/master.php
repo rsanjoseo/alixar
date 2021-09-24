@@ -104,7 +104,7 @@ if (!defined('NOREQUIREDB')) {
 			print '<div class="center" style="text-align: center; margin: 100px;">';
 			if (is_object($langs)) {
 				$langs->setDefaultLang('auto');
-				$langs->load("website");
+				// $langs->load("website");
 				print $langs->trans("SorryWebsiteIsCurrentlyOffLine");
 			} else {
 				print "SorryWebsiteIsCurrentlyOffLine";

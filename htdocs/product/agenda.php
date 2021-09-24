@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php';
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 
 if (GETPOST('actioncode', 'array')) {
 	$actioncode = GETPOST('actioncode', 'array', 3);
@@ -128,7 +128,7 @@ if ($id > 0 || $ref) {
 	require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 	require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 
-	$langs->load("companies");
+    // $langs->load("companies");
 
 
 	$object = new Product($db);
@@ -144,7 +144,7 @@ if ($id > 0 || $ref) {
 	llxHeader('', $title, $help_url);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 	$type = $langs->trans('Product');
 	if ($object->isService()) {

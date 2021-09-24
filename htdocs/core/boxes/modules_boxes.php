@@ -442,7 +442,7 @@ class ModeleBoxes // Can't be abtract as it is instantiated to build "empty" box
                         $modName = ucfirst($reg[1]);
                         //print "file=$file"; print "modName=$modName"; exit;
                         if (in_array($modName, $modules)) {
-                            $langs->load("errors");
+                            // $langs->load("errors");
                             print '<div class="error">' . $langs->trans("Error") . ' : ' . $langs->trans("ErrorDuplicateWidget", $modName, "") . '</div>';
                         } else {
                             try {

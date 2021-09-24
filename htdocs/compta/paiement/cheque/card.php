@@ -240,7 +240,7 @@ if ($action == 'builddoc' && $user->rights->banque->cheque) {
 	if ($object->fetch($id) > 0) {
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-		$langs->load("other");
+		// $langs->load("other");
 
 		$file = $dir.get_exdir($object->ref, 0, 1, 0, $object, 'cheque').GETPOST('file');
 		$ret = dol_delete_file($file, 0, 0, 0, $object);
@@ -686,8 +686,8 @@ if ($action == 'new') {
 
 		// Cheque denormalized data nbcheque is similar to real number of bank check
 		if ($num > 0 && $i < ($object->nbcheque + 1)) {
-			// Show warning that some records were removed.
-			$langs->load("errors");
+            // Show warning that some records were removed.
+            // $langs->load("errors");
 			print info_admin($langs->trans("WarningSomeBankTransactionByChequeWereRemovedAfter"), 0, 0, 'warning');
 			// TODO Fix data ->nbcheque and ->amount
 		}

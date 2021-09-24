@@ -734,7 +734,7 @@ class Fichinter extends CommonObject
         // Init/load array of translation of status
         if (empty($this->statuts) || empty($this->statuts_short) || empty($this->statuts_logo)) {
             global $langs;
-            $langs->load("fichinter");
+            // $langs->load("fichinter");
 
             $this->statuts[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
             $this->statuts[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Validated');
@@ -841,7 +841,7 @@ class Fichinter extends CommonObject
     public function getNextNumRef($soc)
     {
         global $conf, $db, $langs;
-        $langs->load("interventions");
+        // $langs->load("interventions");
 
         if (!empty($conf->global->FICHEINTER_ADDON)) {
             $mybool = false;
@@ -875,7 +875,7 @@ class Fichinter extends CommonObject
                 return "";
             }
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("Error_FICHEINTER_ADDON_NotDefined");
             return "";
 		}
@@ -1029,14 +1029,14 @@ class Fichinter extends CommonObject
 					dol_delete_preview($this);
 
 					if (!dol_delete_file($file, 0, 0, 0, $this)) { // For triggers
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans("ErrorFailToDeleteFile", $file);
 						return 0;
 					}
 				}
 				if (file_exists($dir)) {
 					if (!dol_delete_dir_recursive($dir)) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans("ErrorFailToDeleteDir", $dir);
 						return 0;
 					}

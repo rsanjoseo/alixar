@@ -27,7 +27,7 @@
 // $trackid='ord'.$object->id;
 
 if ($massaction == 'presend_attendees') {
-	$langs->load("mails");
+	// $langs->load("mails");
 	require_once DOL_DOCUMENT_ROOT.'/eventorganization/class/conferenceorboothattendee.class.php';
 	$attendee = new ConferenceOrBoothAttendee($db);
 	$listofselectedid = array();
@@ -113,7 +113,7 @@ if ($massaction == 'presend_attendees') {
 	$formmail->param['id'] = join(',', $arrayofselected);
 	// $formmail->param['returnurl']=$_SERVER["PHP_SELF"].'?id='.$object->id;
 	if (!empty($conf->global->MAILING_LIMIT_SENDBYWEB) && count($listofselectedid) > $conf->global->MAILING_LIMIT_SENDBYWEB) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print img_warning().' '.$langs->trans('WarningNumberOfRecipientIsRestrictedInMassAction', $conf->global->MAILING_LIMIT_SENDBYWEB);
 		print ' - <a href="javascript: window.history.go(-1)">'.$langs->trans("GoBack").'</a>';
 		$arrayofmassactions = array();

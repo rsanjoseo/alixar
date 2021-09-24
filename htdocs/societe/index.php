@@ -36,7 +36,7 @@ $hookmanager = new HookManager($db);
 // Initialize technical object to manage hooks. Note that conf->hooks_modules contains array
 $hookmanager->initHooks(['thirdpartiesindex']);
 
-$langs->load("companies");
+// $langs->load("companies");
 
 $socid = GETPOST('socid', 'int');
 if ($user->socid) {

@@ -58,7 +58,7 @@ class Utils
 	{
 		global $conf, $langs, $dolibarr_main_data_root;
 
-		$langs->load("admin");
+		// $langs->load("admin");
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
@@ -196,14 +196,14 @@ class Utils
 		global $dolibarr_main_db_name, $dolibarr_main_db_host, $dolibarr_main_db_user, $dolibarr_main_db_port, $dolibarr_main_db_pass;
 		global $dolibarr_main_db_character_set;
 
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		dol_syslog("Utils::dumpDatabase type=".$type." compression=".$compression." file=".$file, LOG_DEBUG);
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 		// Check compression parameter
 		if (!in_array($compression, array('none', 'gz', 'bz', 'zip'))) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->transnoentitiesnoconv("ErrorBadValueForParameter", $compression, "Compression");
 			return -1;
 		}
@@ -213,7 +213,7 @@ class Utils
 			$type = $this->db->type;
 		}
 		if (!in_array($type, array('postgresql', 'pgsql', 'mysql', 'mysqli', 'mysqlnobin'))) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->transnoentitiesnoconv("ErrorBadValueForParameter", $type, "Basetype");
 			return -1;
 		}
@@ -363,7 +363,7 @@ class Utils
 					exec($fullcommandclear, $output_arr, $retval);
 
 					if ($retval != 0) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						dol_syslog("Datadump retval after exec=".$retval, LOG_ERR);
 						$errormsg = 'Error '.$retval;
 						$ok = 0;
@@ -420,7 +420,7 @@ class Utils
 					@chmod($outputfile, octdec($conf->global->MAIN_UMASK));
 				}
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				dol_syslog("Failed to open file ".$outputfile, LOG_ERR);
 				$errormsg = $langs->trans("ErrorFailedToWriteInDir");
 			}
@@ -459,7 +459,7 @@ class Utils
 					@rename($outputfile, $outputerror);
 					// Si safe_mode on et command hors du parametre exec, on a un fichier out vide donc errormsg vide
 					if (!$errormsg) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$errormsg = $langs->trans("ErrorFailedToRunExternalCommand");
 					}
 				}
@@ -633,7 +633,7 @@ class Utils
             exec($command, $output_arr, $retval);
             $result = $retval;
             if ($retval != 0) {
-                $langs->load("errors");
+                // $langs->load("errors");
                 dol_syslog("Utils::executeCLI retval after exec=" . $retval, LOG_ERR);
                 $error = 'Error ' . $retval;
             }
@@ -702,7 +702,7 @@ class Utils
 			}
 		} else {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			dol_print_error($langs->trans("ErrorFailedToLoadModuleDescriptorForXXX", $module));
 			exit;
 		}
@@ -848,12 +848,12 @@ class Utils
 				return 1;
 			} else {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorFailToGenerateFile", $outputfiledoc);
 			}
 		} else {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorCheckVersionIsDefined");
 		}
 
@@ -1013,7 +1013,7 @@ class Utils
         //cycle through
         $handle = fopen($outputfile, 'w+');
         if (fwrite($handle, '') === false) {
-            $langs->load("errors");
+            // $langs->load("errors");
             dol_syslog("Failed to open file " . $outputfile, LOG_ERR);
             $errormsg = $langs->trans("ErrorFailedToWriteInDir");
             return -1;

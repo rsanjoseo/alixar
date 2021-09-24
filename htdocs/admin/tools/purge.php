@@ -28,7 +28,7 @@ if (!defined('CSRFCHECK_WITH_TOKEN')) {
 require '../../main.inc.php';
 include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-$langs->load("admin");
+// $langs->load("admin");
 
 $action = GETPOST('action', 'aZ09');
 $confirm = GETPOST('confirm', 'alpha');

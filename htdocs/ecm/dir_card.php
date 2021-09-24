@@ -118,7 +118,7 @@ if (GETPOST("sendit") && !empty($conf->global->MAIN_UPLOAD_DOC) && $permtoupload
 		if (is_numeric($resupload) && $resupload > 0) {
 			$result = $ecmdir->changeNbOfFiles('+');
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			if ($resupload < 0) {	// Unknown error
 				setEventMessages($langs->trans("ErrorFileNotUploaded"), null, 'errors');
 			} elseif (preg_match('/ErrorFileIsInfectedWithAVirus/', $resupload)) {
@@ -130,15 +130,15 @@ if (GETPOST("sendit") && !empty($conf->global->MAIN_UPLOAD_DOC) && $permtoupload
 			}
 		}
 	} else {
-		// Failed transfer (exceeding the limit file?)
-		$langs->load("errors");
+        // Failed transfer (exceeding the limit file?)
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFailToCreateDir", $upload_dir), null, 'errors');
 	}
 }
 
 // Remove file
 if ($action == 'confirm_deletefile' && $confirm == 'yes' && $permtoupload) {
-	$langs->load("other");
+    // $langs->load("other");
 	$file = $upload_dir."/".GETPOST('urlfile'); // Do not use urldecode here ($_GET and $_REQUEST are already decoded by PHP).
 	$ret = dol_delete_file($file);
 	if ($ret) {
@@ -163,7 +163,7 @@ if ($action == 'confirm_deletedir' && $confirm == 'yes' && $permtoupload) {
 		// Fetch was already done
 		$result = $ecmdir->delete($user, 'all', $deletedirrecursive);
 		if ($result <= 0) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans($ecmdir->error, $ecmdir->label), null, 'errors');
 		}
 	} else {
@@ -175,7 +175,7 @@ if ($action == 'confirm_deletedir' && $confirm == 'yes' && $permtoupload) {
 		if ($resbool) {
 			$result = 1;
 		} else {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFailToDeleteDir", $upload_dir), null, 'errors');
 			$result = 0;
 		}
@@ -226,7 +226,7 @@ if ($action == 'update' && !GETPOST('cancel', 'alpha') && $permtoadd) {
 				//print $olddir.'-'.$newdir;
 				$result = @rename($olddir, $newdir);
 				if (!$result) {
-					$langs->load('errors');
+                    // $langs->load('errors');
 					setEventMessages($langs->trans('ErrorFailToRenameDir', $olddir, $newdir), null, 'errors');
 					$error++;
 				}
@@ -250,7 +250,7 @@ if ($action == 'update' && !GETPOST('cancel', 'alpha') && $permtoadd) {
 
 		$result = @rename($olddir, $newdir);
 		if (!$result) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans('ErrorFailToRenameDir', $olddir, $newdir), null, 'errors');
 			$error++;
 		}
@@ -476,7 +476,7 @@ if ($action == 'delete_dir') {
 
 	//Form to close proposal (signed or not)
 	if (count($filearrayall) > 0) {
-		$langs->load("other");
+        // $langs->load("other");
 		$formquestion = array(
 			array('type' => 'checkbox', 'name' => 'deletedirrecursive', 'label' => $langs->trans("ContentOfDirectoryIsNotEmpty").'<br>'.$langs->trans("DeleteAlsoContentRecursively"), 'value' => '0')				// Field to complete private note (not replace)
 		);

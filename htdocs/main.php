@@ -685,7 +685,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
 
         // Link to Dolibarr wiki pages
         if (empty($conf->global->MAIN_HELP_DISABLELINK) && empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-            $langs->load("help");
+            // $langs->load("help");
 
             $helpbaseurl = '';
             $helppage = '';
@@ -731,7 +731,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
 
             // Version
             if (!empty($conf->global->MAIN_SHOWDATABASENAMEINHELPPAGESLINK)) {
-                $langs->load('admin');
+                // $langs->load('admin');
                 $appli .= '<br>' . $langs->trans("Database") . ': ' . $db->database_name;
             }
         }
@@ -802,7 +802,7 @@ function top_menu_user($hideloginname = 0, $urllogout = '')
     global $dolibarr_main_authentication, $dolibarr_main_demo;
     global $menumanager;
 
-    $langs->load('companies');
+    // $langs->load('companies');
 
     $userImage = $userDropDownImage = '';
     if (!empty($user->photo)) {
@@ -1048,7 +1048,7 @@ function top_menu_quickadd()
     $dropDownQuickAddHtml .= '<div class="quickadd-body dropdown-body">';
     $dropDownQuickAddHtml .= '<div class="quickadd">';
     if (!empty($conf->societe->enabled) && $user->rights->societe->creer) {
-        $langs->load("companies");
+        // $langs->load("companies");
         $dropDownQuickAddHtml .= '
                 <!-- Thirdparty link -->
                 <div class="quickaddblock center">
@@ -1059,7 +1059,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->societe->enabled) && $user->rights->societe->contact->creer) {
-        $langs->load("companies");
+        // $langs->load("companies");
         $dropDownQuickAddHtml .= '
                 <!-- Contact link -->
                 <div class="quickaddblock center">
@@ -1070,7 +1070,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->propal->enabled) && $user->rights->propale->creer) {
-        $langs->load("propal");
+        // $langs->load("propal");
         $dropDownQuickAddHtml .= '
                 <!-- Propal link -->
                 <div class="quickaddblock center">
@@ -1081,7 +1081,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->commande->enabled) && $user->rights->commande->creer) {
-        $langs->load("orders");
+        // $langs->load("orders");
         $dropDownQuickAddHtml .= '
                 <!-- Order link -->
                 <div class="quickaddblock center">
@@ -1092,7 +1092,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->facture->enabled) && $user->rights->facture->creer) {
-        $langs->load("bills");
+        // $langs->load("bills");
         $dropDownQuickAddHtml .= '
                 <!-- Invoice link -->
                 <div class="quickaddblock center">
@@ -1103,7 +1103,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->contrat->enabled) && $user->rights->contrat->creer) {
-        $langs->load("contracts");
+        // $langs->load("contracts");
         $dropDownQuickAddHtml .= '
                 <!-- Contract link -->
                 <div class="quickaddblock center">
@@ -1114,7 +1114,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->supplier_proposal->enabled) && $user->rights->supplier_proposal->creer) {
-        $langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
         $dropDownQuickAddHtml .= '
                 <!-- Supplier proposal link -->
                 <div class="quickaddblock center">
@@ -1125,7 +1125,7 @@ function top_menu_quickadd()
     }
 
     if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD) && $user->rights->fournisseur->commande->creer) || (!empty($conf->supplier_order->enabled) && $user->rights->supplier_order->creer)) {
-        $langs->load("orders");
+        // $langs->load("orders");
         $dropDownQuickAddHtml .= '
                 <!-- Supplier order link -->
                 <div class="quickaddblock center">
@@ -1136,7 +1136,7 @@ function top_menu_quickadd()
     }
 
     if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD) && $user->rights->fournisseur->facture->creer) || (!empty($conf->supplier_invoice->enabled) && $user->rights->supplier_invoice->creer)) {
-        $langs->load("bills");
+        // $langs->load("bills");
         $dropDownQuickAddHtml .= '
                 <!-- Supplier invoice link -->
                 <div class="quickaddblock center">
@@ -1147,7 +1147,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->product->enabled) && $user->rights->produit->creer) {
-        $langs->load("products");
+        // $langs->load("products");
         $dropDownQuickAddHtml .= '
                 <!-- Product link -->
                 <div class="quickaddblock center">
@@ -1158,7 +1158,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->service->enabled) && $user->rights->service->creer) {
-        $langs->load("products");
+        // $langs->load("products");
         $dropDownQuickAddHtml .= '
                 <!-- Service link -->
                 <div class="quickaddblock center">
@@ -1169,7 +1169,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->expensereport->enabled) && $user->rights->expensereport->creer) {
-        $langs->load("trips");
+        // $langs->load("trips");
         $dropDownQuickAddHtml .= '
                 <!-- Expense report link -->
                 <div class="quickaddblock center">
@@ -1180,7 +1180,7 @@ function top_menu_quickadd()
     }
 
     if (!empty($conf->holiday->enabled) && $user->rights->holiday->write) {
-        $langs->load("holiday");
+        // $langs->load("holiday");
         $dropDownQuickAddHtml .= '
                 <!-- Holiday link -->
                 <div class="quickaddblock center">
@@ -1267,7 +1267,7 @@ function top_menu_bookmark()
 
     if (!defined('JS_JQUERY_DISABLE_DROPDOWN') && !empty($conf->use_javascript_ajax)) {        // This may be set by some pages that use different jquery version to avoid errors
         include_once DOL_DOCUMENT_ROOT . '/bookmarks/bookmarks.lib.php';
-        $langs->load("bookmarks");
+        // $langs->load("bookmarks");
 
         if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
             $html .= '<div id="topmenu-bookmark-dropdown" class="dropdown inline-block">';
@@ -2716,7 +2716,7 @@ if (!defined('NOLOGIN')) {
     // Check if user is active
     if ($user->statut < 1) {
         // If not active, we refuse the user
-        $langs->load("other");
+        // $langs->load("other");
         dol_syslog("Authentication KO as login is disabled", LOG_NOTICE);
         accessforbidden($langs->trans("ErrorLoginDisabled"));
         exit;

@@ -99,7 +99,7 @@ class FormExpenseReport
 	{
 		// phpcs:enable
 		global $langs, $user;
-		$langs->load("trips");
+		// $langs->load("trips");
 
 		$out = '';
 

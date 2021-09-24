@@ -137,7 +137,7 @@ class Interfaces
 						$modName = "Interface".ucfirst($reg[3]);
 						//print "file=$file - modName=$modName\n";
 						if (in_array($modName, $modules)) {    // $modules = list of modName already loaded
-							$langs->load("errors");
+                            // $langs->load("errors");
 							dol_syslog(get_class($this)."::run_triggers action=".$action." ".$langs->trans("ErrorDuplicateTrigger", $newdir."/".$file, $fullpathfiles[$modName]), LOG_WARNING);
 							continue;
 						}
@@ -281,7 +281,7 @@ class Interfaces
 						$modName = 'Interface'.ucfirst($reg[3]);
 						//print "file=$file"; print "modName=$modName"; exit;
 						if (in_array($modName, $modules)) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							print '<div class="error">'.$langs->trans("Error").' : '.$langs->trans("ErrorDuplicateTrigger", $modName, "/htdocs/core/triggers/").'</div>';
 						} else {
 							include_once $newdir.'/'.$file;

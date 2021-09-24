@@ -42,7 +42,7 @@ require_once $path."../../htdocs/master.inc.php";
 require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
 require_once DOL_DOCUMENT_ROOT."/adherents/class/adherent.class.php";
 
-$langs->load("main");
+// $langs->load("main");
 
 // Global variables
 $version = constant('DOL_VERSION');

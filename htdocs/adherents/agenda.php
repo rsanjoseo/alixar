@@ -119,7 +119,7 @@ if ($object->id > 0) {
 	require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 	require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-	$langs->load("companies");
+	// $langs->load("companies");
 
 	$title = $langs->trans("Member")." - ".$langs->trans("Agenda");
 
@@ -128,7 +128,7 @@ if ($object->id > 0) {
 	llxHeader("", $title, $help_url);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 	$head = member_prepare_head($object);
 

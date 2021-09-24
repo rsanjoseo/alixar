@@ -161,7 +161,7 @@ function ecm_prepare_head_fm($object)
 function ecm_admin_prepare_head()
 {
 	global $langs, $conf;
-	$langs->load("ecm");
+	// $langs->load("ecm");
 
 	$h = 0;
 	$head = array();

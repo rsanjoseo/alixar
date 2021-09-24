@@ -171,14 +171,14 @@ print '<td class="right nowraponall">'."\n";
 
 if (empty($conf->global->AGENDA_REMINDER_BROWSER)) {
 	if (!isHTTPS()) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print img_warning($langs->trans("WarningAvailableOnlyForHTTPSServers"), '', 'valignmiddle size15x').' ';
 	}
 	print '<a class="valignmiddle" href="' . $_SERVER['PHP_SELF'] . '?action=set_AGENDA_REMINDER_BROWSER&token=' . newToken() . '">' . img_picto($langs->trans('Disabled'), 'switch_off') . '</a>';
     print '</td></tr>' . "\n";
 } else {
 	if (!isHTTPS()) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print img_warning($langs->trans("WarningAvailableOnlyForHTTPSServers"), '', 'valignmiddle size15x').' ';
 	}
     print '<a class="valignmiddle" href="' . $_SERVER['PHP_SELF'] . '?action=del_AGENDA_REMINDER_BROWSER&token=' . newToken() . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';
@@ -226,7 +226,7 @@ if (empty($conf->cron->enabled)) {
 		// Get the max frequency of reminder
 		if ($job->id > 0) {
 			if ($job->status != $job::STATUS_ENABLED) {
-				$langs->load("cron");
+                // $langs->load("cron");
 				print '<span class="opacitymedium warning">'.$langs->trans("JobXMustBeEnabled", $langs->transnoentitiesnoconv("sendEmailsReminder")).'</span>';
 			} else {
                 print '<a href="' . $_SERVER['PHP_SELF'] . '?action=del_AGENDA_REMINDER_EMAIL&token=' . newToken() . '">' . img_picto($langs->trans('Enabled'), 'switch_on') . '</a>';

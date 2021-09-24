@@ -77,7 +77,7 @@ $morehtmlref = '<div class="refidno">';
 $morehtmlref .= $langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+	// $langs->load("projects");
 	$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 	if ($user->rights->supplier_proposal->creer) {
 		if ($action != 'classify') {

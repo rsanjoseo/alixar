@@ -200,12 +200,12 @@ if (empty($reshook)) {
 				$typeofcontact = 'PROJECTLEADER';	// TODO If use rename this code in dictionary, the add_contact will generate an error.
 				$result = $object->add_contact($user->id, $typeofcontact, 'internal');
 				if ($result < 0) {
-					$langs->load("errors");
+					// $langs->load("errors");
 					setEventMessages($object->error, $object->errors, 'errors');
 					$error++;
 				}
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($object->error, $object->errors, 'errors');
 				$error++;
 			}
@@ -214,7 +214,7 @@ if (empty($reshook)) {
 				$categories = GETPOST('categories', 'array');
 				$result = $object->setCategories($categories);
 				if ($result < 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($object->error, $object->errors, 'errors');
 					$error++;
 				}
@@ -378,7 +378,7 @@ if (empty($reshook)) {
 		if ($object->id > 0) {
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-			$langs->load("other");
+            // $langs->load("other");
 			$upload_dir = $conf->projet->dir_output;
 			$file = $upload_dir.'/'.GETPOST('file');
 			$ret = dol_delete_file($file, 0, 0, 0, $object);
@@ -1290,43 +1290,43 @@ if ($action == 'create' && $user->rights->projet->creer) {
 			// Add button to create objects from project
 			if (!empty($conf->global->PROJECT_SHOW_CREATE_OBJECT_BUTTON)) {
 				if (!empty($conf->propal->enabled) && $user->rights->propal->creer) {
-					$langs->load("propal");
+                    // $langs->load("propal");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/comm/propal/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddProp").'</a>';
 				}
 				if (!empty($conf->commande->enabled) && $user->rights->commande->creer) {
-					$langs->load("orders");
+                    // $langs->load("orders");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/commande/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("CreateOrder").'</a>';
 				}
 				if (!empty($conf->facture->enabled) && $user->rights->facture->creer) {
-					$langs->load("bills");
+                    // $langs->load("bills");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/compta/facture/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("CreateBill").'</a>';
 				}
 				if (!empty($conf->supplier_proposal->enabled) && $user->rights->supplier_proposal->creer) {
-					$langs->load("supplier_proposal");
+                    // $langs->load("supplier_proposal");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/supplier_proposal/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddSupplierProposal").'</a>';
 				}
 				if (!empty($conf->supplier_order->enabled) && ($user->rights->fournisseur->commande->creer || $user->rights->supplier_order->creer)) {
-					$langs->load("suppliers");
+                    // $langs->load("suppliers");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/fourn/commande/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddSupplierOrder").'</a>';
 				}
 				if (!empty($conf->supplier_invoice->enabled) && ($user->rights->fournisseur->facture->creer || $user->rights->supplier_invoice->creer)) {
-					$langs->load("suppliers");
+                    // $langs->load("suppliers");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/fourn/facture/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddSupplierInvoice").'</a>';
 				}
 				if (!empty($conf->ficheinter->enabled) && $user->rights->ficheinter->creer) {
-					$langs->load("interventions");
+                    // $langs->load("interventions");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/fichinter/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddIntervention").'</a>';
 				}
 				if (!empty($conf->contrat->enabled) && $user->rights->contrat->creer) {
-					$langs->load("contracts");
+                    // $langs->load("contracts");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/contrat/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddContract").'</a>';
 				}
 				if (!empty($conf->expensereport->enabled) && $user->rights->expensereport->creer) {
-					$langs->load("trips");
+                    // $langs->load("trips");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/expensereport/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddTrip").'</a>';
 				}
 				if (!empty($conf->don->enabled) && $user->rights->don->creer) {
-					$langs->load("donations");
+                    // $langs->load("donations");
 					print '<a class="butAction" href="'.DOL_URL_ROOT.'/don/card.php?action=create&projectid='.$object->id.'&socid='.$object->socid.'">'.$langs->trans("AddDonation").'</a>';
 				}
 			}

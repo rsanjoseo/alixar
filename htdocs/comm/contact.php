@@ -27,7 +27,7 @@
 require '../main.inc.php';
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 
 $sortfield = GETPOST('sortfield', 'aZ09comma');
 $sortorder = GETPOST('sortorder', 'aZ09comma');

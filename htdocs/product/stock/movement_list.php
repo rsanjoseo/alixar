@@ -46,7 +46,7 @@ if (!empty($conf->projet->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('products', 'stocks', 'orders'));
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+	// $langs->load("productbatch");
 }
 
 // Security check
@@ -650,7 +650,7 @@ if ($object->id > 0) {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.img_picto('', 'project').' '.$langs->trans('Project').' ';
 		if ($usercancreate && 1 == 2) {
 			if ($action != 'classify') {

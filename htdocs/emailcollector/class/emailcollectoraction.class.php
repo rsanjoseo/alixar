@@ -190,7 +190,7 @@ class EmailCollectorAction extends CommonObject
 	{
 		global $langs;
 		if (empty($this->type)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->errors[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type"));
 			return -1;
 		}
@@ -424,7 +424,7 @@ class EmailCollectorAction extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus)) {
 			global $langs;
-			//$langs->load("emailcollector");
+            //// $langs->load("emailcollector");
 			$this->labelStatus[1] = $langs->trans('Enabled');
 			$this->labelStatus[0] = $langs->trans('Disabled');
 		}

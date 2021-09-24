@@ -73,7 +73,7 @@ class mod_contract_olive extends ModelNumRefContracts
 	{
 		global $langs;
 
-		$langs->load("companies");
+		// $langs->load("companies");
 		return $langs->trans("LeopardNumRefModelDesc");
 	}
 

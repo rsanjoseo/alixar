@@ -122,7 +122,7 @@ if ($id > 0 || !empty($ref)) {
 
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+			// $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if (0) {    // Do not change on shipment
 				if ($action != 'classify') {

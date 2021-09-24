@@ -43,7 +43,7 @@ if (!isset($usedbyinclude) || empty($usedbyinclude)) {
 
 	$res = @include '../../main.inc.php';
 	if ($res == 'ERROR_NOT_LOGGED') {
-		$langs->load("other");
+		// $langs->load("other");
 		$arrayresult['jumptologin'] = array('img'=>'object_generic', 'label'=>$langs->trans("JumpToLogin"), 'text'=>'<span class="fa fa-sign-in"></span> '.$langs->trans("JumpToLogin"), 'url'=>DOL_URL_ROOT.'/index.php');
 		print json_encode($arrayresult);
 		if (is_object($db)) {

@@ -174,7 +174,7 @@ class Don extends CommonObject
         // phpcs:enable
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            $langs->load("donations");
+            // $langs->load("donations");
             $this->labelStatus[-1] = $langs->transnoentitiesnoconv("Canceled");
             $this->labelStatus[0] = $langs->transnoentitiesnoconv("DonationStatusPromiseNotValidated");
             $this->labelStatus[1] = $langs->transnoentitiesnoconv("DonationStatusPromiseValidated");
@@ -262,22 +262,22 @@ class Don extends CommonObject
 	 *	@return	int				0 if KO, >0 if OK
 	 */
 	public function check($minimum = 0)
-	{
-		global $langs;
-		$langs->load('main');
-		$langs->load('companies');
+    {
+        global $langs;
+        // $langs->load('main');
+        // $langs->load('companies');
 
-		$error_string = array();
-		$err = 0;
+        $error_string = [];
+        $err = 0;
 
-		if (dol_strlen(trim($this->societe)) == 0) {
-			if ((dol_strlen(trim($this->lastname)) + dol_strlen(trim($this->firstname))) == 0) {
-				$error_string[] = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Company').'/'.$langs->transnoentitiesnoconv('Firstname').'-'.$langs->transnoentitiesnoconv('Lastname'));
-				$err++;
-			}
-		}
+        if (dol_strlen(trim($this->societe)) == 0) {
+            if ((dol_strlen(trim($this->lastname)) + dol_strlen(trim($this->firstname))) == 0) {
+                $error_string[] = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Company') . '/' . $langs->transnoentitiesnoconv('Firstname') . '-' . $langs->transnoentitiesnoconv('Lastname'));
+                $err++;
+            }
+        }
 
-		if (dol_strlen(trim($this->address)) == 0) {
+        if (dol_strlen(trim($this->address)) == 0) {
 			$error_string[] = $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Address'));
 			$err++;
 		}
@@ -996,9 +996,9 @@ class Don extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
-		if (!dol_strlen($modele)) {
+        if (!dol_strlen($modele)) {
 			$modele = 'html_cerfafr';
 
 			if ($this->model_pdf) {

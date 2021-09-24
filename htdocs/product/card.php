@@ -74,13 +74,13 @@ if (!empty($conf->bom->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('products', 'other'));
 if (!empty($conf->stock->enabled)) {
-	$langs->load("stocks");
+	// $langs->load("stocks");
 }
 if (!empty($conf->facture->enabled)) {
-	$langs->load("bills");
+    // $langs->load("bills");
 }
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+    // $langs->load("productbatch");
 }
 
 $mesg = ''; $error = 0; $errors = array();
@@ -254,7 +254,7 @@ if (empty($reshook)) {
 			header("Location: ".$_SERVER['PHP_SELF']."?id=".$object->id);
 			exit;
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			if ($result == -1) {
 				$errors[] = 'ErrorBadBarCodeSyntax';
 			} elseif ($result == -2) {
@@ -1158,7 +1158,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 			// Product specific batch number management
 			$status_batch = GETPOST('status_batch');
 			if ($status_batch !== '0') {
-				$langs->load("admin");
+                // $langs->load("admin");
 				$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("Batch"), $langs->transnoentities("Batch"));
 				$tooltip .= '<br>'.$langs->trans("GenericMaskCodes2");
 				$tooltip .= '<br>'.$langs->trans("GenericMaskCodes3");
@@ -1679,7 +1679,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 					print $form->selectarray('status_batch', $statutarray, $object->status_batch);
 					print '</td></tr>';
 					if (!empty($object->status_batch) || !empty($conf->use_javascript_ajax)) {
-						$langs->load("admin");
+                        // $langs->load("admin");
 						$tooltip = $langs->trans("GenericMaskCodes", $langs->transnoentities("Batch"), $langs->transnoentities("Batch"));
 						$tooltip .= '<br>'.$langs->trans("GenericMaskCodes2");
 						$tooltip .= '<br>'.$langs->trans("GenericMaskCodes3");
@@ -2551,7 +2551,7 @@ if (!empty($conf->global->PRODUCT_ADD_FORM_ADD_TO) && $object->id && ($action ==
 	if (!empty($conf->propal->enabled) && $user->rights->propale->creer) {
 		$propal = new Propal($db);
 
-		$langs->load("propal");
+        // $langs->load("propal");
 
 		$otherprop = $propal->liste_array(2, 1, 0);
 
@@ -2572,7 +2572,7 @@ if (!empty($conf->global->PRODUCT_ADD_FORM_ADD_TO) && $object->id && ($action ==
 	if (!empty($conf->commande->enabled) && $user->rights->commande->creer) {
 		$commande = new Commande($db);
 
-		$langs->load("orders");
+        // $langs->load("orders");
 
 		$othercom = $commande->liste_array(2, 1, null);
 		if (is_array($othercom) && count($othercom)) {
@@ -2592,7 +2592,7 @@ if (!empty($conf->global->PRODUCT_ADD_FORM_ADD_TO) && $object->id && ($action ==
 	if (!empty($conf->facture->enabled) && $user->rights->facture->creer) {
 		$invoice = new Facture($db);
 
-		$langs->load("bills");
+        // $langs->load("bills");
 
 		$otherinvoice = $invoice->liste_array(2, 1, null);
 		if (is_array($otherinvoice) && count($otherinvoice)) {

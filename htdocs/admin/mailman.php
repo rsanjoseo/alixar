@@ -96,7 +96,7 @@ if ($action == 'unset') {
 if (($action == 'testsubscribe' || $action == 'testunsubscribe') && !empty($conf->global->ADHERENT_USE_MAILMAN)) {
 	$email = GETPOST($action.'email');
 	if (!isValidEmail($email)) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("ErrorBadEMail", $email), null, 'errors');
 	} else {
 		include_once DOL_DOCUMENT_ROOT.'/mailmanspip/class/mailmanspip.class.php';

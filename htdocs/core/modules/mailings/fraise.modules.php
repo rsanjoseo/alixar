@@ -74,7 +74,7 @@ class mailing_fraise extends MailingTargets
 	{
 		global $langs;
 
-		$langs->load("members");
+		// $langs->load("members");
 
 		// Array for requests for statistics board
 		$statssql = array();

@@ -109,7 +109,7 @@ class FormWebsite
 	{
 		global $langs, $conf, $user;
 
-		$langs->load("admin");
+		// $langs->load("admin");
 
 		$sql = "SELECT rowid, code, label, entity";
 		$sql .= " FROM ".MAIN_DB_PREFIX.'c_type_container';
@@ -169,7 +169,7 @@ class FormWebsite
 	{
 		global $langs, $conf, $user;
 
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		$listofsamples = dol_dir_list(DOL_DOCUMENT_ROOT.'/website/samples', 'files', 0, '^page-sample-.*\.html$');
 

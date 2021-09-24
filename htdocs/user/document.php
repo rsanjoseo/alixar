@@ -135,7 +135,7 @@ if ($object->id) {
 	 * Affichage onglets
 	 */
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+		// $langs->load("mails");
 	}
 	$head = user_prepare_head($object);
 

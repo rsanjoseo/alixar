@@ -71,7 +71,7 @@ function rebuildObjectClass($destdir, $module, $objectname, $newmask, $readdir =
 	$pathoffiletoeditsrc = $readdir.'/class/'.strtolower($objectname).'.class.php';
 	$pathoffiletoedittarget = $destdir.'/class/'.strtolower($objectname).'.class.php'.($readdir != $destdir ? '.new' : '');
 	if (!dol_is_file($pathoffiletoeditsrc)) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFileNotFound", $pathoffiletoeditsrc), null, 'errors');
 		return -3;
 	}
@@ -262,7 +262,7 @@ function rebuildObjectSql($destdir, $module, $objectname, $newmask, $readdir = '
 	}
 
 	if (!dol_is_file($pathoffiletoeditsrc)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFileNotFound", $pathoffiletoeditsrc), null, 'errors');
 		return -1;
 	}

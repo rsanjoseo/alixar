@@ -109,7 +109,7 @@ class AdvanceTargetingMailing extends CommonObject
 	public function __construct($db)
 	{
 		global $langs;
-		$langs->load('customers');
+		// $langs->load('customers');
 
 		$this->db = $db;
 

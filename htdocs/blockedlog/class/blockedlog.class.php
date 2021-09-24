@@ -758,7 +758,7 @@ class BlockedLog
 
                 return 1;
             } else {
-                $langs->load("blockedlog");
+                // $langs->load("blockedlog");
                 $this->error = $langs->trans("RecordNotFound");
                 return 0;
             }
@@ -814,7 +814,7 @@ class BlockedLog
 	{
 		global $conf, $langs, $hookmanager;
 
-		$langs->load('blockedlog');
+        // $langs->load('blockedlog');
 
 		$error = 0;
 

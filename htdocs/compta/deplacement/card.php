@@ -34,7 +34,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->load("trips");
+// $langs->load("trips");
 
 
 // Security check
@@ -423,7 +423,7 @@ if ($action == 'create') {
 
 			// Project
 			if (!empty($conf->projet->enabled)) {
-				$langs->load('projects');
+                // $langs->load('projects');
 				print '<tr>';
 				print '<td>';
 

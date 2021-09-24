@@ -882,7 +882,7 @@ class MyObject extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule@mymodule");
+			//// $langs->load("mymodule@mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->trans('Disabled');
@@ -991,7 +991,7 @@ class MyObject extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("mymodule@mymodule");
+        // $langs->load("mymodule@mymodule");
 
         if (empty($conf->global->MYMODULE_MYOBJECT_ADDON)) {
             $conf->global->MYMODULE_MYOBJECT_ADDON = 'mod_myobject_standard';
@@ -1056,7 +1056,7 @@ class MyObject extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("mymodule@mymodule");
+        // $langs->load("mymodule@mymodule");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_myobject';

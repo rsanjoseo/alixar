@@ -380,7 +380,7 @@ print_barre_liste($langs->trans("SocialContributions"), $page, $_SERVER["PHP_SEL
 
 if (empty($mysoc->country_id) && empty($mysoc->country_code)) {
 	print '<div class="error">';
-	$langs->load("errors");
+	// $langs->load("errors");
 	$countrynotdefined = $langs->trans("ErrorSetACountryFirst");
 	print $countrynotdefined;
 	print '</div>';

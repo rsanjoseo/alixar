@@ -79,7 +79,7 @@ class mod_facture_terre extends ModeleNumRefFactures
 	public function info()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans('TerreNumRefModelDesc1', $this->prefixinvoice, $this->prefixcreditnote, $this->prefixdeposit);
 	}
 
@@ -103,7 +103,7 @@ class mod_facture_terre extends ModeleNumRefFactures
 	{
 		global $langs, $conf, $db;
 
-		$langs->load("bills");
+        // $langs->load("bills");
 
 		// Check invoice num
 		$fayymm = '';
@@ -124,7 +124,7 @@ class mod_facture_terre extends ModeleNumRefFactures
 			}
 		}
 		if ($fayymm && !preg_match('/'.$this->prefixinvoice.'[0-9][0-9][0-9][0-9]/i', $fayymm)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

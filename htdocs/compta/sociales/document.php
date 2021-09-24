@@ -120,7 +120,7 @@ if ($object->id) {
 	$morehtmlref .= $form->editfieldval("Label", 'lib', $object->label, $object, $user->rights->tax->charges->creer, 'string', '', null, null, '', 1);
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+		// $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' : ';
 		if (!empty($object->fk_project)) {
 			$proj = new Project($db);

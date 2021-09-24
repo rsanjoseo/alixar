@@ -91,7 +91,7 @@ abstract class ModeleNumRefDons
 	public function info()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans("NoDescription");
 	}
 
@@ -103,7 +103,7 @@ abstract class ModeleNumRefDons
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("bills");
+        // $langs->load("bills");
 		return $langs->trans("NoExample");
 	}
 
@@ -137,7 +137,7 @@ abstract class ModeleNumRefDons
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

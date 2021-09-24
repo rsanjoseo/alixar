@@ -37,7 +37,7 @@ if (!empty($conf->accounting->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->load("assets");
+// $langs->load("assets");
 
 $rowid  = GETPOST('rowid', 'int');
 $action = GETPOST('action', 'aZ09');
@@ -128,7 +128,7 @@ if ($action == 'add' && $user->rights->asset->write) {
 		}
 		if ($num) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorLabelAlreadyExists", $login), null, 'errors');
 		}
 	}

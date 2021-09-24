@@ -869,7 +869,7 @@ class User extends CommonObject
 		}
 
 		if (!$error && !$notrigger) {
-			$langs->load("other");
+			// $langs->load("other");
 			$this->context = array('audit'=>$langs->trans("PermissionsAdd").($rid ? ' (id='.$rid.')' : ''));
 
 			// Call trigger
@@ -1001,7 +1001,7 @@ class User extends CommonObject
 		}
 
 		if (!$error && !$notrigger) {
-			$langs->load("other");
+            // $langs->load("other");
 			$this->context = array('audit'=>$langs->trans("PermissionsDelete").($rid ? ' (id='.$rid.')' : ''));
 
 			// Call trigger
@@ -1383,16 +1383,16 @@ class User extends CommonObject
 
 		// Check parameters
 		if (!empty($conf->global->USER_MAIL_REQUIRED) && !isValidEMail($this->email)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadEMail", $this->email);
 			return -1;
 		}
 		if (empty($this->login)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Login"));
 			return -1;
 		} elseif (preg_match('/[,@<>"\']/', $this->login)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadCharIntoLoginName");
 			return -1;
 		}
@@ -1409,7 +1409,7 @@ class User extends CommonObject
 			if ($resqltochecklogin) {
 				$objtochecklogin = $this->db->fetch_object($resqltochecklogin);
 				if ($objtochecklogin && $objtochecklogin->nb > 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans("ErrorLoginAlreadyExists", $this->login);
 					dol_syslog(get_class($this)."::create ".$this->error, LOG_DEBUG);
 					$this->db->rollback();
@@ -1424,7 +1424,7 @@ class User extends CommonObject
 			if ($resqltochecklogin) {
 				$objtochecklogin = $this->db->fetch_object($resqltochecklogin);
 				if ($objtochecklogin && $objtochecklogin->nb > 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans("ErrorEmailAlreadyExists", $this->email);
 					dol_syslog(get_class($this)."::create ".$this->error, LOG_DEBUG);
 					$this->db->rollback();
@@ -1452,7 +1452,7 @@ class User extends CommonObject
 
 			if (!empty($conf->global->MAIN_DEFAULT_WAREHOUSE_USER) && !empty($conf->global->STOCK_USERSTOCK_AUTOCREATE)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				$entrepot = new Entrepot($this->db);
 				$entrepot->label = $langs->trans("PersonalStock", $this->getFullName($langs));
 				$entrepot->libelle = $entrepot->label; // For backward compatibility
@@ -1783,16 +1783,16 @@ class User extends CommonObject
 
 		// Check parameters
 		if (!empty($conf->global->USER_MAIL_REQUIRED) && !isValidEMail($this->email)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadEMail", $this->email);
 			return -1;
 		}
 		if (empty($this->login)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorFieldRequired", 'Login');
 			return -1;
 		} elseif (preg_match('/[,@<>"\']/', $this->login)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadCharIntoLoginName");
 			return -1;
 		}
@@ -1806,7 +1806,7 @@ class User extends CommonObject
 			if ($resqltochecklogin) {
 				$objtochecklogin = $this->db->fetch_object($resqltochecklogin);
 				if ($objtochecklogin && $objtochecklogin->nb > 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans("ErrorLoginAlreadyExists", $this->login);
 					dol_syslog(get_class($this)."::create ".$this->error, LOG_DEBUG);
 					$this->db->rollback();
@@ -1820,7 +1820,7 @@ class User extends CommonObject
 			if ($resqltochecklogin) {
 				$objtochecklogin = $this->db->fetch_object($resqltochecklogin);
 				if ($objtochecklogin && $objtochecklogin->nb > 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans("ErrorEmailAlreadyExists", $this->email);
 					dol_syslog(get_class($this)."::create ".$this->error, LOG_DEBUG);
 					$this->db->rollback();
@@ -2666,7 +2666,7 @@ class User extends CommonObject
 		$linkclose = "";
 		if (empty($notooltip)) {
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$langs->load("users");
+                // $langs->load("users");
 				$label = $langs->trans("ShowUser");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
@@ -2814,7 +2814,7 @@ class User extends CommonObject
 
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            //$langs->load("mymodule");
+            //// $langs->load("mymodule");
             $this->labelStatus[self::STATUS_ENABLED] = $langs->trans('Enabled');
             $this->labelStatus[self::STATUS_DISABLED] = $langs->trans('Disabled');
             $this->labelStatusShort[self::STATUS_ENABLED] = $langs->trans('Enabled');
@@ -3525,7 +3525,7 @@ class User extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("user");
+        // $langs->load("user");
 
 		// Positionne le modele sur le nom du modele a utiliser
 		if (!dol_strlen($modele)) {

@@ -692,7 +692,7 @@ class WebsitePage extends CommonObject
 
 		// Check parameters
 		if (empty($newref)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("WEBSITE_TITLE"));
 			return -1;
 		}
@@ -834,7 +834,7 @@ class WebsitePage extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+            //// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Disabled');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->trans('Disabled');

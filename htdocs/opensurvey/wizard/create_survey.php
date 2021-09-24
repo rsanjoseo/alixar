@@ -35,7 +35,7 @@ if (!$user->rights->opensurvey->write) {
 	accessforbidden();
 }
 
-$langs->load("opensurvey");
+// $langs->load("opensurvey");
 
 $title = GETPOST('title');
 $description = GETPOST('description', 'restricthtml');

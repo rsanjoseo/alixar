@@ -505,7 +505,7 @@ if (empty($reshook)) {
 				Header("Location: ".DOL_URL_ROOT."/ticket/list.php");
 				exit;
 			} else {
-				$langs->load("errors");
+				// $langs->load("errors");
 				$mesg = '<div class="error">'.$langs->trans($object->error).'</div>';
 				$action = '';
 			}
@@ -916,7 +916,7 @@ if ($action == 'create' || $action == 'presend') {
 		if ($object->fk_user_create > 0) {
 			$morehtmlref .= '<br>'.$langs->trans("CreatedBy").' : ';
 
-			$langs->load("users");
+            // $langs->load("users");
 			$fuser = new User($db);
 			$fuser->fetch($object->fk_user_create);
 			$morehtmlref .= $fuser->getNomUrl(-1);
@@ -942,7 +942,7 @@ if ($action == 'create' || $action == 'presend') {
 
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($user->rights->ticket->write) {
 				if ($action != 'classify') {

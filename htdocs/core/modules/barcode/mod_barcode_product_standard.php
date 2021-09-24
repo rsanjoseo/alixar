@@ -85,7 +85,7 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
 		global $conf, $mc;
 		global $form;
 
-		$langs->load("products");
+		// $langs->load("products");
 
 		$disabled = ((!empty($mc->sharings['referent']) && $mc->sharings['referent'] != $conf->entity) ? ' disabled' : '');
 
@@ -132,7 +132,7 @@ class mod_barcode_product_standard extends ModeleNumRefBarCode
             $examplebarcode = $langs->trans('NotConfigured');
         }
         if ($examplebarcode == "ErrorBadMask") {
-            $langs->load("errors");
+            // $langs->load("errors");
             $examplebarcode = $langs->trans($examplebarcode);
         }
 

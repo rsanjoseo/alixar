@@ -51,55 +51,55 @@ if ($action == 'add') {
 		// Check values
 		if (!$type) {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type"));
 			$action = 'create';
 		}
 		if ($type == 'varchar' && $extrasize <= 0) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Size"));
 			$action = 'edit';
 		}
 		if ($type == 'varchar' && $extrasize > $maxsizestring) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorSizeTooLongForVarcharType", $maxsizestring);
 			$action = 'create';
 		}
 		if ($type == 'int' && $extrasize > $maxsizeint) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorSizeTooLongForIntType", $maxsizeint);
 			$action = 'create';
 		}
 		if ($type == 'select' && !$param) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorNoValueForSelectType");
 			$action = 'create';
 		}
 		if ($type == 'sellist' && !$param) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorNoValueForSelectListType");
 			$action = 'create';
 		}
 		if ($type == 'checkbox' && !$param) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorNoValueForCheckBoxType");
 			$action = 'create';
 		}
 		if ($type == 'link' && !$param) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorNoValueForLinkType");
 			$action = 'create';
 		}
 		if ($type == 'radio' && !$param) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg[] = $langs->trans("ErrorNoValueForRadioType");
 			$action = 'create';
 		}
@@ -112,13 +112,13 @@ if ($action == 'add') {
 					if (preg_match_all('/,/', $param_ligne, $matches)) {
 						if (count($matches[0]) > 1) {
 							$error++;
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
 							$action = 'create';
 						}
 					} else {
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
 						$action = 'create';
 					}
@@ -129,7 +129,7 @@ if ($action == 'add') {
 		if (!$error) {
 			if (strlen(GETPOST('attrname', 'aZ09')) < 3) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				$mesg[] = $langs->trans("ErrorValueLength", $langs->transnoentitiesnoconv("AttributeCode"), 3);
 				$action = 'create';
 			}
@@ -139,7 +139,7 @@ if ($action == 'add') {
 		if (!$error) {
 			if (in_array(GETPOST('attrname', 'aZ09'), array('and', 'keyword', 'table', 'index', 'int', 'integer', 'float', 'double', 'real', 'position'))) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				$mesg[] = $langs->trans("ErrorReservedKeyword", GETPOST('attrname', 'aZ09'));
 				$action = 'create';
 			}
@@ -160,7 +160,7 @@ if ($action == 'add') {
 				} else {
 					// Else it's separated key/value and coma list
 					foreach ($parameters_array as $param_ligne) {
-						list($key, $value) = explode(',', $param_ligne);
+						[$key, $value] = explode(',', $param_ligne);
 						$params['options'][$key] = $value;
 					}
 				}
@@ -204,8 +204,8 @@ if ($action == 'add') {
 				}
 			} else {
 				$error++;
-				$langs->load("errors");
-				$mesg = $langs->trans("ErrorFieldCanNotContainSpecialNorUpperCharacters", $langs->transnoentities("AttributeCode"));
+				// $langs->load("errors");
+                $mesg = $langs->trans("ErrorFieldCanNotContainSpecialNorUpperCharacters", $langs->transnoentities("AttributeCode"));
 				setEventMessages($mesg, null, 'errors');
 				$action = 'create';
 			}
@@ -221,50 +221,50 @@ if ($action == 'update') {
 		// Check values
 		if (!$type) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type"));
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type"));
 			$action = 'edit';
 		}
 		if ($type == 'varchar' && $extrasize <= 0) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Size"));
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Size"));
 			$action = 'edit';
 		}
 		if ($type == 'varchar' && $extrasize > $maxsizestring) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorSizeTooLongForVarcharType", $maxsizestring);
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorSizeTooLongForVarcharType", $maxsizestring);
 			$action = 'edit';
 		}
 		if ($type == 'int' && $extrasize > $maxsizeint) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorSizeTooLongForIntType", $maxsizeint);
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorSizeTooLongForIntType", $maxsizeint);
 			$action = 'edit';
 		}
 		if ($type == 'select' && !$param) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorNoValueForSelectType");
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorNoValueForSelectType");
 			$action = 'edit';
 		}
 		if ($type == 'sellist' && !$param) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorNoValueForSelectListType");
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorNoValueForSelectListType");
 			$action = 'edit';
 		}
 		if ($type == 'checkbox' && !$param) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorNoValueForCheckBoxType");
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorNoValueForCheckBoxType");
 			$action = 'edit';
 		}
 		if ($type == 'radio' && !$param) {
 			$error++;
-			$langs->load("errors");
-			$mesg[] = $langs->trans("ErrorNoValueForRadioType");
+			// $langs->load("errors");
+            $mesg[] = $langs->trans("ErrorNoValueForRadioType");
 			$action = 'edit';
 		}
 		if ((($type == 'radio') || ($type == 'checkbox')) && $param) {
@@ -276,14 +276,14 @@ if ($action == 'update') {
 					if (preg_match_all('/,/', $param_ligne, $matches)) {
 						if (count($matches[0]) > 1) {
 							$error++;
-							$langs->load("errors");
-							$mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
+							// $langs->load("errors");
+                            $mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
 							$action = 'edit';
 						}
 					} else {
 						$error++;
-						$langs->load("errors");
-						$mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
+						// $langs->load("errors");
+                        $mesg[] = $langs->trans("ErrorBadFormatValueList", $param_ligne);
 						$action = 'edit';
 					}
 				}
@@ -293,8 +293,8 @@ if ($action == 'update') {
 		if (!$error) {
 			if (strlen(GETPOST('attrname', 'aZ09')) < 3 && empty($conf->global->MAIN_DISABLE_EXTRAFIELDS_CHECK_FOR_UPDATE)) {
 				$error++;
-				$langs->load("errors");
-				$mesg[] = $langs->trans("ErrorValueLength", $langs->transnoentitiesnoconv("AttributeCode"), 3);
+				// $langs->load("errors");
+                $mesg[] = $langs->trans("ErrorValueLength", $langs->transnoentitiesnoconv("AttributeCode"), 3);
 				$action = 'edit';
 			}
 		}
@@ -303,8 +303,8 @@ if ($action == 'update') {
 		if (!$error) {
 			if (in_array(GETPOST('attrname', 'aZ09'), array('and', 'keyword', 'table', 'index', 'integer', 'float', 'double', 'position')) && empty($conf->global->MAIN_DISABLE_EXTRAFIELDS_CHECK_FOR_UPDATE)) {
 				$error++;
-				$langs->load("errors");
-				$mesg[] = $langs->trans("ErrorReservedKeyword", GETPOST('attrname', 'aZ09'));
+				// $langs->load("errors");
+                $mesg[] = $langs->trans("ErrorReservedKeyword", GETPOST('attrname', 'aZ09'));
 				$action = 'edit';
 			}
 		}
@@ -323,7 +323,7 @@ if ($action == 'update') {
 				} else {
 					//Esle it's separated key/value and coma list
 					foreach ($parameters_array as $param_ligne) {
-						list($key, $value) = explode(',', $param_ligne);
+						[$key, $value] = explode(',', $param_ligne);
 						$params['options'][$key] = $value;
 					}
 				}
@@ -370,8 +370,8 @@ if ($action == 'update') {
 				}
 			} else {
 				$error++;
-				$langs->load("errors");
-				$mesg = $langs->trans("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities("AttributeCode"));
+				// $langs->load("errors");
+                $mesg = $langs->trans("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities("AttributeCode"));
 				setEventMessages($mesg, null, 'errors');
 			}
 		} else {
@@ -392,7 +392,7 @@ if ($action == 'delete') {
 		}
 	} else {
 		$error++;
-		$langs->load("errors");
-		$mesg = $langs->trans("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities("AttributeCode"));
+		// $langs->load("errors");
+        $mesg = $langs->trans("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities("AttributeCode"));
 	}
 }

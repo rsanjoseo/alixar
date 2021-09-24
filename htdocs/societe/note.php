@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 
 $action = GETPOST('action', 'aZ09');
 
-$langs->load("companies");
+// $langs->load("companies");
 
 $id = GETPOST('id') ?GETPOST('id', 'int') : GETPOST('socid', 'int');
 
@@ -83,7 +83,7 @@ if ($object->id > 0) {
 	 * Affichage onglets
 	 */
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 
 	$head = societe_prepare_head($object);
@@ -145,7 +145,7 @@ if ($object->id > 0) {
 
 	print dol_get_fiche_end();
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print $langs->trans("ErrorRecordNotFound");
 }
 

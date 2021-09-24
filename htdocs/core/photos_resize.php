@@ -581,7 +581,7 @@ if (!empty($conf->use_javascript_ajax)) {
 		      <input type="submit" id="cancelcrop" name="cancel" class="button button-cancel" value="'.dol_escape_htmltag($langs->trans("Cancel")).'" />
 		   </form>'."\n";
 	} else {
-		$langs->load("other");
+		// $langs->load("other");
 		print '<div class="opacitymedium">'.$langs->trans("FeatureNotAvailableOnDevicesWithoutMouse").'</div>';
 	}
 	print '</fieldset>'."\n";

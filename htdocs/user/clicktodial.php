@@ -118,7 +118,7 @@ if ($id > 0) {
 			print '<td class="valeur">';
 			print '<input name="url" value="'.(!empty($object->clicktodial_url) ? $object->clicktodial_url : '').'" size="92">';
 			if (empty($conf->global->CLICKTODIAL_URL) && empty($object->clicktodial_url)) {
-				$langs->load("errors");
+				// $langs->load("errors");
 				print '<font class="error">'.$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("ClickToDial")).'</font>';
 			} else {
 				print ' &nbsp; &nbsp; '.$form->textwithpicto($langs->trans("KeepEmptyToUseDefault").': '.$conf->global->CLICKTODIAL_URL, $langs->trans("ClickToDialUrlDesc"));
@@ -157,7 +157,7 @@ if ($id > 0) {
 				$url = $object->clicktodial_url;
 			}
 			if (empty($url)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print '<font class="error">'.$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("ClickToDial")).'</font>';
 			} else {
 				print $form->textwithpicto((empty($object->clicktodial_url) ? '<span class="opacitymedium">'.$langs->trans("DefaultLink").':</span> ' : '').$url, $langs->trans("ClickToDialUrlDesc"));

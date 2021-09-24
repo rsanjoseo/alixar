@@ -154,7 +154,7 @@ class Import
 						$langtoload = $module->getLangFilesArray();
 						if (is_array($langtoload)) {
 							foreach ($langtoload as $key) {
-								$langs->load($key);
+								// $langs->load($key);
 							}
 						}
 

@@ -723,7 +723,7 @@ if ($resql) {
 
 	// If we ask a dedicated card and not allow to see it, we force on user.
 	if ($id && empty($user->rights->holiday->readall) && !in_array($id, $childids)) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print '<tr class="oddeven opacitymediuem"><td colspan="10">'.$langs->trans("NotEnoughPermissions").'</td></tr>';
 		$result = 0;
 	} elseif ($num > 0 && !empty($mysoc->country_id)) {

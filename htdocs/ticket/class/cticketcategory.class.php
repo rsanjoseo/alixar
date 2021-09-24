@@ -741,7 +741,7 @@ class CTicketCategory extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule@mymodule");
+			//// $langs->load("mymodule@mymodule");
 			$this->labelStatus[self::STATUS_ENABLED] = $langs->trans('Enabled');
 			$this->labelStatus[self::STATUS_DISABLED] = $langs->trans('Disabled');
 			$this->labelStatusShort[self::STATUS_ENABLED] = $langs->trans('Enabled');

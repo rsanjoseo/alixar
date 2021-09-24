@@ -238,7 +238,7 @@ if ($action == 'addtime' && $user->rights->projet->lire && GETPOST('assigntask')
 	if ($result < 0) {
 		$error++;
 		if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($langs->trans("ErrorTaskAlreadyAssigned"), null, 'warnings');
 		} else {
 			setEventMessages($object->error, $object->errors, 'errors');

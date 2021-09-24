@@ -65,7 +65,7 @@ class mailing_xinputuser extends MailingTargets
 	public function getSqlArrayForStats()
 	{
 		global $langs;
-		$langs->load("users");
+		// $langs->load("users");
 
 		$statssql = array();
 		return $statssql;
@@ -147,12 +147,12 @@ class mailing_xinputuser extends MailingTargets
 
 				return parent::addTargetsToDatabase($mailing_id, $cibles);
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorBadEMail", $email);
 				return -1;
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadEmail", $email);
 			return -1;
 		}

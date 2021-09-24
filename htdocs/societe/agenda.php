@@ -118,7 +118,7 @@ if ($socid > 0) {
 	llxHeader('', $title);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+		// $langs->load("mails");
 	}
 	$head = societe_prepare_head($object);
 

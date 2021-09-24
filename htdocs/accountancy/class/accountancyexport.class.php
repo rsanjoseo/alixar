@@ -1634,7 +1634,7 @@ class AccountancyExport
     public function exportCharlemagne($objectLines)
     {
         global $langs;
-        $langs->load('compta');
+        // $langs->load('compta');
 
         $separator = "\t";
         $end_line = "\n";

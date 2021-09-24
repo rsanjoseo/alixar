@@ -581,12 +581,12 @@ if ($action == 'addsite' && $usercanedit) {
 
 	if (!$error && !GETPOST('WEBSITE_REF', 'alpha')) {
 		$error++;
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->transnoentities("ErrorFieldRequired", $langs->transnoentities("Ref")), null, 'errors');
 	}
 	if (!$error && !preg_match('/^[a-z0-9_\-\.]+$/i', GETPOST('WEBSITE_REF', 'alpha'))) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->transnoentities("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities("Ref")), null, 'errors');
 	}
 
@@ -647,12 +647,12 @@ if ($action == 'addcontainer' && $usercanedit) {
 
 		if (empty($urltograb)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("URL")), null, 'errors');
 			$action = 'createcontainer';
 		} elseif (!preg_match('/^http/', $urltograb)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages('Error URL must start with http:// or https://', null, 'errors');
 			$action = 'createcontainer';
 		}
@@ -956,7 +956,7 @@ if ($action == 'addcontainer' && $usercanedit) {
 				// Disallow alias name pageX (already used to save the page with id)
 				if (preg_match('/^page\d+/i', $aliastotest)) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages("Alias name 'pageX' is not allowed", null, 'errors');
 					$action = 'createcontainer';
 					break;
@@ -964,14 +964,14 @@ if ($action == 'addcontainer' && $usercanedit) {
 					$result = $websitepagetemp->fetch(0, $object->id, $aliastotest);
 					if ($result < 0) {
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($websitepagetemp->error, $websitepagetemp->errors, 'errors');
 						$action = 'createcontainer';
 						break;
 					}
 					if ($result > 0) {
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($langs->trans("ErrorAPageWithThisNameOrAliasAlreadyExists", $websitepagetemp->pageurl), null, 'errors');
 						$action = 'createcontainer';
 						break;
@@ -1023,31 +1023,31 @@ if ($action == 'addcontainer' && $usercanedit) {
 
 	if (!$error) {
 		if (empty($objectpage->pageurl)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("WEBSITE_PAGENAME")), null, 'errors');
 			$error++;
 			$action = 'createcontainer';
 		} elseif (!preg_match('/^[a-z0-9\-\_]+$/i', $objectpage->pageurl)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->transnoentities("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities('WEBSITE_PAGENAME')), null, 'errors');
 			$error++;
 			$action = 'createcontainer';
 		}
 		if (empty($objectpage->title)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("WEBSITE_TITLE")), null, 'errors');
 			$error++;
 			$action = 'createcontainer';
 		}
 		if ($objectpage->fk_page > 0 && empty($objectpage->lang)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorLanguageRequiredIfPageIsTranslationOfAnother"), null, 'errors');
 			$error++;
 			$action = 'createcontainer';
 		}
 		if ($objectpage->fk_page > 0 && !empty($objectpage->lang)) {
 			if ($objectpage->lang == $website->lang) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorLanguageMustNotBeSourceLanguageIfPageIsTranslationOfAnother"), null, 'errors');
 				$error++;
 				$action = 'createcontainer';
@@ -1646,7 +1646,7 @@ if ($action == 'updatemeta' && $usercanedit) {
 	// Check parameters
 	if (!preg_match('/^[a-z0-9\-\_]+$/i', GETPOST('WEBSITE_PAGENAME', 'alpha'))) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->transnoentities("ErrorFieldCanNotContainSpecialCharacters", $langs->transnoentities('WEBSITE_PAGENAME')), null, 'errors');
 		$action = 'editmeta';
 	}
@@ -1663,13 +1663,13 @@ if ($action == 'updatemeta' && $usercanedit) {
 		$result = $websitepagetemp->fetch(-1 * $objectpage->id, $object->id, GETPOST('WEBSITE_PAGENAME', 'alpha'));
 		if ($result < 0) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($websitepagetemp->error, $websitepagetemp->errors, 'errors');
 			$action = 'editmeta';
 		}
 		if ($result > 0) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorAPageWithThisNameOrAliasAlreadyExists", $websitepagetemp->pageurl), null, 'errors');
 			$action = 'editmeta';
 		}
@@ -1686,7 +1686,7 @@ if ($action == 'updatemeta' && $usercanedit) {
 			// Disallow alias name pageX (already used to save the page with id)
 			if (preg_match('/^page\d+/i', $aliastotest)) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages("Alias name 'pageX' is not allowed", null, 'errors');
 				$action = 'editmeta';
 				break;
@@ -1694,14 +1694,14 @@ if ($action == 'updatemeta' && $usercanedit) {
 				$result = $websitepagetemp->fetch(-1 * $objectpage->id, $object->id, $aliastotest);
 				if ($result < 0) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($websitepagetemp->error, $websitepagetemp->errors, 'errors');
 					$action = 'editmeta';
 					break;
 				}
 				if ($result > 0) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorAPageWithThisNameOrAliasAlreadyExists", $websitepagetemp->pageurl), null, 'errors');
 					$action = 'editmeta';
 					break;
@@ -1737,15 +1737,15 @@ if ($action == 'updatemeta' && $usercanedit) {
 
 		$res = $objectpage->update($user);
 		if (!($res > 0)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			if ($db->lasterrno == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorAPageWithThisNameOrAliasAlreadyExists"), null, 'errors');
 				$action = 'editmeta';
 			} else {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($objectpage->error, $objectpage->errors, 'errors');
 				$action = 'editmeta';
 			}
@@ -3883,7 +3883,7 @@ if ($action == 'editmeta' || $action == 'createcontainer') {	// Edit properties 
 
 	// Categories
 	if (!empty($conf->categorie->enabled) && !empty($user->rights->categorie->lire)) {
-		$langs->load('categories');
+        // $langs->load('categories');
 
 		if (!GETPOSTISSET('categories')) {
 			$cate_arbo = $form->select_all_categories(Categorie::TYPE_WEBSITE_PAGE, '', null, null, null, 1);

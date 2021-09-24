@@ -648,7 +648,7 @@ class Opensurveysondage extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+			//// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Opened');
 			$this->labelStatus[self::STATUS_CLOSED] = $langs->trans('Closed');

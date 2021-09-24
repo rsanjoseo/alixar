@@ -167,7 +167,7 @@ function limitChars(textarea, limit, infodiv)
 				print '<input type="hidden" name="fromsms" value="'.$this->fromsms.'">';
 				print "</td><td>";
 				if ($this->fromtype == 'user') {
-					$langs->load("users");
+					// $langs->load("users");
 					$fuser = new User($this->db);
 					$fuser->fetch($this->fromid);
 					print $fuser->getNomUrl(1);
@@ -177,7 +177,7 @@ function limitChars(textarea, limit, infodiv)
 					print $this->fromsms;
 				} else {
 					if ($this->fromtype) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						print '<font class="warning"> &lt;'.$langs->trans("ErrorNoPhoneDefinedForThisUser").'&gt; </font>';
 					}
 				}

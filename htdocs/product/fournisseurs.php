@@ -194,33 +194,33 @@ if (empty($reshook)) {
 
 		if ($tva_tx == '') {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("VATRateForSupplierProduct")), null, 'errors');
 		}
 		if (!is_numeric($tva_tx)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldMustBeANumeric", $langs->transnoentities("VATRateForSupplierProduct")), null, 'errors');
 		}
 		if (empty($quantity)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Qty")), null, 'errors');
 		}
 		if (empty($ref_fourn)) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("RefSupplier")), null, 'errors');
 		}
 		if ($id_fourn <= 0) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Supplier")), null, 'errors');
 		}
 		if (price2num(GETPOST("price")) < 0 || GETPOST("price") == '') {
 			if ($price_expression === '') {	// Return error of missing price only if price_expression not set
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Price")), null, 'errors');
 			} else {
 				$_POST["price"] = 0;
@@ -229,17 +229,17 @@ if (empty($reshook)) {
 		if (!empty($conf->multicurrency->enabled)) {
 			if (!GETPOST("multicurrency_code")) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("Currency")), null, 'errors');
 			}
 			if (price2num(GETPOST("multicurrency_tx")) <= 0 || GETPOST("multicurrency_tx") == '') {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("CurrencyRate")), null, 'errors');
 			}
 			if (price2num(GETPOST("multicurrency_price")) < 0 || GETPOST("multicurrency_price") == '') {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentities("PriceCurrency")), null, 'errors');
 			}
 		}
@@ -456,7 +456,7 @@ if ($id > 0 || $ref) {
 
 			// Form to add or update a price
 			if (($action == 'add_price' || $action == 'update_price') && $usercancreate) {
-				$langs->load("suppliers");
+                // $langs->load("suppliers");
 
 				if ($rowid) {
 					$object->fetch_product_fournisseur_price($rowid, 1); //Ignore the math expression when getting the price
@@ -511,7 +511,7 @@ if ($id > 0 || $ref) {
 
 				// Availability
 				if (!empty($conf->global->FOURN_PRODUCT_AVAILABILITY)) {
-					$langs->load("propal");
+                    // $langs->load("propal");
 					print '<tr><td>'.$langs->trans("Availability").'</td><td>';
 					$form->selectAvailabilityDelay($object->fk_availability, "oselDispo", 1);
 					print '</td></tr>'."\n";
@@ -787,7 +787,7 @@ END;
 						foreach ($extralabels as $key => $value) {
 							if (!empty($extrafields->attributes["product_fournisseur_price"]['list'][$key]) && ($extrafields->attributes["product_fournisseur_price"]['list'][$key] == 1 || $extrafields->attributes["product_fournisseur_price"]['list'][$key] == 3 || ($action == "update_price" && $extrafields->attributes["product_fournisseur_price"]['list'][$key] == 4))) {
 								if (!empty($extrafields->attributes["product_fournisseur_price"]['langfile'][$key])) {
-									$langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
+                                    // $langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
 								}
 
 								print '<tr><td'.($extrafields->attributes["product_fournisseur_price"]['required'][$key] ? ' class="fieldrequired"' : '').'>';
@@ -813,7 +813,7 @@ END;
 							foreach ($extralabels as $key => $value) {
 								if (!empty($extrafields->attributes["product_fournisseur_price"]['list'][$key]) && ($extrafields->attributes["product_fournisseur_price"]['list'][$key] == 1 || $extrafields->attributes["product_fournisseur_price"]['list'][$key] == 3 || ($action == "update_price" && $extrafields->attributes["product_fournisseur_price"]['list'][$key] == 4))) {
 									if (!empty($extrafields->attributes["product_fournisseur_price"]['langfile'][$key])) {
-										$langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
+                                        // $langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
 									}
 
 									print '<tr><td'.($extrafields->attributes["product_fournisseur_price"]['required'][$key] ? ' class="fieldrequired"' : '').'>';
@@ -997,7 +997,7 @@ END;
 						// Show field if not hidden
 						if (!empty($extrafields->attributes["product_fournisseur_price"]['list'][$key]) && $extrafields->attributes["product_fournisseur_price"]['list'][$key] != 3) {
 							if (!empty($extrafields->attributes["product_fournisseur_price"]['langfile'][$key])) {
-								$langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
+                                // $langs->load($extrafields->attributes["product_fournisseur_price"]['langfile'][$key]);
 							}
 							if (!empty($extrafields->attributes["product_fournisseur_price"]['help'][$key])) {
 								$extratitle = $form->textwithpicto($langs->trans($value), $langs->trans($extrafields->attributes["product_fournisseur_price"]['help'][$key]));

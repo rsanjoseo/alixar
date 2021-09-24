@@ -598,7 +598,7 @@ class Propal extends CommonObject
             }
 
             if ($date_start && $date_end && $date_start > $date_end) {
-                $langs->load("errors");
+                // $langs->load("errors");
                 $this->error = $langs->trans('ErrorStartDateGreaterEnd');
                 return -1;
             }
@@ -612,7 +612,7 @@ class Propal extends CommonObject
                 $product_type = $product->type;
 
                 if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_PROPOSAL) && $product_type == 0 && $product->stock_reel < $qty) {
-                    $langs->load("errors");
+                    // $langs->load("errors");
                     $this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnProposal', $product->ref);
                     $this->db->rollback();
                     return -3;
@@ -818,7 +818,7 @@ class Propal extends CommonObject
 		}
 
 		if ($date_start && $date_end && $date_start > $date_end) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 			return -1;
 		}
@@ -3247,7 +3247,7 @@ class Propal extends CommonObject
         // Init/load array of translation of status
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            $langs->load("propal");
+            // $langs->load("propal");
             $this->labelStatus[0] = $langs->transnoentitiesnoconv("PropalStatusDraft");
             $this->labelStatus[1] = $langs->transnoentitiesnoconv("PropalStatusValidated");
             $this->labelStatus[2] = $langs->transnoentitiesnoconv("PropalStatusSigned");
@@ -3314,7 +3314,7 @@ class Propal extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("propal");
+            // $langs->load("propal");
 			$now = dol_now();
 
 			$delay_warning = 0;
@@ -3507,7 +3507,7 @@ class Propal extends CommonObject
     public function getNextNumRef($soc)
     {
         global $conf, $langs;
-        $langs->load("propal");
+        // $langs->load("propal");
 
         $classname = $conf->global->PROPALE_ADDON;
 
@@ -3542,7 +3542,7 @@ class Propal extends CommonObject
                 return "";
             }
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Proposal"));
             return "";
         }
@@ -3711,7 +3711,7 @@ class Propal extends CommonObject
     {
         global $conf, $langs;
 
-        $langs->load("propale");
+        // $langs->load("propale");
         $outputlangs->load("products");
 
         if (!dol_strlen($modele)) {

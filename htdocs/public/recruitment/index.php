@@ -78,7 +78,7 @@ $user_assign = new User($db);
 $user_create = new User($db);
 
 if (!$conf->global->RECRUITMENT_ENABLE_PUBLIC_INTERFACE) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	print '<div class="error">'.$langs->trans('ErrorPublicInterfaceNotEnabled').'</div>';
 	$db->close();
 	exit();

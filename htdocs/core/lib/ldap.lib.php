@@ -32,7 +32,7 @@ function ldap_prepare_head()
 {
 	global $langs, $conf, $user;
 
-	$langs->load("ldap");
+	// $langs->load("ldap");
 
 	// Onglets
 	$head = array();
@@ -111,7 +111,7 @@ function show_ldap_test_button($butlabel, $testlabel, $key, $dn, $objectclass)
 	} elseif (empty($conf->global->LDAP_SERVER_HOST)) {
 		print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans('LDAPSetupNotComplete').'">'.$butlabel.'</a>';
 	} elseif (empty($key) || empty($dn) || empty($objectclass)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print '<a class="butActionRefused classfortooltip" href="#" title="'.$langs->trans('ErrorLDAPSetupNotComplete').'">'.$butlabel.'</a>';
 	} else {
 		print '<a class="butAction reposition" href="'.$_SERVER["PHP_SELF"].'?action='.$testlabel.'">'.$butlabel.'</a>';

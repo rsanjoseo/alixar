@@ -255,7 +255,7 @@ if (empty($reshook)) {
 
 					$TFactThird[$rcp->socid] = $objecttmp;
 				} else {
-					$langs->load("errors");
+					// $langs->load("errors");
 					$errors[] = $rcp->ref.' : '.$langs->trans($objecttmp->error);
 					$error++;
 				}

@@ -64,7 +64,7 @@ if ($action == 'addcontact' && $user->rights->resource->write) {
 		exit;
 	} else {
 		if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$mesg = $langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType");
 		} else {
 			$mesg = $object->error;

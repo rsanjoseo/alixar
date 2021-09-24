@@ -48,7 +48,7 @@ if (!empty($conf->projet->enabled)) {
 // $langs->loadLangs(array("bills", "orders", "sendings", "companies", "deliveries", "products", "stocks", "receptions"));
 
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load('productbatch');
+	// $langs->load('productbatch');
 }
 
 	// Security check
@@ -543,7 +543,7 @@ if ($id > 0 || !empty($ref)) {
 	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($user->rights->fournisseur->commande->creer || $user->rights->supplier_order->creer) {
 			if ($action != 'classify') {
@@ -1002,7 +1002,7 @@ if ($id > 0 || !empty($ref)) {
 						} elseif (count($listwarehouses) == 1) {
 							print $formproduct->selectWarehouses(GETPOST("entrepot".$suffix) ?GETPOST("entrepot".$suffix) : ($objp->fk_default_warehouse ? $objp->fk_default_warehouse : ''), "entrepot".$suffix, '', 0, 0, $objp->fk_product, '', 1, 0, null, 'csswarehouse'.$suffix);
 						} else {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							print $langs->trans("ErrorNoWarehouseDefined");
 						}
 						print "</td>\n";
@@ -1234,7 +1234,7 @@ if ($id > 0 || !empty($ref)) {
 					} elseif (count($listwarehouses) == 1) {
 						print $formproduct->selectWarehouses(GETPOST("fk_entrepot") ?GETPOST("fk_entrepot") : ($objp->warehouse_id ? $objp->warehouse_id : ''), "fk_entrepot", '', 0, 0, $objp->fk_product, '', 1, 1, null, 'csswarehouse');
 					} else {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						print $langs->trans("ErrorNoWarehouseDefined");
 					}
 				} else {

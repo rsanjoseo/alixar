@@ -422,7 +422,7 @@ print $form->select_dolusers($search_fk_user, 'search_fk_user', 1, null, 0, '', 
 print '</td>';
 
 // Actions code
-$langs->load("blockedlog");
+// $langs->load("blockedlog");
 print '<td class="liste_titre">';
 print $form->selectarray('search_code', $block_static->trackedevents, $search_code, 1, 0, 0, '', 1, 0, 0, 'ASC', 'maxwidth200', 1);
 print '</td>';

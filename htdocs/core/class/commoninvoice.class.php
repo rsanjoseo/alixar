@@ -531,7 +531,7 @@ abstract class CommonInvoice extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('bills');
+		// $langs->load('bills');
 
 		if ($type == -1) {
 			$type = $this->type;

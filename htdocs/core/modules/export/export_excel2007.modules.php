@@ -199,7 +199,7 @@ class ExportExcel2007 extends ModeleExports
 
 		if ($this->id == 'excel2007') {
 			if (!class_exists('ZipArchive')) {	// For Excel2007, PHPSpreadSheet may need ZipArchive
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorPHPNeedModule', 'zip');
 				return -1;
 			}

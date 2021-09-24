@@ -149,7 +149,7 @@ if ($action == 'add') {
 		}
 	}
 
-	$langs->load("errors");
+	// $langs->load("errors");
 
 	$error = 0;
 	if (!$error && !$_POST['menu_handler']) {

@@ -46,7 +46,7 @@ $object = new Propal($db);
 if ($id > 0 || !empty($ref)) {
 	$ret = $object->fetch($id, $ref);
 	if ($ret == 0) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans('ErrorRecordNotFound'), null, 'errors');
 		$error++;
 	} elseif ($ret < 0) {
@@ -85,7 +85,7 @@ if ($action == 'addcontact' && $user->rights->propale->creer) {
 		exit;
 	} else {
 		if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 		} else {
 			setEventMessages($object->error, $object->errors, 'errors');
@@ -144,7 +144,7 @@ if ($object->id > 0) {
 	$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1, 'customer');
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($user->rights->propal->creer) {
 			if ($action != 'classify') {

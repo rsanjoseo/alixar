@@ -224,7 +224,7 @@ $sql .= " ORDER BY c.rowid ASC";
 
 $resql = $db->query($sql);
 if ($resql) {
-	$langs->load("orders");
+	// $langs->load("orders");
 
 	$num = $db->num_rows($resql);
 

@@ -185,7 +185,7 @@ if (!empty($conf->supplier_proposal->enabled)) {
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
 		print '<th colspan="2">'.$langs->trans("DraftRequests").'</th></tr>';
-		$langs->load("supplier_proposal");
+		// $langs->load("supplier_proposal");
 		$num = $db->num_rows($resql);
 		if ($num) {
 			$i = 0;
@@ -298,7 +298,7 @@ if ($resql) {
  * Opened askprice
  */
 if (!empty($conf->supplier_proposal->enabled) && $user->rights->supplier_proposal->lire) {
-	$langs->load("supplier_proposal");
+    // $langs->load("supplier_proposal");
 
 	$now = dol_now();
 

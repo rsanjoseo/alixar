@@ -60,7 +60,7 @@ class FormEcm
 	public function selectAllSections($selected = 0, $select_name = '', $module = 'ecm')
 	{
 		global $conf, $langs;
-		$langs->load("ecm");
+		// $langs->load("ecm");
 
 		if ($select_name == '') {
 			$select_name = "catParent";

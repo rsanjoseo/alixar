@@ -300,7 +300,7 @@ if ($object->id) {
 
 			// Get language
 			if ($conf->global->MAIN_MULTILANGS) {
-				$langs->load("languages");
+				// $langs->load("languages");
 
 				print  '<tr class="liste_titre"><td>';
 

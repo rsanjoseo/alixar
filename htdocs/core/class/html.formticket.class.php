@@ -399,7 +399,7 @@ class FormTicket
 		// User of creation
 		if ($this->withusercreate > 0 && $this->fk_user_create) {
 			print '<tr><td class="titlefield">'.$langs->trans("CreatedBy").'</td><td>';
-			$langs->load("users");
+			// $langs->load("users");
 			$fuser = new User($this->db);
 
 			if ($this->withcreatereadonly) {

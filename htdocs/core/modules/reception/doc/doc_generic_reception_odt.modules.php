@@ -60,20 +60,20 @@ class doc_generic_reception_odt extends ModelePdfReception
 	 */
 	public function __construct($db)
 	{
-		global $conf, $langs, $mysoc;
+        global $conf, $langs, $mysoc;
 
-		$langs->load("main");
-		$langs->load("companies");
+        // $langs->load("main");
+        // $langs->load("companies");
 
-		$this->db = $db;
-		$this->name = "ODT templates";
-		$this->description = $langs->trans("DocumentModelOdt");
-		$this->scandir = 'RECEPTION_ADDON_PDF_ODT_PATH'; // Name of constant that is used to save list of directories to scan
+        $this->db = $db;
+        $this->name = "ODT templates";
+        $this->description = $langs->trans("DocumentModelOdt");
+        $this->scandir = 'RECEPTION_ADDON_PDF_ODT_PATH'; // Name of constant that is used to save list of directories to scan
 
-		// Page size for A4 format
-		$this->type = 'odt';
-		$this->page_largeur = 0;
-		$this->page_hauteur = 0;
+        // Page size for A4 format
+        $this->type = 'odt';
+        $this->page_largeur = 0;
+        $this->page_hauteur = 0;
 		$this->format = array($this->page_largeur, $this->page_hauteur);
 		$this->marge_gauche = 0;
 		$this->marge_droite = 0;
@@ -106,20 +106,20 @@ class doc_generic_reception_odt extends ModelePdfReception
 	 *  @return string       			Description
 	 */
 	public function info($langs)
-	{
-		global $conf, $langs;
+    {
+        global $conf, $langs;
 
-		$langs->load("companies");
-		$langs->load("errors");
+        // $langs->load("companies");
+        // $langs->load("errors");
 
-		$form = new Form($this->db);
+        $form = new Form($this->db);
 
-		$texte = $this->description.".<br>\n";
-		$texte .= '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
-		$texte .= '<input type="hidden" name="token" value="'.newToken().'">';
-		$texte .= '<input type="hidden" name="action" value="setModuleOptions">';
-		$texte .= '<input type="hidden" name="param1" value="RECEPTION_ADDON_PDF_ODT_PATH">';
-		$texte .= '<table class="nobordernopadding" width="100%">';
+        $texte = $this->description . ".<br>\n";
+        $texte .= '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
+        $texte .= '<input type="hidden" name="token" value="' . newToken() . '">';
+        $texte .= '<input type="hidden" name="action" value="setModuleOptions">';
+        $texte .= '<input type="hidden" name="param1" value="RECEPTION_ADDON_PDF_ODT_PATH">';
+        $texte .= '<table class="nobordernopadding" width="100%">';
 
 		// List of directories area
 		$texte .= '<tr><td>';

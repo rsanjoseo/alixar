@@ -83,7 +83,7 @@ abstract class ModeleThirdPartyCode
      */
     public function info($langs)
     {
-        $langs->load("bills");
+        // $langs->load("bills");
         return $langs->trans("NoDescription");
     }
 
@@ -106,7 +106,7 @@ abstract class ModeleThirdPartyCode
      */
     public function getExample($langs)
     {
-        $langs->load("bills");
+        // $langs->load("bills");
         return $langs->trans("NoExample");
     }
 
@@ -143,7 +143,7 @@ abstract class ModeleThirdPartyCode
     public function getVersion()
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         if ($this->version == 'development') {
             return $langs->trans("VersionDevelopment");
@@ -294,7 +294,7 @@ abstract class ModeleAccountancyCode
 	 */
 	public function info($langs)
 	{
-		$langs->load("bills");
+        // $langs->load("bills");
 		return $langs->trans("NoDescription");
 	}
 
@@ -308,7 +308,7 @@ abstract class ModeleAccountancyCode
 	 */
 	public function getExample($langs, $objsoc = 0, $type = -1)
 	{
-		$langs->load("bills");
+        // $langs->load("bills");
 		return $langs->trans("NoExample");
     }
 
@@ -331,7 +331,7 @@ abstract class ModeleAccountancyCode
     public function getVersion()
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         if ($this->version == 'development') {
             return $langs->trans("VersionDevelopment");
@@ -359,7 +359,7 @@ abstract class ModeleAccountancyCode
 	{
 		global $conf, $db;
 
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		$s = '';
 		if ($type == -1) {

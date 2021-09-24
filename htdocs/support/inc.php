@@ -266,10 +266,10 @@ function pHeader($soutitre, $next, $action = 'none')
  */
 function pFooter($nonext = 0, $setuplang = '')
 {
-	global $langs;
-	$langs->load("main");
-	$langs->load("admin");
+    global $langs;
+    // $langs->load("main");
+    // $langs->load("admin");
 
-	print '</body>'."\n";
-	print '</html>'."\n";
+    print '</body>' . "\n";
+    print '</html>' . "\n";
 }

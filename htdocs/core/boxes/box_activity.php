@@ -193,7 +193,7 @@ class box_activity extends ModeleBoxes
 			include_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 			$commandestatic = new Commande($this->db);
 
-			$langs->load("orders");
+			// $langs->load("orders");
 
 			$cachedir = DOL_DATA_ROOT.'/commande/temp';
 			$filename = '/boxactivity-order'.$fileid;

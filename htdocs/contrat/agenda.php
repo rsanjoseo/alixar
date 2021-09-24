@@ -139,7 +139,7 @@ if ($id > 0) {
 	llxHeader('', $title);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+		// $langs->load("mails");
 	}
 	$head = contract_prepare_head($object);
 
@@ -172,7 +172,7 @@ if ($id > 0) {
 	}
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($user->rights->contrat->creer) {
 			if ($action != 'classify') {

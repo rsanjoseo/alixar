@@ -745,7 +745,7 @@ if (!empty($usemargins) && $user->rights->margins->creer) {
 		}
 
 		if (!empty($usemargins) && $user->rights->margins->creer) {
-			$langs->load('stocks');
+			// $langs->load('stocks');
 			?>
 
 			/* Code for margin */

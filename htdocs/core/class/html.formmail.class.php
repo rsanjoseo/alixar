@@ -567,7 +567,7 @@ class FormMail extends Form
 							$out .= ' &lt;'.$this->frommail.'&gt;';
 						} else {
 							if ($this->fromtype) {
-								$langs->load('errors');
+								// $langs->load('errors');
 								$out .= '<span class="warning"> &lt;'.$langs->trans('ErrorNoMailDefinedForThisUser').'&gt; </span>';
 							}
 						}
@@ -576,7 +576,7 @@ class FormMail extends Form
 
 						// Add user email
 						if (empty($user->email)) {
-							$langs->load('errors');
+                            // $langs->load('errors');
 							$liste['user'] = $user->getFullName($langs).' &lt;'.$langs->trans('ErrorNoMailDefinedForThisUser').'&gt;';
 						} else {
 							$liste['user'] = $user->getFullName($langs).' &lt;'.$user->email.'&gt;';
@@ -869,7 +869,7 @@ class FormMail extends Form
 				}
 
 				if (count($validpaymentmethod) > 0 && $paymenturl) {
-					$langs->load('other');
+                    // $langs->load('other');
 					$this->substit['__ONLINE_PAYMENT_TEXT_AND_URL__'] = str_replace('\n', "\n", $langs->transnoentities("PredefinedMailContentLink", $paymenturl));
 					$this->substit['__ONLINE_PAYMENT_URL__'] = $paymenturl;
 				} else {

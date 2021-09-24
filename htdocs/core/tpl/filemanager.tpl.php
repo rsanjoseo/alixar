@@ -173,7 +173,7 @@ if ($action == 'delete_section') {
 
 // Ask confirmation to build webp images
 if ($action == 'confirmconvertimgwebp') {
-	$langs->load("ecm");
+	// $langs->load("ecm");
 
 	$section_dir=GETPOST('section_dir', 'alpha');
 	$section=GETPOST('section', 'alpha');
@@ -231,7 +231,7 @@ if ($action == 'convertimgwebp' && $permtoadd) {
 }
 
 if (empty($action) || $action == 'editfile' || $action == 'file_manager' || preg_match('/refresh/i', $action) || $action == 'delete') {
-	$langs->load("ecm");
+    // $langs->load("ecm");
 
 	print '<table width="100%" class="liste noborderbottom">'."\n";
 

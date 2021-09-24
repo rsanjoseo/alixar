@@ -79,7 +79,7 @@ class box_members_subscriptions_by_year extends ModeleBoxes
 	public function loadBox($max = 5)
 	{
 		global $user, $langs, $conf;
-		$langs->load("boxes");
+		// $langs->load("boxes");
 
 		$this->max = $max;
 

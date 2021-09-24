@@ -368,7 +368,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		// Project
 		if (! empty($conf->projet->enabled))
 		{
-			$langs->load("projects");
+			// $langs->load("projects");
 			$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 			if ($user->rights->emailcollector->creer)
 			{

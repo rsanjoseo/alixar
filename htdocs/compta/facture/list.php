@@ -435,7 +435,7 @@ if ($action == 'makepayment_confirm' && $user->rights->facture->paiement) {
 		}
 	}
 } elseif ($massaction == 'withdrawrequest') {
-	$langs->load("withdrawals");
+	// $langs->load("withdrawals");
 
 	if (!$user->rights->prelevement->bons->creer) {
 		$error++;
@@ -1049,7 +1049,7 @@ if ($resql) {
 		$arrayofmassactions['makepayment'] = $langs->trans("RegisterPaymentAndClasiffiedPayed");
 	}
 	if ($conf->prelevement->enabled && !empty($user->rights->prelevement->bons->creer)) {
-			$langs->load("withdrawals");
+        // $langs->load("withdrawals");
 			$arrayofmassactions['withdrawrequest'] = img_picto('', 'payment', 'class="pictofixedwidth"').$langs->trans("MakeWithdrawRequest");
 	}
 	if ($user->rights->facture->supprimer) {
@@ -1122,7 +1122,7 @@ if ($resql) {
 	// If the user can view prospects other than his'
 	$moreforfilter = '';
 	if ($user->rights->societe->client->voir || $socid) {
-		$langs->load("commercial");
+        // $langs->load("commercial");
 		$moreforfilter .= '<div class="divsearchfield">';
 		$tmptitle = $langs->trans('ThirdPartiesOfSaleRepresentative');
 		$moreforfilter .= img_picto($tmptitle, 'user', 'class="pictofixedwidth"').$formother->select_salesrepresentatives($search_sale, 'search_sale', $user, 0, $tmptitle, 'maxwidth250');

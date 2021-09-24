@@ -109,8 +109,8 @@ function societe_prepare_head(Societe $object)
 		$h++;
 
 		if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) {
-			$langs->load("products");
-			// price
+			// $langs->load("products");
+            // price
 			$head[$h][0] = DOL_URL_ROOT.'/societe/price.php?socid='.$object->id;
 			$head[$h][1] = $langs->trans("CustomerPrices");
 			$head[$h][2] = 'price';
@@ -199,14 +199,14 @@ function societe_prepare_head(Societe $object)
 	if (empty($conf->global->SOCIETE_DISABLE_BANKACCOUNT)) {
 		$nbBankAccount = 0;
 		$foundonexternalonlinesystem = 0;
-		$langs->load("banks");
+        // $langs->load("banks");
 
 		//$title = $langs->trans("BankAccounts");
 		$title = $langs->trans("PaymentInformation");
 
 		if (!empty($conf->stripe->enabled)) {
-			//$langs->load("stripe");
-			//$title = $langs->trans("BankAccountsAndGateways");
+            //// $langs->load("stripe");
+            //$title = $langs->trans("BankAccountsAndGateways");
 
 			$servicestatus = 0;
 			if (!empty($conf->global->STRIPE_LIVE) && !GETPOST('forcesandbox', 'alpha')) {
@@ -790,7 +790,7 @@ function show_projects($conf, $langs, $db, $object, $backtopage = '', $nocreatel
 	$i = -1;
 
 	if (!empty($conf->projet->enabled) && $user->rights->projet->lire) {
-		$langs->load("projects");
+        // $langs->load("projects");
 
 		$newcardbutton = '';
 		if (!empty($conf->projet->enabled) && $user->rights->projet->creer && empty($nocreatelink)) {
@@ -2096,7 +2096,7 @@ function addMailingEventTypeSQL($actioncode, $objcon, $filterobj)
 	// Add also event from emailings. TODO This should be replaced by an automatic event ? May be it's too much for very large emailing.
 	if (!empty($conf->mailing->enabled) && !empty($objcon->email)
 		&& (empty($actioncode) || $actioncode == 'AC_OTH_AUTO' || $actioncode == 'AC_EMAILING')) {
-		$langs->load("mails");
+        // $langs->load("mails");
 
 		$sql2 = "SELECT m.rowid as id, m.titre as label, mc.date_envoi as dp, mc.date_envoi as dp2, '100' as percent, 'mailing' as type";
 		$sql2 .= ", '' as fk_element, '' as elementtype, '' as contact_id";

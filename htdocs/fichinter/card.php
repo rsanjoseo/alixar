@@ -415,7 +415,7 @@ if (empty($reshook)) {
 					if ($result > 0) {
 						$id = $result; // Force raffraichissement sur fiche venant d'etre cree
 					} else {
-						$langs->load("errors");
+						// $langs->load("errors");
 						setEventMessages($object->error, $object->errors, 'errors');
 						$action = 'create';
 					}
@@ -737,7 +737,7 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$mesg = $langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType");
 				} else {
 					$mesg = $object->error;
@@ -885,7 +885,7 @@ if ($action == 'create') {
 		if (!empty($conf->projet->enabled)) {
 			$formproject = new FormProjets($db);
 
-			$langs->load("project");
+            // $langs->load("project");
 
 			print '<tr><td>'.$langs->trans("Project").'</td><td>';
 			/* Fix: If a project must be linked to any companies (suppliers or not), project must be not be set as limited to customer but must be not linked to any particular thirdparty
@@ -903,7 +903,7 @@ if ($action == 'create') {
 
 		// Contract
 		if ($conf->contrat->enabled) {
-			$langs->load("contracts");
+            // $langs->load("contracts");
 			print '<tr><td>'.$langs->trans("Contract").'</td><td>';
 			$numcontrat = $formcontract->select_contract($soc->id, GETPOST('contratid', 'int'), 'contratid', 0, 1, 1);
 			if ($numcontrat == 0) {
@@ -1134,7 +1134,7 @@ if ($action == 'create') {
 	$morehtmlref .= $langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($user->rights->ficheinter->creer) {
 			if ($action != 'classify') {
@@ -1207,7 +1207,7 @@ if ($action == 'create') {
 
 	// Contract
 	if ($conf->contrat->enabled) {
-		$langs->load('contracts');
+        // $langs->load('contracts');
 		print '<tr>';
 		print '<td>';
 
@@ -1599,7 +1599,7 @@ if ($action == 'create') {
 
 				// Proposal
 				if ($conf->service->enabled && !empty($conf->propal->enabled) && $object->statut > Fichinter::STATUS_DRAFT) {
-					$langs->load("propal");
+                    // $langs->load("propal");
 					if ($object->statut < Fichinter::STATUS_BILLED) {
 						if ($user->rights->propal->creer) {
 							print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/comm/propal/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->socid.'">'.$langs->trans("AddProp").'</a></div>';
@@ -1611,7 +1611,7 @@ if ($action == 'create') {
 
 				// Invoicing
 				if (!empty($conf->facture->enabled) && $object->statut > Fichinter::STATUS_DRAFT) {
-					$langs->load("bills");
+                    // $langs->load("bills");
 					if ($object->statut < Fichinter::STATUS_BILLED) {
 						if ($user->rights->facture->creer) {
 							print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/compta/facture/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->socid.'">'.$langs->trans("AddBill").'</a></div>';

@@ -72,7 +72,7 @@ if (!$error && $massaction == 'confirm_presend') {
 	$resaction = '';
 	$nbsent = 0;
 	$nbignored = 0;
-	$langs->load("mails");
+	// $langs->load("mails");
 	include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 	$listofobjectid = array();
@@ -230,19 +230,19 @@ if (!$error && $massaction == 'confirm_presend') {
 			foreach ($listofobjectref[$thirdpartyid] as $objectid => $objectobj) {
 				//var_dump($thirdpartyid.' - '.$objectid.' - '.$objectobj->statut);
 				if ($objectclass == 'Propal' && $objectobj->statut == Propal::STATUS_DRAFT) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$nbignored++;
 					$resaction .= '<div class="error">'.$langs->trans('ErrorOnlyProposalNotDraftCanBeSentInMassAction', $objectobj->ref).'</div><br>';
 					continue; // Payment done or started or canceled
 				}
 				if ($objectclass == 'Commande' && $objectobj->statut == Commande::STATUS_DRAFT) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$nbignored++;
 					$resaction .= '<div class="error">'.$langs->trans('ErrorOnlyOrderNotDraftCanBeSentInMassAction', $objectobj->ref).'</div><br>';
 					continue;
 				}
 				if ($objectclass == 'Facture' && $objectobj->statut == Facture::STATUS_DRAFT) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$nbignored++;
 					$resaction .= '<div class="error">'.$langs->trans('ErrorOnlyInvoiceValidatedCanBeSentInMassAction', $objectobj->ref).'</div><br>';
 					continue; // Payment done or started or canceled
@@ -325,7 +325,7 @@ if (!$error && $massaction == 'confirm_presend') {
 						);
 					} else {
 							$nbignored++;
-							$langs->load("errors");
+                        // $langs->load("errors");
 							$resaction .= '<div class="error">'.$langs->trans('ErrorCantReadFile', $file).'</div><br>';
 							dol_syslog('Failed to read file: '.$file, LOG_WARNING);
 							continue;
@@ -342,7 +342,7 @@ if (!$error && $massaction == 'confirm_presend') {
 
 			// Send email if there is at least one qualified object for current thirdparty
 			if (count($listofqualifiedobj) > 0) {
-				$langs->load("commercial");
+                // $langs->load("commercial");
 
 				$reg = array();
 				$fromtype = GETPOST('fromtype');
@@ -589,7 +589,7 @@ if (!$error && $massaction == 'confirm_presend') {
 								$nbsent++; // Nb of object sent
 							}
 						} else {
-							$langs->load("other");
+                            // $langs->load("other");
 							if ($mailfile->error) {
 								$resaction .= $langs->trans('ErrorFailedToSendMail', $from, $sendto);
 								$resaction .= '<br><div class="error">'.$mailfile->error.'</div>';
@@ -686,7 +686,7 @@ if ($massaction == 'confirm_createbills') {   // Create bills from orders.
 
 				$TFactThird[$cmd->socid] = $objecttmp;
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$errors[] = $cmd->ref.' : '.$langs->trans($objecttmp->error);
 				$error++;
 			}
@@ -971,7 +971,7 @@ if (!$error && $massaction == 'cancelorders') {
 		}
 
 		if ($cmd->statut != Commande::STATUS_VALIDATED) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorObjectMustHaveStatusValidToBeCanceled", $cmd->ref), null, 'errors');
 			$error++;
 			break;
@@ -1102,7 +1102,7 @@ if (!$error && $massaction == "builddoc" && $permissiontoread && !GETPOST('butto
 					@chmod($file, octdec($conf->global->MAIN_UMASK));
 				}
 
-				$langs->load("exports");
+                // $langs->load("exports");
 				setEventMessages($langs->trans('FileSuccessfullyBuilt', $filename.'_'.dol_print_date($now, 'dayhourlog')), null, 'mesgs');
 			} else {
 				setEventMessages($langs->trans('ErrorPDFTkOutputFileNotFound'), null, 'errors');
@@ -1170,7 +1170,7 @@ if (!$error && $massaction == "builddoc" && $permissiontoread && !GETPOST('butto
 				@chmod($file, octdec($conf->global->MAIN_UMASK));
 			}
 
-			$langs->load("exports");
+            // $langs->load("exports");
 			setEventMessages($langs->trans('FileSuccessfullyBuilt', $filename.'_'.dol_print_date($now, 'dayhourlog')), null, 'mesgs');
 		} else {
 			setEventMessages($langs->trans('NoPDFAvailableForDocGenAmongChecked'), null, 'errors');
@@ -1182,7 +1182,7 @@ if (!$error && $massaction == "builddoc" && $permissiontoread && !GETPOST('butto
 if ($action == 'remove_file') {
 	require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
-	$langs->load("other");
+    // $langs->load("other");
 	$upload_dir = $diroutputmassaction;
 	$file = $upload_dir.'/'.GETPOST('file');
 	$ret = dol_delete_file($file);
@@ -1200,12 +1200,12 @@ if (!$error && $massaction == 'validate' && $permissiontoadd) {
 	$objecttmp = new $objectclass($db);
 
 	if (($objecttmp->element == 'facture' || $objecttmp->element == 'invoice') && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorMassValidationNotAllowedWhenStockIncreaseOnAction'), null, 'errors');
 		$error++;
 	}
 	if ($objecttmp->element == 'invoice_supplier' && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorMassValidationNotAllowedWhenStockIncreaseOnAction'), null, 'errors');
 		$error++;
 	}
@@ -1218,7 +1218,7 @@ if (!$error && $massaction == 'validate' && $permissiontoadd) {
 			if ($result > 0) {
 				$result = $objecttmp->validate($user);
 				if ($result == 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorObjectMustHaveStatusDraftToBeValidated", $objecttmp->ref), null, 'errors');
 					$error++;
 					break;
@@ -1293,7 +1293,7 @@ if (!$error && ($massaction == 'delete' || ($action == 'delete' && $confirm == '
 		if ($result > 0) {
 			// Refuse deletion for some objects/status
 			if ($objectclass == 'Facture' && empty($conf->global->INVOICE_CAN_ALWAYS_BE_REMOVED) && $objecttmp->status != Facture::STATUS_DRAFT) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$nbignored++;
 				$resaction .= '<div class="error">'.$langs->trans('ErrorOnlyDraftStatusCanBeDeletedInMassAction', $objecttmp->ref).'</div><br>';
 				continue;

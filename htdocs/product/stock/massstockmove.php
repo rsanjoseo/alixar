@@ -101,7 +101,7 @@ if ($action == 'addline' && !empty($user->rights->stock->mouvement->creer)) {
 	}
 	if ($id_sw > 0 && $id_tw == $id_sw) {
 		$error++;
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("ErrorWarehouseMustDiffers"), null, 'errors');
 	}
 	if (!$qty) {
@@ -116,7 +116,7 @@ if ($action == 'addline' && !empty($user->rights->stock->mouvement->creer)) {
 		if ($producttmp->hasbatch()) {
 			if (empty($batch)) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorTryToMakeMoveOnProductRequiringBatchData", $producttmp->ref), null, 'errors');
 			}
 		}
@@ -303,7 +303,7 @@ if ($action == 'importCSV' && !empty($user->rights->stock->mouvement->creer)) {
 		dol_syslog("File ".$fullpath." was added for import");
 	} else {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFailedToSaveFile"), null, 'errors');
 	}
 
@@ -370,7 +370,7 @@ if ($action == 'importCSV' && !empty($user->rights->stock->mouvement->creer)) {
 
 				if ($tmp_id_sw > 0 && $tmp_id_tw == $tmp_id_sw) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorWarehouseMustDiffers"), null, 'errors');
 				}
 				if (!$tmp_qty) {
@@ -385,7 +385,7 @@ if ($action == 'importCSV' && !empty($user->rights->stock->mouvement->creer)) {
 					if ($producttmp->hasbatch()) {
 						if (empty($tmp_batch)) {
 							$error++;
-							$langs->load("errors");
+                            // $langs->load("errors");
 							setEventMessages($langs->trans("ErrorTryToMakeMoveOnProductRequiringBatchData", $producttmp->ref), null, 'errors');
 						}
 					}
@@ -416,7 +416,7 @@ if ($action == 'importCSV' && !empty($user->rights->stock->mouvement->creer)) {
 }
 
 if ($action == 'confirm_deletefile' && $confirm == 'yes') {
-	$langs->load("other");
+    // $langs->load("other");
 
 	$param = '&datatoimport='.urlencode($datatoimport).'&format='.urlencode($format);
 	if ($excludefirstline) {
@@ -525,7 +525,7 @@ if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
 		}
 	}
 
-	$langs->load('other');
+    // $langs->load('other');
 	$out .= ' ';
 	$out .= info_admin($langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow), 1);
 } else {

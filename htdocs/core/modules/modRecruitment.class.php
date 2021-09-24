@@ -342,52 +342,52 @@ class modRecruitment extends DolibarrModules
 		// Exports profiles provided by this module
 		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT RECRUITMENTJOBPOSITION */
-		/*
-		$langs->load("recruitment");
-		$this->export_code[$r]=$this->rights_class.'_'.$r;
-		$this->export_label[$r]='RecruitmentJobPositionLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		$this->export_icon[$r]='recruitmentjobposition';
-		// Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-		$keyforclass = 'RecruitmentJobPosition'; $keyforclassfile='/mymobule/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobposition';
-		include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		//$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
-		//unset($this->export_fields_array[$r]['t.fieldtoremove']);
-		//$keyforclass = 'RecruitmentJobPositionLine'; $keyforclassfile='/recruitment/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobpositionline'; $keyforalias='tl';
-		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		$keyforselect='recruitmentjobposition'; $keyforaliasextra='extra'; $keyforelement='recruitmentjobposition';
-		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$keyforselect='recruitmentjobpositionline'; $keyforaliasextra='extraline'; $keyforelement='recruitmentjobpositionline';
-		//include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$this->export_dependencies_array[$r] = array('recruitmentjobpositionline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		//$this->export_special_array[$r] = array('t.field'=>'...');
-		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
-		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
-		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'recruitmentjobposition as t';
-		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'recruitmentjobposition_line as tl ON tl.fk_recruitmentjobposition = t.rowid';
-		$this->export_sql_end[$r] .=' WHERE 1 = 1';
-		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('recruitmentjobposition').')';
-		$r++; */
+        /*
+        // $langs->load("recruitment");
+        $this->export_code[$r]=$this->rights_class.'_'.$r;
+        $this->export_label[$r]='RecruitmentJobPositionLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->export_icon[$r]='recruitmentjobposition';
+        // Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
+        $keyforclass = 'RecruitmentJobPosition'; $keyforclassfile='/mymobule/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobposition';
+        include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        //$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
+        //unset($this->export_fields_array[$r]['t.fieldtoremove']);
+        //$keyforclass = 'RecruitmentJobPositionLine'; $keyforclassfile='/recruitment/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobpositionline'; $keyforalias='tl';
+        //include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        $keyforselect='recruitmentjobposition'; $keyforaliasextra='extra'; $keyforelement='recruitmentjobposition';
+        include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$keyforselect='recruitmentjobpositionline'; $keyforaliasextra='extraline'; $keyforelement='recruitmentjobpositionline';
+        //include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$this->export_dependencies_array[$r] = array('recruitmentjobpositionline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+        //$this->export_special_array[$r] = array('t.field'=>'...');
+        //$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
+        //$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
+        $this->export_sql_start[$r]='SELECT DISTINCT ';
+        $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'recruitmentjobposition as t';
+        //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'recruitmentjobposition_line as tl ON tl.fk_recruitmentjobposition = t.rowid';
+        $this->export_sql_end[$r] .=' WHERE 1 = 1';
+        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('recruitmentjobposition').')';
+        $r++; */
 		/* END MODULEBUILDER EXPORT RECRUITMENTJOBPOSITION */
 
 		// Imports profiles provided by this module
 		$r = 1;
-		/* BEGIN MODULEBUILDER IMPORT RECRUITMENTJOBPOSITION */
-		/*
-		 $langs->load("recruitment");
-		 $this->export_code[$r]=$this->rights_class.'_'.$r;
-		 $this->export_label[$r]='RecruitmentJobPositionLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		 $this->export_icon[$r]='recruitmentjobposition';
-		 $keyforclass = 'RecruitmentJobPosition'; $keyforclassfile='/mymobule/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobposition';
-		 include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		 $keyforselect='recruitmentjobposition'; $keyforaliasextra='extra'; $keyforelement='recruitmentjobposition';
-		 include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		 //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		 $this->export_sql_start[$r]='SELECT DISTINCT ';
-		 $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'recruitmentjobposition as t';
-		 $this->export_sql_end[$r] .=' WHERE 1 = 1';
-		 $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('recruitmentjobposition').')';
-		 $r++; */
+        /* BEGIN MODULEBUILDER IMPORT RECRUITMENTJOBPOSITION */
+        /*
+         // $langs->load("recruitment");
+         $this->export_code[$r]=$this->rights_class.'_'.$r;
+         $this->export_label[$r]='RecruitmentJobPositionLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+         $this->export_icon[$r]='recruitmentjobposition';
+         $keyforclass = 'RecruitmentJobPosition'; $keyforclassfile='/mymobule/class/recruitmentjobposition.class.php'; $keyforelement='recruitmentjobposition';
+         include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+         $keyforselect='recruitmentjobposition'; $keyforaliasextra='extra'; $keyforelement='recruitmentjobposition';
+         include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+         //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+         $this->export_sql_start[$r]='SELECT DISTINCT ';
+         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'recruitmentjobposition as t';
+         $this->export_sql_end[$r] .=' WHERE 1 = 1';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('recruitmentjobposition').')';
+         $r++; */
 		/* END MODULEBUILDER IMPORT RECRUITMENTJOBPOSITION */
 	}
 
@@ -441,7 +441,7 @@ class modRecruitment extends DolibarrModules
 					dol_mkdir($dirodt);
 					$result = dol_copy($src, $dest, 0, 0);
 					if ($result < 0) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 						return 0;
 					}

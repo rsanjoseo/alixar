@@ -332,7 +332,7 @@ class modMrp extends DolibarrModules
 
 		// Imports profiles provided by this module
 		$r = 0;
-		$langs->load("mrp");
+		// $langs->load("mrp");
 		/* BEGIN MODULEBUILDER IMPORT MO */
 		/*
 		 $this->export_code[$r]=$this->rights_class.'_'.$r;
@@ -475,7 +475,7 @@ class modMrp extends DolibarrModules
 			dol_mkdir($dirodt);
 			$result = dol_copy($src, $dest, 0, 0);
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 				return 0;
 			}

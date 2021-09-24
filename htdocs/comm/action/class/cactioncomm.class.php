@@ -154,7 +154,7 @@ class CActionComm
 	{
 		// phpcs:enable
 		global $langs, $conf, $user;
-		$langs->load("commercial");
+		// $langs->load("commercial");
 
 		$repid = array();
 		$repcode = array();

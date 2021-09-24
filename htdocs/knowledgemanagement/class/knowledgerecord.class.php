@@ -824,7 +824,7 @@ class KnowledgeRecord extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("knowledgemanagement");
+			//// $langs->load("knowledgemanagement");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Validated');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->trans('Disabled');
@@ -930,7 +930,7 @@ class KnowledgeRecord extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("knowledgemanagement");
+        // $langs->load("knowledgemanagement");
 
         if (empty($conf->global->KNOWLEDGEMANAGEMENT_KNOWLEDGERECORD_ADDON)) {
             $conf->global->KNOWLEDGEMANAGEMENT_KNOWLEDGERECORD_ADDON = 'mod_knowledgerecord_standard';
@@ -995,7 +995,7 @@ class KnowledgeRecord extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("knowledgemanagement");
+        // $langs->load("knowledgemanagement");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_knowledgerecord';

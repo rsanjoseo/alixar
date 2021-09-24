@@ -392,7 +392,7 @@ class FormProduct
 	{
 		global $langs, $conf, $mysoc, $db;
 
-		$langs->load("other");
+		// $langs->load("other");
 
 		$return = '';
 
@@ -469,7 +469,7 @@ class FormProduct
 	{
 		global $langs, $db;
 
-		$langs->load('products');
+        // $langs->load('products');
 
 		$return = '';
 

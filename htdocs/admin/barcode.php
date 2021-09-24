@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formbarcode.class.php';
 
 // Load translation files required by the page
-$langs->load("admin");
+// $langs->load("admin");
 
 if (!$user->admin) {
 	accessforbidden();
@@ -301,7 +301,7 @@ if (!isset($_SERVER['WINDIR'])) {
 	print '<td width="60" class="center">';
 	print '<input type="text" size="40" name="GENBARCODE_LOCATION" value="'.$conf->global->GENBARCODE_LOCATION.'">';
 	if (!empty($conf->global->GENBARCODE_LOCATION) && !@file_exists($conf->global->GENBARCODE_LOCATION)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print '<br><font class="error">'.$langs->trans("ErrorFileNotFound", $conf->global->GENBARCODE_LOCATION).'</font>';
 	}
 	print '</td></tr>';

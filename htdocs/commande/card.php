@@ -61,13 +61,13 @@ if (!empty($conf->variants->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('orders', 'sendings', 'companies', 'bills', 'propal', 'deliveries', 'products', 'other'));
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 if (!empty($conf->margin->enabled)) {
-	$langs->load('margins');
+    // $langs->load('margins');
 }
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+    // $langs->load("productbatch");
 }
 
 $id = (GETPOST('id', 'int') ? GETPOST('id', 'int') : GETPOST('orderid', 'int'));
@@ -625,8 +625,8 @@ if (empty($reshook)) {
 		foreach ($object->lines as $line) {
 			$result = $object->updateline($line->id, $line->desc, $line->subprice, $line->qty, $line->remise_percent, $vat_rate, $localtax1_rate, $localtax2_rate, 'HT', $line->info_bits, $line->date_start, $line->date_end, $line->product_type, $line->fk_parent_line, 0, $line->fk_fournprice, $line->pa_ht, $line->label, $line->special_code, $line->array_options, $line->fk_unit, $line->multicurrency_subprice);
 		}
-	} elseif ($action == 'addline' && $usercancreate) {		// Add a new line
-		$langs->load('errors');
+	} elseif ($action == 'addline' && $usercancreate) {        // Add a new line
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -1379,7 +1379,7 @@ if (empty($reshook)) {
 				exit();
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -1696,7 +1696,7 @@ if ($action == 'create' && $usercancreate) {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		print '<tr>';
 		print '<td>'.$langs->trans("Project").'</td><td>';
 		print img_picto('', 'project', 'class="pictofixedwidth"').$formproject->select_projects(($soc->id > 0 ? $soc->id : -1), $projectid, 'projectid', 0, 0, 1, 0, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
@@ -1907,7 +1907,7 @@ if ($action == 'create' && $usercancreate) {
 
 			$formquestion = array();
 			if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				$formproduct = new FormProduct($db);
 				$forcecombo = 0;
@@ -1937,7 +1937,7 @@ if ($action == 'create' && $usercancreate) {
 			$text = $langs->trans('ConfirmUnvalidateOrder', $object->ref);
 			$formquestion = array();
 			if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				$formproduct = new FormProduct($db);
 				$forcecombo = 0;
@@ -1976,7 +1976,7 @@ if ($action == 'create' && $usercancreate) {
 			$text = $langs->trans('ConfirmCancelOrder', $object->ref);
 			$formquestion = array();
 			if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				$formproduct = new FormProduct($db);
 				$forcecombo = 0;
@@ -2037,7 +2037,7 @@ if ($action == 'create' && $usercancreate) {
 		}
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($usercancreate) {
 				if ($action != 'classify') {
@@ -2176,7 +2176,7 @@ if ($action == 'create' && $usercancreate) {
 
 		// Warehouse
 		if (!empty($conf->stock->enabled) && !empty($conf->global->WAREHOUSE_ASK_WAREHOUSE_DURING_ORDER)) {
-			$langs->load('stocks');
+            // $langs->load('stocks');
 			require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 			$formproduct = new FormProduct($db);
 			print '<tr><td>';
@@ -2527,7 +2527,7 @@ if ($action == 'create' && $usercancreate) {
 
 				// Create intervention
 				if ($conf->ficheinter->enabled) {
-					$langs->load("interventions");
+                    // $langs->load("interventions");
 
 					if ($object->statut > Commande::STATUS_DRAFT && $object->statut < Commande::STATUS_CLOSED && $object->getNbOfServicesLines() > 0) {
 						if ($user->rights->ficheinter->creer) {
@@ -2540,7 +2540,7 @@ if ($action == 'create' && $usercancreate) {
 
 				// Create contract
 				if ($conf->contrat->enabled && ($object->statut == Commande::STATUS_VALIDATED || $object->statut == Commande::STATUS_SHIPMENTONPROCESS || $object->statut == Commande::STATUS_CLOSED)) {
-					$langs->load("contracts");
+                    // $langs->load("contracts");
 
 					if ($user->rights->contrat->creer) {
 						print '<a class="butAction" href="'.DOL_URL_ROOT.'/contrat/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->socid.'">'.$langs->trans('AddContract').'</a>';
@@ -2560,7 +2560,7 @@ if ($action == 'create' && $usercancreate) {
 								print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NotAllowed")).'">'.$langs->trans('CreateShipment').'</a>';
 							}
 						} else {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Shipment"))).'">'.$langs->trans('CreateShipment').'</a>';
 						}
 					}

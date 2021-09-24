@@ -160,13 +160,13 @@ llxHeader('', $title);
 $form = new Form($db);
 
 if ($id > 0) {
-	$langs->load("members");
+	// $langs->load("members");
 
 	$object = new Adherent($db);
 	$result = $object->fetch($id);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 
 	$adht->fetch($object->typeid);

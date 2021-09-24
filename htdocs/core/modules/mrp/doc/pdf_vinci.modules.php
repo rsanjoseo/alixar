@@ -1154,7 +1154,7 @@ class pdf_vinci extends ModelePDFMo
 				$outputlangs->load("projects");
 				$posy += 4;
 				$pdf->SetXY($posx, $posy);
-				$langs->load("projects");
+				// $langs->load("projects");
 				$pdf->SetTextColor(0, 0, 60);
 				$pdf->MultiCell(100, 3, $outputlangs->transnoentities("Project")." : ".(empty($object->project->ref) ? '' : $object->project->ref), '', 'R');
 			}

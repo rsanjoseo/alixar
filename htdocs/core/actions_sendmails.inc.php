@@ -93,7 +93,7 @@ if (GETPOST('removAll', 'alpha')) {
 		$filetodelete = $listofnames[$key];
 		$result = dol_delete_file($pathtodelete, 1); // Delete uploded Files
 
-		$langs->load("other");
+		// $langs->load("other");
 		setEventMessages($langs->trans("FileWasRemoved", $filetodelete), null, 'mesgs');
 
 		$formmail->remove_attached_files($key); // Update Session
@@ -112,7 +112,7 @@ if (($action == 'send' || $action == 'relance') && !$_POST['addfile'] && !$_POST
 	$actionmsg = '';
 	$actionmsg2 = '';
 
-	$langs->load('mails');
+    // $langs->load('mails');
 
 	if (is_object($object)) {
 		$result = $object->fetch($id);
@@ -268,7 +268,7 @@ if (($action == 'send' || $action == 'relance') && !$_POST['addfile'] && !$_POST
 
 			require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 
-			$langs->load("commercial");
+            // $langs->load("commercial");
 
 			$reg = array();
 			$fromtype = GETPOST('fromtype', 'alpha');
@@ -425,7 +425,7 @@ if (($action == 'send' || $action == 'relance') && !$_POST['addfile'] && !$_POST
 					header('Location: '.$_SERVER["PHP_SELF"].'?'.($paramname ? $paramname : 'id').'='.(is_object($object) ? $object->id : '').$moreparam);
 					exit;
 				} else {
-					$langs->load("other");
+                    // $langs->load("other");
 					$mesg = '<div class="error">';
 					if ($mailfile->error) {
 						$mesg .= $langs->transnoentities('ErrorFailedToSendMail', dol_escape_htmltag($from), dol_escape_htmltag($sendto));
@@ -445,13 +445,13 @@ if (($action == 'send' || $action == 'relance') && !$_POST['addfile'] && !$_POST
 				}
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("MailTo")), null, 'warnings');
 			dol_syslog('Try to send email with no recipient defined', LOG_WARNING);
 			$action = 'presend';
 		}
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailedToReadObject', $object->element), null, 'errors');
 		dol_syslog('Failed to read data of object id='.$object->id.' element='.$object->element);
 		$action = 'presend';

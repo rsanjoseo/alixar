@@ -181,7 +181,7 @@ if (($action == 'add' || $action == 'create') && empty($massaction) && !GETPOST(
 				header('Location: '.dol_buildpath('/variants/combinations.php?id='.$id, 2));
 				exit();
 			} else {
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($prodcomb->error, $prodcomb->errors, 'errors');
 			}
 		} else {

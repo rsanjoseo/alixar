@@ -71,7 +71,7 @@ class mod_facture_fournisseur_cactus extends ModeleNumRefSuppliersInvoices
 	public function info()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans("CactusNumRefModelDesc1", $this->prefixinvoice, $this->prefixcreditnote, $this->prefixdeposit);
 	}
 
@@ -96,7 +96,7 @@ class mod_facture_fournisseur_cactus extends ModeleNumRefSuppliersInvoices
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+        // $langs->load("bills");
 
 		// Check invoice num
 		$siyymm = '';
@@ -116,7 +116,7 @@ class mod_facture_fournisseur_cactus extends ModeleNumRefSuppliersInvoices
 			}
 		}
 		if ($siyymm && !preg_match('/'.$this->prefixinvoice.'[0-9][0-9][0-9][0-9]/i', $siyymm)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

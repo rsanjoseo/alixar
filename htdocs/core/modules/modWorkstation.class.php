@@ -329,52 +329,52 @@ class modWorkstation extends DolibarrModules
 		// Exports profiles provided by this module
 		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT WORKSTATION */
-		/*
-		$langs->load("workstation@workstation");
-		$this->export_code[$r]=$this->rights_class.'_'.$r;
-		$this->export_label[$r]='WorkstationLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		$this->export_icon[$r]='workstation@workstation';
-		// Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-		$keyforclass = 'Workstation'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstation@workstation';
-		include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		//$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
-		//unset($this->export_fields_array[$r]['t.fieldtoremove']);
-		//$keyforclass = 'WorkstationLine'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstationline@workstation'; $keyforalias='tl';
-		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		$keyforselect='workstation'; $keyforaliasextra='extra'; $keyforelement='workstation@workstation';
-		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$keyforselect='workstationline'; $keyforaliasextra='extraline'; $keyforelement='workstationline@workstation';
-		//include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$this->export_dependencies_array[$r] = array('workstationline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		//$this->export_special_array[$r] = array('t.field'=>'...');
-		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
-		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
-		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'workstation as t';
-		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'workstation_line as tl ON tl.fk_workstation = t.rowid';
-		$this->export_sql_end[$r] .=' WHERE 1 = 1';
-		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('workstation').')';
-		$r++; */
+        /*
+        // $langs->load("workstation@workstation");
+        $this->export_code[$r]=$this->rights_class.'_'.$r;
+        $this->export_label[$r]='WorkstationLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->export_icon[$r]='workstation@workstation';
+        // Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
+        $keyforclass = 'Workstation'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstation@workstation';
+        include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        //$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
+        //unset($this->export_fields_array[$r]['t.fieldtoremove']);
+        //$keyforclass = 'WorkstationLine'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstationline@workstation'; $keyforalias='tl';
+        //include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        $keyforselect='workstation'; $keyforaliasextra='extra'; $keyforelement='workstation@workstation';
+        include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$keyforselect='workstationline'; $keyforaliasextra='extraline'; $keyforelement='workstationline@workstation';
+        //include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$this->export_dependencies_array[$r] = array('workstationline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+        //$this->export_special_array[$r] = array('t.field'=>'...');
+        //$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
+        //$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
+        $this->export_sql_start[$r]='SELECT DISTINCT ';
+        $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'workstation as t';
+        //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'workstation_line as tl ON tl.fk_workstation = t.rowid';
+        $this->export_sql_end[$r] .=' WHERE 1 = 1';
+        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('workstation').')';
+        $r++; */
 		/* END MODULEBUILDER EXPORT WORKSTATION */
 
 		// Imports profiles provided by this module
 		$r = 1;
-		/* BEGIN MODULEBUILDER IMPORT WORKSTATION */
-		/*
-		 $langs->load("workstation@workstation");
-		 $this->export_code[$r]=$this->rights_class.'_'.$r;
-		 $this->export_label[$r]='WorkstationLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		 $this->export_icon[$r]='workstation@workstation';
-		 $keyforclass = 'Workstation'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstation@workstation';
-		 include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		 $keyforselect='workstation'; $keyforaliasextra='extra'; $keyforelement='workstation@workstation';
-		 include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		 //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		 $this->export_sql_start[$r]='SELECT DISTINCT ';
-		 $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'workstation as t';
-		 $this->export_sql_end[$r] .=' WHERE 1 = 1';
-		 $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('workstation').')';
-		 $r++; */
+        /* BEGIN MODULEBUILDER IMPORT WORKSTATION */
+        /*
+         // $langs->load("workstation@workstation");
+         $this->export_code[$r]=$this->rights_class.'_'.$r;
+         $this->export_label[$r]='WorkstationLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+         $this->export_icon[$r]='workstation@workstation';
+         $keyforclass = 'Workstation'; $keyforclassfile='/workstation/class/workstation.class.php'; $keyforelement='workstation@workstation';
+         include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+         $keyforselect='workstation'; $keyforaliasextra='extra'; $keyforelement='workstation@workstation';
+         include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+         //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+         $this->export_sql_start[$r]='SELECT DISTINCT ';
+         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'workstation as t';
+         $this->export_sql_end[$r] .=' WHERE 1 = 1';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('workstation').')';
+         $r++; */
 		/* END MODULEBUILDER IMPORT WORKSTATION */
 	}
 
@@ -428,7 +428,7 @@ class modWorkstation extends DolibarrModules
 					dol_mkdir($dirodt);
 					$result = dol_copy($src, $dest, 0, 0);
 					if ($result < 0) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 						return 0;
 					}

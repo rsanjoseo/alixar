@@ -147,7 +147,7 @@ llxHeader('', $title, $help_url);
 
 
 if ($result > 0) {
-	$langs->load("other");
+	// $langs->load("other");
 
 	$head = societe_prepare_head($object);
 
@@ -315,7 +315,7 @@ if ($result > 0) {
 				if (isValidEmail($obj->email)) {
 					print ' &lt;'.$obj->email.'&gt;';
 				} else {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					print ' '.img_warning().' <span class="warning">'.$langs->trans("ErrorBadEMail", $obj->email).'</span>';
 				}
 			}
@@ -360,7 +360,7 @@ if ($result > 0) {
 			}
 			else
 			{
-				$langs->load("errors");
+				// $langs->load("errors");
 				print ' '.img_warning().' <span class="warning">'.$langs->trans("ErrorBadEMail",$valemail).'</span>;
 			}
 		}

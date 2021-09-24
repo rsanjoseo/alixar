@@ -330,8 +330,8 @@ if (!$ret) {
 			//$morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . $object->thirdparty->getNomUrl(1);
 			// Project
 			if (!empty($conf->projet->enabled)) {
-				$langs->load("projects");
-				//$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
+				// $langs->load("projects");
+                //$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 				$morehtmlref .= $langs->trans('Project').': ';
 				if (!empty($act->fk_project)) {
 					$proj = new Project($db);
@@ -498,7 +498,7 @@ if (!$ret) {
 			$morehtmlref .= $langs->trans('ThirdParty').' : '.$fichinter->thirdparty->getNomUrl(1);
 			// Project
 			if (!empty($conf->projet->enabled)) {
-				$langs->load("projects");
+                // $langs->load("projects");
 				$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 				if ($user->rights->commande->creer) {
 					if ($action != 'classify') {

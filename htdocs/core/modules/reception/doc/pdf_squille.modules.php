@@ -803,7 +803,7 @@ class pdf_squille extends ModelePdfReception
 	{
 		global $conf, $langs, $mysoc;
 
-		$langs->load("orders");
+		// $langs->load("orders");
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 

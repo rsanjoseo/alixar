@@ -104,7 +104,7 @@ class box_graph_orders_permonth extends ModeleBoxes
 		}
 
 		if ($user->rights->commande->lire) {
-			$langs->load("orders");
+			// $langs->load("orders");
 
 			$param_year = 'DOLUSERCOOKIE_box_'.$this->boxcode.'_year';
 			$param_shownb = 'DOLUSERCOOKIE_box_'.$this->boxcode.'_shownb';
@@ -222,7 +222,7 @@ class box_graph_orders_permonth extends ModeleBoxes
 			}
 
 			if (empty($conf->use_javascript_ajax)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$mesg = $langs->trans("WarningFeatureDisabledWithDisplayOptimizedForBlindNoJs");
 			}
 

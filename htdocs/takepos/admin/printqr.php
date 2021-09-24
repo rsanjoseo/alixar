@@ -28,7 +28,7 @@ if (!$user->admin) {
 	accessforbidden();
 }
 
-$langs->load("cashdesk");
+// $langs->load("cashdesk");
 
 $id = GETPOST('id', 'int');
 

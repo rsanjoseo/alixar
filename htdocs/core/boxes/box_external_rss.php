@@ -72,7 +72,7 @@ class box_external_rss extends ModeleBoxes
 	public function loadBox($max = 5, $cachedelay = 3600)
 	{
 		global $user, $langs, $conf;
-		$langs->load("boxes");
+		// $langs->load("boxes");
 
 		$this->max = $max;
 

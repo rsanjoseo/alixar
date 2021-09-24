@@ -58,7 +58,7 @@ $result = restrictedArea($user, 'prelevement', '', '');
 llxHeader('', $langs->trans("CustomersStandingOrdersArea"));
 
 if (prelevement_check_config() < 0) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	setEventMessages($langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("PaymentByDirectDebit")), null, 'errors');
 }
 

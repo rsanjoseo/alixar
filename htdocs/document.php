@@ -163,7 +163,7 @@ if (!empty($hashp)) {
 			$original_file = (($tmp[1] ? $tmp[1].'/' : '').$ecmfile->filename); // this is relative to module dir
 		}
 	} else {
-		$langs->load("errors");
+		// $langs->load("errors");
 		accessforbidden($langs->trans("ErrorFileNotFoundWithSharedLink"), 0, 0, 1);
 	}
 }

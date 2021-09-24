@@ -386,7 +386,7 @@ class Asset extends CommonObject
 		// phpcs:enable
 		global $langs;
 
-		$langs->load("contracts");
+		// $langs->load("contracts");
 		$labelStatus = array();
 		$labelStatus[self::STATUS_DRAFT] = $langs->trans('Disabled');
 		$labelStatus[self::STATUS_VALIDATED] = $langs->trans('Enabled');

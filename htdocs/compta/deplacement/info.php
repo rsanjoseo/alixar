@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/deplacement/class/deplacement.class.php';
 
 // Load translation files required by the page
-$langs->load("trips");
+// $langs->load("trips");
 
 // Security check
 $id = GETPOST('id', 'int');

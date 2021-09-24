@@ -102,37 +102,37 @@ if (!empty($conf->mrp->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('projects', 'companies', 'suppliers', 'compta'));
 if (!empty($conf->facture->enabled)) {
-	$langs->load("bills");
+	// $langs->load("bills");
 }
 if (!empty($conf->commande->enabled)) {
-	$langs->load("orders");
+    // $langs->load("orders");
 }
 if (!empty($conf->propal->enabled)) {
-	$langs->load("propal");
+    // $langs->load("propal");
 }
 if (!empty($conf->ficheinter->enabled)) {
-	$langs->load("interventions");
+    // $langs->load("interventions");
 }
 if (!empty($conf->deplacement->enabled)) {
-	$langs->load("trips");
+    // $langs->load("trips");
 }
 if (!empty($conf->expensereport->enabled)) {
-	$langs->load("trips");
+    // $langs->load("trips");
 }
 if (!empty($conf->don->enabled)) {
-	$langs->load("donations");
+    // $langs->load("donations");
 }
 if (!empty($conf->loan->enabled)) {
-	$langs->load("loan");
+    // $langs->load("loan");
 }
 if (!empty($conf->salaries->enabled)) {
-	$langs->load("salaries");
+    // $langs->load("salaries");
 }
 if (!empty($conf->mrp->enabled)) {
-	$langs->load("mrp");
+    // $langs->load("mrp");
 }
 if (!empty($conf->eventorganization->enabled)) {
-	$langs->load("eventorganization");
+    // $langs->load("eventorganization");
 }
 
 $id = GETPOST('id', 'int');
@@ -710,7 +710,7 @@ if (!$showdatefilter) {
 // $langs->loadLangs(array("suppliers", "bills", "orders", "proposals", "margins"));
 
 if (!empty($conf->stock->enabled)) {
-	$langs->load('stocks');
+    // $langs->load('stocks');
 }
 
 print load_fiche_titre($langs->trans("Profit"), '', 'title_accountancy');
@@ -999,7 +999,7 @@ foreach ($listofreferent as $key => $value) {
 		//if ($key == 'project_task') $key = 'project_task_time';
 
 		if ($langtoload) {
-			$langs->load($langtoload);
+            // $langs->load($langtoload);
 		}
 
 		$element = new $classname($db);
@@ -1328,7 +1328,7 @@ foreach ($listofreferent as $key => $value) {
 							// TODO Permission to read daily rate to show value
 							$total_ht_by_line = price2num($tmpprojtime['amount'], 'MT');
 							if ($tmpprojtime['nblinesnull'] > 0) {
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$warning = $langs->trans("WarningSomeLinesWithNullHourlyRate", $conf->currency);
 							}
 						} else {

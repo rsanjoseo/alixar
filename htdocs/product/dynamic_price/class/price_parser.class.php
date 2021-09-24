@@ -62,7 +62,7 @@ class PriceParser
 	public function translatedError()
 	{
 		global $langs;
-		$langs->load("errors");
+		// $langs->load("errors");
 		/*
 		-No arg
 		 9, an unexpected error occured

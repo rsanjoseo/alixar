@@ -116,7 +116,7 @@ class box_produits_alerte_stock extends ModeleBoxes
 
 			$result = $this->db->query($sql);
 			if ($result) {
-				$langs->load("stocks");
+				// $langs->load("stocks");
 				$num = $this->db->num_rows($result);
 				$line = 0;
 				while ($line < $num) {

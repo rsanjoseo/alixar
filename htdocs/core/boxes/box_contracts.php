@@ -111,7 +111,7 @@ class box_contracts extends ModeleBoxes
 
 				$line = 0;
 
-				$langs->load("contracts");
+				// $langs->load("contracts");
 
 				while ($line < $num) {
 					$objp = $this->db->fetch_object($resql);

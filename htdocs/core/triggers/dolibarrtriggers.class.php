@@ -131,7 +131,7 @@ abstract class DolibarrTriggers
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+		// $langs->load("admin");
 
 		if ($this->version == self::VERSION_DEVELOPMENT) {
 			return $langs->trans("VersionDevelopment");

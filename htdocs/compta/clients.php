@@ -40,7 +40,7 @@ if (!$user->rights->facture->lire) {
 }
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 
 $mode = GETPOST("mode");
 
@@ -130,7 +130,7 @@ if ($resql) {
 	$num = $db->num_rows($resql);
 	$i = 0;
 
-	$langs->load('commercial');
+    // $langs->load('commercial');
 
 	print_barre_liste($langs->trans("ListOfCustomers"), $page, $_SERVER["PHP_SELF"], "", $sortfield, $sortorder, '', $num);
 

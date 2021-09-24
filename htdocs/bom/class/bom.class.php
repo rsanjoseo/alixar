@@ -529,7 +529,7 @@ class BOM extends CommonObject
     public function getNextNumRef($prod)
     {
         global $langs, $conf;
-        $langs->load("mrp");
+        // $langs->load("mrp");
 
         if (!empty($conf->global->BOM_ADDON)) {
             $mybool = false;
@@ -875,7 +875,7 @@ class BOM extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus)) {
 			global $langs;
-			//$langs->load("mrp");
+            //// $langs->load("mrp");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('Enabled');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->transnoentitiesnoconv('Disabled');
@@ -975,7 +975,7 @@ class BOM extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("mrp");
+        // $langs->load("mrp");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {

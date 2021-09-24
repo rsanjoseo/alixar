@@ -244,7 +244,7 @@ print '<br>';
 // Draft MyObject
 if (! empty($conf->recruitment->enabled) && $user->rights->recruitment->read)
 {
-	$langs->load("orders");
+	// $langs->load("orders");
 
 	$sql = "SELECT c.rowid, c.ref, c.ref_client, c.total_ht, c.total_tva, c.total_ttc, s.rowid as socid, s.nom as name, s.client, s.canvas";
 	$sql.= ", s.code_client";

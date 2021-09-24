@@ -264,7 +264,7 @@ class EmailCollector extends CommonObject
 
         // Check parameters
         if ($this->host && preg_match('/^http:/i', trim($this->host))) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $this->error = $langs->trans("ErrorHostMustNotStartWithHttp", $this->host);
             return -1;
         }
@@ -473,7 +473,7 @@ class EmailCollector extends CommonObject
 
         // Check parameters
         if ($this->host && preg_match('/^http:/i', trim($this->host))) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $this->error = $langs->trans("ErrorHostMustNotStartWithHttp", $this->host);
             return -1;
         }
@@ -600,7 +600,7 @@ class EmailCollector extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+            //// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_ENABLED] = $langs->trans('Enabled');
 			$this->labelStatus[self::STATUS_DISABLED] = $langs->trans('Disabled');
 			$this->labelStatusShort[self::STATUS_ENABLED] = $langs->trans('Enabled');

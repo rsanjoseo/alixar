@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 $action = GETPOST('action', 'aZ09');
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 
 // Security check
 $id = GETPOST('id', 'int');
@@ -83,7 +83,7 @@ if ($id > 0) {
 	 * Affichage onglets
 	 */
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 
 	$head = contact_prepare_head($object);

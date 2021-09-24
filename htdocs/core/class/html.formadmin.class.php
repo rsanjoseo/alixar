@@ -413,7 +413,7 @@ class FormAdmin
 		// phpcs:enable
 		global $langs;
 
-		$langs->load("dict");
+		// $langs->load("dict");
 
 		$sql = "SELECT code, label, width, height, unit";
 		$sql .= " FROM ".MAIN_DB_PREFIX."c_paper_format";

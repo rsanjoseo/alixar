@@ -348,7 +348,7 @@ if ($action == 'createtask' && $user->rights->projet->creer) {
 				$result = $task->add_contact(GETPOST("userid", 'int'), 'TASKEXECUTIVE', 'internal');
 			} else {
 				if ($db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("projects");
+					// $langs->load("projects");
 					setEventMessages($langs->trans('NewTaskRefSuggested'), '', 'warnings');
 					$duplicate_code_error = true;
 				} else {
@@ -664,14 +664,14 @@ if ($action == 'create' && $user->rights->projet->creer && (empty($object->third
 
 	if ($object->id > 0 && $object->statut == Project::STATUS_CLOSED) {
 		print '<div class="warning">';
-		$langs->load("errors");
+        // $langs->load("errors");
 		print $langs->trans("WarningProjectClosed");
 		print '</div>';
 	}
 
 	if ($object->id > 0 && $object->statut == Project::STATUS_DRAFT) {
 		print '<div class="warning">';
-		$langs->load("errors");
+        // $langs->load("errors");
 		print $langs->trans("WarningProjectDraft");
 		print '</div>';
 	}

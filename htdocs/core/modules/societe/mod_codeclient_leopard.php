@@ -84,7 +84,7 @@ class mod_codeclient_leopard extends ModeleThirdPartyCode
 	 */
 	public function info($langs)
 	{
-		$langs->load("companies");
+		// $langs->load("companies");
 		return $langs->trans("LeopardNumRefModelDesc");
 	}
 

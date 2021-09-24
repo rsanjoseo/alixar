@@ -941,7 +941,7 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+					// $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -1154,7 +1154,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load('projects');
+        // $langs->load('projects');
 
 		$formproject = new FormProjets($db);
 
@@ -1314,7 +1314,7 @@ if ($action == 'create') {
 		}
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($user->rights->contrat->creer) {
 				if ($action != 'classify') {
@@ -2046,7 +2046,7 @@ if ($action == 'create') {
 				}
 
 				if (!empty($conf->commande->enabled) && $object->statut > 0 && $object->nbofservicesclosed < $nbofservices) {
-					$langs->load("orders");
+                    // $langs->load("orders");
 					if ($user->rights->commande->creer) {
                         print '<div class="inline-block divButAction"><a class="butAction" href="' . DOL_URL_ROOT . '/commande/card.php?action=create&token=' . newToken() . '&origin=' . $object->element . '&originid=' . $object->id . '&socid=' . $object->thirdparty->id . '">' . $langs->trans("CreateOrder") . '</a></div>';
 					} else {
@@ -2055,7 +2055,7 @@ if ($action == 'create') {
 				}
 
 				if (!empty($conf->facture->enabled) && $object->statut > 0) {
-					$langs->load("bills");
+                    // $langs->load("bills");
 					if ($user->rights->facture->creer) {
 						print '<div class="inline-block divButAction"><a class="butAction" href="'.DOL_URL_ROOT.'/compta/facture/card.php?action=create&amp;origin='.$object->element.'&amp;originid='.$object->id.'&amp;socid='.$object->thirdparty->id.'">'.$langs->trans("CreateBill").'</a></div>';
 					} else {

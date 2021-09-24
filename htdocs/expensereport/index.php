@@ -190,7 +190,7 @@ print '</div><div class="fichetwothirdright"><div class="ficheaddleft">';
 
 $max = 10;
 
-$langs->load("boxes");
+// $langs->load("boxes");
 
 $sql = "SELECT u.rowid as uid, u.lastname, u.firstname, u.login, u.statut as user_status, u.photo, u.email, u.admin,";
 $sql .= " d.rowid, d.ref, d.date_debut as dated, d.date_fin as datef, d.date_create as dm, d.total_ht, d.total_ttc, d.fk_statut as status";

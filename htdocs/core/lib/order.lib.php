@@ -35,9 +35,9 @@ function commande_prepare_head(Commande $object)
 {
 	global $db, $langs, $conf, $user;
 	if (!empty($conf->expedition->enabled)) {
-		$langs->load("sendings");
+		// $langs->load("sendings");
 	}
-	$langs->load("orders");
+    // $langs->load("orders");
 
 	$h = 0;
 	$head = array();

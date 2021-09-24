@@ -79,7 +79,7 @@ class box_factures extends ModeleBoxes
 		$facturestatic = new Facture($this->db);
 		$societestatic = new Societe($this->db);
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$text = $langs->trans("BoxTitleLast".(!empty($conf->global->MAIN_LASTBOX_ON_OBJECT_DATE) ? "" : "Modified")."CustomerBills", $max);
 		$this->info_box_head = array(

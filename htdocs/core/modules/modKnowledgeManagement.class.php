@@ -381,52 +381,52 @@ class modKnowledgeManagement extends DolibarrModules
 		// Exports profiles provided by this module
 		$r = 1;
 		/* BEGIN MODULEBUILDER EXPORT KNOWLEDGERECORD */
-		/*
-		$langs->load("knowledgemanagement");
-		$this->export_code[$r]=$this->rights_class.'_'.$r;
-		$this->export_label[$r]='KnowledgeRecordLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		$this->export_icon[$r]='knowledgerecord@knowledgemanagement';
-		// Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
-		$keyforclass = 'KnowledgeRecord'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecord@knowledgemanagement';
-		include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		//$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
-		//unset($this->export_fields_array[$r]['t.fieldtoremove']);
-		//$keyforclass = 'KnowledgeRecordLine'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecordline@knowledgemanagement'; $keyforalias='tl';
-		//include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		$keyforselect='knowledgerecord'; $keyforaliasextra='extra'; $keyforelement='knowledgerecord@knowledgemanagement';
-		include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$keyforselect='knowledgerecordline'; $keyforaliasextra='extraline'; $keyforelement='knowledgerecordline@knowledgemanagement';
-		//include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		//$this->export_dependencies_array[$r] = array('knowledgerecordline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		//$this->export_special_array[$r] = array('t.field'=>'...');
-		//$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
-		//$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
-		$this->export_sql_start[$r]='SELECT DISTINCT ';
-		$this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'knowledgerecord as t';
-		//$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'knowledgerecord_line as tl ON tl.fk_knowledgerecord = t.rowid';
-		$this->export_sql_end[$r] .=' WHERE 1 = 1';
-		$this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('knowledgerecord').')';
-		$r++; */
+        /*
+        // $langs->load("knowledgemanagement");
+        $this->export_code[$r]=$this->rights_class.'_'.$r;
+        $this->export_label[$r]='KnowledgeRecordLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+        $this->export_icon[$r]='knowledgerecord@knowledgemanagement';
+        // Define $this->export_fields_array, $this->export_TypeFields_array and $this->export_entities_array
+        $keyforclass = 'KnowledgeRecord'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecord@knowledgemanagement';
+        include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        //$this->export_fields_array[$r]['t.fieldtoadd']='FieldToAdd'; $this->export_TypeFields_array[$r]['t.fieldtoadd']='Text';
+        //unset($this->export_fields_array[$r]['t.fieldtoremove']);
+        //$keyforclass = 'KnowledgeRecordLine'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecordline@knowledgemanagement'; $keyforalias='tl';
+        //include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+        $keyforselect='knowledgerecord'; $keyforaliasextra='extra'; $keyforelement='knowledgerecord@knowledgemanagement';
+        include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$keyforselect='knowledgerecordline'; $keyforaliasextra='extraline'; $keyforelement='knowledgerecordline@knowledgemanagement';
+        //include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+        //$this->export_dependencies_array[$r] = array('knowledgerecordline'=>array('tl.rowid','tl.ref')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+        //$this->export_special_array[$r] = array('t.field'=>'...');
+        //$this->export_examplevalues_array[$r] = array('t.field'=>'Example');
+        //$this->export_help_array[$r] = array('t.field'=>'FieldDescHelp');
+        $this->export_sql_start[$r]='SELECT DISTINCT ';
+        $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'knowledgerecord as t';
+        //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'knowledgerecord_line as tl ON tl.fk_knowledgerecord = t.rowid';
+        $this->export_sql_end[$r] .=' WHERE 1 = 1';
+        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('knowledgerecord').')';
+        $r++; */
 		/* END MODULEBUILDER EXPORT KNOWLEDGERECORD */
 
 		// Imports profiles provided by this module
 		$r = 1;
-		/* BEGIN MODULEBUILDER IMPORT KNOWLEDGERECORD */
-		/*
-		 $langs->load("knowledgemanagement");
-		 $this->export_code[$r]=$this->rights_class.'_'.$r;
-		 $this->export_label[$r]='KnowledgeRecordLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
-		 $this->export_icon[$r]='knowledgerecord@knowledgemanagement';
-		 $keyforclass = 'KnowledgeRecord'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecord@knowledgemanagement';
-		 include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
-		 $keyforselect='knowledgerecord'; $keyforaliasextra='extra'; $keyforelement='knowledgerecord@knowledgemanagement';
-		 include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
-		 //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
-		 $this->export_sql_start[$r]='SELECT DISTINCT ';
-		 $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'knowledgerecord as t';
-		 $this->export_sql_end[$r] .=' WHERE 1 = 1';
-		 $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('knowledgerecord').')';
-		 $r++; */
+        /* BEGIN MODULEBUILDER IMPORT KNOWLEDGERECORD */
+        /*
+         // $langs->load("knowledgemanagement");
+         $this->export_code[$r]=$this->rights_class.'_'.$r;
+         $this->export_label[$r]='KnowledgeRecordLines';	// Translation key (used only if key ExportDataset_xxx_z not found)
+         $this->export_icon[$r]='knowledgerecord@knowledgemanagement';
+         $keyforclass = 'KnowledgeRecord'; $keyforclassfile='/knowledgemanagement/class/knowledgerecord.class.php'; $keyforelement='knowledgerecord@knowledgemanagement';
+         include DOL_DOCUMENT_ROOT.'/core/commonfieldsinexport.inc.php';
+         $keyforselect='knowledgerecord'; $keyforaliasextra='extra'; $keyforelement='knowledgerecord@knowledgemanagement';
+         include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
+         //$this->export_dependencies_array[$r]=array('mysubobject'=>'ts.rowid', 't.myfield'=>array('t.myfield2','t.myfield3')); // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
+         $this->export_sql_start[$r]='SELECT DISTINCT ';
+         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'knowledgerecord as t';
+         $this->export_sql_end[$r] .=' WHERE 1 = 1';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('knowledgerecord').')';
+         $r++; */
 		/* END MODULEBUILDER IMPORT KNOWLEDGERECORD */
 	}
 
@@ -480,7 +480,7 @@ class modKnowledgeManagement extends DolibarrModules
 					dol_mkdir($dirodt);
 					$result = dol_copy($src, $dest, 0, 0);
 					if ($result < 0) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 						return 0;
 					}

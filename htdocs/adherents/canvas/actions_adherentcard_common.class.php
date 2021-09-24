@@ -180,7 +180,7 @@ abstract class ActionsAdherentCardCommon
 		if ($action == 'view' || $action == 'edit' || $action == 'delete') {
 			// Emailing
 			if (!empty($conf->mailing->enabled)) {
-				$langs->load("mails");
+				// $langs->load("mails");
 				$this->tpl['nb_emailing'] = $this->object->getNbOfEMailings();
 			}
 

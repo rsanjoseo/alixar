@@ -121,7 +121,7 @@ class AntiVir
 		}
 		else
 		{
-			$langs->load("errors");
+			// $langs->load("errors");
 			dol_syslog("Failed to open file ".$outputfile,LOG_ERR);
 			$this->error="ErrorFailedToWriteInDir";
 			$return=-1;

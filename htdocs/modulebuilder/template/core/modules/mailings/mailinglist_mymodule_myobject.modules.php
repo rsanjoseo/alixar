@@ -62,7 +62,7 @@ class mailing_mailinglist_mymodule_myobject extends MailingTargets
 	public function formFilter()
 	{
 		global $langs;
-		$langs->load("members");
+		// $langs->load("members");
 
 		$form = new Form($this->db);
 

@@ -121,7 +121,7 @@ class mod_commande_fournisseur_muguet extends ModeleNumRefSuppliersOrders
 		if (!$coyymm || preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $coyymm)) {
 			return true;
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

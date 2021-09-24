@@ -77,8 +77,8 @@ class Link extends CommonObject
 		global $langs, $conf;
 
 		$error = 0;
-		$langs->load("errors");
-		// Clean parameters
+		// $langs->load("errors");
+        // Clean parameters
 		if (empty($this->label)) {
 			$this->label = trim(basename($this->url));
 		}
@@ -154,7 +154,7 @@ class Link extends CommonObject
 		global $langs, $conf;
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
-		$langs->load("errors");
+        // $langs->load("errors");
 		$error = 0;
 
 		dol_syslog(get_class($this)."::Update id = ".$this->id." call_trigger = ".$call_trigger);

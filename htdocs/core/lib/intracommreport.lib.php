@@ -31,7 +31,7 @@ function intracommReportAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("intracommreport");
+	// $langs->load("intracommreport");
 
 	$h = 0;
 	$head = array();
@@ -62,7 +62,7 @@ function intracommReportPrepareHead($object)
 {
 	global $langs, $conf;
 
-	$langs->load("intracommreport");
+    // $langs->load("intracommreport");
 
 	$h = 0;
 	$head = array();

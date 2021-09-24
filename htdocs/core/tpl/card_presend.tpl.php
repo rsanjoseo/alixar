@@ -34,7 +34,7 @@ if (empty($conf) || !is_object($conf)) {
 
 
 if ($action == 'presend') {
-	$langs->load("mails");
+	// $langs->load("mails");
 
 	$titreform = 'SendMail';
 

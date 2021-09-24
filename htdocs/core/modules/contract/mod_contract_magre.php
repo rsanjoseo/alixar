@@ -67,7 +67,7 @@ class mod_contract_magre extends ModelNumRefContracts
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

@@ -178,7 +178,7 @@ class modWebsite extends DolibarrModules
 				dol_mkdir($dest);
 				$result = dolCopyDir($src, $dest, 0, 0);
 				if ($result < 0) {
-					$langs->load("errors");
+					// $langs->load("errors");
 					$this->error = $langs->trans('ErrorFailToCopyDir', $src, $dest);
 					return 0;
 				}
@@ -198,7 +198,7 @@ class modWebsite extends DolibarrModules
 
 			$result = dol_copy($src, $dest, 0, 1); // For full zip templates, we overwrite old existing files
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 			}
 		}

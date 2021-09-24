@@ -34,7 +34,7 @@
 function prelevement_prepare_head(BonPrelevement $object)
 {
 	global $langs, $conf, $user;
-	$langs->load("withdrawals");
+	// $langs->load("withdrawals");
 
 	$h = 0;
 	$head = array();

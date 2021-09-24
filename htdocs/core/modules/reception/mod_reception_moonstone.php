@@ -43,7 +43,7 @@ class mod_reception_moonstone extends ModelNumRefReception
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

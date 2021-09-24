@@ -161,7 +161,7 @@ if ($action == 'update' && !$cancel && $permissiontoaddbankaccount) {
 					if ($ret < 0) {
 						$error++;
 						if ($db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-							$langs->load("errors");
+							// $langs->load("errors");
 							setEventMessages($langs->trans("ErrorLoginAlreadyExists", $objectuser->login), null, 'errors');
 						} else {
 							setEventMessages($objectuser->error, $objectuser->errors, 'errors');

@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 
 // Load translation files required by the page
-$langs->load("admin");
+// $langs->load("admin");
 
 if (!$user->admin) {
 	accessforbidden();
@@ -159,7 +159,7 @@ if (dol_is_dir(DOL_DOCUMENT_ROOT.'/includes/restler/framework/Luracast/Restler/e
 	print '<div class="urllink soixantepercent">'.img_picto('', 'globe').' <a href="'.$urlswagger.'" target="_blank">'.$urlswagger."</a></div><br>\n";
 	print '</div>';
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print info_admin($langs->trans("ErrorNotAvailableWithThisDistribution"), 0, 0, 'error');
 }
 

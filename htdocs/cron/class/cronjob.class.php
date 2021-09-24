@@ -644,7 +644,7 @@ class Cronjob extends CommonObject
     {
         global $conf, $langs;
 
-        $langs->load('cron');
+        // $langs->load('cron');
 
         $error = 0;
 
@@ -1064,7 +1064,7 @@ class Cronjob extends CommonObject
 		$error = 0;
 		$retval = '';
 
-		$langs->load('cron');
+        // $langs->load('cron');
 
 		if (empty($userlogin)) {
 			$this->error = "User login is mandatory";
@@ -1168,17 +1168,17 @@ class Cronjob extends CommonObject
 
 			// Load langs
 			if (!$error) {
-				$result = $langs->load($this->module_name);
-				$result = $langs->load($this->module_name.'@'.$this->module_name, 0, 0, '', 0, 1);
+                $result = // $langs->load($this->module_name);
+                $result = // $langs->load($this->module_name.'@'.$this->module_name, 0, 0, '', 0, 1);
 
-				if ($result < 0) {	// If technical error
-					dol_syslog(get_class($this)."::run_jobs Cannot load module lang file - ".$langs->error, LOG_ERR);
-					$this->error = $langs->error;
-					$this->lastoutput = $this->error;
-					$this->lastresult = -1;
-					$retval = $this->lastresult;
-					$error++;
-				}
+				if ($result < 0) {    // If technical error
+                    dol_syslog(get_class($this) . "::run_jobs Cannot load module lang file - " . $langs->error, LOG_ERR);
+                    $this->error = $langs->error;
+                    $this->lastoutput = $this->error;
+                    $this->lastresult = -1;
+                    $retval = $this->lastresult;
+                    $error++;
+                }
 			}
 
 			if (!$error) {
@@ -1202,7 +1202,7 @@ class Cronjob extends CommonObject
 				}
 
 				if ($result === false || (!is_bool($result) && $result != 0)) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 
 					$errmsg = '';
 					if (!is_array($object->errors) || !in_array($object->error, $object->errors)) {
@@ -1233,34 +1233,34 @@ class Cronjob extends CommonObject
 
 		if ($this->jobtype == 'function') {
 			//load lib
-			$libpath = '/'.strtolower($this->module_name).'/lib/'.$this->libname;
-			$ret = dol_include_once($libpath);
-			if ($ret === false) {
-				$this->error = $langs->trans('CronCannotLoadLib').': '.$libpath;
-				dol_syslog(get_class($this)."::run_jobs ".$this->error, LOG_ERR);
-				$conf->entity = $savcurrententity;
-				return -1;
-			}
+            $libpath = '/' . strtolower($this->module_name) . '/lib/' . $this->libname;
+            $ret = dol_include_once($libpath);
+            if ($ret === false) {
+                $this->error = $langs->trans('CronCannotLoadLib') . ': ' . $libpath;
+                dol_syslog(get_class($this) . "::run_jobs " . $this->error, LOG_ERR);
+                $conf->entity = $savcurrententity;
+                return -1;
+            }
 
-			// Load langs
-			$result = $langs->load($this->module_name);
-			$result = $langs->load($this->module_name.'@'.$this->module_name); // If this->module_name was an existing language file, this will make nothing
-			if ($result < 0) {	// If technical error
-				dol_syslog(get_class($this)."::run_jobs Cannot load module langs".$langs->error, LOG_ERR);
-				$conf->entity = $savcurrententity;
-				return -1;
-			}
+            // Load langs
+            $result = // $langs->load($this->module_name);
+            $result = // $langs->load($this->module_name.'@'.$this->module_name); // If this->module_name was an existing language file, this will make nothing
+			if ($result < 0) {    // If technical error
+                dol_syslog(get_class($this) . "::run_jobs Cannot load module langs" . $langs->error, LOG_ERR);
+                $conf->entity = $savcurrententity;
+                return -1;
+            }
 
-			dol_syslog(get_class($this)."::run_jobs ".$this->libname."::".$this->methodename."(".$this->params.");", LOG_DEBUG);
+			dol_syslog(get_class($this) . "::run_jobs " . $this->libname . "::" . $this->methodename . "(" . $this->params . ");", LOG_DEBUG);
 			$params_arr = explode(", ", $this->params);
 			if (!is_array($params_arr)) {
-				$result = call_user_func($this->methodename, $this->params);
+                $result = call_user_func($this->methodename, $this->params);
 			} else {
 				$result = call_user_func_array($this->methodename, $params_arr);
 			}
 
 			if ($result === false || (!is_bool($result) && $result != 0)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				dol_syslog(get_class($this)."::run_jobs result=".$result, LOG_ERR);
 				$this->error = $langs->trans('ErrorUnknown');
 				$this->lastoutput = $this->error;
@@ -1279,7 +1279,7 @@ class Cronjob extends CommonObject
 			global $dolibarr_cron_allow_cli;
 
 			if (empty($dolibarr_cron_allow_cli)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error      = $langs->trans("FailedToExecutCommandJob");
 				$this->lastoutput = '';
 				$this->lastresult = $langs->trans("ErrorParameterMustBeEnabledToAllwoThisFeature", 'dolibarr_cron_allow_cli');
@@ -1423,7 +1423,7 @@ class Cronjob extends CommonObject
 
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            $langs->load('users');
+            // $langs->load('users');
 
             $moretext = '';
             if ($processing) {

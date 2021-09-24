@@ -77,7 +77,7 @@ class mod_codecompta_aquarium extends ModeleAccountancyCode
 		global $conf;
 		global $form;
 
-		$langs->load("companies");
+		// $langs->load("companies");
 
 		$tooltip = '';
 		$texte = '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';

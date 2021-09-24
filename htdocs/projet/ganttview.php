@@ -393,7 +393,7 @@ if (count($tasksarray) > 0) {
 
 		print '</div>';
 	} else {
-		$langs->load("admin");
+		// $langs->load("admin");
 		print $langs->trans("AvailableOnlyIfJavascriptAndAjaxNotDisabled");
 	}
 } else {

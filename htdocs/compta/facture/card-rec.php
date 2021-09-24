@@ -298,7 +298,7 @@ if (empty($reshook)) {
 		} else {
 			$error++;
 			if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($langs->trans('ErrorRefAlreadyExists', $ref), null, 'errors');
 			} else {
 				setEventMessages($object->error, $object->errors, 'errors');
@@ -416,7 +416,7 @@ if (empty($reshook)) {
 
 	// Add a new line
 	if ($action == 'addline' && $user->rights->facture->creer) {
-		$langs->load('errors');
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -468,7 +468,7 @@ if (empty($reshook)) {
 			$error++;
 		}
 		if ($qty < 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorQtyForCustomerInvoiceCantBeNegative'), null, 'errors');
 			$error++;
 		}
@@ -814,7 +814,7 @@ if (empty($reshook)) {
 			}
 		}
 		if ($qty < 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorQtyForCustomerInvoiceCantBeNegative'), null, 'errors');
 			$error++;
 		}
@@ -1038,7 +1038,7 @@ if ($action == 'create') {
 		// Project
 		if (!empty($conf->projet->enabled) && is_object($object->thirdparty) && $object->thirdparty->id > 0) {
 			$projectid = GETPOST('projectid') ?GETPOST('projectid') : $object->fk_project;
-			$langs->load('projects');
+            // $langs->load('projects');
 			print '<tr><td>'.$langs->trans('Project').'</td><td>';
 			$numprojet = $formproject->select_projects($object->thirdparty->id, $projectid, 'projectid', 0, 0, 1, 0, 0, 0, 0, '', 0, 0, '');
 			print ' &nbsp; <a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.$object->thirdparty->id.'&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create&socid='.$object->thirdparty->id.(!empty($id) ? '&id='.$id : '')).'">'.$langs->trans("AddProject").'</a>';
@@ -1197,7 +1197,7 @@ if ($action == 'create') {
 		$morehtmlref .= $langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($user->rights->facture->creer) {
 				if ($action != 'classify') {

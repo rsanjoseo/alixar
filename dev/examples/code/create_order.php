@@ -43,7 +43,7 @@ require_once $path . "../../htdocs/master.inc.php";
 // After this $db, $mysoc, $langs and $conf->entity are defined. Opened handler to database will be closed at end of file.
 
 //$langs->setDefaultLang('en_US'); 	// To change default language of $langs
-$langs->load("main");                // To load language file for default language
+// $langs->load("main");                // To load language file for default language
 @set_time_limit(0);
 
 // Load user and its permissions

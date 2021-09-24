@@ -63,7 +63,7 @@ class mod_supplier_payment_brodator extends ModeleNumRefSupplierPayments
 	{
 		global $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($this->db);
 

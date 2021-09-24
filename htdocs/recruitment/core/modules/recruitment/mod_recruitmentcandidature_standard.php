@@ -103,7 +103,7 @@ class mod_recruitmentcandidature_standard extends ModeleNumRefRecruitmentCandida
 			}
 		}
 		if ($coyymm && !preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $coyymm)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

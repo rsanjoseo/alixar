@@ -33,7 +33,7 @@ if (!$user->rights->opensurvey->write) {
 	accessforbidden();
 }
 
-$langs->load("opensurvey");
+// $langs->load("opensurvey");
 
 
 /*

@@ -65,7 +65,7 @@ class mailing_xinputfile extends MailingTargets
 	public function getSqlArrayForStats()
 	{
 		global $langs;
-		$langs->load("users");
+		// $langs->load("users");
 
 		$statssql = array();
 		return $statssql;
@@ -173,7 +173,7 @@ class mailing_xinputfile extends MailingTargets
 								}
 							} else {
 								$i++;
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$msg = $langs->trans("ErrorFoundBadEmailInFile", $i, $cpt, $email);
 								if (!empty($msg)) {
 									$this->error = $msg;
@@ -195,7 +195,7 @@ class mailing_xinputfile extends MailingTargets
 
 				dol_syslog(get_class($this)."::add_to_target mailing ".$cpt." targets found");
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				if ($resupload < 0) {	// Unknown error
 					$this->error = '<div class="error">'.$langs->trans("ErrorFileNotUploaded").'</div>';
 				} elseif (preg_match('/ErrorFileIsInfectedWithAVirus/', $resupload)) {	// Files infected by a virus

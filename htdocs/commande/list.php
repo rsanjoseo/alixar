@@ -315,7 +315,7 @@ if ($action == 'validate' && $permissiontoadd) {
 						$error++;
 					}
 				} else {
-                    $langs->load("errors");
+                    // $langs->load("errors");
                     setEventMessage($langs->trans('ErrorIsNotADraft', $objecttmp->ref), 'errors');
                     $error++;
                 }
@@ -346,7 +346,7 @@ if ($action == 'shipped' && $permissiontoadd) {
                         $error++;
 					}
 				} else {
-                    $langs->load("errors");
+                    // $langs->load("errors");
                     setEventMessage($langs->trans('ErrorIsNotADraft', $objecttmp->ref), 'errors');
                     $error++;
                 }
@@ -954,7 +954,7 @@ if ($resql) {
 
 	// If the user can view prospects other than his'
 	if ($user->rights->societe->client->voir || $socid) {
-		$langs->load("commercial");
+        // $langs->load("commercial");
 		$moreforfilter .= '<div class="divsearchfield">';
 		$tmptitle = $langs->trans('ThirdPartiesOfSaleRepresentative');
 		$moreforfilter .= img_picto($tmptitle, 'user', 'class="pictofixedwidth"').$formother->select_salesrepresentatives($search_sale, 'search_sale', $user, 0, $tmptitle, 'maxwidth250');

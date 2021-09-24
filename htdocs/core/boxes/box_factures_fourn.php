@@ -85,7 +85,7 @@ class box_factures_fourn extends ModeleBoxes
 		);
 
 		if ($user->rights->fournisseur->facture->lire) {
-			$langs->load("bills");
+			// $langs->load("bills");
 
 			$sql = "SELECT s.rowid as socid, s.nom as name, s.name_alias";
 			$sql .= ", s.code_fournisseur, s.code_compta_fournisseur, s.fournisseur";

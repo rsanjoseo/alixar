@@ -92,7 +92,7 @@ abstract class ModeleNumRefFicheinter
 	public function info()
 	{
 		global $langs;
-		$langs->load("ficheinter");
+		// $langs->load("ficheinter");
 		return $langs->trans("NoDescription");
 	}
 
@@ -104,7 +104,7 @@ abstract class ModeleNumRefFicheinter
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("ficheinter");
+        // $langs->load("ficheinter");
 		return $langs->trans("NoExample");
 	}
 
@@ -138,7 +138,7 @@ abstract class ModeleNumRefFicheinter
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");
@@ -172,7 +172,7 @@ function fichinter_create($db, $object, $modele, $outputlangs, $hidedetails = 0,
 {
 	// phpcs:enable
 	global $conf, $langs, $user;
-	$langs->load("ficheinter");
+    // $langs->load("ficheinter");
 
 	$error = 0;
 

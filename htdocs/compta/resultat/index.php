@@ -662,7 +662,7 @@ if (!empty($conf->salaries->enabled) && ($modecompta == 'CREANCES-DETTES' || $mo
  */
 
 if (!empty($conf->expensereport->enabled) && ($modecompta == 'CREANCES-DETTES' || $modecompta == "RECETTES-DEPENSES")) {
-	$langs->load('trips');
+	// $langs->load('trips');
 
 	if ($modecompta == 'CREANCES-DETTES') {
 		$sql = "SELECT date_format(date_valid,'%Y-%m') as dm, sum(p.total_ht) as amount_ht,sum(p.total_ttc) as amount_ttc";

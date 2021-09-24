@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/CMailFile.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->load("mails");
+// $langs->load("mails");
 
 // Load variable for pagination
 $limit = GETPOST('limit', 'int') ?GETPOST('limit', 'int') : $conf->liste_limit;
@@ -241,7 +241,7 @@ if ($object->fetch($id) >= 0) {
 			print dol_escape_htmltag($name).' &lt;'.$email;
 			print '&gt;';
 			if (!isValidEmail($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadEMail", $email));
 			}
 		} else {
@@ -260,7 +260,7 @@ if ($object->fetch($id) >= 0) {
 			print dol_escape_htmltag($name).' &lt;'.$email;
 			print '&gt;';
 			if (!isValidEmail($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadEMail", $email));
 			}
 		} else {

@@ -1429,7 +1429,7 @@ if ($socid && $action != 'edit' && $action != 'create' && $action != 'editcard' 
 				}
 				$genbutton .= '>';
 				if ($allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {
-					$langs->load("errors");
+					// $langs->load("errors");
 					$genbutton .= ' '.img_warning($langs->transnoentitiesnoconv("WarningNoDocumentModelActivated"));
 				}
 				if (!$allowgenifempty && !is_array($modellist) && empty($modellist) && empty($conf->dol_no_mouse_hover) && $modulepart != 'unpaid') {

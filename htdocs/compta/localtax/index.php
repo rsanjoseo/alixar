@@ -442,7 +442,7 @@ while ((($y < $yend) || ($y == $yend && $m <= $mend)) && $mcursor < 1000) {	// $
 	$reshook = $hookmanager->executeHooks('addVatLine', $parameters, $object, $action); // Note that $action and $object may have been modified by some hooks
 
 	if (!is_array($x_coll) && $coll_listbuy == -1) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print '<tr><td colspan="5">'.$langs->trans("ErrorNoAccountancyModuleLoaded").'</td></tr>';
 		break;
 	}

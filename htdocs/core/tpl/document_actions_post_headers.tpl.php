@@ -36,7 +36,7 @@ if (empty($langs) || !is_object($langs)) {
 }
 
 
-$langs->load("link");
+// $langs->load("link");
 if (empty($relativepathwithnofile)) {
 	$relativepathwithnofile = '';
 }
@@ -67,7 +67,7 @@ if (in_array($modulepart, array('product', 'produit', 'societe', 'user', 'ticket
  */
 
 if ($action == 'delete') {
-	$langs->load("companies"); // Need for string DeleteFile+ConfirmDeleteFiles
+    // $langs->load("companies"); // Need for string DeleteFile+ConfirmDeleteFiles
 	print $form->formconfirm(
 		$_SERVER["PHP_SELF"].'?id='.$object->id.'&urlfile='.urlencode(GETPOST("urlfile")).'&linkid='.GETPOST('linkid', 'int').(empty($param) ? '' : $param),
 		$langs->trans('DeleteFile'),

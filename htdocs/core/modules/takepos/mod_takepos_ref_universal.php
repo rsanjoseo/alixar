@@ -59,7 +59,7 @@ class mod_takepos_ref_universal extends ModeleNumRefTakepos
 	{
 		global $conf, $langs;
 
-		$langs->load('cashdesk@cashdesk');
+		// $langs->load('cashdesk@cashdesk');
 
 		$form = new Form($this->db);
 

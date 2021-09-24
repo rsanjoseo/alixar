@@ -69,7 +69,7 @@ if ($action=="split") {
 			$invoice->pos_source = $_SESSION["takeposterminal"];
 			$invoice->entity = !empty($_SESSION["takeposinvoiceentity"]) ? $_SESSION["takeposinvoiceentity"] : $conf->entity;
 			if ($invoice->socid <= 0) {
-				$langs->load('errors');
+				// $langs->load('errors');
 				dol_htmloutput_errors($langs->trans("ErrorModuleSetupNotComplete", "TakePos"), null, 1);
 			} else {
 				$placeid = $invoice->create($user);
@@ -95,7 +95,7 @@ if ($action=="split") {
 			$invoice->pos_source = $_SESSION["takeposterminal"];
 			$invoice->entity = !empty($_SESSION["takeposinvoiceentity"]) ? $_SESSION["takeposinvoiceentity"] : $conf->entity;
 			if ($invoice->socid <= 0) {
-				$langs->load('errors');
+                // $langs->load('errors');
 				dol_htmloutput_errors($langs->trans("ErrorModuleSetupNotComplete", "TakePos"), null, 1);
 			} else {
 				$placeid = $invoice->create($user);

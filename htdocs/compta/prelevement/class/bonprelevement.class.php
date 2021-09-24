@@ -438,7 +438,7 @@ class BonPrelevement extends CommonObject
 
 			$resql = $this->db->query($sql);
 			if ($resql) {
-				$langs->load('withdrawals');
+				// $langs->load('withdrawals');
 				$subject = $langs->trans("InfoCreditSubject", $this->ref);
 				$message = $langs->trans("InfoCreditMessage", $this->ref, dol_print_date($date, 'dayhour'));
 
@@ -592,7 +592,7 @@ class BonPrelevement extends CommonObject
 
 			if ($this->db->query($sql)) {
 				$this->method_trans = $method;
-				$langs->load('withdrawals');
+                // $langs->load('withdrawals');
 				$subject = $langs->trans("InfoTransSubject", $this->ref);
 				$message = $langs->trans("InfoTransMessage", $this->ref, dolGetFirstLastname($user->firstname, $user->lastname));
 				$message .= $langs->trans("InfoTransData", price($this->amount), $this->methodes_trans[$this->method_trans], dol_print_date($date, 'day'));
@@ -1759,7 +1759,7 @@ class BonPrelevement extends CommonObject
 				}
 			}
 
-			$langs->load('withdrawals');
+            // $langs->load('withdrawals');
 
 			// TODO Add here code to generate a generic file
 			fputs($this->file, $langs->transnoentitiesnoconv('WithdrawalFileNotCapable', $mysoc->country_code));
@@ -2360,7 +2360,7 @@ class BonPrelevement extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+            //// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('StatusWaiting');
 			$this->labelStatus[self::STATUS_TRANSFERED] = $langs->trans('StatusTrans');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->trans('StatusWaiting');

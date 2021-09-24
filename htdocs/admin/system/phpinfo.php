@@ -85,7 +85,7 @@ if (preg_match('/t$/i', $maxphp2)) {
 	$maxphp2 = $maxphp2 * 1024 * 1024 * 1024;
 }
 if ($maxphp > 0 && $maxphp2 > 0 && $maxphp > $maxphp2) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	print info_admin($langs->trans("WarningParamUploadMaxFileSizeHigherThanPostMaxSize", @ini_get('upload_max_filesize'), @ini_get('post_max_size')), 0, 0, 0, 'warning');
 	print '<br>';
 }

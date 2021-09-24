@@ -2029,7 +2029,7 @@ class ActionComm extends CommonObject
 			}
 
 			if ($exportholiday == 1) {
-				$langs->load("holidays");
+				// $langs->load("holidays");
 				$title = $langs->trans("Holidays");
 
 				$sql = "SELECT u.rowid as uid, u.lastname, u.firstname, u.email, u.statut, x.rowid, x.date_debut as date_start, x.date_fin as date_end, x.halfday, x.statut as status";
@@ -2101,7 +2101,7 @@ class ActionComm extends CommonObject
 				}
 			}
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Define title and desc
 			$more = '';
@@ -2152,7 +2152,7 @@ class ActionComm extends CommonObject
 			} else {
 				dol_syslog(get_class($this)."::build_exportfile build_xxxfile function fails to for format=".$format." outputfiletmp=".$outputfile, LOG_ERR);
 				dol_delete_file($outputfiletmp, 0, 1);
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorFailToCreateFile", $outputfile);
 			}
 		}
@@ -2308,13 +2308,13 @@ class ActionComm extends CommonObject
 		$nbMailSend = 0;
 		$errorsMsg = array();
 
-		if (empty($conf->agenda->enabled)) {	// Should not happen. If module disabled, cron job should not be visible.
-			$langs->load("agenda");
+		if (empty($conf->agenda->enabled)) {    // Should not happen. If module disabled, cron job should not be visible.
+            // $langs->load("agenda");
 			$this->output = $langs->trans('ModuleNotEnabled', $langs->transnoentitiesnoconv("Agenda"));
 			return 0;
 		}
 		if (empty($conf->global->AGENDA_REMINDER_EMAIL)) {
-			$langs->load("agenda");
+            // $langs->load("agenda");
 			$this->output = $langs->trans('EventRemindersByEmailNotEnabled', $langs->transnoentitiesnoconv("Agenda"));
 			return 0;
 		}

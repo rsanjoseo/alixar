@@ -29,7 +29,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/holiday/class/holiday.class.php';
 
 // Load translation files required by the page
-$langs->load("holiday");
+// $langs->load("holiday");
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');

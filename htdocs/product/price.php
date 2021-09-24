@@ -549,13 +549,13 @@ if (empty($reshook)) {
 		$prodcustprice->localtax2_type = $localtax2_type;
 
 		if (!($prodcustprice->fk_soc > 0)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ThirdParty")), null, 'errors');
 			$error++;
 			$action = 'add_customer_price';
 		}
 		if (!empty($conf->global->PRODUCT_MINIMUM_RECOMMENDED_PRICE) && $prodcustprice->price_min < $maxpricesupplier) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("MinimumPriceLimit", price($maxpricesupplier, 0, '', 1, -1, -1, 'auto')), null, 'errors');
 			$error++;
 			$action = 'add_customer_price';

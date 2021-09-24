@@ -157,7 +157,7 @@ if ($action == 'update' && $permtoadd) {
 	if ($newlabel != $oldlabel) {
 		$result = dol_move($oldfile, $newfileformove); // This include update of database
 		if (!$result) {
-			$langs->load('errors');
+			// $langs->load('errors');
 			setEventMessages($langs->trans('ErrorFailToRenameFile', $oldfile, $newfile), null, 'errors');
 			$error++;
 		}

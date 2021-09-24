@@ -890,7 +890,7 @@ class RecruitmentJobPosition extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("recruitment");
+			//// $langs->load("recruitment");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Validated');
 			$this->labelStatus[self::STATUS_RECRUITED] = $langs->trans('Recruited');
@@ -992,7 +992,7 @@ class RecruitmentJobPosition extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("recruitment");
+        // $langs->load("recruitment");
 
         if (empty($conf->global->RECRUITMENT_RECRUITMENTJOBPOSITION_ADDON)) {
             $conf->global->RECRUITMENT_RECRUITMENTJOBPOSITION_ADDON = 'mod_recruitmentjobposition_standard';
@@ -1058,7 +1058,7 @@ class RecruitmentJobPosition extends CommonObject
         $result = 0;
         $includedocgeneration = 1;
 
-        $langs->load("recruitment");
+        // $langs->load("recruitment");
 
         if (!dol_strlen($modele)) {
             if (!empty($conf->global->RECRUITMENTJOBPOSITION_ADDON_PDF)) {

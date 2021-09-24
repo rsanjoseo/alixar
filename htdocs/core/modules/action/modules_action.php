@@ -73,7 +73,7 @@ function action_create($db, $object, $modele, $outputlangs, $hidedetails = 0, $h
 {
 	// phpcs:enable
 	global $conf, $langs, $user;
-	$langs->load("action");
+	// $langs->load("action");
 
 	$error = 0;
 

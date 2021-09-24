@@ -94,7 +94,7 @@ print load_fiche_titre($langs->trans("HRMArea"), '', 'hrm');
 
 
 if (!empty($setupcompanynotcomplete)) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	$warnpicto = img_warning($langs->trans("WarningMandatorySetupNotComplete"));
 	print '<br><div class="warning"><a href="'.DOL_URL_ROOT.'/admin/company.php?mainmenu=home'.(empty($setupcompanynotcomplete) ? '' : '&action=edit').'">'.$warnpicto.' '.$langs->trans("WarningMandatorySetupNotComplete").'</a></div>';
 
@@ -107,15 +107,15 @@ print '<div class="fichecenter"><div class="fichethirdleft">';
 
 if (!empty($conf->global->MAIN_SEARCH_FORM_ON_HOME_AREAS)) {     // This is useless due to the global search combo
 	if (!empty($conf->holiday->enabled) && $user->rights->holiday->read) {
-		$langs->load("holiday");
+        // $langs->load("holiday");
 		$listofsearchfields['search_holiday'] = array('text'=>'TitreRequestCP');
 	}
 	if (!empty($conf->deplacement->enabled) && $user->rights->deplacement->lire) {
-		$langs->load("trips");
+        // $langs->load("trips");
 		$listofsearchfields['search_deplacement'] = array('text'=>'ExpenseReport');
 	}
 	if (!empty($conf->expensereport->enabled) && $user->rights->expensereport->lire) {
-		$langs->load("trips");
+        // $langs->load("trips");
 		$listofsearchfields['search_expensereport'] = array('text'=>'ExpenseReport');
 	}
 	if (count($listofsearchfields)) {

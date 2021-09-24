@@ -34,7 +34,7 @@ if ($object->element == 'product') {
 	$productref = $object->ref;
 }
 
-$langs->load("productbatch");
+// $langs->load("productbatch");
 
 
 if (empty($id)) {

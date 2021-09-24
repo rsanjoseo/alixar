@@ -69,7 +69,7 @@ class mod_facture_mars extends ModeleNumRefFactures
 	public function info()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans('MarsNumRefModelDesc1', $this->prefixinvoice, $this->prefixreplacement, $this->prefixdeposit, $this->prefixcreditnote);
 	}
 
@@ -93,7 +93,7 @@ class mod_facture_mars extends ModeleNumRefFactures
 	{
 		global $langs, $conf, $db;
 
-		$langs->load("bills");
+        // $langs->load("bills");
 
 		// Check invoice num
 		$fayymm = '';
@@ -114,7 +114,7 @@ class mod_facture_mars extends ModeleNumRefFactures
 			}
 		}
 		if ($fayymm && !preg_match('/'.$this->prefixinvoice.'[0-9][0-9][0-9][0-9]/i', $fayymm)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

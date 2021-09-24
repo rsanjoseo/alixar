@@ -122,7 +122,7 @@ function check_user_password_ldap($usertotest, $passwordtotest, $entitytotest)
 					}
 					$ldap->close();
 					sleep(1);
-					$langs->load('ldap');
+					// $langs->load('ldap');
 					$_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("YouMustChangePassNextLogon", $usertotest, $ldap->domainFQDN);
 					return '';
 				}

@@ -129,7 +129,7 @@ if ($id > 0 || !empty($ref)) {
 	$search_account = $object->id; // Force the search field on id of account
 
 	if (!($object->id > 0)) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print($langs->trans('ErrorRecordNotFound'));
 		exit;
 	}
@@ -255,12 +255,12 @@ if ((GETPOST('confirm_savestatement', 'alpha') || GETPOST('confirm_reconcile', '
 			}
 		} else {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("NoRecordSelected"), null, 'errors');
 		}
 	} else {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorPleaseTypeBankTransactionReportName"), null, 'errors');
 	}
 
@@ -987,7 +987,7 @@ if ($resql) {
 	if (!empty($conf->categorie->enabled)) {
 		// Categories
 		if (!empty($conf->categorie->enabled) && !empty($user->rights->categorie->lire)) {
-			$langs->load('categories');
+            // $langs->load('categories');
 
 			// Bank line
 			$moreforfilter .= '<div class="divsearchfield">';

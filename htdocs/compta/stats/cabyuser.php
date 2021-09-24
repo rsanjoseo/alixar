@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/tax.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 
 // Load translation files required by the page
-$langs->load("accountancy");
+// $langs->load("accountancy");
 
 $socid = GETPOST('socid', 'int');
 

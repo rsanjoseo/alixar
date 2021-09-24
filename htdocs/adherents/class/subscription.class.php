@@ -403,7 +403,7 @@ class Subscription extends CommonObject
 
 		$result = '';
 
-		$langs->load("members");
+		// $langs->load("members");
 
 		$label = img_picto('', $this->picto).' <u class="paddingrightonly">'.$langs->trans("Subscription").'</u>';
 		/*if (isset($this->statut)) {
@@ -468,7 +468,7 @@ class Subscription extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load("members");
+        // $langs->load("members");
 		return '';
 	}
 

@@ -82,7 +82,7 @@ function categoriesadmin_prepare_head()
 {
 	global $langs, $conf, $user;
 
-	$langs->load("categories");
+	// $langs->load("categories");
 
 	$h = 0;
 	$head = array();

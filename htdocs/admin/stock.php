@@ -181,7 +181,7 @@ $formproduct = new FormProduct($db);
 
 $disabled = '';
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+	// $langs->load("productbatch");
 	$disabled = ' disabled';
 	print info_admin($langs->trans("WhenProductBatchModuleOnOptionAreForced"));
 }

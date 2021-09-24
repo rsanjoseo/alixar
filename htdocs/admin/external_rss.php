@@ -34,7 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/rssparser.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/infobox.class.php';
 
 // Load translation files required by the page
-$langs->load("admin");
+// $langs->load("admin");
 
 // Security check
 if (!$user->admin) {
@@ -278,7 +278,7 @@ if ($resql) {
 			print '<font class="ok">'.$langs->trans("Online").'</div>';
 		} else {
 			print '<font class="error">'.$langs->trans("Offline");
-			$langs->load("errors");
+            // $langs->load("errors");
 			if ($rssparser->error) {
 				print ' - '.$langs->trans($rssparser->error);
 			}

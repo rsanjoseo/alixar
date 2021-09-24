@@ -64,7 +64,7 @@ if ($action == 'up' && $permissiontoadd) {
  * View
  */
 
-$langs->load('products');
+// $langs->load('products');
 
 $title = $langs->trans($langs->trans('ProductAttributes'));
 

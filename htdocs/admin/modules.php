@@ -137,22 +137,22 @@ if ($action == 'install') {
 	$newfile = $conf->admin->dir_temp.'/'.$original_file.'/'.$original_file;
 
 	if (!$original_file) {
-		$langs->load("Error");
+		// $langs->load("Error");
 		setEventMessages($langs->trans("ErrorModuleFileRequired"), null, 'warnings');
 		$error++;
 	} else {
 		if (!$error && !preg_match('/\.zip$/i', $original_file)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFileMustBeADolibarrPackage", $original_file), null, 'errors');
 			$error++;
 		}
 		if (!$error && !preg_match('/^(module[a-zA-Z0-9]*|theme)_.*\-([0-9][0-9\.]*)\.zip$/i', $original_file)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFilenameDosNotMatchDolibarrPackageRules", $original_file, 'module_*-x.y*.zip'), null, 'errors');
 			$error++;
 		}
 		if (empty($_FILES['fileinstall']['tmp_name'])) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFileNotUploaded"), null, 'errors');
 			$error++;
 		}
@@ -175,7 +175,7 @@ if ($action == 'install') {
 			$result = dol_uncompress($newfile, $conf->admin->dir_temp.'/'.$tmpdir);
 
 			if (!empty($result['error'])) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans($result['error'], $original_file), null, 'errors');
 				$error++;
 			} else {
@@ -227,7 +227,7 @@ if ($action == 'install') {
 						$result = dolCopyDir($modulenamedir, $dirins.'/'.$modulenameval, '0444', 1);
 						if ($result <= 0) {
 							dol_syslog('Failed to call dolCopyDir result='.$result." with param ".$modulenamedir." and ".$dirins.'/'.$modulenameval, LOG_WARNING);
-							$langs->load("errors");
+                            // $langs->load("errors");
 							setEventMessages($langs->trans("ErrorFailToCopyDir", $modulenamedir, $dirins.'/'.$modulenameval), null, 'errors');
 							$error++;
 						}
@@ -688,7 +688,7 @@ if ($mode == 'common' || $mode == 'commonkanban') {
 		// Load all lang files of module
 		if (isset($objMod->langfiles) && is_array($objMod->langfiles)) {
 			foreach ($objMod->langfiles as $domain) {
-				$langs->load($domain);
+                // $langs->load($domain);
 			}
 		}
 
@@ -1090,7 +1090,7 @@ if ($mode == 'deploy') {
 		} else {
 			if ($dirins_ok) {
 				if (!is_writable(dol_osencode($dirins))) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$message = info_admin($langs->trans("ErrorFailedToWriteInDir", $dirins), 0, 0, '1', 'warning');
 					$allowfromweb = 0;
 				}
@@ -1209,7 +1209,7 @@ if ($mode == 'deploy') {
 
 			if (!empty($conf->global->MAIN_UPLOAD_DOC)) {
 				if ($user->admin) {
-					$langs->load('other');
+                    // $langs->load('other');
 					print ' ';
 					print info_admin($langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow, $maxphptoshowparam), 1);
 				}

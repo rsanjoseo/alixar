@@ -64,7 +64,7 @@ abstract class ModeleGenPassword
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans("NoExample");
 	}
 

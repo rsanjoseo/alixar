@@ -73,7 +73,7 @@ $endyear = $year;
  * View
  */
 if (!empty($conf->category->enabled)) {
-	$langs->load('categories');
+	// $langs->load('categories');
 }
 $form = new Form($db);
 $formcompany = new FormCompany($db);

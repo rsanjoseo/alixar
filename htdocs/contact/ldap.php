@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/ldap.lib.php';
 
 // Load translation files required by the page
 // $langs->loadLangs(array('companies', 'ldap'));
-$langs->load("admin");
+// $langs->load("admin");
 
 $action = GETPOST('action', 'aZ09');
 

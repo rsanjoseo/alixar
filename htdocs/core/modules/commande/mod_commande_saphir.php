@@ -60,7 +60,7 @@ class mod_commande_saphir extends ModeleNumRefCommandes
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

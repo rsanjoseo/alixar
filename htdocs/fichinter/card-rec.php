@@ -486,7 +486,7 @@ if ($action == 'create') {
 			// Project
 			if (!empty($conf->projet->enabled)) {
 				$formproject = new FormProjets($db);
-				$langs->load("projects");
+				// $langs->load("projects");
 				$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 				if ($user->rights->ficheinter->creer) {
 					if ($action != 'classify') {
@@ -540,7 +540,7 @@ if ($action == 'create') {
 
 			// Contract
 			if (!empty($conf->contrat->enabled)) {
-				$langs->load('contracts');
+                // $langs->load('contracts');
 				print '<tr>';
 				print '<td>';
 

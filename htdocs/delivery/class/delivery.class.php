@@ -849,7 +849,7 @@ class Delivery extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+			//// $langs->load("mymodule");
 			$this->labelStatus[-1] = $langs->trans('StatusDeliveryCanceled');
 			$this->labelStatus[0] = $langs->trans('StatusDeliveryDraft');
 			$this->labelStatus[1] = $langs->trans('StatusDeliveryValidated');
@@ -1035,7 +1035,7 @@ class Delivery extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("deliveries");
+        // $langs->load("deliveries");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {

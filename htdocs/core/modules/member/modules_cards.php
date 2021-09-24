@@ -80,7 +80,7 @@ function members_card_pdf_create($db, $arrayofmembers, $modele, $outputlangs, $o
 {
 	// phpcs:enable
 	global $conf, $langs;
-	$langs->load("members");
+	// $langs->load("members");
 
 	$error = 0;
 

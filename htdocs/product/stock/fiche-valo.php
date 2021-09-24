@@ -125,7 +125,7 @@ if ($id > 0) {
 			print '<br><img src="'.$url.'" alt="Valorisation du stock annee '.($year - 1).'">';
 		}
 	} else {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print $langs->trans("FeatureNotYetAvailable");
 	}
 

@@ -43,7 +43,7 @@ $varname = GETPOST('varname', 'alpha');
 $driver = GETPOST('driver', 'alpha');
 
 if (!empty($driver)) {
-	$langs->load($driver);
+	// $langs->load($driver);
 }
 
 if (!$mode) {
@@ -351,7 +351,7 @@ if ($mode == 'test' && $user->admin) {
 	if (!empty($driver)) {
 		require_once DOL_DOCUMENT_ROOT.'/core/modules/printing/'.$driver.'.modules.php';
 		$classname = 'printing_'.$driver;
-		$langs->load($driver);
+        // $langs->load($driver);
 		$printer = new $classname($db);
 		//print '<pre>'.print_r($printer, true).'</pre>';
 		if (count($printer->getlistAvailablePrinters())) {

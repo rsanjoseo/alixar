@@ -2135,7 +2135,7 @@ class ExtraFields
 			}
 
 			if ($nofillrequired) {
-				$langs->load('errors');
+				// $langs->load('errors');
 				setEventMessages($langs->trans('ErrorFieldsRequired').' : '.implode(', ', $error_field_required), null, 'errors');
 				return -1;
 			} else {

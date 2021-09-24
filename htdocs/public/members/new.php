@@ -201,12 +201,12 @@ if (empty($reshook) && $action == 'add') {
 		}
 		if ($num != 0) {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			$errmsg .= $langs->trans("ErrorLoginAlreadyExists")."<br>\n";
 		}
 		if (!GETPOSTISSET("pass1") || !GETPOSTISSET("pass2") || GETPOST("pass1", 'none') == '' || GETPOST("pass2", 'none') == '' || GETPOST("pass1", 'none') != GETPOST("pass2", 'none')) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			$errmsg .= $langs->trans("ErrorPasswordsMustMatch")."<br>\n";
 		}
 		if (!GETPOST('email')) {
@@ -234,14 +234,14 @@ if (empty($reshook) && $action == 'add') {
 		$error++;
 		$errmsg .= $langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv('Email'))."<br>\n";
 	} elseif (GETPOST("email") && !isValidEmail(GETPOST("email"))) {
-		$langs->load('errors');
+        // $langs->load('errors');
 		$error++;
 		$errmsg .= $langs->trans("ErrorBadEMail", GETPOST("email"))."<br>\n";
 	}
 	$birthday = dol_mktime(GETPOST("birthhour", 'int'), GETPOST("birthmin", 'int'), GETPOST("birthsec", 'int'), GETPOST("birthmonth", 'int'), GETPOST("birthday", 'int'), GETPOST("birthyear", 'int'));
 	if (GETPOST("birthmonth") && empty($birthday)) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errmsg .= $langs->trans("ErrorBadDateFormat")."<br>\n";
 	}
 	if (!empty($conf->global->MEMBER_NEWFORM_DOLIBARRTURNOVER)) {

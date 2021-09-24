@@ -286,7 +286,7 @@ if (empty($reshook)) {
 							$nbok++;
 						}
 					} else {
-						$langs->load("errors");
+						// $langs->load("errors");
 						setEventMessages($langs->trans("ErrorObjectMustHaveStatusClosedToBeReOpened", $objecttmp->ref), null, 'errors');
 						$error++;
 						break;
@@ -924,7 +924,7 @@ while ($i < min($num, $limit)) {
 			$object->$key = $obj->$key;
 		}
 	}
-	$langs->load("ticket");
+    // $langs->load("ticket");
 
 	// Show here line of result
 	print '<tr class="oddeven">';

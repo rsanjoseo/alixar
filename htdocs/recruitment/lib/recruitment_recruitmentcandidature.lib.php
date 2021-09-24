@@ -31,7 +31,7 @@ function recruitmentCandidaturePrepareHead($object)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("recruitment");
+	// $langs->load("recruitment");
 
 	$h = 0;
 	$head = array();

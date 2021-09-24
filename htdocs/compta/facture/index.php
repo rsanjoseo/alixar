@@ -31,7 +31,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 restrictedArea($user, 'facture');
 
 // Load translation files required by the page
-$langs->load('bills');
+// $langs->load('bills');
 
 // Filter to show only result of one customer
 $socid = GETPOST('socid', 'int');

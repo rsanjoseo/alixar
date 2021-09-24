@@ -57,7 +57,7 @@ $id = GETPOST('id', 'int');
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 $form = new Form($db);
 
-//$langs->load("companies");
+//// $langs->load("companies");
 
 top_httphead();
 

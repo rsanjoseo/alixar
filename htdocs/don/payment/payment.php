@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/don/class/don.class.php';
 require_once DOL_DOCUMENT_ROOT.'/don/class/paymentdonation.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
-$langs->load("bills");
+// $langs->load("bills");
 
 $chid = GETPOST("rowid", 'int');
 $action = GETPOST('action', 'aZ09');

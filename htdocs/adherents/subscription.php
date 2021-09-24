@@ -138,7 +138,7 @@ if (empty($reshook) && $action == 'confirm_create_thirdparty' && $confirm == 'ye
 		$result = $company->create_from_member($object, GETPOST('companyname', 'alpha'), GETPOST('companyalias', 'alpha'), GETPOST('customercode', 'alpha'));
 
 		if ($result < 0) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($company->error, $company->errors, 'errors');
 		} else {
 			$action = 'addsubscription';
@@ -201,7 +201,7 @@ if (empty($reshook) && $action == 'setsocid') {
 if ($user->rights->adherent->cotisation->creer && $action == 'subscription' && !$cancel) {
 	$error = 0;
 
-	$langs->load("banks");
+    // $langs->load("banks");
 
 	$result = $object->fetch($rowid);
 	$result = $adht->fetch($object->typeid);
@@ -237,14 +237,14 @@ if ($user->rights->adherent->cotisation->creer && $action == 'subscription' && !
 	// Check parameters
 	if (!$datesubscription) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errmsg = $langs->trans("ErrorBadDateFormat", $langs->transnoentitiesnoconv("DateSubscription"));
 		setEventMessages($errmsg, null, 'errors');
 		$action = 'addsubscription';
 	}
 	if (GETPOST('end') && !$datesubend) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errmsg = $langs->trans("ErrorBadDateFormat", $langs->transnoentitiesnoconv("DateEndSubscription"));
 		setEventMessages($errmsg, null, 'errors');
 		$action = 'addsubscription';
@@ -525,7 +525,7 @@ if ($rowid > 0) {
 			}
 		}
 		if ((!empty($object->pass) || !empty($object->pass_crypted)) && empty($object->user_id)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$htmltext = $langs->trans("WarningPasswordSetWithNoAccount");
 			print ' '.$form->textwithpicto('', $htmltext, 1, 'warning');
 		}
@@ -1135,7 +1135,7 @@ if ($rowid > 0) {
 			if ($subjecttosend) {
 				$helpcontent .= $subjecttosend."\n";
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$helpcontent .= '<span class="error">'.$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Module310Name")).'</span>'."\n";
 			}
 			$helpcontent .= "<br>";
@@ -1143,7 +1143,7 @@ if ($rowid > 0) {
 			if ($texttosend) {
 				$helpcontent .= dol_htmlentitiesbr($texttosend)."\n";
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$helpcontent .= '<span class="error">'.$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Module310Name")).'</span>'."\n";
 			}
 			print $form->textwithpicto($tmp, $helpcontent, 1, 'help', '', 0, 2, 'helpemailtosend');
@@ -1168,7 +1168,7 @@ if ($rowid > 0) {
 	//print '</td></tr>';
 	//print '</table>';
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print $langs->trans("ErrorRecordNotFound");
 }
 

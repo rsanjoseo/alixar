@@ -590,4 +590,9 @@ abstract class Engine
             return " LIMIT " . ((int) $limit) . " ";
         }
     }
+
+    public function idate($param, $gm = 'tzserver')
+    {
+        return idate($param, $gm);
+    }
 }

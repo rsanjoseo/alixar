@@ -401,7 +401,7 @@ class Commande extends CommonOrder
     public function getNextNumRef($soc)
     {
         global $langs, $conf;
-        $langs->load("order");
+        // $langs->load("order");
 
         if (!empty($conf->global->COMMANDE_ADDON)) {
             $mybool = false;
@@ -508,7 +508,7 @@ class Commande extends CommonOrder
             // If stock is incremented on validate order, we must increment it
             if ($result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER == 1) {
                 require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
-                $langs->load("agenda");
+                // $langs->load("agenda");
 
                 // Loop on each line
                 $cpt = count($this->lines);
@@ -639,7 +639,7 @@ class Commande extends CommonOrder
 				$result = 0;
 
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
@@ -818,7 +818,7 @@ class Commande extends CommonOrder
 			// If stock is decremented on validate order, we must reincrement it
 			if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER == 1) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
@@ -1510,7 +1510,7 @@ class Commande extends CommonOrder
 			}
 
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -1524,7 +1524,7 @@ class Commande extends CommonOrder
 				$product_type = $product->type;
 
 				if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_ORDER) && $product_type == 0 && $product->stock_reel < $qty) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnOrder', $product->ref);
 					$this->errors[] = $this->error;
 					dol_syslog(get_class($this)."::addline error=Product ".$product->ref.": ".$this->error, LOG_ERR);
@@ -3090,7 +3090,7 @@ class Commande extends CommonOrder
 			}
 
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -3164,7 +3164,7 @@ class Commande extends CommonOrder
 				$product_type = $product->type;
 
 				if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_ORDER) && $product_type == 0 && $product->stock_reel < $qty) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnOrder', $product->ref);
 					$this->errors[] = $this->error;
 
@@ -3971,7 +3971,7 @@ class Commande extends CommonOrder
 	{
 		global $conf, $langs;
 
-		$langs->load("orders");
+        // $langs->load("orders");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {
@@ -4238,7 +4238,7 @@ class OrderLine extends CommonOrderLine
 			$this->error    = $this->db->lasterror();
 			$this->errors[] = $this->error;
 		} else {
-			$langs->load('errors');
+            // $langs->load('errors');
 			$num = $this->db->num_rows($resqlCheckShipmentLine);
 			if ($num > 0) {
 				$error++;

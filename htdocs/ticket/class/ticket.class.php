@@ -1511,7 +1511,7 @@ class Ticket extends CommonObject
 
         $nb_sent = 0;
 
-        $langs->load('ticket');
+        // $langs->load('ticket');
 
         // Retrieve email of all contacts (internal and external)
         $contacts = $this->listeContact(-1, 'internal');
@@ -2778,7 +2778,7 @@ class Ticket extends CommonObject
 			return '';
 		}
 
-		$langs->load("mails");
+        // $langs->load("mails");
 
 		include_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
 		//$contactstatic = new Contact($this->db);
@@ -2816,7 +2816,7 @@ class Ticket extends CommonObject
 					if ($result) {
 						setEventMessages($langs->trans('MailSuccessfulySent', $mailfile->getValidAddress($from, 2), $mailfile->getValidAddress($receiver, 2)), null, 'mesgs');
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							setEventMessages($langs->trans('ErrorFailedToSendMail', $from, $receiver), null, 'errors');
 							dol_syslog($langs->trans('ErrorFailedToSendMail', $from, $receiver).' : '.$mailfile->error);
@@ -2830,7 +2830,7 @@ class Ticket extends CommonObject
 				}
 			}
 		} else {
-			$langs->load("other");
+            // $langs->load("other");
 			setEventMessages($langs->trans('ErrorMailRecipientIsEmptyForSendTicketMessage'), null, 'warnings');
 		}
 	}

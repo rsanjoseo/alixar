@@ -341,7 +341,7 @@ if ($action == 'add_export_model') {
 		if ($result >= 0) {
 			setEventMessages($langs->trans("ExportModelSaved", $objexport->model_name), null, 'mesgs');
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			if ($objexport->errno == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
 				setEventMessages($langs->trans("ErrorExportDuplicateProfil"), null, 'errors');
 			} else {

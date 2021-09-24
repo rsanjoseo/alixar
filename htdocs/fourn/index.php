@@ -100,7 +100,7 @@ if ($resql) {
 
 // Draft orders
 if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled)) {
-	$langs->load("orders");
+	// $langs->load("orders");
 
 	$sql = "SELECT cf.rowid, cf.ref, cf.total_ttc,";
 	$sql .= " s.nom as name, s.rowid as socid";
@@ -250,7 +250,7 @@ $sql .= $db->plimit($max, 0);
 
 $resql = $db->query($sql);
 if ($resql) {
-	$langs->load("boxes");
+    // $langs->load("boxes");
 	$num = $db->num_rows($resql);
 	$i = 0;
 

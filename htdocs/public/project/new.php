@@ -208,12 +208,12 @@ if (empty($reshook) && $action == 'add') {
 		}
 		if ($num != 0) {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			$errmsg .= $langs->trans("ErrorLoginAlreadyExists")."<br>\n";
 		}
 		if (!GETPOSTISSET("pass1") || !GETPOSTISSET("pass2") || GETPOST("pass1", 'none') == '' || GETPOST("pass2", 'none') == '' || GETPOST("pass1", 'none') != GETPOST("pass2", 'none')) {
 			$error++;
-			$langs->load("errors");
+			// $langs->load("errors");
 			$errmsg .= $langs->trans("ErrorPasswordsMustMatch")."<br>\n";
 		}
 		if (!GETPOST("email")) {
@@ -240,7 +240,7 @@ if (empty($reshook) && $action == 'add') {
 	}
 	if (GETPOST("email") && !isValidEmail(GETPOST("email"))) {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		$errmsg .= $langs->trans("ErrorBadEMail", GETPOST("email"))."<br>\n";
 	}
 

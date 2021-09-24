@@ -285,7 +285,7 @@ if ($action == "view_ticket" || $action == "presend" || $action == "close" || $a
 		// Author
 		print '<tr><td>'.$langs->trans("Author").'</td><td>';
 		if ($object->dao->fk_user_create > 0) {
-			$langs->load("users");
+			// $langs->load("users");
 			$fuser = new User($db);
 			$fuser->fetch($object->dao->fk_user_create);
 			print img_picto('', 'user', 'class="pictofixedwidth"');

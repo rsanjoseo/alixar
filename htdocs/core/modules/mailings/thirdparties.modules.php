@@ -50,7 +50,7 @@ class mailing_thirdparties extends MailingTargets
 	public function __construct($db)
 	{
 		global $conf, $langs;
-		$langs->load("companies");
+		// $langs->load("companies");
 
 		$this->db = $db;
 	}
@@ -224,7 +224,7 @@ class mailing_thirdparties extends MailingTargets
 	{
 		global $conf, $langs;
 
-		$langs->load("companies");
+        // $langs->load("companies");
 
 		$s = $langs->trans("Categories").' ';
 		$s .= '<select name="filter" class="flat marginrightonly">';

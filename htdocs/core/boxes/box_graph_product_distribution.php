@@ -155,7 +155,7 @@ class box_graph_product_distribution extends ModeleBoxes
 		if (!empty($conf->propal->enabled) && !empty($user->rights->propale->lire)) {
 			// Build graphic number of object. $data = array(array('Lib',val1,val2,val3),...)
 			if ($showpropalnb) {
-				$langs->load("propal");
+				// $langs->load("propal");
 				include_once DOL_DOCUMENT_ROOT.'/comm/propal/class/propalestats.class.php';
 
 				$showpointvalue = 1;
@@ -217,7 +217,7 @@ class box_graph_product_distribution extends ModeleBoxes
 		if (!empty($conf->commande->enabled) && !empty($user->rights->commande->lire)) {
 			// Build graphic number of object. $data = array(array('Lib',val1,val2,val3),...)
 			if ($showordernb) {
-				$langs->load("orders");
+                // $langs->load("orders");
 				include_once DOL_DOCUMENT_ROOT.'/commande/class/commandestats.class.php';
 
 				$showpointvalue = 1;
@@ -281,7 +281,7 @@ class box_graph_product_distribution extends ModeleBoxes
 		if (!empty($conf->facture->enabled) && !empty($user->rights->facture->lire)) {
 			// Build graphic number of object. $data = array(array('Lib',val1,val2,val3),...)
 			if ($showinvoicenb) {
-				$langs->load("bills");
+                // $langs->load("bills");
 				include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facturestats.class.php';
 
 				$showpointvalue = 1;
@@ -342,11 +342,11 @@ class box_graph_product_distribution extends ModeleBoxes
 		}
 
 		if (empty($nbofgraph)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg = $langs->trans("ReadPermissionNotAllowed");
 		}
 		if (empty($conf->use_javascript_ajax)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$mesg = $langs->trans("WarningFeatureDisabledWithDisplayOptimizedForBlindNoJs");
 		}
 

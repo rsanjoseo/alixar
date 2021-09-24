@@ -108,7 +108,7 @@ try {
 
 // Do something with $event
 
-$langs->load("main");
+// $langs->load("main");
 
 // TODO Do we really need a user in setup just to have a name to fill an email topic when it is a technical system notification email
 $user = new User($db);
@@ -196,7 +196,7 @@ if ($event->type == 'payout.created') {
 	$error = 0;
 	$result = dolibarr_set_const($db, $service."_NEXTPAYOUT", null, 'chaine', 0, '', $conf->entity);
 	if ($result) {
-		$langs->load("errors");
+        // $langs->load("errors");
 
 		$dateo = dol_now();
 		$label = $event->data->object->description;

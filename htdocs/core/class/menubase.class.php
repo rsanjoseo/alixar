@@ -686,7 +686,7 @@ class Menubase
 					if ($title == $menu['titre']) {   // Translation not found
 						if (!empty($menu['langs'])) {    // If there is a dedicated translation file
 							//print 'Load file '.$menu['langs'].'<br>';
-							$langs->load($menu['langs']);
+                            // $langs->load($menu['langs']);
 						}
 
 						$substitarray = array('__LOGIN__' => $user->login, '__USER_ID__' => $user->id, '__USER_SUPERVISOR_ID__' => $user->fk_user);

@@ -26,7 +26,7 @@
 
 require '../../main.inc.php';
 
-$langs->load("admin");
+// $langs->load("admin");
 
 if (!$user->admin) {
 	accessforbidden();

@@ -95,7 +95,7 @@ if ($object->id) {
 	$morehtmlref = '<div class="refidno">';
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+		// $langs->load("projects");
 		$morehtmlref .= $langs->trans('Project').' : ';
 		if ($user->rights->banque->modifier && 0) {
 			if ($action != 'classify') {

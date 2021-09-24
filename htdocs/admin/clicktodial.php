@@ -27,7 +27,7 @@ require '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
 
 // Load translation files required by the page
-$langs->load("admin");
+// $langs->load("admin");
 
 if (!$user->admin) {
 	accessforbidden();
@@ -151,7 +151,7 @@ if (!empty($conf->global->CLICKTODIAL_URL)) {
 	if ($setupcomplete) {
 		print $langs->trans("LinkToTest", $user->login).': &nbsp; '.dol_print_phone($phonefortest, '', 0, 0, 'AC_TEL', '', 'mobile');
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print '<div class="warning">'.$langs->trans("WarningClickToDialUserSetupNotComplete").'</div>';
 	}
 }

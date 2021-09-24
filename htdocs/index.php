@@ -108,15 +108,15 @@ if ($user->admin && empty($conf->global->MAIN_REMOVE_INSTALL_WARNING)) {
     // Check if install lock file is present
     $lockfile = DOL_DATA_ROOT . '/install.lock';
     if (!empty($lockfile) && !file_exists($lockfile) && is_dir(DOL_DOCUMENT_ROOT . "/install")) {
-        $langs->load("errors");
+        // $langs->load("errors");
         //if (! empty($message)) $message.='<br>';
         $message .= info_admin($langs->trans("WarningLockFileDoesNotExists", DOL_DATA_ROOT) . ' ' . $langs->trans("WarningUntilDirRemoved", DOL_DOCUMENT_ROOT . "/install"), 0, 0, '1', 'clearboth');
     }
 
     // Conf files must be in read only mode
     if (is_writable($conffile)) {
-        $langs->load("errors");
-        //$langs->load("other");
+        // $langs->load("errors");
+        //// $langs->load("other");
         //if (! empty($message)) $message.='<br>';
         $message .= info_admin($langs->transnoentities("WarningConfFileMustBeReadOnly") . ' ' . $langs->trans("WarningUntilDirRemoved", DOL_DOCUMENT_ROOT . "/install"), 0, 0, '1', 'clearboth');
     }
@@ -182,7 +182,7 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
 
     // Number of supplier proposals open (expired)
     if (!empty($conf->supplier_proposal->enabled) && empty($conf->global->MAIN_DISABLE_BLOCK_SUPPLIER) && $user->rights->supplier_proposal->lire) {
-        $langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
         include_once DOL_DOCUMENT_ROOT . '/supplier_proposal/class/supplier_proposal.class.php';
         $board = new SupplierProposal($db);
         $dashboardlines[$board->element . '_opened'] = $board->load_board($user, "opened");

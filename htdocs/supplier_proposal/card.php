@@ -51,7 +51,7 @@ if (!empty($conf->projet->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('companies', 'supplier_proposal', 'compta', 'bills', 'propal', 'orders', 'products', 'deliveries', 'sendings'));
 if (!empty($conf->margin->enabled)) {
-	$langs->load('margins');
+	// $langs->load('margins');
 }
 
 $error = 0;
@@ -185,7 +185,7 @@ if (empty($reshook)) {
 			header('Location: '.DOL_URL_ROOT.'/supplier_proposal/list.php');
 			exit();
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans($object->error), null, 'errors');
 		}
 	} elseif ($action == 'confirm_deleteline' && $confirm == 'yes' && $usercancreate) {
@@ -236,7 +236,7 @@ if (empty($reshook)) {
 				}
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			if (count($object->errors) > 0) {
 				setEventMessages($object->error, $object->errors, 'errors');
 			} else {
@@ -533,7 +533,7 @@ if (empty($reshook)) {
 
 	// Add a product line
 	if ($action == 'addline' && $usercancreate) {
-		$langs->load('errors');
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -697,13 +697,13 @@ if (empty($reshook)) {
 				if ($idprod == -99 || $idprod == 0) {
 					// Product not selected
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ProductOrService")).' '.$langs->trans("or").' '.$langs->trans("NoPriceDefinedForThisSupplier"), null, 'errors');
 				}
 				if ($idprod == -1) {
 					// Quantity too low
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorQtyTooLowForThisSupplier"), null, 'errors');
 				}
 			} elseif ((GETPOST('price_ht') !== '' || GETPOST('price_ttc') !== '' || GETPOST('multicurrency_price_ht') != '') && empty($error)) {    // Free product.  // $price_ht is already set
@@ -1218,7 +1218,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 
 		$formproject = new FormProjets($db);
 
@@ -1459,7 +1459,7 @@ if ($action == 'create') {
 	}
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($usercancreate) {
 			if ($action != 'classify') {
@@ -1541,8 +1541,8 @@ if ($action == 'create') {
 	print '</td>';
 	print '</tr>';
 
-	// Delivery date
-	$langs->load('deliveries');
+    // Delivery date
+    // $langs->load('deliveries');
 	print '<tr><td>';
 	print '<table class="nobordernopadding" width="100%"><tr><td>';
 	print $langs->trans('DeliveryDate');

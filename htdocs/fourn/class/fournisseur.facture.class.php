@@ -1558,12 +1558,12 @@ class FactureFournisseur extends CommonInvoice
 			return 0;
 		}
 		if (preg_match('/^'.preg_quote($langs->trans("CopyOf").' ').'/', $this->ref_supplier)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorFieldFormat", $langs->transnoentities("RefSupplier")).'. '.$langs->trans('RemoveString', $langs->transnoentitiesnoconv("CopyOf"));
 			return -1;
 		}
 		if (count($this->lines) <= 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorObjectMustHaveLinesToBeValidated", $this->ref);
 			return -1;
 		}
@@ -1590,7 +1590,7 @@ class FactureFournisseur extends CommonInvoice
 			// Si on incrémente le produit principal et ses composants à la validation de facture fournisseur
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				$cpt = count($this->lines);
 				for ($i = 0; $i < $cpt; $i++) {
@@ -1720,7 +1720,7 @@ class FactureFournisseur extends CommonInvoice
 			// Si on incremente le produit principal et ses composants a la validation de facture fournisseur, on decremente
 			if ($result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				$cpt = count($this->lines);
 				for ($i = 0; $i < $cpt; $i++) {
@@ -1837,7 +1837,7 @@ class FactureFournisseur extends CommonInvoice
 			$txlocaltax2 = price2num($txlocaltax2);
 
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -1868,7 +1868,7 @@ class FactureFournisseur extends CommonInvoice
 							}
 						}
 						if ($result == 0) {                   // If result == 0, we failed to found the supplier reference price
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error = "Ref ".$prod->ref." ".$langs->trans("ErrorQtyTooLowForThisSupplier");
 							$this->db->rollback();
 							dol_syslog(get_class($this)."::addline we did not found supplier price, so we can't guess unit price");
@@ -1877,7 +1877,7 @@ class FactureFournisseur extends CommonInvoice
 							return -1;
 						}
 						if ($result == -1) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error = "Ref ".$prod->ref." ".$langs->trans("ErrorQtyTooLowForThisSupplier");
 							$this->db->rollback();
 							dol_syslog(get_class($this)."::addline result=".$result." - ".$this->error, LOG_DEBUG);
@@ -2068,7 +2068,7 @@ class FactureFournisseur extends CommonInvoice
         }
 
         if ($date_start && $date_end && $date_start > $date_end) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $this->error = $langs->trans('ErrorStartDateGreaterEnd');
             return -1;
         }
@@ -2424,7 +2424,7 @@ class FactureFournisseur extends CommonInvoice
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("bills");
+            // $langs->load("bills");
 			$now = dol_now();
 
 			$response = new WorkboardResponse();
@@ -2607,7 +2607,7 @@ class FactureFournisseur extends CommonInvoice
     public function getNextNumRef($soc, $mode = 'next')
     {
         global $db, $langs, $conf;
-        $langs->load("orders");
+        // $langs->load("orders");
 
         // Clean parameters (if not defined or using deprecated value)
         if (empty($conf->global->INVOICE_SUPPLIER_ADDON_NUMBER)) {
@@ -2876,7 +2876,7 @@ class FactureFournisseur extends CommonInvoice
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("suppliers");
+        // $langs->load("suppliers");
 		$outputlangs->load("products");
 
 		// Set the model on the model name to use

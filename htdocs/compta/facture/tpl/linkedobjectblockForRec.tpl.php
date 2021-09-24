@@ -33,7 +33,7 @@ global $noMoreLinkedObjectBlockAfter;
 $langs = $GLOBALS['langs'];
 $linkedObjectBlock = $GLOBALS['linkedObjectBlock'];
 
-$langs->load("bills");
+// $langs->load("bills");
 
 $total = 0;
 $ilink = 0;

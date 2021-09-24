@@ -52,7 +52,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('activityindex'));
 
 // Load translation files required by the page
-$langs->load("projects");
+// $langs->load("projects");
 
 
 /*

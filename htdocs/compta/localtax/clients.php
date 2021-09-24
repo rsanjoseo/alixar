@@ -247,7 +247,7 @@ if ($calc == 0 || $calc == 2) {
 		print '<td class="nowrap right">'.price($total).'</td>';
 		print '</tr>';
 	} else {
-		$langs->load("errors");
+		// $langs->load("errors");
 		if ($coll_list == -1) {
 			print '<tr><td colspan="5">'.$langs->trans("ErrorNoAccountancyModuleLoaded").'</td></tr>';
 		} elseif ($coll_list == -2) {
@@ -312,7 +312,7 @@ if ($calc == 0 || $calc == 1) {
 		print '<td class="nowrap right">'.price($total).'</td>';
 		print '</tr>';
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		if ($coll_list == -1) {
 			print '<tr><td colspan="5">'.$langs->trans("ErrorNoAccountancyModuleLoaded").'</td></tr>';
 		} elseif ($coll_list == -2) {

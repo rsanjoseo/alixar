@@ -48,7 +48,7 @@ class DataPolicyCron
 	{
 		global $conf, $langs, $user;
 
-		$langs->load('datapolicy@datapolicy');
+		// $langs->load('datapolicy@datapolicy');
 
 		$error = 0;
 		$errormsg = '';

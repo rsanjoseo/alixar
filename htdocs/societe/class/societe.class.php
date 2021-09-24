@@ -1141,7 +1141,7 @@ class Societe extends CommonObject
                     if ($mysoc->country_id > 0 && $this->country_id == $mysoc->country_id) {
                         $idprof_mandatory = 'SOCIETE_' . $key . '_MANDATORY';
                         if (!$vallabel && !empty($conf->global->$idprof_mandatory)) {
-                            $langs->load("errors");
+                            // $langs->load("errors");
                             $error++;
                             $this->errors[] = $langs->trans("ErrorProdIdIsMandatory", $langs->transcountry('ProfId' . $i, $this->country_code)) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
                         }
@@ -1151,7 +1151,7 @@ class Societe extends CommonObject
                 // Check for unicity on profid
                 if (!$error && $vallabel && $this->id_prof_verifiable($i)) {
                     if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
-                        $langs->load("errors");
+                        // $langs->load("errors");
                         $error++;
                         $this->errors[] = $langs->transcountry('ProfId' . $i, $this->country_code) . " " . $langs->trans("ErrorProdIdAlreadyExist", $vallabel) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
                     }
@@ -1162,7 +1162,7 @@ class Societe extends CommonObject
                 if ($key == 'EMAIL') {
                     // Check for mandatory
                     if (!empty($conf->global->SOCIETE_EMAIL_MANDATORY) && !isValidEMail($this->email)) {
-                        $langs->load("errors");
+                        // $langs->load("errors");
                         $error++;
                         $this->errors[] = $langs->trans("ErrorBadEMail", $this->email) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
                     }
@@ -1170,7 +1170,7 @@ class Societe extends CommonObject
                     // Check for unicity
                     if (!$error && $vallabel && !empty($conf->global->SOCIETE_EMAIL_UNIQUE)) {
                         if ($this->id_prof_exists($keymin, $vallabel, ($this->id > 0 ? $this->id : 0))) {
-                            $langs->load("errors");
+                            // $langs->load("errors");
                             $error++;
                             $this->errors[] = $langs->trans('Email') . " " . $langs->trans("ErrorProdIdAlreadyExist", $vallabel) . ' (' . $langs->trans("ForbiddenBySetupRules") . ')';
                         }
@@ -1297,7 +1297,7 @@ class Societe extends CommonObject
 
         // Check parameters. More tests are done later in the ->verify()
         if (!is_numeric($this->client) && !is_numeric($this->fournisseur)) {
-            $langs->load("errors");
+            // $langs->load("errors");
             $this->error = $langs->trans("BadValueForParameterClientOrSupplier");
             return -1;
         }
@@ -2773,7 +2773,7 @@ class Societe extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('companies');
+        // $langs->load('companies');
 
 		$statusType = 'status4';
 		if ($status == 0) {
@@ -4333,7 +4333,7 @@ class Societe extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('customers');
+        // $langs->load('customers');
 
 		if ($mode == 2) {
 			if ($status == '-1' || $status == 'ST_NO') {
@@ -4583,7 +4583,7 @@ class Societe extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('companies');
+        // $langs->load('companies');
 
 		if ($status == 0) {
 			return $langs->trans("NorProspectNorCustomer");

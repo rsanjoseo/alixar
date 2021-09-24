@@ -284,7 +284,7 @@ class modBom extends DolibarrModules
 		$r = 1;
 
 		/* BEGIN MODULEBUILDER EXPORT BILLOFMATERIALS */
-		$langs->load("mrp");
+		// $langs->load("mrp");
 		$this->export_code[$r] = $this->rights_class.'_'.$r;
 		$this->export_label[$r] = 'BomAndBomLines'; // Translation key (used only if key ExportDataset_xxx_z not found)
 		$this->export_permission[$r] = array(array("bom", "read"));
@@ -497,7 +497,7 @@ class modBom extends DolibarrModules
 			dol_mkdir($dirodt);
 			$result = dol_copy($src, $dest, 0, 0);
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 				return 0;
 			}

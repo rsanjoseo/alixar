@@ -158,7 +158,7 @@ class BlockedLogAuthority
 			return -1;
 		}
 
-		$langs->load("blockedlog");
+		// $langs->load("blockedlog");
 
 		$sql = "SELECT b.rowid, b.signature, b.blockchain, b.tms";
 		$sql .= " FROM ".MAIN_DB_PREFIX."blockedlog_authority as b";
@@ -204,7 +204,7 @@ class BlockedLogAuthority
 
 		global $conf, $langs, $hookmanager;
 
-		$langs->load('blockedlog');
+        // $langs->load('blockedlog');
 
 		$error = 0;
 
@@ -252,7 +252,7 @@ class BlockedLogAuthority
 
 		global $conf, $langs, $hookmanager;
 
-		$langs->load('blockedlog');
+        // $langs->load('blockedlog');
 
 		$error = 0;
 

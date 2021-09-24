@@ -70,7 +70,7 @@ class mailing_pomme extends MailingTargets
 	{
 		global $conf, $langs;
 
-		$langs->load("users");
+		// $langs->load("users");
 
 		$statssql = array();
 		$sql = "SELECT '".$this->db->escape($langs->trans("DolibarrUsers"))."' as label,";
@@ -116,7 +116,7 @@ class mailing_pomme extends MailingTargets
 	{
 		global $langs;
 
-		$langs->load("users");
+        // $langs->load("users");
 
 		$s = '';
 		$s .= $langs->trans("Status").' ';
@@ -163,7 +163,7 @@ class mailing_pomme extends MailingTargets
     {
         // phpcs:enable
         global $conf, $langs;
-		$langs->load("companies");
+        // $langs->load("companies");
 
 		$cibles = array();
 

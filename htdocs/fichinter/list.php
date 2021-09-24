@@ -43,10 +43,10 @@ if (!empty($conf->contrat->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('companies', 'bills', 'interventions'));
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+	// $langs->load("projects");
 }
 if (!empty($conf->contrat->enabled)) {
-	$langs->load("contracts");
+    // $langs->load("contracts");
 }
 
 $action = GETPOST('action', 'aZ09');

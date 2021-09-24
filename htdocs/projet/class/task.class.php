@@ -451,7 +451,7 @@ class Task extends CommonObject
 					include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 					$res = dol_move($olddir, $newdir);
 					if (!$res) {
-						$langs->load("errors");
+						// $langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToRenameDir', $olddir, $newdir);
 						$error++;
 					}
@@ -1854,7 +1854,7 @@ class Task extends CommonObject
 					while ($i < $num) {
 						$clone_task->add_contact($tab[$i]['id'], $tab[$i]['code'], $tab[$i]['source']);
 						if ($clone_task->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error .= $langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType");
 							$error++;
 						} else {

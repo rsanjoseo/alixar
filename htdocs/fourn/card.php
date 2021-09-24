@@ -217,7 +217,7 @@ if ($object->id > 0) {
 		print '</td>';
 		print '</tr>';
 
-		$langs->load('compta');
+		// $langs->load('compta');
 		print '<tr>';
 		print '<td>';
 		print $form->editfieldkey("SupplierAccountancyCode", 'supplieraccountancycode', $object->code_compta_fournisseur, $object, $user->rights->societe->creer);
@@ -253,8 +253,8 @@ if ($object->id > 0) {
 	print showValueWithClipboardCPButton(dol_escape_htmltag($object->tva_intra));
 	print '</td></tr>';
 
-	// Default terms of the settlement
-	$langs->load('bills');
+    // Default terms of the settlement
+    // $langs->load('bills');
 	$form = new Form($db);
 	print '<tr><td>';
 	print '<table width="100%" class="nobordernopadding"><tr><td>';
@@ -339,7 +339,7 @@ if ($object->id > 0) {
 
 	// Categories
 	if (!empty($conf->categorie->enabled)) {
-		$langs->load("categories");
+        // $langs->load("categories");
 		print '<tr><td>'.$langs->trans("SuppliersCategoriesShort").'</td>';
 		print '<td>';
 		print $form->showCategories($object->id, Categorie::TYPE_SUPPLIER, 1);
@@ -352,18 +352,18 @@ if ($object->id > 0) {
 
 	// Module Adherent
 	if (!empty($conf->adherent->enabled)) {
-		$langs->load("members");
-		$langs->load("users");
-		print '<tr><td>'.$langs->trans("LinkedToDolibarrMember").'</td>';
-		print '<td>';
-		$adh = new Adherent($db);
-		$result = $adh->fetch('', '', $object->id);
-		if ($result > 0) {
-			$adh->ref = $adh->getFullName($langs);
-			print $adh->getNomUrl(1);
-		} else {
-			print $langs->trans("ThirdpartyNotLinkedToMember");
-		}
+        // $langs->load("members");
+        // $langs->load("users");
+        print '<tr><td>' . $langs->trans("LinkedToDolibarrMember") . '</td>';
+        print '<td>';
+        $adh = new Adherent($db);
+        $result = $adh->fetch('', '', $object->id);
+        if ($result > 0) {
+            $adh->ref = $adh->getFullName($langs);
+            print $adh->getNomUrl(1);
+        } else {
+            print $langs->trans("ThirdpartyNotLinkedToMember");
+        }
 		print '</td>';
 		print "</tr>\n";
 	}
@@ -513,8 +513,8 @@ if ($object->id > 0) {
 	 * List of products
 	 */
 	if (!empty($conf->product->enabled) || !empty($conf->service->enabled)) {
-		$langs->load("products");
-		//Query from product/liste.php
+        // $langs->load("products");
+        //Query from product/liste.php
 		$sql = 'SELECT p.rowid, p.ref, p.label, p.fk_product_type, p.entity, p.tosell as status, p.tobuy as status_buy, p.tobatch as status_batch,';
 		$sql .= ' pfp.tms, pfp.ref_fourn as supplier_ref, pfp.price, pfp.quantity, pfp.unitprice';
 		$sql .= ' FROM '.MAIN_DB_PREFIX.'product_fournisseur_price as pfp';
@@ -750,7 +750,7 @@ if ($object->id > 0) {
 	 * Latest supplier invoices
 	 */
 
-	$langs->load('bills');
+    // $langs->load('bills');
 	$facturestatic = new FactureFournisseur($db);
 
 	if ($user->rights->fournisseur->facture->lire) {
@@ -833,7 +833,7 @@ if ($object->id > 0) {
 		}
 
 		if (!empty($conf->supplier_proposal->enabled) && !empty($user->rights->supplier_proposal->creer)) {
-			$langs->load("supplier_proposal");
+            // $langs->load("supplier_proposal");
 			if ($object->status == 1) {
 				print '<a class="butAction" href="'.DOL_URL_ROOT.'/supplier_proposal/card.php?action=create&socid='.$object->id.'">'.$langs->trans("AddSupplierProposal").'</a>';
 			} else {
@@ -842,7 +842,7 @@ if ($object->id > 0) {
 		}
 
 		if ($user->rights->fournisseur->commande->creer || $user->rights->supplier_order->creer) {
-			$langs->load("orders");
+            // $langs->load("orders");
 			if ($object->status == 1) {
 				print '<a class="butAction" href="'.DOL_URL_ROOT.'/fourn/commande/card.php?action=create&socid='.$object->id.'">'.$langs->trans("AddSupplierOrderShort").'</a>';
 			} else {
@@ -864,7 +864,7 @@ if ($object->id > 0) {
 		}
 
 		if ($user->rights->fournisseur->facture->creer || $user->rights->supplier_invoice->creer) {
-			$langs->load("bills");
+            // $langs->load("bills");
 			if ($object->status == 1) {
 				print '<a class="butAction" href="'.DOL_URL_ROOT.'/fourn/facture/card.php?action=create&socid='.$object->id.'">'.$langs->trans("AddBill").'</a>';
 			} else {

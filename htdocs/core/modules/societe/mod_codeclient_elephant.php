@@ -112,7 +112,7 @@ class mod_codeclient_elephant extends ModeleThirdPartyCode
 		global $conf, $mc;
 		global $form;
 
-		$langs->load("companies");
+		// $langs->load("companies");
 
 		$disabled = ((!empty($mc->sharings['referent']) && $mc->sharings['referent'] != $conf->entity) ? ' disabled' : '');
 
@@ -173,7 +173,7 @@ class mod_codeclient_elephant extends ModeleThirdPartyCode
 				$examplecust = $langs->trans('NotConfigured');
 			}
 			if (in_array($examplecust, $errmsg)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$examplecust = $langs->trans($examplecust);
 			}
 		}
@@ -183,7 +183,7 @@ class mod_codeclient_elephant extends ModeleThirdPartyCode
 				$examplesup = $langs->trans('NotConfigured');
 			}
 			if (in_array($examplesup, $errmsg)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$examplesup = $langs->trans($examplesup);
 			}
 		}

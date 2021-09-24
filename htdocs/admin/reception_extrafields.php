@@ -29,28 +29,26 @@
  */
 
 require '../main.inc.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/reception.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-
+require_once DOL_DOCUMENT_ROOT . '/core/lib/reception.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
 
 if (!$user->admin) {
-	accessforbidden();
+    accessforbidden();
 }
 
-$langs->load("admin");
-$langs->load("other");
-$langs->load("receptions");
-$langs->load("deliveries");
-
+// $langs->load("admin");
+// $langs->load("other");
+// $langs->load("receptions");
+// $langs->load("deliveries");
 
 $extrafields = new ExtraFields($db);
 $form = new Form($db);
 
 // List of supported format
 $tmptype2label = ExtraFields::$type2label;
-$type2label = array('');
+$type2label = [''];
 foreach ($tmptype2label as $key => $val) {
-	$type2label[$key] = $langs->trans($val);
+    $type2label[$key] = $langs->trans($val);
 }
 
 $action = GETPOST('action', 'aZ09');

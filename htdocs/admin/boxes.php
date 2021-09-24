@@ -341,7 +341,7 @@ foreach ($boxtoadd as $box) {
 	print '</td>'."\n";
 	print '<td>';
 	if ($box->note == '(WarningUsingThisBoxSlowDown)') {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print $langs->trans("WarningUsingThisBoxSlowDown");
 	} else {
 		print ($box->note ? $box->note : '&nbsp;');
@@ -412,7 +412,7 @@ foreach ($boxactivated as $key => $box) {
 	print '</td>';
 	print '<td>';
 	if ($box->note == '(WarningUsingThisBoxSlowDown)') {
-		$langs->load("errors");
+        // $langs->load("errors");
         print img_warning('', 0) . ' ' . $langs->trans("WarningUsingThisBoxSlowDown");
     } else {
         print ($box->note ? $box->note : '&nbsp;');

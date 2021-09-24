@@ -376,7 +376,7 @@ if (empty($reshook)) {
 		}
 
 		if (!$error && $result > 0 && $object->fk_user_validator > 0) {
-			$langs->load("mails");
+			// $langs->load("mails");
 
 			// TO
 			$destinataire = new User($db);
@@ -426,7 +426,7 @@ if (empty($reshook)) {
 						$mesg = $langs->trans('MailSuccessfulySent', $mailfile->getValidAddress($emailFrom, 2), $mailfile->getValidAddress($emailTo, 2));
 						setEventMessages($mesg, null, 'mesgs');
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							$mesg = '';
 							$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -540,7 +540,7 @@ if (empty($reshook)) {
 						header("Location: ".$_SERVER["PHP_SELF"]."?id=".$id);
 						exit;
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							$mesg = '';
 							$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -653,7 +653,7 @@ if (empty($reshook)) {
 						header("Location: ".$_SERVER["PHP_SELF"]."?id=".$id);
 						exit;
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							$mesg = '';
 							$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -762,7 +762,7 @@ if (empty($reshook)) {
 						header("Location: ".$_SERVER["PHP_SELF"]."?id=".$id);
 						exit;
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							$mesg = '';
 							$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -876,7 +876,7 @@ if (empty($reshook)) {
 								header("Location: ".$_SERVER["PHP_SELF"]."?id=".$id);
 								exit;
 							} else {
-								$langs->load("other");
+                                // $langs->load("other");
 								if ($mailfile->error) {
 									$mesg = '';
 									$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -1045,7 +1045,7 @@ if (empty($reshook)) {
 						header("Location: ".$_SERVER["PHP_SELF"]."?id=".$id);
 						exit;
 					} else {
-						$langs->load("other");
+                        // $langs->load("other");
 						if ($mailfile->error) {
 							$mesg = '';
 							$mesg .= $langs->trans('ErrorFailedToSendMail', $emailFrom, $emailTo);
@@ -1121,8 +1121,8 @@ if (empty($reshook)) {
 			$error++;
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 		} elseif ($date < $object->date_debut || $date > ($object->date_fin + (24 * 3600 - 1))) {
-			// Warning if date out of range
-			$langs->load("errors");
+            // Warning if date out of range
+            // $langs->load("errors");
 			setEventMessages($langs->trans("WarningDateOfLineMustBeInExpenseReportRange"), null, 'warnings');
 		}
 
@@ -1262,7 +1262,7 @@ if (empty($reshook)) {
 		}
 		// Warning if date out of range
 		if ($date < $object->date_debut || $date > ($object->date_fin + (24 * 3600 - 1))) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("WarningDateOfLineMustBeInExpenseReportRange"), null, 'warnings');
 		}
 
@@ -1632,44 +1632,44 @@ if ($action == 'create') {
 			$linkback = '<a href="'.DOL_URL_ROOT.'/expensereport/list.php?restore_lastsearch_values=1'.(!empty($socid) ? '&socid='.$socid : '').'">'.$langs->trans("BackToList").'</a>';
 
 			$morehtmlref = '<div class="refidno">';
-			/*
-			 // Ref customer
-			 $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, $user->rights->commande->creer, 'string', '', 0, 1);
-			 $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, $user->rights->commande->creer, 'string', '', null, null, '', 1);
-			 // Thirdparty
-			 $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . $soc->getNomUrl(1);
-			 // Project
-			 if (! empty($conf->projet->enabled))
-			 {
-			 $langs->load("projects");
-			 $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
-			 if ($user->rights->commande->creer)
-			 {
-			 if ($action != 'classify')
-			 $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
-			 if ($action == 'classify') {
-			 //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
-			 $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
-			 $morehtmlref.='<input type="hidden" name="action" value="classin">';
-			 $morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
-			 $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
-			 $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
-			 $morehtmlref.='</form>';
-			 } else {
-			 $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
-			 }
-			 } else {
-			 if (! empty($object->fk_project)) {
-			 $proj = new Project($db);
-			 $proj->fetch($object->fk_project);
-			 $morehtmlref.='<a href="'.DOL_URL_ROOT.'/projet/card.php?id=' . $object->fk_project . '" title="' . $langs->trans('ShowProject') . '">';
-			 $morehtmlref.=$proj->ref;
-			 $morehtmlref.='</a>';
-			 } else {
-			 $morehtmlref.='';
-			 }
-			 }
-			 }*/
+            /*
+             // Ref customer
+             $morehtmlref.=$form->editfieldkey("RefCustomer", 'ref_client', $object->ref_client, $object, $user->rights->commande->creer, 'string', '', 0, 1);
+             $morehtmlref.=$form->editfieldval("RefCustomer", 'ref_client', $object->ref_client, $object, $user->rights->commande->creer, 'string', '', null, null, '', 1);
+             // Thirdparty
+             $morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . $soc->getNomUrl(1);
+             // Project
+             if (! empty($conf->projet->enabled))
+             {
+             // $langs->load("projects");
+             $morehtmlref.='<br>'.$langs->trans('Project') . ' ';
+             if ($user->rights->commande->creer)
+             {
+             if ($action != 'classify')
+             $morehtmlref.='<a class="editfielda" href="' . $_SERVER['PHP_SELF'] . '?action=classify&token='.newToken().'&id=' . $object->id . '">' . img_edit($langs->transnoentitiesnoconv('SetProject')) . '</a> : ';
+             if ($action == 'classify') {
+             //$morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'projectid', 0, 0, 1, 1);
+             $morehtmlref.='<form method="post" action="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'">';
+             $morehtmlref.='<input type="hidden" name="action" value="classin">';
+             $morehtmlref.='<input type="hidden" name="token" value="'.newToken().'">';
+             $morehtmlref.=$formproject->select_projects($object->socid, $object->fk_project, 'projectid', $maxlength, 0, 1, 0, 1, 0, 0, '', 1);
+             $morehtmlref.='<input type="submit" class="button valignmiddle" value="'.$langs->trans("Modify").'">';
+             $morehtmlref.='</form>';
+             } else {
+             $morehtmlref.=$form->form_project($_SERVER['PHP_SELF'] . '?id=' . $object->id, $object->socid, $object->fk_project, 'none', 0, 0, 0, 1);
+             }
+             } else {
+             if (! empty($object->fk_project)) {
+             $proj = new Project($db);
+             $proj->fetch($object->fk_project);
+             $morehtmlref.='<a href="'.DOL_URL_ROOT.'/projet/card.php?id=' . $object->fk_project . '" title="' . $langs->trans('ShowProject') . '">';
+             $morehtmlref.=$proj->ref;
+             $morehtmlref.='</a>';
+             } else {
+             $morehtmlref.='';
+             }
+             }
+             }*/
 			 $morehtmlref .= '</div>';
 
 			 dol_banner_tab($object, 'ref', $linkback, 1, 'ref', 'ref', $morehtmlref);
@@ -1734,7 +1734,7 @@ if ($action == 'create') {
 						print $userfee->getNomUrl(-1);
 					}
 					if (empty($userfee->email) || !isValidEmail($userfee->email)) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						print img_warning($langs->trans("ErrorBadEMail", $userfee->email));
 					}
 				}

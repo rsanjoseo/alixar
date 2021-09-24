@@ -165,7 +165,7 @@ if ($action == 'addtimespent' && $user->rights->projet->lire) {
 		$error++;
 	}
 	if (!GETPOST("userid", 'int')) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans('ErrorUserNotAssignedToTask'), null, 'errors');
 		$error++;
 	}
@@ -293,7 +293,7 @@ if ($action == 'confirm_delete' && $confirm == "yes" && $user->rights->projet->l
 	$result = $object->delTimeSpent($user);
 
 	if ($result < 0) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans($object->error), null, 'errors');
 		$error++;
 		$action = '';
@@ -362,7 +362,7 @@ if ($action == 'confirm_generateinvoice') {
 
 			if (empty($tmpproduct->duration_value)) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorDurationForServiceNotDefinedCantCalculateHourlyPrice"), null, 'errors');
 			}
 
@@ -588,7 +588,7 @@ if ($action == 'confirm_generateinvoice') {
 }
 
 if ($action == 'confirm_generateinter') {
-	$langs->load('interventions');
+    // $langs->load('interventions');
 
 	if (!empty($projectstatic->socid)) $projectstatic->fetch_thirdparty();
 
@@ -878,7 +878,7 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0) {
 		);
 	}
 	if ( ! empty($conf->ficheinter->enabled) && $user->rights->ficheinter->creer) {
-		$langs->load("interventions");
+        // $langs->load("interventions");
 		$arrayofmassactions['generateinter'] = $langs->trans("GenerateInter");
 	}
 	//if ($user->rights->projet->creer) $arrayofmassactions['predelete']='<span class="fa fa-trash paddingrightonly"></span>'.$langs->trans("Delete");
@@ -1670,7 +1670,7 @@ if (($id > 0 || !empty($ref)) || $projectidforalltimes > 0) {
 
 			// Value spent
 			if (!empty($arrayfields['value']['checked'])) {
-				$langs->load("salaries");
+                // $langs->load("salaries");
 
 				print '<td class="nowraponall right">';
 				$value = price2num($task_time->thm * $task_time->task_duration / 3600, 'MT', 1);

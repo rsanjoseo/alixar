@@ -158,7 +158,7 @@ $morehtmlref .= $object->subject;
 if ($object->fk_user_create > 0) {
 	$morehtmlref .= '<br>'.$langs->trans("CreatedBy").' : ';
 
-	$langs->load("users");
+	// $langs->load("users");
 	$fuser = new User($db);
 	$fuser->fetch($object->fk_user_create);
 	$morehtmlref .= $fuser->getNomUrl(0);
@@ -184,7 +184,7 @@ if (!empty($conf->societe->enabled)) {
 
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+    // $langs->load("projects");
 	$morehtmlref .= '<br>'.$langs->trans('Project');
 	if ($user->rights->ticket->write) {
 		if ($action != 'classify') {

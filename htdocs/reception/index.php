@@ -229,7 +229,7 @@ $resql = $db->query($sql);
 if ($resql) {
 	$num = $db->num_rows($resql);
 	if ($num) {
-		$langs->load("orders");
+		// $langs->load("orders");
 
 		$i = 0;
 		print '<div class="div-table-responsive-no-min">';

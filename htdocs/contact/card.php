@@ -85,7 +85,7 @@ if ($id > 0) {
 }
 
 if (!($object->id > 0) && $action == 'view') {
-	$langs->load("errors");
+	// $langs->load("errors");
 	print($langs->trans('ErrorRecordNotFound'));
 	exit;
 }
@@ -249,7 +249,7 @@ if (empty($reshook)) {
 		}
 
 		if (!empty($object->email) && !isValidEMail($object->email)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$error++;
 			$errors[] = $langs->trans("ErrorBadEMail", GETPOST('email', 'alpha'));
 			$action = 'create';
@@ -341,7 +341,7 @@ if (empty($reshook)) {
 		}
 
 		if (!empty(GETPOST('email', 'custom', 0, FILTER_SANITIZE_EMAIL)) && !isValidEMail(GETPOST('email', 'custom', 0, FILTER_SANITIZE_EMAIL))) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$error++;
 			$errors[] = $langs->trans("ErrorBadEMail", GETPOST('email', 'alpha'));
 			$action = 'edit';
@@ -1058,7 +1058,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 			print img_picto('', 'object_email');
 			print '<input type="text" name="email" id="email" class="maxwidth100onsmartphone quatrevingtpercent" value="'.(GETPOSTISSET('email') ?GETPOST('email', 'alpha') : $object->email).'"></td>';
 			if (!empty($conf->mailing->enabled)) {
-				$langs->load("mails");
+                // $langs->load("mails");
 				print '<td class="nowrap">'.$langs->trans("NbOfEMailingsSend").'</td>';
 				print '<td>'.$object->getNbOfEMailings().'</td>';
 			} else {
@@ -1312,7 +1312,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Email
 		if (!empty($conf->mailing->enabled)) {
-			$langs->load("mails");
+            // $langs->load("mails");
 			print '<tr><td>'.$langs->trans("NbOfEMailingsSend").'</td>';
 			print '<td><a href="'.DOL_URL_ROOT.'/comm/mailing/list.php?filteremail='.urlencode($object->email).'">'.$object->getNbOfEMailings().'</a></td></tr>';
 		}
@@ -1477,10 +1477,10 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 		if (empty($reshook) && $action != 'presend') {
 			if (empty($user->socid)) {
 				if (!empty($object->email)) {
-					$langs->load("mails");
+                    // $langs->load("mails");
 					print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a></div>';
 				} else {
-					$langs->load("mails");
+                    // $langs->load("mails");
 					print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NoEMail")).'">'.$langs->trans('SendMail').'</a></div>';
 				}
 			}

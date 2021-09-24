@@ -257,7 +257,7 @@ class MouvementStock extends CommonObject
 		// Test if product require batch data. If yes, and there is not or values are not correct, we throw an error.
 		if (!empty($conf->productbatch->enabled) && $product->hasbatch() && !$skip_batch) {
 			if (empty($batch)) {
-				$langs->load("errors");
+				// $langs->load("errors");
 				$this->errors[] = $langs->transnoentitiesnoconv("ErrorTryToMakeMoveOnProductRequiringBatchData", $product->ref);
 				dol_syslog("Try to make a movement of a product with status_batch on without any batch data");
 
@@ -286,8 +286,8 @@ class MouvementStock extends CommonObject
 								$tmparray = dol_getdate($eatby, true);
 								$eatbywithouthour = dol_mktime(0, 0, 0, $tmparray['mon'], $tmparray['mday'], $tmparray['year']);
 								if ($this->db->jdate($obj->eatby) != $eatby && $this->db->jdate($obj->eatby) != $eatbywithouthour) {    // We test date without hours and with hours for backward compatibility
-									// If found and eatby/sellby defined into table and provided and differs, return error
-									$langs->load("stocks");
+                                    // If found and eatby/sellby defined into table and provided and differs, return error
+                                    // $langs->load("stocks");
 									$this->errors[] = $langs->transnoentitiesnoconv("ThisSerialAlreadyExistWithDifferentDate", $batch, dol_print_date($this->db->jdate($obj->eatby), 'dayhour'), dol_print_date($eatbywithouthour, 'dayhour'));
 									dol_syslog("ThisSerialAlreadyExistWithDifferentDate batch=".$batch.", eatby found into product_lot = ".$obj->eatby." = ".dol_print_date($this->db->jdate($obj->eatby), 'dayhourrfc')." so eatbywithouthour = ".$eatbywithouthour." = ".dol_print_date($eatbywithouthour)." - eatby provided = ".$eatby." = ".dol_print_date($eatby, 'dayhourrfc'), LOG_ERR);
 									$this->db->rollback();
@@ -381,7 +381,7 @@ class MouvementStock extends CommonObject
 					break;
 				}
 				if (!$foundforbatch || $qtyisnotenough) {
-					$langs->load("stocks");
+                    // $langs->load("stocks");
 					include_once DOL_DOCUMENT_ROOT.'/product/stock/class/entrepot.class.php';
 					$tmpwarehouse = new Entrepot($this->db);
 					$tmpwarehouse->fetch($entrepot_id);
@@ -393,7 +393,7 @@ class MouvementStock extends CommonObject
 				}
 			} else {
 				if (empty($product->stock_warehouse[$entrepot_id]->real) || $product->stock_warehouse[$entrepot_id]->real < abs($qty)) {
-					$langs->load("stocks");
+                    // $langs->load("stocks");
 					$this->error = $langs->trans('qtyToTranferIsNotEnough').' : '.$product->ref;
 					$this->errors[] = $langs->trans('qtyToTranferIsNotEnough').' : '.$product->ref;
 					$this->db->rollback();
@@ -1173,7 +1173,7 @@ class MouvementStock extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("stocks");
+        // $langs->load("stocks");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {

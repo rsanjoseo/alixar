@@ -867,7 +867,7 @@ class Tva extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+			//// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_UNPAID] = $langs->trans('BillStatusNotPaid');
 			$this->labelStatus[self::STATUS_PAID] = $langs->trans('BillStatusPaid');
 			if ($status == self::STATUS_UNPAID && $alreadypaid <> 0) {

@@ -482,7 +482,7 @@ if (($action == "addline" || $action == "freezone") && $placeid == 0) {
 	$invoice->entity = !empty($_SESSION["takeposinvoiceentity"]) ? $_SESSION["takeposinvoiceentity"] : $conf->entity;
 
 	if ($invoice->socid <= 0) {
-		$langs->load('errors');
+		// $langs->load('errors');
 		dol_htmloutput_errors($langs->trans("ErrorModuleSetupNotComplete", "TakePos"), null, 1);
 	} else {
 		$placeid = $invoice->create($user);
@@ -1144,7 +1144,7 @@ $( document ).ready(function() {
 	if (!empty($conf->adherent->enabled) && $invoice->socid > 0 && $invoice->socid != $conf->global->$constforcompanyid) {
 		$s = '<span class="small">';
 		require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
-		$langs->load("members");
+        // $langs->load("members");
 		$s .= $langs->trans("Member").': ';
 		$adh = new Adherent($db);
 		$result = $adh->fetch('', '', $invoice->socid);

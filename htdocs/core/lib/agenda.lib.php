@@ -53,7 +53,7 @@ function print_actions_filter($form, $canedit, $status, $year, $month, $day, $sh
 	global $begin_h, $end_h, $begin_d, $end_d;
 	global $massaction;
 
-	$langs->load("companies");
+	// $langs->load("companies");
 
 	include_once DOL_DOCUMENT_ROOT.'/core/class/html.formactions.class.php';
 	$formactions = new FormActions($db);

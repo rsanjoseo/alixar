@@ -165,8 +165,8 @@ if (empty($reshook)) {
 					}
 					// Check date
 					if ($datepaye && ($datepaye < $tmpinvoice->date)) {
-						$langs->load("errors");
-						//$error++;
+						// $langs->load("errors");
+                        //$error++;
 						setEventMessages($langs->transnoentities("WarningPaymentDateLowerThanInvoiceDate", dol_print_date($datepaye, 'day'), dol_print_date($tmpinvoice->date, 'day'), $tmpinvoice->ref), null, 'warnings');
 					}
 				}
@@ -192,8 +192,8 @@ if (empty($reshook)) {
 					}
 					// Check date
 					if ($datepaye && ($datepaye < $tmpinvoice->date)) {
-						$langs->load("errors");
-						//$error++;
+                        // $langs->load("errors");
+                        //$error++;
 						setEventMessages($langs->transnoentities("WarningPaymentDateLowerThanInvoiceDate", dol_print_date($datepaye, 'day'), dol_print_date($tmpinvoice->date, 'day'), $tmpinvoice->ref), null, 'warnings');
 					}
 				}

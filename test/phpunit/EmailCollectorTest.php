@@ -140,7 +140,7 @@ class EmailCollectorTest extends PHPUnit\Framework\TestCase
 		$langs=$this->savlangs;
 		$db=$this->savdb;
 
-		$langs->load("main");
+		// $langs->load("main");
 
 		// Create supplier order with a too low quantity
 		$localobject=new EmailCollector($db);

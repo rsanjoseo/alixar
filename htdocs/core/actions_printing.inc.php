@@ -29,7 +29,7 @@
 
 // Print file
 if ($action == 'print_file' && $user->rights->printing->read) {
-	$langs->load("printing");
+	// $langs->load("printing");
 	require_once DOL_DOCUMENT_ROOT.'/core/modules/printing/modules_printing.php';
 	$objectprint = new PrintingDriver($db);
 	$list = $objectprint->listDrivers($db, 10);
@@ -47,8 +47,8 @@ if ($action == 'print_file' && $user->rights->printing->read) {
 			require_once $classfile;
 			$classname = 'printing_'.$driver;
 			$printer = new $classname($db);
-			$langs->load($printer::LANGFILE);
-			//print '<pre>'.print_r($printer, true).'</pre>';
+            // $langs->load($printer::LANGFILE);
+            //print '<pre>'.print_r($printer, true).'</pre>';
 
 			if (!empty($conf->global->{$printer->active})) {
 				$printerfound++;

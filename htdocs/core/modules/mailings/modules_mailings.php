@@ -63,7 +63,7 @@ class MailingTargets // This can't be abstract as it is used for some method
 	{
 		global $langs, $form;
 
-		$langs->load("mails");
+		// $langs->load("mails");
 		$transstring = "MailingModuleDesc".$this->name;
 		$s = '';
 

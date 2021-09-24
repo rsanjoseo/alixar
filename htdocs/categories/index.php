@@ -33,7 +33,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/treeview.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load translation files required by the page
-$langs->load("categories");
+// $langs->load("categories");
 
 if (!$user->rights->categorie->lire) {
 	accessforbidden();

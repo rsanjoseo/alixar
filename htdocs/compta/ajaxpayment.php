@@ -38,7 +38,7 @@ if (!defined('NOREQUIREHTML')) {
 
 require '../main.inc.php';
 
-$langs->load('compta');
+// $langs->load('compta');
 
 
 /*

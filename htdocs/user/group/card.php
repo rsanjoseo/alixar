@@ -114,7 +114,7 @@ if (empty($reshook)) {
 			header("Location: ".DOL_URL_ROOT."/user/group/list.php?restore_lastsearch_values=1");
 			exit;
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 		}
 	}
@@ -157,13 +157,13 @@ if (empty($reshook)) {
 				} else {
 					$db->rollback();
 
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorGroupAlreadyExists", $object->name), null, 'errors');
 					$action = "create"; // Go back to create page
 				}
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 		}
 	}
@@ -192,7 +192,7 @@ if (empty($reshook)) {
 				}
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'errors');
 		}
 	}
@@ -231,7 +231,7 @@ if (empty($reshook)) {
 				$db->rollback();
 			}
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans('ErrorForbidden'), null, 'mesgs');
 		}
 	}

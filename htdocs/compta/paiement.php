@@ -121,8 +121,8 @@ if (empty($reshook)) {
 					}
 					// Check date
 					if ($datepaye && ($datepaye < $tmpinvoice->date)) {
-						$langs->load("errors");
-						//$error++;
+						// $langs->load("errors");
+                        //$error++;
 						setEventMessages($langs->transnoentities("WarningPaymentDateLowerThanInvoiceDate", dol_print_date($datepaye, 'day'), dol_print_date($tmpinvoice->date, 'day'), $tmpinvoice->ref), null, 'warnings');
 					}
 				}
@@ -148,8 +148,8 @@ if (empty($reshook)) {
 					}
 					// Check date
 					if ($datepaye && ($datepaye < $tmpinvoice->date)) {
-						$langs->load("errors");
-						//$error++;
+                        // $langs->load("errors");
+                        //$error++;
 						setEventMessages($langs->transnoentities("WarningPaymentDateLowerThanInvoiceDate", dol_print_date($datepaye, 'day'), dol_print_date($tmpinvoice->date, 'day'), $tmpinvoice->ref), null, 'warnings');
 					}
 				}
@@ -816,11 +816,11 @@ if ($action == 'create' || $action == 'confirm_paiement' || $action == 'add_paie
 
 			print '<br><div class="center">';
 			print '<input type="checkbox" checked name="closepaidinvoices"> '.$checkboxlabel;
-			/*if (! empty($conf->prelevement->enabled))
-			{
-				$langs->load("withdrawals");
-				if (! empty($conf->global->WITHDRAW_DISABLE_AUTOCREATE_ONPAYMENTS)) print '<br>'.$langs->trans("IfInvoiceNeedOnWithdrawPaymentWontBeClosed");
-			}*/
+            /*if (! empty($conf->prelevement->enabled))
+            {
+                // $langs->load("withdrawals");
+                if (! empty($conf->global->WITHDRAW_DISABLE_AUTOCREATE_ONPAYMENTS)) print '<br>'.$langs->trans("IfInvoiceNeedOnWithdrawPaymentWontBeClosed");
+            }*/
 			print '<br><input type="submit" class="button" value="'.dol_escape_htmltag($buttontitle).'"><br><br>';
 			print '</div>';
 		}

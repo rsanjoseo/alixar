@@ -64,16 +64,16 @@ if (! empty($conf->eventorganization->enabled)) {
 
 // $langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
 if (!empty($conf->adherent->enabled)) {
-	$langs->load("members");
+	// $langs->load("members");
 }
 if (!empty($conf->categorie->enabled)) {
-	$langs->load("categories");
+    // $langs->load("categories");
 }
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load("incoterm");
+    // $langs->load("incoterm");
 }
 if (!empty($conf->notification->enabled)) {
-	$langs->load("mails");
+    // $langs->load("mails");
 }
 
 $error = 0; $errors = array();
@@ -108,7 +108,7 @@ if ($socid > 0) {
 }
 
 if (!($object->id > 0) && $action == 'view') {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print($langs->trans('ErrorRecordNotFound'));
 	exit;
 }
@@ -184,7 +184,7 @@ if (empty($reshook)) {
 		$soc_origin = new Societe($db);
 
 		if ($soc_origin_id <= 0) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans('ErrorThirdPartyIdIsMandatory', $langs->transnoentitiesnoconv('MergeOriginThirdparty')), null, 'errors');
 		} else {
 			if (!$error && $soc_origin->fetch($soc_origin_id) < 1) {
@@ -344,7 +344,7 @@ if (empty($reshook)) {
 					setEventMessages($langs->trans('ThirdpartiesMergeSuccess'), null, 'mesgs');
 					$db->commit();
 				} else {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans('ErrorsThirdpartyMerge'), null, 'errors');
 					$db->rollback();
 				}
@@ -562,12 +562,12 @@ if (empty($reshook)) {
 			// Check parameters
 			if (!GETPOST('cancel', 'alpha')) {
 				if (!empty($object->email) && !isValidEMail($object->email)) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$error++;
 					setEventMessages('', $langs->trans("ErrorBadEMail", $object->email), 'errors');
 				}
 				if (!empty($object->url) && !isValidUrl($object->url)) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages('', $langs->trans("ErrorBadUrl", $object->url), 'errors');
 				}
 				if (!empty($object->webservices_url)) {
@@ -576,7 +576,7 @@ if (empty($reshook)) {
 						$object->webservices_url = "http://".$object->webservices_url;
 					}
 					if (!isValidUrl($object->webservices_url)) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$error++; $errors[] = $langs->trans("ErrorBadUrl", $object->webservices_url);
 					}
 				}
@@ -863,7 +863,7 @@ if (empty($reshook)) {
 			header("Location: ".DOL_URL_ROOT."/societe/list.php?restore_lastsearch_values=1&delsoc=".urlencode($object->name));
 			exit;
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($object->error, $object->errors, 'errors');
 			$error++;
 			$action = '';
@@ -1616,7 +1616,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Categories
 		if (!empty($conf->categorie->enabled) && !empty($user->rights->categorie->lire)) {
-			$langs->load('categories');
+            // $langs->load('categories');
 
 			// Customer
 			//if ($object->prospect || $object->client || (! $object->fournisseur && ! empty($conf->global->THIRDPARTY_CAN_HAVE_CATEGORY_EVEN_IF_NOT_CUSTOMER_PROSPECT_SUPPLIER))) {
@@ -2693,7 +2693,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Warehouse
 		if (!empty($conf->stock->enabled) && !empty($conf->global->SOCIETE_ASK_FOR_WAREHOUSE)) {
-			$langs->load('stocks');
+            // $langs->load('stocks');
 			require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 			$formproduct = new FormProduct($db);
 			print '<tr class="nowrap">';
@@ -2774,8 +2774,8 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 			require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 			print '<tr><td>'.$langs->trans("DefaultLang").'</td><td>';
 			//$s=picto_from_langcode($object->default_lang);
-			//print ($s?$s.' ':'');
-			$langs->load("languages");
+            //print ($s?$s.' ':'');
+            // $langs->load("languages");
 			$labellang = ($object->default_lang ? $langs->trans('Language_'.$object->default_lang) : '');
 			print picto_from_langcode($object->default_lang, 'class="paddingrightonly saturatemedium opacitylow"');
 			print $labellang;
@@ -2865,7 +2865,7 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 		// Module Adherent
 		if (!empty($conf->adherent->enabled)) {
-			$langs->load("members");
+            // $langs->load("members");
 			print '<tr><td>'.$langs->trans("LinkedToDolibarrMember").'</td>';
 			print '<td>';
 			$adh = new Adherent($db);
@@ -2914,10 +2914,10 @@ if (is_object($objcanvas) && $objcanvas->displayCanvasExists($action)) {
 
 				if (empty($user->socid)) {
 					if (!empty($object->email) || $at_least_one_email_contact) {
-						$langs->load("mails");
+                        // $langs->load("mails");
 						print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?socid='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a>'."\n";
 					} else {
-						$langs->load("mails");
+                        // $langs->load("mails");
 						print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NoEMail")).'">'.$langs->trans('SendMail').'</a>'."\n";
 					}
 				}

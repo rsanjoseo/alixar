@@ -73,7 +73,7 @@ if ($massaction == 'preaffecttag') {
 }
 
 if ($massaction == 'presend') {
-	$langs->load("mails");
+	// $langs->load("mails");
 
 	$listofselectedid = array();
 	$listofselectedthirdparties = array();
@@ -184,7 +184,7 @@ if ($massaction == 'presend') {
 	$formmail->param['id'] = join(',', $arrayofselected);
 	// $formmail->param['returnurl']=$_SERVER["PHP_SELF"].'?id='.$object->id;
 	if (!empty($conf->global->MAILING_LIMIT_SENDBYWEB) && count($listofselectedthirdparties) > $conf->global->MAILING_LIMIT_SENDBYWEB) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print img_warning().' '.$langs->trans('WarningNumberOfRecipientIsRestrictedInMassAction', $conf->global->MAILING_LIMIT_SENDBYWEB);
 		print ' - <a href="javascript: window.history.go(-1)">'.$langs->trans("GoBack").'</a>';
 		$arrayofmassactions = array();

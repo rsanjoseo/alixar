@@ -417,7 +417,7 @@ foreach ($configfileparameters as $key => $value) {
 					}
 					print $value2;
 					if (!is_readable($value2)) {
-						$langs->load("errors");
+						// $langs->load("errors");
 						print ' '.img_warning($langs->trans("ErrorCantReadDir", $value2));
 					}
 					++$i;

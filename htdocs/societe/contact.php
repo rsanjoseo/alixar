@@ -48,13 +48,13 @@ if (!empty($conf->adherent->enabled)) {
 
 // $langs->loadLangs(array("companies", "commercial", "bills", "banks", "users"));
 if (!empty($conf->categorie->enabled)) {
-	$langs->load("categories");
+	// $langs->load("categories");
 }
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load("incoterm");
+    // $langs->load("incoterm");
 }
 if (!empty($conf->notification->enabled)) {
-	$langs->load("mails");
+    // $langs->load("mails");
 }
 
 $mesg = ''; $error = 0; $errors = array();
@@ -81,7 +81,7 @@ $extrafields->fetch_name_optionals_label($object->table_element);
 $hookmanager->initHooks(array('thirdpartycontact', 'globalcard'));
 
 if ($object->fetch($socid) <= 0 && $action == 'view') {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print($langs->trans('ErrorRecordNotFound'));
 	exit;
 }

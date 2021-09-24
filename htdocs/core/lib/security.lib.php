@@ -825,7 +825,7 @@ function accessforbidden($message = '', $printheader = 1, $printfooter = 1, $sho
 		$langs->setDefaultLang();
 	}
 
-//	$langs->load("errors");
+//	// $langs->load("errors");
 
 	if ($printheader) {
 		if (function_exists("llxHeader")) {

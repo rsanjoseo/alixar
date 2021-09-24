@@ -88,7 +88,7 @@ class PrintingDriver
 	public function getDesc()
 	{
 		global $langs;
-		$langs->load("printing");
+		// $langs->load("printing");
 		$transstring = "PrintingModuleDesc".$this->name;
 		if ($langs->trans($transstring) != $transstring) {
 			return $langs->trans($transstring);

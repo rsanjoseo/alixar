@@ -475,12 +475,12 @@ class Mos extends DolibarrApi
 						$qtytoprocess = $line->qty;
 						if (isset($line->fk_warehouse)) {	// If there is a warehouse to set
 							if (!($line->fk_warehouse > 0)) {	// If there is no warehouse set.
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$error++;
 								throw new RestException(500, $langs->trans("ErrorFieldRequiredForProduct", $langs->transnoentitiesnoconv("Warehouse"), $tmpproduct->ref));
 							}
 							if ($tmpproduct->status_batch) {
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$error++;
 								throw new RestException(500, $langs->trans("ErrorFieldRequiredForProduct", $langs->transnoentitiesnoconv("Batch"), $tmpproduct->ref));
 							}
@@ -533,13 +533,13 @@ class Mos extends DolibarrApi
 					if ($line->qty != 0) {
 						$qtytoprocess = $line->qty;
 						if (isset($line->fk_warehouse)) {	// If there is a warehouse to set
-							if (!($line->fk_warehouse > 0)) {	// If there is no warehouse set.
-								$langs->load("errors");
+							if (!($line->fk_warehouse > 0)) {    // If there is no warehouse set.
+                                // $langs->load("errors");
 								$error++;
 								throw new RestException(500, $langs->trans("ErrorFieldRequiredForProduct", $langs->transnoentitiesnoconv("Warehouse"), $tmpproduct->ref));
 							}
 							if ($tmpproduct->status_batch) {
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$error++;
 								throw new RestException(500, $langs->trans("ErrorFieldRequiredForProduct", $langs->transnoentitiesnoconv("Batch"), $tmpproduct->ref));
 							}

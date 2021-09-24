@@ -91,7 +91,7 @@ class ActionsDatapolicy
 	public function doActions($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
-		$langs->load('datapolicy@datapolicy');
+		// $langs->load('datapolicy@datapolicy');
 		$error = 0; // Error counter
 
 		if (GETPOST('socid') && $parameters['currentcontext'] == 'thirdpartycard') {
@@ -329,7 +329,7 @@ class ActionsDatapolicy
 	public function addMoreActionsButtons($parameters, &$object, &$action, $hookmanager)
 	{
 		global $conf, $user, $langs;
-		$langs->load('datapolicy@datapolicy');
+        // $langs->load('datapolicy@datapolicy');
 
 		if (!empty($conf->global->DATAPOLICIES_ENABLE_EMAILS)) {
 			$dialog = '<div id="dialogdatapolicy" style="display:none;" title="'.$langs->trans('DATAPOLICIES_PORTABILITE_TITLE').'">';

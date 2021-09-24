@@ -876,7 +876,7 @@ class ExpenseReport extends CommonObject
 		// phpcs:enable
 		global $conf, $db, $langs;
 
-		$langs->load('trips');
+		// $langs->load('trips');
 
 		if ($user->rights->expensereport->lire) {
 			$sql = "SELECT de.fk_expensereport, de.date, de.comments, de.total_ht, de.total_ttc";
@@ -1604,7 +1604,7 @@ class ExpenseReport extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("trips");
+        // $langs->load("trips");
 
         if (!empty($conf->global->EXPENSEREPORT_ADDON)) {
             $mybool = false;
@@ -1910,7 +1910,7 @@ class ExpenseReport extends CommonObject
     {
         global $user, $conf, $db, $langs;
 
-        $langs->load('trips');
+        // $langs->load('trips');
 
         if (empty($conf->global->MAIN_USE_EXPENSE_RULE)) {
             return true; // if don't use rules
@@ -2422,7 +2422,7 @@ class ExpenseReport extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("trips");
+            // $langs->load("trips");
 
 			$response = new WorkboardResponse();
 			if ($option == 'toapprove') {

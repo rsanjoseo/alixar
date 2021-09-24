@@ -375,7 +375,7 @@ class CashControl extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+			//// $langs->load("mymodule");
 			$this->labelStatus[0] = $langs->trans('Draft');
 			$this->labelStatus[1] = $langs->trans('Closed');
 			$this->labelStatusShort[0] = $langs->trans('Draft');

@@ -97,7 +97,7 @@ class mod_codeproduct_elephant extends ModeleProductCode
 		global $conf, $mc;
 		global $form;
 
-		$langs->load("products");
+		// $langs->load("products");
 
 		$disabled = ((!empty($mc->sharings['referent']) && $mc->sharings['referent'] != $conf->entity) ? ' disabled' : '');
 
@@ -150,7 +150,7 @@ class mod_codeproduct_elephant extends ModeleProductCode
 				$exampleproduct = $langs->trans('NotConfigured');
 			}
 			if ($exampleproduct == "ErrorBadMask") {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$exampleproduct = $langs->trans($exampleproduct);
 			}
 		}
@@ -160,7 +160,7 @@ class mod_codeproduct_elephant extends ModeleProductCode
 				$exampleservice = $langs->trans('NotConfigured');
 			}
 			if ($exampleservice == "ErrorBadMask") {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$exampleservice = $langs->trans($exampleservice);
 			}
 		}

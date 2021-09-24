@@ -63,7 +63,7 @@ class mod_expensereport_sand extends ModeleNumRefExpenseReport
 	{
 		global $db, $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

@@ -179,7 +179,7 @@ if (!empty($conf->ficheinter->enabled) && !empty($user->rights->ficheinter->lire
 }
 
 if ($object->fournisseur) {
-	$langs->load("supplier_proposal");
+	// $langs->load("supplier_proposal");
 	print '<tr><td class="titlefield">';
 	print $langs->trans('SupplierCode').'</td><td colspan="3">';
 	print showValueWithClipboardCPButton(dol_escape_htmltag($object->code_fournisseur));

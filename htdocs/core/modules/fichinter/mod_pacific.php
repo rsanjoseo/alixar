@@ -87,7 +87,7 @@ class mod_pacific extends ModeleNumRefFicheinter
 	{
 		global $langs, $conf, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$fayymm = '';
 		$max = '';
@@ -109,7 +109,7 @@ class mod_pacific extends ModeleNumRefFicheinter
 		if (!$fayymm || preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $fayymm)) {
 			return true;
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

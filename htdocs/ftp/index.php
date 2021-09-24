@@ -111,7 +111,7 @@ if (GETPOST("sendit") && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 		if (is_numeric($resupload) && $resupload > 0) {
 			$result = $ecmdir->changeNbOfFiles('+');
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			if ($resupload < 0) {	// Unknown error
 				setEventMessages($langs->trans("ErrorFileNotUploaded"), null, 'errors');
 			} elseif (preg_match('/ErrorFileIsInfectedWithAVirus/', $resupload)) {
@@ -123,8 +123,8 @@ if (GETPOST("sendit") && !empty($conf->global->MAIN_UPLOAD_DOC)) {
 			}
 		}
 	} else {
-		// Transfer failure (file exceeding the limit ?)
-		$langs->load("errors");
+        // Transfer failure (file exceeding the limit ?)
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFailToCreateDir", $upload_dir), null, 'errors');
 	}
 }
@@ -162,7 +162,7 @@ if ($action == 'confirm_deletefile' && GETPOST('confirm') == 'yes') {
 			$newsection = ssh2_sftp_realpath($conn_id, ".").'/./'; // workaround for bug https://bugs.php.net/bug.php?id=64169
 		}
 
-		$langs->load("other");
+        // $langs->load("other");
 
 		// Remote file
 		$filename = $file;
@@ -204,8 +204,8 @@ if (GETPOST("const", 'array') && GETPOST("delete") && GETPOST("delete") == $lang
 
 	if ($conn_id && $ok && !$mesg) {
 		foreach (GETPOST('const', 'array') as $const) {
-			if ($const["check"]) {	// Is checkbox checked
-				$langs->load("other");
+			if ($const["check"]) {    // Is checkbox checked
+                // $langs->load("other");
 
 				// Remote file
 				$file = $const["file"];

@@ -62,7 +62,7 @@ if (!empty($conf->accounting->enabled)) {
 
 // $langs->loadLangs(array('bills', 'compta', 'suppliers', 'companies', 'products', 'banks', 'admin'));
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 
 $id = (GETPOST('facid', 'int') ? GETPOST('facid', 'int') : GETPOST('id', 'int'));
@@ -190,7 +190,7 @@ if (empty($reshook)) {
 			header("Location: ".$_SERVER['PHP_SELF'].'?id='.$result);
 			exit;
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($objectutil->error, $objectutil->errors, 'errors');
 			$action = '';
 		}
@@ -209,7 +209,7 @@ if (empty($reshook)) {
 
 		// Check parameters
 		if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL) && $qualified_for_stock_change) {
-			$langs->load("stocks");
+            // $langs->load("stocks");
 			if (!$idwarehouse || $idwarehouse == -1) {
 				$error++;
 				setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("Warehouse")), null, 'errors');
@@ -1214,7 +1214,7 @@ if (empty($reshook)) {
 		}
 
 		if ($error) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$db->rollback();
 
 			setEventMessages($object->error, $object->errors, 'errors');
@@ -1332,7 +1332,7 @@ if (empty($reshook)) {
 		}
 		$ret = $object->fetch_thirdparty();
 
-		$langs->load('errors');
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -1512,13 +1512,13 @@ if (empty($reshook)) {
 			if ($idprod == -99 || $idprod == 0) {
 				// Product not selected
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ProductOrService")), null, 'errors');
 			}
 			if ($idprod == -1) {
 				// Quantity too low
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorQtyTooLowForThisSupplier"), null, 'errors');
 			}
 		} elseif (empty($error)) { // $price_ht is already set
@@ -1645,7 +1645,7 @@ if (empty($reshook)) {
 
 				// Check parameters
 				if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL) && $qualified_for_stock_change) {
-					$langs->load("stocks");
+                    // $langs->load("stocks");
 					if (!$idwarehouse || $idwarehouse == -1) {
 						$error++;
 						setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv("Warehouse")), null, 'errors');
@@ -1762,7 +1762,7 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -2242,7 +2242,7 @@ if ($action == 'create') {
 	if (!empty($conf->projet->enabled)) {
 		$formproject = new FormProjets($db);
 
-		$langs->load('projects');
+        // $langs->load('projects');
 		print '<tr><td>'.$langs->trans('Project').'</td><td>';
 		print img_picto('', 'project', 'class="pictofixedwidth"').$formproject->select_projects((empty($conf->global->PROJECT_CAN_ALWAYS_LINK_TO_ALL_SUPPLIERS) ? $societe->id : -1), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500 widthcentpercentminusxx');
 		print ' <a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.$soc->id.'&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create&socid='.$soc->id.($fac_rec ? '&fac_rec='.$fac_rec : '')).'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
@@ -2309,7 +2309,7 @@ if ($action == 'create') {
 
 		$txt = $langs->trans($classname);
 		if ($classname == 'CommandeFournisseur') {
-			$langs->load('orders');
+            // $langs->load('orders');
 			$txt = $langs->trans("SupplierOrder");
 		}
 		print '<tr><td>'.$txt.'</td><td>'.$objectsrc->getNomUrl(1);
@@ -2494,7 +2494,7 @@ if ($action == 'create') {
 				}
 
 				if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL) && $qualified_for_stock_change) {
-					$langs->load("stocks");
+                    // $langs->load("stocks");
 					require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 					$formproduct = new FormProduct($db);
 					$warehouse = new Entrepot($db);
@@ -2526,7 +2526,7 @@ if ($action == 'create') {
 				$qualified_for_stock_change = $object->hasProductsOrServices(1);
 			}
 			if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL) && $qualified_for_stock_change) {
-				$langs->load("stocks");
+                // $langs->load("stocks");
 				require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 				$formproduct = new FormProduct($db);
 				$warehouse = new Entrepot($db);
@@ -2650,7 +2650,7 @@ if ($action == 'create') {
 		}
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($usercancreate) {
 				if ($action != 'classify') {
@@ -2764,8 +2764,8 @@ if ($action == 'create') {
 		print $form->editfieldval("Date", 'datef', $object->datep, $object, $form_permission, 'datepicker');
 		print '</td>';
 
-		// Default terms of the settlement
-		$langs->load('bills');
+        // Default terms of the settlement
+        // $langs->load('bills');
 		print '<tr><td class="nowrap">';
 		print '<table width="100%" class="nobordernopadding"><tr><td class="nowrap">';
 		print $langs->trans('PaymentConditions');
@@ -2793,8 +2793,8 @@ if ($action == 'create') {
 		}
 		print '</td>';
 
-		// Mode of payment
-		$langs->load('bills');
+        // Mode of payment
+        // $langs->load('bills');
 		print '<tr><td class="nowrap">';
 		print '<table width="100%" class="nobordernopadding"><tr><td class="nowrap">';
 		print $langs->trans('PaymentMode');

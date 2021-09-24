@@ -65,7 +65,7 @@ class mod_arctic extends ModeleNumRefFicheinter
 	{
 		global $db, $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

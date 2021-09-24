@@ -241,7 +241,7 @@ class ConferenceOrBoothAttendee extends CommonObject
 		global $langs;
 
 		if (!isValidEMail($this->email)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->errors[] = $langs->trans("ErrorBadEMail", $this->email);
 			return -1;
 		}
@@ -906,7 +906,7 @@ class ConferenceOrBoothAttendee extends CommonObject
 		global $langs;
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
-			//$langs->load("eventorganization@eventorganization");
+            //// $langs->load("eventorganization@eventorganization");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Validated');
 			$this->labelStatus[self::STATUS_CANCELED] = $langs->trans('Disabled');
@@ -1016,7 +1016,7 @@ class ConferenceOrBoothAttendee extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("eventorganization@eventorganization");
+        // $langs->load("eventorganization@eventorganization");
 
         if (empty($conf->global->EVENTORGANIZATION_CONFERENCEORBOOTHATTENDEE_ADDON)) {
             $conf->global->EVENTORGANIZATION_CONFERENCEORBOOTHATTENDEE_ADDON = 'mod_conferenceorboothattendee_standard';
@@ -1082,7 +1082,7 @@ class ConferenceOrBoothAttendee extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("eventorganization@eventorganization");
+        // $langs->load("eventorganization@eventorganization");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_conferenceorboothattendee';

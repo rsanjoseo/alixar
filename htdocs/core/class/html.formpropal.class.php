@@ -69,7 +69,7 @@ class FormPropal
 		if ($mode == 'supplier') {
 			$prefix = 'SupplierProposalStatus';
 
-			$langs->load("supplier_proposal");
+			// $langs->load("supplier_proposal");
 			$listofstatus = array(
 				0=>array('id'=>0, 'code'=>'PR_DRAFT'),
 				1=>array('id'=>1, 'code'=>'PR_OPEN'),

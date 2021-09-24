@@ -34,7 +34,7 @@ if (empty($conf) || !is_object($conf)) {
 }
 
 
-$langs->load("modulebuilder");
+// $langs->load("modulebuilder");
 
 $listofexamplesforlink = 'Societe:societe/class/societe.class.php<br>Contact:contact/class/contact.class.php<br>Product:product/class/product.class.php<br>Project:projet/class/project.class.php';
 

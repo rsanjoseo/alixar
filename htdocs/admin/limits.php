@@ -64,14 +64,14 @@ if ($action == 'update') {
 	if ($_POST[$mainmaxdecimalsunit].(!empty($currencycode) ? '_'.$currencycode : '') < 0
 	|| $_POST[$mainmaxdecimalstot] < 0
 	|| $_POST[$mainmaxdecimalsshown] < 0) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		$error++;
 		setEventMessages($langs->trans("ErrorNegativeValueNotAllowed"), null, 'errors');
 	}
 
 	if ($valmainroundingruletot) {
 		if ($valmainroundingruletot * pow(10, $valmainmaxdecimalstot) < 1) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$error++;
 			setEventMessages($langs->trans("ErrorMAIN_ROUNDING_RULE_TOTCanMAIN_MAX_DECIMALS_TOT"), null, 'errors');
 		}
@@ -201,7 +201,7 @@ if (!empty($conf->multicurrency->enabled) && !empty($conf->global->MULTICURRENCY
 }
 
 if (empty($mysoc->country_code)) {
-	$langs->load("errors");
+    // $langs->load("errors");
 	$warnpicto = img_warning($langs->trans("WarningMandatorySetupNotComplete"));
 	print '<br><a href="'.DOL_URL_ROOT.'/admin/company.php?mainmenu=home">'.$warnpicto.' '.$langs->trans("WarningMandatorySetupNotComplete").'</a>';
 } else {

@@ -257,7 +257,7 @@ $year = $year_end;
 
 $result = dol_mkdir($conf->bank->dir_temp);
 if ($result < 0) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	$error++;
 	setEventMessages($langs->trans("ErrorFailedToCreateDir"), null, 'errors');
 } else {

@@ -1458,7 +1458,7 @@ class FactureRec extends CommonInvoice
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('bills');
+		// $langs->load('bills');
 
 		$labelStatus = $langs->trans('Active');
 		$statusType = 'status0';

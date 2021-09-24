@@ -136,7 +136,7 @@ if (empty($pageid)) {
 	// Return header 404
 	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
 
-	$langs->load("website");
+	// $langs->load("website");
 
 	if (!GETPOSTISSET('pageref')) {
 		print $langs->trans("PreviewOfSiteNotYetAvailable", $websitekey);
@@ -206,7 +206,7 @@ if (!file_exists($original_file_osencoded)) {
 	// Return header 404
 	header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found", true, 404);
 
-	$langs->load("website");
+    // $langs->load("website");
 	print $langs->trans("RequestedPageHasNoContentYet", $pageid);
 
 	include DOL_DOCUMENT_ROOT.'/public/error-404.php';

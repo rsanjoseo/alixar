@@ -40,7 +40,7 @@ $hookmanager = new HookManager($db);
 $hookmanager->initHooks(array('interventionindex'));
 
 // Load translation files required by the page
-$langs->load("interventions");
+// $langs->load("interventions");
 
 // Security check
 $socid = GETPOST('socid', 'int');
@@ -211,7 +211,7 @@ if (!empty($conf->ficheinter->enabled)) {
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
 		print '<th colspan="2">'.$langs->trans("DraftFichinter").'</th></tr>';
-		$langs->load("fichinter");
+        // $langs->load("fichinter");
 		$num = $db->num_rows($resql);
 		if ($num) {
 			$i = 0;

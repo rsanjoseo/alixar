@@ -475,7 +475,7 @@ class pdf_beluga extends ModelePDFProjects
 					$qualified = $value['test'];
 					$langstoload = $value['lang'];
 					$projectField = isset($value['project_field']) ? $value['project_field'] : 'fk_projet';
-					$langs->load($langstoload);
+					// $langs->load($langstoload);
 
 					if (!$qualified) {
 						continue;

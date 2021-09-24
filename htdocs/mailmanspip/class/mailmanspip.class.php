@@ -323,7 +323,7 @@ class MailmanSpip
 		$this->mladded_ko = array();
 
 		if (!function_exists("curl_init")) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorFunctionNotAvailableInPHP", "curl_init");
 			return -1;
 		}
@@ -391,7 +391,7 @@ class MailmanSpip
 		$this->mlremoved_ko = array();
 
 		if (!function_exists("curl_init")) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorFunctionNotAvailableInPHP", "curl_init");
 			return -1;
 		}

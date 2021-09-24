@@ -107,7 +107,7 @@ if ($action == 'create') {
  *
  */
 if ($action == 'edit' && !empty($attrname)) {
-	$langs->load("members");
+	// $langs->load("members");
 
 	print "<br>";
 	print load_fiche_titre($langs->trans("FieldEdition", $attrname));

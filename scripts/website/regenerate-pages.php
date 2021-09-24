@@ -63,7 +63,7 @@ include_once DOL_DOCUMENT_ROOT.'/core/lib/website2.lib.php';
  * Main
  */
 
-$langs->load('main');
+// $langs->load('main');
 
 if (!empty($dolibarr_main_db_readonly)) {
 	print "Error: instance in read-onyl mode\n";

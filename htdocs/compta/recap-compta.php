@@ -29,9 +29,9 @@ require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 if (!empty($conf->facture->enabled)) {
-	$langs->load("bills");
+    // $langs->load("bills");
 }
 
 $id = GETPOST('id') ?GETPOST('id', 'int') : GETPOST('socid', 'int');

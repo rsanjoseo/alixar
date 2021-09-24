@@ -28,7 +28,7 @@
 require_once DOL_DOCUMENT_ROOT.'/stripe/class/stripe.class.php';
 
 
-$langs->load("stripe@stripe");
+// $langs->load("stripe@stripe");
 
 
 /**
@@ -194,7 +194,7 @@ class ActionsStripeconnect
 				$stripe = new Stripe($this->db);
 				if ($resteapayer > 0) {
 					if ($stripe->getStripeAccount($conf->entity)) {  // a modifier avec droit stripe
-						$langs->load("withdrawals");
+                        // $langs->load("withdrawals");
 						print '<a class="butActionDelete" href="'.dol_buildpath('/stripeconnect/payment.php?facid='.$object->id.'&action=create', 1).'" title="'.dol_escape_htmltag($langs->trans("StripeConnectPay")).'">'.$langs->trans("StripeConnectPay").'</a>';
 					} else {
 						print '<a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("StripeConnectPay").'</a>';

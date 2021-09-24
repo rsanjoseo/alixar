@@ -76,7 +76,7 @@ $linkback = '<a href="'.DOL_URL_ROOT.'/admin/modules.php?restore_lastsearch_valu
 print load_fiche_titre($langs->trans("DebugBarSetup"), $linkback, 'title_setup');
 
 if (!function_exists('mb_check_encoding')) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	print info_admin($langs->trans("ErrorPHPNeedModule", 'mbstring'), 0, 0, 'error');
 }
 

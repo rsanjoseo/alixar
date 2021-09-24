@@ -96,7 +96,7 @@ if (!$res) {
 // $user is created but empty.
 
 //$langs->setDefaultLang('en_US'); 	// To change default language of $langs
-$langs->load("main"); // To load language file for default language
+// $langs->load("main"); // To load language file for default language
 
 // Load user and its permissions
 $result = $user->fetch('', 'admin'); // Load user for login 'admin'. Comment line to run as anonymous user.

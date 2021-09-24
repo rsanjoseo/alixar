@@ -30,7 +30,7 @@ function mrpAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("mrp");
+	// $langs->load("mrp");
 
 	$h = 0;
 	$head = array();

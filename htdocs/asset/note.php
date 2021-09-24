@@ -109,7 +109,7 @@ if ($id > 0 || !empty($ref)) {
 	// Project
 	if (! empty($conf->projet->enabled))
 	{
-		$langs->load("projects");
+		// $langs->load("projects");
 		$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 		if ($user->rights->asset->creer)
 		{

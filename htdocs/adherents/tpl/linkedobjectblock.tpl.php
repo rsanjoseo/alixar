@@ -29,7 +29,7 @@ global $user;
 
 $langs = $GLOBALS['langs'];
 $linkedObjectBlock = $GLOBALS['linkedObjectBlock'];
-$langs->load("members");
+// $langs->load("members");
 
 $total = 0;
 foreach ($linkedObjectBlock as $key => $objectlink) {

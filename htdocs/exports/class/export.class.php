@@ -164,7 +164,7 @@ class Export
 									$langtoload = $module->getLangFilesArray();
 									if (is_array($langtoload)) {
 										foreach ($langtoload as $key) {
-											$langs->load($key);
+											// $langs->load($key);
 										}
 									}
 
@@ -492,12 +492,12 @@ class Export
 							//var_dump($InfoFieldList[1]);
 							$labeltoshow = dol_trunc($obj->label, 18);
 							if ($InfoFieldList[1] == 'c_stcomm') {
-								$langs->load("companies");
+                                // $langs->load("companies");
 								$labeltoshow = (($langs->trans("StatusProspect".$obj->id) != "StatusProspect".$obj->id) ? $langs->trans("StatusProspect".$obj->id) : $obj->label);
 							}
 							if ($InfoFieldList[1] == 'c_country') {
-								//var_dump($sql);
-								$langs->load("dict");
+                                //var_dump($sql);
+                                // $langs->load("dict");
 								$labeltoshow = (($langs->trans("Country".$obj->code) != "Country".$obj->code) ? $langs->trans("Country".$obj->code) : $obj->label);
 							}
 							if (!empty($ValueField) && $ValueField == $obj->rowid) {

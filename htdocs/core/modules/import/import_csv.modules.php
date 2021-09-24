@@ -196,7 +196,7 @@ class ImportCsv extends ModeleImports
 
 		$this->handle = fopen(dol_osencode($file), "r");
 		if (!$this->handle) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorFailToOpenFile", $file);
 			$ret = -1;
 		} else {

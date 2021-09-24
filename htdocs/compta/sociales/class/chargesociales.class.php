@@ -524,7 +524,7 @@ class ChargeSociales extends CommonObject
 
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            //$langs->load("mymodule");
+            //// $langs->load("mymodule");
             $this->labelStatus[self::STATUS_UNPAID] = $langs->trans('Unpaid');
             $this->labelStatus[self::STATUS_PAID] = $langs->trans('Paid');
             if ($status == self::STATUS_UNPAID && $alreadypaid > 0) {

@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/stock.lib.php';
 
 // Load translation files required by the page
-$langs->load("stocks");
+// $langs->load("stocks");
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
@@ -60,7 +60,7 @@ $morehtmlref .= $langs->trans("LocationSummary").' : '.$object->lieu;
 
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+    // $langs->load("projects");
 	$morehtmlref .= '<br>'.img_picto('', 'project').' '.$langs->trans('Project').' ';
 	if ($usercancreate) {
 		if ($action != 'classify') {

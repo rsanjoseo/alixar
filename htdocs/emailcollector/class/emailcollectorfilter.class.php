@@ -159,12 +159,12 @@ class EmailCollectorFilter extends CommonObject
 	{
 		global $langs;
 		if (empty($this->type)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->errors[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Type"));
 			return -1;
 		}
 		if (!in_array($this->type, array('seen', 'unseen', 'unanswered', 'answered', 'withtrackingidinmsgid', 'withouttrackingidinmsgid', 'withtrackingid', 'withouttrackingid', 'isanswer', 'isnotanswer')) && empty($this->rulevalue)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->errors[] = $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("SearchString"));
 			return -2;
 		}
@@ -398,7 +398,7 @@ class EmailCollectorFilter extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus)) {
 			global $langs;
-			//$langs->load("emailcollector");
+            //// $langs->load("emailcollector");
 			$this->labelStatus[1] = $langs->trans('Enabled');
 			$this->labelStatus[0] = $langs->trans('Disabled');
 		}

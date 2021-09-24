@@ -576,7 +576,7 @@ class Productlot extends CommonObject
 		// phpcs:enable
 		global $langs;
 
-		//$langs->load('stocks');
+		//// $langs->load('stocks');
 
 		return '';
 	}

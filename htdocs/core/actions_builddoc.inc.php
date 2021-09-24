@@ -124,7 +124,7 @@ if ($action == 'remove_file' && $permissiontoadd) {
 			$ret = $object->fetch_thirdparty();
 		}
 
-		$langs->load("other");
+		// $langs->load("other");
 		$filetodelete = GETPOST('file', 'alpha');
 		$file = $upload_dir.'/'.$filetodelete;
 		$dirthumb = dirname($file).'/thumbs/'; // Chemin du dossier contenant la vignette (if file is an image)

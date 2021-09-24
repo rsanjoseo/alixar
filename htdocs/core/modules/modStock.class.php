@@ -264,7 +264,7 @@ class modStock extends DolibarrModules
 
 		// Export stock including batch number
 		if (!empty($conf->productbatch->enabled)) {
-			$langs->load("productbatch");
+			// $langs->load("productbatch");
 
 			// This request is same than previous but without field ps.stock (real stock in warehouse) and with link to subtable productbatch
 			$r++;
@@ -444,7 +444,7 @@ class modStock extends DolibarrModules
 			dol_mkdir($dirodt);
 			$result = dol_copy($src, $dest, 0, 0);
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 				return 0;
 			}

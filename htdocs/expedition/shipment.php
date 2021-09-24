@@ -289,7 +289,7 @@ if ($id > 0 || !empty($ref)) {
 		$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$soc->getNomUrl(1);
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+			// $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if ($user->rights->commande->creer) {
 				if ($action != 'classify') {
@@ -887,7 +887,7 @@ if ($id > 0 || !empty($ref)) {
 				print '<input type="hidden" name="projectid" value="'.$object->fk_project.'">';
 				//print '<table class="border centpercent">';
 
-				$langs->load("stocks");
+                // $langs->load("stocks");
 
 				//print '<tr>';
 

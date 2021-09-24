@@ -153,7 +153,7 @@ class box_graph_invoices_permonth extends ModeleBoxes
 				$px1 = new DolGraph();
 				$mesg = $px1->isGraphKo();
 				if (!$mesg) {
-					$langs->load("bills");
+					// $langs->load("bills");
 
 					$px1->SetData($data1);
 					unset($data1);
@@ -197,7 +197,7 @@ class box_graph_invoices_permonth extends ModeleBoxes
 				$px2 = new DolGraph();
 				$mesg = $px2->isGraphKo();
 				if (!$mesg) {
-					$langs->load("bills");
+                    // $langs->load("bills");
 
 					$px2->SetData($data2);
 					unset($data2);
@@ -227,7 +227,7 @@ class box_graph_invoices_permonth extends ModeleBoxes
 			}
 
 			if (empty($conf->use_javascript_ajax)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$mesg = $langs->trans("WarningFeatureDisabledWithDisplayOptimizedForBlindNoJs");
 			}
 

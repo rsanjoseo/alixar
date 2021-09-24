@@ -136,7 +136,7 @@ if ($action == 'confirm_deletefile' && $confirm == 'yes' && (!isset($permissiont
 		$link->fetch($linkid);
 		$res = $link->delete($user);
 
-		$langs->load('link');
+		// $langs->load('link');
 		if ($res > 0) {
 			setEventMessages($langs->trans("LinkRemoved", $link->label), null, 'mesgs');
 		} else {
@@ -160,7 +160,7 @@ if ($action == 'confirm_deletefile' && $confirm == 'yes' && (!isset($permissiont
 	}
 } elseif ($action == 'confirm_updateline' && GETPOST('save', 'alpha') && GETPOST('link', 'alpha') && (!isset($permissiontoadd) || $permissiontoadd)) {
 	require_once DOL_DOCUMENT_ROOT.'/core/class/link.class.php';
-	$langs->load('link');
+    // $langs->load('link');
 	$link = new Link($db);
 	$f = $link->fetch(GETPOST('linkid', 'int'));
 	if ($f) {
@@ -215,7 +215,7 @@ if ($action == 'confirm_deletefile' && $confirm == 'yes' && (!isset($permissiont
 
 				if (empty($reshook)) {
 					if (preg_match('/^\./', $filenameto)) {
-						$langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
+                        // $langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
 						setEventMessages($langs->trans("ErrorFilenameCantStartWithDot", $filenameto), null, 'errors');
 					} elseif (!file_exists($destpath)) {
 						$result = dol_move($srcpath, $destpath);
@@ -240,11 +240,11 @@ if ($action == 'confirm_deletefile' && $confirm == 'yes' && (!isset($permissiont
 
 							setEventMessages($langs->trans("FileRenamed"), null);
 						} else {
-							$langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
+                            // $langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
 							setEventMessages($langs->trans("ErrorFailToRenameFile", $filenamefrom, $filenameto), null, 'errors');
 						}
 					} else {
-						$langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
+                        // $langs->load("errors"); // lang must be loaded because we can't rely on loading during output, we need var substitution to be done now.
 						setEventMessages($langs->trans("ErrorDestinationAlreadyExists", $filenameto), null, 'errors');
 					}
 				}

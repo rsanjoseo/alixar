@@ -48,7 +48,7 @@ if (!empty($conf->categorie->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('products', 'stocks', 'suppliers', 'companies', 'margins'));
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+	// $langs->load("productbatch");
 }
 
 $action = GETPOST('action', 'aZ09');

@@ -1025,7 +1025,7 @@ class Paiement extends CommonObject
     public function getNextNumRef($soc, $mode = 'next')
     {
         global $conf, $db, $langs;
-        $langs->load("bills");
+        // $langs->load("bills");
 
         // Clean parameters (if not defined or using deprecated value)
         if (empty($conf->global->PAYMENT_ADDON)) {
@@ -1090,7 +1090,7 @@ class Paiement extends CommonObject
 
             return $numref;
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Invoice"));
             return "";
         }
@@ -1242,7 +1242,7 @@ class Paiement extends CommonObject
 		// phpcs:enable
 		global $langs; // TODO Renvoyer le libelle anglais et faire traduction a affichage
 
-		$langs->load('compta');
+        // $langs->load('compta');
 		/*if ($mode == 0)
 		{
 			if ($status == 0) return $langs->trans('ToValidate');

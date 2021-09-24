@@ -100,7 +100,7 @@ class FormAccounting extends Form
 			}
 
 			$selected = 0;
-			$langs->load('accountancy');
+			// $langs->load('accountancy');
 			while ($obj = $this->db->fetch_object($resql)) {
 				$label = $obj->code.' - '.$langs->trans($obj->label);
 
@@ -180,7 +180,7 @@ class FormAccounting extends Form
 			}
 
 			$selected = array();
-			$langs->load('accountancy');
+            // $langs->load('accountancy');
 			while ($obj = $this->db->fetch_object($resql)) {
 				$label = $langs->trans($obj->label);
 
@@ -382,7 +382,7 @@ class FormAccounting extends Form
 			$num_rows = $this->db->num_rows($resql);
 
 			if ($num_rows == 0 && (empty($conf->global->CHARTOFACCOUNTS) || $conf->global->CHARTOFACCOUNTS < 0)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$showempty = $langs->trans("ErrorYouMustFirstSetupYourChartOfAccount");
 			} else {
 				$selected = $selectid; // selectid can be -1, 0, 123

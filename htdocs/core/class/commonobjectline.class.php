@@ -75,7 +75,7 @@ abstract class CommonObjectLine extends CommonObject
 			return '';
 		}
 
-		$langs->load('products');
+		// $langs->load('products');
 
 		$label_type = 'label';
 

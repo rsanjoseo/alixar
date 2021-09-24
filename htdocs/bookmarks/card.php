@@ -111,7 +111,7 @@ if ($action == 'add' || $action == 'addproduct' || $action == 'update') {
 			exit;
 		} else {
 			if ($object->errno == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($langs->transnoentities("WarningBookmarkAlreadyExists"), null, 'warnings');
 			} else {
 				setEventMessages($object->error, $object->errors, 'errors');

@@ -138,15 +138,15 @@ function getValidOnlinePaymentMethods($paymentmethod = '')
 	$validpaymentmethod = array();
 
 	if ((empty($paymentmethod) || $paymentmethod == 'paypal') && !empty($conf->paypal->enabled)) {
-		$langs->load("paypal");
+		// $langs->load("paypal");
 		$validpaymentmethod['paypal'] = 'valid';
 	}
 	if ((empty($paymentmethod) || $paymentmethod == 'paybox') && !empty($conf->paybox->enabled)) {
-		$langs->load("paybox");
+        // $langs->load("paybox");
 		$validpaymentmethod['paybox'] = 'valid';
 	}
 	if ((empty($paymentmethod) || $paymentmethod == 'stripe') && !empty($conf->stripe->enabled)) {
-		$langs->load("stripe");
+        // $langs->load("stripe");
 		$validpaymentmethod['stripe'] = 'valid';
 	}
 	// TODO Add trigger

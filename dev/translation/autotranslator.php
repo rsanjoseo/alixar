@@ -42,7 +42,7 @@ require_once $path.'../../htdocs/core/lib/files.lib.php';
 // After this $db is an opened handler to database. We close it at end of file.
 
 // Load main language strings
-$langs->load("main");
+// $langs->load("main");
 
 // Global variables
 $version='1.14';

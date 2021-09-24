@@ -214,7 +214,7 @@ if ($action == 'viewgraph') {
 	if (!count($search_xaxis)) {
 		setEventMessages($langs->trans("AtLeastOneXAxisIsRequired"), null, 'warnings');
 	} elseif ($mode == 'graph' && $search_graph == 'bars' && count($search_measures) > $MAXMEASURESINBARGRAPH) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("GraphInBarsAreLimitedToNMeasures", $MAXMEASURESINBARGRAPH), null, 'warnings');
 		$search_graph = 'lines';
 	}
@@ -298,11 +298,11 @@ if (is_array($search_groupby) && count($search_groupby)) {
 		asort($arrayofvaluesforgroupby['g_'.$gkey]);
 
 		if (count($arrayofvaluesforgroupby['g_'.$gkey]) > $MAXUNIQUEVALFORGROUP) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			if (strpos($fieldtocount, 'te.') === 0) {
-				//if (!empty($extrafields->attributes[$object->table_element]['langfile'][$gvalwithoutprefix])) {
-				//      $langs->load($extrafields->attributes[$object->table_element]['langfile'][$gvalwithoutprefix]);
-				//}
+                //if (!empty($extrafields->attributes[$object->table_element]['langfile'][$gvalwithoutprefix])) {
+                //      // $langs->load($extrafields->attributes[$object->table_element]['langfile'][$gvalwithoutprefix]);
+                //}
 				$keyforlabeloffield = $extrafields->attributes[$object->table_element]['label'][$gvalwithoutprefix];
 			} else {
 				$keyforlabeloffield = $object->fields[$gvalwithoutprefix]['label'];
@@ -344,7 +344,7 @@ foreach ($arrayoftype as $key => $val) {
 		$newarrayoftype[$key] = $arrayoftype[$key];
 	}
 	if ($val['langs']) {
-		$langs->load($val['langs']);
+        // $langs->load($val['langs']);
 	}
 }
 print $form->selectarray('objecttype', $newarrayoftype, $objecttype, 0, 0, 0, '', 1, 0, 0, '', 'minwidth200', 1);

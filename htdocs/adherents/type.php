@@ -36,7 +36,7 @@ require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent_type.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 
-$langs->load("members");
+// $langs->load("members");
 
 $rowid  = GETPOST('rowid', 'int');
 $action = GETPOST('action', 'aZ09');
@@ -145,7 +145,7 @@ if ($action == 'add' && $user->rights->adherent->configurer) {
 		}
 		if ($num) {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorLabelAlreadyExists", $login), null, 'errors');
 		}
 	}

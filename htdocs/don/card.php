@@ -320,7 +320,7 @@ if (empty($reshook)) {
 
 			$object->fetch_thirdparty();
 
-			$langs->load("other");
+			// $langs->load("other");
 			$upload_dir = $conf->don->dir_output;
 			$file = $upload_dir . '/' . GETPOST('file');
 			$ret=dol_delete_file($file,0,0,0,$object);
@@ -596,7 +596,7 @@ if (!empty($id) && $action == 'edit') {
 		}
 		print '</td></tr>';
 	} else {
-		$langs->load("companies");
+        // $langs->load("companies");
 		print '<tr><td>'.$langs->trans("Company").'</td><td><input type="text" name="societe" class="maxwidth200" value="'.dol_escape_htmltag($object->societe).'"></td></tr>';
 		print '<tr><td>'.$langs->trans("Lastname").'</td><td><input type="text" name="lastname" class="maxwidth200" value="'.dol_escape_htmltag($object->lastname).'"></td></tr>';
 		print '<tr><td>'.$langs->trans("Firstname").'</td><td><input type="text" name="firstname" class="maxwidth200" value="'.dol_escape_htmltag($object->firstname).'"></td></tr>';
@@ -637,7 +637,7 @@ if (!empty($id) && $action == 'edit') {
 	if (!empty($conf->projet->enabled)) {
 		$formproject = new FormProjets($db);
 
-		$langs->load('projects');
+        // $langs->load('projects');
 		print '<tr><td>'.$langs->trans('Project').'</td><td>';
 		$formproject->select_projects(-1, $object->fk_project, 'fk_project', 0, 0, 1, 1, 0, 0, 0, '', 0, 0, 'maxwidth500');
 		print '</td></tr>';
@@ -696,7 +696,7 @@ if (!empty($id) && $action != 'edit') {
 	$morehtmlref = '<div class="refidno">';
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= $langs->trans('Project').' ';
 		if ($user->rights->don->creer) {
 			if ($action != 'classify') {

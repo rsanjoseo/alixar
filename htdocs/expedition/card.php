@@ -64,10 +64,10 @@ if (!empty($conf->projet->enabled)) {
 // $langs->loadLangs(array("sendings", "companies", "bills", 'deliveries', 'orders', 'stocks', 'other', 'propal'));
 
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load('productbatch');
+    // $langs->load('productbatch');
 }
 
 $origin = GETPOST('origin', 'alpha') ?GETPOST('origin', 'alpha') : 'expedition'; // Example: commande, propal
@@ -903,7 +903,7 @@ if ($action == 'create') {
 					$projectid = ($originid ? $originid : 0);
 				}
 
-				$langs->load("projects");
+                // $langs->load("projects");
 				print '<tr>';
 				print '<td>'.$langs->trans("Project").'</td><td colspan="2">';
 				print img_picto('', 'project');
@@ -1686,7 +1686,7 @@ if ($action == 'create') {
 		$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$object->thirdparty->getNomUrl(1);
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 			$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 			if (0) {    // Do not change on shipment
 				if ($action != 'classify') {

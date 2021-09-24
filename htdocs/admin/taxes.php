@@ -283,7 +283,7 @@ echo '</div>';
 
 
 if (!empty($conf->accounting->enabled)) {
-	$langs->load("accountancy");
+	// $langs->load("accountancy");
 	print '<br><br><span class="opacitymedium">'.$langs->trans("AccountingAccountForSalesTaxAreDefinedInto", $langs->transnoentitiesnoconv("MenuAccountancy"), $langs->transnoentitiesnoconv("Setup")).'</span>';
 }
 

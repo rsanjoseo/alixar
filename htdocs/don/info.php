@@ -30,7 +30,7 @@ if (!empty($conf->projet->enabled)) {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 }
 
-$langs->load("donations");
+// $langs->load("donations");
 
 $id = GETPOST('id', 'int');
 $ref = GETPOST('ref', 'alpha');
@@ -78,7 +78,7 @@ $linkback = '<a href="'.DOL_URL_ROOT.'/don/list.php'.(!empty($socid) ? '?socid='
 $morehtmlref = '<div class="refidno">';
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+    // $langs->load("projects");
 	$morehtmlref .= $langs->trans('Project').' ';
 	if ($user->rights->don->creer) {
 		if ($action != 'classify') {

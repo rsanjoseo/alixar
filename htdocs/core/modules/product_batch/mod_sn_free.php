@@ -84,7 +84,7 @@ class mod_sn_free extends ModeleNumRefBatch
 	public function info()
 	{
 		global $langs;
-		$langs->load("companies");
+		// $langs->load("companies");
 		return $langs->trans("LeopardNumRefModelDesc");
 	}
 

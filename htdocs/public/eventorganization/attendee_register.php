@@ -240,7 +240,7 @@ if (empty($reshook) && $action == 'add' && (!empty($conference->id) && $conferen
 	}
 	if (GETPOST("email") && !isValidEmail(GETPOST("email"))) {
 		$error++;
-		$langs->load("errors");
+		// $langs->load("errors");
 		$errmsg .= $langs->trans("ErrorBadEMail", GETPOST("email"))."<br>\n";
 	}
 	if (!GETPOST("country_id")) {

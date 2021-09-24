@@ -34,7 +34,7 @@ if (!empty($conf->projet->enabled)) {
 }
 
 // Load translation files required by the page
-$langs->load("commercial");
+// $langs->load("commercial");
 
 $id = GETPOST('id', 'int');
 
@@ -87,8 +87,8 @@ $morehtmlref = '<div class="refidno">';
 //$morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . $object->thirdparty->getNomUrl(1);
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
-	//$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
+    // $langs->load("projects");
+    //$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 	$morehtmlref .= $langs->trans('Project').': ';
 	if (!empty($object->fk_project)) {
 		$proj = new Project($db);

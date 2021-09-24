@@ -279,7 +279,7 @@ class FormCompany extends Form
 
 		dol_syslog(get_class($this)."::select_departement selected=".$selected.", country_codeid=".$country_codeid, LOG_DEBUG);
 
-		$langs->load("dict");
+		// $langs->load("dict");
 
 		$out = '';
 
@@ -384,7 +384,7 @@ class FormCompany extends Form
 	{
 		// phpcs:enable
 		global $conf, $langs;
-		$langs->load("dict");
+        // $langs->load("dict");
 
 		$sql = "SELECT r.rowid, r.code_region as code, r.nom as label, r.active, c.code as country_code, c.label as country";
 		$sql .= " FROM ".MAIN_DB_PREFIX."c_regions as r, ".MAIN_DB_PREFIX."c_country as c";
@@ -442,7 +442,7 @@ class FormCompany extends Form
 	{
 		// phpcs:enable
 		global $conf, $langs, $user;
-		$langs->load("dict");
+        // $langs->load("dict");
 
 		$out = '';
 
@@ -521,7 +521,7 @@ class FormCompany extends Form
 	{
 		// phpcs:enable
 		global $conf, $langs, $user;
-		$langs->load("dict");
+        // $langs->load("dict");
 
 		$out = '';
 

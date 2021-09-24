@@ -55,7 +55,7 @@ if ($action == 'addlinkbyref' && ! empty($permissiondellink) && !$cancellink && 
 		} elseif ($ret < 0) {
 			setEventMessages($objecttmp->error, $objecttmp->errors, 'errors');
 		} else {
-			$langs->load('errors');
+			// $langs->load('errors');
 			setEventMessage($langs->trans('ErrorRecordNotFound'), 'errors');
 		}
 	}

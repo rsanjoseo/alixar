@@ -936,7 +936,7 @@ if ($modecompta == 'BOOKKEEPING') {
 
 	if (!empty($conf->expensereport->enabled)) {
 		if ($modecompta == 'CREANCES-DETTES' || $modecompta == 'RECETTES-DEPENSES') {
-			$langs->load('trips');
+			// $langs->load('trips');
 			if ($modecompta == 'CREANCES-DETTES') {
 				$sql = "SELECT p.rowid, p.ref, u.rowid as userid, u.firstname, u.lastname, date_format(date_valid,'%Y-%m') as dm, sum(p.total_ht) as amount_ht,sum(p.total_ttc) as amount_ttc";
 				$sql .= " FROM ".MAIN_DB_PREFIX."expensereport as p";

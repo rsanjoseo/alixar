@@ -472,7 +472,7 @@ class SupplierProposal extends CommonObject
                             }
                         }
                         if ($result == 0) {                   // If result == 0, we failed to found the supplier reference price
-                            $langs->load("errors");
+                            // $langs->load("errors");
                             $this->error = "Ref " . $prod->ref . " " . $langs->trans("ErrorQtyTooLowForThisSupplier");
                             $this->db->rollback();
                             dol_syslog(get_class($this) . "::addline we did not found supplier price, so we can't guess unit price");
@@ -481,7 +481,7 @@ class SupplierProposal extends CommonObject
                             return -1;
                         }
                         if ($result == -1) {
-                            $langs->load("errors");
+                            // $langs->load("errors");
                             $this->error = "Ref " . $prod->ref . " " . $langs->trans("ErrorQtyTooLowForThisSupplier");
                             $this->db->rollback();
                             dol_syslog(get_class($this) . "::addline result=" . $result . " - " . $this->error, LOG_DEBUG);
@@ -2177,7 +2177,7 @@ class SupplierProposal extends CommonObject
         // Init/load array of translation of status
         if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
             global $langs;
-            $langs->load("supplier_proposal");
+            // $langs->load("supplier_proposal");
             $this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv("SupplierProposalStatusDraft");
             $this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv("SupplierProposalStatusValidated");
             $this->labelStatus[self::STATUS_SIGNED] = $langs->transnoentitiesnoconv("SupplierProposalStatusSigned");
@@ -2420,7 +2420,7 @@ class SupplierProposal extends CommonObject
     public function getNextNumRef($soc)
     {
         global $conf, $db, $langs;
-        $langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
 
         if (!empty($conf->global->SUPPLIER_PROPOSAL_ADDON)) {
             $mybool = false;
@@ -2453,7 +2453,7 @@ class SupplierProposal extends CommonObject
                 return "";
             }
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("SupplierProposal"));
             return "";
         }
@@ -2657,7 +2657,7 @@ class SupplierProposal extends CommonObject
     {
         global $conf, $langs;
 
-        $langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
         $outputlangs->load("products");
 
         if (!dol_strlen($modele)) {

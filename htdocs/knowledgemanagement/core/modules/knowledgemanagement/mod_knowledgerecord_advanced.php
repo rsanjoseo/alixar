@@ -60,7 +60,7 @@ class mod_knowledgerecord_advanced extends ModeleNumRefKnowledgeRecord
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

@@ -30,7 +30,7 @@ function knowledgemanagementAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("knowledgemanagement");
+	// $langs->load("knowledgemanagement");
 
 	$h = 0;
 	$head = array();

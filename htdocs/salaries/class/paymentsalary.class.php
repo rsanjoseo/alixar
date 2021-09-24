@@ -652,7 +652,7 @@ class PaymentSalary extends CommonObject
         // phpcs:enable
 		global $langs; // TODO Renvoyer le libelle anglais et faire traduction a affichage
 
-		$langs->load('compta');
+		// $langs->load('compta');
 		/*if ($mode == 0)
 			{
 			if ($status == 0) return $langs->trans('ToValidate');

@@ -30,7 +30,7 @@ function asset_admin_prepare_head()
 {
 	global $langs, $conf;
 
-	$langs->load("assets");
+	// $langs->load("assets");
 
 	$h = 0;
 	$head = array();
@@ -75,7 +75,7 @@ function asset_prepare_head(Asset $object)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("assets");
+    // $langs->load("assets");
 
 	$h = 0;
 	$head = array();

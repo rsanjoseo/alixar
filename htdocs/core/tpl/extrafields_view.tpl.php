@@ -96,7 +96,7 @@ if (empty($reshook) && isset($extrafields->attributes[$object->table_element]['l
 
 		// Load language if required
 		if (!empty($extrafields->attributes[$object->table_element]['langfile'][$tmpkeyextra])) {
-			$langs->load($extrafields->attributes[$object->table_element]['langfile'][$tmpkeyextra]);
+			// $langs->load($extrafields->attributes[$object->table_element]['langfile'][$tmpkeyextra]);
 		}
 		if ($action == 'edit_extras') {
 			$value = (GETPOSTISSET("options_".$tmpkeyextra) ? GETPOST("options_".$tmpkeyextra) : $object->array_options["options_".$tmpkeyextra]);

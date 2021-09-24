@@ -1509,7 +1509,7 @@ class Contact extends CommonObject
             return '';
         }
 
-        $langs->load("dict");
+        // $langs->load("dict");
         return $langs->getLabelFromKey($this->db, "Civility" . $code, "c_civility", "code", "label", $code);
     }
 
@@ -1969,7 +1969,7 @@ class Contact extends CommonObject
 	public function libProspCommStatut($statut, $mode = 0, $label = '', $picto = '')
 	{
 		global $langs;
-		$langs->load('customers');
+        // $langs->load('customers');
 
 		if ($mode == 2) {
 			if ($statut == '-1' || $statut == 'ST_NO') {

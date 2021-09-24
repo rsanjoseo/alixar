@@ -34,7 +34,7 @@ class DolMemoryCollector extends MemoryCollector
 	{
 		global $langs;
 
-		$langs->load("other");
+		// $langs->load("other");
 
 		return array(
 			"memory" => array(

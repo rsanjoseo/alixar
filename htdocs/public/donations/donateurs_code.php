@@ -64,7 +64,7 @@ if (empty($conf->don->enabled)) {
 }
 
 
-$langs->load("donations");
+// $langs->load("donations");
 
 
 /*

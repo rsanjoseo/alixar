@@ -66,7 +66,7 @@ class mod_supplier_proposal_saphir extends ModeleNumRefSupplierProposal
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

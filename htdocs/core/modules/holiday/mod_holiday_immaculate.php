@@ -67,7 +67,7 @@ class mod_holiday_immaculate extends ModelNumRefHolidays
 	{
 		global $db, $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

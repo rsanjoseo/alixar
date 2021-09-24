@@ -222,7 +222,7 @@ if ($dirins && $action == 'initmodule' && $modulename) {
 		if ($result <= 0) {
 			if ($result < 0) {
 				$error++;
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFailToCopyDir", $srcdir, $destdir), null, 'errors');
 			} else {
 				// $result == 0
@@ -372,7 +372,7 @@ if ($dirins && $action == 'initapi' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -408,7 +408,7 @@ if ($dirins && $action == 'initphpunit' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -453,7 +453,7 @@ if ($dirins && $action == 'initsqlextrafields' && !empty($module)) {
 		dolReplaceInFile($destfile1, $arrayreplacement);
 		dolReplaceInFile($destfile2, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', ''), null, 'errors');
 	}
 	// TODO Enable in class the property $isextrafieldmanaged = 1
@@ -487,7 +487,7 @@ if ($dirins && $action == 'inithook' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -520,7 +520,7 @@ if ($dirins && $action == 'inittrigger' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -553,7 +553,7 @@ if ($dirins && $action == 'initwidget' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -591,7 +591,7 @@ if ($dirins && $action == 'initcss' && !empty($module)) {
 		$arrayreplacement = array('/\/\/\s*\''.preg_quote('/'.strtolower($module).'/css/'.strtolower($module).'.css.php', '/').'\'/' => '\'/'.strtolower($module).'/css/'.strtolower($module).'.css.php\'');
 		dolReplaceInFile($srcfile, $arrayreplacement, '', 0, 0, 1);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -629,7 +629,7 @@ if ($dirins && $action == 'initjs' && !empty($module)) {
 		$arrayreplacement = array('/\/\/\s*\''.preg_quote('/'.strtolower($module).'/js/'.strtolower($module).'.js.php', '/').'\'/' => '\'/'.strtolower($module).'/js/'.strtolower($module).'.js.php\'');
 		dolReplaceInFile($srcfile, $arrayreplacement, '', 0, 0, 1);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -667,7 +667,7 @@ if ($dirins && $action == 'initcli' && !empty($module)) {
 
 		dolReplaceInFile($destfile, $arrayreplacement);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -717,7 +717,7 @@ if ($dirins && $action == 'initdoc' && !empty($module)) {
 		dol_delete_file($outputfiledoc, 0, 0, 0, null, false, 0);
 		dol_delete_file($outputfiledocpdf, 0, 0, 0, null, false, 0);
 	} else {
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans('ErrorFailToCreateFile', $destfile), null, 'errors');
 	}
 }
@@ -1060,7 +1060,7 @@ if ($dirins && $action == 'initobject' && $module && $objectname) {
 			if ($result <= 0) {
 				if ($result < 0) {
 					$error++;
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorFailToCopyFile", $srcdir.'/'.$srcfile, $destdir.'/'.$destfile), null, 'errors');
 				} else {
 					// $result == 0
@@ -1515,7 +1515,7 @@ if ($dirins && $action == 'generatepackage') {
 		}
 	} else {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		dol_print_error($db, $langs->trans("ErrorFailedToLoadModuleDescriptorForXXX", $module));
 		exit;
 	}
@@ -1539,12 +1539,12 @@ if ($dirins && $action == 'generatepackage') {
 			setEventMessages($langs->trans("ZipFileGeneratedInto", $outputfilezip), null);
 		} else {
 			$error++;
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFailToGenerateFile", $outputfilezip), null, 'errors');
 		}
 	} else {
 		$error++;
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($langs->trans("ErrorCheckVersionIsDefined"), null, 'errors');
 	}
 }
@@ -1706,7 +1706,7 @@ if (!$dirins) {
 } else {
 	if ($dirins_ok) {
 		if (!is_writable(dol_osencode($dirins))) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$message = info_admin($langs->trans("ErrorFailedToWriteInDir", $dirins));
 			$allowfromweb = 0;
 		}
@@ -1757,7 +1757,7 @@ if (!empty($module) && $module != 'initmodule' && $module != 'deletemodule') {
 		if (empty($forceddirread)) {
 			$error++;
 		}
-		$langs->load("errors");
+        // $langs->load("errors");
 		print img_warning('').' '.$langs->trans("ErrorFailedToLoadModuleDescriptorForXXX", $module).'<br>';
 		print $loadclasserrormessage;
 	}
@@ -3866,7 +3866,7 @@ if ($module == 'initmodule') {
 				}
 			} else {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				dol_print_error($db, $langs->trans("ErrorFailedToLoadModuleDescriptorForXXX", $module));
 				exit;
 			}

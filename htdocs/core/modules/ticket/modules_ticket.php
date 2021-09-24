@@ -85,7 +85,7 @@ abstract class ModeleNumRefTicket
 	public function info()
 	{
 		global $langs;
-		$langs->load("ticket");
+		// $langs->load("ticket");
 		return $langs->trans("NoDescription");
 	}
 
@@ -97,7 +97,7 @@ abstract class ModeleNumRefTicket
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("ticket");
+        // $langs->load("ticket");
 		return $langs->trans("NoExample");
 	}
 
@@ -133,7 +133,7 @@ abstract class ModeleNumRefTicket
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

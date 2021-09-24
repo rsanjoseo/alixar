@@ -280,7 +280,7 @@ if (!$modulename) {
 // Load all lang files of module
 if (isset($objMod->langfiles) && is_array($objMod->langfiles)) {
 	foreach ($objMod->langfiles as $domain) {
-		$langs->load($domain);
+		// $langs->load($domain);
 	}
 }
 

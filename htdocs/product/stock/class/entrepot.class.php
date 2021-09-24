@@ -681,7 +681,7 @@ class Entrepot extends CommonObject
             $statusType = 'status4';
         }
 
-        $langs->load('stocks');
+        // $langs->load('stocks');
         $label = $langs->trans($this->statuts[$status]);
         $labelshort = $langs->trans($this->statuts[$status]);
 
@@ -702,7 +702,7 @@ class Entrepot extends CommonObject
 	public function getNomUrl($withpicto = 0, $option = '', $showfullpath = 0, $notooltip = 0, $morecss = '', $save_lastsearch_value = -1)
 	{
 		global $conf, $langs, $hookmanager;
-		$langs->load("stocks");
+        // $langs->load("stocks");
 
 		if (!empty($conf->dol_no_mouse_hover)) {
 			$notooltip = 1; // Force disable tooltips
@@ -884,7 +884,7 @@ class Entrepot extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("stocks");
+        // $langs->load("stocks");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {

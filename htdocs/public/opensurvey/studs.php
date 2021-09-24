@@ -253,7 +253,7 @@ $arrayofcss = array('/opensurvey/css/style.css');
 llxHeaderSurvey($object->title, "", 0, 0, $arrayofjs, $arrayofcss, $numsondage);
 
 if (empty($object->ref)) {     // For survey, id is a hex string
-	$langs->load("errors");
+    // $langs->load("errors");
 	print $langs->trans("ErrorRecordNotFound");
 
 	llxFooterSurvey();

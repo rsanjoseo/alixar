@@ -807,7 +807,7 @@ class Product extends CommonObject
 					}
 				} else {
 					// Product already exists with this ref
-					$langs->load("products");
+                    // $langs->load("products");
 					$error++;
 					$this->error = "ErrorProductAlreadyExists";
 				}
@@ -1228,7 +1228,7 @@ class Product extends CommonObject
 							// do not use dol_move with directory
 							$res = @rename($olddir, $newdir);
 							if (!$res) {
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$this->error = $langs->trans('ErrorFailToRenameDir', $olddir, $newdir);
 								$error++;
 							}
@@ -1255,7 +1255,7 @@ class Product extends CommonObject
 				}
 			} else {
 				if ($this->db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					if (empty($conf->barcode->enabled) || empty($this->barcode)) {
 						$this->error = $langs->trans("Error")." : ".$langs->trans("ErrorProductAlreadyExists", $this->ref);
 					} else {
@@ -4827,7 +4827,7 @@ class Product extends CommonObject
 		}
 		if ($this->type == Product::TYPE_PRODUCT || !empty($conf->global->STOCK_SUPPORTS_SERVICES)) {
 			if (!empty($conf->productbatch->enabled)) {
-				$langs->load("productbatch");
+                // $langs->load("productbatch");
 				$label .= "<br><b>".$langs->trans("ManageLotSerial").'</b>: '.$this->getLibStatut(0, 2);
 			}
 		}
@@ -4959,7 +4959,7 @@ class Product extends CommonObject
     {
         global $conf, $user, $langs;
 
-        $langs->load("products");
+        // $langs->load("products");
         $outputlangs->load("products");
 
         // Positionne le modele sur le nom du modele a utiliser
@@ -5015,9 +5015,9 @@ class Product extends CommonObject
 
 		$labelStatus = $labelStatusShort = '';
 
-		$langs->load('products');
+        // $langs->load('products');
 		if (!empty($conf->productbatch->enabled)) {
-			$langs->load("productbatch");
+            // $langs->load("productbatch");
 		}
 
 		if ($type == 2) {
@@ -5088,7 +5088,7 @@ class Product extends CommonObject
 	public function getLibFinished()
 	{
 		global $langs;
-		$langs->load('products');
+        // $langs->load('products');
 
 		if (isset($this->finished) && $this->finished >= 0) {
 			$sql = 'SELECT label, code FROM '.MAIN_DB_PREFIX.'c_product_nature where code='.((int) $this->finished).' AND active=1';
@@ -5789,7 +5789,7 @@ class Product extends CommonObject
 			return '';
 		}
 
-		$langs->load('products');
+        // $langs->load('products');
 
 		$label_type = 'label';
 		if ($type == 'short') {

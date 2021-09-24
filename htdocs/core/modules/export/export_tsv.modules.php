@@ -170,7 +170,7 @@ class ExportTsv extends ModeleExports
 		$outputlangs->load("exports");
 		$this->handle = fopen($file, "wt");
 		if (!$this->handle) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorFailToCreateFile", $file);
 			$ret = -1;
 		}

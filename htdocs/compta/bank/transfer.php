@@ -57,7 +57,7 @@ if ($reshook < 0) {
 	setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
 }
 if ($action == 'add') {
-	$langs->load("errors");
+	// $langs->load("errors");
 
 	$dateo = dol_mktime(12, 0, 0, GETPOST('remonth', 'int'), GETPOST('reday', 'int'), GETPOST('reyear', 'int'));
 	$label = GETPOST('label', 'alpha');

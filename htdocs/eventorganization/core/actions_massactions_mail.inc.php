@@ -72,7 +72,7 @@ if (!$error && $massaction == 'confirm_presend_attendees') {
 	$resaction = '';
 	$nbsent = 0;
 	$nbignored = 0;
-	$langs->load("mails");
+	// $langs->load("mails");
 	include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
 	$listofobjectid = array();
@@ -157,8 +157,7 @@ if (!$error && $massaction == 'confirm_presend_attendees') {
 			}
 			$sendtocc = implode(',', $tmparray);
 
-
-			$langs->load("commercial");
+            // $langs->load("commercial");
 
 			$reg = array();
 			$fromtype = GETPOST('fromtype');
@@ -269,7 +268,7 @@ if (!$error && $massaction == 'confirm_presend_attendees') {
 
 					$nbsent++; // Nb of object sent
 				} else {
-					$langs->load("other");
+                    // $langs->load("other");
 					if ($mailfile->error) {
 						$resaction .= $langs->trans('ErrorFailedToSendMail', $from, $sendto);
 						$resaction .= '<br><div class="error">' . $mailfile->error . '</div>';

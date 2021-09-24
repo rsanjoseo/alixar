@@ -59,7 +59,7 @@ if (!empty($conf->variants->enabled)) {
 
 // $langs->loadLangs(array('admin', 'orders', 'sendings', 'companies', 'bills', 'propal', 'receptions', 'supplier_proposal', 'deliveries', 'products', 'stocks', 'productbatch'));
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 
 $id = GETPOST('id', 'int');
@@ -386,7 +386,7 @@ if (empty($reshook)) {
 	if ($action == 'addline' && $usercancreate) {
 		$db->begin();
 
-		$langs->load('errors');
+        // $langs->load('errors');
 		$error = 0;
 
 		// Set if we used free entry or predefined product
@@ -583,13 +583,13 @@ if (empty($reshook)) {
 			if ($idprod == -99 || $idprod == 0) {
 				// Product not selected
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("ProductOrService")), null, 'errors');
 			}
 			if ($idprod == -1) {
 				// Quantity too low
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorQtyTooLowForThisSupplier"), null, 'errors');
 			}
 		} elseif (empty($error)) { // $price_ht is already set
@@ -1082,7 +1082,7 @@ if (empty($reshook)) {
 
 				$result = $object->Livraison($user, $date_liv, GETPOST("type"), GETPOST("comment")); // GETPOST("type") is 'tot', 'par', 'nev', 'can'
 				if ($result > 0) {
-					$langs->load("deliveries");
+                    // $langs->load("deliveries");
 					setEventMessages($langs->trans("DeliveryStateSaved"), null);
 					$action = '';
 				} elseif ($result == -3) {
@@ -1352,7 +1352,7 @@ if (empty($reshook)) {
 			}
 
 			if ($error) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$db->rollback();
 				$action = 'create';
 				$_GET['socid'] = $_POST['socid'];
@@ -1460,7 +1460,7 @@ if (empty($reshook)) {
 				exit;
 			} else {
 				if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 				} else {
 					setEventMessages($object->error, $object->errors, 'errors');
@@ -1690,7 +1690,7 @@ if ($action == 'create') {
 
 	// Bank Account
 	if (!empty($conf->global->BANK_ASK_PAYMENT_BANK_DURING_SUPPLIER_ORDER) && !empty($conf->banque->enabled)) {
-		$langs->load("bank");
+        // $langs->load("bank");
 		print '<tr><td>'.$langs->trans('BankAccount').'</td><td>';
 		print img_picto('', 'bank_account', 'class="paddingrightonly"');
 		$form->select_comptes($fk_account, 'fk_account', 0, '', 1);
@@ -1701,7 +1701,7 @@ if ($action == 'create') {
 	if (!empty($conf->projet->enabled)) {
 		$formproject = new FormProjets($db);
 
-		$langs->load('projects');
+        // $langs->load('projects');
 		print '<tr><td>'.$langs->trans('Project').'</td><td>';
 		print img_picto('', 'project').$formproject->select_projects((empty($conf->global->PROJECT_CAN_ALWAYS_LINK_TO_ALL_SUPPLIERS) ? $societe->id : -1), $projectid, 'projectid', 0, 0, 1, 1, 0, 0, 0, '', 1, 0, 'maxwidth500');
 		print ' &nbsp; <a href="'.DOL_URL_ROOT.'/projet/card.php?socid='.$societe->id.'&action=create&status=1&backtopage='.urlencode($_SERVER["PHP_SELF"].'?action=create&socid='.$societe->id).'"><span class="fa fa-plus-circle valignmiddle" title="'.$langs->trans("AddProject").'"></span></a>';
@@ -1878,7 +1878,7 @@ if ($action == 'create') {
 
 		$formquestion = array();
 		if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_VALIDATE_ORDER) && $qualified_for_stock_change) {
-			$langs->load("stocks");
+            // $langs->load("stocks");
 			require_once DOL_DOCUMENT_ROOT.'/product/class/html.formproduct.class.php';
 			$formproduct = new FormProduct($db);
 			$forcecombo = 0;
@@ -1985,7 +1985,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($usercancreate) {
 			if ($action != 'classify') {
@@ -2068,8 +2068,8 @@ if ($action == 'create') {
 
 	print '</td></tr>';
 
-	// Default terms of the settlement
-	$langs->load('bills');
+    // Default terms of the settlement
+    // $langs->load('bills');
 	print '<tr><td class="nowrap">';
 	print '<table class="nobordernopadding centpercent"><tr><td class="nowrap">';
 	print $langs->trans('PaymentConditions');
@@ -2087,8 +2087,8 @@ if ($action == 'create') {
 	print "</td>";
 	print '</tr>';
 
-	// Mode of payment
-	$langs->load('bills');
+    // Mode of payment
+    // $langs->load('bills');
 	print '<tr><td class="nowrap">';
 	print '<table class="nobordernopadding centpercent"><tr><td class="nowrap">';
 	print $langs->trans('PaymentMode');

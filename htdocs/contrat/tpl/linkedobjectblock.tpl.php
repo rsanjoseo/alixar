@@ -33,7 +33,7 @@ $langs = $GLOBALS['langs'];
 $linkedObjectBlock = $GLOBALS['linkedObjectBlock'];
 
 // Load translation files required by the page
-$langs->load("contracts");
+// $langs->load("contracts");
 
 $total = 0; $ilink = 0;
 foreach ($linkedObjectBlock as $key => $objectlink) {

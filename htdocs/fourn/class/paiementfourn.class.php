@@ -543,7 +543,7 @@ class PaiementFourn extends Paiement
 		// phpcs:enable
 		global $langs;
 
-		$langs->load('compta');
+		// $langs->load('compta');
 		/*if ($mode == 0)
 		{
 			if ($status == 0) return $langs->trans('ToValidate');
@@ -680,7 +680,7 @@ class PaiementFourn extends Paiement
     public function getNextNumRef($soc, $mode = 'next')
     {
         global $conf, $db, $langs;
-        $langs->load("bills");
+        // $langs->load("bills");
 
         // Clean parameters (if not defined or using deprecated value)
         if (empty($conf->global->SUPPLIER_PAYMENT_ADDON)) {
@@ -745,7 +745,7 @@ class PaiementFourn extends Paiement
 
             return $numref;
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Supplier"));
             return "";
         }
@@ -766,7 +766,7 @@ class PaiementFourn extends Paiement
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("suppliers");
+        // $langs->load("suppliers");
 
 		// Set the model on the model name to use
 		if (empty($modele)) {

@@ -51,7 +51,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice.lib.php';
 // Load translation files required by the page
 // $langs->loadLangs(array('compta', 'bills'));
 if (!empty($conf->commande->enabled)) {
-	$langs->load("orders");
+	// $langs->load("orders");
 }
 
 $action = GETPOST('action', 'aZ09');
@@ -117,7 +117,7 @@ print '</div><div class="fichetwothirdright"><div class="ficheaddleft">';
 
 // Latest modified customer invoices
 if (!empty($conf->facture->enabled) && !empty($user->rights->facture->lire)) {
-	$langs->load("boxes");
+    // $langs->load("boxes");
 	$tmpinvoice = new Facture($db);
 
 	$sql = "SELECT f.rowid, f.ref, f.fk_statut as status, f.type, f.total_ht, f.total_tva, f.total_ttc, f.paye, f.tms";
@@ -264,7 +264,7 @@ if (!empty($conf->facture->enabled) && !empty($user->rights->facture->lire)) {
 
 // Last modified supplier invoices
 if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD) && $user->rights->fournisseur->facture->lire) || (!empty($conf->supplier_invoice->enabled) && $user->rights->supplier_invoice->lire)) {
-	$langs->load("boxes");
+    // $langs->load("boxes");
 	$facstatic = new FactureFournisseur($db);
 
 	$sql = "SELECT ff.rowid, ff.ref, ff.fk_statut as status, ff.type, ff.libelle, ff.total_ht, ff.total_tva, ff.total_ttc, ff.tms, ff.paye, ff.ref_supplier";
@@ -392,7 +392,7 @@ if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SU
 if (!empty($conf->don->enabled) && !empty($user->rights->don->lire)) {
 	include_once DOL_DOCUMENT_ROOT.'/don/class/don.class.php';
 
-	$langs->load("boxes");
+    // $langs->load("boxes");
 	$donationstatic = new Don($db);
 
 	$sql = "SELECT d.rowid, d.lastname, d.firstname, d.societe, d.datedon as date, d.tms as dm, d.amount, d.fk_statut as status";
@@ -574,7 +574,7 @@ if (!empty($conf->tax->enabled) && !empty($user->rights->tax->charges->lire)) {
  */
 if (!empty($conf->facture->enabled) && !empty($conf->commande->enabled) && $user->rights->commande->lire && empty($conf->global->WORKFLOW_DISABLE_CREATE_INVOICE_FROM_ORDER)) {
 	$commandestatic = new Commande($db);
-	$langs->load("orders");
+    // $langs->load("orders");
 
 	$sql = "SELECT sum(f.total_ht) as tot_fht, sum(f.total_ttc) as tot_fttc";
 	$sql .= ", s.nom as name, s.email";

@@ -44,7 +44,7 @@ function contact_prepare_head(Contact $object)
 
 	if ((!empty($conf->ldap->enabled) && !empty($conf->global->LDAP_CONTACT_ACTIVE))
 		&& (empty($conf->global->MAIN_DISABLE_LDAP_TAB) || !empty($user->admin))) {
-		$langs->load("ldap");
+		// $langs->load("ldap");
 
 		$head[$tab][0] = DOL_URL_ROOT.'/contact/ldap.php?id='.$object->id;
 		$head[$tab][1] = $langs->trans("LDAPCard");

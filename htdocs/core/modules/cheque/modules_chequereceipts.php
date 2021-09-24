@@ -59,7 +59,7 @@ abstract class ModeleNumRefChequeReceipts
 	public function info()
 	{
 		global $langs;
-		$langs->load("bills");
+		// $langs->load("bills");
 		return $langs->trans("NoDescription");
 	}
 
@@ -71,7 +71,7 @@ abstract class ModeleNumRefChequeReceipts
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("bills");
+        // $langs->load("bills");
 		return $langs->trans("NoExample");
 	}
 
@@ -107,7 +107,7 @@ abstract class ModeleNumRefChequeReceipts
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");
@@ -176,7 +176,7 @@ abstract class ModeleChequeReceipts extends CommonDocGenerator
 function chequereceipt_pdf_create($db, $id, $message, $modele, $outputlangs)
 {
 	global $conf, $langs;
-	$langs->load("bills");
+    // $langs->load("bills");
 
 	$dir = DOL_DOCUMENT_ROOT."/core/modules/cheque/doc/";
 

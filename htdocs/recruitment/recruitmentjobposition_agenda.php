@@ -159,7 +159,7 @@ if ($object->id > 0) {
 	llxHeader('', $title, $help_url);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+		// $langs->load("mails");
 	}
 	$head = recruitmentjobpositionPrepareHead($object);
 
@@ -180,7 +180,7 @@ if ($object->id > 0) {
 	*/
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= $langs->trans('Project').' ';
 		if ($permissiontoadd) {
 			if ($action != 'classify') {

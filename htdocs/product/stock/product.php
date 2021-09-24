@@ -57,7 +57,7 @@ if (!empty($conf->variants->enabled)) {
 // Load translation files required by the page
 // $langs->loadLangs(array('products', 'suppliers', 'orders', 'bills', 'stocks', 'sendings', 'margins'));
 if (!empty($conf->productbatch->enabled)) {
-	$langs->load("productbatch");
+	// $langs->load("productbatch");
 }
 
 $backtopage = GETPOST('backtopage', 'alpha');

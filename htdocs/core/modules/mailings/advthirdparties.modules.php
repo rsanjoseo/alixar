@@ -225,7 +225,7 @@ class mailing_advthirdparties extends MailingTargets
 	{
 		global $conf, $langs;
 
-		$langs->load("companies");
+		// $langs->load("companies");
 
 		$s = '';
 		$s .= '<select name="filter" class="flat">';

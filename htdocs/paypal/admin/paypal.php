@@ -156,7 +156,7 @@ print '<span class="opacitymedium">'.$langs->trans("PaypalDesc")."</span><br>\n"
 
 // Test if php curl exist
 if (!function_exists('curl_version')) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	setEventMessages($langs->trans("ErrorPhpCurlNotInstalled"), null, 'errors');
 }
 
@@ -313,7 +313,7 @@ if (!empty($conf->use_javascript_ajax)) {
 	print '&nbsp;'.img_picto($langs->trans('Generate'), 'refresh', 'id="generate_token" class="linkobject"');
 }
 if (!empty($conf->global->PAYMENT_SECURITY_ACCEPT_ANY_TOKEN)) {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print img_warning($langs->trans("WarningTheHiddenOptionIsOn", 'PAYMENT_SECURITY_ACCEPT_ANY_TOKEN'), '', 'pictowarning marginleftonly');
 }
 print '</td></tr>';

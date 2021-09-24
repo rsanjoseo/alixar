@@ -30,7 +30,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/emailing.lib.php';
 $id = GETPOST('id', 'int');
 
 // Load translation files required by the page
-$langs->load("mails");
+// $langs->load("mails");
 
 // Security check
 if (!$user->rights->mailing->lire || (empty($conf->global->EXTERNAL_USERS_ARE_AUTHORIZED) && $user->socid > 0)) {

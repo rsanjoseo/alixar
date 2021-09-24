@@ -618,7 +618,7 @@ if ($id) {
 					$error = $hookmanager->error; $errors = $hookmanager->errors;
 
 					if (empty($reshook)) {
-						$langs->load("accountancy");
+						// $langs->load("accountancy");
 						foreach ($fieldlist as $field => $value) {
 							$showfield = 1;
 							$class = "left";

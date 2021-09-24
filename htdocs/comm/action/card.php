@@ -437,7 +437,7 @@ if (empty($reshook) && $action == 'add') {
 						if ($res <= 0) {
 							// If error
 							$db->rollback();
-							$langs->load("errors");
+							// $langs->load("errors");
 							$error = $langs->trans('ErrorReminderActionCommCreation');
 							setEventMessages($error, null, 'errors');
 							$action = 'create'; $donotclearsession = 1;
@@ -464,7 +464,7 @@ if (empty($reshook) && $action == 'add') {
 			} else {
 				// If error
 				$db->rollback();
-				$langs->load("errors");
+                // $langs->load("errors");
 				$error = $langs->trans($object->error);
 				setEventMessages($error, null, 'errors');
 				$action = 'create'; $donotclearsession = 1;
@@ -709,8 +709,8 @@ if (empty($reshook) && $action == 'update') {
 						$res = $actionCommReminder->create($user);
 
 						if ($res <= 0) {
-							// If error
-							$langs->load("errors");
+                            // If error
+                            // $langs->load("errors");
 							$error = $langs->trans('ErrorReminderActionCommCreation');
 							setEventMessages($error, null, 'errors');
 							$action = 'create'; $donotclearsession = 1;
@@ -1208,7 +1208,7 @@ if ($action == 'create') {
 
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 
 		$projectid = GETPOST('projectid', 'int');
 
@@ -1371,7 +1371,7 @@ if ($action == 'create') {
 if ($id > 0) {
 	$result1 = $object->fetch($id);
 	if ($result1 <= 0) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print $langs->trans("ErrorRecordNotFound");
 
 		llxFooter();
@@ -1683,7 +1683,7 @@ if ($id > 0) {
 
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
+            // $langs->load("projects");
 
 			print '<tr><td class="titlefieldcreate">'.$langs->trans("Project").'</td><td>';
 			print img_picto('', 'project', 'class="paddingrightonly"');
@@ -1882,8 +1882,8 @@ if ($id > 0) {
 		//$morehtmlref.='<br>'.$langs->trans('ThirdParty') . ' : ' . $object->thirdparty->getNomUrl(1);
 		// Project
 		if (!empty($conf->projet->enabled)) {
-			$langs->load("projects");
-			//$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
+            // $langs->load("projects");
+            //$morehtmlref.='<br>'.$langs->trans('Project') . ' ';
 			$morehtmlref .= $langs->trans('Project').' ';
 			if ($user->rights->agenda->allactions->create ||
 				(($object->authorid == $user->id || $object->userownerid == $user->id) && $user->rights->agenda->myactions->create)) {

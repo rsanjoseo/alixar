@@ -211,7 +211,7 @@ if (empty($reshook)) {
 
 			$result = $object->delete($user);
 			if ($result < 0) {
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($langs->trans("ErrorUserCannotBeDelete"), null, 'errors');
 			} else {
 				setEventMessages($langs->trans("RecordDeleted"), null);
@@ -350,7 +350,7 @@ if (empty($reshook)) {
 				header("Location: ".$_SERVER['PHP_SELF'].'?id='.$id);
 				exit;
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$db->rollback();
 				setEventMessages($object->error, $object->errors, 'errors');
 				$action = "create"; // Go back to create page
@@ -503,7 +503,7 @@ if (empty($reshook)) {
 						$object->photo = dol_sanitizeFileName($_FILES['photo']['name']);
 					} else {
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($langs->trans("ErrorBadImageFormat"), null, 'errors');
 						dol_syslog($langs->transnoentities("ErrorBadImageFormat"), LOG_INFO);
 					}
@@ -514,7 +514,7 @@ if (empty($reshook)) {
 					if ($ret < 0) {
 						$error++;
 						if ($db->errno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							setEventMessages($langs->trans("ErrorLoginAlreadyExists", $object->login), null, 'errors');
 						} else {
 							setEventMessages($object->error, $object->errors, 'errors');
@@ -578,7 +578,7 @@ if (empty($reshook)) {
 							}
 						} else {
 							$error++;
-							$langs->load("errors");
+                            // $langs->load("errors");
 							setEventMessages($langs->trans("ErrorFailedToCreateDir", $dir), $mesgs, 'errors');
 						}
 					}
@@ -597,7 +597,7 @@ if (empty($reshook)) {
 					$login = $_SESSION["dol_login"];
 					if ($login && $login == $object->oldcopy->login && $object->oldcopy->login != $object->login) {    // Current user has changed its login
 						$error++;
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($langs->transnoentitiesnoconv("WarningYourLoginWasModifiedPleaseLogin"), null, 'warnings');
 					}
 				} else {
@@ -1231,7 +1231,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 	if ((!empty($conf->salaries->enabled) && !empty($user->rights->salaries->read) && in_array($id, $childids))
 		|| (!empty($conf->salaries->enabled) && !empty($user->rights->salaries->readall))
 		|| (!empty($conf->hrm->enabled) && !empty($user->rights->hrm->employee->read))) {
-		$langs->load("salaries");
+        // $langs->load("salaries");
 
 		// THM
 		print '<tr><td>';
@@ -1533,8 +1533,8 @@ if ($action == 'create' || $action == 'adduserldap') {
 				|| (!empty($conf->salaries->enabled) && !empty($user->rights->salaries->readall))
 				|| (!empty($conf->hrm->enabled) && !empty($user->rights->hrm->employee->read))) {
 				// Even a superior can't see this info of its subordinates wihtout $user->rights->salaries->read and $user->rights->hrm->employee->read (setting/viewing is reserverd to HR people).
-				// However, he can see the valuation of timesheet of its subordinates even without these permissions.
-				$langs->load("salaries");
+                // However, he can see the valuation of timesheet of its subordinates even without these permissions.
+                // $langs->load("salaries");
 
 				// THM
 				print '<tr><td>';
@@ -1626,7 +1626,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 
 			// Default language
 			if (!empty($conf->global->MAIN_MULTILANGS)) {
-				$langs->load("languages");
+                // $langs->load("languages");
 				require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 				print '<tr><td class="titlefield">';
 				print $form->textwithpicto($langs->trans("DefaultLang"), $langs->trans("WarningNotLangOfInterface", $langs->transnoentitiesnoconv("UserGUISetup")));
@@ -1697,7 +1697,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 
 			// Module Adherent
 			if (!empty($conf->adherent->enabled)) {
-				$langs->load("members");
+                // $langs->load("members");
 				print '<tr><td>'.$langs->trans("LinkedToDolibarrMember").'</td>';
 				print '<td>';
 				if ($object->fk_member) {
@@ -1849,10 +1849,10 @@ if ($action == 'create' || $action == 'adduserldap') {
 			if (empty($reshook)) {
 				if (empty($user->socid)) {
 					if (!empty($object->email)) {
-						$langs->load("mails");
+                        // $langs->load("mails");
 						print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER['PHP_SELF'].'?id='.$object->id.'&action=presend&mode=init#formmailbeforetitle">'.$langs->trans('SendMail').'</a></div>';
 					} else {
-						$langs->load("mails");
+                        // $langs->load("mails");
 						print '<div class="inline-block divButAction"><a class="butActionRefused classfortooltip" href="#" title="'.dol_escape_htmltag($langs->trans("NoEMail")).'">'.$langs->trans('SendMail').'</a></div>';
 					}
 				}
@@ -2078,7 +2078,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 			// Administrator
 			print '<tr><td>'.$langs->trans("Administrator").'</td>';
 			if ($object->socid > 0) {
-				$langs->load("admin");
+                // $langs->load("admin");
 				print '<td>';
 				print '<input type="hidden" name="admin" value="'.$object->admin.'">'.yn($object->admin);
 				print ' ('.$langs->trans("ExternalUser").')';
@@ -2573,7 +2573,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 
 			// Module Adherent
 			if (!empty($conf->adherent->enabled)) {
-				$langs->load("members");
+                // $langs->load("members");
 				print '<tr><td>'.$langs->trans("LinkedToDolibarrMember").'</td>';
 				print '<td>';
 				if ($object->fk_member) {
@@ -2661,7 +2661,7 @@ if ($action == 'create' || $action == 'adduserldap') {
 			if ((!empty($conf->salaries->enabled) && !empty($user->rights->salaries->read) && in_array($id, $childids))
 				|| (!empty($conf->salaries->enabled) && !empty($user->rights->salaries->readall))
 				|| (!empty($conf->hrm->enabled) && !empty($user->rights->hrm->employee->read))) {
-				$langs->load("salaries");
+                // $langs->load("salaries");
 
 				// THM
 				print '<tr><td>';

@@ -52,7 +52,7 @@ if (!empty($conf->projet->enabled)) {
 // $langs->loadLangs(array("sendings", "bills", 'deliveries', 'orders'));
 
 if (!empty($conf->incoterm->enabled)) {
-	$langs->load('incoterm');
+	// $langs->load('incoterm');
 }
 
 $action = GETPOST('action', 'aZ09');
@@ -326,7 +326,7 @@ if ($action == 'create') {    // Create. Seems to no be used
 			$morehtmlref .= '<br>'.$langs->trans('ThirdParty').' : '.$expedition->thirdparty->getNomUrl(1);
 			// Project
 			if (!empty($conf->projet->enabled)) {
-				$langs->load("projects");
+                // $langs->load("projects");
 				$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 				if (0) {    // Do not change on shipment
 					if ($action != 'classify') {

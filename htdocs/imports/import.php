@@ -232,7 +232,7 @@ if ($action == 'add_import_model') {
 		if ($result >= 0) {
 			setEventMessages($langs->trans("ImportModelSaved", $objimport->model_name), null, 'mesgs');
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			if ($objimport->errno == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
 				setEventMessages($langs->trans("ErrorImportDuplicateProfil"), null, 'errors');
 			} else {
@@ -253,14 +253,14 @@ if ($step == 3 && $datatoimport) {
 		if (dol_move_uploaded_file($_FILES['userfile']['tmp_name'], $fullpath, 1) > 0) {
 			dol_syslog("File ".$fullpath." was added for import");
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorFailedToSaveFile"), null, 'errors');
 		}
 	}
 
 	// Delete file
 	if ($action == 'confirm_deletefile' && $confirm == 'yes') {
-		$langs->load("other");
+        // $langs->load("other");
 
 		$param = '&datatoimport='.urlencode($datatoimport).'&format='.urlencode($format);
 		if ($excludefirstline) {
@@ -620,7 +620,7 @@ if ($step == 3 && $datatoimport) {
 
 
 	if ($format == 'xlsx' && !class_exists('XMLWriter')) {
-		$langs->load("install");
+        // $langs->load("install");
 		print info_admin($langs->trans("ErrorPHPDoesNotSupport", 'php-xml'), 0, 0, 1, 'error');
 	}
 
@@ -697,7 +697,7 @@ if ($step == 3 && $datatoimport) {
 			}
 		}
 
-		$langs->load('other');
+        // $langs->load('other');
 		$out .= ' ';
 		$out .= info_admin($langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow), 1);
 	} else {
@@ -778,7 +778,7 @@ if ($step == 4 && $datatoimport) {
 	}
 	if ($model == 'xlsx') {
 		if (!preg_match('/\.xlsx$/i', $filetoimport)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$param = '&datatoimport='.$datatoimport.'&format='.$format;
 			setEventMessages($langs->trans("ErrorFileMustHaveFormat", $model), null, 'errors');
 			header("Location: ".$_SERVER["PHP_SELF"].'?step=3'.$param.'&filetoimport='.urlencode($relativepath));

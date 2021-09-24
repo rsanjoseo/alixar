@@ -120,7 +120,7 @@ class ImportXlsx extends ModeleImports
 		//if ($this->id == 'excel2007new')
 		{
 		if (!class_exists('ZipArchive')) {	// For Excel2007
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorPHPNeedModule', 'zip');
 			return -1;
 		}

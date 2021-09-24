@@ -1641,7 +1641,7 @@ class Setup extends DolibarrApi
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
 
-		$langs->load("admin");
+		// $langs->load("admin");
 
 		$outexpectedchecksum = '';
 		$outcurrentchecksum = '';
@@ -1665,11 +1665,11 @@ class Setup extends DolibarrApi
 			$xmlremote = 'https://www.dolibarr.org/files/stable/signatures/filelist-'.DOL_VERSION.'.xml';
 		}
 		if ($xmlremote && !preg_match('/^https?:\/\//i', $xmlremote)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			throw new RestException(500, $langs->trans("ErrorURLMustStartWithHttp", $xmlremote));
 		}
 		if ($xmlremote && !preg_match('/\.xml$/', $xmlremote)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			throw new RestException(500, $langs->trans("ErrorURLMustEndWith", $xmlremote, '.xml'));
 		}
 

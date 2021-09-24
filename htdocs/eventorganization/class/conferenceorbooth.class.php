@@ -670,7 +670,7 @@ class ConferenceOrBooth extends ActionComm
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("eventorganization@eventorganization");
+			//// $langs->load("eventorganization@eventorganization");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_SUGGESTED] = $langs->trans('Suggested');
 			$this->labelStatus[self::STATUS_CONFIRMED] = $langs->trans('Confirmed');
@@ -778,7 +778,7 @@ class ConferenceOrBooth extends ActionComm
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("eventorganization@eventorganization");
+        // $langs->load("eventorganization@eventorganization");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_conferenceorbooth';

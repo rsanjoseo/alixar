@@ -72,7 +72,7 @@ class mailing_contacts1 extends MailingTargets
 	{
 		global $conf, $langs;
 
-		$langs->load("commercial");
+		// $langs->load("commercial");
 
 		$statssql = array();
 		$statssql[0] = "SELECT '".$this->db->escape($langs->trans("NbOfCompaniesContacts"))."' as label,";

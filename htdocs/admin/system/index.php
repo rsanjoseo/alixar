@@ -97,8 +97,8 @@ if ($db->type == 'pgsql') {
 	$paramarray = $db->getServerParametersValues('standard_conforming_strings');
 	//	if ($paramarray['standard_conforming_strings'] != 'on' && $paramarray['standard_conforming_strings'] != 1)
 	//	{
-	//		$langs->load("errors");
-	//	}
+    //		// $langs->load("errors");
+    //	}
 }
 print '<br>';
 

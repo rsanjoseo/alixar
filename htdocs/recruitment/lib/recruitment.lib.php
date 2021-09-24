@@ -30,7 +30,7 @@ function recruitmentAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("recruitment");
+	// $langs->load("recruitment");
 
 	$h = 0;
 	$head = array();

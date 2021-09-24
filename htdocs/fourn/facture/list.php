@@ -308,7 +308,7 @@ if (empty($reshook)) {
 	include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 
 	if ($massaction == 'banktransfertrequest') {
-		$langs->load("withdrawals");
+		// $langs->load("withdrawals");
 
 		if (!$user->rights->paymentbybanktransfer->create) {
 			$error++;
@@ -831,7 +831,7 @@ if ($resql) {
 	);
 	//if($user->rights->fournisseur->facture->creer) $arrayofmassactions['createbills']=$langs->trans("CreateInvoiceForThisCustomer");
 	if (!empty($conf->paymentbybanktransfer->enabled) && !empty($user->rights->paymentbybanktransfer->create)) {
-		$langs->load('withdrawals');
+        // $langs->load('withdrawals');
 		$arrayofmassactions['banktransfertrequest'] = img_picto('', 'payment', 'class="pictofixedwidth"').$langs->trans("MakeBankTransferOrder");
 	}
 	if ($user->rights->fournisseur->facture->supprimer) {
@@ -917,7 +917,7 @@ if ($resql) {
 	// If the user can view prospects other than his'
 	$moreforfilter = '';
 	if ($user->rights->societe->client->voir || $socid) {
-		$langs->load("commercial");
+        // $langs->load("commercial");
 		$moreforfilter .= '<div class="divsearchfield">';
 		$tmptitle = $langs->trans('ThirdPartiesOfSaleRepresentative');
 		$moreforfilter .= img_picto($tmptitle, 'company', 'class="pictofixedwidth"').$formother->select_salesrepresentatives($search_sale, 'search_sale', $user, 0, $tmptitle, 'maxwidth200');

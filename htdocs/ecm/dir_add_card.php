@@ -151,7 +151,7 @@ if ($action == 'add' && $permtoadd) {
 			$id = $ecmdir->create($user);
 			if ($id <= 0) {
 				$error++;
-				$langs->load("errors");
+				// $langs->load("errors");
 				setEventMessages($ecmdir->error, $ecmdir->errors, 'errors');
 				$action = 'create';
 			}
@@ -169,7 +169,7 @@ if ($action == 'add' && $permtoadd) {
 				$fullpathofdir = $dirfornewdir.'/'.($catParent ? $catParent.'/' : '').$label;
 				$result = dol_mkdir($fullpathofdir, DOL_DATA_ROOT);
 				if ($result < 0) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					setEventMessages($langs->trans('ErrorFailToCreateDir', $label), null, 'errors');
 					$error++;
 				} else {

@@ -562,7 +562,7 @@ class CommandeFournisseurDispatch extends CommonObjectLine
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('orders');
+		// $langs->load('orders');
 
 		if ($mode == 0) {
 			return $langs->trans($this->statuts[$status]);

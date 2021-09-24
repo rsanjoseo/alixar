@@ -1471,7 +1471,7 @@ class FunctionsLibTest extends PHPUnit\Framework\TestCase
 	public function testMakeSubstitutions()
 	{
 		global $conf, $langs, $mysoc;
-		$langs->load("main");
+		// $langs->load("main");
 
 		// Try simple replacement
 		$substit = array("__AAA__"=>'Not used', "__BBB__"=>'Not used', "__CCC__"=>"C replaced", "DDD"=>"D replaced");

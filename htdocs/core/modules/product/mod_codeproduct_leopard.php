@@ -92,7 +92,7 @@ class mod_codeproduct_leopard extends ModeleProductCode
 	 */
 	public function info($langs)
 	{
-		$langs->load("companies");
+		// $langs->load("companies");
 		return $langs->trans("LeopardNumRefModelDesc");
 	}
 

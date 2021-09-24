@@ -58,7 +58,7 @@ $result = restrictedArea($user, 'paymentbybanktransfer', '', '');
 llxHeader('', $langs->trans("SuppliersStandingOrdersArea"));
 
 if (prelevement_check_config('bank-transfer') < 0) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	setEventMessages($langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("PaymentByBankTransfer")), null, 'errors');
 }
 

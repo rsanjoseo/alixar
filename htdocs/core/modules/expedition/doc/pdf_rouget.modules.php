@@ -891,7 +891,7 @@ class pdf_rouget extends ModelePdfExpedition
 	{
 		global $conf, $langs, $mysoc;
 
-		$langs->load("orders");
+		// $langs->load("orders");
 
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 

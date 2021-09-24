@@ -82,7 +82,7 @@ if (empty($conf->global->MAIN_DISABLE_OTHER_LINK) && $object->thirdparty->id > 0
 }
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+	// $langs->load("projects");
 	$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 	if ($user->rights->facture->creer) {
 		if ($action != 'classify') {

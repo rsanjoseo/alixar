@@ -145,7 +145,7 @@ class ProductFournisseur extends Product
 		global $langs;
 
 		$this->db = $db;
-		$langs->load("suppliers");
+		// $langs->load("suppliers");
 		$this->reputations = array('-1'=>'', 'FAVORITE'=>$langs->trans('Favorite'), 'NOTTHGOOD'=>$langs->trans('NotTheGoodQualitySupplier'), 'DONOTORDER'=>$langs->trans('DoNotOrderThisProductToThisSupplier'));
 	}
 
@@ -941,7 +941,7 @@ class ProductFournisseur extends Product
 		global $langs;
 
 		$out = '';
-		$langs->load("suppliers");
+        // $langs->load("suppliers");
 		if (count($productFournList) > 0) {
 			$out .= '<table class="nobordernopadding" width="100%">';
 			$out .= '<tr><td class="liste_titre right">'.($showunitprice ? $langs->trans("Price").' '.$langs->trans("HT") : '').'</td>';
@@ -1056,7 +1056,7 @@ class ProductFournisseur extends Product
         global $conf, $langs;
 
         $out = '';
-        $langs->load("suppliers");
+        // $langs->load("suppliers");
         if (count($productFournLogList) > 0) {
             $out .= '<table class="noborder centpercent">';
             $out .= '<tr class="liste_titre"><td class="liste_titre">' . $langs->trans("Date") . '</td>';
@@ -1129,7 +1129,7 @@ class ProductFournisseur extends Product
 
 		if ($this->type == Product::TYPE_PRODUCT || !empty($conf->global->STOCK_SUPPORTS_SERVICES)) {
 			if (!empty($conf->productbatch->enabled)) {
-				$langs->load("productbatch");
+                // $langs->load("productbatch");
 				$label .= "<br><b>".$langs->trans("ManageLotSerial").'</b>: '.$this->getLibStatut(0, 2);
 			}
 		}

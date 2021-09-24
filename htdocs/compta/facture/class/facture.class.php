@@ -2287,7 +2287,7 @@ class Facture extends CommonInvoice
 			// If we decrease stock on invoice validation, we increase back if a warehouse id was provided
 			if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL) && $idwarehouse != -1) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+				// $langs->load("agenda");
 
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
@@ -2332,7 +2332,7 @@ class Facture extends CommonInvoice
 							$ret = dol_delete_preview($this);
 
 							if (!dol_delete_file($file, 0, 0, 0, $this)) { // For triggers
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$this->error = $langs->trans("ErrorFailToDeleteFile", $file);
 								$this->errors[] = $this->error;
 								$this->db->rollback();
@@ -2341,7 +2341,7 @@ class Facture extends CommonInvoice
 						}
 						if (file_exists($dir)) {
 							if (!dol_delete_dir_recursive($dir)) { // For remove dir and meta
-								$langs->load("errors");
+                                // $langs->load("errors");
 								$this->error = $langs->trans("ErrorFailToDeleteDir", $dir);
 								$this->errors[] = $this->error;
 								$this->db->rollback();
@@ -2633,7 +2633,7 @@ class Facture extends CommonInvoice
 			return 0;
 		}
 		if (count($this->lines) <= 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorObjectMustHaveLinesToBeValidated", $this->ref);
 			return -1;
 		}
@@ -2727,7 +2727,7 @@ class Facture extends CommonInvoice
 				// Si active on decremente le produit principal et ses composants a la validation de facture
 				if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL) && $idwarehouse > 0) {
 					require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-					$langs->load("agenda");
+                    // $langs->load("agenda");
 
 					// Loop on each line
 					$cpt = count($this->lines);
@@ -2768,7 +2768,7 @@ class Facture extends CommonInvoice
 											$batchList = $resBatchList;
 											if (empty($batchList)) {
 												$error++;
-												$langs->load('errors');
+                                                // $langs->load('errors');
 												$warehouseStatic->fetch($idwarehouse);
 												$this->error = $langs->trans('ErrorBatchNoFoundForProductInWarehouse', $productStatic->label, $warehouseStatic->ref);
 												dol_syslog(__METHOD__.' Error: '.$langs->transnoentitiesnoconv('ErrorBatchNoFoundForProductInWarehouse', $productStatic->label, $warehouseStatic->ref), LOG_ERR);
@@ -2811,7 +2811,7 @@ class Facture extends CommonInvoice
 													}
 												} else {
 													$error++;
-													$langs->load('errors');
+                                                    // $langs->load('errors');
 													$warehouseStatic->fetch($idwarehouse);
 													$this->error = $langs->trans('ErrorBatchNoFoundEnoughQuantityForProductInWarehouse', $productStatic->label, $warehouseStatic->ref);
 													dol_syslog(__METHOD__.' Error: '.$langs->transnoentitiesnoconv('ErrorBatchNoFoundEnoughQuantityForProductInWarehouse', $productStatic->label, $warehouseStatic->ref), LOG_ERR);
@@ -3020,7 +3020,7 @@ class Facture extends CommonInvoice
 			// If we decrease stock on invoice validation, we increase back
 			if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				$num = count($this->lines);
 				for ($i = 0; $i < $num; $i++) {
@@ -3218,7 +3218,7 @@ class Facture extends CommonInvoice
             }
 
             if ($date_start && $date_end && $date_start > $date_end) {
-                $langs->load("errors");
+                // $langs->load("errors");
                 $this->error = $langs->trans('ErrorStartDateGreaterEnd');
                 return -1;
             }
@@ -3232,7 +3232,7 @@ class Facture extends CommonInvoice
                 $product_type = $product->type;
 
                 if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_INVOICE) && $product_type == 0 && $product->stock_reel < $qty) {
-                    $langs->load("errors");
+                    // $langs->load("errors");
                     $this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnInvoice', $product->ref);
                     $this->db->rollback();
                     return -3;
@@ -3421,7 +3421,7 @@ class Facture extends CommonInvoice
 			}
 
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -3512,7 +3512,7 @@ class Facture extends CommonInvoice
 				$product_type = $product->type;
 
 				if (!empty($conf->global->STOCK_MUST_BE_ENOUGH_FOR_INVOICE) && $product_type == 0 && $product->stock_reel < $qty) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnInvoice', $product->ref);
 					$this->db->rollback();
 					return -3;
@@ -3884,7 +3884,7 @@ class Facture extends CommonInvoice
         global $conf, $langs;
 
         if ($this->module_source == 'takepos') {
-            $langs->load('cashdesk');
+            // $langs->load('cashdesk');
 
             $moduleName = 'takepos';
             $moduleSourceName = 'Takepos';
@@ -3897,7 +3897,7 @@ class Facture extends CommonInvoice
 
             $addon = $conf->global->TAKEPOS_REF_ADDON;
         } else {
-            $langs->load('bills');
+            // $langs->load('bills');
 
             $moduleName = 'facture';
             $moduleSourceName = 'Invoice';
@@ -3969,7 +3969,7 @@ class Facture extends CommonInvoice
 
             return $numref;
         } else {
-            $langs->load('errors');
+            // $langs->load('errors');
             print $langs->trans('Error') . ' ' . $langs->trans('ErrorModuleSetupNotComplete', $langs->transnoentitiesnoconv($moduleSourceName));
             return '';
         }
@@ -4263,7 +4263,7 @@ class Facture extends CommonInvoice
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("bills");
+            // $langs->load("bills");
 			$now = dol_now();
 
 			$response = new WorkboardResponse();
@@ -4954,18 +4954,18 @@ class Facture extends CommonInvoice
 		$nbMailSend = 0;
 		$errorsMsg = array();
 
-		$langs->load("bills");
+        // $langs->load("bills");
 
 		if (empty($conf->facture->enabled)) {	// Should not happen. If module disabled, cron job should not be visible.
 			$this->output .= $langs->trans('ModuleNotEnabled', $langs->transnoentitiesnoconv("Facture"));
 			return 0;
 		}
-		/*if (empty($conf->global->FACTURE_REMINDER_EMAIL)) {
-			$langs->load("bills");
-			$this->output .= $langs->trans('EventRemindersByEmailNotEnabled', $langs->transnoentitiesnoconv("Facture"));
-			return 0;
-		}
-		*/
+        /*if (empty($conf->global->FACTURE_REMINDER_EMAIL)) {
+            // $langs->load("bills");
+            $this->output .= $langs->trans('EventRemindersByEmailNotEnabled', $langs->transnoentitiesnoconv("Facture"));
+            return 0;
+        }
+        */
 
 		require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 		require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
@@ -5023,7 +5023,7 @@ class Facture extends CommonInvoice
 						// Select email template
 						$arraymessage = $formmail->getEMailTemplate($this->db, 'facture_send', $user, $outputlangs, (is_numeric($template) ? $template : 0), 1, (is_numeric($template) ? '' : $template));
 						if (is_numeric($arraymessage) && $arraymessage <= 0) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->output .= $langs->trans('ErrorFailedToFindEmailTemplate', $template);
 							return 0;
 						}

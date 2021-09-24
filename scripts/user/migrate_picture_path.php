@@ -49,7 +49,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/files.lib.php";
 // $user is created but empty.
 
 // $langs->setDefaultLang('en_US'); // To change default language of $langs
-$langs->load("main"); // To load language file for default language
+// $langs->load("main"); // To load language file for default language
 
 // Global variables
 $version = DOL_VERSION;

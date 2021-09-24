@@ -547,7 +547,7 @@ class Adherent extends CommonObject
 
 		// Check parameters
 		if (!empty($conf->global->ADHERENT_MAIL_REQUIRED) && !isValidEMail($this->email)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadEMail", $this->email);
 			return -1;
 		}
@@ -676,7 +676,7 @@ class Adherent extends CommonObject
 
 		// Check parameters
 		if (!empty($conf->global->ADHERENT_MAIL_REQUIRED) && !isValidEMail($this->email)) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorBadEMail", $this->email);
 			return -1;
 		}
@@ -1711,7 +1711,7 @@ class Adherent extends CommonObject
 							$this->fk_soc = $result;
 						}
 					} else {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						$this->error = $langs->trans("ErrorMemberNotLinkedToAThirpartyLinkOrCreateFirst");
 						$this->errors[] = $this->error;
 						$error++;
@@ -2056,11 +2056,11 @@ class Adherent extends CommonObject
 				$err += 1;
 			}
 			foreach ($mailmanspip->mladded_ko as $tmplist => $tmpemail) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->errors[] = $langs->trans("ErrorFailedToAddToMailmanList", $tmpemail, $tmplist);
 			}
 			foreach ($mailmanspip->mladded_ok as $tmplist => $tmpemail) {
-				$langs->load("mailmanspip");
+                // $langs->load("mailmanspip");
 				$this->mesgs[] = $langs->trans("SuccessToAddToMailmanList", $tmpemail, $tmplist);
 			}
 		}
@@ -2109,11 +2109,11 @@ class Adherent extends CommonObject
 			}
 
 			foreach ($mailmanspip->mlremoved_ko as $tmplist => $tmpemail) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->errors[] = $langs->trans("ErrorFailedToRemoveToMailmanList", $tmpemail, $tmplist);
 			}
 			foreach ($mailmanspip->mlremoved_ok as $tmplist => $tmpemail) {
-				$langs->load("mailmanspip");
+                // $langs->load("mailmanspip");
 				$this->mesgs[] = $langs->trans("SuccessToRemoveToMailmanList", $tmpemail, $tmplist);
 			}
 		}
@@ -2141,7 +2141,7 @@ class Adherent extends CommonObject
     public function getCivilityLabel()
     {
         global $langs;
-        $langs->load("dict");
+        // $langs->load("dict");
 
         $code = (empty($this->civility_id) ? '' : $this->civility_id);
         if (empty($code)) {
@@ -2219,7 +2219,7 @@ class Adherent extends CommonObject
 		$linkclose = "";
 		if (empty($notooltip)) {
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$langs->load("users");
+                // $langs->load("users");
 				$label = $langs->trans("ShowUser");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1).'"';
 			}
@@ -2311,7 +2311,7 @@ class Adherent extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load("members");
+        // $langs->load("members");
 
 		$statusType = '';
 		$labelStatus = '';
@@ -2419,7 +2419,7 @@ class Adherent extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("members");
+            // $langs->load("members");
 
 			$warning_delay = 0;
 			$url = '';
@@ -2482,7 +2482,7 @@ class Adherent extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("orders");
+        // $langs->load("orders");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard';
@@ -2898,12 +2898,12 @@ class Adherent extends CommonObject
 		$blockingerrormsg = '';
 
 		if (empty($conf->adherent->enabled)) { // Should not happen. If module disabled, cron job should not be visible.
-			$langs->load("agenda");
+            // $langs->load("agenda");
 			$this->output = $langs->trans('ModuleNotEnabled', $langs->transnoentitiesnoconv("Adherent"));
 			return 0;
 		}
 		if (empty($conf->global->MEMBER_REMINDER_EMAIL)) {
-			$langs->load("agenda");
+            // $langs->load("agenda");
 			$this->output = $langs->trans('EventRemindersByEmailNotEnabled', $langs->transnoentitiesnoconv("Adherent"));
 			return 0;
 		}

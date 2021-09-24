@@ -31,7 +31,7 @@ function inventoryAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("inventory");
+	// $langs->load("inventory");
 
 	$h = 0;
 	$head = array();

@@ -25,7 +25,7 @@ require_once '../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/exports/class/export.class.php';
 
 // Load translation files required by the page
-$langs->load("exports");
+// $langs->load("exports");
 
 $export = new Export($db);
 $export->load_arrays($user);

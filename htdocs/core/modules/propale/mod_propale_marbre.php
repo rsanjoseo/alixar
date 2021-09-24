@@ -111,7 +111,7 @@ class mod_propale_marbre extends ModeleNumRefPropales
 		if (!$pryymm || preg_match('/'.$this->prefix.'[0-9][0-9][0-9][0-9]/i', $pryymm)) {
 			return true;
 		} else {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans('ErrorNumRefModel', $max);
 			return false;
 		}

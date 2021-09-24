@@ -39,7 +39,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/class/html.formmail.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 
 // Load translation files required by the page
-$langs->load("mails");
+// $langs->load("mails");
 
 $id = (GETPOST('mailid', 'int') ? GETPOST('mailid', 'int') : GETPOST('id', 'int'));
 $action = GETPOST('action', 'aZ09');
@@ -873,10 +873,10 @@ if ($action == 'create') {
 			print $form->editfieldval("MailFrom", 'email_from', $object->email_from, $object, $user->rights->mailing->creer && $object->statut < 3, 'string');
 			$email = CMailFile::getValidAddress($object->email_from, 2);
 			if ($email && !isValidEmail($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadEMail", $email));
 			} elseif ($email && !isValidMailDomain($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadMXDomain", $email));
 			}
 
@@ -889,10 +889,10 @@ if ($action == 'create') {
 			print $form->editfieldval("MailErrorsTo", 'email_errorsto', $object->email_errorsto, $object, $user->rights->mailing->creer && $object->statut < 3, 'string');
 			$email = CMailFile::getValidAddress($object->email_errorsto, 2);
 			if ($email && !isValidEmail($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadEMail", $email));
 			} elseif ($email && !isValidMailDomain($email)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				print img_warning($langs->trans("ErrorBadMXDomain", $email));
 			}
 			print '</td></tr>';

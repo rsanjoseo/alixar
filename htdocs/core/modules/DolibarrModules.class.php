@@ -562,7 +562,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
     public function getName()
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         if ($langs->transnoentitiesnoconv("Module" . $this->numero . "Name") != ("Module" . $this->numero . "Name")) {
             // If module name translation exists
@@ -572,7 +572,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
             if (is_array($this->langfiles)) {
                 foreach ($this->langfiles as $val) {
                     if ($val) {
-                        $langs->load($val);
+                        // $langs->load($val);
                     }
                 }
             }
@@ -595,7 +595,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
     public function getDesc()
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         if ($langs->transnoentitiesnoconv("Module" . $this->numero . "Desc") != ("Module" . $this->numero . "Desc")) {
             // If module description translation exists
@@ -605,7 +605,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
             if (is_array($this->langfiles)) {
                 foreach ($this->langfiles as $val) {
                     if ($val) {
-                        $langs->load($val);
+                        // $langs->load($val);
                     }
                 }
             }
@@ -629,7 +629,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
     public function getDescLong()
     {
         global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
@@ -661,7 +661,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 				if (is_array($this->langfiles)) {
 					foreach ($this->langfiles as $val) {
 						if ($val) {
-							$langs->load($val);
+                            // $langs->load($val);
 						}
 					}
 				}
@@ -716,7 +716,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
 	public function getChangeLog()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 		include_once DOL_DOCUMENT_ROOT.'/core/lib/geturl.lib.php';
@@ -782,7 +782,7 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
     public function getVersion($translated = 1)
     {
         global $langs;
-        $langs->load("admin");
+        // $langs->load("admin");
 
         $ret = '';
 

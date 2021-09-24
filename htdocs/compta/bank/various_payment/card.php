@@ -130,32 +130,32 @@ if (empty($reshook)) {
 		$object->fk_project = GETPOSTINT('fk_project');
 
 		if (empty($datep) || empty($datev)) {
-			$langs->load('errors');
+			// $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Date")), null, 'errors');
 			$error++;
 		}
 		if (empty($object->amount)) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Amount")), null, 'errors');
 			$error++;
 		}
 		if (!empty($conf->banque->enabled) && !$object->accountid > 0) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("BankAccount")), null, 'errors');
 			$error++;
 		}
 		if (empty($object->type_payment) || $object->type_payment < 0) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("PaymentMode")), null, 'errors');
 			$error++;
 		}
 		if (!empty($conf->accounting->enabled) && !$object->accountancy_code) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("AccountAccounting")), null, 'errors');
 			$error++;
 		}
 		if ($object->sens < 0) {
-			$langs->load('errors');
+            // $langs->load('errors');
 			setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Sens")), null, 'errors');
 			$error++;
 		}
@@ -486,8 +486,8 @@ if ($action == 'create') {
 	if (!empty($conf->projet->enabled)) {
 		$formproject = new FormProjets($db);
 
-		// Associated project
-		$langs->load("projects");
+        // Associated project
+        // $langs->load("projects");
 
 		print '<tr><td>'.$langs->trans("Project").'</td><td>';
 
@@ -551,7 +551,7 @@ if ($id) {
 	$morehtmlref = '<div class="refidno">';
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+        // $langs->load("projects");
 		$morehtmlref .= $langs->trans('Project').' ';
 		if ($user->rights->banque->modifier) {
 			if ($action != 'classify') {

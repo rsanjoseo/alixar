@@ -92,7 +92,7 @@ abstract class ModeleNumRefBoms
 	public function info()
 	{
 		global $langs;
-		$langs->load("mrp");
+		// $langs->load("mrp");
 		return $langs->trans("NoDescription");
 	}
 
@@ -104,7 +104,7 @@ abstract class ModeleNumRefBoms
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("mrp");
+        // $langs->load("mrp");
 		return $langs->trans("NoExample");
 	}
 
@@ -140,7 +140,7 @@ abstract class ModeleNumRefBoms
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

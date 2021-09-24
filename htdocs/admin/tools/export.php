@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/utils.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/class/html.formfile.class.php';
 
-$langs->load("admin");
+// $langs->load("admin");
 
 $action = GETPOST('action', 'aZ09');
 $what = GETPOST('what', 'alpha');

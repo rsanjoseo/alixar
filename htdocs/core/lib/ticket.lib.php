@@ -32,7 +32,7 @@ function ticketAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("ticket");
+	// $langs->load("ticket");
 
 	$h = 0;
 	$head = array();
@@ -157,7 +157,7 @@ function showDirectPublicLink($object)
 
 	$out = '';
 	if (empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE)) {
-		$langs->load('errors');
+        // $langs->load('errors');
 		$out .= '<span class="opacitymedium">'.$langs->trans("ErrorPublicInterfaceNotEnabled").'</span>';
 	} else {
 		$out .= img_picto('', 'object_globe.png').' <span class="opacitymedium">'.$langs->trans("TicketPublicAccess").'</span><br>';
@@ -442,7 +442,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
 	// Add also event from emailings. TODO This should be replaced by an automatic event ? May be it's too much for very large emailing.
 	if (!empty($conf->mailing->enabled) && !empty($objcon->email)
 		&& (empty($actioncode) || $actioncode == 'AC_OTH_AUTO' || $actioncode == 'AC_EMAILING')) {
-		$langs->load("mails");
+        // $langs->load("mails");
 
 		$sql2 = "SELECT m.rowid as id, m.titre as label, mc.date_envoi as dp, mc.date_envoi as dp2, '100' as percent, 'mailing' as type";
 		$sql2 .= ", null as fk_element, '' as elementtype, null as contact_id";

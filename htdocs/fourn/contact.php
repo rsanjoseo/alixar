@@ -25,7 +25,7 @@
 
 require '../main.inc.php';
 
-$langs->load("companies");
+// $langs->load("companies");
 
 
 /*

@@ -60,7 +60,7 @@ class mod_bom_advanced extends ModeleNumRefboms
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

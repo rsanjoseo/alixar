@@ -97,7 +97,7 @@ if ($action == 'confirm_delete' && $confirm == 'yes' && $user->rights->facture->
 			exit;
 		}
 	} else {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($object->error, $object->errors, 'errors');
 		$db->rollback();
 	}
@@ -168,7 +168,7 @@ if ($action == 'confirm_validate' && $confirm == 'yes' && $user->rights->facture
 	} else {
 		$db->rollback();
 
-		$langs->load("errors");
+        // $langs->load("errors");
 		setEventMessages($object->error, $object->errors, 'errors');
 	}
 }
@@ -314,7 +314,7 @@ if (!empty($conf->banque->enabled)) {
 	if ($object->fk_account > 0) {
 		print $bankline->getNomUrl(1, 0, 'showconciliatedandaccounted');
 	} else {
-		$langs->load("admin");
+        // $langs->load("admin");
 		print '<span class="opacitymedium">'.$langs->trans("NoRecordFoundIBankcAccount", $langs->transnoentitiesnoconv("Module85Name")).'</span>';
 	}
 	print '</td>';

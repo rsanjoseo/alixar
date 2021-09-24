@@ -31,7 +31,7 @@ function myobjectPrepareHead($object)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("mymodule@mymodule");
+	// $langs->load("mymodule@mymodule");
 
 	$h = 0;
 	$head = array();

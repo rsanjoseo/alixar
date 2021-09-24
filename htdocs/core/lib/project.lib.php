@@ -206,7 +206,7 @@ function project_prepare_head(Project $project, $moreparam = '')
 	}
 
 	if ($conf->eventorganization->enabled && !empty($project->usage_organize_event)) {
-		$langs->load('eventorganization');
+		// $langs->load('eventorganization');
 		$head[$h][0] = DOL_URL_ROOT . '/eventorganization/conferenceorbooth_list.php?projectid=' . $project->id;
 		$head[$h][1] = $langs->trans("EventOrganization");
 
@@ -515,7 +515,7 @@ function project_admin_prepare_head()
 	$h++;
 
 	if (! empty($conf->global->MAIN_FEATURES_LEVEL) && $conf->global->MAIN_FEATURES_LEVEL >= 2) {
-		$langs->load("members");
+        // $langs->load("members");
 
 		$head[$h][0] = DOL_URL_ROOT.'/projet/admin/website.php';
 		$head[$h][1] = $langs->trans("BlankSubscriptionForm");

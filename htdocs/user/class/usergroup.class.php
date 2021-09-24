@@ -389,7 +389,7 @@ class UserGroup extends CommonObject
 			}
 
 			if (!$error) {
-				$langs->load("other");
+				// $langs->load("other");
 				$this->context = array('audit'=>$langs->trans("PermissionsAdd").($rid ? ' (id='.$rid.')' : ''));
 
 				// Call trigger
@@ -518,7 +518,7 @@ class UserGroup extends CommonObject
 			}
 
 			if (!$error) {
-				$langs->load("other");
+                // $langs->load("other");
 				$this->context = array('audit'=>$langs->trans("PermissionsDelete").($rid ? ' (id='.$rid.')' : ''));
 
 				// Call trigger
@@ -702,7 +702,7 @@ class UserGroup extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('users');
+        // $langs->load('users');
 		return '';
 	}
 
@@ -755,7 +755,7 @@ class UserGroup extends CommonObject
 		$linkclose = "";
 		if (empty($notooltip)) {
 			if (!empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
-				$langs->load("users");
+                // $langs->load("users");
 				$label = $langs->trans("ShowGroup");
 				$linkclose .= ' alt="'.dol_escape_htmltag($label, 1, 1).'"';
 			}
@@ -909,7 +909,7 @@ class UserGroup extends CommonObject
 	{
 		global $conf, $user, $langs;
 
-		$langs->load("user");
+        // $langs->load("user");
 
 		// Positionne le modele sur le nom du modele a utiliser
 		if (!dol_strlen($modele)) {

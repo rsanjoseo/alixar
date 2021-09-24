@@ -53,7 +53,7 @@ class box_last_ticket extends ModeleBoxes
 	public function __construct($db, $param = '')
 	{
 		global $langs;
-//		$langs->load("boxes");
+//		// $langs->load("boxes");
 		$this->db = $db;
         //		$this->boxlabel = $langs->transnoentitiesnoconv("BoxLastTicket");
 	}

@@ -1064,7 +1064,7 @@ class Partnership extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("partnership");
+			//// $langs->load("partnership");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Validated');
 			$this->labelStatus[self::STATUS_ACCEPTED] = $langs->trans('Accepted');
@@ -1178,7 +1178,7 @@ class Partnership extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("partnership");
+        // $langs->load("partnership");
 
         if (empty($conf->global->PARTNERSHIP_ADDON)) {
             $conf->global->PARTNERSHIP_ADDON = 'mod_partnership_standard';
@@ -1243,7 +1243,7 @@ class Partnership extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("partnership");
+        // $langs->load("partnership");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'standard_partnership';

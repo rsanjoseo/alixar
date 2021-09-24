@@ -79,7 +79,7 @@ if ($boxorder && $zone != '' && $userid > 0) {
 
 	$result = InfoBox::saveboxorder($db, $zone, $boxorder, $userid);
 	if ($result > 0) {
-		$langs->load("boxes");
+		// $langs->load("boxes");
 		if (!GETPOST('closing')) {
 			setEventMessages($langs->trans("BoxAdded"), null);
 		}

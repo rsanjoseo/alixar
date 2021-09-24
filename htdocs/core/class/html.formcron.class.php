@@ -63,7 +63,7 @@ class FormCron extends Form
 		// phpcs:enable
 		global $langs;
 
-		$langs->load('cron@cron');
+		// $langs->load('cron@cron');
 		$out = '';
 		if (!empty($readonly)) {
 			if ($selected == 'command') {

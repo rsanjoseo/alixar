@@ -613,7 +613,7 @@ function Search2(keyCodeForEnter) {
 				if (eventKeyCode == keyCodeForEnter){
 					if (data.length == 0) {
 						$('#search').val('<?php
-						$langs->load('errors');
+						// $langs->load('errors');
 						echo dol_escape_js($langs->trans("ErrorRecordNotFound"));
 						?>');
 						$('#search').select();
@@ -1026,7 +1026,7 @@ if (isset($_SESSION["takeposterminal"]) && $_SESSION["takeposterminal"]) {
     }
 
     if (empty($paiementsModes)) {
-        $langs->load('errors');
+        // $langs->load('errors');
         setEventMessages($langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("TakePOS")), null, 'errors');
         setEventMessages($langs->trans("ProblemIsInSetupOfTerminal", $_SESSION["takeposterminal"]), null, 'errors');
     }

@@ -65,7 +65,7 @@ if ($action == 'updateform') {
 	}
 } elseif ($action == 'delete') {
 	// Delete file
-	$langs->load("other");
+    // $langs->load("other");
 	$file = $conf->admin->dir_temp.'/'.GETPOST('urlfile', 'alpha');
 	$ret = dol_delete_file($file);
 	if ($ret) {
@@ -145,7 +145,7 @@ print '<span class="opacitymedium">'.$langs->trans("AntiVirusCommandExample").'<
 print '</td>';
 print '<td>';
 if (ini_get('safe_mode') && !empty($conf->global->MAIN_ANTIVIRUS_COMMAND)) {
-	$langs->load("errors");
+    // $langs->load("errors");
 	$basedir = preg_replace('/"/', '', dirname($conf->global->MAIN_ANTIVIRUS_COMMAND));
 	$listdir = explode(';', ini_get('safe_mode_exec_dir'));
 	if (!in_array($basedir, $listdir)) {

@@ -19,7 +19,7 @@ $authmode = explode(',', $dolibarr_main_authentication);
 
 // No authentication mode
 if (!count($authmode)) {
-    //    $langs->load('main');
+    //    // $langs->load('main');
     dol_print_error('', $langs->trans("ErrorConfigParameterNotDefined", 'dolibarr_main_authentication'));
     exit;
 }

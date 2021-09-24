@@ -94,7 +94,7 @@ if (!empty($conf->global->MAIN_NGINX_FIX)) {
 
 // Enable and test if module Api is enabled
 if (empty($conf->global->MAIN_MODULE_API)) {
-	$langs->load("admin");
+	// $langs->load("admin");
 	dol_syslog("Call of Dolibarr API interfaces with module API REST are disabled");
 	print $langs->trans("WarningModuleNotActive", 'Api').'.<br><br>';
 	print $langs->trans("ToActivateModule");
@@ -104,7 +104,7 @@ if (empty($conf->global->MAIN_MODULE_API)) {
 
 // Test if explorer is not disabled
 if (preg_match('/api\/index\.php\/explorer/', $url) && !empty($conf->global->API_EXPLORER_DISABLED)) {
-	$langs->load("admin");
+    // $langs->load("admin");
 	dol_syslog("Call Dolibarr API interfaces with module REST disabled");
 	print $langs->trans("WarningAPIExplorerDisabled").'.<br><br>';
 	//session_destroy();

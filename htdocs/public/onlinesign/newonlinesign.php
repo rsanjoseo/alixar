@@ -140,7 +140,7 @@ llxHeader($head, $langs->trans("OnlineSignature"), '', '', 0, 0, '', '', '', 'on
 
 // Check link validity for param 'source'
 if (!empty($source) && in_array($ref, array('member_ref', 'contractline_ref', 'invoice_ref', 'order_ref', ''))) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	dol_print_error_email('BADREFINONLINESIGNFORM', $langs->trans("ErrorBadLinkSourceSetButBadValueForRef", $source, $ref));
 	// End of page
 	llxFooter();
@@ -204,7 +204,7 @@ if (!empty($conf->global->PROPOSAL_IMAGE_PUBLIC_SIGN)) {
 // Output introduction text
 $text = '';
 if (!empty($conf->global->ONLINE_SIGN_NEWFORM_TEXT)) {
-	$langs->load("members");
+    // $langs->load("members");
 	$reg = array();
 	if (preg_match('/^\((.*)\)$/', $conf->global->ONLINE_SIGN_NEWFORM_TEXT, $reg)) {
 		$text .= $langs->trans($reg[1])."<br>\n";
@@ -231,7 +231,7 @@ $var = false;
 // Payment on customer order
 if ($source == 'proposal') {
 	$found = true;
-	$langs->load("proposal");
+    // $langs->load("proposal");
 
 	require_once DOL_DOCUMENT_ROOT.'/comm/propal/class/propal.class.php';
 

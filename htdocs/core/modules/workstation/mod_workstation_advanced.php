@@ -61,7 +61,7 @@ class mod_workstation_advanced extends ModeleNumRefWorkstation
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

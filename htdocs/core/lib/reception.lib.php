@@ -34,21 +34,21 @@
  */
 function reception_prepare_head(Reception $object)
 {
-	global $db, $langs, $conf, $user;
+    global $db, $langs, $conf, $user;
 
-	$langs->load("sendings");
-	$langs->load("deliveries");
+    // $langs->load("sendings");
+    // $langs->load("deliveries");
 
-	$h = 0;
-	$head = array();
+    $h = 0;
+    $head = [];
 
-	$head[$h][0] = DOL_URL_ROOT."/reception/card.php?id=".$object->id;
-	$head[$h][1] = $langs->trans("ReceptionCard");
-	$head[$h][2] = 'reception';
-	$h++;
+    $head[$h][0] = DOL_URL_ROOT . "/reception/card.php?id=" . $object->id;
+    $head[$h][1] = $langs->trans("ReceptionCard");
+    $head[$h][2] = 'reception';
+    $h++;
 
-	if (empty($conf->global->MAIN_DISABLE_CONTACTS_TAB)) {
-		$objectsrc = $object;
+    if (empty($conf->global->MAIN_DISABLE_CONTACTS_TAB)) {
+        $objectsrc = $object;
 		if ($object->origin == 'commande' && $object->origin_id > 0) {
 			$objectsrc = new Commande($db);
 			$objectsrc->fetch($object->origin_id);
@@ -97,9 +97,9 @@ function reception_prepare_head(Reception $object)
 function reception_admin_prepare_head()
 {
 	global $langs, $conf, $user;
-	$langs->load("receptions");
+	// $langs->load("receptions");
 
-	$h = 0;
+    $h = 0;
 	$head = array();
 
 	$head[$h][0] = DOL_URL_ROOT."/admin/reception_setup.php";

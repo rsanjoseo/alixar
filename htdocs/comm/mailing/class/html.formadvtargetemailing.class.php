@@ -98,7 +98,7 @@ class FormAdvTargetEmailing extends Form
 	{
 		global $conf, $langs;
 
-		$langs->load("dict");
+		// $langs->load("dict");
 		$maxlength = 0;
 
 		$out = '';
@@ -289,7 +289,7 @@ class FormAdvTargetEmailing extends Form
 	public function multiselectCivility($htmlname = 'civilite_id', $selected_array = array())
 	{
 		global $conf, $langs, $user;
-		$langs->load("dict");
+        // $langs->load("dict");
 
 		$options_array = array();
 

@@ -35,7 +35,7 @@ function user_prepare_head($object)
 {
 	global $langs, $conf, $user, $db;
 
-	$langs->load("users");
+	// $langs->load("users");
 
 	$canreadperms = true;
 	if (!empty($conf->global->MAIN_USE_ADVANCED_PERMS)) {
@@ -52,7 +52,7 @@ function user_prepare_head($object)
 
 	if ((!empty($conf->ldap->enabled) && !empty($conf->global->LDAP_SYNCHRO_ACTIVE))
 		&& (empty($conf->global->MAIN_DISABLE_LDAP_TAB) || !empty($user->admin))) {
-		$langs->load("ldap");
+        // $langs->load("ldap");
 		$head[$h][0] = DOL_URL_ROOT.'/user/ldap.php?id='.$object->id;
 		$head[$h][1] = $langs->trans("LDAPCard");
 		$head[$h][2] = 'ldap';
@@ -124,7 +124,7 @@ function user_prepare_head($object)
 			dol_print_error($db);
 		}
 
-		$langs->load("mails");
+        // $langs->load("mails");
 		$head[$h][0] = DOL_URL_ROOT.'/user/notify/card.php?id='.$object->id;
 		$head[$h][1] = $langs->trans("NotificationsAuto");
 		if ($nbNote > 0) {
@@ -217,7 +217,7 @@ function group_prepare_head($object)
 
 	if ((!empty($conf->ldap->enabled) && !empty($conf->global->LDAP_SYNCHRO_ACTIVE))
 		&& (empty($conf->global->MAIN_DISABLE_LDAP_TAB) || !empty($user->admin))) {
-		$langs->load("ldap");
+        // $langs->load("ldap");
 		$head[$h][0] = DOL_URL_ROOT.'/user/group/ldap.php?id='.$object->id;
 		$head[$h][1] = $langs->trans("LDAPCard");
 		$head[$h][2] = 'ldap';
@@ -251,7 +251,7 @@ function user_admin_prepare_head()
 {
 	global $langs, $conf, $user;
 
-	$langs->load("users");
+    // $langs->load("users");
 	$h = 0;
 	$head = array();
 

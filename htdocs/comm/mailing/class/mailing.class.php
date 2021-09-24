@@ -776,7 +776,7 @@ class Mailing extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load("mailing");
+		// $langs->load("mailing");
 
 		$labelStatus = $langs->trans($this->statuts[$status]);
 		$labelStatusShort = $langs->trans($this->statuts[$status]);
@@ -805,7 +805,7 @@ class Mailing extends CommonObject
     public static function libStatutDest($status, $mode = 0, $desc = '')
     {
         global $langs;
-        $langs->load("mails");
+        // $langs->load("mails");
 
         $labelStatus = [];
         $labelStatusShort = [];

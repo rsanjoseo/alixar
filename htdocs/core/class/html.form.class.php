@@ -878,7 +878,7 @@ class Form
 		// phpcs:enable
 		global $conf, $langs, $mysoc;
 
-		$langs->load("dict");
+		// $langs->load("dict");
 
 		$out = '';
 		$countryArray = array();
@@ -1003,7 +1003,7 @@ class Form
 		// phpcs:enable
 		global $conf, $langs;
 
-		$langs->load("dict");
+        // $langs->load("dict");
 
 		$out = '';
 		$incotermArray = array();
@@ -1154,7 +1154,7 @@ class Form
 
         dol_syslog(__METHOD__, LOG_DEBUG);
 
-        $langs->load("trips");
+        // $langs->load("trips");
 
         $sql = "SELECT c.code, c.label";
         $sql .= " FROM " . MAIN_DB_PREFIX . "c_type_fees as c";
@@ -1649,7 +1649,7 @@ class Form
 	{
 		global $conf, $langs, $hookmanager, $action;
 
-		$langs->load('companies');
+        // $langs->load('companies');
 
 		if (empty($htmlid)) {
 			$htmlid = $htmlname;
@@ -2403,7 +2403,7 @@ class Form
 
 		// Units
 		if (!empty($conf->global->PRODUCT_USE_UNITS)) {
-			$langs->load('other');
+            // $langs->load('other');
 		}
 
 		$warehouseStatusArray = array();
@@ -2983,7 +2983,7 @@ class Form
 				$outval .= $langs->transnoentities("Stock").': '.price(price2num($objp->stock, 'MS'));
 				$outval .= '</span>';
 				if (empty($novirtualstock) && !empty($conf->global->STOCK_SHOW_VIRTUAL_STOCK_IN_PRODUCTS_COMBO)) {  // Warning, this option may slow down combo list generation
-					$langs->load("stocks");
+                    // $langs->load("stocks");
 
 					$tmpproduct = new Product($this->db);
 					$tmpproduct->fetch($objp->rowid, '', '', '', 1, 1, 1); // Load product without lang and prices arrays (we just need to make ->virtual_stock() after)
@@ -3102,10 +3102,10 @@ class Form
 
 		$maxlengtharticle = (empty($conf->global->PRODUCT_MAX_LENGTH_COMBO) ? 48 : $conf->global->PRODUCT_MAX_LENGTH_COMBO);
 
-		$langs->load('stocks');
-		// Units
+        // $langs->load('stocks');
+        // Units
 		if (!empty($conf->global->PRODUCT_USE_UNITS)) {
-			$langs->load('other');
+            // $langs->load('other');
 		}
 
 		$sql = "SELECT p.rowid, p.ref, p.label, p.price, p.duration, p.fk_product_type, p.stock,";
@@ -3364,7 +3364,7 @@ class Form
 						$optlabel .= $langs->transnoentities("Stock").':'.price(price2num($objp->stock, 'MS'));
 						$optlabel .= '</span>';
 						if (empty($novirtualstock) && !empty($conf->global->STOCK_SHOW_VIRTUAL_STOCK_IN_PRODUCTS_COMBO)) {  // Warning, this option may slow down combo list generation
-							$langs->load("stocks");
+                            // $langs->load("stocks");
 
 							$tmpproduct = new Product($this->db);
 							$tmpproduct->fetch($objp->rowid, '', '', '', 1, 1, 1); // Load product without lang and prices arrays (we just need to make ->virtual_stock() after)
@@ -3468,7 +3468,7 @@ class Form
 		// phpcs:enable
 		global $langs, $conf;
 
-		$langs->load('stocks');
+        // $langs->load('stocks');
 
 		$sql = "SELECT p.rowid, p.ref, p.label, p.price, p.duration, pfp.fk_soc,";
 		$sql .= " pfp.ref_fourn, pfp.rowid as idprodfournprice, pfp.price as fprice, pfp.remise_percent, pfp.quantity, pfp.unitprice,";
@@ -3672,7 +3672,7 @@ class Form
 
         dol_syslog(__METHOD__, LOG_DEBUG);
 
-        $langs->load('propal');
+        // $langs->load('propal');
 
         $sql = "SELECT rowid, code, label, position";
         $sql .= " FROM " . MAIN_DB_PREFIX . 'c_availability';
@@ -4216,21 +4216,21 @@ class Form
 	 * 	@return	void
 	 */
 	public function selectShippingMethod($selected = '', $htmlname = 'shipping_method_id', $filtre = '', $useempty = 0, $moreattrib = '', $noinfoadmin = 0, $morecss = '')
-	{
-		global $langs, $conf, $user;
+    {
+        global $langs, $conf, $user;
 
-		$langs->load("admin");
-		$langs->load("deliveries");
+        // $langs->load("admin");
+        // $langs->load("deliveries");
 
-		$sql = "SELECT rowid, code, libelle as label";
-		$sql .= " FROM ".MAIN_DB_PREFIX."c_shipment_mode";
-		$sql .= " WHERE active > 0";
-		if ($filtre) {
-			$sql .= " AND ".$filtre;
-		}
-		$sql .= " ORDER BY libelle ASC";
+        $sql = "SELECT rowid, code, libelle as label";
+        $sql .= " FROM " . MAIN_DB_PREFIX . "c_shipment_mode";
+        $sql .= " WHERE active > 0";
+        if ($filtre) {
+            $sql .= " AND " . $filtre;
+        }
+        $sql .= " ORDER BY libelle ASC";
 
-		dol_syslog(get_class($this)."::selectShippingMode", LOG_DEBUG);
+        dol_syslog(get_class($this) . "::selectShippingMode", LOG_DEBUG);
 		$result = $this->db->query($sql);
 		if ($result) {
 			$num = $this->db->num_rows($result);
@@ -4279,7 +4279,7 @@ class Form
     {
         global $langs, $db;
 
-        $langs->load("deliveries");
+        // $langs->load("deliveries");
 
         if ($htmlname != "none") {
             print '<form method="POST" action="' . $page . '">';
@@ -4310,7 +4310,7 @@ class Form
 	{
 		global $langs;
 
-		$langs->load('bills');
+        // $langs->load('bills');
 
 		$opt = '<option value ="" selected></option>';
 		$sql = 'SELECT rowid, ref, situation_cycle_ref, situation_counter, situation_final, fk_soc';
@@ -4365,7 +4365,7 @@ class Form
 	{
 		global $langs;
 
-		$langs->load('products');
+        // $langs->load('products');
 
 		$return = '<select class="flat" id="'.$htmlname.'" name="'.$htmlname.'">';
 
@@ -4422,7 +4422,7 @@ class Form
 
         $out = '';
 
-        $langs->load("admin");
+        // $langs->load("admin");
         $num = 0;
 
         $sql = "SELECT rowid, label, bank, clos as status, currency_code";
@@ -4502,7 +4502,7 @@ class Form
 	{
 		global $langs, $conf;
 
-		$langs->load("admin");
+        // $langs->load("admin");
 		$num = 0;
 
 		$sql = "SELECT rowid, name, fk_country, status, entity";
@@ -4577,7 +4577,7 @@ class Form
 			}
 			print '</form>';
 		} else {
-			$langs->load('banks');
+            // $langs->load('banks');
 
 			if ($selected) {
 				require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
@@ -4616,7 +4616,7 @@ class Form
     {
         // phpcs:enable
         global $conf, $langs;
-        $langs->load("categories");
+        // $langs->load("categories");
 
         include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
 
@@ -5098,7 +5098,7 @@ class Form
 
 		$formproject = new FormProjets($this->db);
 
-		$langs->load("project");
+        // $langs->load("project");
 		if ($htmlname != "none") {
 			$out .= "\n";
 			$out .= '<form method="post" action="'.$page.'">';
@@ -5153,7 +5153,7 @@ class Form
 				if (isset($this->cache_conditions_paiements[$selected])) {
 					print $this->cache_conditions_paiements[$selected]['label'];
 				} else {
-					$langs->load('errors');
+                    // $langs->load('errors');
 					print $langs->trans('ErrorNotInDictionaryPaymentConditions');
 				}
 			} else {
@@ -5856,7 +5856,7 @@ class Form
 		// phpcs:enable
 		global $langs, $conf, $mysoc;
 
-		$langs->load('errors');
+        // $langs->load('errors');
 
 		$return = '';
 
@@ -7035,7 +7035,7 @@ class Form
 			if (isset($objecttmp->fields['ref'])) {
 				$fieldstoshow = 't.ref';
 			} else {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorNoFieldWithAttributeShowoncombobox");
 				return $langs->trans('ErrorNoFieldWithAttributeShowoncombobox');
 			}
@@ -7726,7 +7726,7 @@ class Form
             }
             if ($val['label']) {
                 if (!empty($val['langfile']) && is_object($langs)) {
-                    $langs->load($val['langfile']);
+                    // $langs->load($val['langfile']);
                 }
 
                 // Note: $val['checked'] <> 0 means we must show the field into the combo list

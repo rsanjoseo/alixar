@@ -171,7 +171,7 @@ $massactionbutton = $form->selectMassAction('', $arrayofmassactions);
 llxHeader('', $langs->trans("NewStandingOrder"));
 
 if (prelevement_check_config($type) < 0) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	$modulenametoshow = "Withdraw";
 	if ($type == 'bank-transfer') {
 		$modulenametoshow = "PaymentByBankTransfer";

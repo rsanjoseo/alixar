@@ -246,7 +246,7 @@ foreach ($arrayhandler as $key => $module) {
 		print '<td class="nowrap">';
 		$tmp = $module->getExample();
 		if (preg_match('/^Error/', $tmp)) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			print '<div class="error">'.$langs->trans($tmp).'</div>';
 		} elseif ($tmp == 'NotConfigured') {
 			print '<span class="opacitymedium">'.$langs->trans($tmp).'</span>';
@@ -439,7 +439,7 @@ print '</td>';
 
 print '<td align="center" width="100">';
 if (empty($dolibarr_main_db_pass) && empty($dolibarr_main_db_encrypted_pass)) {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print img_warning($langs->trans("WarningPassIsEmpty"));
 } else {
 	if (empty($dolibarr_main_db_encrypted_pass)) {

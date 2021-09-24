@@ -731,7 +731,7 @@ class AdherentType extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load('companies');
+		// $langs->load('companies');
 
 		$statusType = 'status4';
 		if ($status == 0) {

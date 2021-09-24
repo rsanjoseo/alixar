@@ -82,7 +82,7 @@ class box_factures_imp extends ModeleBoxes
 		$facturestatic = new Facture($this->db);
 		$societestatic = new Societe($this->db);
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$this->info_box_head = array('text' => $langs->trans("BoxTitleOldestUnpaidCustomerBills", $max));
 

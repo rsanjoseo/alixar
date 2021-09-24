@@ -208,7 +208,7 @@ $x_coll = tax_by_thirdparty('vat', $db, 0, $date_start, $date_end, $modetax, 'se
 $x_paye = tax_by_thirdparty('vat', $db, 0, $date_start, $date_end, $modetax, 'buy');
 
 if (!is_array($x_coll) || !is_array($x_paye)) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	if ($x_coll == -1) {
 		print '<tr><td colspan="'.$columns.'">'.$langs->trans("ErrorNoAccountancyModuleLoaded").'</td></tr>';
 	} elseif ($x_coll == -2) {

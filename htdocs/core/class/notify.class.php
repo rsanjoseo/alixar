@@ -109,7 +109,7 @@ class Notify
 	public function confirmMessage($action, $socid, $object)
 	{
 		global $langs;
-		$langs->load("mails");
+		// $langs->load("mails");
 
 		$listofnotiftodo = $this->getNotificationsArray($action, $socid, $object, 0);
 
@@ -345,7 +345,7 @@ class Notify
 
 		dol_syslog(get_class($this)."::send notifcode=".$notifcode.", object=".$object->id);
 
-		$langs->load("other");
+        // $langs->load("other");
 
 		// Define $urlwithroot
 		$urlwithouturlroot = preg_replace('/'.preg_quote(DOL_URL_ROOT, '/').'$/i', '', trim($dolibarr_main_url_root));

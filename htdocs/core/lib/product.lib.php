@@ -35,7 +35,7 @@
 function product_prepare_head($object)
 {
 	global $db, $langs, $conf, $user;
-	$langs->load("products");
+	// $langs->load("products");
 
 	$label = $langs->trans('Product');
 	if ($object->isService()) {
@@ -380,7 +380,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("propal");
+        // $langs->load("propal");
 		print '<tr><td>';
 		print '<a href="propal.php?id='.$product->id.'">'.img_object('', 'propal', 'class="paddingright"').$langs->trans("Proposals").'</a>';
 		print '</td><td class="right">';
@@ -399,7 +399,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
 		print '<tr><td>';
 		print '<a href="supplier_proposal.php?id='.$product->id.'">'.img_object('', 'supplier_proposal', 'class="paddingright"').$langs->trans("SupplierProposals").'</a>';
 		print '</td><td class="right">';
@@ -418,7 +418,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("orders");
+        // $langs->load("orders");
 		print '<tr><td>';
 		print '<a href="commande.php?id='.$product->id.'">'.img_object('', 'order', 'class="paddingright"').$langs->trans("CustomersOrders").'</a>';
 		print '</td><td class="right">';
@@ -437,7 +437,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("orders");
+        // $langs->load("orders");
 		print '<tr><td>';
 		print '<a href="commande_fournisseur.php?id='.$product->id.'">'.img_object('', 'supplier_order', 'class="paddingright"').$langs->trans("SuppliersOrders").'</a>';
 		print '</td><td class="right">';
@@ -456,7 +456,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("bills");
+        // $langs->load("bills");
 		print '<tr><td>';
 		print '<a href="facture.php?id='.$product->id.'">'.img_object('', 'bill').' '.$langs->trans("CustomersInvoices").'</a>';
 		print '</td><td class="right">';
@@ -475,7 +475,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("bills");
+        // $langs->load("bills");
 		print '<tr><td>';
 		print '<a href="facture_fournisseur.php?id='.$product->id.'">'.img_object('', 'supplier_invoice', 'class="paddingright"').$langs->trans("SuppliersInvoices").'</a>';
 		print '</td><td class="right">';
@@ -495,7 +495,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			dol_print_error($db);
 		}
-		$langs->load("contracts");
+        // $langs->load("contracts");
 		print '<tr><td>';
 		print '<a href="contrat.php?id='.$product->id.'">'.img_object('', 'contract', 'class="paddingright"').$langs->trans("Contracts").'</a>';
 		print '</td><td class="right">';
@@ -515,7 +515,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			setEventMessage($product->error, 'errors');
 		}
-		$langs->load("mrp");
+        // $langs->load("mrp");
 
 		print '<tr><td>';
 		print '<a href="bom.php?id='.$product->id.'">'.img_object('', 'bom', 'class="paddingright"').$langs->trans("BOM").'</a>';
@@ -538,7 +538,7 @@ function show_stats_for_company($product, $socid)
 		if ($ret < 0) {
 			setEventMessage($product->error, 'errors');
 		}
-		$langs->load("mrp");
+        // $langs->load("mrp");
 		print '<tr><td>';
 		print '<a href="mo.php?id='.$product->id.'">'.img_object('', 'mrp', 'class="paddingright"').$langs->trans("MO").'</a>';
 		print '</td><td class="right">';

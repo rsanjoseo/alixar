@@ -154,7 +154,7 @@ class Reception extends CommonObject
     public function getNextNumRef($soc)
     {
         global $langs, $conf;
-        $langs->load("receptions");
+        // $langs->load("receptions");
 
         if (!empty($conf->global->RECEPTION_ADDON_NUMBER)) {
             $mybool = false;
@@ -551,7 +551,7 @@ class Reception extends CommonObject
 		if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION)) {
 			require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Loop on each product line to add a stock movement
 			// TODO in future, reception lines may not be linked to order line
@@ -720,7 +720,7 @@ class Reception extends CommonObject
 			$fk_product = $supplierorderline->fk_product;
 
 			if (!($entrepot_id > 0) && empty($conf->global->STOCK_WAREHOUSE_NOT_REQUIRED_FOR_RECEPTIONS)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorWarehouseRequiredIntoReceptionLine");
 				return -1;
 			}
@@ -906,7 +906,7 @@ class Reception extends CommonObject
 		if ($conf->stock->enabled && $conf->global->STOCK_CALCULATE_ON_RECEPTION && $this->statut > 0) {
 			require_once DOL_DOCUMENT_ROOT."/product/stock/class/mouvementstock.class.php";
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Loop on each product line to add a stock movement
 			$sql = "SELECT cd.fk_product, cd.subprice, ed.qty, ed.fk_entrepot, ed.eatby, ed.sellby, ed.batch, ed.rowid as commande_fournisseur_dispatch_id";
@@ -1481,7 +1481,7 @@ class Reception extends CommonObject
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION_CLOSE)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				// Loop on each product line to add a stock movement
 				// TODO possibilite de receptionner a partir d'une propale ou autre origine ?
@@ -1643,7 +1643,7 @@ class Reception extends CommonObject
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION_CLOSE)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 				$numref = $this->ref;
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				// Loop on each product line to add a stock movement
 				// TODO possibilite de receptionner a partir d'une propale ou autre origine
@@ -1765,7 +1765,7 @@ class Reception extends CommonObject
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_RECEPTION)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				// Loop on each product line to add a stock movement
 				// TODO possibilite de receptionner a partir d'une propale ou autre origine
@@ -1885,7 +1885,7 @@ class Reception extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("receptions");
+        // $langs->load("receptions");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'squille';

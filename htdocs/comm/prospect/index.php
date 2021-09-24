@@ -28,7 +28,7 @@ require '../../main.inc.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/agenda.lib.php';
 
 // Load translation files required by the page
-$langs->load("propal");
+// $langs->load("propal");
 
 if ($user->socid > 0) {
 	$socid = $user->socid;

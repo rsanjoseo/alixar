@@ -234,7 +234,7 @@ class Expedition extends CommonObject
     public function getNextNumRef($soc)
     {
         global $langs, $conf;
-        $langs->load("sendings");
+        // $langs->load("sendings");
 
         if (!empty($conf->global->EXPEDITION_ADDON_NUMBER)) {
             $mybool = false;
@@ -722,7 +722,7 @@ class Expedition extends CommonObject
 		if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT)) {
 			require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Loop on each product line to add a stock movement
 			$sql = "SELECT cd.fk_product, cd.subprice,";
@@ -920,7 +920,7 @@ class Expedition extends CommonObject
 			$fk_product = $orderline->fk_product;
 
 			if (!($entrepot_id > 0) && empty($conf->global->STOCK_WAREHOUSE_NOT_REQUIRED_FOR_SHIPMENTS)) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans("ErrorWarehouseRequiredIntoShipmentLine");
 				return -1;
 			}
@@ -943,7 +943,7 @@ class Expedition extends CommonObject
 					// The product is qualified for a check of quantity (must be enough in stock to be added into shipment).
 					if (!$isavirtualproduct || empty($conf->global->PRODUIT_SOUSPRODUITS) || ($isavirtualproduct && empty($conf->global->STOCK_EXCLUDE_VIRTUAL_PRODUCTS))) {  // If STOCK_EXCLUDE_VIRTUAL_PRODUCTS is set, we do not manage stock for kits/virtual products.
 						if ($product_stock < $qty) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error = $langs->trans('ErrorStockIsNotEnoughToAddProductOnShipment', $product->ref);
 							$this->errorhidden = 'ErrorStockIsNotEnoughToAddProductOnShipment';
 
@@ -1008,7 +1008,7 @@ class Expedition extends CommonObject
 						$prod_batch->fetch($value['id_batch']);
 
 						if ($prod_batch->qty < $linebatch->qty) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->errors[] = $langs->trans('ErrorStockIsNotEnoughToAddProductOnShipment', $prod_batch->fk_product);
 							dol_syslog(get_class($this)."::addline_batch error=Product ".$prod_batch->batch.": ".$this->errorsToString(), LOG_ERR);
 							$this->db->rollback();
@@ -1218,7 +1218,7 @@ class Expedition extends CommonObject
 			 ($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE && $this->statut == self::STATUS_CLOSED && $also_update_stock))) {
 			require_once DOL_DOCUMENT_ROOT."/product/stock/class/mouvementstock.class.php";
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Loop on each product line to add a stock movement and delete features
 			$sql = "SELECT cd.fk_product, cd.subprice, ed.qty, ed.fk_entrepot, ed.rowid as expeditiondet_id";
@@ -1402,7 +1402,7 @@ class Expedition extends CommonObject
 			 ($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE && $this->statut == self::STATUS_CLOSED && $also_update_stock))) {
 			require_once DOL_DOCUMENT_ROOT."/product/stock/class/mouvementstock.class.php";
 
-			$langs->load("agenda");
+            // $langs->load("agenda");
 
 			// Loop on each product line to add a stock movement
 			$sql = "SELECT cd.fk_product, cd.subprice, ed.qty, ed.fk_entrepot, ed.rowid as expeditiondet_id";
@@ -2201,7 +2201,7 @@ class Expedition extends CommonObject
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				// Loop on each product line to add a stock movement
 				// TODO possibilite d'expedier a partir d'une propale ou autre origine ?
@@ -2372,7 +2372,7 @@ class Expedition extends CommonObject
 			if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT_CLOSE)) {
 				require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
 
-				$langs->load("agenda");
+                // $langs->load("agenda");
 
 				// Loop on each product line to add a stock movement
 				// TODO possibilite d'expedier a partir d'une propale ou autre origine

@@ -86,7 +86,7 @@ $apiService = $serviceFactory->createService('GitHub', $credentials, $storage, $
 // access type needed to have oauth provider refreshing token
 //$apiService->setAccessType('offline');
 
-$langs->load("oauth");
+// $langs->load("oauth");
 
 
 /*

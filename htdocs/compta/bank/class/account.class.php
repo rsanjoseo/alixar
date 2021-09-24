@@ -1126,7 +1126,7 @@ class Account extends CommonObject
     {
         // phpcs:enable
         global $langs;
-        $langs->load('banks');
+        // $langs->load('banks');
 
         if ($status == self::STATUS_OPEN) {
             $label = $langs->trans("StatusAccountOpened");
@@ -1244,7 +1244,7 @@ class Account extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("banks");
+            // $langs->load("banks");
 			$now = dol_now();
 
 			require_once DOL_DOCUMENT_ROOT.'/core/class/workboardresponse.class.php';
@@ -1376,7 +1376,7 @@ class Account extends CommonObject
 
 		if (!empty($conf->accounting->enabled)) {
 			include_once DOL_DOCUMENT_ROOT.'/core/lib/accounting.lib.php';
-			$langs->load("accountancy");
+            // $langs->load("accountancy");
 			$label .= '<br><b>'.$langs->trans('AccountAccounting').':</b> '.length_accountg($this->account_number);
 			$label .= '<br><b>'.$langs->trans('AccountancyJournal').':</b> '.$this->accountancy_journal;
 		}
@@ -2440,7 +2440,7 @@ class AccountLine extends CommonObject
 	{
 		// phpcs:enable
 		global $langs;
-		//$langs->load('companies');
+        //// $langs->load('companies');
 		/*
 		if ($mode == 0)
 		{

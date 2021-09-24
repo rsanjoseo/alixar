@@ -48,7 +48,7 @@ require_once __DIR__.'/../main.inc.php';
 top_httphead('text/javascript');
 
 global $langs;
-$langs->load("projects");
+// $langs->load("projects");
 ?>
 
 var vLangs={'<?php print $langs->getDefaultLang(1); ?>':

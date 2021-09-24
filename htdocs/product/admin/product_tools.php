@@ -54,7 +54,7 @@ if ($action == 'convert') {
 	$error = 0;
 
 	if ($oldvatrate == $newvatrate) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("ErrorNewValueCantMatchOldValue"), null, 'errors');
 		$error++;
 	}
@@ -288,7 +288,7 @@ print load_fiche_titre($title, '', 'title_setup');
 print $langs->trans("ProductVatMassChangeDesc").'<br><br>';
 
 if (empty($mysoc->country_code)) {
-	$langs->load("errors");
+    // $langs->load("errors");
 	$warnpicto = img_error($langs->trans("WarningMandatorySetupNotComplete"));
 	print '<br><a href="'.DOL_URL_ROOT.'/admin/company.php?mainmenu=home">'.$warnpicto.' '.$langs->trans("WarningMandatorySetupNotComplete").'</a>';
 } else {

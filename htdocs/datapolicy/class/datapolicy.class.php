@@ -49,7 +49,7 @@ class DataPolicy
 	{
 		global $langs, $conf, $db, $user;
 
-		$langs->load("companies");
+		// $langs->load("companies");
 
 		$sql = "SELECT c.rowid";
 		$sql .= " FROM ".MAIN_DB_PREFIX."socpeople as c";
@@ -85,7 +85,7 @@ class DataPolicy
     {
         global $langs, $conf, $db, $user;
 
-        $langs->load("companies");
+        // $langs->load("companies");
 
         $sql = "SELECT s.rowid";
         $sql .= " FROM " . MAIN_DB_PREFIX . "societe as s";
@@ -120,7 +120,7 @@ class DataPolicy
     {
         global $langs, $conf, $db, $user;
 
-        $langs->load("adherent");
+        // $langs->load("adherent");
 
         $sql = "SELECT a.rowid";
         $sql .= " FROM " . MAIN_DB_PREFIX . "adherent as a";

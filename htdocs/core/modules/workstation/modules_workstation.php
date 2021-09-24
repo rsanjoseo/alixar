@@ -92,7 +92,7 @@ abstract class ModeleNumRefWorkstation
 	public function info()
 	{
 		global $langs;
-		$langs->load("workstation@workstation");
+		// $langs->load("workstation@workstation");
 		return $langs->trans("NoDescription");
 	}
 
@@ -104,7 +104,7 @@ abstract class ModeleNumRefWorkstation
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("workstation@workstation");
+        // $langs->load("workstation@workstation");
 		return $langs->trans("NoExample");
 	}
 
@@ -140,7 +140,7 @@ abstract class ModeleNumRefWorkstation
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

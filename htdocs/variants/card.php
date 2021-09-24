@@ -132,7 +132,7 @@ if ($confirm == 'yes') {
  * View
  */
 
-$langs->load('products');
+// $langs->load('products');
 
 $help_url = 'EN:Module_Products#Variants';
 

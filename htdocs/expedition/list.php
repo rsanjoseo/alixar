@@ -517,7 +517,7 @@ $moreforfilter = '';
 
 // If the user can view prospects other than his'
 if ($user->rights->societe->client->voir || $socid) {
-	$langs->load("commercial");
+	// $langs->load("commercial");
 	$moreforfilter .= '<div class="divsearchfield">';
 	$tmptitle = $langs->trans('ThirdPartiesOfSaleRepresentative');
 	$moreforfilter .= img_picto($tmptitle, 'user');

@@ -387,7 +387,7 @@ class RemiseCheque extends CommonObject
 	public function getNextNumRef($mode = 'next')
 	{
 		global $conf, $db, $langs, $mysoc;
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		// Clean parameters (if not defined or using deprecated value)
 		if (empty($conf->global->CHEQUERECEIPTS_ADDON)) {
@@ -452,7 +452,7 @@ class RemiseCheque extends CommonObject
 
 			return $numref;
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			print $langs->trans("Error")." ".$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Bank"));
 			return "";
 		}
@@ -486,7 +486,7 @@ class RemiseCheque extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("banks");
+            // $langs->load("banks");
 			$now = dol_now();
 
 			$response = new WorkboardResponse();
@@ -1006,7 +1006,7 @@ class RemiseCheque extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			$langs->load('compta');
+            // $langs->load('compta');
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('ToValidate');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Validated');
 			$this->labelStatusShort[self::STATUS_DRAFT] = $langs->trans('ToValidate');

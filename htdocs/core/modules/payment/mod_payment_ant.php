@@ -63,7 +63,7 @@ class mod_payment_ant extends ModeleNumRefPayments
 	{
 		global $db, $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

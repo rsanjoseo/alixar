@@ -311,7 +311,7 @@ abstract class ActionsCardCommon
 				require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 				//$s=picto_from_langcode($this->default_lang);
 				//print ($s?$s.' ':'');
-				$langs->load("languages");
+                // $langs->load("languages");
 				$this->tpl['default_lang'] = ($this->default_lang ? $langs->trans('Language_'.$this->object->default_lang) : '');
 			}
 
@@ -344,7 +344,7 @@ abstract class ActionsCardCommon
 
 			// Linked member
 			if (!empty($conf->adherent->enabled)) {
-				$langs->load("members");
+                // $langs->load("members");
 				$adh = new Adherent($this->db);
 				$result = $adh->fetch('', '', $this->object->id);
 				if ($result > 0) {

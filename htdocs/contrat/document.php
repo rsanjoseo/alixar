@@ -143,7 +143,7 @@ if ($object->id) {
 	}
 	// Project
 	if (!empty($conf->projet->enabled)) {
-		$langs->load("projects");
+		// $langs->load("projects");
 		$morehtmlref .= '<br>'.$langs->trans('Project').' ';
 		if ($user->rights->contrat->creer) {
 			if ($action != 'classify') {

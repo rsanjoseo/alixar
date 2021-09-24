@@ -174,7 +174,7 @@ if ($rss) {
 		} else {
 			dol_syslog("build_exportfile build_xxxfile function fails to for format=".$format." outputfiletmp=".$outputfile, LOG_ERR);
 			dol_delete_file($outputfiletmp, 0, 1);
-			$langs->load("errors");
+			// $langs->load("errors");
 			print $langs->trans("ErrorFailToCreateFile", $outputfile);
 			exit(-1);
 		}

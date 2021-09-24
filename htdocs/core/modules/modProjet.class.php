@@ -343,7 +343,7 @@ class modProjet extends DolibarrModules
 			dol_mkdir($dirodt);
 			$result = dol_copy($src, $dest, 0, 0);
 			if ($result < 0) {
-				$langs->load("errors");
+				// $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 				return 0;
 			}
@@ -359,7 +359,7 @@ class modProjet extends DolibarrModules
 			dol_mkdir($dirodt);
 			$result = dol_copy($src, $dest, 0, 0);
 			if ($result < 0) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
 				return 0;
 			}

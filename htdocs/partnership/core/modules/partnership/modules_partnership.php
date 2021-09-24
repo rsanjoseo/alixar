@@ -91,7 +91,7 @@ abstract class ModeleNumRefPartnership
 	public function info()
 	{
 		global $langs;
-		$langs->load("partnership");
+		// $langs->load("partnership");
 		return $langs->trans("NoDescription");
 	}
 
@@ -103,7 +103,7 @@ abstract class ModeleNumRefPartnership
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("partnership");
+        // $langs->load("partnership");
 		return $langs->trans("NoExample");
 	}
 
@@ -139,7 +139,7 @@ abstract class ModeleNumRefPartnership
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

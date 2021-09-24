@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/usergroups.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/user/class/user.class.php';
 
 // Load translation files required by page
-$langs->load("users");
+// $langs->load("users");
 
 // Security check
 $id = GETPOST('id', 'int');

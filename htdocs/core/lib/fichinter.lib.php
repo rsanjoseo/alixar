@@ -36,7 +36,7 @@
 function fichinter_prepare_head($object)
 {
 	global $db, $langs, $conf, $user;
-	$langs->load("fichinter");
+	// $langs->load("fichinter");
 
 	$h = 0;
 	$head = array();

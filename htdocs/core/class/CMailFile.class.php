@@ -757,7 +757,7 @@ class CMailFile
 					}
 
 					if (!$res) {
-						$langs->load("errors");
+						// $langs->load("errors");
 						$this->error = "Failed to send mail with php mail";
 						if (!$linuxlike) {
 							$this->error .= " to HOST=".ini_get('SMTP').", PORT=".ini_get('smtp_port'); // This values are value used only for non linuxlike systems

@@ -32,7 +32,7 @@ function conferenceorboothPrepareHead($object, $with_project = 0)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("eventorganization");
+	// $langs->load("eventorganization");
 
 	$h = 0;
 	$head = array();
@@ -117,7 +117,7 @@ function conferenceorboothProjectPrepareHead($object)
 
 	global $db, $langs, $conf;
 
-	$langs->load("eventorganization");
+    // $langs->load("eventorganization");
 
 	$h = 0;
 	$head = array();
@@ -191,7 +191,7 @@ function conferenceorboothattendeePrepareHead($object)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("eventorganization");
+    // $langs->load("eventorganization");
 
 	$h = 0;
 	$head = array();

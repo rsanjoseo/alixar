@@ -447,7 +447,7 @@ class PriceGlobalVariableUpdater
 	public function process()
 	{
 		global $langs, $user;
-		$langs->load("errors");
+		// $langs->load("errors");
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
 		$this->error = null;

@@ -46,7 +46,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/date.lib.php";
 require_once DOL_DOCUMENT_ROOT.'/core/lib/invoice2.lib.php';
 
 // Load main language strings
-$langs->load("main");
+// $langs->load("main");
 
 // Global variables
 $version = DOL_VERSION;

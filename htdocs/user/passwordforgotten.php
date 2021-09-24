@@ -105,7 +105,7 @@ if (empty($reshook)) {
 				header("Location: ".DOL_URL_ROOT.'/');
 				exit;
 			} else {
-				$langs->load("errors");
+				// $langs->load("errors");
 				$message = '<div class="error">'.$langs->trans("ErrorFailedToValidatePasswordReset").'</div>';
 			}
 		}

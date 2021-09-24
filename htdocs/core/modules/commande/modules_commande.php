@@ -93,7 +93,7 @@ abstract class ModeleNumRefCommandes
 	public function info()
 	{
 		global $langs;
-		$langs->load("orders");
+		// $langs->load("orders");
 		return $langs->trans("NoDescription");
 	}
 
@@ -105,7 +105,7 @@ abstract class ModeleNumRefCommandes
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("orders");
+        // $langs->load("orders");
 		return $langs->trans("NoExample");
 	}
 
@@ -141,7 +141,7 @@ abstract class ModeleNumRefCommandes
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

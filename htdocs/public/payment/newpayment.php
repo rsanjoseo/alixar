@@ -820,7 +820,7 @@ llxHeader($head, $langs->trans("PaymentForm"), '', '', 0, 0, '', '', '', 'online
 
 // Check link validity
 if ($source && in_array($ref, array('member_ref', 'contractline_ref', 'invoice_ref', 'order_ref', 'donation_ref', ''))) {
-	$langs->load("errors");
+	// $langs->load("errors");
 	dol_print_error_email('BADREFINPAYMENTFORM', $langs->trans("ErrorBadLinkSourceSetButBadValueForRef", $source, $ref));
 	// End of page
 	llxFooter();
@@ -916,7 +916,7 @@ print '<table id="dolpaymenttable" summary="Payment form" class="center">'."\n";
 // Output introduction text
 $text = '';
 if (!empty($conf->global->PAYMENT_NEWFORM_TEXT)) {
-	$langs->load("members");
+    // $langs->load("members");
 	if (preg_match('/^\((.*)\)$/', $conf->global->PAYMENT_NEWFORM_TEXT, $reg)) {
 		$text .= $langs->trans($reg[1])."<br>\n";
 	} else {
@@ -991,7 +991,7 @@ if (!$source) {
 // Payment on customer order
 if ($source == 'order') {
 	$found = true;
-	$langs->load("orders");
+    // $langs->load("orders");
 
 	require_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 
@@ -1115,7 +1115,7 @@ if ($source == 'order') {
 // Payment on customer invoice
 if ($source == 'invoice') {
 	$found = true;
-	$langs->load("bills");
+    // $langs->load("bills");
 
 	require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
 
@@ -1245,7 +1245,7 @@ if ($source == 'invoice') {
 // Payment on contract line
 if ($source == 'contractline') {
 	$found = true;
-	$langs->load("contracts");
+    // $langs->load("contracts");
 
 	require_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
 
@@ -1447,7 +1447,7 @@ if ($source == 'member' || $source == 'membersubscription') {
 	$newsource = 'member';
 
 	$found = true;
-	$langs->load("members");
+    // $langs->load("members");
 
 	require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
 	require_once DOL_DOCUMENT_ROOT.'/adherents/class/subscription.class.php';
@@ -1674,7 +1674,7 @@ if ($source == 'member' || $source == 'membersubscription') {
 // Payment on donation
 if ($source == 'donation') {
 	$found = true;
-	$langs->load("don");
+    // $langs->load("don");
 
 	require_once DOL_DOCUMENT_ROOT.'/don/class/don.class.php';
 
@@ -1921,7 +1921,7 @@ if ($source == 'organizedeventregistration') {
 
 if ($source == 'boothlocation') {
 	$found = true;
-	$langs->load("members");
+    // $langs->load("members");
 
 	if (GETPOST('fulltag', 'alpha')) {
 		$fulltag = GETPOST('fulltag', 'alpha');
@@ -2035,7 +2035,7 @@ if ($action != 'dopayment') {
 		} else {
 			// Membership can be paid and we still allow to make renewal
 			if (($source == 'member' || $source == 'membersubscription') && $object->datefin > dol_now()) {
-				$langs->load("members");
+                // $langs->load("members");
 				print '<br><span class="amountpaymentcomplete size15x">'.$langs->trans("MembershipPaid", dol_print_date($object->datefin, 'day')).'</span><br>';
 				print '<div class="opacitymedium margintoponly">'.$langs->trans("PaymentWillBeRecordedForNextPeriod").'</div>';
 			}
@@ -2268,7 +2268,7 @@ if (preg_match('/^dopayment/', $action)) {			// If we choosed/click on the payme
 
 		// JS Code for Stripe
 		if (empty($stripearrayofkeys['publishable_key'])) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			print info_admin($langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Stripe")), 0, 0, 'error');
 		} else {
 			print '<!-- JS Code for Stripe components -->';

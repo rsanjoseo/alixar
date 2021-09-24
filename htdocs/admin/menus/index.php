@@ -304,7 +304,7 @@ if ($conf->use_javascript_ajax) {
 		$i = 1;
 		while ($menu = $db->fetch_array($res)) {
 			if (!empty($menu['langs'])) {
-				$langs->load($menu['langs']);
+				// $langs->load($menu['langs']);
 			}
 			$titre = $langs->trans($menu['titre']);
 
@@ -391,7 +391,7 @@ if ($conf->use_javascript_ajax) {
 
 	print '</div>';
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	setEventMessages($langs->trans("ErrorFeatureNeedJavascript"), null, 'errors');
 }
 

@@ -69,26 +69,27 @@ class box_services_expired extends ModeleBoxes
 	 */
 	public function loadBox($max = 5)
 	{
-		global $user, $langs, $conf;
+        global $user, $langs, $conf;
 
-		$this->max = $max;
+        $this->max = $max;
 
-		include_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
 
-		$now = dol_now();
+        $now = dol_now();
 
-		$this->info_box_head = array('text' => $langs->trans("BoxLastExpiredServices", $max));
+        //		$this->info_box_head = array('text' => $langs->trans("BoxLastExpiredServices", $max));
+        $this->info_box_head = ['text' => $langs->trans("BoxLastExpiredServices", ['s' => $max])];
 
-		if ($user->rights->contrat->lire) {
-			// Select contracts with at least one expired service
-			$sql = "SELECT ";
-			$sql .= " c.rowid, c.ref, c.statut as fk_statut, c.date_contrat, c.ref_customer, c.ref_supplier,";
-			$sql .= " s.nom as name, s.rowid as socid, s.email, s.client, s.fournisseur, s.code_client, s.code_fournisseur, s.code_compta, s.code_compta_fournisseur,";
-			$sql .= " MIN(cd.date_fin_validite) as date_line, COUNT(cd.rowid) as nb_services";
-			$sql .= " FROM ".MAIN_DB_PREFIX."contrat as c, ".MAIN_DB_PREFIX."societe s, ".MAIN_DB_PREFIX."contratdet as cd";
-			if (!$user->rights->societe->client->voir && !$user->socid) {
-				$sql .= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
-			}
+        if ($user->rights->contrat->lire) {
+            // Select contracts with at least one expired service
+            $sql = "SELECT ";
+            $sql .= " c.rowid, c.ref, c.statut as fk_statut, c.date_contrat, c.ref_customer, c.ref_supplier,";
+            $sql .= " s.nom as name, s.rowid as socid, s.email, s.client, s.fournisseur, s.code_client, s.code_fournisseur, s.code_compta, s.code_compta_fournisseur,";
+            $sql .= " MIN(cd.date_fin_validite) as date_line, COUNT(cd.rowid) as nb_services";
+            $sql .= " FROM " . MAIN_DB_PREFIX . "contrat as c, " . MAIN_DB_PREFIX . "societe s, " . MAIN_DB_PREFIX . "contratdet as cd";
+            if (!$user->rights->societe->client->voir && !$user->socid) {
+                $sql .= ", " . MAIN_DB_PREFIX . "societe_commerciaux as sc";
+            }
 			$sql .= " WHERE cd.statut = 4 AND cd.date_fin_validite <= '".$this->db->idate($now)."'";
 			$sql .= " AND c.entity = ".$conf->entity;
 			$sql .= " AND c.fk_soc=s.rowid AND cd.fk_contrat=c.rowid AND c.statut > 0";
@@ -166,8 +167,8 @@ class box_services_expired extends ModeleBoxes
 				}
 
 				if ($num == 0) {
-					$langs->load("contracts");
-					$this->info_box_contents[$i][] = array(
+					// $langs->load("contracts");
+                    $this->info_box_contents[$i][] = array(
 						'td' => 'class="nohover opacitymedium center"',
 						'text' => $langs->trans("NoExpiredServices"),
 					);

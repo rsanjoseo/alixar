@@ -86,7 +86,7 @@ foreach ($object->fields as $key => $val) {
 		print '<div class="longmessagecut">';
 	}
 	if ($key == 'lang') {
-		$langs->load("languages");
+		// $langs->load("languages");
 		$labellang = ($value ? $langs->trans('Language_'.$value) : '');
 		print picto_from_langcode($value, 'class="paddingrightonly saturatemedium opacitylow"');
 		print $labellang;

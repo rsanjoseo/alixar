@@ -76,7 +76,7 @@ class box_scheduled_jobs extends ModeleBoxes
 	{
 		global $user, $langs, $conf, $form;
 
-		$langs->load("cron");
+		// $langs->load("cron");
 		$this->info_box_head = array('text' => $langs->trans("BoxScheduledJobs", $max));
 
 		if ($user->rights->cron->read) {

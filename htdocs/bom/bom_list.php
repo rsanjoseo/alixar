@@ -190,7 +190,7 @@ if (empty($reshook)) {
 				$result = $objecttmp->fetch($toselectid);
 				if ($result > 0) {
 					if ($objecttmp->status != $objecttmp::STATUS_VALIDATED) {
-						$langs->load("errors");
+						// $langs->load("errors");
 						setEventMessages($langs->trans("ErrorObjectMustHaveStatusActiveToBeDisabled", $objecttmp->ref), null, 'errors');
 						$error++;
 						break;
@@ -238,7 +238,7 @@ if (empty($reshook)) {
 				$result = $objecttmp->fetch($toselectid);
 				if ($result > 0) {
 					if ($objecttmp->status != $objecttmp::STATUS_DRAFT && $objecttmp->status != $objecttmp::STATUS_CANCELED) {
-						$langs->load("errors");
+                        // $langs->load("errors");
 						setEventMessages($langs->trans("ErrorObjectMustHaveStatusDraftOrDisabledToBeActivated", $objecttmp->ref), null, 'errors');
 						$error++;
 						break;

@@ -81,7 +81,7 @@ function doc_label_pdf_create($db, $arrayofrecords, $modele, $outputlangs, $outp
 {
 	// phpcs:enable
 	global $conf, $langs;
-	$langs->load("members");
+	// $langs->load("members");
 
 	$error = 0;
 

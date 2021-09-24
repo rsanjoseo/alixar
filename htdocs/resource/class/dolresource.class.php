@@ -305,7 +305,7 @@ class Dolresource extends CommonObject
 				if (file_exists($olddir)) {
 					$res = @rename($olddir, $newdir);
 					if (!$res) {
-						$langs->load("errors");
+						// $langs->load("errors");
 						$this->error = $langs->trans('ErrorFailToRenameDir', $olddir, $newdir);
 						$error++;
 					}

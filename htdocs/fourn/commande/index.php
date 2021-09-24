@@ -195,7 +195,7 @@ if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SU
 		print '<table class="noborder centpercent">';
 		print '<tr class="liste_titre">';
 		print '<th colspan="2">'.$langs->trans("DraftOrders").'</th></tr>';
-		$langs->load("orders");
+		// $langs->load("orders");
 		$num = $db->num_rows($resql);
 		if ($num) {
 			$i = 0;

@@ -30,7 +30,7 @@ function partnershipAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("partnership");
+	// $langs->load("partnership");
 
 	$h = 0;
 	$head = array();
@@ -76,7 +76,7 @@ function partnershipPrepareHead($object)
 {
 	global $db, $langs, $conf;
 
-	$langs->load("partnership");
+    // $langs->load("partnership");
 
 	$h = 0;
 	$head = array();

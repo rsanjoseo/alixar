@@ -26,7 +26,7 @@ require '../main.inc.php';
 include_once DOL_DOCUMENT_ROOT.'/core/modules/printing/modules_printing.php';
 
 // Load translation files required by the page
-$langs->load("printing");
+// $langs->load("printing");
 
 if (!$user->admin) {
 	accessforbidden();
@@ -56,7 +56,7 @@ $result = $object->listDrivers($db, 10);
 foreach ($result as $driver) {
 	require_once DOL_DOCUMENT_ROOT.'/core/modules/printing/'.$driver.'.modules.php';
 	$classname = 'printing_'.$driver;
-	$langs->load($driver);
+    // $langs->load($driver);
 	$printer = new $classname($db);
 	$keyforprinteractive = $printer->active;
 	if ($keyforprinteractive && $conf->global->$keyforprinteractive) {

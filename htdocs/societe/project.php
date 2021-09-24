@@ -69,7 +69,7 @@ if ($socid) {
 	require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 	require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
 
-	$langs->load("companies");
+	// $langs->load("companies");
 
 
 	$object = new Societe($db);
@@ -82,7 +82,7 @@ if ($socid) {
 	llxHeader('', $title);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 	$head = societe_prepare_head($object);
 

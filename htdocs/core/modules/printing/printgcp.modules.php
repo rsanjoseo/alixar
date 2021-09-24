@@ -209,7 +209,7 @@ class printing_printgcp extends PrintingDriver
 	{
 		global $conf, $langs;
 		$error = 0;
-		$langs->load('printing');
+		// $langs->load('printing');
 
 		$html = '<tr class="liste_titre">';
 		$html .= '<td>'.$langs->trans('GCP_Name').'</td>';

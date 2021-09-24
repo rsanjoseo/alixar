@@ -30,7 +30,7 @@ function eventorganizationAdminPrepareHead()
 {
 	global $langs, $conf;
 
-	$langs->load("eventorganization");
+	// $langs->load("eventorganization");
 
 	$h = 0;
 	$head = array();

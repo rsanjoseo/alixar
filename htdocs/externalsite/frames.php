@@ -29,7 +29,7 @@
 require '../main.inc.php';
 
 // Load translation files required by the page
-$langs->load("externalsite");
+// $langs->load("externalsite");
 
 
 $mainmenu = GETPOST('mainmenu', "aZ09");
@@ -58,10 +58,10 @@ if (!empty($keyforcontent)) {
 
 	if (!preg_match('/EXTERNAL_SITE_CONTENT_/', $keyforcontent)
 		 && !preg_match('/EXTERNAL_SITE_URL_/', $keyforcontent)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print $langs->trans("ErrorBadSyntaxForParamKeyForContent", 'EXTERNAL_SITE_CONTENT_', 'EXTERNAL_SITE_URL_');
 	} elseif (empty($conf->global->$keyforcontent)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		print $langs->trans("ErrorVariableKeyForContentMustBeSet", 'EXTERNAL_SITE_CONTENT_'.$keyforcontent, 'EXTERNAL_SITE_URL_'.$keyforcontent);
 	} else {
 		if (preg_match('/EXTERNAL_SITE_CONTENT_/', $keyforcontent)) {

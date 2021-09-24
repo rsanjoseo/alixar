@@ -35,7 +35,7 @@ if (!empty($conf->commande->enabled)) {
 	print img_picto('', 'globe').' <span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlinePaymentOnOrder", $servicename).':</span><br>';
 	print '<strong class="wordbreak">'.getOnlinePaymentUrl(1, 'order')."</strong><br>\n";
 	if (!empty($conf->global->PAYMENT_SECURITY_TOKEN) && !empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-		$langs->load("orders");
+		// $langs->load("orders");
 		print '<form action="'.$_SERVER["PHP_SELF"].'#order" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 
@@ -57,7 +57,7 @@ if (!empty($conf->facture->enabled)) {
 	print img_picto('', 'globe').'  <span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlinePaymentOnInvoice", $servicename).':</span><br>';
 	print '<strong class="wordbreak">'.getOnlinePaymentUrl(1, 'invoice')."</strong><br>\n";
 	if (!empty($conf->global->PAYMENT_SECURITY_TOKEN) && !empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-		$langs->load("bills");
+        // $langs->load("bills");
 		print '<form action="'.$_SERVER["PHP_SELF"].'#invoice" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 
@@ -79,7 +79,7 @@ if (!empty($conf->contrat->enabled)) {
 	print img_picto('', 'globe').'  <span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlinePaymentOnContractLine", $servicename).':</span><br>';
 	print '<strong class="wordbreak">'.getOnlinePaymentUrl(1, 'contractline')."</strong><br>\n";
 	if (!empty($conf->global->PAYMENT_SECURITY_TOKEN) && !empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-		$langs->load("contracts");
+        // $langs->load("contracts");
 		print '<form action="'.$_SERVER["PHP_SELF"].'#contractline" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 
@@ -101,7 +101,7 @@ if (!empty($conf->adherent->enabled)) {
 	print img_picto('', 'globe').'  <span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlinePaymentOnMemberSubscription", $servicename).':</span><br>';
 	print '<strong class="wordbreak">'.getOnlinePaymentUrl(1, 'membersubscription')."</strong><br>\n";
 	if (!empty($conf->global->PAYMENT_SECURITY_TOKEN) && !empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-		$langs->load("members");
+        // $langs->load("members");
 		print '<form action="'.$_SERVER["PHP_SELF"].'#membersubscription" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 
@@ -123,7 +123,7 @@ if (!empty($conf->don->enabled)) {
 	print img_picto('', 'globe').'  <span class="opacitymedium">'.$langs->trans("ToOfferALinkForOnlinePaymentOnDonation", $servicename).':</span><br>';
 	print '<strong class="wordbreak">'.getOnlinePaymentUrl(1, 'donation')."</strong><br>\n";
 	if (!empty($conf->global->PAYMENT_SECURITY_TOKEN) && !empty($conf->global->PAYMENT_SECURITY_TOKEN_UNIQUE)) {
-		$langs->load("members");
+        // $langs->load("members");
 		print '<form action="'.$_SERVER["PHP_SELF"].'#donation" method="POST">';
 		print '<input type="hidden" name="token" value="'.newToken().'">';
 

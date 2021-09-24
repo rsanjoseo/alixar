@@ -129,7 +129,7 @@ if ($id > 0) {
 		}
 
 		if (!empty($conf->notification->enabled)) {
-			$langs->load("mails");
+			// $langs->load("mails");
 		}
 
 		$head = member_prepare_head($object);
@@ -191,7 +191,7 @@ if ($id > 0) {
 		dol_print_error($db);
 	}
 } else {
-	$langs->load("errors");
+    // $langs->load("errors");
 	print $langs->trans("ErrorRecordNotFound");
 }
 

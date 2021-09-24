@@ -64,7 +64,7 @@ if ($action == 'add') {
 	}
 }
 
-$langs->load('products');
+// $langs->load('products');
 
 
 /*

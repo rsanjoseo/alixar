@@ -91,7 +91,7 @@ $apiService->setAccessType('offline');
 
 $apiService->setApprouvalPrompt('force');
 
-$langs->load("oauth");
+// $langs->load("oauth");
 
 
 /*

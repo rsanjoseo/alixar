@@ -795,7 +795,7 @@ class RecruitmentCandidature extends CommonObject
 		// phpcs:enable
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("recruitment@recruitment");
+			//// $langs->load("recruitment@recruitment");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('Draft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('Received').' ('.$langs->trans("InterviewToDo").')';
 			$this->labelStatus[self::STATUS_CONTRACT_PROPOSED] = $langs->trans('ContractProposed');
@@ -911,7 +911,7 @@ class RecruitmentCandidature extends CommonObject
     public function getNextNumRef()
     {
         global $langs, $conf;
-        $langs->load("recruitment@recruitment");
+        // $langs->load("recruitment@recruitment");
 
         if (empty($conf->global->RECRUITMENT_RECRUITMENTCANDIDATURE_ADDON)) {
             $conf->global->RECRUITMENT_RECRUITMENTCANDIDATURE_ADDON = 'mod_recruitmentcandidature_standard';
@@ -976,7 +976,7 @@ class RecruitmentCandidature extends CommonObject
 		$result = 0;
 		$includedocgeneration = 0;
 
-		$langs->load("recruitment@recruitment");
+        // $langs->load("recruitment@recruitment");
 
 		if (!dol_strlen($modele)) {
 			if (!empty($conf->global->RECRUITMENTCANDIDATURE_ADDON_PDF)) {

@@ -173,7 +173,7 @@ $contactstatic = new Contact($db);
 
 $form = new Form($db);
 
-$langs->load("companies");
+// $langs->load("companies");
 
 $title = $langs->trans("WebsiteAccounts");
 llxHeader('', $title);

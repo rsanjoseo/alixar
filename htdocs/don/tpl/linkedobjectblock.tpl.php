@@ -27,7 +27,7 @@ global $noMoreLinkedObjectBlockAfter;
 $langs = $GLOBALS['langs'];
 $linkedObjectBlock = $GLOBALS['linkedObjectBlock'];
 
-$langs->load("donations");
+// $langs->load("donations");
 
 $total = 0;
 $ilink = 0;

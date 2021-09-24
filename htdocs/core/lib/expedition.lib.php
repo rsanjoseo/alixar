@@ -36,9 +36,9 @@ function expedition_prepare_head(Expedition $object)
 {
 	global $langs, $conf, $user;
 	if (!empty($conf->expedition->enabled)) {
-		$langs->load("sendings");
+		// $langs->load("sendings");
 	}
-	$langs->load("orders");
+    // $langs->load("orders");
 
 	$h = 0;
 	$head = array();
@@ -74,7 +74,7 @@ function expedition_prepare_head(Expedition $object)
 function expedition_admin_prepare_head()
 {
 	global $langs, $conf, $user;
-	$langs->load("sendings");
+    // $langs->load("sendings");
 
 	$h = 0;
 	$head = array();

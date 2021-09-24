@@ -77,7 +77,7 @@ class box_customers_outstanding_bill_reached extends ModeleBoxes
 	public function loadBox($max = 5)
 	{
 		global $user, $langs, $conf;
-		$langs->load("boxes");
+		// $langs->load("boxes");
 
 		$this->max = $max;
 

@@ -193,7 +193,7 @@ $result = $object->fetch($socid);
 llxHeader("", $langs->trans("ThirdParty").'-'.$langs->trans('PriceByCustomer'));
 
 if (!empty($conf->notification->enabled)) {
-	$langs->load("mails");
+	// $langs->load("mails");
 }
 $head = societe_prepare_head($object);
 

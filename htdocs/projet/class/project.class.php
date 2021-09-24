@@ -539,7 +539,7 @@ class Project extends CommonObject
 							include_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
 							$res = @rename($olddir, $newdir);
 							if (!$res) {
-								$langs->load("errors");
+								// $langs->load("errors");
 								$this->error = $langs->trans('ErrorFailToRenameDir', $olddir, $newdir);
 								$error++;
 							}
@@ -1615,7 +1615,7 @@ class Project extends CommonObject
 					foreach ($tab as $contacttoadd) {
 						$clone_project->add_contact($contacttoadd['id'], $contacttoadd['code'], $contacttoadd['source'], $notrigger);
 						if ($clone_project->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error .= $langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType");
 							$error++;
 						} else {
@@ -1856,7 +1856,7 @@ class Project extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("projects");
+        // $langs->load("projects");
 
 		if (!dol_strlen($modele)) {
 			$modele = 'baleine';

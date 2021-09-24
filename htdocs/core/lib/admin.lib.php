@@ -1269,7 +1269,7 @@ function complete_dictionary_with_modules(&$taborder, &$tabname, &$tablib, &$tab
 							// Load languages files of module
 							if (isset($objMod->langfiles) && is_array($objMod->langfiles)) {
 								foreach ($objMod->langfiles as $langfile) {
-									$langs->load($langfile);
+									// $langs->load($langfile);
 								}
 							}
 
@@ -1507,7 +1507,7 @@ function complete_elementList_with_modules(&$elementList)
 							// Load languages files of module
 							if (isset($objMod->langfiles) && is_array($objMod->langfiles)) {
 								foreach ($objMod->langfiles as $langfile) {
-									$langs->load($langfile);
+                                    // $langs->load($langfile);
 								}
 							}
 

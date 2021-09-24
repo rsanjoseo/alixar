@@ -31,7 +31,7 @@ if (empty($langs) || !is_object($langs)) {
 }
 
 
-$langs->load("modulebuilder");
+// $langs->load("modulebuilder");
 
 ?>
 
@@ -80,7 +80,7 @@ if (isset($extrafields->attributes[$elementtype]['type']) && is_array($extrafiel
 
 		// Load language if required
 		if (!empty($extrafields->attributes[$elementtype]['langfile'][$key])) {
-			$langs->load($extrafields->attributes[$elementtype]['langfile'][$key]);
+            // $langs->load($extrafields->attributes[$elementtype]['langfile'][$key]);
 		}
 
 		print '<tr class="oddeven">';

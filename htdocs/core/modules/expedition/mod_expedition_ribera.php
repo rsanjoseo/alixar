@@ -62,7 +62,7 @@ class mod_expedition_ribera extends ModelNumRefExpedition
 	{
 		global $conf, $langs, $db;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

@@ -35,7 +35,7 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/resource.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/resource/class/dolresource.class.php';
 
 // Load translation files required by the page
-$langs->load("companies");
+// $langs->load("companies");
 
 // Get parameters
 $id = GETPOST('id', 'int');
@@ -122,7 +122,7 @@ if ($object->id > 0) {
 	require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 	require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 
-	$langs->load("companies");
+    // $langs->load("companies");
 	$picto = 'resource';
 
 	$title = $langs->trans("Agenda");
@@ -132,7 +132,7 @@ if ($object->id > 0) {
 	llxHeader('', $title);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 	$type = $langs->trans('ResourceSingular');
 

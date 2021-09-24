@@ -1025,13 +1025,13 @@ abstract class CommonObject
 
 		// Check parameters
 		if ($fk_socpeople <= 0) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$this->error = $langs->trans("ErrorWrongValueForParameterX", "1");
 			dol_syslog(get_class($this)."::add_contact ".$this->error, LOG_ERR);
 			return -1;
 		}
 		if (!$type_contact) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans("ErrorWrongValueForParameterX", "2");
 			dol_syslog(get_class($this)."::add_contact ".$this->error, LOG_ERR);
 			return -2;
@@ -4341,7 +4341,7 @@ abstract class CommonObject
             if ($resql) {
                 $obj = $this->db->fetch_object($resql);
                 if ($obj->nb > 0) {
-                    $langs->load("errors");
+                    // $langs->load("errors");
                     //print 'Found into table '.$table.', type '.$langs->transnoentitiesnoconv($elementname).', haschild='.$haschild;
                     $haschild += $obj->nb;
                     if (is_numeric($elementname)) {    // old usage
@@ -5669,7 +5669,7 @@ abstract class CommonObject
 
 			$this->array_languages[$key][$codelang] = $value_key;
             /*if ($nofillrequired) {
-				$langs->load('errors');
+				// $langs->load('errors');
 				setEventMessages($langs->trans('ErrorFieldsRequired').' : '.implode(', ', $error_field_required), null, 'errors');
 				return -1;
 			}*/
@@ -5876,7 +5876,7 @@ abstract class CommonObject
 
         if (!empty($this->array_options)) {
             // Check parameters
-            $langs->load('admin');
+            // $langs->load('admin');
             require_once DOL_DOCUMENT_ROOT . '/core/class/extrafields.class.php';
             $extrafields = new ExtraFields($this->db);
             $target_extrafields = $extrafields->fetch_name_optionals_label($this->table_element);
@@ -5912,7 +5912,7 @@ abstract class CommonObject
                         $mandatorypb = true;
                     }
                     if ($mandatorypb) {
-                        $langs->load("errors");
+                        // $langs->load("errors");
                         dol_syslog("Mandatory field '" . $key . "' is empty during create and set to required into definition of extrafields");
                         $this->errors[] = $langs->trans('ErrorFieldRequired', $attributeLabel);
                         return -1;
@@ -6255,8 +6255,8 @@ abstract class CommonObject
 		$error = 0;
 
 		if (!empty($this->array_options) && isset($this->array_options["options_".$key])) {
-			// Check parameters
-			$langs->load('admin');
+            // Check parameters
+            // $langs->load('admin');
 			require_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
 			$extrafields = new ExtraFields($this->db);
 			$extrafields->fetch_name_optionals_label($this->table_element);
@@ -6279,7 +6279,7 @@ abstract class CommonObject
 					$mandatorypb = true;
 				}
 				if ($mandatorypb) {
-					$langs->load("errors");
+                    // $langs->load("errors");
 					dol_syslog("Mandatory field 'options_".$key."' is empty during update and set to required into definition of extrafields");
 					$this->errors[] = $langs->trans('ErrorFieldRequired', $attributeLabel);
 					return -1;
@@ -7698,7 +7698,7 @@ abstract class CommonObject
 					}
 					// Load language if required
 					if (!empty($extrafields->attributes[$this->table_element]['langfile'][$key])) {
-						$langs->load($extrafields->attributes[$this->table_element]['langfile'][$key]);
+                        // $langs->load($extrafields->attributes[$this->table_element]['langfile'][$key]);
 					}
 
 					$colspan = '';
@@ -8714,7 +8714,7 @@ abstract class CommonObject
 
 			if (isset($this->fields[$key]['notnull']) && $this->fields[$key]['notnull'] == 1 && (!isset($values[$key]) || $values[$key] === 'NULL') && is_null($this->fields[$key]['default'])) {
 				$error++;
-				$langs->load("errors");
+                // $langs->load("errors");
 				dol_syslog("Mandatory field '".$key."' is empty and required into ->fields definition of class");
 				$this->errors[] = $langs->trans("ErrorFieldRequired", $this->fields[$key]['label']);
 			}

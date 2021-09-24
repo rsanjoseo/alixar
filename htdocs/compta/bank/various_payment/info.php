@@ -58,7 +58,7 @@ print dol_get_fiche_head($head, 'info', $langs->trans("VariousPayment"), -1, $ob
 $morehtmlref = '<div class="refidno">';
 // Project
 if (!empty($conf->projet->enabled)) {
-	$langs->load("projects");
+	// $langs->load("projects");
 	$morehtmlref .= $langs->trans('Project').' : ';
 	if ($user->rights->banque->modifier && 0) {
 		if ($action != 'classify') {

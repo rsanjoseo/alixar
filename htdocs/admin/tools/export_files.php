@@ -32,7 +32,7 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/utils.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formfile.class.php';
 
-$langs->load("admin");
+// $langs->load("admin");
 
 $action = GETPOST('action', 'aZ09');
 $what = GETPOST('what', 'alpha');
@@ -130,10 +130,10 @@ if ($compression == 'zip') {
 	$ret = dol_compress_dir(DOL_DATA_ROOT, $outputdir."/".$file, $compression, $excludefiles);
 	if ($ret < 0) {
 		if ($ret == -2) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$errormsg = $langs->trans("ErrNoZipEngine");
 		} else {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$errormsg = $langs->trans("ErrorFailedToWriteInDir", $outputdir);
 		}
 	}
@@ -150,7 +150,7 @@ if ($compression == 'zip') {
 
 	$retval = $result['error'];
 	if ($result['result'] || !empty($retval)) {
-		$langs->load("errors");
+        // $langs->load("errors");
 		dol_syslog("Documents tar retval after exec=".$retval, LOG_ERR);
 		$errormsg = 'Error tar generation return '.$retval;
 	} else {

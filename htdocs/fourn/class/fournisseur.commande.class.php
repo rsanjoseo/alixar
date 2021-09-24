@@ -704,7 +704,7 @@ class CommandeFournisseur extends CommonOrder
         global $conf, $langs, $hookmanager;
 
         if (empty($this->statuts) || empty($this->statutshort)) {
-            $langs->load('orders');
+            // $langs->load('orders');
 
             $this->statuts[0] = 'StatusSupplierOrderDraft';
             $this->statuts[1] = 'StatusSupplierOrderValidated';
@@ -877,7 +877,7 @@ class CommandeFournisseur extends CommonOrder
     public function getNextNumRef($soc)
     {
         global $db, $langs, $conf;
-        $langs->load("orders");
+        // $langs->load("orders");
 
         if (!empty($conf->global->COMMANDE_SUPPLIER_ADDON_NUMBER)) {
             $mybool = false;
@@ -1040,7 +1040,7 @@ class CommandeFournisseur extends CommonOrder
 				// If stock is incremented on validate order, we must increment it
 				if (!$error && $movetoapprovestatus && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_VALIDATE_ORDER)) {
 					require_once DOL_DOCUMENT_ROOT.'/product/stock/class/mouvementstock.class.php';
-					$langs->load("agenda");
+                    // $langs->load("agenda");
 
 					$cpt = count($this->lines);
 					for ($i = 0; $i < $cpt; $i++) {
@@ -1738,7 +1738,7 @@ class CommandeFournisseur extends CommonOrder
 				return -1;
 			}
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -1773,7 +1773,7 @@ class CommandeFournisseur extends CommonOrder
 							}
 						}
 						if ($result == 0) {                   // If result == 0, we failed to found the supplier reference price
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error = "Ref ".$prod->ref." ".$langs->trans("ErrorQtyTooLowForThisSupplier");
 							$this->db->rollback();
 							dol_syslog(get_class($this)."::addline we did not found supplier price, so we can't guess unit price");
@@ -1782,7 +1782,7 @@ class CommandeFournisseur extends CommonOrder
 							return -1;
 						}
 						if ($result == -1) {
-							$langs->load("errors");
+                            // $langs->load("errors");
 							$this->error = "Ref ".$prod->ref." ".$langs->trans("ErrorQtyTooLowForThisSupplier");
 							$this->db->rollback();
 							dol_syslog(get_class($this)."::addline result=".$result." - ".$this->error, LOG_DEBUG);
@@ -2688,7 +2688,7 @@ class CommandeFournisseur extends CommonOrder
 				return -1;
 			}
 			if ($date_start && $date_end && $date_start > $date_end) {
-				$langs->load("errors");
+                // $langs->load("errors");
 				$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 				return -1;
 			}
@@ -3109,7 +3109,7 @@ class CommandeFournisseur extends CommonOrder
 	{
 		global $conf, $langs;
 
-		$langs->load("suppliers");
+        // $langs->load("suppliers");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {

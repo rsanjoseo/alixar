@@ -35,7 +35,7 @@ if (!$user->rights->user->user->lire && !$user->admin) {
 }
 
 // Load translation files required by page
-$langs->load("users");
+// $langs->load("users");
 
 $canreadperms = true;
 if (!empty($conf->global->MAIN_USE_ADVANCED_PERMS)) {

@@ -59,7 +59,7 @@ function marges_admin_prepare_head()
 function marges_prepare_head()
 {
 	global $langs, $conf, $user;
-	$langs->load("margins");
+	// $langs->load("margins");
 
 	$h = 0;
 	$head = array();

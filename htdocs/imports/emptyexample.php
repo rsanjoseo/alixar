@@ -57,7 +57,7 @@ $datatoimport = GETPOST('datatoimport');
 $format = GETPOST('format');
 
 // Load translation files required by the page
-$langs->load("exports");
+// $langs->load("exports");
 
 // Check exportkey
 if (empty($datatoimport)) {

@@ -94,7 +94,7 @@ abstract class ModeleNumRefSupplierProposal
 	public function info()
 	{
 		global $langs;
-		$langs->load("supplier_proposal");
+		// $langs->load("supplier_proposal");
 		return $langs->trans("NoDescription");
 	}
 
@@ -106,7 +106,7 @@ abstract class ModeleNumRefSupplierProposal
 	public function getExample()
 	{
 		global $langs;
-		$langs->load("supplier_proposal");
+        // $langs->load("supplier_proposal");
 		return $langs->trans("NoExample");
 	}
 
@@ -142,7 +142,7 @@ abstract class ModeleNumRefSupplierProposal
 	public function getVersion()
 	{
 		global $langs;
-		$langs->load("admin");
+        // $langs->load("admin");
 
 		if ($this->version == 'development') {
 			return $langs->trans("VersionDevelopment");

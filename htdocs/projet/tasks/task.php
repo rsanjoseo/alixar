@@ -169,7 +169,7 @@ if ($action == 'builddoc' && $user->rights->projet->creer) {
 if ($action == 'remove_file' && $user->rights->projet->creer) {
 	require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 
-    $langs->load("other");
+    // $langs->load("other");
     $upload_dir = $conf->projet->dir_output;
     $file = $upload_dir . '/' . dol_sanitizeFileName(GETPOST('file'));
 

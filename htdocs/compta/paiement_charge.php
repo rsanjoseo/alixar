@@ -28,7 +28,7 @@ require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/paymentsocialcontribution
 require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 // Load translation files required by the page
-$langs->load("bills");
+// $langs->load("bills");
 
 $chid = GETPOST("id", 'int');
 $action = GETPOST('action', 'aZ09');

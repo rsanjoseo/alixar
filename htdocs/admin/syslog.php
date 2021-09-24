@@ -218,7 +218,7 @@ foreach ($syslogModules as $moduleName) {
 	print $module->getName();
 	if ($moduleName == 'mod_syslog_syslog') {
 		if (!$module->isActive()) {
-			$langs->load("errors");
+			// $langs->load("errors");
 			print $form->textwithpicto('', $langs->trans("ErrorPHPNeedModule", 'SysLog'));
 		}
 	}

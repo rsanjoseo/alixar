@@ -38,16 +38,16 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/payments.lib.php';
 // Load translation files required by the page
 // $langs->loadLangs(array('banks', 'categories', 'compta', 'bills', 'other'));
 if (!empty($conf->adherent->enabled)) {
-	$langs->load("members");
+	// $langs->load("members");
 }
 if (!empty($conf->don->enabled)) {
-	$langs->load("donations");
+    // $langs->load("donations");
 }
 if (!empty($conf->loan->enabled)) {
-	$langs->load("loan");
+    // $langs->load("loan");
 }
 if (!empty($conf->salaries->enabled)) {
-	$langs->load("salaries");
+    // $langs->load("salaries");
 }
 
 
@@ -563,7 +563,7 @@ if ($result) {
 
 		// Categories
 		if (!empty($conf->categorie->enabled) && !empty($user->rights->categorie->lire)) {
-			$langs->load('categories');
+            // $langs->load('categories');
 
 			// Bank line
 			print '<tr><td class="toptd">'.$form->editfieldkey('RubriquesTransactions', 'custcats', '', $object, 0).'</td><td>';

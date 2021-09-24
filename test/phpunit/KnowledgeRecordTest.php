@@ -27,7 +27,7 @@ global $conf, $user, $langs, $db;
 //require_once 'PHPUnit/Autoload.php';
 require_once dirname(__FILE__).'/../../htdocs/master.inc.php';
 require_once dirname(__FILE__).'/../../htdocs/knowledgemanagement/class/knowledgerecord.class.php';
-$langs->load("main");
+// $langs->load("main");
 
 if (empty($user->id)) {
 	print "Load permissions for admin user nb 1\n";

@@ -91,7 +91,7 @@ if (!empty($action) && $action == 'fetch' && !empty($id)) {
 } else {
 	require_once DOL_DOCUMENT_ROOT.'/core/class/html.form.class.php';
 
-	$langs->load("companies");
+	// $langs->load("companies");
 
 	top_httphead();
 

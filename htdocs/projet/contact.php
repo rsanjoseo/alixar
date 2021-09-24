@@ -155,7 +155,7 @@ if ($action == 'addcontact_confirm' && $user->rights->projet->creer) {
 
 	if (! ($contactid > 0)) {
 		$error++;
-		$langs->load("errors");
+		// $langs->load("errors");
 		setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Contact")), null, 'errors');
 	}
 
@@ -166,11 +166,11 @@ if ($action == 'addcontact_confirm' && $user->rights->projet->creer) {
 		$result = $object->add_contact($contactid, $typeid, GETPOST("source", 'aZ09'));
 
 		if ($result == 0) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 		} elseif ($result < 0) {
 			if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-				$langs->load("errors");
+                // $langs->load("errors");
 				setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 			} else {
 				setEventMessages($object->error, $object->errors, 'errors');
@@ -192,7 +192,7 @@ if ($action == 'addcontact_confirm' && $user->rights->projet->creer) {
 							$result = $tasksToAffect->add_contact($contactid, GETPOST('person_role_'.$task_id), GETPOST("source", 'aZ09'));
 							if ($result < 0) {
 								if ($tasksToAffect->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-									$langs->load("errors");
+                                    // $langs->load("errors");
 									setEventMessages($langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType"), null, 'errors');
 								} else {
 									setEventMessages($tasksToAffect->error, $tasksToAffect->errors, 'errors');

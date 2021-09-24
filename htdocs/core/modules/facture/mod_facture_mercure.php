@@ -54,7 +54,7 @@ class mod_facture_mercure extends ModeleNumRefFactures
 	{
 		global $db, $conf, $langs;
 
-		$langs->load("bills");
+		// $langs->load("bills");
 
 		$form = new Form($db);
 

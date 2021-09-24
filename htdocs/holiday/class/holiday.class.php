@@ -176,7 +176,7 @@ class Holiday extends CommonObject
     public function getNextNumRef($objsoc)
     {
         global $langs, $conf;
-        $langs->load("order");
+        // $langs->load("order");
 
         if (empty($conf->global->HOLIDAY_ADDON)) {
             $conf->global->HOLIDAY_ADDON = 'mod_holiday_madonna';
@@ -1264,7 +1264,7 @@ class Holiday extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			//$langs->load("mymodule");
+            //// $langs->load("mymodule");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->trans('DraftCP');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->trans('ToReviewCP');
 			$this->labelStatus[self::STATUS_APPROVED] = $langs->trans('ApprovedCP');
@@ -1418,7 +1418,7 @@ class Holiday extends CommonObject
         $error = 0;
 
         if (empty($userID) && empty($nbHoliday) && empty($fk_type)) {
-            $langs->load("holiday");
+            // $langs->load("holiday");
 
             // Si mise à jour pour tout le monde en début de mois
             $now = dol_now();
@@ -2285,7 +2285,7 @@ class Holiday extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("members");
+            // $langs->load("members");
 
 			$response = new WorkboardResponse();
 			$response->warning_delay = $conf->holiday->approve->warning_delay / 60 / 60 / 24;

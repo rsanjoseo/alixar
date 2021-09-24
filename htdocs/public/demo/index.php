@@ -294,7 +294,7 @@ foreach ($demoprofiles as $profilearray) {
 	if ($profilearray['default'] >= 0) {
 		//print $profilearray['lang'];
 		if (!empty($profilearray['lang'])) {
-			$langs->load($profilearray['lang']);
+			// $langs->load($profilearray['lang']);
 		}
 
 		$url = $_SERVER["PHP_SELF"].'?action=gotodemo';

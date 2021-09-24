@@ -80,7 +80,7 @@ $websitekey = GETPOST('websitekey', 'alpha');
 $pageid = GETPOST('pageid', 'int');
 
 // Load translation files required by the page
-$langs->load("ecm");
+// $langs->load("ecm");
 
 // Define fullpathselecteddir.
 $fullpathselecteddir = '<none>';

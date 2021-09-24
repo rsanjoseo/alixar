@@ -278,7 +278,7 @@ class Contrat extends CommonObject
     public function getNextNumRef($soc)
     {
         global $db, $langs, $conf;
-        $langs->load("contracts");
+        // $langs->load("contracts");
 
         if (!empty($conf->global->CONTRACT_ADDON)) {
             $mybool = false;
@@ -312,7 +312,7 @@ class Contrat extends CommonObject
                 return "";
             }
         } else {
-            $langs->load("errors");
+            // $langs->load("errors");
             print $langs->trans("Error") . " " . $langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Contract"));
             return "";
 		}
@@ -943,12 +943,12 @@ class Contrat extends CommonObject
         // Check parameters
         $paramsok = 1;
         if ($this->commercial_signature_id <= 0) {
-            $langs->load("commercial");
+            // $langs->load("commercial");
             $this->error .= $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("SalesRepresentativeSignature"));
             $paramsok = 0;
         }
         if ($this->commercial_suivi_id <= 0) {
-            $langs->load("commercial");
+            // $langs->load("commercial");
             $this->error .= ($this->error ? "<br>" : '');
             $this->error .= $langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("SalesRepresentativeFollowUp"));
             $paramsok = 0;
@@ -1499,7 +1499,7 @@ class Contrat extends CommonObject
             }
 
             if ($date_start && $date_end && $date_start > $date_end) {
-                $langs->load("errors");
+                // $langs->load("errors");
                 $this->error = $langs->trans('ErrorStartDateGreaterEnd');
                 return -1;
             }
@@ -1687,7 +1687,7 @@ class Contrat extends CommonObject
 		}
 
 		if ($date_start && $date_end && $date_start > $date_end) {
-			$langs->load("errors");
+            // $langs->load("errors");
 			$this->error = $langs->trans('ErrorStartDateGreaterEnd');
 			return -1;
 		}
@@ -1942,7 +1942,7 @@ class Contrat extends CommonObject
 
 		if (empty($this->labelStatus) || empty($this->labelStatusShort)) {
 			global $langs;
-			$langs->load("contracts");
+            // $langs->load("contracts");
 			$this->labelStatus[self::STATUS_DRAFT] = $langs->transnoentitiesnoconv('ContractStatusDraft');
 			$this->labelStatus[self::STATUS_VALIDATED] = $langs->transnoentitiesnoconv('ContractStatusValidated');
 			$this->labelStatus[self::STATUS_CLOSED] = $langs->transnoentitiesnoconv('ContractStatusClosed');
@@ -2233,7 +2233,7 @@ class Contrat extends CommonObject
 
 		$resql = $this->db->query($sql);
 		if ($resql) {
-			$langs->load("contracts");
+            // $langs->load("contracts");
 			$now = dol_now();
 
 			if ($mode == 'inactive') {
@@ -2439,7 +2439,7 @@ class Contrat extends CommonObject
 	{
 		global $conf, $langs;
 
-		$langs->load("contracts");
+        // $langs->load("contracts");
 		$outputlangs->load("products");
 
 		if (!dol_strlen($modele)) {
@@ -2776,7 +2776,7 @@ class ContratLigne extends CommonObjectLine
 	{
 		// phpcs:enable
 		global $langs;
-		$langs->load("contracts");
+        // $langs->load("contracts");
 
 		if ($status == self::STATUS_INITIAL) {
 			$labelStatus = $langs->trans("ServiceStatusInitial");

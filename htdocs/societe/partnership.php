@@ -158,13 +158,13 @@ llxHeader('', $title);
 $form = new Form($db);
 
 if ($id > 0) {
-	$langs->load("companies");
+	// $langs->load("companies");
 
 	$object = new Societe($db);
 	$result = $object->fetch($id);
 
 	if (!empty($conf->notification->enabled)) {
-		$langs->load("mails");
+        // $langs->load("mails");
 	}
 	$head = societe_prepare_head($object);
 

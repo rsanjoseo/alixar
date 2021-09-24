@@ -86,7 +86,7 @@ if ($action == 'addcontact' && $user->rights->societe->creer) {
 		exit;
 	} else {
 		if ($object->error == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
-			$langs->load("errors");
+			// $langs->load("errors");
 			$mesg = '<div class="error">'.$langs->trans("ErrorThisContactIsAlreadyDefinedAsThisType").'</div>';
 		} else {
 			$mesg = '<div class="error">'.$object->error.'</div>';
@@ -220,7 +220,7 @@ if ($id > 0 || !empty($ref)) {
 			$membertypestatic = new AdherentType($db);
 			$memberstatic = new Adherent($db);
 
-			$langs->load("members");
+            // $langs->load("members");
 			$sql = "SELECT d.rowid, d.login, d.lastname, d.firstname, d.societe as company, d.fk_soc,";
 			$sql .= " d.datefin,";
 			$sql .= " d.email, d.fk_adherent_type as type_id, d.morphy, d.statut,";

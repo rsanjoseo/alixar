@@ -189,7 +189,7 @@ if ($result > 0) {
 	$search = "(".$object->_load_ldap_dn($info, 2).")";
 
 	if (empty($dn)) {
-		$langs->load("errors");
+		// $langs->load("errors");
 		print '<tr class="oddeven"><td colspan="2"><font class="error">'.$langs->trans("ErrorModuleSetupNotComplete", $langs->transnoentitiesnoconv("Member")).'</font></td></tr>';
 	} else {
 		$records = $ldap->getAttribute($dn, $search);

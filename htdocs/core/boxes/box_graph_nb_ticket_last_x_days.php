@@ -50,7 +50,7 @@ class box_graph_nb_ticket_last_x_days extends ModeleBoxes
 	public function __construct($db, $param = '')
 	{
 		global $langs;
-		$langs->load("boxes");
+		// $langs->load("boxes");
 		$this->db = $db;
 
 		$this->boxlabel = $langs->transnoentitiesnoconv("BoxNumberOfTicketByDay");

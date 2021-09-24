@@ -113,7 +113,7 @@ if (empty($pageid)) {
 /* Not required for CSS file
 if (empty($pageid))
 {
-	$langs->load("website");
+	// $langs->load("website");
 	print $langs->trans("PreviewOfSiteNotYetAvailable");
 	exit;
 }
@@ -153,7 +153,7 @@ $original_file_osencoded = dol_osencode($original_file); // New file name encode
 
 // This test if file exists should be useless. We keep it to find bug more easily
 if (!file_exists($original_file_osencoded)) {
-	$langs->load("website");
+	// $langs->load("website");
 	print $langs->trans("RequestedPageHasNoContentYet", $pageid);
 	//dol_print_error(0,$langs->trans("ErrorFileDoesNotExists",$original_file));
 	exit;
