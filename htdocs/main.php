@@ -2406,6 +2406,7 @@ if (!empty($conf->debugbar->enabled) && !GETPOST('dol_use_jmobile') && empty($_S
     $debugbar['time']->startMeasure('pageaftermaster', 'Page generation (after environment init)');
 }
 */
+$debugbar->debugBar['time']->startMeasure('pageaftermaster', 'Page generation (after environment init)');
 
 // Detection browser
 if (isset($_SERVER["HTTP_USER_AGENT"])) {

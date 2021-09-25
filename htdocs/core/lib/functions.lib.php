@@ -8801,7 +8801,7 @@ function printCommonFooter($zone = 'private')
 
         // Add DebugBar data
         if (!empty($user->rights->debugbar->read) && is_object($debugbar)) {
-            $debugbar['time']->stopMeasure('pageaftermaster');
+            $debugbar->debugBar['time']->stopMeasure('pageaftermaster');
             print '<!-- Output debugbar data -->' . "\n";
             $renderer = $debugbar->getRenderer();
             print $debugbar->getRenderer()->render();
