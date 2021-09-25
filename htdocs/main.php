@@ -78,11 +78,11 @@ if (!function_exists("llxHeader")) {
         print '<body id="mainbody" class="' . $tmpcsstouse . '">' . "\n";
 
         // top menu and left menu area
-        if (empty($conf->dol_hide_topmenu) || GETPOST('dol_invisible_topmenu', 'int')) {
+        if (empty($conf->dol_hide_topmenu) || GETPOST('dol_invisible_topmenu', 'int') || constant('MAIN_HIDE_TOP_MENU') != 1) {
             top_menu($head, $title, $target, $disablejs, $disablehead, $arrayofjs, $arrayofcss, $morequerystring, $help_url);
         }
 
-        if (empty($conf->dol_hide_leftmenu)) {
+        if (empty($conf->dol_hide_leftmenu) || constant('MAIN_HIDE_LEFT_MENU') != 1) {
             left_menu('', $help_url, '', '', 1, $title, 1); // $menumanager is retrieved with a global $menumanager inside this function
         }
 
@@ -174,6 +174,7 @@ function top_httphead($contenttype = 'text/html', $forcenocache = 0)
  * @param array  $arrayofcss      Array of complementary css files
  * @param int    $disablejmobile  Disable jmobile (No more used)
  * @param int    $disablenofollow Disable no follow tag
+ *
  * @return    void
  */
 function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $disablejmobile = 0, $disablenofollow = 0)
@@ -569,6 +570,8 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
     global $dolibarr_main_authentication, $dolibarr_main_demo;
     global $hookmanager, $menumanager;
 
+    dump('top_menu');
+
     $searchform = '';
     $bookmarks = '';
 
@@ -587,7 +590,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
     /*
 	 * Top menu
 	 */
-    if ((empty($conf->dol_hide_topmenu) || GETPOST('dol_invisible_topmenu', 'int')) && (!defined('NOREQUIREMENU') || !constant('NOREQUIREMENU'))) {
+    if (constant('MAIN_HIDE_TOP_MENU') != 1 || (empty($conf->dol_hide_topmenu) || GETPOST('dol_invisible_topmenu', 'int')) && (!defined('NOREQUIREMENU') || !constant('NOREQUIREMENU'))) {
         if (!isset($form) || !is_object($form)) {
             include_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
             $form = new Form($db);
@@ -783,7 +786,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
         print "<!-- End top horizontal menu -->\n\n";
     }
 
-    if (empty($conf->dol_hide_leftmenu) && empty($conf->dol_use_jmobile)) {
+    if (constant('MAIN_HIDE_TOP_MENU') != 1 || (empty($conf->dol_hide_leftmenu) && empty($conf->dol_use_jmobile))) {
         print '<!-- Begin div id-container --><div id="id-container" class="id-container">';
     }
 }
@@ -1465,15 +1468,15 @@ function top_menu_search()
 /**
  *  Show left menu bar
  *
- *  @param  array	$menu_array_before 	       	Table of menu entries to show before entries of menu handler. This param is deprectaed and must be provided to ''.
- *  @param string $helppagename                   Name of wiki page for help ('' by default).
+ * @param array  $menu_array_before               Table of menu entries to show before entries of menu handler. This param is deprectaed and must be provided to ''.
+ * @param string $helppagename                    Name of wiki page for help ('' by default).
  *                                                Syntax is: For a wiki page: EN:EnglishPage|FR:FrenchPage|ES:SpanishPage
  *                                                For other external page: http://server/url
- * @param string  $notused                        Deprecated. Used in past to add content into left menu. Hooks can be used now.
- * @param array   $menu_array_after               Table of menu entries to show after entries of menu handler
- * @param int     $leftmenuwithoutmainarea        Must be set to 1. 0 by default for backward compatibility with old modules.
- * @param string  $title                          Title of web page
- * @param string  $acceptdelayedhtml              1 if caller request to have html delayed content not returned but saved into global $delayedhtmlcontent (so caller can show it at end of page to avoid flash FOUC effect)
+ * @param string $notused                         Deprecated. Used in past to add content into left menu. Hooks can be used now.
+ * @param array  $menu_array_after                Table of menu entries to show after entries of menu handler
+ * @param int    $leftmenuwithoutmainarea         Must be set to 1. 0 by default for backward compatibility with old modules.
+ * @param string $title                           Title of web page
+ * @param string $acceptdelayedhtml               1 if caller request to have html delayed content not returned but saved into global $delayedhtmlcontent (so caller can show it at end of page to avoid flash FOUC effect)
  *
  * @return    void
  */
@@ -1481,6 +1484,8 @@ function left_menu($menu_array_before, $helppagename = '', $notused = '', $menu_
 {
     global $user, $conf, $langs, $db, $form;
     global $hookmanager, $menumanager;
+
+    dump('left_menu');
 
     $searchform = '';
     $bookmarks = '';
@@ -1847,9 +1852,9 @@ if (!function_exists("llxFooter")) {
      * Close div /DIV class=fiche + /DIV id-right + /DIV id-container + /BODY + /HTML.
      * If global var $delayedhtmlcontent was filled, we output it just before closing the body.
      *
-     * @param	string	$comment                  A text to add as HTML comment into HTML generated page
-     * @param string       $zone                     'private' (for private pages) or 'public' (for public pages)
-     * @param int          $disabledoutputofmessages Clear all messages stored into session without diplaying them
+     * @param string $comment                  A text to add as HTML comment into HTML generated page
+     * @param string $zone                     'private' (for private pages) or 'public' (for public pages)
+     * @param int    $disabledoutputofmessages Clear all messages stored into session without diplaying them
      *
      * @return    void
      */

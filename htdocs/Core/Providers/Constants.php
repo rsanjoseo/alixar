@@ -18,6 +18,9 @@ class Constants extends Provider
 {
     /**
      * Dolibar constants
+     *
+     * Most, if not all, of these constants are to be extinguished. Either they are useless, or their use by
+     * double negation makes them confusing.
      */
     const CONSTANTS = [
         'NOREQUIREDB' => '1',                // Do not create database handler $db
