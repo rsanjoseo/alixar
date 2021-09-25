@@ -125,7 +125,9 @@ class Constants extends Provider
 
         // Load Dolibarr constants
         foreach (self::CONSTANTS as $name => $value) {
-            define($name, $value);
+            if (!defined($name)) {
+                define($name, $value);
+            }
         }
         return true;
     }

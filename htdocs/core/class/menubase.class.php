@@ -638,33 +638,36 @@ class Menubase
 		$sql .= " FROM ".MAIN_DB_PREFIX."menu as m";
 		$sql .= " WHERE m.entity IN (0,".$conf->entity.")";
 		$sql .= " AND m.menu_handler IN ('".$this->db->escape($menu_handler)."','all')";
-		if ($type_user == 0) {
-			$sql .= " AND m.usertype IN (0,2)";
-		}
-		if ($type_user == 1) {
-			$sql .= " AND m.usertype IN (1,2)";
-		}
-		$sql .= " ORDER BY m.position, m.rowid";
-		//print $sql;
+        if ($type_user == 0) {
+            $sql .= " AND m.usertype IN (0,2)";
+        }
+        if ($type_user == 1) {
+            $sql .= " AND m.usertype IN (1,2)";
+        }
+        $sql .= " ORDER BY m.position, m.rowid";
+        //print $sql;
 
-		//dol_syslog(get_class($this)."::menuLoad mymainmenu=".$mymainmenu." myleftmenu=".$myleftmenu." type_user=".$type_user." menu_handler=".$menu_handler." tabMenu size=".count($tabMenu)."", LOG_DEBUG);
-		$resql = $this->db->query($sql);
-		if ($resql) {
-			$numa = $this->db->num_rows($resql);
+        //dol_syslog(get_class($this)."::menuLoad mymainmenu=".$mymainmenu." myleftmenu=".$myleftmenu." type_user=".$type_user." menu_handler=".$menu_handler." tabMenu size=".count($tabMenu)."", LOG_DEBUG);
+        //		$resql = $this->db->query($sql);
+        $resql = $this->db->select($sql);
+        if ($resql) {
+            // $numa = $this->db->num_rows($resql);
+            $numa = count($resql);
 
-			$a = 0;
-			$b = 0;
-			while ($a < $numa) {
-				//$objm = $this->db->fetch_object($resql);
-				$menu = $this->db->fetch_array($resql);
+            $a = 0;
+            $b = 0;
+            foreach ($resql as $key => $menu) {
+                // while ($a < $numa) {
+                //$objm = $this->db->fetch_object($resql);
+                //				$menu = $this->db->fetch_array($resql);
 
-				// Define $right
-				$perms = true;
-				if (isset($menu['perms'])) {
-					$tmpcond = $menu['perms'];
-					if ($leftmenu == 'all') {
-						$tmpcond = preg_replace('/\$leftmenu\s*==\s*["\'a-zA-Z_]+/', '1==1', $tmpcond); // Force part of condition to true
-					}
+                // Define $right
+                $perms = true;
+                if (isset($menu['perms'])) {
+                    $tmpcond = $menu['perms'];
+                    if ($leftmenu == 'all') {
+                        $tmpcond = preg_replace('/\$leftmenu\s*==\s*["\'a-zA-Z_]+/', '1==1', $tmpcond); // Force part of condition to true
+                    }
 					$perms = verifCond($tmpcond);
 					//print "verifCond rowid=".$menu['rowid']." ".$tmpcond.":".$perms."<br>\n";
 				}

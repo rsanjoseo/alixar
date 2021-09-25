@@ -27,7 +27,6 @@
 
 //if (! defined('NOREQUIREUSER')) define('NOREQUIREUSER','1');	// Not disabled because need to load personalized language
 //if (! defined('NOREQUIREDB'))   define('NOREQUIREDB','1');	// Not disabled to increase speed. Language code is found on url.
-/*
 if (!defined('NOREQUIRESOC')) {
 	define('NOREQUIRESOC', '1');
 }
@@ -38,7 +37,6 @@ if (!defined('NOCSRFCHECK')) {
 if (!defined('NOTOKENRENEWAL')) {
 	define('NOTOKENRENEWAL', 1);
 }
-*/
 if (!defined('NOLOGIN')) {
 	define('NOLOGIN', 1); // File must be accessed by logon page so without login.
 }
@@ -69,6 +67,8 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 if (empty($user->id) && !empty($_SESSION['dol_login'])) {
 	$user->fetch('', $_SESSION['dol_login'], '', 1);
 	$user->getrights();
+
+    require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
 
 	// Reload menu now we have the good user (and we need the good menu to have ->showmenu('topnb') correct.
 	$menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
