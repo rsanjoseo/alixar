@@ -4,6 +4,7 @@ namespace Alxarafe\Core\DebugBarCollectors;
 
 use DebugBar\DataCollector\MessagesCollector;
 use Psr\Log\LogLevel;
+use ReflectionClass;
 
 //use ReflectionClass;
 
@@ -61,7 +62,8 @@ class DolLogsCollector extends MessagesCollector
     {
         global $langs;
 
-        $title = $langs->transnoentities('Logs');
+        //        $title = $langs->transnoentities('Logs');
+        $title = $langs->trans('Logs');
         $name = $this->getName();
 
         return [

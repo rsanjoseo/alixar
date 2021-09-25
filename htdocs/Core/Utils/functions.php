@@ -19,6 +19,25 @@
 use Alxarafe\Core\Providers\Constants;
 use Alxarafe\Core\Singletons\Config;
 
+function baseUrl(string $url = ''): string
+{
+    $defaultPort = constant('SERVER_PORT') ?? 80;
+    $defaultHost = constant('SERVER_NAME') ?? 'localhost';
+    $path = $_SERVER['PHP_SELF'];
+    // For PHPUnit tests, SERVER PHP_SELF contains 'vendor/bin/phpunit'
+    if (isset($_SERVER['argv'][0]) && $_SERVER['PHP_SELF'] === $_SERVER['argv'][0]) {
+        $path = '';
+    }
+    $folder = str_replace(['/index.php', constant('APP_URI')], '', $path);
+    $port = '';
+    if (!in_array($defaultPort, ['80', '443'], false)) {
+        $port = ':' . $defaultPort;
+    }
+    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http')
+        . '://' . $defaultHost . $port . constant('APP_URI') . $folder;
+    return empty($url) ? $baseUrl : trim($baseUrl, '/') . '/' . trim($url, '/');
+}
+
 /**
  * Create a configuration file, from the Dolibarr configuration file
  *
