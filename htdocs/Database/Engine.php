@@ -600,4 +600,13 @@ abstract class Engine
     {
         return 'IF(' . $test . ',' . $resok . ',' . $resko . ')';
     }
+
+    /**
+     * @return bool
+     * @deprecated use commit() instead
+     */
+    public function commitTransaction()
+    {
+        return $this->commit();
+    }
 }

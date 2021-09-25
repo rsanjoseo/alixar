@@ -450,7 +450,7 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
             //            $text = $langs->transnoentitiesnoconv("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->transnoentitiesnoconv(
             $text = $langs->trans("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->trans(
                     "NActionsLate",
-                    $totallate . (!empty($conf->global->MAIN_USE_METEO_WITH_PERCENTAGE) ? '%' : '')
+                    ['s' => $totallate . (!empty($conf->global->MAIN_USE_METEO_WITH_PERCENTAGE) ? '%' : '')]
                 ) . ')';
         } else {
             //            $text = $langs->transnoentitiesnoconv("NoItemLate");
@@ -539,7 +539,7 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
                         $infoName = $board->label;
                     }
 
-                    $textLateTitle = $langs->trans("NActionsLate", $board->nbtodolate);
+                    $textLateTitle = $langs->trans("NActionsLate", ['s' => $board->nbtodolate]);
                     $textLateTitle .= ' (' . $langs->trans("Late") . ' = ' . $langs->trans("DateReference") . ' > ' . $langs->trans("DateToday") . ' ' . (ceil($board->warning_delay) >= 0 ? '+' : '') . ceil($board->warning_delay) . ' ' . $langs->trans("days") . ')';
 
                     if ($board->id == 'bank_account') {
@@ -594,7 +594,7 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
             if ($totallate > 0) {
                 $text = $langs->transnoentitiesnoconv("WarningYouHaveAtLeastOneTaskLate") . ' (' . $langs->transnoentitiesnoconv(
                         "NActionsLate",
-                        $totallate . (!empty($conf->global->MAIN_USE_METEO_WITH_PERCENTAGE) ? '%' : '')
+                        ['s' => $totallate . (!empty($conf->global->MAIN_USE_METEO_WITH_PERCENTAGE) ? '%' : '')]
                     ) . ')';
             } else {
                 $text = $langs->transnoentitiesnoconv("NoItemLate");
@@ -621,12 +621,12 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
             } else {
                 $weatherDashBoard .= '			<span class="info-box-number">' . $langs->transnoentitiesnoconv(
                         "NActionsLate",
-                        $totalLateNumber
+                        ['s' => $totalLateNumber]
                     ) . '</span>' . "\n";
                 if ($totallatePercentage > 0) {
                     $weatherDashBoard .= '			<span class="progress-description">' . $langs->trans(
                             'NActionsLate',
-                            price($totallatePercentage) . '%'
+                            ['s' => price($totallatePercentage) . '%']
                         ) . '</span>' . "\n";
                 }
             }

@@ -1460,6 +1460,8 @@ class Project extends CommonObject
 
         $resql = $this->db->query($sql);
         if ($resql) {
+            return $resql;
+            /*
             $num = $this->db->num_rows($resql);
             $i = 0;
             while ($i < $num) {
@@ -1478,6 +1480,7 @@ class Project extends CommonObject
                 $result = implode(',', $temp);
                 return $result;
             }
+            */
         } else {
             dol_print_error($this->db);
         }

@@ -442,7 +442,7 @@ if (!isset($_SESSION["dol_login"])) {
         dol_print_error($db, 'Error in some triggers USER_LOGIN or in some hooks afterLogin');
         exit;
     } else {
-        $db->commitTransactions();
+        $db->commit();
     }
 
     // Change landing page if defined.
