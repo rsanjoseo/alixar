@@ -48,7 +48,7 @@ if (!defined('NOREQUIREAJAX')) {
 
 session_cache_limiter('public');
 
-require_once '../../main.inc.php';
+require_once '../../main.php';
 
 
 /*

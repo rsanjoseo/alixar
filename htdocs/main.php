@@ -189,10 +189,11 @@ function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arr
 
     print '<!doctype html>' . "\n";
 
+    // TODO: Resolve $langs->defaultlang value
     if (!empty($conf->global->MAIN_USE_CACHE_MANIFEST)) {
-        print '<html lang="' . substr($langs->defaultlang, 0, 2) . '" manifest="' . DOL_URL_ROOT . '/cache.manifest">' . "\n";
+        print '<html lang="' . substr($langs->defaultlang ?? 'es', 0, 2) . '" manifest="' . DOL_URL_ROOT . '/cache.manifest">' . "\n";
     } else {
-        print '<html lang="' . substr($langs->defaultlang, 0, 2) . '">' . "\n";
+        print '<html lang="' . substr($langs->defaultlang ?? 'es', 0, 2) . '">' . "\n";
     }
     //print '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">'."\n";
     if (empty($disablehead)) {

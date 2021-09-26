@@ -67,13 +67,11 @@ require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 if (empty($user->id) && !empty($_SESSION['dol_login'])) {
 	$user->fetch('', $_SESSION['dol_login'], '', 1);
 	$user->getrights();
-
-    require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
-
-	// Reload menu now we have the good user (and we need the good menu to have ->showmenu('topnb') correct.
-	$menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
-	$menumanager->loadMenu();
 }
+require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
+// Reload menu now we have the good user (and we need the good menu to have ->showmenu('topnb') correct.
+$menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
+$menumanager->loadMenu();
 
 
 // Define css type
