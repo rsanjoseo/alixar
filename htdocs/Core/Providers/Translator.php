@@ -354,4 +354,23 @@ class Translator extends Provider
         }
         return $str;
     }
+
+    public function transcountry($str, $countrycode)
+    {
+        if (!empty($this->tab_translate["$str$countrycode"])) {
+            return $this->trans("$str$countrycode");
+        } else {
+            return $this->trans($str);
+        }
+    }
+
+    public function getDefaultLang($mode = 0)
+    {
+        $lang = self::LANG; // TODO: FALLBACK_LANG or LANG?
+        if (empty($mode)) {
+            return $lang;
+        } else {
+            return substr($lang, 0, 2);
+        }
+    }
 }

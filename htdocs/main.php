@@ -189,11 +189,10 @@ function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arr
 
     print '<!doctype html>' . "\n";
 
-    // TODO: Resolve $langs->defaultlang value
     if (!empty($conf->global->MAIN_USE_CACHE_MANIFEST)) {
-        print '<html lang="' . substr($langs->defaultlang ?? 'es', 0, 2) . '" manifest="' . DOL_URL_ROOT . '/cache.manifest">' . "\n";
+        print '<html lang="' . substr($langs->getDefaultLang(), 0, 2) . '" manifest="' . DOL_URL_ROOT . '/cache.manifest">' . "\n";
     } else {
-        print '<html lang="' . substr($langs->defaultlang ?? 'es', 0, 2) . '">' . "\n";
+        print '<html lang="' . substr($langs->getDefaultLang(), 0, 2) . '">' . "\n";
     }
     //print '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">'."\n";
     if (empty($disablehead)) {
@@ -570,8 +569,6 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
     global $user, $conf, $langs, $db;
     global $dolibarr_main_authentication, $dolibarr_main_demo;
     global $hookmanager, $menumanager;
-
-    dump('top_menu');
 
     $searchform = '';
     $bookmarks = '';
@@ -1486,8 +1483,6 @@ function left_menu($menu_array_before, $helppagename = '', $notused = '', $menu_
     global $user, $conf, $langs, $db, $form;
     global $hookmanager, $menumanager;
 
-    dump('left_menu');
-
     $searchform = '';
     $bookmarks = '';
 
@@ -1495,7 +1490,7 @@ function left_menu($menu_array_before, $helppagename = '', $notused = '', $menu_
         dol_syslog("Deprecated parameter menu_array_before was used when calling main::left_menu function. Menu entries of module should now be defined into module descriptor and not provided when calling left_menu.", LOG_WARNING);
     }
 
-    if (empty($conf->dol_hide_leftmenu) && (!defined('NOREQUIREMENU') || !constant('NOREQUIREMENU'))) {
+    if (constant('MAIN_HIDE_TOP_MENU') != 1 || empty($conf->dol_hide_leftmenu) && (!defined('NOREQUIREMENU') || !constant('NOREQUIREMENU'))) {
         // Instantiate hooks for external modules
         $hookmanager->initHooks(['searchform', 'leftblock']);
 
@@ -1691,11 +1686,13 @@ function left_menu($menu_array_before, $helppagename = '', $notused = '', $menu_
         print '</div></div> <!-- End side-nav id-left -->'; // End div id="side-nav" div id="id-left"
     }
 
-    print "\n";
-    print '<!-- Begin right area -->' . "\n";
+    if (constant('MAIN_HIDE_TOP_MENU') != 1) {
+        print "\n";
+        print '<!-- Begin right area -->' . "\n";
 
-    if (empty($leftmenuwithoutmainarea)) {
-        main_area($title);
+        if (empty($leftmenuwithoutmainarea)) {
+            main_area($title);
+        }
     }
 }
 
@@ -2784,34 +2781,34 @@ if (empty($conf->browser->firefox)) {
 $heightforframes = 50;
 
 // Init menu manager
-if (!defined('NOREQUIREMENU')) {
-    if (empty($user->socid)) {    // If internal user or not defined
-        $conf->standard_menu = (empty($conf->global->MAIN_MENU_STANDARD_FORCED) ? (empty($conf->global->MAIN_MENU_STANDARD) ? 'eldy_menu.php' : $conf->global->MAIN_MENU_STANDARD) : $conf->global->MAIN_MENU_STANDARD_FORCED);
-    } else {
-        // If external user
-        $conf->standard_menu = (empty($conf->global->MAIN_MENUFRONT_STANDARD_FORCED) ? (empty($conf->global->MAIN_MENUFRONT_STANDARD) ? 'eldy_menu.php' : $conf->global->MAIN_MENUFRONT_STANDARD) : $conf->global->MAIN_MENUFRONT_STANDARD_FORCED);
-    }
-
-    // Load the menu manager (only if not already done)
-    $file_menu = $conf->standard_menu;
-    if (GETPOST('menu', 'alpha')) {
-        $file_menu = GETPOST('menu', 'alpha'); // example: menu=eldy_menu.php
-    }
-    if (!class_exists('MenuManager')) {
-        $menufound = 0;
-        $dirmenus = array_merge(["/core/menus/"], (array) $conf->modules_parts['menus']);
-        foreach ($dirmenus as $dirmenu) {
-            $menufound = dol_include_once($dirmenu . "standard/" . $file_menu);
-            if (class_exists('MenuManager')) {
-                break;
-            }
-        }
-        if (!class_exists('MenuManager')) {    // If failed to include, we try with standard eldy_menu.php
-            dol_syslog("You define a menu manager '" . $file_menu . "' that can not be loaded.", LOG_WARNING);
-            $file_menu = 'eldy_menu.php';
-            include_once DOL_DOCUMENT_ROOT . "/core/menus/standard/" . $file_menu;
-        }
-    }
-    $menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
-    $menumanager->loadMenu();
+//if (!defined('NOREQUIREMENU')) {
+if (empty($user->socid)) {    // If internal user or not defined
+    $conf->standard_menu = (empty($conf->global->MAIN_MENU_STANDARD_FORCED) ? (empty($conf->global->MAIN_MENU_STANDARD) ? 'eldy_menu.php' : $conf->global->MAIN_MENU_STANDARD) : $conf->global->MAIN_MENU_STANDARD_FORCED);
+} else {
+    // If external user
+    $conf->standard_menu = (empty($conf->global->MAIN_MENUFRONT_STANDARD_FORCED) ? (empty($conf->global->MAIN_MENUFRONT_STANDARD) ? 'eldy_menu.php' : $conf->global->MAIN_MENUFRONT_STANDARD) : $conf->global->MAIN_MENUFRONT_STANDARD_FORCED);
 }
+
+// Load the menu manager (only if not already done)
+$file_menu = $conf->standard_menu;
+if (GETPOST('menu', 'alpha')) {
+    $file_menu = GETPOST('menu', 'alpha'); // example: menu=eldy_menu.php
+}
+if (!class_exists('MenuManager')) {
+    $menufound = 0;
+    $dirmenus = array_merge(["/core/menus/"], (array) $conf->modules_parts['menus']);
+    foreach ($dirmenus as $dirmenu) {
+        $menufound = dol_include_once($dirmenu . "standard/" . $file_menu);
+        if (class_exists('MenuManager')) {
+            break;
+        }
+    }
+    if (!class_exists('MenuManager')) {    // If failed to include, we try with standard eldy_menu.php
+        dol_syslog("You define a menu manager '" . $file_menu . "' that can not be loaded.", LOG_WARNING);
+        $file_menu = 'eldy_menu.php';
+        include_once DOL_DOCUMENT_ROOT . "/core/menus/standard/" . $file_menu;
+    }
+}
+$menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
+$menumanager->loadMenu();
+//}

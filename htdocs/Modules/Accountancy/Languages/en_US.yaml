@@ -2,7 +2,6 @@ Accountancy: Accountancy
 Accounting: Accounting
 ACCOUNTING_EXPORT_SEPARATORCSV: 'Column separator for export file'
 ACCOUNTING_EXPORT_DATE: 'Date format for export file'
-ACCOUNTING_EXPORT_PIECE: 'Export the number of piece'
 ACCOUNTING_EXPORT_GLOBAL_ACCOUNT: 'Export with global account'
 ACCOUNTING_EXPORT_LABEL: 'Export label'
 ACCOUNTING_EXPORT_AMOUNT: 'Export amount'
