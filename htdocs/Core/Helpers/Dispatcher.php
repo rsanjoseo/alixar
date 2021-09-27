@@ -148,6 +148,14 @@ class Dispatcher extends Globals
     {
         $className = 'Alxarafe\\Modules\\' . $module . '\\Controllers\\' . $controller;
         $filename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/' . $controller . '.php';
+
+        $oldFilename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/Dol_' . $controller . '.php';
+        if (file_exists($oldFilename)) {
+            $oldUrl = constant('BASE_URI') . '/Modules/' . $module . '/Controllers/Dol_' . $controller . '.php';
+            redirectTo($oldUrl);
+            die();
+        }
+
         if (file_exists($filename)) {
             $this->debug->addMessage('messages', "$className exists!");
             $controller = new $className();

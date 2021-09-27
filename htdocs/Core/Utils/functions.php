@@ -175,3 +175,9 @@ function snakeToCamel(string $string, string $us = '_'): string
 {
     return str_replace($us, '', ucwords($string, $us));
 }
+
+function redirectTo($url)
+{
+    header('location: ' . $url);
+    die();
+}

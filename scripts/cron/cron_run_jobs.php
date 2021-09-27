@@ -77,8 +77,7 @@ $version = DOL_VERSION;
 $error = 0;
 
 // Language Management
-// $langs->loadLangs(array('main', 'admin', 'cron', 'dict'));
-
+$langs->loadLangs(['main', 'admin', 'cron', 'dict']);
 
 /*
  * Main

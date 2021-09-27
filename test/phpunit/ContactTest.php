@@ -27,8 +27,8 @@ global $conf,$user,$langs,$db;
 //define('TEST_DB_FORCE_TYPE','mysql');	// This is to force using mysql driver
 //require_once 'PHPUnit/Autoload.php';
 require_once dirname(__FILE__).'/../../htdocs/master.inc.php';
-require_once dirname(__FILE__).'/../../htdocs/contact/class/contact.class.php';
-// $langs->load("dict");
+require_once dirname(__FILE__) . '/../../htdocs/contact/class/contact.class.php';
+$langs->load("dict");
 
 if ($langs->defaultlang != 'en_US') {
 	print "Error: Default language for company to run tests must be set to en_US or auto. Current is ".$langs->defaultlang."\n";

@@ -20,6 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Descend to the htdocs folder
+chdir('../../..');
+
 /**
  *    \file       htdocs/index.php
  *    \brief      Dolibarr home page

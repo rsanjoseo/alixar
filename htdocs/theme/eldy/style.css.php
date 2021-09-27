@@ -73,7 +73,6 @@ require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
 $menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
 $menumanager->loadMenu();
 
-
 // Define css type
 top_httphead('text/css');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
@@ -93,7 +92,7 @@ if (GETPOST('THEME_DARKMODEENABLED', 'int')) {
 	$conf->global->THEME_DARKMODEENABLED = GETPOST('THEME_DARKMODEENABLED', 'int'); // If darkmode was forced on URL
 }
 
-//// $langs->load("main", 0, 1);
+//$langs->load("main", 0, 1);
 $right = ($langs->trans("DIRECTION") == 'rtl' ? 'left' : 'right');
 $left = ($langs->trans("DIRECTION") == 'rtl' ? 'right' : 'left');
 

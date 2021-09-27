@@ -72,7 +72,7 @@ class DateLibTest extends PHPUnit\Framework\TestCase
 		$this->savlangs=$langs;
 		$this->savdb=$db;
 
-		// $langs->load("admin");
+		$langs->load("admin");
 
 		print __METHOD__." db->type=".$db->type." user->id=".$user->id;
 

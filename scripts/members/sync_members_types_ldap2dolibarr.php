@@ -45,7 +45,7 @@ require_once DOL_DOCUMENT_ROOT."/core/lib/date.lib.php";
 require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
 require_once DOL_DOCUMENT_ROOT."/adherents/class/adherent_type.class.php";
 
-// $langs->loadLangs(array("main", "errors"));
+$langs->loadLangs(["main", "errors"]);
 
 // Global variables
 $version = constant('DOL_VERSION');

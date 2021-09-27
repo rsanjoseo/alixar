@@ -69,13 +69,13 @@ if (!empty($dolibarr_main_document_root_alt)) {
 
 // Chargement des includes principaux de librairies communes
 if (!defined('NOREQUIREUSER')) {
-    require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php'; // Need 500ko memory
+    require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php'; // Need 500ko memory
 }
 if (!defined('NOREQUIRETRAN')) {
 	require_once DOL_DOCUMENT_ROOT . '/core/class/translate.class.php';
 }
 if (!defined('NOREQUIRESOC')) {
-	require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+    require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 }
 
 
@@ -104,7 +104,7 @@ if (!defined('NOREQUIREDB')) {
 			print '<div class="center" style="text-align: center; margin: 100px;">';
 			if (is_object($langs)) {
 				$langs->setDefaultLang('auto');
-				// $langs->load("website");
+				$langs->load("website");
 				print $langs->trans("SorryWebsiteIsCurrentlyOffLine");
 			} else {
 				print "SorryWebsiteIsCurrentlyOffLine";

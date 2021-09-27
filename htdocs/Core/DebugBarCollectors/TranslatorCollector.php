@@ -10,6 +10,7 @@ use Alxarafe\Core\Providers\Translator;
 use DebugBar\DataCollector\AssetProvider;
 use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
+use function Sabre\Uri\parse;
 
 /**
  * This class collects the translations
@@ -83,6 +84,10 @@ class TranslatorCollector extends DataCollector implements Renderable, AssetProv
      */
     public function getAssets(): array
     {
+        return [
+            'css' => BASE_FOLDER . '/html/common/css/phpdebugbar.custom-widget.css',
+            'js' => BASE_FOLDER . '/html/common/js/phpdebugbar.custom-widget.js',
+        ];
         return [
             'css' => baseUrl('/html/common/css/phpdebugbar.custom-widget.css'),
             'js' => baseUrl('/html/common/js/phpdebugbar.custom-widget.js'),

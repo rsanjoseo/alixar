@@ -45,7 +45,7 @@ require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
 require_once DOL_DOCUMENT_ROOT."/user/class/user.class.php";
 require_once DOL_DOCUMENT_ROOT."/user/class/usergroup.class.php";
 
-// $langs->loadLangs(array("main", "errors"));
+$langs->loadLangs(["main", "errors"]);
 
 // Global variables
 $version = DOL_VERSION;

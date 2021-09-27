@@ -53,7 +53,7 @@ $mode = $argv[1];
 require $path."../../htdocs/master.inc.php";
 require_once DOL_DOCUMENT_ROOT."/core/class/CMailFile.class.php";
 
-// $langs->loadLangs(array('main', 'contracts'));
+$langs->loadLangs(['main', 'contracts']);
 
 // Global variables
 $version = DOL_VERSION;

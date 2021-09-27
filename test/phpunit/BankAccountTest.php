@@ -36,7 +36,7 @@ if (empty($user->id)) {
 }
 $conf->global->MAIN_DISABLE_ALL_MAILS=1;
 
-// $langs->load("main");
+$langs->load("main");
 
 
 /**

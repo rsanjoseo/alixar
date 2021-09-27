@@ -19,7 +19,7 @@ $authmode = explode(',', $dolibarr_main_authentication);
 
 // No authentication mode
 if (!count($authmode)) {
-    //    // $langs->load('main');
+    //    $langs->load('main');
     dol_print_error('', $langs->trans("ErrorConfigParameterNotDefined", 'dolibarr_main_authentication'));
     exit;
 }
@@ -80,7 +80,7 @@ if (!isset($_SESSION["dol_login"])) {
         if (!$ok) {
             dol_syslog('Bad value for code, connexion refused');
             // Load translation files required by page
-            // $langs->loadLangs(['main', 'errors']);
+            $langs->loadLangs(['main', 'errors']);
 
             $_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorBadValueForCode");
             $test = false;
@@ -172,7 +172,7 @@ if (!isset($_SESSION["dol_login"])) {
         if (!$login) {
             dol_syslog('Bad password, connexion refused', LOG_DEBUG);
             // Load translation files required by page
-            //            // $langs->loadLangs(['main', 'errors']);
+            //            $langs->loadLangs(['main', 'errors']);
 
             // Bad password. No authmode has found a good password.
             // We set a generic message if not defined inside function checkLoginPassEntity or subfunctions
@@ -227,7 +227,7 @@ if (!isset($_SESSION["dol_login"])) {
 
         if ($resultFetchUser == 0) {
             // Load translation files required by page
-            // $langs->loadLangs(['main', 'errors']);
+            $langs->loadLangs(['main', 'errors']);
 
             $_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorCantLoadUserFromDolibarrDatabase", $login);
 
@@ -290,7 +290,7 @@ if (!isset($_SESSION["dol_login"])) {
 
         if ($resultFetchUser == 0) {
             // Load translation files required by page
-            // $langs->loadLangs(['main', 'errors']);
+            $langs->loadLangs(['main', 'errors']);
 
             $_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorCantLoadUserFromDolibarrDatabase", $login);
 

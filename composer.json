@@ -43,6 +43,7 @@
     "shuchkin/simplexlsx": "*",
     "parsecsv/php-parsecsv": "*",
     "mischiefcollective/colorjizz": "*",
+    "mobiledetect/mobiledetectlib": "*",
     "twig/twig": "*",
     "symfony/http-foundation": "*",
     "symfony/translation": "*",

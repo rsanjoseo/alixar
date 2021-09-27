@@ -231,8 +231,13 @@ class Translator extends Provider
      *
      * @return string
      */
-    public static function trans(string $txt, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public static function trans(string $txt, string|array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
+        if (is_string($parameters)) {
+            $x = $parameters;
+            $parameters = [];
+            $parameters['s'] = $x;
+        }
         $translated = self::$translator->trans($txt, $parameters, $domain, $locale);
         self::verifyMissing($translated, $txt, $domain);
         return $translated;
@@ -324,15 +329,15 @@ class Translator extends Provider
     }
 
     /**
-     * @param string      $txt
-     * @param array       $parameters
-     * @param string|null $domain
-     * @param string|null $locale
+     * @param string       $txt
+     * @param string|array $parameters
+     * @param string|null  $domain
+     * @param string|null  $locale
      *
      * @return string
      * @deprecated Do not use
      */
-    public function transnoentitiesnoconv(string $txt, array $parameters = []): string
+    public function transnoentitiesnoconv(string $txt, string|array $parameters = []): string
     {
         return self::trans($txt, $parameters);
     }
@@ -372,5 +377,18 @@ class Translator extends Provider
         } else {
             return substr($lang, 0, 2);
         }
+    }
+
+    public function transnoentities($string)
+    {
+        return $this->trans($string);
+    }
+
+    public function loadLangs(array $domains)
+    {
+    }
+
+    public function load($domain, $alt = 0, $stopafterdirection = 0, $forcelangdir = '', $loadfromfileonly = 0, $forceloadifalreadynotfound = 0)
+    {
     }
 }
