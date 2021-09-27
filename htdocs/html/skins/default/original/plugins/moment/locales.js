@@ -937,7 +937,6 @@
                 ? forms[1]
                 : forms[2];
     }
-
     function relativeTimeWithPlural(number, withoutSuffix, key) {
         var format = {
             ss: withoutSuffix ? 'секунда_секунды_секунд' : 'секунду_секунды_секунд',
@@ -1565,7 +1564,6 @@
         };
         return number + ' ' + mutation(format[key], number);
     }
-
     function specialMutationForYears(number) {
         switch (lastNumber(number)) {
             case 1:
@@ -1578,21 +1576,18 @@
                 return number + ' vloaz';
         }
     }
-
     function lastNumber(number) {
         if (number > 9) {
             return lastNumber(number % 10);
         }
         return number;
     }
-
     function mutation(text, number) {
         if (number === 2) {
             return softMutation(text);
         }
         return text;
     }
-
     function softMutation(text) {
         var mutationTable = {
             m: 'v',
@@ -1987,7 +1982,6 @@
     function plural$1(n) {
         return n > 1 && n < 5 && ~~(n / 10) !== 1;
     }
-
     function translate$1(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {
@@ -3980,7 +3974,6 @@
             numbersPast[8],
             numbersPast[9],
         ];
-
     function translate$2(number, withoutSuffix, key, isFuture) {
         var result = '';
         switch (key) {
@@ -4018,7 +4011,6 @@
         result = verbalNumber(number, isFuture) + ' ' + result;
         return result;
     }
-
     function verbalNumber(number, isFuture) {
         return number < 10
             ? isFuture
@@ -5521,7 +5513,6 @@
     var weekEndings = 'vasárnap hétfőn kedden szerdán csütörtökön pénteken szombaton'.split(
         ' '
     );
-
     function translate$4(number, withoutSuffix, key, isFuture) {
         var num = number;
         switch (key) {
@@ -5556,7 +5547,6 @@
         }
         return '';
     }
-
     function week(isFuture) {
         return (
             (isFuture ? '' : '[múlt] ') +
@@ -5803,7 +5793,6 @@
         }
         return true;
     }
-
     function translate$5(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {
@@ -6975,7 +6964,6 @@
         };
         return withoutSuffix ? format[key][0] : format[key][1];
     }
-
     function processFutureTime(string) {
         var number = string.substr(0, string.indexOf(' '));
         if (eifelerRegelAppliesToNumber(number)) {
@@ -6983,7 +6971,6 @@
         }
         return 'an ' + string;
     }
-
     function processPastTime(string) {
         var number = string.substr(0, string.indexOf(' '));
         if (eifelerRegelAppliesToNumber(number)) {
@@ -6991,7 +6978,6 @@
         }
         return 'virun ' + string;
     }
-
     /**
      * Returns true if the word before the given number loses the '-n' ending.
      * e.g. 'an 10 Deeg' but 'a 5 Deeg'
@@ -7174,7 +7160,6 @@
         y: 'metai_metų_metus',
         yy: 'metai_metų_metus',
     };
-
     function translateSeconds(number, withoutSuffix, key, isFuture) {
         if (withoutSuffix) {
             return 'kelios sekundės';
@@ -7182,7 +7167,6 @@
             return isFuture ? 'kelių sekundžių' : 'kelias sekundes';
         }
     }
-
     function translateSingular(number, withoutSuffix, key, isFuture) {
         return withoutSuffix
             ? forms(key)[0]
@@ -7190,15 +7174,12 @@
                 ? forms(key)[1]
                 : forms(key)[2];
     }
-
     function special(number) {
         return number % 10 === 0 || (number > 10 && number < 20);
     }
-
     function forms(key) {
         return units[key].split('_');
     }
-
     function translate$6(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         if (number === 1) {
@@ -7215,7 +7196,6 @@
             }
         }
     }
-
     moment.defineLocale('lt', {
         months: {
             format: 'sausio_vasario_kovo_balandžio_gegužės_birželio_liepos_rugpjūčio_rugsėjo_spalio_lapkričio_gruodžio'.split(
@@ -7300,7 +7280,6 @@
         y: 'gada_gadiem_gads_gadi'.split('_'),
         yy: 'gada_gadiem_gads_gadi'.split('_'),
     };
-
     /**
      * @param withoutSuffix boolean true = a length of time; false = before/after a period of time.
      */
@@ -7314,15 +7293,12 @@
             return number % 10 === 1 && number % 100 !== 11 ? forms[0] : forms[1];
         }
     }
-
     function relativeTimeWithPlural$1(number, withoutSuffix, key) {
         return number + ' ' + format(units$1[key], number, withoutSuffix);
     }
-
     function relativeTimeWithSingular(number, withoutSuffix, key) {
         return format(units$1[key], number, withoutSuffix);
     }
-
     function relativeSeconds(number, withoutSuffix) {
         return withoutSuffix ? 'dažas sekundes' : 'dažām sekundēm';
     }
@@ -8931,11 +8907,9 @@
             /^lis/i,
             /^gru/i,
         ];
-
     function plural$3(n) {
         return n % 10 < 5 && n % 10 > 1 && ~~(n / 10) % 10 !== 1;
     }
-
     function translate$8(number, withoutSuffix, key) {
         var result = number + ' ';
         switch (key) {
@@ -9240,7 +9214,6 @@
                 ? forms[1]
                 : forms[2];
     }
-
     function relativeTimeWithPlural$3(number, withoutSuffix, key) {
         var format = {
             ss: withoutSuffix ? 'секунда_секунды_секунд' : 'секунду_секунды_секунд',
@@ -9257,7 +9230,6 @@
             return number + ' ' + plural$4(format[key], +number);
         }
     }
-
     var monthsParse$b = [
         /^янв/i,
         /^фев/i,
@@ -9636,11 +9608,9 @@
             '_'
         ),
         monthsShort$7 = 'jan_feb_mar_apr_máj_jún_júl_aug_sep_okt_nov_dec'.split('_');
-
     function plural$5(n) {
         return n > 1 && n < 5;
     }
-
     function translate$9(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {
@@ -11535,7 +11505,6 @@
                 ? forms[1]
                 : forms[2];
     }
-
     function relativeTimeWithPlural$4(number, withoutSuffix, key) {
         var format = {
             ss: withoutSuffix ? 'секунда_секунди_секунд' : 'секунду_секунди_секунд',
@@ -11553,7 +11522,6 @@
             return number + ' ' + plural$6(format[key], +number);
         }
     }
-
     function weekdaysCaseReplace(m, format) {
         var weekdays = {
                 nominative: 'неділя_понеділок_вівторок_середа_четвер_п’ятниця_субота'.split(
@@ -11584,7 +11552,6 @@
                 : 'nominative';
         return weekdays[nounCase][m.day()];
     }
-
     function processHoursFunction(str) {
         return function () {
             return str + 'о' + (this.hours() === 11 ? 'б' : '') + '] LT';

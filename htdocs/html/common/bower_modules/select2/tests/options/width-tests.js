@@ -6,7 +6,7 @@ var Select2 = require('select2/core');
 var select = new Select2($('<select></select>'));
 
 test('string passed as width', function (assert) {
-    var $test = $('<select></select>');
+  var $test = $('<select></select>');
 
     var width = select._resolveWidth($test, '80%');
 

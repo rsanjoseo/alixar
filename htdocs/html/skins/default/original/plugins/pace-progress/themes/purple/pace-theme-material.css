@@ -58,7 +58,6 @@
     left: 2.5rem;
     top: 0;
 }
-
 .pace-progress .pace-progress-inner:before,
 .pace-progress .pace-progress-inner:after {
     position: absolute;
@@ -71,7 +70,6 @@
     border: 1px solid;
     border-radius: 5rem;
 }
-
 .pace-progress .pace-progress-inner:before {
     border-right-color: transparent;
     border-bottom-color: transparent;

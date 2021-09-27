@@ -18,7 +18,7 @@
   }
 
 
-    // Return color if no color blind mode.
+  // Return color if no color blind mode.
   @else {
     @return $color;
   }

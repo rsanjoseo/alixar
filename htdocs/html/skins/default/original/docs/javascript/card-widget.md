@@ -137,6 +137,7 @@ This attribute, when attached to a button, allows the box to be maximize/minimiz
   </div>
 </div>
 
+
 ###### jQuery
 
 {: .text-bold } To activate any button using jQuery, you must provide the removeTrigger and collapseTrigger options.

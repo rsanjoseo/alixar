@@ -388,9 +388,7 @@
                 ctx.moveTo(x + radius, y);
                 ctx.arc(x, y, radius, 0, shadow ? Math.PI : Math.PI * 2, false);
             }
-
             drawCircle.fill = true;
-
             function plotPoints(datapoints, radius, fill, offset, shadow, axisx, axisy, drawSymbolFn) {
                 var points = datapoints.points,
                     ps = datapoints.pointsize;

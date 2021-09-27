@@ -340,7 +340,6 @@ on [option creation](/tagging#tag-properties) when migrating from previous versi
 
 The `createSearchChoicePosition` option has been removed in favor of the `insertTag` function. New tags are added to the
 bottom of the list by default.
-
 ```
 insertTag: function (data, tag) {
   // Insert the tag at the end of the results

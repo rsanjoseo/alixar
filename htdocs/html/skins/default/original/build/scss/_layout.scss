@@ -689,12 +689,10 @@ body:not(.layout-fixed) {
       color: $gray-500;
     }
   }
-
   .main-footer {
     background-color: $dark;
     border-color: lighten($dark, 10%);
   }
-
   .content-wrapper {
     background-color: lighten($dark, 7.5%);
     color: $white;

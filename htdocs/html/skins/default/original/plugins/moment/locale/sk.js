@@ -21,7 +21,6 @@
     function plural(n) {
         return n > 1 && n < 5;
     }
-
     function translate(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {

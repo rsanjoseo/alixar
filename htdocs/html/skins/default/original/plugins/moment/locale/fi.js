@@ -27,7 +27,6 @@
             numbersPast[8],
             numbersPast[9],
         ];
-
     function translate(number, withoutSuffix, key, isFuture) {
         var result = '';
         switch (key) {
@@ -65,7 +64,6 @@
         result = verbalNumber(number, isFuture) + ' ' + result;
         return result;
     }
-
     function verbalNumber(number, isFuture) {
         return number < 10
             ? isFuture

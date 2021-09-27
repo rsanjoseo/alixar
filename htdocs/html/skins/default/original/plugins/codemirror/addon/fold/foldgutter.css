@@ -5,20 +5,16 @@
     line-height: .3;
     cursor: pointer;
 }
-
 .CodeMirror-foldgutter {
     width: .7em;
 }
-
 .CodeMirror-foldgutter-open,
 .CodeMirror-foldgutter-folded {
     cursor: pointer;
 }
-
 .CodeMirror-foldgutter-open:after {
     content: "\25BE";
 }
-
 .CodeMirror-foldgutter-folded:after {
     content: "\25B8";
 }

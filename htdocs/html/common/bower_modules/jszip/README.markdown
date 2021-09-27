@@ -27,7 +27,6 @@ images/
     smile.gif
 */
 ```
-
 License
 -------
 

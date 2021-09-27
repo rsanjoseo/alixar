@@ -25,18 +25,15 @@ large (`.ribbon-wrapper` with `.ribbon-lg`), extra large (`.ribbon-wrapper` with
 </div>
 
 ```html
-
 <div class="ribbon-wrapper">
-    <div class="ribbon bg-primary">
-        Ribbon
-    </div>
+  <div class="ribbon bg-primary">
+    Ribbon
+  </div>
 </div>
 ```
-
 {: .max-height-300}
 
 ##### Ribbon Size Variations
-
 {: .text-bold .text-dark .mt-5}
 
 <div class="row">
@@ -105,7 +102,6 @@ large (`.ribbon-wrapper` with `.ribbon-lg`), extra large (`.ribbon-wrapper` with
 </div>
 
 ##### Text Size Variations
-
 {: .text-bold .text-dark .mt-5}
 
 <div class="row">
@@ -174,17 +170,15 @@ large (`.ribbon-wrapper` with `.ribbon-lg`), extra large (`.ribbon-wrapper` with
 </div>
 
 ##### Image Example Code
-
 {: .text-bold .text-dark .mt-5}
 
 ```html
-
 <div class="position-relative">
-    <img src="../../dist/img/photo1.png" alt="Photo 1" class="img-fluid">
-    <div class="ribbon-wrapper ribbon-lg">
-        <div class="ribbon bg-success text-lg">
-            Ribbon
-        </div>
+  <img src="../../dist/img/photo1.png" alt="Photo 1" class="img-fluid">
+  <div class="ribbon-wrapper ribbon-lg">
+    <div class="ribbon bg-success text-lg">
+      Ribbon
     </div>
+  </div>
 </div>
 ```

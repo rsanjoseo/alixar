@@ -32,11 +32,9 @@
             /^lis/i,
             /^gru/i,
         ];
-
     function plural(n) {
         return n % 10 < 5 && n % 10 > 1 && ~~(n / 10) % 10 !== 1;
     }
-
     function translate(number, withoutSuffix, key) {
         var result = number + ' ';
         switch (key) {

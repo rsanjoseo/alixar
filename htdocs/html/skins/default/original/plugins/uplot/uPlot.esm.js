@@ -962,7 +962,6 @@ function mkDate(y, m, d) {
 function timeSeriesStamp(stampCfg, fmtDate) {
     return fmtDate(stampCfg);
 }
-
 const _timeSeriesStamp = '{YYYY}-{MM}-{DD} {h}:{mm}{aa}';
 
 function timeSeriesVal(tzDate, stamp) {

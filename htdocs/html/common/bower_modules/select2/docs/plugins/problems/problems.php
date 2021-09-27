@@ -1,5 +1,4 @@
 <?php
-
 namespace Grav\Plugin;
 
 use Grav\Common\Cache;
@@ -34,6 +33,110 @@ class ProblemsPlugin extends Plugin
         if ($this->problemChecker()) {
             $this->renderProblems();
         }
+    }
+
+    public function onPluginsInitialized()
+    {
+        if ($this->isAdmin()) {
+            $this->active = false;
+            return;
+        }
+
+        /** @var Cache $cache */
+        $cache = $this->grav['cache'];
+        $validated_prefix = 'problem-check-';
+
+        $this->check = CACHE_DIR . $validated_prefix . $cache->getKey();
+
+        if (!file_exists($this->check)) {
+            // If no issues remain, save a state file in the cache
+            if (!$this->problemChecker()) {
+                // delete any existing validated files
+                foreach (new \GlobIterator(CACHE_DIR . $validated_prefix . '*') as $fileInfo) {
+                    @unlink($fileInfo->getPathname());
+                }
+
+                // create a file in the cache dir so it only runs on cache changes
+                touch($this->check);
+            } else {
+                $this->renderProblems();
+            }
+        }
+    }
+
+    protected function renderProblems()
+    {
+        $theme = 'antimatter';
+
+        /** @var Uri $uri */
+        $uri = $this->grav['uri'];
+        $baseUrlRelative = $uri->rootUrl(false);
+        $themeUrl = $baseUrlRelative . '/' . USER_PATH . basename(THEMES_DIR) . '/' . $theme;
+        $problemsUrl = $baseUrlRelative . '/user/plugins/problems';
+
+        $html = file_get_contents(__DIR__ . '/html/problems.html');
+
+        /**
+         * Process the results, ignore the statuses passed as $ignore_status
+         *
+         * @param $results
+         * @param $ignore_status
+         */
+        $processResults = function ($results, $ignore_status) {
+            $problems = '';
+
+            foreach ($results as $key => $result) {
+                if ($key == 'files' || $key == 'apache' || $key == 'execute') {
+                    foreach ($result as $key_text => $value_text) {
+                        foreach ($value_text as $status => $text) {
+                            if ($status == $ignore_status) {
+                                continue;
+                            }
+                            $problems .= $this->getListRow($status, '<b>' . $key_text . '</b> ' . $text);
+                        }
+                    }
+                } else {
+                    foreach ($result as $status => $text) {
+                        if ($status == $ignore_status) {
+                            continue;
+                        }
+                        $problems .= $this->getListRow($status, $text);
+                    }
+                }
+            }
+
+            return $problems;
+        };
+
+        // First render the errors
+        $problems = $processResults($this->results, 'success');
+
+        // Then render the successful checks
+        $problems .= $processResults($this->results, 'error');
+
+        $html = str_replace('%%BASE_URL%%', $baseUrlRelative, $html);
+        $html = str_replace('%%THEME_URL%%', $themeUrl, $html);
+        $html = str_replace('%%PROBLEMS_URL%%', $problemsUrl, $html);
+        $html = str_replace('%%PROBLEMS%%', $problems, $html);
+
+        echo $html;
+        http_response_code(500);
+
+        exit();
+    }
+
+    protected function getListRow($status, $text)
+    {
+        if ($status == 'error') {
+            $icon = 'fa-times';
+        } elseif ($status == 'info') {
+            $icon = 'fa-info';
+        } else {
+            $icon = 'fa-check';
+        }
+        $output = "\n";
+        $output .= '<li class="' . $status . ' clearfix"><i class="fa fa-fw ' . $icon . '"></i><p>' . $text . '</p></li>';
+        return $output;
     }
 
     protected function problemChecker()
@@ -104,6 +207,7 @@ class ProblemsPlugin extends Plugin
             $problems_found = true;
             $php_version_adjective = 'lower';
             $php_version_status = 'error';
+
         } else {
             $php_version_adjective = 'greater';
             $php_version_status = 'success';
@@ -222,109 +326,5 @@ class ProblemsPlugin extends Plugin
         }
 
         return $problems_found;
-    }
-
-    protected function renderProblems()
-    {
-        $theme = 'antimatter';
-
-        /** @var Uri $uri */
-        $uri = $this->grav['uri'];
-        $baseUrlRelative = $uri->rootUrl(false);
-        $themeUrl = $baseUrlRelative . '/' . USER_PATH . basename(THEMES_DIR) . '/' . $theme;
-        $problemsUrl = $baseUrlRelative . '/user/plugins/problems';
-
-        $html = file_get_contents(__DIR__ . '/html/problems.html');
-
-        /**
-         * Process the results, ignore the statuses passed as $ignore_status
-         *
-         * @param $results
-         * @param $ignore_status
-         */
-        $processResults = function ($results, $ignore_status) {
-            $problems = '';
-
-            foreach ($results as $key => $result) {
-                if ($key == 'files' || $key == 'apache' || $key == 'execute') {
-                    foreach ($result as $key_text => $value_text) {
-                        foreach ($value_text as $status => $text) {
-                            if ($status == $ignore_status) {
-                                continue;
-                            }
-                            $problems .= $this->getListRow($status, '<b>' . $key_text . '</b> ' . $text);
-                        }
-                    }
-                } else {
-                    foreach ($result as $status => $text) {
-                        if ($status == $ignore_status) {
-                            continue;
-                        }
-                        $problems .= $this->getListRow($status, $text);
-                    }
-                }
-            }
-
-            return $problems;
-        };
-
-        // First render the errors
-        $problems = $processResults($this->results, 'success');
-
-        // Then render the successful checks
-        $problems .= $processResults($this->results, 'error');
-
-        $html = str_replace('%%BASE_URL%%', $baseUrlRelative, $html);
-        $html = str_replace('%%THEME_URL%%', $themeUrl, $html);
-        $html = str_replace('%%PROBLEMS_URL%%', $problemsUrl, $html);
-        $html = str_replace('%%PROBLEMS%%', $problems, $html);
-
-        echo $html;
-        http_response_code(500);
-
-        exit();
-    }
-
-    protected function getListRow($status, $text)
-    {
-        if ($status == 'error') {
-            $icon = 'fa-times';
-        } elseif ($status == 'info') {
-            $icon = 'fa-info';
-        } else {
-            $icon = 'fa-check';
-        }
-        $output = "\n";
-        $output .= '<li class="' . $status . ' clearfix"><i class="fa fa-fw ' . $icon . '"></i><p>' . $text . '</p></li>';
-        return $output;
-    }
-
-    public function onPluginsInitialized()
-    {
-        if ($this->isAdmin()) {
-            $this->active = false;
-            return;
-        }
-
-        /** @var Cache $cache */
-        $cache = $this->grav['cache'];
-        $validated_prefix = 'problem-check-';
-
-        $this->check = CACHE_DIR . $validated_prefix . $cache->getKey();
-
-        if (!file_exists($this->check)) {
-            // If no issues remain, save a state file in the cache
-            if (!$this->problemChecker()) {
-                // delete any existing validated files
-                foreach (new \GlobIterator(CACHE_DIR . $validated_prefix . '*') as $fileInfo) {
-                    @unlink($fileInfo->getPathname());
-                }
-
-                // create a file in the cache dir so it only runs on cache changes
-                touch($this->check);
-            } else {
-                $this->renderProblems();
-            }
-        }
     }
 }

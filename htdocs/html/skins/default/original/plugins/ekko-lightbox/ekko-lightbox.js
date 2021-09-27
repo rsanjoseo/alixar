@@ -6,7 +6,7 @@
  */
 +function ($) {
 
-    'use strict';
+'use strict';
 
     var _createClass = (function () {
         function defineProperties(target, props) {

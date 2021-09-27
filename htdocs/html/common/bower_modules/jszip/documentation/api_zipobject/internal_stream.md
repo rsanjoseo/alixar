@@ -15,17 +15,15 @@ name     | type     | description
 ---------|----------|------------
 type     | String   | the type of the result: `string`, `binarystring`, `uint8array`, `arraybuffer`, `nodebuffer`.
 
+
 ## Example
 
 ```js
 zip
-    .file("my_text.txt")
-    .internalStream("string")
-    .on("data", function (data) {...
-    })
-    .on("error", function (e) {...
-    })
-    .on("end", function () {...
-    });
+.file("my_text.txt")
+.internalStream("string")
+.on("data", function (data) {...})
+.on("error", function (e) {...})
+.on("end", function () {...});
 ```
 

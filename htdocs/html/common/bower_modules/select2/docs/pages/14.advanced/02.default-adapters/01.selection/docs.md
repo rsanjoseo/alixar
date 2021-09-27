@@ -22,6 +22,7 @@ The selection adapter can be overridden by assigning a custom adapter to the `se
 
 These decorators implement Select2's [placeholder](/placeholders) features.
 
+
 ### `AllowClear`
 
 **AMD Modules:**

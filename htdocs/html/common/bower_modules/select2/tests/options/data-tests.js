@@ -5,7 +5,7 @@ var $ = require('jquery');
 var Options = require('select2/options');
 
 test('no nesting', function (assert) {
-    var $test = $('<select data-test="test"></select>');
+  var $test = $('<select data-test="test"></select>');
 
     var options = new Options({}, $test);
 

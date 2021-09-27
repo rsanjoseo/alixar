@@ -35,7 +35,6 @@ function JSZip() {
         return newObj;
     };
 }
-
 JSZip.prototype = require('./object');
 JSZip.prototype.loadAsync = require('./load');
 JSZip.support = require('./support');

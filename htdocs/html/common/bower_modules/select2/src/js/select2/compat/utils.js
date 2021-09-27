@@ -1,5 +1,5 @@
 define([
-    'jquery'
+  'jquery'
 ], function ($) {
     function syncCssClasses($dest, $src, adapter) {
         var classes, replacements = [], adapted;

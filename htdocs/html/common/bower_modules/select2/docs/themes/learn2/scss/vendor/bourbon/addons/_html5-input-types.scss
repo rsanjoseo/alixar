@@ -32,6 +32,7 @@ $all-text-inputs-hover: assign-inputs($inputs-list, hover);
 $all-text-inputs-focus: assign-inputs($inputs-list, focus);
 
 
+
 // You must use interpolation on the variable:
 // #{$all-text-inputs}
 // #{$all-text-inputs-hover}

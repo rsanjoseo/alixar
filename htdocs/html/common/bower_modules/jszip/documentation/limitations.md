@@ -9,6 +9,7 @@ Not all features of zip files are supported. Classic zip files will work but enc
 supported and the loadAsync()
 method will return a failed promise.
 
+
 ### ZIP64 and 32bit integers
 
 ZIP64 files can be loaded, but only if the zip file is not "too big". ZIP64 uses 64bits integers but JavaScript

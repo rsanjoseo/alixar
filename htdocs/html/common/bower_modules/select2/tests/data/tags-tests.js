@@ -9,7 +9,7 @@ var Utils = require('select2/utils');
 
 var SelectTags = Utils.Decorate(SelectData, Tags);
 var options = new Options({
-    tags: true
+  tags: true
 });
 
 test('does not trigger on blank or null terms', function (assert) {

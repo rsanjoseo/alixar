@@ -109,28 +109,23 @@
 ## 4.0.7
 
 ### New features/improvements
-
 - Do not close on select if Ctrl or Meta (Cmd) keys being held (#5222)
 
 ### Bug fixes
-
 - Fixed issue where single select boxes would automatically reopen when they were closed (#5490, #5492)
 
 ### Miscellaneous
-
 - Move almost and jquery-mousewheel to devDependencies (#5489)
 
 ## 4.0.6
 
 ### New features/improvements
-
 - Add style property to package.json (#5019)
 - Implement `clear` and `clearing` events (#5058)
 - Add `scrollAfterSelect` option (#5150)
 - Add missing diacritics (#4118, #4337, #5464)
 
 ### Bug fixes
-
 - Fix up arrow error when there are no options in dropdown (#5127)
 - Add `;` before beginning of factory wrapper (#5089)
 - Fix IE11 issue with select losing focus after selecting an item (#4860)
@@ -143,12 +138,10 @@
 - Removing the double event binding registration of `selection:update` (#4306)
 
 #### Accessibility
-
 - Improve `.select2-hidden-accessible` (#4908)
 - Add role and aria-readonly attributes to single selection dropdown value (#4881)
 
 ### Translations
-
 - Add Turkmen translations (`tk`) (#5125)
 - Fix error in French translations (#5122)
 - Add Albanian translation (`sq`) (#5199)
@@ -160,17 +153,14 @@
 - Fix error in Russian translation (#5401)
 
 ### Miscellaneous
-
 - Remove duplicate CSS selector in classic theme (#5115)
 
 ## 4.0.5
 
 ### Bug fixes
-
 - Replace `autocapitalize=off` with `autocapitalize=none` (#4994)
 
 ### Translations
-
 - Vietnamese: remove an unnecessary quote mark (#5059)
 - Czech: Add missing commas and periods (#5052)
 - Spanish: Update the 'errorLoading' message (#5032)
@@ -193,12 +183,10 @@
   values [https://github.com/select2/select2/commit/16b4840c0e2df0461998e3b464ee0a546173950d, https://github.com/select2/select2/commit/0358ee528765157234643d289bce6b8ca5889c72]
 
 ### Bug fixes
-
 - Fix issue with entire form losing focus when tabbing away from a Select2 control (#4419)
 - Fix UMD support for CommonJS [https://github.com/select2/select2/commit/45a877345482956021161203ac789c25f40a7d5e]
 
 ### Documentation
-
 - Github Pages documentation has been deprecated, replaced with https://github.com/select2/docs
 - Add django-autocomplete-light to integrations [https://github.com/select2/select2/pull/4597]
 - Correct typo in options page [https://github.com/select2/select2/pull/4389]
@@ -308,7 +296,6 @@ minor improvements.
 - Added notes about DOM events [https://github.com/select2/select2/commit/37dbe059fce4578b46b7561e6243b7fdc63ac002]
 
 ### Translations
-
 - Correct Romanian translation [https://github.com/select2/select2/commit/72d905f9e026d49e7c600f37a1ce742c404654d7]
 
 ## 4.0.1
@@ -385,7 +372,6 @@ minor improvements.
 - Fix invalid JSON in the tags example within the 4.0 announcement [https://github.com/select2/select2/pull/3637]
 
 ### Translations
-
 - Added Cyrillic variant of the Serbian language [https://github.com/select2/select2/pull/3943]
 - Corrected Thai "no results found" translation [https://github.com/select2/select2/pull/3782]
 - Swapped the `inputTooLong` and `inputTooShort` messages in the Galician
@@ -455,7 +441,6 @@ data is sent to the server
 - The `copy` value for the `width` option has been renamed to `style`.
 
 ##### Renamed
-
 - `formatSelection` -> `templateSelection`
 - `formatResult` -> `templateResult`
 - `sortResults` -> `sorter`
@@ -467,7 +452,6 @@ data is sent to the server
 - `placeholderOption` has been replaced by `placeholder.id` (`placeholder` -> `placeholder.text`)
 
 ##### [Internationalization](https://select2.org/i18n)
-
 - `formatNoMatches` -> `language.noMatches`
 - `formatSearching` -> `language.searching`
 - `formatInputTooShort` -> `language.inputTooShort`
@@ -492,7 +476,6 @@ data is sent to the server
 #### Methods
 
 ##### Renamed
-
 - `.select2("val", [value])` -> `.val([value])`
 - `.select2("enable", !disabled)` -> `.prop("disabled", disabled)`
 
@@ -508,12 +491,10 @@ data is sent to the server
 #### Events
 
 ##### New
-
 - `select2:closing` is triggered before the dropdown is closed
 - `select2:select` is triggered when an option is selected
 
 ##### Renamed
-
 - `select2-close` is now `select2:close`
 - `select2-open` is now `select2:open`
 - `select2-opening` is now `select2:opening`
@@ -522,7 +503,6 @@ data is sent to the server
 - `select2-removing` is now `select2:unselecting`
 
 ##### Removed
-
 - `select2-clearing` has been removed in favor of `select2:unselecting`
 - `select2-highlight`
 - `select2-loaded`

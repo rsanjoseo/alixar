@@ -18,12 +18,10 @@ div.dt-autofill-select {
     background-color: #0275d8;
     background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255, 255, 255, 0.5) 5px, rgba(255, 255, 255, 0.5) 10px);
 }
-
 div.dt-autofill-select.top, div.dt-autofill-select.bottom {
     height: 3px;
     margin-top: -1px;
 }
-
 div.dt-autofill-select.left, div.dt-autofill-select.right {
     width: 3px;
     margin-left: -1px;
@@ -43,7 +41,6 @@ div.dt-autofill-list {
     box-sizing: border-box;
     padding: 1.5em 2em;
 }
-
 div.dt-autofill-list ul {
     display: table;
     margin: 0;
@@ -51,31 +48,25 @@ div.dt-autofill-list ul {
     list-style: none;
     width: 100%;
 }
-
 div.dt-autofill-list ul li {
     display: table-row;
 }
-
 div.dt-autofill-list ul li:last-child div.dt-autofill-question, div.dt-autofill-list ul li:last-child div.dt-autofill-button {
     border-bottom: none;
 }
-
 div.dt-autofill-list ul li:hover {
     background-color: #f6f6f6;
 }
-
 div.dt-autofill-list div.dt-autofill-question {
     display: table-cell;
     padding: 0.5em 0;
     border-bottom: 1px solid #ccc;
 }
-
 div.dt-autofill-list div.dt-autofill-question input[type=number] {
     padding: 6px;
     width: 30px;
     margin: -2px 0;
 }
-
 div.dt-autofill-list div.dt-autofill-button {
     display: table-cell;
     padding: 0.5em 0;

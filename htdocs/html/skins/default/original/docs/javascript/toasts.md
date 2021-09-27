@@ -5,7 +5,6 @@ layout: page title: Toasts Plugin
 The toasts plugin provides simple functionality to create easily a bootstrap toast.
 
 ##### Usage
-
 This plugin can be activated as a jQuery plugin.
 
 ###### jQuery
@@ -15,8 +14,8 @@ unchecking the todo list checkbox events.
 
 ```js
 $(document).Toasts('create', {
-    title: 'Toast Title',
-    body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
+  title: 'Toast Title',
+  body: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr.'
 })
 ```
 
@@ -43,6 +42,7 @@ for the toast |--- {: .table .table-bordered .bg-light}
 the toast is created |removed.lte.toasts | Fired when the toast is removed {: .table .table-bordered .bg-light}
 
 Example: `$('body').on('created.lte.toast', handleCreateEvent)`
+
 
 ##### Methods
 

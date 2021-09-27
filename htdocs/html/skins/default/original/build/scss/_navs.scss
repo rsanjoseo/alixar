@@ -126,16 +126,13 @@
         &:hover {
           border-color: lighten($dark, 15%) transparent lighten($dark, 15%) lighten($dark, 15%);
         }
-
         &:focus,
         &:hover {
           background-color: lighten($dark, 5%);
         }
       }
-
       &.nav-tabs-right {
         border-color: lighten($dark, 15%);
-
         .nav-link {
           &.active,
           &:focus,

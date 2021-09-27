@@ -20,14 +20,15 @@ unchecking the todo list checkbox events.
 
 ```js
 $('#my-todo-list').TodoList({
-    onCheck: function (checkbox) {
-        // Do something when the checkbox is checked
-    },
-    onUnCheck: function (checkbox) {
-        // Do something after the checkbox has been unchecked
-    }
+  onCheck: function(checkbox) {
+    // Do something when the checkbox is checked
+  },
+  onUnCheck: function(checkbox) {
+    // Do something after the checkbox has been unchecked
+  }
 })
 ```
+
 
 ##### Options
 

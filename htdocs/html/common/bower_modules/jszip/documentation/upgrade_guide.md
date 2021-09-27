@@ -28,32 +28,26 @@ title: Upgrade Guide layout: default section: main
 zip.file("test.txt").asText();
 // 3.x
 zip.file("test.txt").async("string")
-    .then(function (content) {
-        // use content
-    });
+.then(function (content) {
+    // use content
+});
 
 
 // 2.x
 zip.generate();
 // 3.x
-zip.generateAsync({type: "uint8array"})
-    .then(function (content) {
-        // use content
-    });
+zip.generateAsync({type:"uint8array"})
+.then(function (content) {
+    // use content
+});
 
 // 2.x
 new JSZip(data);
 zip.load(data);
 // zip.file(...)
 // 3.x
-JSZip.loadAsync(data).then(zip)
-{...
-}
-;
-zip.loadAsync(data).then(zip)
-{...
-}
-;
+JSZip.loadAsync(data).then(zip) {...};
+zip.loadAsync(data).then(zip) {...};
 // here, zip won't have (yet) the updated content
 
 // 2.x
@@ -61,9 +55,9 @@ var data = zip.file("img.jpg").asBinary();
 var dataURI = "data:image/jpeg;base64," + JSZip.base64.encode(data);
 // 3.x
 zip.file("img.jpg").async("base64")
-    .then(function (data64) {
-        var dataURI = "data:image/jpeg;base64," + data64;
-    });
+.then(function (data64) {
+    var dataURI = "data:image/jpeg;base64," + data64;
+});
 ```
 
 `async` and `loadAsync` use (a polyfill of) promises, you can find the
@@ -101,20 +95,18 @@ saveAs(blob, "result.zip");
 
 // read, update, generate a zip file with JSZip v3
 JSZip.loadAsync(content)
-    .then(function (zip) {
-        zip.file("new_file", "new_content");
-        // if you return the zip object, it will be available in the next "then"
-        return zip;
-    .
-        then(function (zip) {
-            // if you return a promise of a blob, promises will "merge": the current
-            // promise will wait for the other and the next "then" will get the
-            // blob
-            return zip.generateAsync({type: "blob"});
-        .
-            then(function (blob) {
-                saveAs(blob, "result.zip");
-            });
+.then(function (zip) {
+    zip.file("new_file", "new_content");
+    // if you return the zip object, it will be available in the next "then"
+    return zip;
+.then(function (zip) {
+    // if you return a promise of a blob, promises will "merge": the current
+    // promise will wait for the other and the next "then" will get the
+    // blob
+    return zip.generateAsync({type: "blob"});
+.then(function (blob) {
+    saveAs(blob, "result.zip");
+});
 ```
 
 ### From 2.2.2 to 2.3.0

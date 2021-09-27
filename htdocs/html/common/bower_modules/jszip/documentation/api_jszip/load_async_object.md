@@ -12,19 +12,18 @@ zip.loadAsync(data, options);
 
 Please see the documentation of [loadAsync]({{site.baseurl}}/documentation/api_jszip/load_async.html).
 
+
 __Examples__
 
 ```js
 dataAsPromise
-    .then(JSZip.loadAsync)
-    .then(function (zip) {...
-    })
+.then(JSZip.loadAsync)
+.then(function(zip) {...})
 ```
 
 same as:
 
 ```js
 JSZip.loadAsync(dataAsPromise)
-    .then(function (zip) {...
-    })
+.then(function(zip) {...})
 ```

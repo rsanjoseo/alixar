@@ -218,7 +218,6 @@ function Utf8DecodeWorker() {
     // the last bytes if a chunk didn't end with a complete codepoint.
     this.leftOver = null;
 }
-
 utils.inherits(Utf8DecodeWorker, GenericWorker);
 
 /**
@@ -280,7 +279,6 @@ exports.Utf8DecodeWorker = Utf8DecodeWorker;
 function Utf8EncodeWorker() {
     GenericWorker.call(this, "utf-8 encode");
 }
-
 utils.inherits(Utf8EncodeWorker, GenericWorker);
 
 /**

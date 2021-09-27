@@ -17,7 +17,7 @@ var external = require("./external");
 function string2binary(str) {
     var result = null;
     if (support.uint8array) {
-        result = new Uint8Array(str.length);
+      result = new Uint8Array(str.length);
     } else {
         result = new Array(str.length);
     }
@@ -62,7 +62,6 @@ exports.newBlob = function (part, type) {
 
 
 };
-
 /**
  * The identity function.
  * @param {Object} input the input.

@@ -22,7 +22,6 @@
                 ? forms[1]
                 : forms[2];
     }
-
     function relativeTimeWithPlural(number, withoutSuffix, key) {
         var format = {
             ss: withoutSuffix ? 'секунда_секунды_секунд' : 'секунду_секунды_секунд',

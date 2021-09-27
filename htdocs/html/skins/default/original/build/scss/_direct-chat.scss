@@ -234,11 +234,9 @@
       border-right-color: lighten($dark, 10%);
     }
   }
-
   .direct-chat-timestamp {
     color: $gray-500;
   }
-
   .right > .direct-chat-text {
     &::after,
     &::before {

@@ -8,7 +8,6 @@ function ArrayReader(data) {
         data[i] = data[i] & 0xFF;
     }
 }
-
 utils.inherits(ArrayReader, DataReader);
 /**
  * @see DataReader.byteAt

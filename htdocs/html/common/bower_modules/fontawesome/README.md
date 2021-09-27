@@ -117,7 +117,6 @@ We've kept attribution comments terse, so we ask that you do not actively work t
 code. They're a great way for folks to learn about Font Awesome.
 
 ## Team
-
 * [Dave Gandy](https://github.com/davegandy)
 * [Travis Chase](https://github.com/supercodepoet)
 * [Rob Madole](https://github.com/robmadole)

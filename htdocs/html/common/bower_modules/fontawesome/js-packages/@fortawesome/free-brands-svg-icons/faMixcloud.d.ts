@@ -1,5 +1,4 @@
 import {IconDefinition, IconPrefix, IconName} from "@fortawesome/fontawesome-common-types";
-
 export const definition: IconDefinition;
 export const faMixcloud: IconDefinition;
 export const prefix: IconPrefix;

@@ -22,6 +22,7 @@ name         | type      | description
 relativePath | string    | the filename and its path, relative to the current folder.
 file         | ZipObject | the current file. See [ZipObject]({{site.baseurl}}/documentation/api_zipobject.html).
 
+
 ## Examples
 
 ```js
@@ -32,7 +33,7 @@ zip.file("test/index.html", "...");
 zip.file("test/asserts/file.js", "...");
 zip.file("test/asserts/generate.js", "...");
 
-zip.folder("test").forEach(function (relativePath, file) {
+zip.folder("test").forEach(function (relativePath, file){
     console.log("iterating over", relativePath);
 });
 

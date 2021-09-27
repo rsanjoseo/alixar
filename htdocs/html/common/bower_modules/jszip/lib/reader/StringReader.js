@@ -5,7 +5,6 @@ var utils = require('../utils');
 function StringReader(data) {
     DataReader.call(this, data);
 }
-
 utils.inherits(StringReader, DataReader);
 /**
  * @see DataReader.byteAt

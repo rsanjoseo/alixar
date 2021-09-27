@@ -1,5 +1,5 @@
 define([
-    'jquery'
+  'jquery'
 ], function ($) {
     function oldMatcher(matcher) {
         function wrappedMatcher(params, data) {

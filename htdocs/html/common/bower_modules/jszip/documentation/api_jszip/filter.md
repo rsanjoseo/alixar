@@ -24,15 +24,16 @@ file         | ZipObject | the file being tested. See [ZipObject]({{site.baseurl
 
 The predicate must return true if the file should be included, false otherwise.
 
+
 ## Examples
 
 ```js
 var zip = new JSZip().folder("dir");
 zip.file("readme.txt", "content");
-zip.filter(function (relativePath, file) {
-    // relativePath == "readme.txt"
-    // file = {name:"dir/readme.txt",options:{...},async:function}
-    return true / false;
+zip.filter(function (relativePath, file){
+  // relativePath == "readme.txt"
+  // file = {name:"dir/readme.txt",options:{...},async:function}
+  return true/false;
 });
 ```
 

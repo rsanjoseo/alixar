@@ -1,16 +1,13 @@
 div.dts {
     display: block !important;
 }
-
 div.dts tbody th,
 div.dts tbody td {
     white-space: nowrap;
 }
-
 div.dts div.dts_loading {
     z-index: 1;
 }
-
 div.dts div.dts_label {
     position: absolute;
     right: 10px;
@@ -23,15 +20,12 @@ div.dts div.dts_label {
     z-index: 2;
     display: none;
 }
-
 div.dts div.dataTables_scrollBody {
     background: repeating-linear-gradient(45deg, #edeeff, #edeeff 10px, white 10px, white 20px);
 }
-
 div.dts div.dataTables_scrollBody table {
     z-index: 2;
 }
-
 div.dts div.dataTables_paginate,
 div.dts div.dataTables_length {
     display: none;

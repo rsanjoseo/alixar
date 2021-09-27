@@ -349,9 +349,9 @@ function ZipFileWorker(streamFiles, comment, platform, encodeFileName) {
     this.currentFile = null;
 
 
+
     this._sources = [];
 }
-
 utils.inherits(ZipFileWorker, GenericWorker);
 
 /**

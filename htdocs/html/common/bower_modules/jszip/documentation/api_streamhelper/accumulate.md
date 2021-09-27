@@ -23,10 +23,10 @@ the [`on` method]({{site.baseurl}}/documentation/api_streamhelper/on.html)).
 
 ```js
 zip
-    .generateInternalStream({type: "uint8array"})
-    .accumulate(function updateCallback(metadata) {
-        // metadata contains for example currentFile and percent, see the generateInternalStream doc.
-    }).then(function (data) {
-        // data contains here the complete zip file as a uint8array (the type asked in generateInternalStream)
-    });
+.generateInternalStream({type:"uint8array"})
+.accumulate(function updateCallback(metadata) {
+    // metadata contains for example currentFile and percent, see the generateInternalStream doc.
+}).then(function (data) {
+    // data contains here the complete zip file as a uint8array (the type asked in generateInternalStream)
+});
 ```

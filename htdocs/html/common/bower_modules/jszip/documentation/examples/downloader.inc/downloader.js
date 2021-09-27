@@ -1,3 +1,4 @@
+
 var Promise = window.Promise;
 if (!Promise) {
     Promise = JSZip.external.Promise;

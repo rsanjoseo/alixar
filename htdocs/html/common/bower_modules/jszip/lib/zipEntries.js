@@ -5,7 +5,6 @@ var sig = require('./signature');
 var ZipEntry = require('./zipEntry');
 var utf8 = require('./utf8');
 var support = require('./support');
-
 //  class ZipEntries {{{
 /**
  * All the entries in the zip file.
@@ -16,7 +15,6 @@ function ZipEntries(loadOptions) {
     this.files = [];
     this.loadOptions = loadOptions;
 }
-
 ZipEntries.prototype = {
     /**
      * Check that the reader is on the specified signature.

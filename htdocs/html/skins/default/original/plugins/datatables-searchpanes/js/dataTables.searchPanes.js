@@ -6,12 +6,10 @@
 
     var $;
     var DataTable;
-
     function setJQuery(jq) {
         $ = jq;
         DataTable = jq.fn.dataTable;
     }
-
     var SearchPane = /** @class */ (function () {
         /**
          * Creates the panes, sets up the search function
@@ -181,7 +179,6 @@
             });
             return this;
         }
-
         /**
          * In the case of a rebuild there is potential for new data to have been included or removed
          * so all of the rowData must be reset as a precaution.
@@ -1510,12 +1507,10 @@
 
     var $$1;
     var DataTable$1;
-
     function setJQuery$1(jq) {
         $$1 = jq;
         DataTable$1 = jq.fn.dataTable;
     }
-
     var SearchPanes = /** @class */ (function () {
         function SearchPanes(paneSettings, opts, fromInit) {
             var _this = this;
@@ -1599,7 +1594,6 @@
             }
             return this;
         }
-
         /**
          * Clear the selections of all of the panes
          */
@@ -2613,7 +2607,6 @@
             },
             text: 'Search Panes'
         };
-
         function _init(settings, fromPre) {
             if (fromPre === void 0) {
                 fromPre = false;
@@ -2624,7 +2617,6 @@
             var node = searchPanes.getNode();
             return node;
         }
-
         // Attach a listener to the document which listens for DataTables initialisation
         // events so we can automatically initialise
         $(document).on('preInit.dt.dtsp', function (e, settings, json) {

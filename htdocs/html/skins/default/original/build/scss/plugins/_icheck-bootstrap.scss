@@ -47,7 +47,6 @@
       border-color: $gray-600;
     }
   }
-
   // iCheck colors (theme colors)
   @each $name, $color in $theme-colors-alt {
     .icheck-#{$name} > input:first-child:not(:checked):not(:disabled):hover + label::before,

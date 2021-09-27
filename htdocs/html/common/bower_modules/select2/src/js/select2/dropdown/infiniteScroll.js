@@ -1,5 +1,5 @@
 define([
-    'jquery'
+  'jquery'
 ], function ($) {
     function InfiniteScroll(decorated, $element, options, dataAdapter) {
         this.lastParams = {};

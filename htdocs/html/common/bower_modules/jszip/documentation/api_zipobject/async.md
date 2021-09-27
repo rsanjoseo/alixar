@@ -60,15 +60,16 @@ zip.file("image.png").async("uint8array", function updateCallback(metadata) {
 })
 ```
 
+
 ## Other examples
 
 ```js
 zip
-    .file("my_text.txt")
-    .async("string")
-    .then(function success(content) {
-        // use the content
-    }, function error(e) {
-        // handle the error
-    });
+.file("my_text.txt")
+.async("string")
+.then(function success(content) {
+    // use the content
+}, function error(e) {
+    // handle the error
+});
 ```

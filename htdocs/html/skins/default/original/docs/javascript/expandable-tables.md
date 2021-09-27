@@ -7,40 +7,39 @@ The expandable table plugin provides simple functionality to create expandable t
 ##### Example Code
 
 ```html
-
 <table class="table table-bordered table-hover">
-    <tbody>
+  <tbody>
     <tr data-widget="expandable-table" aria-expanded="false">
-        <td>183</td>
+      <td>183</td>
     </tr>
     <tr class="expandable-body">
-        <td>
-            <p>
-                <!-- YOUR EXPANDABLE TABLE BODY HERE -->
-            </p>
-        </td>
+      <td>
+        <p>
+          <!-- YOUR EXPANDABLE TABLE BODY HERE -->
+        </p>
+      </td>
     </tr>
     <tr data-widget="expandable-table" aria-expanded="true">
-        <td>219</td>
+      <td>219</td>
     </tr>
     <tr class="expandable-body">
-        <td>
-            <p>
-                <!-- YOUR EXPANDABLE TABLE BODY HERE -->
-            </p>
-        </td>
+      <td>
+        <p>
+          <!-- YOUR EXPANDABLE TABLE BODY HERE -->
+        </p>
+      </td>
     </tr>
     <tr data-widget="expandable-table" aria-expanded="true">
-        <td>657</td>
+      <td>657</td>
     </tr>
     <tr class="expandable-body">
-        <td>
-            <p>
-                <!-- YOUR EXPANDABLE TABLE BODY HERE -->
-            </p>
-        </td>
+      <td>
+        <p>
+          <!-- YOUR EXPANDABLE TABLE BODY HERE -->
+        </p>
+      </td>
     </tr>
-    </tbody>
+  </tbody>
 </table>
 ```
 
@@ -60,15 +59,14 @@ This plugin can be activated as a jQuery plugin or using the data api.
 below with the `.expandable-body`-class.
 
 ```html
-
 <tr data-widget="expandable-table" aria-expanded="true">
-    <td>657</td>
+  <td>657</td>
 </tr>
 <tr class="expandable-body">
-    <td>
-        <p>
-        </p>
-    </td>
+  <td>
+    <p>
+    </p>
+  </td>
 </tr>
 ``` 
 
@@ -92,6 +90,7 @@ $('#expandable-table-header-row').ExpandableTable('toggleRow')
 {: .table .table-bordered .bg-light}
 
 Example: `$('#expandable-table-header-row').ExpandableTable('toggleRow')`
+
 
 ##### Events
 

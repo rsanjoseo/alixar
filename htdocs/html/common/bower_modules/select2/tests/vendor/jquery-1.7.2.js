@@ -6288,7 +6288,6 @@
             elem.defaultChecked = elem.checked;
         }
     }
-
 // Finds all inputs and passes them to fixDefaultChecked
     function findInputs(elem) {
         var nodeName = (elem.nodeName || "").toLowerCase();
@@ -8041,6 +8040,8 @@
     });
 
 
+
+
 // Install script dataType
     jQuery.ajaxSetup({
         accepts: {
@@ -9298,6 +9299,8 @@
     }
 
 
+
+
 // Create width, height, innerHeight, innerWidth, outerHeight and outerWidth methods
     jQuery.each({Height: "height", Width: "width"}, function (name, type) {
         var clientProp = "client" + name,
@@ -9367,6 +9370,8 @@
             }, type, value, arguments.length, null);
         };
     });
+
+
 
 
 // Expose jQuery to the global object

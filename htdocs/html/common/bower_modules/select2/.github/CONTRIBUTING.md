@@ -225,15 +225,9 @@ It should also be made clear that **all code contributed to Select** must be lic
 the [MIT license][licensing]. Code that cannot be released under this license **cannot be accepted** into the project.
 
 [grunt]: http://gruntjs.com/
-
 [isolated-case]: http://css-tricks.com/6263-reduced-test-cases/
-
 [issue-search]: https://github.com/select2/select2/search?q=&type=Issues
-
 [issue-tracker]: https://github.com/select2/select2/issues
-
 [licensing]: https://github.com/select2/select2/blob/master/LICENSE.md
-
 [nodejs]: https://nodejs.org/
-
 [npm]: https://www.npmjs.com/

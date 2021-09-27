@@ -498,20 +498,16 @@ html.maximized-card {
       background-color: lighten($dark, 5%);
       color: $white;
     }
-
     .nav.flex-column > li {
       border-bottom-color: $gray-600;
     }
-
     .card-footer {
       background-color: rgba($black, .1);
     }
-
     &.card-outline-tabs .card-header a:hover {
       border-color: $gray-600;
       border-bottom-color: transparent;
     }
-
     &:not(.card-outline) > .card-header a.active {
       color: $white;
     }
@@ -519,11 +515,9 @@ html.maximized-card {
 
   .card-comments {
     background-color: lighten($dark, 1.25%);
-
     .username {
       color: $gray-400;
     }
-
     .card-comment {
       border-bottom-color: lighten($dark, 7.5%);
     }

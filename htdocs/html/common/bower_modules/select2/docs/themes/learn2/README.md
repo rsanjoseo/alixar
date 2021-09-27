@@ -82,6 +82,7 @@ Manually updating Learn2 is pretty simple. Here is what you will need to do to g
 * "Chapter" template
 * Error view template
 
+
 ## Setup
 
 If you want to set Learn2 as the default theme, you can do so by following these steps:

@@ -3,7 +3,6 @@
     position: relative;
     line-height: 1.5;
 }
-
 .CodeMirror-Tern-completion:before {
     position: absolute;
     left: 2px;
@@ -19,37 +18,30 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
 .CodeMirror-Tern-completion-unknown:before {
     content: "?";
     background: #4bb;
 }
-
 .CodeMirror-Tern-completion-object:before {
     content: "O";
     background: #77c;
 }
-
 .CodeMirror-Tern-completion-fn:before {
     content: "F";
     background: #7c7;
 }
-
 .CodeMirror-Tern-completion-array:before {
     content: "A";
     background: #c66;
 }
-
 .CodeMirror-Tern-completion-number:before {
     content: "1";
     background: #999;
 }
-
 .CodeMirror-Tern-completion-string:before {
     content: "S";
     background: #999;
 }
-
 .CodeMirror-Tern-completion-bool:before {
     content: "B";
     background: #999;

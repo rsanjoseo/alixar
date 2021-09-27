@@ -15,22 +15,19 @@ This plugin can be activated as a jQuery plugin or using the data api.
 Add `data-widget="treeview"` to any `ul` or `ol` element to activate the plugin.
 
 ```html
-
 <ul data-widget="treeview">
-    <li><a href="#">One Level</a></li>
-    <li class="treeview">
-        <a href="#">Multilevel</a>
-        <ul class="treeview-menu">
-            <li><a href="#">Level 2</a></li>
-        </ul>
-    </li>
+  <li><a href="#">One Level</a></li>
+  <li class="treeview">
+    <a href="#">Multilevel</a>
+    <ul class="treeview-menu">
+      <li><a href="#">Level 2</a></li>
+    </ul>
+  </li>
 </ul>
 ```
 
 ###### jQuery
-
 {: .text-bold }
-
 ```js
 $('ul').Treeview(options)
 ```

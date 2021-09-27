@@ -5,7 +5,6 @@ var utils = require('../utils');
 function Uint8ArrayReader(data) {
     ArrayReader.call(this, data);
 }
-
 utils.inherits(Uint8ArrayReader, ArrayReader);
 /**
  * @see DataReader.readData

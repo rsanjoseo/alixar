@@ -10,13 +10,11 @@ This plugin can be activated as a jQuery plugin or using the data api. To activa
 HTML markup to your layout, then create the toggle button as shown below.
 
 ###### HTML Markup
-
 {: .text-bold }
-
 ```html
 <!-- Control Sidebar -->
 <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
+  <!-- Control sidebar content goes here -->
 </aside>
 <!-- /.control-sidebar -->
 ```
@@ -61,6 +59,7 @@ String | `.control-sidebar` | Target control-sidebar to handle multiple control-
 |collapsed.lte.controlsidebar | Triggered after a control sidebar collapses. {: .table .table-bordered .bg-light}
 
 Example: `$('#toggle-button').on('expanded.lte.controlsidebar', handleExpandedEvent)`
+
 
 ##### Methods
 

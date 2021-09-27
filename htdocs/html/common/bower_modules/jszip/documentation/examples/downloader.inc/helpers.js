@@ -17,7 +17,6 @@ function showMessage(text) {
         .addClass("alert alert-success")
         .text(text);
 }
-
 /**
  * show an error message.
  * @param {String} text the text to show.
@@ -28,7 +27,6 @@ function showError(text) {
         .addClass("alert alert-danger")
         .text(text);
 }
-
 /**
  * Update the progress bar.
  * @param {Integer} percent the current percent

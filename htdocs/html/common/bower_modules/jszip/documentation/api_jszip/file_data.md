@@ -47,9 +47,9 @@ You can use a Promise of content directly to simplify async content handling. Le
 
 // instead of
 $.get("url/to.file.txt") // jQuery v3 returns promises
-    .then(function (content) {
-        zip.file("file.txt", content);
-    })
+.then(function (content) {
+    zip.file("file.txt", content);
+})
 
 // you can do
 var promise = $.get("url/to.file.txt");
@@ -70,7 +70,7 @@ var promise = new Promise(function (resolve, reject) {
         if (error) {
             reject(error);
         } else {
-            resolve(body);
+          resolve(body);
         }
     });
 });
@@ -215,6 +215,7 @@ zip.file("script.sh", "#!/bin/bash", {
 });
 ```
 
+
 ### `dir` option
 
 If `dir` is true or if a permission says it's a folder, this entry be flagged as a folder and the content will be
@@ -240,7 +241,7 @@ zip.file("smile.gif", arraybufferFromXhr);
 // or on nodejs
 zip.file("smile.gif", fs.readFileSync("smile.gif"));
 
-zip.file("Xmas.txt", "Ho ho ho !", {date: new Date("December 25, 2007 00:00:01")});
+zip.file("Xmas.txt", "Ho ho ho !", {date : new Date("December 25, 2007 00:00:01")});
 zip.file("folder/file.txt", "file in folder");
 
 zip.file("animals.txt", "dog,platypus\n").file("people.txt", "james,sebastian\n");

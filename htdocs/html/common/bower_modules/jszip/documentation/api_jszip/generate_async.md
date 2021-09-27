@@ -160,6 +160,7 @@ zip.generateAsync({
 });
 ```
 
+
 ### `streamFiles` option
 
 In a zip file, the size and the crc32 of the content are placed before the actual content: to write it we must process
@@ -189,9 +190,9 @@ percent     | number | the percent of completion (a double between 0 and 100)
 currentFile | string | the name of the current file being processed, if any.
 
 ```js
-zip.generateAsync({type: "blob"}, function updateCallback(metadata) {
+zip.generateAsync({type:"blob"}, function updateCallback(metadata) {
     console.log("progression: " + metadata.percent.toFixed(2) + " %");
-    if (metadata.currentFile) {
+    if(metadata.currentFile) {
         console.log("current file = " + metadata.currentFile);
     }
 })
@@ -200,18 +201,18 @@ zip.generateAsync({type: "blob"}, function updateCallback(metadata) {
 ## Other examples
 
 ```js
-zip.generateAsync({type: "blob"})
-    .then(function (content) {
-        // see FileSaver.js
-        saveAs(content, "hello.zip");
-    });
+zip.generateAsync({type:"blob"})
+.then(function (content) {
+    // see FileSaver.js
+    saveAs(content, "hello.zip");
+});
 ```
 
 ```js
-zip.generateAsync({type: "base64"})
-    .then(function (content) {
-        location.href = "data:application/zip;base64," + content;
-    });
+zip.generateAsync({type:"base64"})
+.then(function (content) {
+    location.href="data:application/zip;base64,"+content;
+});
 ```
 
 ```js
@@ -221,12 +222,11 @@ zip.folder("folder_1").folder("folder_2").file("hello.txt", "hello");
 // folder_1/folder_2/
 // folder_1/folder_2/hello.txt
 
-zip.folder("folder_1").generateAsync({type: "nodebuffer"})
-    .then(function (content) {
-        // relative to folder_1/, this file only contains:
-        // folder_2/
-        // folder_2/hello.txt
-        require("fs").writeFile("hello.zip", content, function (err) {/*...*/
-        });
-    });
+zip.folder("folder_1").generateAsync({type:"nodebuffer"})
+.then(function (content) {
+    // relative to folder_1/, this file only contains:
+    // folder_2/
+    // folder_2/hello.txt
+    require("fs").writeFile("hello.zip", content, function(err){/*...*/});
+});
 ```

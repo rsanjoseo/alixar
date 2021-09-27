@@ -17,7 +17,7 @@ called `.my-custom-style`.
 // Custom Theme Color START
 $custom-color: #00FF00;
 $theme-colors: map-merge((
-        'custom-color': $custom-color,
+    'custom-color': $custom-color,
 ), $theme-colors);
 // Custom Theme Color END
 
@@ -40,10 +40,8 @@ $theme-colors: map-merge((
   background-color: $custom-color;
   padding: .5rem 0;
 }
-
 // Custom Style END
 ```
-
 {: .max-height-300}
 
 You can also create a skin on top of AdminLTE with the following SCSS template.
@@ -60,7 +58,7 @@ In this example we create a custom class called `.btn-custom-color` with a extra
 $custom-color: #00FF00;
 
 .btn-custom-color {
-  @include button-variant($custom-color, $custom-color);
+    @include button-variant($custom-color, $custom-color);
 }
 ```
 

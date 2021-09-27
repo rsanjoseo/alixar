@@ -3872,6 +3872,7 @@
 //>>docs: http://api.jqueryui.com/focusable-selector/
 
 
+
 // Selectors
     $.ui.focusable = function (element, hasTabindex) {
         var map, mapName, img, focusableIfVisible, fieldset,
@@ -3928,6 +3929,8 @@
     });
 
     var focusable = $.ui.focusable;
+
+
 
 
 // Support: IE8 Only
@@ -4013,6 +4016,7 @@
 //>>label: jQuery 1.7 Support
 //>>group: Core
 //>>description: Support version 1.7.x of jQuery core
+
 
 
 // Support: jQuery 1.7 only
@@ -4111,6 +4115,8 @@
         TAB: 9,
         UP: 38
     };
+
+
 
 
 // Internal use only
@@ -18700,6 +18706,8 @@
     }
 
     var widgetsTooltip = $.ui.tooltip;
+
+
 
 
 }));

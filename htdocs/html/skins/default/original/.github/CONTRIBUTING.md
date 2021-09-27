@@ -1,3 +1,4 @@
+
 # Contributing to AdminLTE
 
 Contributions are always **welcome and recommended**! Here is how for

@@ -54,6 +54,7 @@ Triggered after the overlay removed from the card. {: .table .table-bordered .bg
 
 Example: `$('#my-card [data-card-widget="card-refresh"]').on('loaded.lte.cardrefresh', handleLoadedEvent)`
 
+
 ##### Methods
 
 {: .mt-4}

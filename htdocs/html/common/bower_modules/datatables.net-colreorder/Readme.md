@@ -7,6 +7,7 @@ styling, [Bootstrap](http://getbootstrap.com) and [Foundation](http://foundation
 
 ColReorder allows the end user to modify the column order of a table through drop-and-drag of column headers.
 
+
 ## Installation
 
 ### Browser

@@ -463,7 +463,6 @@ function publishRejection(promise) {
 function notifyRejectionHandled(promise) {
     global.process.emit('rejectionHandled', promise);
 }
-
 /**
  * @class
  */
@@ -604,7 +603,6 @@ var meaninglessTransform = {
 function isReserved(name) {
     return ~RESERVED_CLASSES.indexOf(name);
 }
-
 function insertCss(css) {
     if (!css || !IS_DOM) {
         return;
@@ -628,9 +626,7 @@ function insertCss(css) {
     DOCUMENT.head.insertBefore(style, beforeChild);
     return css;
 }
-
 var idPool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
 function nextUniqueId() {
     var size = 12;
     var id = '';
@@ -641,7 +637,6 @@ function nextUniqueId() {
 
     return id;
 }
-
 function toArray(obj) {
     var array = [];
 
@@ -651,7 +646,6 @@ function toArray(obj) {
 
     return array;
 }
-
 function classArray(node) {
     if (node.classList) {
         return toArray(node.classList);
@@ -661,7 +655,6 @@ function classArray(node) {
         });
     }
 }
-
 function getIconName(familyPrefix, cls) {
     var parts = cls.split('-');
     var prefix = parts[0];
@@ -673,27 +666,22 @@ function getIconName(familyPrefix, cls) {
         return null;
     }
 }
-
 function htmlEscape(str) {
     return "".concat(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-
 function joinAttributes(attributes) {
     return Object.keys(attributes || {}).reduce(function (acc, attributeName) {
         return acc + "".concat(attributeName, "=\"").concat(htmlEscape(attributes[attributeName]), "\" ");
     }, '').trim();
 }
-
 function joinStyles(styles) {
     return Object.keys(styles || {}).reduce(function (acc, styleName) {
         return acc + "".concat(styleName, ": ").concat(styles[styleName], ";");
     }, '');
 }
-
 function transformIsMeaningful(transform) {
     return transform.size !== meaninglessTransform.size || transform.x !== meaninglessTransform.x || transform.y !== meaninglessTransform.y || transform.rotate !== meaninglessTransform.rotate || transform.flipX || transform.flipY;
 }
-
 function transformForSvg(_ref) {
     var transform = _ref.transform,
         containerWidth = _ref.containerWidth,
@@ -716,7 +704,6 @@ function transformForSvg(_ref) {
         path: path
     };
 }
-
 function transformForCss(_ref2) {
     var transform = _ref2.transform,
         _ref2$width = _ref2.width,
@@ -999,7 +986,6 @@ function makeInlineSvgAbstract(params) {
         return asIcon(args);
     }
 }
-
 function makeLayersTextAbstract(params) {
     var content = params.content,
         width = params.width,
@@ -1057,7 +1043,6 @@ function makeLayersTextAbstract(params) {
 
     return val;
 }
-
 function makeLayersCounterAbstract(params) {
     var content = params.content,
         title = params.title,
@@ -1261,15 +1246,12 @@ var build = function build() {
     }, {});
 };
 build();
-
 function byUnicode(prefix, unicode) {
     return (_byUnicode[prefix] || {})[unicode];
 }
-
 function byLigature(prefix, ligature) {
     return (_byLigature[prefix] || {})[ligature];
 }
-
 function byOldName(name) {
     return _byOldName[name] || {
         prefix: null,
@@ -1285,7 +1267,6 @@ var emptyCanonicalIcon = function emptyCanonicalIcon() {
         rest: []
     };
 };
-
 function getCanonicalIcon(values) {
     return values.reduce(function (acc, cls) {
         var iconName = getIconName(config.familyPrefix, cls);
@@ -1305,7 +1286,6 @@ function getCanonicalIcon(values) {
         return acc;
     }, emptyCanonicalIcon());
 }
-
 function iconFromMapping(mapping, prefix, iconName) {
     if (mapping && mapping[prefix] && mapping[prefix][iconName]) {
         return {
@@ -1422,19 +1402,14 @@ function perform(mutations, callback) {
         });
     }
 }
-
 var disabled = false;
-
 function disableObservation() {
     disabled = true;
 }
-
 function enableObservation() {
     disabled = false;
 }
-
 var mo = null;
-
 function observe(options) {
     if (!MUTATION_OBSERVER) {
         return;
@@ -1486,7 +1461,6 @@ function observe(options) {
         subtree: true
     });
 }
-
 function disconnect() {
     if (!mo) return;
     mo.disconnect();
@@ -1663,7 +1637,6 @@ function blankMeta() {
         }
     };
 }
-
 function parseMeta(node) {
     var _classParser = classParser(node),
         iconName = _classParser.iconName,
@@ -1697,7 +1670,6 @@ function MissingIcon(error) {
     this.message = error || 'Icon unavailable';
     this.stack = new Error().stack;
 }
-
 MissingIcon.prototype = Object.create(Error.prototype);
 MissingIcon.prototype.constructor = MissingIcon;
 
@@ -1772,7 +1744,6 @@ var missing = {
 };
 
 var styles$2 = namespace.styles;
-
 function asFoundIcon(icon) {
     var width = icon[0];
     var height = icon[1];
@@ -1822,7 +1793,6 @@ function asFoundIcon(icon) {
         icon: element
     };
 }
-
 function findIcon(iconName, prefix) {
     return new picked(function (resolve, reject) {
         var val = {
@@ -1998,7 +1968,6 @@ function onTree(root) {
         });
     });
 }
-
 function onNode(node) {
     var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     generateMutation(node).then(function (mutation) {

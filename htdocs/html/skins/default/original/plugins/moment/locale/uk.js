@@ -21,7 +21,6 @@
                 ? forms[1]
                 : forms[2];
     }
-
     function relativeTimeWithPlural(number, withoutSuffix, key) {
         var format = {
             ss: withoutSuffix ? 'секунда_секунди_секунд' : 'секунду_секунди_секунд',
@@ -39,7 +38,6 @@
             return number + ' ' + plural(format[key], +number);
         }
     }
-
     function weekdaysCaseReplace(m, format) {
         var weekdays = {
                 nominative: 'неділя_понеділок_вівторок_середа_четвер_п’ятниця_субота'.split(
@@ -70,7 +68,6 @@
                 : 'nominative';
         return weekdays[nounCase][m.day()];
     }
-
     function processHoursFunction(str) {
         return function () {
             return str + 'о' + (this.hours() === 11 ? 'б' : '') + '] LT';

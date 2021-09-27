@@ -13,7 +13,6 @@ This plugin can be activated as a jQuery plugin or using the data api.
 {: .text-bold } Add `data-widget="chat-pane-toggle"` to a button to activate the plugin.
 
 ```html
-
 <button class="btn btn-primary" data-widget="chat-pane-toggle">Toggle Chat Pane</button>
 ``` 
 
@@ -25,6 +24,7 @@ pane.
 ```js
 $('#chat-pane-toggle').DirectChat('toggle')
 ```
+
 
 ##### Methods
 

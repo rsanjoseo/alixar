@@ -15,7 +15,7 @@ var sed = sh.sed;
 
 // Blame TC39... https://github.com/benjamingr/RegExp.escape/issues/37
 RegExp.quote = function (string) {
-    return string.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
+  return string.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
 };
 RegExp.quoteReplacement = function (string) {
     return string.replace(/[$]/g, '$$');

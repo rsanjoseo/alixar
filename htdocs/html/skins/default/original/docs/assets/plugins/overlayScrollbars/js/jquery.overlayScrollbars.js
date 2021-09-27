@@ -60,7 +60,6 @@
             var cssCache = {};
             var cssPrefixes = ['-webkit-', '-moz-', '-o-', '-ms-'];
             var jsPrefixes = ['WebKit', 'Moz', 'O', 'MS'];
-
             function firstLetterToUpper(str) {
                 return str.charAt(0).toUpperCase() + str.slice(1);
             }
@@ -146,7 +145,6 @@
             function windowSize(x) {
                 return x ? window.innerWidth || document.documentElement[LEXICON.cW] || document.body[LEXICON.cW] : window.innerHeight || document.documentElement[LEXICON.cH] || document.body[LEXICON.cH];
             }
-
             function bind(func, thisObj) {
                 if (typeof func != TYPES.f) {
                     throw "Can't bind function!";
@@ -3232,7 +3230,6 @@
                         if (doClearInterval && _autoUpdateRecommended)
                             clearInterval(textareaUpdateIntervalID);
                     }
-
                     function textareaOnScroll(event) {
                         _targetElement[_strScrollLeft](_rtlScrollBehavior.i && _normalizeRTLCache ? 9999999 : 0);
                         _targetElement[_strScrollTop](0);
@@ -3240,26 +3237,22 @@
                         COMPATIBILITY.stpP(event);
                         return false;
                     }
-
                     function textareaOnDrop(event) {
                         setTimeout(function () {
                             if (!_destroyed)
                                 updateTextarea();
                         }, 50);
                     }
-
                     function textareaOnFocus() {
                         _textareaHasFocus = true;
                         addClass(_hostElement, strFocus);
                     }
-
                     function textareaOnFocusout() {
                         _textareaHasFocus = false;
                         textareaKeyDownKeyCodesList = [];
                         removeClass(_hostElement, strFocus);
                         updateTextarea(true);
                     }
-
                     function textareaOnKeyDown(event) {
                         var keyCode = event.keyCode;
 
@@ -3272,7 +3265,6 @@
                                 textareaKeyDownKeyCodesList.push(keyCode);
                         }
                     }
-
                     function textareaOnKeyUp(event) {
                         var keyCode = event.keyCode;
                         var index = inArray(keyCode, textareaKeyDownKeyCodesList);
@@ -3284,7 +3276,6 @@
                                 updateTextarea(true);
                         }
                     }
-
                     function contentOnTransitionEnd(event) {
                         if (_autoUpdateCache === true)
                             return;
@@ -3292,7 +3283,6 @@
                         if (isSizeAffectingCSSProperty(event.propertyName))
                             _base.update(_strAuto);
                     }
-
                     function viewportOnScroll(event) {
                         if (!_sleeping) {
                             if (scrollStopTimeoutId !== undefined)
@@ -3378,7 +3368,6 @@
                             _handle: handle
                         };
                     };
-
                     function resetScrollbarDOM(isHorizontal) {
                         var scrollbarVars = getScrollbarVars(isHorizontal);
                         var scrollbar = scrollbarVars._scrollbar;
@@ -3393,7 +3382,6 @@
                             remove(scrollbar || selectOrGenerateScrollbarDOM(isHorizontal)._scrollbar);
                         }
                     }
-
                     var horizontalElements;
                     var verticalElements;
 
@@ -3442,39 +3430,31 @@
                     function getPointerPosition(event) {
                         return _msieVersion && insideIFrame ? event['screen' + XY] : COMPATIBILITY.page(event)[xy]; //use screen coordinates in EDGE & IE because the page values are incorrect in frames.
                     }
-
                     function getPreparedScrollbarsOption(name) {
                         return _currentPreparedOptions.scrollbars[name];
                     }
-
                     function increaseTrackScrollAmount() {
                         scrollDurationFactor = 0.5;
                     }
-
                     function decreaseTrackScrollAmount() {
                         scrollDurationFactor = 1;
                     }
-
                     function stopClickEventPropagation(event) {
                         COMPATIBILITY.stpP(event);
                     }
-
                     function documentKeyDown(event) {
                         if (inArray(event.keyCode, increaseDecreaseScrollAmountKeyCodes) > -1)
                             increaseTrackScrollAmount();
                     }
-
                     function documentKeyUp(event) {
                         if (inArray(event.keyCode, increaseDecreaseScrollAmountKeyCodes) > -1)
                             decreaseTrackScrollAmount();
                     }
-
                     function onMouseTouchDownContinue(event) {
                         var originalEvent = event.originalEvent || event;
                         var isTouchEvent = originalEvent.touches !== undefined;
                         return _sleeping || _destroyed || nativeOverlayScrollbarsAreActive() || !_scrollbarsDragScrollingCache || (isTouchEvent && !getPreparedScrollbarsOption('touchSupport')) ? false : COMPATIBILITY.mBtn(event) === 1 || isTouchEvent;
                     }
-
                     function documentDragMove(event) {
                         if (onMouseTouchDownContinue(event)) {
                             var trackLength = scrollbarVarsInfo._trackLength;
@@ -3497,7 +3477,6 @@
                         } else
                             documentMouseTouchUp(event);
                     }
-
                     function documentMouseTouchUp(event) {
                         event = event || event.originalEvent;
 
@@ -3543,12 +3522,10 @@
                                 refreshScrollbarsAutoHide(false);
                         }
                     }
-
                     function onHandleMouseTouchDown(event) {
                         if (onMouseTouchDownContinue(event))
                             onHandleMouseTouchDownAction(event);
                     }
-
                     function onHandleMouseTouchDownAction(event) {
                         mouseDownScroll = _viewportElement[scroll]();
                         mouseDownScroll = isNaN(mouseDownScroll) ? 0 : mouseDownScroll;
@@ -3575,7 +3552,6 @@
                             COMPATIBILITY.prvD(event);
                         COMPATIBILITY.stpP(event);
                     }
-
                     function onTrackMouseTouchDown(event) {
                         if (onMouseTouchDownContinue(event)) {
                             var handleToViewportRatio = scrollbarVars._info._handleLength / Math.round(MATH.min(1, _viewportSize[scrollbarVars._w_h] / _contentScrollSizeCache[scrollbarVars._w_h]) * scrollbarVars._info._trackLength);
@@ -3688,20 +3664,17 @@
                             COMPATIBILITY.stpP(event);
                         }
                     }
-
                     function onTrackMouseTouchEnter(event) {
                         //make sure both scrollbars will stay visible if one scrollbar is hovered if autoHide is "scroll" or "move".
                         _scrollbarsHandleHovered = true;
                         if (_scrollbarsAutoHideScroll || _scrollbarsAutoHideMove)
                             refreshScrollbarsAutoHide(true);
                     }
-
                     function onTrackMouseTouchLeave(event) {
                         _scrollbarsHandleHovered = false;
                         if (_scrollbarsAutoHideScroll || _scrollbarsAutoHideMove)
                             refreshScrollbarsAutoHide(false);
                     }
-
                     function onScrollbarMouseTouchDown(event) {
                         COMPATIBILITY.stpP(event);
                     }
@@ -3956,7 +3929,6 @@
                             documentMouseTouchUp(event);
                         }
                     }
-
                     function documentMouseTouchUp(event) {
                         var eventIsTrusted = event !== undefined;
 
@@ -3976,13 +3948,11 @@
                         }
                         reconnectMutationObserver = false;
                     }
-
                     function onMouseTouchDownContinue(event) {
                         var originalEvent = event.originalEvent || event;
                         var isTouchEvent = originalEvent.touches !== undefined;
                         return _sleeping || _destroyed ? false : COMPATIBILITY.mBtn(event) === 1 || isTouchEvent;
                     }
-
                     function getCoordinates(event) {
                         return _msieVersion && insideIFrame ? {
                             x: event.screenX,
@@ -4762,7 +4732,6 @@
                         updateScrollbarInfos();
                         completeCallback();
                     };
-
                     function checkSettingsStringValue(currValue, allowedValues) {
                         for (i = 0; i < allowedValues[strLength]; i++) {
                             if (currValue === allowedValues[i])
@@ -4770,7 +4739,6 @@
                         }
                         return false;
                     }
-
                     function getRawScroll(isX, coordinates) {
                         var coordinateProps = isX ? coordinatesXAxisProps : coordinatesYAxisProps;
                         coordinates = type(coordinates) == TYPES.s || type(coordinates) == TYPES.n ? [coordinates, coordinates] : coordinates;
@@ -4785,7 +4753,6 @@
                                     return coordinates[coordinateProps[i]];
                         }
                     }
-
                     function getFinalScroll(isX, rawScroll) {
                         var isString = type(rawScroll) == TYPES.s;
                         var operator;
@@ -4853,7 +4820,6 @@
                         }
                         return finalValue === currScroll ? undefined : finalValue;
                     }
-
                     function getPerAxisValue(value, valueInternalType, defaultValue, allowedValues) {
                         var resultDefault = [defaultValue, defaultValue];
                         var valueType = type(value);
@@ -4884,7 +4850,6 @@
                             value = resultDefault;
                         return {x: value[0], y: value[1]};
                     }
-
                     function generateMargin(marginTopRightBottomLeftArray) {
                         var result = [];
                         var currValue;

@@ -23,7 +23,7 @@ The most common situation is to use a string of text as your placeholder value.
 
 ```html
 <select class="js-example-placeholder-single js-states form-control">
-    <option></option>
+  <option></option>
 </select>
 ```
 

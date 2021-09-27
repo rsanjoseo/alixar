@@ -64,13 +64,13 @@ You can access the file content with `.file(name)` and
 
 ```js
 zip.file("hello.txt").async("string").then(function (data) {
-    // data is "Hello World\n"
+  // data is "Hello World\n"
 });
 
 if (JSZip.support.uint8array) {
-    zip.file("hello.txt").async("uint8array").then(function (data) {
-        // data is Uint8Array { 0=72, 1=101, 2=108, more...}
-    });
+  zip.file("hello.txt").async("uint8array").then(function (data) {
+    // data is Uint8Array { 0=72, 1=101, 2=108, more...}
+  });
 }
 ```
 
@@ -93,9 +93,9 @@ the user.
 ```js
 var promise = null;
 if (JSZip.support.uint8array) {
-    promise = zip.generateAsync({type: "uint8array"});
+  promise = zip.generateAsync({type : "uint8array"});
 } else {
-    promise = zip.generateAsync({type: "string"});
+  promise = zip.generateAsync({type : "string"});
 }
 ```
 
@@ -109,9 +109,9 @@ seems).
 var new_zip = new JSZip();
 // more files !
 new_zip.loadAsync(content)
-    .then(function (zip) {
-        // you now have every files contained in the loaded zip
-        zip.file("hello.txt").async("string"); // a promise of "Hello World\n"
-    });
+.then(function(zip) {
+    // you now have every files contained in the loaded zip
+    zip.file("hello.txt").async("string"); // a promise of "Hello World\n"
+});
 ```
 

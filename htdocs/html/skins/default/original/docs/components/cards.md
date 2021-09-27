@@ -6,7 +6,6 @@ The card component is the most widely used component through out this template. 
 displaying charts to just blocks of text. It comes in many different styles that we will explore below.
 
 ##### Default Card Markup
-
 {: .text-bold .text-dark .mt-5}
 
 
@@ -26,40 +25,36 @@ displaying charts to just blocks of text. It comes in many different styles that
 </div>
 
 ```html
-
 <div class="card">
-    <div class="card-header">
-        <h3 class="card-title">Default Card Example</h3>
-        <div class="card-tools">
-            <!-- Buttons, labels, and many other things can be placed here! -->
-            <!-- Here is a label for example -->
-            <span class="badge badge-primary">Label</span>
-        </div>
-        <!-- /.card-tools -->
+  <div class="card-header">
+    <h3 class="card-title">Default Card Example</h3>
+    <div class="card-tools">
+      <!-- Buttons, labels, and many other things can be placed here! -->
+      <!-- Here is a label for example -->
+      <span class="badge badge-primary">Label</span>
     </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-        The body of the card
-    </div>
-    <!-- /.card-body -->
-    <div class="card-footer">
-        The footer of the card
-    </div>
-    <!-- /.card-footer -->
+    <!-- /.card-tools -->
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    The body of the card
+  </div>
+  <!-- /.card-body -->
+  <div class="card-footer">
+    The footer of the card
+  </div>
+  <!-- /.card-footer -->
 </div>
 <!-- /.card -->
 ```
-
 {: .max-height-300}
 
 ##### Card Variants
-
 {: .text-bold .text-dark .mt-5}
 
 You can change the style of the card by adding any of the contextual classes.
 
 ###### Default
-
 {: .text-bold .text-dark}
 
 <div class="row">
@@ -172,7 +167,6 @@ You can change the style of the card by adding any of the contextual classes.
 </div>
 
 ```html
-
 <div class="card">...</div>
 <div class="card card-primary">...</div>
 <div class="card card-secondary">...</div>
@@ -184,7 +178,6 @@ You can change the style of the card by adding any of the contextual classes.
 ```
 
 ###### Outline
-
 {: .text-bold .text-dark}
 
 <div class="row">
@@ -284,7 +277,6 @@ You can change the style of the card by adding any of the contextual classes.
 </div>
 
 ```html
-
 <div class="card card-outline card-primary">...</div>
 <div class="card card-outline card-secondary">...</div>
 <div class="card card-outline card-success">...</div>
@@ -294,8 +286,8 @@ You can change the style of the card by adding any of the contextual classes.
 <div class="card card-outline card-dark">...</div>
 ```
 
-###### Background Color
 
+###### Background Color
 {: .text-bold .text-dark}
 
 <div class="row">
@@ -395,7 +387,6 @@ You can change the style of the card by adding any of the contextual classes.
 </div>
 
 ```html
-
 <div class="card bg-primary">...</div>
 <div class="card bg-secondary">...</div>
 <div class="card bg-success">...</div>
@@ -405,8 +396,8 @@ You can change the style of the card by adding any of the contextual classes.
 <div class="card bg-dark">...</div>
 ```
 
-###### Gradient Background Color
 
+###### Gradient Background Color
 {: .text-bold .text-dark}
 
 <div class="row">
@@ -506,7 +497,6 @@ You can change the style of the card by adding any of the contextual classes.
 </div>
 
 ```html
-
 <div class="card bg-gradient-primary">...</div>
 <div class="card bg-gradient-secondary">...</div>
 <div class="card bg-gradient-success">...</div>
@@ -515,6 +505,7 @@ You can change the style of the card by adding any of the contextual classes.
 <div class="card bg-gradient-danger">...</div>
 <div class="card bg-gradient-dark">...</div>
 ```
+
 
 ##### Card Tools
 
@@ -527,31 +518,28 @@ AdminLTE data-card-widget attribute provides cards with the ability to collapse 
 the card-tools which is placed in the card-header.
 
 ```html
-
 <div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">Card Tools</h3>
+  <div class="card-header">
+    <h3 class="card-title">Card Tools</h3>
 
-        <div class="card-tools">
-            <!-- This will cause the card to maximize when clicked -->
-            <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i>
-            </button>
-            <!-- This will cause the card to collapse when clicked -->
-            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-            <!-- This will cause the card to be removed when clicked -->
-            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-        </div>
-        <!-- /.card-tools -->
+    <div class="card-tools">
+      <!-- This will cause the card to maximize when clicked -->
+      <button type="button" class="btn btn-tool" data-card-widget="maximize"><i class="fas fa-expand"></i></button>
+      <!-- This will cause the card to collapse when clicked -->
+      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+      <!-- This will cause the card to be removed when clicked -->
+      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
     </div>
-    <!-- /.card-header -->
-    <div class="card-body">
-        The body of the card
-    </div>
-    <!-- /.card-body -->
+    <!-- /.card-tools -->
+  </div>
+  <!-- /.card-header -->
+  <div class="card-body">
+    The body of the card
+  </div>
+  <!-- /.card-body -->
 </div>
 <!-- /.card -->
 ```
-
 {: .max-height-300}
 
 ##### Loading Style
@@ -561,9 +549,8 @@ the card-tools which is placed in the card-header.
 To simulate a loading state, simply place this code before the `.card` closing tag.
 
 ```html
-
 <div class="overlay">
-    <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
 </div>
 ```
 
@@ -626,9 +613,8 @@ To simulate a loading state, simply place this code before the `.card` closing t
 You can also use a dark loading style with adding `.dark` to `.overlay` like this code.
 
 ```html
-
 <div class="overlay dark">
-    <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+  <i class="fas fa-2x fa-sync-alt fa-spin"></i>
 </div>
 ```
 

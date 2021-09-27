@@ -4,7 +4,6 @@
     line-height: 1.2em;
     font-size: 1em;
 }
-
 .cm-s-liquibyte .CodeMirror-focused .cm-matchhighlight {
     text-decoration: underline;
     text-decoration-color: #0f0;
@@ -170,36 +169,29 @@
     border: 1px solid #404040;
     border-radius: 5px;
 }
-
 .cm-s-liquibyte div.CodeMirror-simplescroll-vertical div {
     border-top: 1px solid #404040;
     border-bottom: 1px solid #404040;
 }
-
 .cm-s-liquibyte div.CodeMirror-simplescroll-horizontal div {
     border-left: 1px solid #404040;
     border-right: 1px solid #404040;
 }
-
 .cm-s-liquibyte div.CodeMirror-simplescroll-vertical {
     background-color: #262626;
 }
-
 .cm-s-liquibyte div.CodeMirror-simplescroll-horizontal {
     background-color: #262626;
     border-top: 1px solid #404040;
 }
-
 /* Overlay */
 .cm-s-liquibyte div.CodeMirror-overlayscroll-horizontal div, div.CodeMirror-overlayscroll-vertical div {
     background-color: #404040;
     border-radius: 5px;
 }
-
 .cm-s-liquibyte div.CodeMirror-overlayscroll-vertical div {
     border: 1px solid #404040;
 }
-
 .cm-s-liquibyte div.CodeMirror-overlayscroll-horizontal div {
     border: 1px solid #404040;
 }

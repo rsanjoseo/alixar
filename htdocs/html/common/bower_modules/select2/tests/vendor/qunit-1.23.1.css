@@ -158,7 +158,6 @@
     padding: 0.25em;
     color: #6B6464;
 }
-
 #qunit-tests li a:hover,
 #qunit-tests li a:focus {
     color: #000;
@@ -327,7 +326,6 @@
 
     border-bottom: 1px solid #FFF;
 }
-
 #qunit-testresult .module-name {
     font-weight: 700;
 }

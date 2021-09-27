@@ -42,12 +42,10 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-
 .bootstrap-duallistbox-container:not(.moveonselect) select {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
-
 .bootstrap-duallistbox-container .moveall,
 .bootstrap-duallistbox-container .removeall {
     width: 50%;

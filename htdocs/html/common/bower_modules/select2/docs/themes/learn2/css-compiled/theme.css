@@ -1,6 +1,5 @@
 @charset "UTF-8";
 @import url(//fonts.googleapis.com/css?family=Montserrat:400|Muli:300,400|Inconsolata);
-
 #top-github-link, #body #breadcrumbs {
     position: relative;
     top: 50%;
@@ -662,7 +661,6 @@ hr {
 #body a.anchor-link {
     color: #ccc;
 }
-
 #body a.anchor-link:hover {
     color: #1694CA;
 }
@@ -853,7 +851,6 @@ td {
     right: 50%;
     margin-top: 5px;
 }
-
 .tooltipped-s:before,
 .tooltipped-se:before,
 .tooltipped-sw:before {
@@ -881,7 +878,6 @@ td {
     bottom: 100%;
     margin-bottom: 5px;
 }
-
 .tooltipped-n:before,
 .tooltipped-ne:before,
 .tooltipped-nw:before {
@@ -913,7 +909,6 @@ td {
     margin-right: 5px;
     transform: translateY(50%);
 }
-
 .tooltipped-w:before {
     top: 50%;
     bottom: 50%;
@@ -928,7 +923,6 @@ td {
     margin-left: 5px;
     transform: translateY(50%);
 }
-
 .tooltipped-e:before {
     top: 50%;
     right: -5px;

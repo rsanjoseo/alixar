@@ -30,8 +30,8 @@ zip.file(/file/); // array of size 2
 // example with a relative path :
 var folder = zip.folder("sub");
 folder
-    .file("file3.txt", "content")  // relative path from folder : file3.txt
-    .file("file4.txt", "content"); // relative path from folder : file4.txt
+  .file("file3.txt", "content")  // relative path from folder : file3.txt
+  .file("file4.txt", "content"); // relative path from folder : file4.txt
 
 folder.file(/file/);  // array of size 2
 folder.file(/^file/); // array of size 2, the relative paths start with file

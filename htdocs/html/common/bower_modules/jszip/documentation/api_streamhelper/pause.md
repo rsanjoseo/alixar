@@ -11,13 +11,13 @@ __Returns__ : The current StreamHelper object, for chaining.
 
 ```js
 zip
-    .generateInternalStream({type: "uint8array"})
-    .on('data', function (chunk) {
+.generateInternalStream({type:"uint8array"})
+.on('data', function(chunk) {
 
-        // if we push the chunk to an other service which is overloaded, we can
-        // pause the stream as backpressure.
-        this.pause();
+    // if we push the chunk to an other service which is overloaded, we can
+    // pause the stream as backpressure.
+    this.pause();
 
-    }).resume(); // start the stream the first time
+}).resume(); // start the stream the first time
 ```
 

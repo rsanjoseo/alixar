@@ -21,13 +21,13 @@ see [the metadata of `generateAsync()`]({{site.baseurl}}/documentation/api_jszip
 ## Examples
 
 ```js
-zip.generateInternalStream({type: "blob"}).accumulate(function callback(err, content) {
-    if (err) {
-        // handle error
-    }
-    // see FileSaver.js
-    saveAs(content, "hello.zip");
+zip.generateInternalStream({type:"blob"}).accumulate(function callback(err, content) {
+  if (err) {
+    // handle error
+  }
+  // see FileSaver.js
+  saveAs(content, "hello.zip");
 }, function updateCallback(metadata) {
-    // print progression with metadata.percent and metadata.currentFile
+  // print progression with metadata.percent and metadata.currentFile
 });
 ```

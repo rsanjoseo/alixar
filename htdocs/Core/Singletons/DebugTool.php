@@ -111,7 +111,7 @@ class DebugTool extends Singleton
         //$this->debugBar->addCollector(new DolExceptionsCollector());
         //        $this->debugBar->addCollector(new DolQueryCollector());
         //        $this->debugBar->addCollector(new DolibarrCollector());
-        $this->debugBar->addCollector(new DolLogsCollector());
+        // $this->debugBar->addCollector(new DolLogsCollector());
     }
 
     /**

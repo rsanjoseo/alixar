@@ -13,8 +13,7 @@ __Since__: v3.0.0
 
 ```js
 zip
-    .generateInternalStream({type: "uint8array"})
-    .on('data', function () {...
-    })
-    .resume();
+.generateInternalStream({type:"uint8array"})
+.on('data', function() {...})
+.resume();
 ```

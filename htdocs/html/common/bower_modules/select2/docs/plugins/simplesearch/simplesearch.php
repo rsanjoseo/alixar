@@ -1,5 +1,4 @@
 <?php
-
 namespace Grav\Plugin;
 
 use Grav\Common\Page\Collection;
@@ -52,6 +51,7 @@ class SimplesearchPlugin extends Plugin
         $types->scanTemplates('plugins://simplesearch/templates');
     }
 
+
     /**
      * Add current directory to twig lookup paths.
      */
@@ -74,6 +74,7 @@ class SimplesearchPlugin extends Plugin
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
         ]);
     }
+
 
     /**
      * Build search results.
@@ -193,6 +194,7 @@ class SimplesearchPlugin extends Plugin
                         $parent = $cpage->parent();
                         $extras[$parent->path()] = ['slug' => $parent->slug()];
                     }
+
                 }
             }
         }
@@ -279,6 +281,41 @@ class SimplesearchPlugin extends Plugin
     }
 
     /**
+     * Set needed variables to display the search results.
+     */
+    public function onTwigSiteVariables()
+    {
+        $twig = $this->grav['twig'];
+
+        if ($this->query) {
+            $twig->twig_vars['query'] = implode(', ', $this->query);
+            $twig->twig_vars['search_results'] = $this->collection;
+        }
+
+        if ($this->config->get('plugins.simplesearch.built_in_css')) {
+            $this->grav['assets']->add('plugin://simplesearch/css/simplesearch.css');
+        }
+
+        $this->grav['assets']->addJs('plugin://simplesearch/js/simplesearch.js', ['group' => 'bottom']);
+    }
+
+    private function matchText($haystack, $needle)
+    {
+        if ($this->config->get('plugins.simplesearch.ignore_accented_characters')) {
+            setlocale(LC_ALL, 'en_US');
+            try {
+                $result = mb_stripos(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $haystack), iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $needle));
+            } catch (\Exception $e) {
+                $result = mb_stripos($haystack, $needle);
+            }
+            setlocale(LC_ALL, '');
+            return $result;
+        } else {
+            return mb_stripos($haystack, $needle);
+        }
+    }
+
+    /**
      * @param      $query
      * @param Page $page
      * @param      $taxonomies
@@ -327,40 +364,5 @@ class SimplesearchPlugin extends Plugin
             }
         }
         return $results;
-    }
-
-    private function matchText($haystack, $needle)
-    {
-        if ($this->config->get('plugins.simplesearch.ignore_accented_characters')) {
-            setlocale(LC_ALL, 'en_US');
-            try {
-                $result = mb_stripos(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $haystack), iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $needle));
-            } catch (\Exception $e) {
-                $result = mb_stripos($haystack, $needle);
-            }
-            setlocale(LC_ALL, '');
-            return $result;
-        } else {
-            return mb_stripos($haystack, $needle);
-        }
-    }
-
-    /**
-     * Set needed variables to display the search results.
-     */
-    public function onTwigSiteVariables()
-    {
-        $twig = $this->grav['twig'];
-
-        if ($this->query) {
-            $twig->twig_vars['query'] = implode(', ', $this->query);
-            $twig->twig_vars['search_results'] = $this->collection;
-        }
-
-        if ($this->config->get('plugins.simplesearch.built_in_css')) {
-            $this->grav['assets']->add('plugin://simplesearch/css/simplesearch.css');
-        }
-
-        $this->grav['assets']->addJs('plugin://simplesearch/js/simplesearch.js', ['group' => 'bottom']);
     }
 }

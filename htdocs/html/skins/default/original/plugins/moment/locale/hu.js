@@ -51,7 +51,6 @@
         }
         return '';
     }
-
     function week(isFuture) {
         return (
             (isFuture ? '' : '[múlt] ') +

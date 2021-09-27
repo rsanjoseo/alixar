@@ -27,7 +27,6 @@ frameworks. The following are some of them:
   by [Real Time Logic](https://github.com/RealTimeLogic/)
 
 ##### AdminLTE v2.4
-
 {: .text-bold .text-dark .mt-3}
 
 - [Setup AdminLTE2 in to Laravel in few minutes](https://youtu.be/8Fa7Ji4lDyI)
@@ -38,20 +37,15 @@ frameworks. The following are some of them:
 - [yii2-adminlte-asset](https://github.com/dmstr/yii2-adminlte-asset) by [Tobias Munk](https://github.com/schmunk42)
 
 ##### AdminLTE v2.3
-
 {: .text-bold .text-dark .mt-3}
-
 - [AdminThemeBundle (Symfony)](https://github.com/avanzu/AdminThemeBundle) by [Marc Bach](https://github.com/avanzu)
 - [lte-rails](https://github.com/racketlogger/lte-rails) by [Carlos at RacketLogger](https://github.com/racketlogger)
 
 ##### AdminLTE v2.2
-
 {: .text-bold .text-dark .mt-3}
-
 - [AdminLTE-RTL](https://github.com/mmdsharifi/AdminLTE-RTL) by [Mohammad Sharifi](https://github.com/mmdsharifi)
 
 ##### AdminLTE v2.1
-
 {: .text-bold .text-dark .mt-3}
 
 - [adminlte2-rails](https://github.com/nicolas-besnard/adminlte2-rails)

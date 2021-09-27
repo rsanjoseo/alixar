@@ -12,7 +12,6 @@ The layout consists of four major parts:
 - Content `.content-wrapper`. Contains the page header and content.
 
 #### Layout Options
-
 {: .mt-4}
 
 > ##### Note!
@@ -27,6 +26,7 @@ tag to get the desired goal.
 - Collapsed Sidebar: use the class `.sidebar-collapse` to have a collapsed sidebar upon loading.
 - Boxed Layout: use the class `.layout-boxed` to get a boxed layout that stretches only to 1250px.
 - Top Navigation: use the class `.layout-top-nav` to remove the sidebar and have your links at the top navbar.
+
 
 ##### Responsive Variations
 
@@ -50,23 +50,24 @@ Preloader to
 avoid [https://github.com/ColorlibHQ/AdminLTE/discussions/3319](https://github.com/ColorlibHQ/AdminLTE/discussions/3319)
 
 ```html
-
 <div class="wrapper">
-    <!-- Preloader -->
-    <div class="preloader">
-        <img src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-    </div>
+  <!-- Preloader -->
+  <div class="preloader">
+    <img src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+  </div>
 </div>
 ```
 
 - Preloader elements should be added inside `.wrapper` element.
 - You can replace image OR modify size OR include any preload items inside `.preloader` element.
 
+
 #### Dark Mode
 
 AdminLTE 3.1 provides a dark mode option. You can add in body tag:
 
 - `.dark-mode`
+
 
 #### Color Variations
 
@@ -101,7 +102,6 @@ The following colors are available:
 </div>
 
 ##### Black/White Nuances
-
 {: .mt-4}
 
 <div class="row">
@@ -112,7 +112,6 @@ The following colors are available:
 </div>
 
 ##### Colors
-
 {: .mt-4}
 
 <div class="row">

@@ -1,5 +1,5 @@
 define([
-    'jquery'
+  'jquery'
 ], function ($) {
     function Tags(decorated, $element, options) {
         var tags = options.get('tags');

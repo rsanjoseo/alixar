@@ -82,6 +82,7 @@ limiting the amount of errors displayed, as well as include the trace in the out
 | [ --limit N \| -l N ]  | The amount of errors to display. Default is 5                   |
 | [ --trace \| -t ]      | When used, it will add the backtrace in the output of the error |
 
+
 # Updating
 
 As development for the Error plugin continues, new versions may become available that add additional features and

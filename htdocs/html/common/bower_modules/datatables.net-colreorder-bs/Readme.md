@@ -6,6 +6,7 @@ with styling for [Bootstrap](http://getbootstrap.com/).
 
 ColReorder allows the end user to modify the column order of a table through drop-and-drag of column headers.
 
+
 ## Installation
 
 ### Browser

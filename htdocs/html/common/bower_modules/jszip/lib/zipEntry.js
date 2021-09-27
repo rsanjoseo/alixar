@@ -38,7 +38,6 @@ function ZipEntry(options, loadOptions) {
     this.options = options;
     this.loadOptions = loadOptions;
 }
-
 ZipEntry.prototype = {
     /**
      * say if the file is encrypted.

@@ -239,11 +239,7 @@ automatically update and clear Grav's cache.
 > Note: Any changes you have made to any of the files listed under this directory will also be removed and replaced by the new set. Any files located elsewhere (for example a YAML settings file placed in `user/config/plugins`) will remain intact.
 
 [taxonomy]: http://learn.getgrav.org/content/taxonomy
-
 [headers]: http://learn.getgrav.org/content/headers
-
 [grav]: http://github.com/getgrav/grav
-
 [simplesearch]: simplesearch.yaml
-
 [results]: templates/simplesearch_results.html.twig

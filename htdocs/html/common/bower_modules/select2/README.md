@@ -24,7 +24,6 @@ Use cases
 
 Browser compatibility
 ---------------------
-
 * IE 8+
 * Chrome 8+
 * Firefox 10+
@@ -88,73 +87,40 @@ Copyright and license
 The license is available within the repository in the [LICENSE][license] file.
 
 [cdnjs]: http://www.cdnjs.com/libraries/select2
-
 [community]: https://select2.org/getting-help
-
 [documentation]: https://select2.org
-
 [documentation-directory]: https://github.com/select2/select2/tree/develop/docs
-
 [freenode]: https://freenode.net/
-
 [github-actions-image]: https://github.com/select2/select2/workflows/CI/badge.svg
-
 [jsdelivr]: https://www.jsdelivr.com/package/npm/select2
-
 [license]: LICENSE.md
-
 [releases]: https://github.com/select2/select2/releases
 
 [angularjs]: https://angularjs.org/
-
 [bootstrap3]: https://getbootstrap.com/
-
 [bootstrap4]: https://getbootstrap.com/
-
 [django]: https://www.djangoproject.com/
-
 [django-autocomplete-light]: https://github.com/yourlabs/django-autocomplete-light
-
 [django-easy-select2]: https://github.com/asyncee/django-easy-select2
-
 [django-select2]: https://github.com/applegrew/django-select2
-
 [drupal]: https://www.drupal.org/
-
 [drupal-select2]: https://www.drupal.org/project/select2
-
 [flat-ui]: http://designmodo.github.io/Flat-UI/
-
 [mdr-angular-select2]: https://github.com/modulr/mdr-angular-select2
-
 [meteor]: https://www.meteor.com/
-
 [meteor-select2]: https://github.com/nate-strauser/meteor-select2
-
 [metro-ui]: http://metroui.org.ua/
-
 [select2-metro]: http://metroui.org.ua/select2.html
-
 [ruby-on-rails]: http://rubyonrails.org/
-
 [select2-bootstrap-theme]: https://github.com/select2/select2-bootstrap-theme
-
 [select2-bootstrap4-theme]: https://github.com/ttskch/select2-bootstrap4-theme
-
 [select2-flat-theme]: https://github.com/techhysahil/select2-Flat_Theme
-
 [select2-rails]: https://github.com/argerim/select2-rails
-
 [vue.js]: http://vuejs.org/
-
 [select2-vue]: http://vuejs.org/examples/select2.html
-
 [wicket]: https://wicket.apache.org/
-
 [wicketstuff-select2]: https://github.com/wicketstuff/core/tree/master/select2-parent
-
 [yii2]: http://www.yiiframework.com/
-
 [yii2-widget-select2]: https://github.com/kartik-v/yii2-widget-select2
 
 ## Contributors

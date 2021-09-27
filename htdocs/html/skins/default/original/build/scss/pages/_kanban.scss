@@ -13,7 +13,6 @@
       align-items: stretch;
     }
   }
-
   .content-header + .content {
     height: calc(100% - ((2 * 15px) + (1.8rem * #{$headings-line-height})));
   }
@@ -42,18 +41,15 @@
           margin-bottom: 0;
           border-bottom-width: 1px;
         }
-
         .card-header {
           padding: .5rem .75rem;
         }
-
         .card-body {
           padding: .75rem;
         }
       }
     }
   }
-
   .btn-tool {
     &.btn-link {
       text-decoration: underline;

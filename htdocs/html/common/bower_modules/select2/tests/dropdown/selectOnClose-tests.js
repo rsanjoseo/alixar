@@ -13,7 +13,7 @@ var SelectOnClose = require('select2/dropdown/selectOnClose');
 var ModifiedResults = Utils.Decorate(Results, SelectOnClose);
 
 var options = new Options({
-    selectOnClose: true
+  selectOnClose: true
 });
 
 test('will not trigger if no results were given', function (assert) {

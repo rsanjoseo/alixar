@@ -9,7 +9,6 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -22,7 +21,6 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Environment (please complete the following information):**
-
 - AdminLTE Version: [e.g. v3.0.0]
 - Operating System:  [e.g. macOS Catalina]
 - Browser (Version): [e.g. Chrome (Latest)]

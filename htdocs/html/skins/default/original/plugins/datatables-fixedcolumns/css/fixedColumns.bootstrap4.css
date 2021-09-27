@@ -16,7 +16,6 @@ div.DTFC_RightBodyWrapper table {
     margin: 0 !important;
     z-index: 2;
 }
-
 div.DTFC_LeftBodyWrapper table thead .sorting:before, div.DTFC_LeftBodyWrapper table thead .sorting:after,
 div.DTFC_LeftBodyWrapper table thead .sorting_asc:before,
 div.DTFC_LeftBodyWrapper table thead .sorting_asc:after,
@@ -42,7 +41,6 @@ div.DTFC_RightBodyWrapper table thead .sorting_desc:before,
 div.DTFC_RightBodyWrapper table thead .sorting_desc:after {
     display: none;
 }
-
 div.DTFC_LeftBodyWrapper table tbody tr:first-child th,
 div.DTFC_LeftBodyWrapper table tbody tr:first-child td,
 div.DTFC_RightBodyWrapper table tbody tr:first-child th,

@@ -59,7 +59,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.12.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.12.1) - 2020-02-04
 
 ### Added
-
 * user-unlock icon FortAwesome/Font-Awesome#13280
 * mixer brand icon FortAwesome/Font-Awesome#11242
 * coffin-cross icon FortAwesome/Font-Awesome#15646
@@ -68,7 +67,6 @@ will get a 404 - Not Found if you do not have access**
 * dailymotion icon FortAwesome/Font-Awesome#3890
 
 ### Changed
-
 * Do not separate web fonts files for Free Kits
 * The .fab CSS class now has explicit weight of 400 instead of inheriting 'normal'
 * Balance the plus symbol in file-plus and folder-plus FortAwesome/Font-Awesome#16004
@@ -77,7 +75,6 @@ will get a 404 - Not Found if you do not have access**
 * Updated clock hands FortAwesome/Font-Awesome#15779
 
 ### Fixed
-
 * Guard against run-away pseudo element searching with String.codePointAt ponyfill
 * Silence errors when using the conflict detector
 
@@ -91,7 +88,6 @@ will get a 404 - Not Found if you do not have access**
 * Metadata in Yaml format now available in JS packages @fortawesome/fontawesome-free and @fortawesome/fontawesome-pro
 
 ### Changed
-
 * Updated twitch, safari, pied-piper, and android brand icon
 * Renaming haykal icon to bahai
 * Added "sideEffects: false" to JS icon packages to aid with tree-shaking
@@ -112,11 +108,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.11.2](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.11.2) - 2019-09-23
 
 ### Changed
-
 * Updated laravel brand icon
 
 ### Fixed
-
 * New scanner-image icon was using the same unicode value as scanner causing overlapped icons
 * The film-canister icon was incorrectly spelled film-cannister
 
@@ -133,12 +127,10 @@ will get a 404 - Not Found if you do not have access**
 ## [5.11.0](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.11.0) - 2019-09-18
 
 ### Added
-
 * New tech, music, and western-themed icons
 * Added umbraco, swift, orcid, mdb (and one more surprise) brand icons
 
 ### Fixed
-
 * SVG with JavaScript no longer duplicates the id attribute when in nesting mode
 * Corrected inconsistencies with the send-back and send-backward icons
 * Corrected inconsistencies with duotone icon viewBox widths that did not match the solid style
@@ -148,11 +140,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.10.2](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.10.2) - 2019-08-22
 
 ### Added
-
 * SVG with JS API function layers() now accepts params to add additional classes
 
 ### Changed
-
 * Lots of updates to various duotone icons
 * Updated the keybase brand icon
 
@@ -167,16 +157,13 @@ will get a 404 - Not Found if you do not have access**
 ## [5.10.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.10.1) - 2019-08-02
 
 ### Added
-
 * README file in the otfs/ directory to help direct folks to documentation for the new Duotone OTF file
 
 ### Changed
-
 * A lot of visual improvements and consistency fixes to many of the new Duotone icons
 * The fa-swap-opacity class now works with parent containers where Duotone icons as children
 
 ### Fixed
-
 * Duotone SCSS files were not being correctly compiled with the Dart-Sass tool
 * Font Awesome logo was not appearing in desktop application in font pickers
 
@@ -185,18 +172,15 @@ will get a 404 - Not Found if you do not have access**
 ## [5.10.0](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.10.0) - 2019-07-29
 
 ### Added
-
 * Duotone icons style added with over 1,600 new icons
 * New conflict detection script to help identify conflicting versions of Font Awesome (js/conflict-detection.js)
 * Icons border-center-v and border-center-h
 * New brand icon for cotton-bureau
 
 ### Changed
-
 * Updated version 4 shim to more accurately match sort-alpha-desc, sort-amount-desc, sort-numeric-desc
 
 ### Fixed
-
 * Icon sort-amount-down-alt incorrectly matching sort-amount-down
 * Icon border-outer icon missing inner grid shapes
 
@@ -208,19 +192,16 @@ will get a 404 - Not Found if you do not have access**
 [UPGRADING.md guide](https://github.com/FortAwesome/Font-Awesome/blob/master/UPGRADING.md) for more information.**
 
 ### Added
-
 * An assortment of voted icons, updated icons, and new icons
 * New icons and updates to the text editor category
 * A flipped version of the phone and phone-alt icon
 
 ### Changed
-
 * Removed the nintendo-switch icon by request of Nintendo
 * Sorted out the sort icons FortAwesome/Font-Awesome#9464 FortAwesome/Font-Awesome#9419 FortAwesome/Font-Awesome-Pro#915
 * De-crevassed the brain icons
 
 ### Fixed
-
 * Proportions corrected on facebook-messenger brand icon
 
 ---
@@ -228,18 +209,15 @@ will get a 404 - Not Found if you do not have access**
 ## [5.8.2](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.8.2) - 2019-05-07
 
 ### Added
-
 * New brand icon stackpath
 
 ### Changed
-
 * Updated redhat, mailchimp brand icons
 * Updated Facebook brand icons in accordance with https://facebookbrand.com (facebook, facebook-f, facebook-square)
 * Updated Git brand icons (git, git-square, git-alt)
 * Removing the "at" character to prevent overlap with the at icon
 
 ### Fixed
-
 * Missing version for the route icon FortAwesome/Font-Awesome#13804
 * Corrected the orientation of radiation and radiation-alt icons
 * Alignment fixed for check-double
@@ -252,7 +230,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.8.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.8.1) - 2019-03-21
 
 ### Fixed
-
 * Correct the baseline alignment of the linkedin-in brand icon
 
 ---
@@ -263,19 +240,16 @@ will get a 404 - Not Found if you do not have access**
 [UPGRADING.md guide](https://github.com/FortAwesome/Font-Awesome/blob/master/UPGRADING.md) for more information.**
 
 ### Added
-
 * New sponsored icon wave-square
 * Adding new mutateApproach configuration which can force SVG with JS to render synchronously
 * Adding a round of top requested brand icons
 
 ### Changed
-
 * Updating search terms and adding new categories
 * Removing descender-based CSS from the .fa-icon Sass mixin
 * Removed title elements from SVG sprites
 
 ### Fixed
-
 * Fixing several icons such as spinner-third that had incorrect widths
 * Allow Sass setting for `font-display` to be changed
 * Missing dots in the flower icons
@@ -296,7 +270,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.7.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.7.1) - 2019-02-01
 
 ### Fixed
-
 * The @fortawesome/fontawesome-pro package had a corrupted SVG webfont file for the solid style
 * IE11 error reporting Promise as undefined or finally() not a function
 * The cheese has been moved on top of the patty for cheeseburger
@@ -309,7 +282,6 @@ will get a 404 - Not Found if you do not have access**
 [UPGRADING.md guide](https://github.com/FortAwesome/Font-Awesome/blob/master/UPGRADING.md) for more information.**
 
 ### Added
-
 * New Food category
 * More Medical icons
 * More icons from the leaderboard
@@ -319,12 +291,10 @@ will get a 404 - Not Found if you do not have access**
 * Sass and Less files contain a variable that can be changed to alter the font-display value
 
 ### Changed
-
 * Updated slack brand icon
 * Reverted calendar-alt to previous design before 5.6.0
 
 ### Fixed
-
 * Safari fails to process pseudo elements if the font-weight is "normal"
 * Renamed internal method to keep from confusing rJS FortAwesome/Font-Awesome#14461
 * Corrected font weights in TTF files FortAwesome/Font-Awesome#13320
@@ -337,7 +307,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.6.3](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.6.3) - 2018-12-20
 
 ### Changed
-
 * Revising fire icon and adding alternative fire icon
 * Updating fedora brand icon
 
@@ -360,7 +329,6 @@ will get a 404 - Not Found if you do not have access**
 [UPGRADING.md guide](https://github.com/FortAwesome/Font-Awesome/blob/master/UPGRADING.md) for more information.**
 
 ### Added
-
 * Holiday category
 * Winter category
 * A nice selection of the top requested icons from the Font Awesome Leaderboard
@@ -370,12 +338,10 @@ will get a 404 - Not Found if you do not have access**
 * The Canadian Maple Leaf (Aboot time, eh. You hosers.)
 
 ### Changed
-
 * Added more icons to Buildings, Hands, Spinners, Users & People, and Vehicles categories
 * Added indicators whether an icon was added to Font Awesome through community voting
 
 ### Fixed
-
 * Missing metadata for holly-berry
 
 ---
@@ -383,14 +349,12 @@ will get a 404 - Not Found if you do not have access**
 ## [5.5.0](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.5.0)  - 2018-11-02
 
 ### Added
-
 * Politics category
 * Weather category (volume 1 and 2)
 * Brand icon reacteurope
 * Sponsorship of briefcase by WorkRails
 
 ### Fixed
-
 * Alignment centered for larger icons when using the CSS stacks feature
 
 ---
@@ -398,18 +362,15 @@ will get a 404 - Not Found if you do not have access**
 ## [5.4.2](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.4.2)  - 2018-10-25
 
 ### Added
-
 * Brand icon think-peaks
 
 ### Changed
-
 * Updated rocketchat brand icon
 * Adding vr-cardboard and d-and-d-beyond to Free version
 * Replacing rendact with wpressr brand icon
 * Changing the version 4 shim for commenting icon to solid style to better match version 4
 
 ### Fixed
-
 * Path issues with tombstone-alt icon in Regular and Light styles
 
 ---
@@ -417,7 +378,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.4.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.4.1)  - 2018-10-10
 
 ### Fixed
-
 * Separate wand and wand-magic into unique icons
 * Corrected the alignment of linkedin-in
 * Renamed categories "Holiday" to "Halloween" and "Seasonal" to "Autumn"
@@ -442,13 +402,11 @@ will get a 404 - Not Found if you do not have access**
   user-injured, and vr-cardboard
 
 ### Changed
-
 * Using masks with SVG and JavaScript now use nanoid generated IDs instead of a simple counter
 * Updated speakap brand icon
 * Revised menorah icon and added hanukiah
 
 ### Fixed
-
 * Slight distortion in book-heart
 * Bad search terms for folder icon
 * Set license for @fortawesome/free-brands-svg-icons NPM package
@@ -458,11 +416,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.3.1](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.3.1)  - 2018-08-28
 
 ### Changed
-
 * Updating icons in the Status category
 
 ### Fixed
-
 * sponsors.yml listed icon prayer instead of pray
 * Removed Pro icons that accidentally made it into Free
 
@@ -471,19 +427,16 @@ will get a 404 - Not Found if you do not have access**
 ## [5.3.0](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.3.0)  - 2018-08-27
 
 ### Added
-
 * New Religion, and Marketing category
 * New icons in the Mathematics, and Business category
 * New stats for signal, volume, and wifi icons
 * New brand icon for the-red-yeti and alipay
 
 ### Changed
-
 * Adding ethereum to Currency category
 * Adding bitcoin and btc to Payments & Shopping
 
 ### Fixed
-
 * Incorrect name for layer-minus and layer-plus in sponsors.yml
 * Reversing route-highway and route-interstate
 * Correct version identifier in OTF and web font files
@@ -495,7 +448,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.2.0](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.2.0)  - 2018-07-23
 
 ### Added
-
 * New education and automotive categories
 * More icons in the medical and maps categories
 * Top requested brands ello, hackerrank, kaggle, markdown, neos, and zhihu
@@ -505,16 +457,13 @@ will get a 404 - Not Found if you do not have access**
 ## [5.1.1](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.1.1)  - 2018-07-17
 
 ### Added
-
 * Additional search terms for various icons FortAwesome/Font-Awesome#13429
 
 ### Changed
-
 * Marked the font-awesome-logo-full as a "private" icon
 * Consistently named and minified CSS and JS files in the CDN, npm packages, and zip files
 
 ### Fixed
-
 * Removed "fa-" prefix from Less and Sass style bundles filenames
 * Unable to use brand icons with pseudo-elements and SVG with JS
 * Adding icons explicitly using the library were not available when using pseudo-elements and SVG with JS
@@ -532,7 +481,6 @@ will get a 404 - Not Found if you do not have access**
 [UPGRADING.md guide](https://github.com/FortAwesome/Font-Awesome/blob/master/UPGRADING.md) for more information.**
 
 ### Added
-
 * New Emoji, Design, and Travel category pack
 * Another group of requested and commissioned icons
 * Version 4 shim for Web Fonts with CSS
@@ -545,7 +493,6 @@ will get a 404 - Not Found if you do not have access**
 * API method watch() to configure MutationObserver and watch DOM for icon changes and additions
 
 ### Changed
-
 * Relocating sponsor data to a separate sponsors.yml
 * Updated teamspeak brand icon
 * No more default exports in the CommonJS/ES packages (anything installed from NPM)
@@ -554,7 +501,6 @@ will get a 404 - Not Found if you do not have access**
 * SVG with JavaScript pseudo-elements now match syntax (font-family, font-weight) of Web Fonts with CSS
 
 ### Fixed
-
 * Tree shaking of all NPM packages by default
 * Alignment of the book-open and dice-six icon
 * Correcting creative-commons
@@ -570,7 +516,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.13](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.13)  - 2018-05-10
 
 ### Added
-
 * 68 icons to Free and 165 to Pro of the most requested icons in Font Awesome
 
 ---
@@ -578,11 +523,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.12](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.12)  - 2018-05-03
 
 ### Added
-
 * A long time ago in a galaxy far, far away some icons were added
 
 ### Fixed
-
 * Renamed the r brand to r-project to prevent ligature collision with the "r" glyph
 
 ---
@@ -590,19 +533,16 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.11](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.11)  - 2018-05-01
 
 ### Added
-
 * 16 new user icons
 * Full set of Creative Commons symbols
 * Regular style comment-dots used for v4 comment-alt in shim
 * Top 6 brand icons: r, ebay, mastodon, researchgate, keybase, teamspeak
 
 ### Changed
-
 * Revised slider icons FortAwesome/Font-Awesome#11872
 * Make desktop typeface easier to find in apps that support ligature previews
 
 ### Fixed
-
 * Remove errant XML entity from the lastfm-square icon FortAwesome/Font-Awesome#12847
 * Correcting paths in cloud icons FortAwesome/Font-Awesome-Pro#920
 
@@ -611,16 +551,13 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.10](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.10)  - 2018-04-10
 
 ### Added
-
 * New java brand icon FortAwesome/Font-Awesome#386
 
 ### Changed
-
 * Updating depth of dna icon
 * Updating pied-piper, adding pied-piper-hat
 
 ### Fixed
-
 * Correcting path errors on readme icon FortAwesome/Font-Awesome#12754
 * Light style of lamp icon FortAwesome/Font-Awesome#12725
 
@@ -629,20 +566,17 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.9](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.9)  - 2018-03-27
 
 ### Added
-
 * New Chat icon pack and category
 * New Charity icon pack and category
 * New Moving icon pack and category
 * New icons hands and hand-holding
 
 ### Changed
-
 * Updated flipboard, readme, and houzz brand icon
 * Making all solid icons in the medical icon pack free
 * Updated hand-holding-box and hand-receiving in the Light style
 
 ### Fixed
-
 * Missing box-sizing CSS property for fa-layers-counter
 
 ---
@@ -650,7 +584,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.8](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.8)  - 2018-03-01
 
 ### Fixed
-
 * OTF font files missing ligatures for Pro styles FortAwesome/Font-Awesome#12486 FortAwesome/Font-Awesome-Pro#1034
 
 ---
@@ -658,20 +591,17 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.7](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.7)  - 2018-02-26
 
 ### Added
-
 * New Logistics category
 * New Medical category
 * Individual SVG files available from the Font Awesome CDN
 * Additional search terms
 
 ### Changed
-
 * Apple brand icon update FortAwesome/Font-Awesome#12337
 * Disable mutation observers with fontawesome.noAuto() is called
 * License information now references https URL scheme
 
 ### Fixed
-
 * Missing TypeScript names FortAwesome/react-fontawesome#83
 * Adding categories metadata FortAwesome/Font-Awesome#12034
 * TypeScript improvement for fontawesome.layer()
@@ -682,7 +612,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.6](https://github.com/FortAwesome/Font-Awesome/releases/tag/5.0.6)  - 2018-01-25
 
 ### Fixed
-
 * @fortawesome/fontawesome-pro-light missing submodules
 
 ---
@@ -690,13 +619,11 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.5](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.5)  - 2018-01-25
 
 ### Added
-
 * New Sports category
 * New Chess category
 * Added brand icons for flipboard, php, quinscape, and hips
 
 ### Fixed
-
 * Sass and Less mixin fa-icon() now uses ems instead of percentage
 * Corrected misspelling of "Alternate" in category labels
 * Improved TypeScript definitions for @fortawesome/fontawesome
@@ -708,11 +635,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.4](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.4)  - 2018-01-10
 
 ### Changed
-
 * Updating all NPM package READMEs
 
 ### Fixed
-
 * Improving TypeScript exports and fixing some incorrect definitions
 * TypeScript error when importing entire style Fort-Awesome/Font-Awesome#12072
 * Pseudo-elements erasing text contents in parent container Fort-Awesome/Font-Awesome-Pro#11995
@@ -723,7 +648,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.3](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.3)  - 2018-01-08
 
 ### Added
-
 * Adding elementor, youtube-square brand icons
 * Adding window-minimize to the Free subset
 * TypeScript support for all NPM packages
@@ -741,12 +665,10 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.2](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.2)  - 2017-12-19
 
 ### Added
-
 * Adding amazon-pay, cc-amazon-pay, korvue, ethereum brand icons
 * Adding stopwatch to Free version
 
 ### Changed
-
 * Ligatures now support capital case, all caps, and title case
 
 ### Fixed
@@ -762,7 +684,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.1](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.1)  - 2017-12-08
 
 ### Added
-
 * Adding font-awesome-flag, lock-open, redo-alt, sync-alt, undo-alt to the Free version
 * New NPM packages `fontawesome-free-webfonts` and `fontawesome-pro-webfonts`
 * Adding old icon names to search terms for renamed icons
@@ -771,14 +692,12 @@ will get a 404 - Not Found if you do not have access**
 * Adding typo3 brand icon
 
 ### Changed
-
 * Updated dropbox brand icon to match new branding guidelines
 * Updated firefox brand icon
 * Updated strava brand icon
 * OTF font file now include a space character
 
 ### Fixed
-
 * OTF font file now supports different styles in Windows
 * OTF font file "j" character now has correct space on the right
 * Modifying the `class` attribute on an existing `<svg>` allows you to change the icon
@@ -788,11 +707,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0)  - 2017-12-01
 
 ### Added
-
 * License information
 
 ### Changed
-
 * CSS vertical-align now "em"-based instead of percentage making it more consistent
 * fa-ul width now closer to default browser size
 
@@ -803,14 +720,12 @@ will get a 404 - Not Found if you do not have access**
 **This release includes breaking changes**
 
 ### Added
-
 * Brand icons: gitter, cc-stripe, stripe, hooli, aviato, strava, ember, angular, font-awesome-flag
 * Icons compress-alt and expand-alt
 * Adding calendar to Font Awesome 5 Free
 * SASS function that makes it easier to use variables FortAwesome/Font-Awesome-Pro#824
 
 ### Changed
-
 * BREAKING Renamed icon composition to mask ("data-fa-compose" becomes "data-fa-mask")
 * BREAKING Re-organized directory structure to match upcoming documentation
 * BREAKING Font Awesome styles inserted into the `<head>` will now precede other link and style definitions
@@ -819,7 +734,6 @@ will get a 404 - Not Found if you do not have access**
 * Class fa-li now respects line-height and has new recommended markup (see included docs)
 
 ### Fixed
-
 * Duplicate `style` tags being added in the head FortAwesome/Font-Awesome-Pro#858
 * Error with icon composition/masking that caused a confusing error message
 * An error when using pseudo elements and the element is empty (Array.reduce error)
@@ -830,7 +744,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-rc4](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-rc4)  - 2017-10-27
 
 ### Added
-
 * Ligature support in the OTF font
 * Vue.js brand icon
 * Sass and Less brand icons
@@ -838,14 +751,12 @@ will get a 404 - Not Found if you do not have access**
 * Individual icon imports in icon packages FortAwesome/Font-Awesome-Pro#808
 
 ### Changed
-
 * Better poo eyes
 * Renamed HTML status classes to `fontawesome-i2svg-active`, `fontawesome-i2svg-pending`, `fontawesome-i2svg-complete`
 * HTML status class for active is added only after the first batch of icon replacements occur
 * Added mention of newer versions of iOS in documentation FortAwesome/Font-Awesome-Pro#810
 
 ### Fixed
-
 * Performance and missing features with mutation observer (should fix FortAwesome/Font-Awesome-Pro#813)
 * Incorrect handling of icon class and style attributes when using autoReplace = 'nest' FortAwesome/Font-Awesome-Pro#809
 * Pseudo elements not added or removed when class mutations occur FortAwesome/Font-Awesome-Pro#821
@@ -855,7 +766,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-rc3](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-rc3)  - 2017-10-13
 
 ### Added
-
 * Node.js brand icon FortAwesome/Font-Awesome-Pro#779
 * React brand icon FortAwesome/Font-Awesome-Pro#780
 * OSI brand icon FortAwesome/Font-Awesome-Pro#748
@@ -864,13 +774,11 @@ will get a 404 - Not Found if you do not have access**
 * Use CSS pseudo elements (:before and :after) to make trigger SVG replacements
 
 ### Changed
-
 * Switched the locations of fork and knife in utensils-alt FortAwesome/Font-Awesome-Pro#466
 * Updated the AWS brand icon FortAwesome/Font-Awesome-Pro#735
 * Updated Apple App Store icon FortAwesome/Font-Awesome-Pro#728
 
 ### Fixed
-
 * Do not throw an error if icon is missing when calling icon() method in API
 * Ensure that unicode values do not change between releases
 * Version field is missing in fontawesome-pro-brands/package.json FortAwesome/Font-Awesome-Pro#781
@@ -882,11 +790,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-rc2](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-rc2)  - 2017-09-22
 
 ### Added
-
 * Brand icons: accusoft, ns8, uniregistry
 
 ### Fixed
-
 * Link to the npm package in the docs FortAwesome/Font-Awesome-Pro#729
 * Incorrect reference to fontawesome-pro.js in docs
 
@@ -895,13 +801,11 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-rc1](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-rc1)  - 2017-09-15
 
 ### Changed
-
 * New Bitbucket logo FortAwesome/Font-Awesome-Pro#720
 * Modifed the star icons to match use case better FortAwesome/Font-Awesome-Pro#710
 * Switched names of css3 and css3-alt to reflect correct branding
 
 ### Fixed
-
 * Correct whitespace with the Visa logo FortAwesome/Font-Awesome-Pro#719
 * Improve OTF support by passing through FontForge FortAwesome/Font-Awesome-Pro#565
 * Fonts with "undefined" name FortAwesome/Font-Awesome-Pro#711
@@ -913,13 +817,11 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta7](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta7)  - 2017-09-11
 
 ### Added
-
 * Ability to nest the `<svg>` tag within the `<i>` FortAwesome/Font-Awesome-Pro#624
 * Define icons as symbols and leverage SVG sprites FortAwesome/Font-Awesome-Pro#629
 * Added alternative CSS3 logo FortAwesome/Font-Awesome-Pro#682
 
 ### Changed
-
 * Power Transforms now execute inside the SVG instead of on the root element
 * Filenames have changed to reflect a better division between Font Awesome Free and Pro
 
@@ -934,17 +836,14 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta6](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta6)  - 2017-09-01
 
 ### Added
-
 * Ability to flip horizontal and vertical with CSS classes fa-flip-horizontal and fa-flip-vertical
 * New film-alt icon that allows for layering other icons
 * Microsoft brand
 
 ### Changed
-
 * New YouTube branding FortAwesome/Font-Awesome-Pro#646
 
 ### Fixed
-
 * Fixed a bunch of shim-related issues
 * Cogs off center FortAwesome/Font-Awesome-Pro#663
 * Corrected icons/categories.yml with canonical names
@@ -954,7 +853,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta5](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta5)  - 2017-08-25
 
 ### Added
-
 * Full parity with Font Awesome 4! 616 total core icons in each style
 * 297 total brand and logo icons
 * Separate CSS file to accompany the SVG Framework FortAwesome/Font-Awesome-Pro#627
@@ -962,7 +860,6 @@ will get a 404 - Not Found if you do not have access**
 * Made window icons consistent FortAwesome/Font-Awesome-Pro#611
 
 ### Fixed
-
 * Production builds not correctly being detected FortAwesome/Font-Awesome-Pro#631
 
 ---
@@ -970,12 +867,10 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta4](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta4)  - 2017-08-18
 
 ### Added
-
 * 590 total core icons in each style
 * 291 total brand and logo icons
 
 ### Fixed
-
 * Reduced the size of JS file from 66 to 22 kb
 * Regression caused by with web font alignment FortAwesome/Font-Awesome-Pro#460
 
@@ -984,11 +879,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta3](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta3)  - 2017-08-15
 
 ### Added
-
 * 583 total core icons in each style
 
 ### Fixed
-
 * Documentation improvements and fixes FortAwesome/Font-Awesome-Pro#586
 * Vertical alignment of TTF and OTF fonts FortAwesome/Font-Awesome-Pro#460
 * The "fa_500px" icon should be named "fa500px" FortAwesome/Font-Awesome-Pro#578
@@ -998,18 +891,15 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta2](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta2)  - 2017-08-11
 
 ### Added
-
 * 570 total core icons in each style
 * 291 total brand and logo icons
 * NPM (ES6, CommonJS, AMD) packages for use with other JavaScript libraries and tools FortAwesome/Font-Awesome-Pro#574
 * Added a guide to choosing which implementation is best for you FortAwesome/Font-Awesome-Pro#532
 
 ### Changed
-
 * Showing a missing icon is now configurable FortAwesome/Font-Awesome-Pro#569
 
 ### Fixed
-
 * Composition framework now works in browsers that do not support transform-origin FortAwesome/Font-Awesome-Pro#564
 
 ---
@@ -1017,20 +907,17 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-beta1](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-beta1)  - 2017-08-04
 
 ### Added
-
 * 524 total core icons in each style
 * 289 total brand and logo icons
 * New composition framework FortAwesome/Font-Awesome-Pro#537
 * Animated indicator if you use an icon that does not exist
 
 ### Changed
-
 * Basic linting for Sass and Less files
 * Add JavaScript guard block to prevent leaking errors
 * Add support for automatic accessibility to SVG Framework Layers
 
 ### Fixed
-
 * Regression where stacks and pulled and bordered were not working in SVG Framework
 * SVG sprite example had confusing inline styles FortAwesome/Font-Awesome-Pro#549
 * Make getting started page more consistent between examples FortAwesome/Font-Awesome-Pro#544
@@ -1042,19 +929,16 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha7](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha7)  - 2017-07-28
 
 ### Added
-
 * 451 total core icons in each style
 * 281 total brand and logo icons
 * Less support is back!
 * OpenType (.otf) file formats for web fonts
 
 ### Changed
-
 * Changes the fa-spin animation to go from 0deg to 360deg to eliminate hitch FortAwesome/Font-Awesome-Pro#522
 * Improved mutation handling FortAwesome/Font-Awesome-Pro#517
 
 ### Fixed
-
 * fa-fw now works correctly with the SVG framework FortAwesome/Font-Awesome-Pro#530
 * Removed execute bit on some icon files FortAwesome/Font-Awesome-Pro#520
 
@@ -1063,18 +947,15 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha6](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha6)  - 2017-07-21
 
 ### Added
-
 * 410 total core icons in each style
 * 270 total brand and logo icons
 * All new Font Awesome 4 shim file
 * Beginnings of a public JS API FortAwesome/Font-Awesome-Pro#512
 
 ### Changed
-
 * Added Firefox ESR and Chrome for Businesses to browser compatibility FortAwesome/Font-Awesome-Pro#506
 
 ### Fixed
-
 * Ensure that SVG title attributes are unique
 * Fixed incorrect viewBox sizes FortAwesome/Font-Awesome-Pro#492
 * Fix chart-area alignment in the solid style FortAwesome/Font-Awesome-Pro#508
@@ -1085,7 +966,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha5](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha5)  - 2017-07-14
 
 ### Added
-
 * 228 total brand and logo icons
 * New transform framework for sizing, moving, rotating, and flipping icons
 * New icon counters
@@ -1094,12 +974,10 @@ will get a 404 - Not Found if you do not have access**
 * Auto-comments with the original source icons alongside SVG replacements
 
 ### Changed
-
 * Autoprefixer to correctly add browser prefixes for supported browsers
 * Removed browser-specific CSS properties in Sass source files (now relies on autoprefixer)
 
 ### Fixed
-
 * The rotation on checkmark icons
 * Other icon feedback from previous weeks
 * Correct fixed width settings to 1.25em (based on the new 16px grid)
@@ -1110,7 +988,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha4](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha4)  - 2017-07-07
 
 ### Added
-
 * 93 brand icons
 
 ---
@@ -1118,11 +995,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha3](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha3)  - 2017-06-30
 
 ### Added
-
 * 95 additional icons; including file types, directional, and some existing and new brand icons
 
 ### Fixed
-
 * Wrong content type in generated CSS FortAwesome/Font-Awesome-Pro#458
 * Removal of query string from static resources FortAwesome/Font-Awesome-Pro#458
 * SVG font ID's are incorrect in webfont implementation FortAwesome/Font-Awesome-Pro#474
@@ -1132,11 +1007,9 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha2](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha2)  - 2017-06-27
 
 ### Added
-
 * How/When to upgrade from FA4 to FA5 FortAwesome/Font-Awesome-Pro#454
 
 ### Fixed
-
 * Links to SVG files broken in the example files FortAwesome/Font-Awesome-Pro#456
 * Misnamed icon names in examples FortAwesome/Font-Awesome-Pro#445
 * Mangled HTML in the Getting Started example FortAwesome/Font-Awesome-Pro#442
@@ -1153,7 +1026,6 @@ will get a 404 - Not Found if you do not have access**
 ## [5.0.0-alpha1](https://github.com/FortAwesome/Font-Awesome-Pro/releases/tag/5.0.0-alpha1)  - 2017-06-23
 
 ### Added
-
 * 300+ more icons
 * Brands pack
 * New JavaScript based SVG Framework
@@ -1162,5 +1034,4 @@ will get a 404 - Not Found if you do not have access**
 * Documentation with a convenient build-in web server
 
 ### Changed
-
 * New directory structure

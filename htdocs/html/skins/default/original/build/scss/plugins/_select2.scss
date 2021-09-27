@@ -291,25 +291,21 @@ select.form-control-sm ~ {
       color: $white;
     }
   }
-
   .select2-dropdown .select2-search__field,
   .select2-search--inline .select2-search__field {
     background-color: $dark;
     border-color: $gray-600;
     color: white;
   }
-
   .select2-dropdown {
     background-color: $dark;
     border-color: $gray-600;
     color: white;
   }
-
   .select2-results__option[aria-selected="true"] {
     background-color: lighten($dark, 5%) !important;
     color: $gray-300;
   }
-
   .select2-container .select2-search--inline .select2-search__field {
     background-color: transparent;
     color: $white;

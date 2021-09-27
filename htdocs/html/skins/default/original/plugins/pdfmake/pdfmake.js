@@ -58788,6 +58788,7 @@ exports.inflateUndermine = inflateUndermine;
                 }
 
 
+
 // == Encoder ==================================================================
 
                 function DBCSEncoder(options, codec) {

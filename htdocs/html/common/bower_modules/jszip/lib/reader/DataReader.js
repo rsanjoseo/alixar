@@ -7,7 +7,6 @@ function DataReader(data) {
     this.index = 0;
     this.zero = 0;
 }
-
 DataReader.prototype = {
     /**
      * Check that the offset will not go too far.

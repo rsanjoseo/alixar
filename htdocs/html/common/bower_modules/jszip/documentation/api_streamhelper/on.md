@@ -37,16 +37,16 @@ It takes an `Error` as parameter.
 
 ```js
 zip
-    .generateInternalStream({type: "uint8array"})
-    .on('data', function (data, metadata) {
-        // data is a Uint8Array because that's the type asked in generateInternalStream
-        // metadata contains for example currentFile and percent, see the generateInternalStream doc.
-    })
-    .on('error', function (e) {
-        // e is the error
-    })
-    .on('end', function () {
-        // no parameter
-    })
-    .resume();
+.generateInternalStream({type:"uint8array"})
+.on('data', function (data, metadata) {
+    // data is a Uint8Array because that's the type asked in generateInternalStream
+    // metadata contains for example currentFile and percent, see the generateInternalStream doc.
+})
+.on('error', function (e) {
+    // e is the error
+})
+.on('end', function () {
+    // no parameter
+})
+.resume();
 ```

@@ -13,6 +13,7 @@ the [core team](https://github.com/orgs/twbs/people) with the massive support an
 
 To get started, check out <https://getbootstrap.com/>!
 
+
 ## Table of contents
 
 * [Quick start](#quick-start)
@@ -24,6 +25,7 @@ To get started, check out <https://getbootstrap.com/>!
 * [Creators](#creators)
 * [Thanks](#thanks)
 * [Copyright and license](#copyright-and-license)
+
 
 ## Quick start
 

@@ -5,7 +5,7 @@
  */
 
 if (typeof jQuery === 'undefined') {
-    throw new Error('Tempus Dominus Bootstrap4\'s requires jQuery. jQuery must be included before Tempus Dominus Bootstrap4\'s JavaScript.');
+  throw new Error('Tempus Dominus Bootstrap4\'s requires jQuery. jQuery must be included before Tempus Dominus Bootstrap4\'s JavaScript.');
 }
 
 +function ($) {

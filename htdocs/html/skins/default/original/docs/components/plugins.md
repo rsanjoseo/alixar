@@ -12,9 +12,8 @@ You can override the color for bootstrap slider tracks with the following classe
 Example:
 
 ```html
-
 <div class="slider-red">
-    <input type="text" value="" class="slider form-control" data-slider...>
+  <input type="text" value="" class="slider form-control" data-slider...>
 </div>
 ```
 
@@ -26,11 +25,11 @@ You can also change the layout of the slider with the following classes:
 Example:
 
 ```html
-
 <div class="slider-red">
-    <input type="text" value="" class="slider slider-vertical form-control" data-slider...>
+  <input type="text" value="" class="slider slider-vertical form-control" data-slider...>
 </div>
 ```
+
 
 ### iCheck Bootstrap
 
@@ -41,14 +40,14 @@ You can override the color of a iCheck checkbox/radio input, add the following c
 Example:
 
 ```html
-
 <div class="icheck-primary">
-    <input type="checkbox" id="checkbox1">
-    <label for="checkbox1">
-        Checkbox Label
-    </label>
+  <input type="checkbox" id="checkbox1">
+  <label for="checkbox1">
+    Checkbox Label
+  </label>
 </div>
 ```
+
 
 ### Pace
 

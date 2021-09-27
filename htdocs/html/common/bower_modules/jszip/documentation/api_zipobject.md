@@ -23,69 +23,29 @@ attribute name              | type        | description
 Example:
 
 ```js
-{
-    name: 'docs/',
-        dir
-:
-    true,
-        date
-:
-    2016 - 12 - 25
-    T08:0
-    9
-:
-    27.153
-    Z,
-        comment
-:
-    null,
-        unixPermissions
-:
-    16877,
-        dosPermissions
-:
-    null,
-        options
-:
-    {
-        compression: 'STORE',
-            compressionOptions
-    :
-        null
-    }
+{ name: 'docs/',
+  dir: true,
+  date: 2016-12-25T08:09:27.153Z,
+  comment: null,
+  unixPermissions: 16877,
+  dosPermissions: null,
+  options: {
+    compression: 'STORE',
+    compressionOptions: null
+  }
 }
 ```
 
 ```js
-{
-    name: 'docs/list.txt',
-        dir
-:
-    false,
-        date
-:
-    2016 - 12 - 25
-    T08:0
-    9
-:
-    27.152
-    Z,
-        comment
-:
-    null,
-        unixPermissions
-:
-    33206,
-        dosPermissions
-:
-    null,
-        options
-:
-    {
-        compression: 'DEFLATE',
-            compressionOptions
-    :
-        null
-    }
+{ name: 'docs/list.txt',
+  dir: false,
+  date: 2016-12-25T08:09:27.152Z,
+  comment: null,
+  unixPermissions: 33206,
+  dosPermissions: null,
+  options: {
+    compression: 'DEFLATE',
+    compressionOptions: null
+  }
 }
 ```

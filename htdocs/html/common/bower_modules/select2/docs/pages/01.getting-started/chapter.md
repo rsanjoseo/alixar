@@ -77,7 +77,6 @@ and many other highly used options.
         <p>Support for both modern and legacy browsers is built-in, even including Internet Explorer 8.</p>
       </div>
     </div>
-
 </div>
 
 > > > > > <p style="text-align: left;">Looking for the documentation for Select2 3.5.3?  That can still be found <a href="http://select2.github.io/select2/">here</a>.</p>

@@ -33,7 +33,6 @@
 .scroll-element {
   display: none;
 }
-
 .scroll-element, .scroll-element div {
   box-sizing: content-box;
 }
@@ -51,11 +50,9 @@
 .scroll-textarea {
 
 }
-
 .scroll-textarea > .scroll-content {
   overflow: hidden !important;
 }
-
 .scroll-textarea > .scroll-content > textarea {
   border: none !important;
   box-sizing: border-box;
@@ -70,11 +67,12 @@
   top: 0;
   width: 100% !important;
 }
-
 .scroll-textarea > .scroll-content > textarea::-webkit-scrollbar {
   height: 0;
   width: 0;
 }
+
+
 
 
 /*************** SIMPLE INNER SCROLLBAR ***************/

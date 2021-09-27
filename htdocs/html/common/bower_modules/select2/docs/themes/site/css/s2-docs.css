@@ -77,12 +77,10 @@
     border-left: 1px solid transparent;
     transition: color .2s, border-color .2s;
 }
-
 .s2-docs-sidebar .nav > li > a code {
     background-color: inherit;
     color: inherit;
 }
-
 .s2-docs-sidebar .nav > li > a:hover,
 .s2-docs-sidebar .nav > li > a:focus {
     color: #428BCA;
@@ -90,7 +88,6 @@
     background-color: transparent;
     border-left-color: #428BCA;
 }
-
 .s2-docs-sidebar .nav > .active > a,
 .s2-docs-sidebar .nav > .active:hover > a,
 .s2-docs-sidebar .nav > .active:focus > a {
@@ -100,12 +97,10 @@
     background-color: transparent;
     border-left: 2px solid #428BCA;
 }
-
 .s2-docs-sidebar .nav .nav {
     display: none;
     padding-bottom: 10px;
 }
-
 .s2-docs-sidebar .nav .nav > li > a {
     padding-top: 1px;
     padding-bottom: 1px;
@@ -113,12 +108,10 @@
     font-size: 12px;
     font-weight: normal;
 }
-
 .s2-docs-sidebar .nav .nav > li > a:hover,
 .s2-docs-sidebar .nav .nav > li > a:focus {
     padding-left: 30px;
 }
-
 .s2-docs-sidebar .nav .nav > .active > a,
 .s2-docs-sidebar .nav .nav > .active:hover > a,
 .s2-docs-sidebar .nav .nav > .active:focus > a {
@@ -307,7 +300,6 @@ section {
         border-width: 10px;
         content: "";
     }
-
     .s2-docs-nav .navbar-nav > li > .dropdown-menu:after {
         position: absolute;
         top: -20px;

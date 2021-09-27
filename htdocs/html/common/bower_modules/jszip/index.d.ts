@@ -81,7 +81,6 @@ declare namespace JSZip {
          * @return Promise the promise of the result.
          */
         async<T extends OutputType>(type: T, onUpdate?: OnUpdateCallback): Promise<OutputByType[T]>;
-
         nodeStream(type?: 'nodebuffer', onUpdate?: OnUpdateCallback): NodeJS.ReadableStream;
     }
 
@@ -132,12 +131,13 @@ declare namespace JSZip {
          * @default 'application/zip'
          */
         mimeType?: string;
+
+        encodeFileName?(filename: string): string;
+
         /** Stream the files and create file descriptors */
         streamFiles?: boolean;
         /** DOS (default) or UNIX */
         platform?: 'DOS' | 'UNIX';
-
-        encodeFileName?(filename: string): string;
     }
 
     interface JSZipLoadOptions {
@@ -150,12 +150,6 @@ declare namespace JSZip {
 
 interface JSZip {
     files: { [key: string]: JSZip.JSZipObject };
-    prototype: JSZip;
-    support: JSZipSupport;
-    external: {
-        Promise: PromiseConstructorLike;
-    };
-    version: string;
 
     /**
      * Get a file from the archive
@@ -182,7 +176,6 @@ interface JSZip {
      * @return JSZip object
      */
     file<T extends JSZip.InputType>(path: string, data: InputByType[T] | Promise<InputByType[T]>, options?: JSZip.JSZipFileOptions): this;
-
     file<T extends JSZip.InputType>(path: string, data: null, options?: JSZip.JSZipFileOptions & { dir: true }): this;
 
     /**
@@ -215,10 +208,6 @@ interface JSZip {
      * @return Array of matched elements
      */
     filter(predicate: (relativePath: string, file: JSZip.JSZipObject) => boolean): JSZip.JSZipObject[];
-
-    /**
-     * Create JSZip instance
-     */
 
     /**
      * Removes the file or folder from the archive
@@ -257,14 +246,25 @@ interface JSZip {
 
     /**
      * Create JSZip instance
+     */
+    prototype: JSZip;
+
+    (): JSZip;
+
+    support: JSZipSupport;
+    external: {
+        Promise: PromiseConstructorLike;
+    };
+    version: string;
+
+    /**
+     * Create JSZip instance
      * If no parameters given an empty zip archive will be created
      *
      * @param data Serialized zip archive
      * @param options Description of the serialized zip archive
      */
     new(data?: InputFileFormat, options?: JSZip.JSZipLoadOptions): this;
-
-    (): JSZip;
 }
 
 declare var JSZip: JSZip;

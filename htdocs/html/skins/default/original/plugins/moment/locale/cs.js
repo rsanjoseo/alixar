@@ -37,7 +37,6 @@
     function plural(n) {
         return n > 1 && n < 5 && ~~(n / 10) !== 1;
     }
-
     function translate(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {

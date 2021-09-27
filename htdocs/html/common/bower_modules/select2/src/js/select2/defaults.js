@@ -35,7 +35,9 @@ define([
 
     './i18n/en'
 ], function ($, require,
+
              ResultsList,
+
              SingleSelection, MultipleSelection, Placeholder, AllowClear,
              SelectionSearch, EventRelay,
              Utils, Translation, DIACRITICS,

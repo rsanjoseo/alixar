@@ -1414,6 +1414,7 @@
     });
 
 
+
 // PDF export
     DataTable.ext.buttons.pdfFlash = $.extend({}, flashButton, {
         className: 'buttons-pdf buttons-flash',

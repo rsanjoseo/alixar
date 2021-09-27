@@ -161,7 +161,6 @@
     margin-left: $sidebar-width-smaller;
   }
 }
-
 @include breakpoint(mobile-only) {
   #sidebar {
     width: $sidebar-width-smaller;

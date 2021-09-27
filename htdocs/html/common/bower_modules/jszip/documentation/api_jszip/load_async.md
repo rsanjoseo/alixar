@@ -61,20 +61,20 @@ larger zip files, this option can have a significant performance cost.
 // here, "bin" is a corrupted zip file
 
 zip.loadAsync(bin)
-    .then(function (zip) {
-        // will be called, even if content is corrupted
-    }, function (e) {
-        // won't be called
-    });
+.then(function (zip) {
+    // will be called, even if content is corrupted
+}, function (e) {
+    // won't be called
+});
 
 zip.loadAsync(bin, {
     checkCRC32: true
 })
-    .then(function (zip) {
-        // won't be called
-    }, function (e) {
-        // Error: Corrupted zip : CRC32 mismatch
-    });
+.then(function (zip) {
+    // won't be called
+}, function (e) {
+    // Error: Corrupted zip : CRC32 mismatch
+});
 ```
 
 ### `createFolders` option
@@ -84,20 +84,20 @@ zip.loadAsync(bin, {
 // folder1/folder2/folder3/file1.txt
 
 zip.loadAsync(bin)
-    .then(function (zip) {
-        console.log(zip.files);
-        // folder1/folder2/folder3/file1.txt
-    });
+.then(function (zip) {
+    console.log(zip.files);
+    // folder1/folder2/folder3/file1.txt
+});
 
 // with createFolders: true, all folders will be created
 zip.loadAsync(bin, {createFolders: true})
-    .then(function (zip) {
-        console.log(zip.files);
-        // folder1/
-        // folder1/folder2/
-        // folder1/folder2/folder3/
-        // folder1/folder2/folder3/file1.txt
-    });
+.then(function (zip) {
+    console.log(zip.files);
+    // folder1/
+    // folder1/folder2/
+    // folder1/folder2/folder3/
+    // folder1/folder2/folder3/file1.txt
+});
 ```
 
 ### `decodeFileName` option
@@ -115,24 +115,24 @@ The function takes the bytes array (Uint8Array or Array) and returns the decoded
 // here, "bin" is a russian zip file, using the cp866 encoding for file names
 // by default, using UTF-8 leads to wrong file names:
 zip.loadAsync(bin)
-    .then(function (zip) {
-        console.log(zip.files);
-        // '����� �����/': ...
-        // '����� �����/����� ⥪�⮢�� ���㬥��.txt': ...
-    });
+.then(function (zip) {
+    console.log(zip.files);
+    // '����� �����/': ...
+    // '����� �����/����� ⥪�⮢�� ���㬥��.txt': ...
+});
 
 // using the correct encoding solve the issue:
 var iconv = require('iconv-lite');
 zip.loadAsync(bin, {
-    decodeFileName: function (bytes) {
-        return iconv.decode(bytes, 'cp866');
-    }
+  decodeFileName: function (bytes) {
+    return iconv.decode(bytes, 'cp866');
+  }
 })
-    .then(function (zip) {
-        console.log(zip.files);
-        // 'Новая папка/': ...
-        // 'Новая папка/Новый текстовый документ.txt': ...
-    });
+.then(function (zip) {
+    console.log(zip.files);
+    // 'Новая папка/': ...
+    // 'Новая папка/Новый текстовый документ.txt': ...
+});
 ```
 
 ## Other examples
@@ -144,9 +144,9 @@ zip.loadAsync(zipDataFromXHR);
 
 ```js
 require("fs").readFile("hello.zip", function (err, data) {
-    if (err) throw err;
-    var zip = new JSZip();
-    zip.loadAsync(data);
+  if (err) throw err;
+  var zip = new JSZip();
+  zip.loadAsync(data);
 }
 ```
 
@@ -159,12 +159,12 @@ Using sub folders :
 
 var zip = new JSZip();
 zip.folder("subfolder").loadAsync(bin)
-    .then(function (zip) {
-        // "zip" is still in the "subfolder" folder
-        console.log(zip.files);
-        // subfolder/file1.txt
-        // subfolder/folder1/file2.txt
-    });
+.then(function (zip) {
+    // "zip" is still in the "subfolder" folder
+    console.log(zip.files);
+    // subfolder/file1.txt
+    // subfolder/folder1/file2.txt
+});
 ```
 
 Using `loadAsync` multiple times:
@@ -179,9 +179,9 @@ Using `loadAsync` multiple times:
 
 var zip = new JSZip();
 zip.loadAsync(bin1)
-    .then(function (zip) {
-        return zip.loadAsync(bin2);
-    }).then(function (zip) {
+.then(function (zip) {
+    return zip.loadAsync(bin2);
+}).then(function (zip) {
     console.log(zip.files);
     // file1.txt, from bin1
     // file2.txt, from bin2

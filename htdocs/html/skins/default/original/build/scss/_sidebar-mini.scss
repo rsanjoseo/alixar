@@ -44,7 +44,6 @@
     @include sidebar-mini-breakpoint();
   }
 }
-
 @include media-breakpoint-down(md) {
   .sidebar-mini.sidebar-collapse .main-sidebar {
     box-shadow: none !important;
@@ -56,7 +55,6 @@
     @include sidebar-mini-breakpoint();
   }
 }
-
 @include media-breakpoint-down(sm) {
   .sidebar-mini-md.sidebar-collapse .main-sidebar {
     box-shadow: none !important;
@@ -102,12 +100,10 @@
         }
       }
     }
-
     .nav-legacy {
       .nav-link {
         width: $sidebar-width;
       }
-
       &.nav-child-indent {
         .nav-treeview {
           .nav-link {
@@ -140,12 +136,10 @@
         }
       }
     }
-
     .nav-flat {
       .nav-link {
         width: $sidebar-width;
       }
-
       &.nav-child-indent {
         .nav-treeview {
           .nav-link {
@@ -178,7 +172,6 @@
         }
       }
     }
-
     .nav-child-indent.nav-compact .nav-treeview {
       .nav-link {
         width: calc(#{$sidebar-width} - #{$sidebar-padding-x} * 2 - .5rem);
@@ -208,12 +201,10 @@
         }
       }
     }
-
     .nav-child-indent.nav-legacy.nav-compact {
       .nav-link {
         width: $sidebar-width;
       }
-
       .nav-treeview {
         .nav-link {
           width: calc(#{$sidebar-width} - .5rem);
@@ -244,7 +235,6 @@
         }
       }
     }
-
     .nav-link {
       width: calc(#{$sidebar-width} - #{$sidebar-padding-x} * 2);
       @include transition(width $transition-fn $transition-speed);
@@ -268,7 +258,6 @@
             width: $sidebar-mini-width;
           }
         }
-
         &.nav-child-indent.nav-compact {
           .nav-treeview {
             padding-left: 0 !important;
@@ -286,7 +275,6 @@
         .nav-link {
           width: calc(#{$sidebar-width} - #{$sidebar-padding-x} * 2);
         }
-
         .nav-header {
           display: inline-block;
         }
@@ -296,12 +284,10 @@
             width: calc(#{$sidebar-width} - #{$sidebar-padding-x} * 2);
           }
         }
-
         .nav-legacy {
           .nav-link {
             width: $sidebar-width;
           }
-
           &.nav-child-indent {
             .nav-treeview {
               .nav-link {
@@ -334,12 +320,10 @@
             }
           }
         }
-
         .nav-flat {
           .nav-link {
             width: $sidebar-width;
           }
-
           &.nav-child-indent {
             .nav-treeview {
               .nav-link {
@@ -372,18 +356,15 @@
             }
           }
         }
-
         .nav-child-indent.nav-compact {
           .nav-link {
             width: calc(#{$sidebar-width} - #{$sidebar-padding-x} * 2);
           }
         }
-
         .nav-child-indent.nav-legacy.nav-compact {
           .nav-link {
             width: $sidebar-width;
           }
-
           .nav-treeview {
             .nav-link {
               width: calc(#{$sidebar-width} - .5rem);
@@ -414,7 +395,6 @@
             }
           }
         }
-
         .sidebar {
           @include scrollbar-width-thin();
         }

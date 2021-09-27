@@ -46,7 +46,7 @@ To get a correct result, try to enable compression in `generateAsync`:
 
 ```js
 zip.generateAsync({
-    type: "...",
+    type:"...",
     compression: "DEFLATE" // <-- here
 });
 ```

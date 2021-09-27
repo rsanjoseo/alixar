@@ -17,10 +17,10 @@ With recent browsers, the easiest way is to use `saveAs` or a polyfill, see
 [FileSaver.js](https://github.com/eligrey/FileSaver.js) :
 
 ```js
-zip.generateAsync({type: "blob"})
-    .then(function (blob) {
-        saveAs(blob, "hello.zip");
-    });
+zip.generateAsync({type:"blob"})
+.then(function (blob) {
+    saveAs(blob, "hello.zip");
+});
 ```
 
 Under the hood, the polyfill uses the native `saveAs` from the
@@ -29,13 +29,14 @@ Under the hood, the polyfill uses the native `saveAs` from the
 a [Blob URL](http://updates.html5rocks.com/2011/08/Downloading-resources-in-HTML5-a-download)
 (on Firefox).
 
+
 #### Data URI
 
 For older browsers that support [data URI](http://caniuse.com/datauri), you can also do the following :
 
 ```js
-zip.generateAsync({type: "base64"}).then(function (base64) {
-    location.href = "data:application/zip;base64," + base64;
+zip.generateAsync({type:"base64"}).then(function (base64) {
+    location.href="data:application/zip;base64," + base64;
 });
 ```
 
@@ -61,21 +62,15 @@ with the following changes:
 zip = new JSZip();
 zip.file("Hello.", "hello.txt");
 
-zip.generateAsync({type: "base64"}).then(function (base64) {
-    Downloadify.create('downloadify', {
-        ...
-            data
-:
-
-    function () {
+zip.generateAsync({type:"base64"}).then(function (base64) {
+    Downloadify.create('downloadify',{
+    ...
+    data: function(){
         return base64;
-    }
-
-,
-...
+    },
+    ...
     dataType: 'base64'
-})
-    ;
+    });
 });
 ```
 

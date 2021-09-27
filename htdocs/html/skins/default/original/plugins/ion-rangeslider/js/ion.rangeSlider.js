@@ -116,6 +116,7 @@
     }
 
 
+
     // =================================================================================================================
     // Template
 
@@ -141,6 +142,7 @@
 
     var disable_html =
         '<span class="irs-disable-mask"></span>';
+
 
 
     // =================================================================================================================
@@ -259,6 +261,7 @@
             p_single_fake: 0,
             p_single_left: 0
         };
+
 
 
         /**
@@ -426,6 +429,7 @@
         }
 
 
+
         // js config extends default config
         $.extend(config, options);
 
@@ -435,9 +439,11 @@
         this.options = config;
 
 
+
         // validate config, to be sure that all data types are correct
         this.update_check = {};
         this.validate();
+
 
 
         // default result object, returned to callbacks
@@ -456,6 +462,7 @@
             to_percent: 0,
             to_value: null
         };
+
 
 
         this.init();

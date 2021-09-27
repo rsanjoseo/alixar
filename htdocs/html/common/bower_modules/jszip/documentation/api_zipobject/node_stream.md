@@ -22,12 +22,12 @@ see [the metadata of `async()`]({{site.baseurl}}/documentation/api_zipobject/asy
 
 ```js
 zip
-    .file("my_text.txt")
-    .nodeStream()
-    .pipe(fs.createWriteStream('/tmp/my_text.txt'))
-    .on('finish', function () {
-        // JSZip generates a readable stream with a "end" event,
-        // but is piped here in a writable stream which emits a "finish" event.
-        console.log("text file written.");
-    });
+.file("my_text.txt")
+.nodeStream()
+.pipe(fs.createWriteStream('/tmp/my_text.txt'))
+.on('finish', function () {
+    // JSZip generates a readable stream with a "end" event,
+    // but is piped here in a writable stream which emits a "finish" event.
+    console.log("text file written.");
+});
 ```

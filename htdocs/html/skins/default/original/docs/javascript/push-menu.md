@@ -13,14 +13,11 @@ This plugin can be activated as a jQuery plugin or using the data api.
 {: .text-bold } Add `data-widget="pushmenu"` to a button to activate the plugin.
 
 ```html
-
 <button class="btn btn-primary" data-widget="pushmenu">Toggle Sidebar</button>
 ```
 
 ###### jQuery
-
 {: .text-bold }
-
 ```js
 $('.sidebar-toggle-btn').PushMenu(options)
 ```
@@ -39,6 +36,7 @@ to trigger auto collapse sidebar |enableRemember | Boolean | FALSE | Remember si
 > <button class="btn btn-primary" data-widget="pushmenu" data-auto-collapse-size="768">Toggle Sidebar</button>
 > ```
 {: .quote-info}
+
 
 ##### Events
 

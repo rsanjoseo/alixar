@@ -1,5 +1,4 @@
 <?php
-
 namespace Grav\Plugin;
 
 use Grav\Common\Grav;
@@ -62,6 +61,7 @@ class Breadcrumbs
                 $hierarchy[] = $home;
             }
         }
+
 
         $this->breadcrumbs = array_reverse($hierarchy);
     }

@@ -13,7 +13,6 @@ function DataLengthProbe(propName) {
     this.propName = propName;
     this.withStreamInfo(propName, 0);
 }
-
 utils.inherits(DataLengthProbe, GenericWorker);
 
 /**

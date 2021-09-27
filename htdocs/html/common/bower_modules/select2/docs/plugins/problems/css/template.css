@@ -534,7 +534,6 @@ textarea:focus, input[type="email"]:focus, input[type="number"]:focus, input[typ
 form .buttons {
     text-align: center;
 }
-
 form input {
     font-weight: 400;
 }
