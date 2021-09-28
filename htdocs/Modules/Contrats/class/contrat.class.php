@@ -1068,7 +1068,7 @@ class Contrat extends CommonObject
                     $originforcontact = $this->origin;
                     $originidforcontact = $this->origin_id;
                     if ($originforcontact == 'shipping') {     // shipment and order share the same contacts. If creating from shipment we take data of order
-                        require_once DOL_DOCUMENT_ROOT . '/expedition/class/expedition.class.php';
+                        require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
                         $exp = new Expedition($this->db);
                         $exp->fetch($this->origin_id);
                         $exp->fetchObjectLinked();
@@ -2010,7 +2010,7 @@ class Contrat extends CommonObject
 
         $result = '';
 
-        $url = DOL_URL_ROOT . '/contrat/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Contrats/card.php?id=' . $this->id;
 
         //if ($option !== 'nolink')
         //{
@@ -2260,15 +2260,15 @@ class Contrat extends CommonObject
                 $warning_delay = $conf->contrat->services->inactifs->warning_delay;
                 $label = $langs->trans("BoardNotActivatedServices");
                 $labelShort = $langs->trans("BoardNotActivatedServicesShort");
-                $url = DOL_URL_ROOT . '/contrat/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=0&sortfield=cd.date_fin_validite&sortorder=asc';
+                $url = DOL_URL_ROOT . '/Modules/Contrats/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=0&sortfield=cd.date_fin_validite&sortorder=asc';
             } elseif ($mode == 'expired') {
                 $warning_delay = $conf->contrat->services->expires->warning_delay;
-                $url = DOL_URL_ROOT . '/contrat/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=4&filter=expired&sortfield=cd.date_fin_validite&sortorder=asc';
+                $url = DOL_URL_ROOT . '/Modules/Contrats/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=4&filter=expired&sortfield=cd.date_fin_validite&sortorder=asc';
                 $label = $langs->trans("BoardExpiredServices");
                 $labelShort = $langs->trans("BoardExpiredServicesShort");
             } else {
                 $warning_delay = $conf->contrat->services->expires->warning_delay;
-                $url = DOL_URL_ROOT . '/contrat/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=4&sortfield=cd.date_fin_validite&sortorder=asc';
+                $url = DOL_URL_ROOT . '/Modules/Contrats/services_list.php?mainmenu=commercial&leftmenu=contracts&mode=4&sortfield=cd.date_fin_validite&sortorder=asc';
                 //$url.= '&op2day='.$arraydatetouse['mday'].'&op2month='.$arraydatetouse['mon'].'&op2year='.$arraydatetouse['year'];
                 //if ($warning_delay >= 0) $url.='&amp;filter=expired';
                 $label = $langs->trans("BoardRunningServices");
@@ -2510,7 +2510,7 @@ class Contrat extends CommonObject
     {
         global $db, $langs, $conf, $hookmanager, $extrafields;
 
-        dol_include_once('/projet/class/project.class.php');
+        dol_include_once('/Modules/Projects/class/project.class.php');
 
         $error = 0;
 
@@ -2846,7 +2846,7 @@ class ContratLigne extends CommonObjectLine
             $label = $this->description;
         }
 
-        $link = '<a href="' . DOL_URL_ROOT . '/contrat/card.php?id=' . $this->fk_contrat . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
+        $link = '<a href="' . DOL_URL_ROOT . '/Modules/Contrats/card.php?id=' . $this->fk_contrat . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
         $linkend = '</a>';
 
         $picto = 'service';

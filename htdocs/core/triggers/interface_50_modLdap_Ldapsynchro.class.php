@@ -452,7 +452,7 @@ class InterfaceLdapsynchro extends DolibarrTriggers
                     // For member type
                     if (!empty($conf->global->LDAP_MEMBER_TYPE_ACTIVE) && (string) $conf->global->LDAP_MEMBER_TYPE_ACTIVE == '1') {
                         if ($object->typeid > 0) {
-                            require_once DOL_DOCUMENT_ROOT . "/adherents/class/adherent_type.class.php";
+                            require_once DOL_DOCUMENT_ROOT . "/Modules/Adherents/class/adherent_type.class.php";
                             $membertype = new AdherentType($this->db);
                             $membertype->fetch($object->typeid);
                             $membertype->listMembersForMemberType('', 1);
@@ -558,7 +558,7 @@ class InterfaceLdapsynchro extends DolibarrTriggers
 
                     // For member type
                     if (!empty($conf->global->LDAP_MEMBER_TYPE_ACTIVE) && (string) $conf->global->LDAP_MEMBER_TYPE_ACTIVE == '1') {
-                        require_once DOL_DOCUMENT_ROOT . "/adherents/class/adherent_type.class.php";
+                        require_once DOL_DOCUMENT_ROOT . "/Modules/Adherents/class/adherent_type.class.php";
 
                         /*
                          * Change member info
@@ -671,7 +671,7 @@ class InterfaceLdapsynchro extends DolibarrTriggers
                     // For member type
                     if (!empty($conf->global->LDAP_MEMBER_TYPE_ACTIVE) && (string) $conf->global->LDAP_MEMBER_TYPE_ACTIVE == '1') {
                         if ($object->typeid > 0) {
-                            require_once DOL_DOCUMENT_ROOT . "/adherents/class/adherent_type.class.php";
+                            require_once DOL_DOCUMENT_ROOT . "/Modules/Adherents/class/adherent_type.class.php";
 
                             /*
                              * Remove member in member type

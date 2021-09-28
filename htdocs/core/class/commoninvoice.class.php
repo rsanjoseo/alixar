@@ -706,7 +706,7 @@ abstract class CommonInvoice extends CommonObject
         dol_syslog(get_class($this) . "::demande_prelevement", LOG_DEBUG);
 
         if ($this->statut > self::STATUS_DRAFT && $this->paye == 0) {
-            require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/companybankaccount.class.php';
             $bac = new CompanyBankAccount($this->db);
             $bac->fetch(0, $this->socid);
 

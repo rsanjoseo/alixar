@@ -116,10 +116,10 @@ function getEntity($element, $shared = 1, $currentobject = null)
     switch ($element) {
         case 'contrat':
             $element = 'contract';
-            break; // "/contrat/class/contrat.class.php"
+            break; // "/Modules/Contracts/class/contrat.class.php"
         case 'order_supplier':
             $element = 'supplier_order';
-            break; // "/fourn/class/fournisseur.commande.class.php"
+            break; // "/Modules/Fourn/class/fournisseur.commande.class.php"
     }
 
     if (is_object($mc)) {
@@ -2790,7 +2790,7 @@ function dol_print_email($email, $cid = 0, $socid = 0, $addlink = 0, $max = 64, 
             $type = 'AC_EMAIL';
             $link = '';
             if (!empty($conf->global->AGENDA_ADDACTIONFOREMAIL)) {
-                $link = '<a href="' . DOL_URL_ROOT . '/comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $type . '&amp;contactid=' . $cid . '&amp;socid=' . $socid . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
+                $link = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $type . '&amp;contactid=' . $cid . '&amp;socid=' . $socid . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
             }
             if ($link) {
                 $newemail = '<div>' . $newemail . ' ' . $link . '</div>';
@@ -2896,7 +2896,7 @@ function dol_print_socialnetworks($value, $cid, $socid, $type, $dictsocialnetwor
                 $addlink = 'AC_SKYPE';
                 $link = '';
                 if (!empty($conf->global->AGENDA_ADDACTIONFORSKYPE)) {
-                    $link = '<a href="' . DOL_URL_ROOT . '/comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $addlink . '&amp;contactid=' . $cid . '&amp;socid=' . $socid . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
+                    $link = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $addlink . '&amp;contactid=' . $cid . '&amp;socid=' . $socid . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
                 }
                 $htmllink .= ($link ? ' ' . $link : '');
             }
@@ -3173,7 +3173,7 @@ function dol_print_phone($phone, $countrycode = '', $cid = 0, $socid = 0, $addli
                 $type = 'AC_FAX';
             }
             if (!empty($conf->global->AGENDA_ADDACTIONFORPHONE)) {
-                $link = '<a href="' . DOL_URL_ROOT . '/comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $type . ($cid ? '&amp;contactid=' . $cid : '') . ($socid ? '&amp;socid=' . $socid : '') . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
+                $link = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/action/card.php?action=create&amp;backtopage=1&amp;actioncode=' . $type . ($cid ? '&amp;contactid=' . $cid : '') . ($socid ? '&amp;socid=' . $socid : '') . '">' . img_object($langs->trans("AddAction"), "calendar") . '</a>';
             }
             if ($link) {
                 $newphone = '<div>' . $newphone . ' ' . $link . '</div>';
@@ -5883,7 +5883,7 @@ function get_product_vat_for_country($idprod, $thirdpartytouse, $idprodfournpric
 {
     global $db, $conf, $mysoc;
 
-    require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+    require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
 
     $ret = 0;
     $found = 0;
@@ -5959,7 +5959,7 @@ function get_product_localtax_for_country($idprod, $local, $thirdpartytouse)
     global $db, $mysoc;
 
     if (!class_exists('Product')) {
-        require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
     }
 
     $ret = 0;
@@ -6133,14 +6133,14 @@ function get_default_npr(Societe $thirdparty_seller, Societe $thirdparty_buyer, 
 
     if ($idprodfournprice > 0) {
         if (!class_exists('ProductFournisseur')) {
-            require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.product.class.php';
         }
         $prodprice = new ProductFournisseur($db);
         $prodprice->fetch_product_fournisseur_price($idprodfournprice);
         return $prodprice->fourn_tva_npr;
     } elseif ($idprod > 0) {
         if (!class_exists('Product')) {
-            require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
         }
         $prod = new Product($db);
         $prod->fetch($idprod);
@@ -7332,19 +7332,19 @@ function getCommonSubstitutionArray($outputlangs, $onlykey = 0, $exclude = null,
                 }
 
                 if (is_object($object) && $object->element == 'propal') {
-                    $substitutionarray['__URL_PROPOSAL__'] = DOL_MAIN_URL_ROOT . "/comm/propal/card.php?id=" . $object->id;
+                    $substitutionarray['__URL_PROPOSAL__'] = DOL_MAIN_URL_ROOT . "/Modules/Comm/propal/card.php?id=" . $object->id;
                 }
                 if (is_object($object) && $object->element == 'commande') {
-                    $substitutionarray['__URL_ORDER__'] = DOL_MAIN_URL_ROOT . "/commande/card.php?id=" . $object->id;
+                    $substitutionarray['__URL_ORDER__'] = DOL_MAIN_URL_ROOT . "/Modules/Commande/card.php?id=" . $object->id;
                 }
                 if (is_object($object) && $object->element == 'facture') {
-                    $substitutionarray['__URL_INVOICE__'] = DOL_MAIN_URL_ROOT . "/compta/facture/card.php?id=" . $object->id;
+                    $substitutionarray['__URL_INVOICE__'] = DOL_MAIN_URL_ROOT . "/Modules/Compta/facture/card.php?id=" . $object->id;
                 }
                 if (is_object($object) && $object->element == 'contrat') {
-                    $substitutionarray['__URL_CONTRACT__'] = DOL_MAIN_URL_ROOT . "/contrat/card.php?id=" . $object->id;
+                    $substitutionarray['__URL_CONTRACT__'] = DOL_MAIN_URL_ROOT . "/Modules/Contracts/card.php?id=" . $object->id;
                 }
                 if (is_object($object) && $object->element == 'supplier_proposal') {
-                    $substitutionarray['__URL_SUPPLIER_PROPOSAL__'] = DOL_MAIN_URL_ROOT . "/supplier_proposal/card.php?id=" . $object->id;
+                    $substitutionarray['__URL_SUPPLIER_PROPOSAL__'] = DOL_MAIN_URL_ROOT . "/Modules/SupplierProposal/card.php?id=" . $object->id;
                 }
                 if (is_object($object) && $object->element == 'shipping') {
                     $substitutionarray['__URL_SHIPMENT__'] = DOL_MAIN_URL_ROOT . "/expedition/card.php?id=" . $object->id;

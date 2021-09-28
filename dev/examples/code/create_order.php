@@ -59,7 +59,7 @@ print "***** " . $script_file . " (" . $version . ") *****\n";
 // Start of transaction
 $db->begin();
 
-require_once DOL_DOCUMENT_ROOT . "/commande/class/commande.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Commande/class/commande.class.php";
 
 // Create order object
 $com = new Commande($db);

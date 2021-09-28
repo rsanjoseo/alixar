@@ -25,7 +25,9 @@
  * @deprecated It's not necessary in Alixar
  */
 
-const BASE_FOLDER = __DIR__;
+if (!defined('BASE_FOLDER')) {
+    define('BASE_FOLDER', __DIR__);
+}
 
 use Alxarafe\Core\Controllers\EditConfig;
 use Alxarafe\Core\Controllers\Install;

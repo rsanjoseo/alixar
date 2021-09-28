@@ -72,7 +72,7 @@ class ProblemsPlugin extends Plugin
         $uri = $this->grav['uri'];
         $baseUrlRelative = $uri->rootUrl(false);
         $themeUrl = $baseUrlRelative . '/' . USER_PATH . basename(THEMES_DIR) . '/' . $theme;
-        $problemsUrl = $baseUrlRelative . '/user/plugins/problems';
+        $problemsUrl = $baseUrlRelative . '/Modules/Users/plugins/problems';
 
         $html = file_get_contents(__DIR__ . '/html/problems.html');
 

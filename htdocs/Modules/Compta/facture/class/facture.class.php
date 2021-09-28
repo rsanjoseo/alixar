@@ -569,7 +569,7 @@ class Facture extends CommonInvoice
         if ($this->fac_rec > 0) {
             $this->fk_fac_rec_source = $this->fac_rec;
 
-            require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture-rec.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture-rec.class.php';
             $_facrec = new FactureRec($this->db);
             $result = $_facrec->fetch($this->fac_rec);
             $result = $_facrec->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0); // This load $_facrec->linkedObjectsIds
@@ -806,7 +806,7 @@ class Facture extends CommonInvoice
                 $originforcontact = $this->origin;
                 $originidforcontact = $this->origin_id;
                 if ($originforcontact == 'shipping') {     // shipment and order share the same contacts. If creating from shipment we take data of order
-                    require_once DOL_DOCUMENT_ROOT . '/expedition/class/expedition.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
                     $exp = new Expedition($this->db);
                     $exp->fetch($this->origin_id);
                     $exp->fetchObjectLinked(null, '', null, '', 'OR', 1, 'sourcetype', 0);
@@ -1006,7 +1006,7 @@ class Facture extends CommonInvoice
 
                     // If buyprice not defined from template invoice, we try to guess the best value
                     if (!$buyprice && $_facrec->lines[$i]->fk_product > 0) {
-                        require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+                        require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.product.class.php';
                         $producttmp = new ProductFournisseur($this->db);
                         $producttmp->fetch($_facrec->lines[$i]->fk_product);
 
@@ -2042,9 +2042,9 @@ class Facture extends CommonInvoice
         $result = '';
 
         if ($option == 'withdraw') {
-            $url = DOL_URL_ROOT . '/compta/facture/prelevement.php?facid=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Compta/facture/prelevement.php?facid=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/compta/facture/card.php?facid=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Compta/facture/card.php?facid=' . $this->id;
         }
 
         if (!$user->rights->facture->lire) {
@@ -2158,7 +2158,7 @@ class Facture extends CommonInvoice
                 //$notetoshow = $langs->trans("ViewPrivateNote").':<br>'.dol_string_nohtmltag($txttoshow, 1);
                 $notetoshow = $langs->trans("ViewPrivateNote") . ':<br>' . $txttoshow;
                 $result .= ' <span class="note inline-block">';
-                $result .= '<a href="' . DOL_URL_ROOT . '/compta/facture/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow, 1, 1) . '">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/Modules/Compta/facture/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow, 1, 1) . '">';
                 $result .= img_picto('', 'note');
                 $result .= '</a>';
                 //$result.=img_picto($langs->trans("ViewNote"),'object_generic');
@@ -2582,7 +2582,7 @@ class Facture extends CommonInvoice
 
             // If we decrease stock on invoice validation, we increase back if a warehouse id was provided
             if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL) && $idwarehouse != -1) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $num = count($this->lines);
@@ -2910,9 +2910,9 @@ class Facture extends CommonInvoice
         $productStatic = null;
         $warehouseStatic = null;
         if ($batch_rule > 0) {
-            require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
-            require_once DOL_DOCUMENT_ROOT . '/product/class/productbatch.class.php';
-            require_once DOL_DOCUMENT_ROOT . '/product/stock/class/entrepot.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/productbatch.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/entrepot.class.php';
             $productStatic = new Product($this->db);
             $warehouseStatic = new Entrepot($this->db);
         }
@@ -3025,7 +3025,7 @@ class Facture extends CommonInvoice
 
                 // Si active on decremente le produit principal et ses composants a la validation de facture
                 if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL) && $idwarehouse > 0) {
-                    require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                     $langs->load("agenda");
 
                     // Loop on each line
@@ -3503,7 +3503,7 @@ class Facture extends CommonInvoice
 
             // If we decrease stock on invoice validation, we increase back
             if ($this->type != self::TYPE_DEPOSIT && $result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_BILL)) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $num = count($this->lines);
@@ -4367,7 +4367,7 @@ class Facture extends CommonInvoice
             $response->warning_delay = $conf->facture->client->warning_delay / 60 / 60 / 24;
             $response->label = $langs->trans("CustomerBillsUnpaid");
             $response->labelShort = $langs->trans("Unpaid");
-            $response->url = DOL_URL_ROOT . '/compta/facture/list.php?search_status=1&mainmenu=billing&leftmenu=customers_bills';
+            $response->url = DOL_URL_ROOT . '/Modules/Compta/facture/list.php?search_status=1&mainmenu=billing&leftmenu=customers_bills';
             $response->img = img_object('', "bill");
 
             $generic_facture = new Facture($this->db);
@@ -4381,7 +4381,7 @@ class Facture extends CommonInvoice
 
                 if ($generic_facture->hasDelay()) {
                     $response->nbtodolate++;
-                    $response->url_late = DOL_URL_ROOT . '/compta/facture/list.php?search_option=late&mainmenu=billing&leftmenu=customers_bills';
+                    $response->url_late = DOL_URL_ROOT . '/Modules/Compta/facture/list.php?search_option=late&mainmenu=billing&leftmenu=customers_bills';
                 }
             }
 

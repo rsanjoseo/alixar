@@ -548,7 +548,7 @@ class RemiseCheque extends CommonObject
             $response->warning_delay = $conf->bank->cheque->warning_delay / 60 / 60 / 24;
             $response->label = $langs->trans("BankChecksToReceipt");
             $response->labelShort = $langs->trans("BankChecksToReceiptShort");
-            $response->url = DOL_URL_ROOT . '/compta/paiement/cheque/index.php?leftmenu=checks&amp;mainmenu=bank';
+            $response->url = DOL_URL_ROOT . '/Modules/Compta/paiement/cheque/index.php?leftmenu=checks&amp;mainmenu=bank';
             $response->img = img_object('', "payment");
 
             while ($obj = $this->db->fetch_object($resql)) {
@@ -626,7 +626,7 @@ class RemiseCheque extends CommonObject
         // Charge le modele
         $file = "pdf_" . $model . ".class.php";
         if (file_exists($dir . $file)) {
-            include_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
             include_once $dir . $file;
 
             $classname = 'BordereauCheque' . ucfirst($model);
@@ -948,7 +948,7 @@ class RemiseCheque extends CommonObject
         $label .= '<br>';
         $label .= '<b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 
-        $url = DOL_URL_ROOT . '/compta/paiement/cheque/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Compta/paiement/cheque/card.php?id=' . $this->id;
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not

@@ -702,7 +702,7 @@ class Fichinter extends CommonObject
         }
         $label .= '<br><b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 
-        $url = DOL_URL_ROOT . '/fichinter/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Fichinter/card.php?id=' . $this->id;
 
         if ($option !== 'nolink') {
             // Add param to save lastsearch_values or not

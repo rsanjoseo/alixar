@@ -414,7 +414,7 @@ class Commande extends CommonOrder
             if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER == 1) {
                 $result = 0;
 
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $num = count($this->lines);
@@ -601,7 +601,7 @@ class Commande extends CommonOrder
         if ($this->db->query($sql)) {
             // If stock is decremented on validate order, we must reincrement it
             if (!empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER == 1) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $num = count($this->lines);
@@ -989,7 +989,7 @@ class Commande extends CommonOrder
                         $originforcontact = $this->origin;
                         $originidforcontact = $this->origin_id;
                         if ($originforcontact == 'shipping') {     // shipment and order share the same contacts. If creating from shipment we take data of order
-                            require_once DOL_DOCUMENT_ROOT . '/expedition/class/expedition.class.php';
+                            require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
                             $exp = new Expedition($this->db);
                             $exp->fetch($this->origin_id);
                             $exp->fetchObjectLinked();
@@ -1825,7 +1825,7 @@ class Commande extends CommonOrder
         if (!$error) {
             // If stock is incremented on validate order, we must increment it
             if ($result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER) && $conf->global->STOCK_CALCULATE_ON_VALIDATE_ORDER == 1) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 // Loop on each line
@@ -3545,7 +3545,7 @@ class Commande extends CommonOrder
             $response->warning_delay = $conf->commande->client->warning_delay / 60 / 60 / 24;
             $response->label = $langs->trans("OrdersToProcess");
             $response->labelShort = $langs->trans("Opened");
-            $response->url = DOL_URL_ROOT . '/commande/list.php?search_status=-3&mainmenu=commercial&leftmenu=orders';
+            $response->url = DOL_URL_ROOT . '/Modules/Commande/list.php?search_status=-3&mainmenu=commercial&leftmenu=orders';
             $response->img = img_object('', "order");
 
             $generic_commande = new Commande($this->db);
@@ -3633,9 +3633,9 @@ class Commande extends CommonOrder
         $result = '';
 
         if (!empty($conf->expedition->enabled) && ($option == '1' || $option == '2')) {
-            $url = DOL_URL_ROOT . '/expedition/shipment.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Expedition/shipment.php?id=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/commande/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Commande/card.php?id=' . $this->id;
         }
 
         if (!$user->rights->commande->lire) {
@@ -3716,7 +3716,7 @@ class Commande extends CommonOrder
             if ($txttoshow) {
                 $notetoshow = $langs->trans("ViewPrivateNote") . ':<br>' . dol_string_nohtmltag($txttoshow, 1);
                 $result .= ' <span class="note inline-block">';
-                $result .= '<a href="' . DOL_URL_ROOT . '/commande/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/Modules/Commande/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
                 $result .= img_picto('', 'note');
                 $result .= '</a>';
                 //$result.=img_picto($langs->trans("ViewNote"),'object_generic');

@@ -34,15 +34,15 @@ $path = __DIR__.'/';
 
 // Test if batch mode
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit(-1);
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit(-1);
 }
 
-require_once $path."../../htdocs/master.inc.php";
-require_once DOL_DOCUMENT_ROOT."/core/lib/date.lib.php";
-require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
-require_once DOL_DOCUMENT_ROOT."/adherents/class/adherent.class.php";
-require_once DOL_DOCUMENT_ROOT."/adherents/class/subscription.class.php";
+require_once $path . "../../htdocs/master.inc.php";
+require_once DOL_DOCUMENT_ROOT . "/core/lib/date.lib.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/ldap.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Adherents/class/adherent.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Adherents/class/subscription.class.php";
 
 $langs->loadLangs(["main", "errors"]);
 

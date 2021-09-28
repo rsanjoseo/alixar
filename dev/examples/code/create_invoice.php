@@ -59,7 +59,7 @@ print "***** " . $script_file . " (" . $version . ") *****\n";
 // Start of transaction
 $db->begin();
 
-require_once DOL_DOCUMENT_ROOT . "/compta/facture/class/facture.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Compta/facture/class/facture.class.php";
 
 // Create invoice object
 $obj = new Facture($db);

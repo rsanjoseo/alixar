@@ -601,7 +601,8 @@ if (empty($conf->global->MAIN_DISABLE_GLOBAL_WORKBOARD)) {
 
         if (!empty($isIntopOpenedDashBoard)) {
             for ($i = 1; $i <= 10; $i++) {
-                $openedDashBoard .= '<div class="box-flex-item filler"></div>';
+                $openedDashBoard .= '<div class="box-flex-item filler"></div>
+';
             }
         }
 

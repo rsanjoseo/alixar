@@ -59,7 +59,7 @@ print "***** " . $script_file . " (" . $version . ") *****\n";
 // Start of transaction
 $db->begin();
 
-require_once DOL_DOCUMENT_ROOT . "/user/class/user.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Users/class/user.class.php";
 
 // Create user object
 $obj = new User($db);

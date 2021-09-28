@@ -19,13 +19,13 @@
 // Put here all includes required by your class file
 
 require '../main.inc.php';
-require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 require_once DOL_DOCUMENT_ROOT . '/stripe/class/stripe.class.php';
 //require_once DOL_DOCUMENT_ROOT.'/core/lib/stripe.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
-require_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
-require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
 if (!empty($conf->accounting->enabled)) {
     require_once DOL_DOCUMENT_ROOT . '/accountancy/class/accountingjournal.class.php';
 }
@@ -248,7 +248,7 @@ if (!$rowid) {
             $object = new Commande($db);
             $object->fetch($charge->metadata->dol_id);
             if ($object->id > 0) {
-                print "<a href='" . DOL_URL_ROOT . "/commande/card.php?id=" . $object->id . "'>" . img_picto('', 'object_order') . " " . $object->ref . "</a>";
+                print "<a href='" . DOL_URL_ROOT . "/Modules/Commande/card.php?id=" . $object->id . "'>" . img_picto('', 'object_order') . " " . $object->ref . "</a>";
             } else {
                 print $FULLTAG;
             }
@@ -257,7 +257,7 @@ if (!$rowid) {
             $object = new Facture($db);
             $object->fetch($charge->metadata->dol_id);
             if ($object->id > 0) {
-                print "<a href='" . DOL_URL_ROOT . "/compta/facture/card.php?facid=" . $charge->metadata->dol_id . "'>" . img_picto('', 'object_invoice') . " " . $object->ref . "</a>";
+                print "<a href='" . DOL_URL_ROOT . "/Modules/Compta/facture/card.php?facid=" . $charge->metadata->dol_id . "'>" . img_picto('', 'object_invoice') . " " . $object->ref . "</a>";
             } else {
                 print $FULLTAG;
             }

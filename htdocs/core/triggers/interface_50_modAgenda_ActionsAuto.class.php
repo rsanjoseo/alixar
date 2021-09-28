@@ -707,7 +707,7 @@ class InterfaceActionsAuto extends DolibarrTriggers
             $member = $this->context['member'];
             if (!is_object($member)) {    // This should not happen
                 dol_syslog("Execute a trigger MEMBER_SUBSCRIPTION_CREATE with context key 'member' not an object");
-                include_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
                 $member = new Adherent($this->db);
                 $member->fetch($object->fk_adherent);
             }
@@ -731,7 +731,7 @@ class InterfaceActionsAuto extends DolibarrTriggers
 
             $member = $this->context['member'];
             if (!is_object($member)) {    // This should not happen
-                include_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
                 $member = new Adherent($this->db);
                 $member->fetch($this->fk_adherent);
             }
@@ -973,8 +973,8 @@ class InterfaceActionsAuto extends DolibarrTriggers
                 $object->actionmsg = dol_concatdesc($object->actionmsg, "\n" . $langs->transnoentities("AttachedFiles") . ': ' . $attachs);
             }
         }
-        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
-        require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
         $contactforaction = new Contact($this->db);
         $societeforaction = new Societe($this->db);
         // Set contactforaction if there is only 1 contact.
@@ -1012,7 +1012,7 @@ class InterfaceActionsAuto extends DolibarrTriggers
         //var_dump($societeforaction);var_dump($contactforaction);var_dump($elementid);var_dump($elementtype);exit;
 
         // Insertion action
-        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
         $actioncomm = new ActionComm($this->db);
         $actioncomm->type_code = $object->actiontypecode; // Type of event ('AC_OTH', 'AC_OTH_AUTO', 'AC_XXX'...)
         $actioncomm->code = 'AC_' . $action;

@@ -30,29 +30,29 @@ $path=__DIR__.'/';
 
 // Test si mode batch
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit(-1);
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit(-1);
 }
 
 // Recupere root dolibarr
-$path=preg_replace('/purge-data.php/i', '', $_SERVER["PHP_SELF"]);
-require $path."../../htdocs/master.inc.php";
-include_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-include_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
-include_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
-include_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
-include_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
+$path = preg_replace('/purge-data.php/i', '', $_SERVER["PHP_SELF"]);
+require $path . "../../htdocs/master.inc.php";
+include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/paiement/class/paiement.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Contrats/class/contrat.class.php';
 
 $langs->loadLangs(["main", "errors"]);
 
 // Global variables
-$version=DOL_VERSION;
-$error=0;
+$version = DOL_VERSION;
+$error = 0;
 
 // List of sql to execute
-$sqls=array(
-	'user'=>array(
+$sqls = array(
+    'user' => array(
 		"DELETE FROM ".MAIN_DB_PREFIX."user_rights WHERE fk_user IN (SELECT rowid FROM ".MAIN_DB_PREFIX."user WHERE admin = 0 and login != 'admin') AND fk_user IN (select rowid FROM ".MAIN_DB_PREFIX."user where datec < '__DATE__')",
 		"DELETE FROM ".MAIN_DB_PREFIX."user WHERE admin = 0 and login != 'admin' AND datec < '__DATE__'",
 	),

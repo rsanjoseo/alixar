@@ -59,7 +59,7 @@ print "***** " . $script_file . " (" . $version . ") *****\n";
 // Start of transaction
 $db->begin();
 
-require_once DOL_DOCUMENT_ROOT . "/product/class/product.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Products/class/product.class.php";
 
 // Create instance of object
 $myproduct = new Product($db);

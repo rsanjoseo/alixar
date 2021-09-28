@@ -1309,7 +1309,7 @@ class FactureFournisseur extends CommonInvoice
         if ($resql) {
             // Si on incrémente le produit principal et ses composants à la validation de facture fournisseur
             if (!$error && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $cpt = count($this->lines);
@@ -1492,7 +1492,7 @@ class FactureFournisseur extends CommonInvoice
 
             // Si on incremente le produit principal et ses composants a la validation de facture fournisseur, on decremente
             if ($result >= 0 && !empty($conf->stock->enabled) && !empty($conf->global->STOCK_CALCULATE_ON_SUPPLIER_BILL)) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
                 $langs->load("agenda");
 
                 $cpt = count($this->lines);
@@ -2042,7 +2042,7 @@ class FactureFournisseur extends CommonInvoice
             $response->label = $langs->trans("SupplierBillsToPay");
             $response->labelShort = $langs->trans("StatusToPay");
 
-            $response->url = DOL_URL_ROOT . '/fourn/facture/list.php?search_status=1&amp;mainmenu=billing&amp;leftmenu=suppliers_bills';
+            $response->url = DOL_URL_ROOT . '/Modules/Fourn/facture/list.php?search_status=1&amp;mainmenu=billing&amp;leftmenu=suppliers_bills';
             $response->img = img_object($langs->trans("Bills"), "bill");
 
             $facturestatic = new FactureFournisseur($this->db);
@@ -2055,7 +2055,7 @@ class FactureFournisseur extends CommonInvoice
 
                 if ($facturestatic->hasDelay()) {
                     $response->nbtodolate++;
-                    $response->url_late = DOL_URL_ROOT . '/fourn/facture/list.php?search_option=late&mainmenu=billing&leftmenu=suppliers_bills';
+                    $response->url_late = DOL_URL_ROOT . '/Modules/Fourn/facture/list.php?search_option=late&mainmenu=billing&leftmenu=suppliers_bills';
                 }
             }
             $this->db->free($resql);
@@ -2106,11 +2106,11 @@ class FactureFournisseur extends CommonInvoice
         $result = '';
 
         if ($option == 'withdraw') {
-            $url = DOL_URL_ROOT . '/compta/facture/prelevement.php?facid=' . $this->id . '&type=bank-transfer';
+            $url = DOL_URL_ROOT . '/Modules/Compta/facture/prelevement.php?facid=' . $this->id . '&type=bank-transfer';
         } elseif ($option == 'document') {
-            $url = DOL_URL_ROOT . '/fourn/facture/document.php?facid=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Fourn/facture/document.php?facid=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/fourn/facture/card.php?facid=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Fourn/facture/card.php?facid=' . $this->id;
         }
 
         if ($short) {
@@ -2213,7 +2213,7 @@ class FactureFournisseur extends CommonInvoice
             if ($txttoshow) {
                 $notetoshow = $langs->trans("ViewPrivateNote") . ':<br>' . dol_string_nohtmltag($txttoshow, 1);
                 $result .= ' <span class="note inline-block">';
-                $result .= '<a href="' . DOL_URL_ROOT . '/fourn/facture/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/Modules/Fourn/facture/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
                 $result .= img_picto('', 'note');
                 $result .= '</a>';
                 $result .= '</span>';
@@ -2235,7 +2235,7 @@ class FactureFournisseur extends CommonInvoice
     public function initAsSpecimen($option = '')
     {
         global $langs, $conf;
-        include_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
 
         $now = dol_now();
 

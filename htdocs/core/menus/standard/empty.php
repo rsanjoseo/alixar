@@ -216,7 +216,7 @@ class MenuManager
                     //var_dump($canonnexturl);
                     print '<ul>' . "\n";
                     if (($canonrelurl != $canonnexturl && !in_array($val['mainmenu'], ['tools']))
-                        || (strpos($canonrelurl, '/product/index.php') !== false || strpos($canonrelurl, '/compta/bank/list.php') !== false)) {
+                        || (strpos($canonrelurl, '/Modules/Products/index.php') !== false || strpos($canonrelurl, '/Modules/Compta/bank/list.php') !== false)) {
                         // We add sub entry
                         print str_pad('', 1) . '<li class="lilevel1 ui-btn-icon-right ui-btn">'; // ui-btn to highlight on clic
                         print '<a href="' . $relurl . '">';

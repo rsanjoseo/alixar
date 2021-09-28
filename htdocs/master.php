@@ -161,7 +161,7 @@ $conf->setValues($db);
 
 // Create object $mysoc (A thirdparty object that contains properties of companies managed by Dolibarr.
 if (!defined('NOREQUIREDB') && !defined('NOREQUIRESOC')) {
-    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+    require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 
     $mysoc = new Societe($db);
     $mysoc->setMysoc($conf);

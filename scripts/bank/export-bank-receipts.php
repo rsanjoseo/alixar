@@ -33,24 +33,24 @@ $path = __DIR__.'/';
 
 // Test if batch mode
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit(-1);
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit(-1);
 }
 
-require_once $path."../../htdocs/master.inc.php";
-require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/core/lib/bank.lib.php';
-require_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-require_once DOL_DOCUMENT_ROOT.'/adherents/class/adherent.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/chargesociales.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/tva/class/tva.class.php';
-require_once DOL_DOCUMENT_ROOT.'/fourn/class/paiementfourn.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
-require_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.facture.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/tva/class/tva.class.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/paymentsocialcontribution.class.php';
+require_once $path . "../../htdocs/master.inc.php";
+require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/bank.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/sociales/class/chargesociales.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/paiement/class/paiement.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/tva/class/tva.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/paiementfourn.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.facture.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/tva/class/tva.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/sociales/class/paymentsocialcontribution.class.php';
 
 // Global variables
 $version = DOL_VERSION;
@@ -338,25 +338,25 @@ if ($resql) {
 				$thirdparty .= $links[$key]['label'];
 				$newline = 0;
 			}
-			/*
-			 * elseif ($links[$key]['type']=='sc')
-			 * {
-			 * if ($accountelem) $accountelem.= ', ';
-			 * //$accountelem.= '<a href="'.DOL_URL_ROOT.'/compta/sociales/card.php?id='.$links[$key]['url_id'].'">';
-			 * //$accountelem.= img_object($langs->transnoentitiesnoconv('ShowBill'),'bill').' ';
-			 * $accountelem.= $langs->transnoentitiesnoconv("SocialContribution");
-			 * //$accountelem.= '</a>';
-			 * $newline=0;
-			 * }
-			 * else
-			 * {
-			 * if ($accountelem) $accountelem.= ', ';
-			 * //$accountelem.= '<a href="'.$links[$key]['url'].$links[$key]['url_id'].'">';
-			 * $accountelem.= $links[$key]['label'];
-			 * //$accountelem.= '</a>';
-			 * $newline=0;
-			 * }
-			 */
+            /*
+             * elseif ($links[$key]['type']=='sc')
+             * {
+             * if ($accountelem) $accountelem.= ', ';
+             * //$accountelem.= '<a href="'.DOL_URL_ROOT.'/Modules/Compta/sociales/card.php?id='.$links[$key]['url_id'].'">';
+             * //$accountelem.= img_object($langs->transnoentitiesnoconv('ShowBill'),'bill').' ';
+             * $accountelem.= $langs->transnoentitiesnoconv("SocialContribution");
+             * //$accountelem.= '</a>';
+             * $newline=0;
+             * }
+             * else
+             * {
+             * if ($accountelem) $accountelem.= ', ';
+             * //$accountelem.= '<a href="'.$links[$key]['url'].$links[$key]['url_id'].'">';
+             * $accountelem.= $links[$key]['label'];
+             * //$accountelem.= '</a>';
+             * $newline=0;
+             * }
+             */
 		}
 
 		$debit = $credit = '';

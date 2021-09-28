@@ -1587,7 +1587,7 @@ class Contact extends CommonObject
         $label .= '<br><b>' . $langs->trans("Phone") . ':</b> ' . implode('&nbsp;', $phonelist);
         $label .= '<br><b>' . $langs->trans("Address") . ':</b> ' . dol_format_address($this, 1, ' ', $langs);
 
-        $url = DOL_URL_ROOT . '/contact/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Contacts/card.php?id=' . $this->id;
 
         if ($option !== 'nolink') {
             // Add param to save lastsearch_values or not
@@ -1623,7 +1623,7 @@ class Contact extends CommonObject
         $linkend = '</a>';
 
         if ($option == 'xxx') {
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/contact/card.php?id=' . $this->id . $moreparam . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Contacts/card.php?id=' . $this->id . $moreparam . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
             $linkend = '</a>';
         }
 

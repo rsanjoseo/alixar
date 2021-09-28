@@ -29,19 +29,19 @@ if (!defined('NOSESSION')) {
 
 $sapi_type = php_sapi_name();
 $script_file = basename(__FILE__);
-$path = __DIR__.'/';
+$path = __DIR__ . '/';
 
 // Test if batch mode
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit(-1);
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit(-1);
 }
 
-require_once $path."../../htdocs/master.inc.php";
-require_once DOL_DOCUMENT_ROOT."/compta/prelevement/class/bonprelevement.class.php";
-require_once DOL_DOCUMENT_ROOT."/compta/facture/class/facture.class.php";
-require_once DOL_DOCUMENT_ROOT."/societe/class/societe.class.php";
-require_once DOL_DOCUMENT_ROOT."/compta/paiement/class/paiement.class.php";
+require_once $path . "../../htdocs/master.inc.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Compta/prelevement/class/bonprelevement.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Compta/facture/class/facture.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Societes/class/societe.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Compta/paiement/class/paiement.class.php";
 
 // Global variables
 $version = constant('DOL_VERSION');

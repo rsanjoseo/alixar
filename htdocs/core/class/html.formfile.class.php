@@ -1682,58 +1682,58 @@ class FormFile
 
         // To show ref or specific information according to view to show (defined by $module)
         if ($modulepart == 'company') {
-            include_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
             $object_instance = new Societe($this->db);
         } elseif ($modulepart == 'invoice') {
-            include_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
             $object_instance = new Facture($this->db);
         } elseif ($modulepart == 'invoice_supplier') {
-            include_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.facture.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.facture.class.php';
             $object_instance = new FactureFournisseur($this->db);
         } elseif ($modulepart == 'propal') {
-            include_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Comm/propal/class/propal.class.php';
             $object_instance = new Propal($this->db);
         } elseif ($modulepart == 'supplier_proposal') {
             include_once DOL_DOCUMENT_ROOT . '/supplier_proposal/class/supplier_proposal.class.php';
             $object_instance = new SupplierProposal($this->db);
         } elseif ($modulepart == 'order') {
-            include_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
             $object_instance = new Commande($this->db);
         } elseif ($modulepart == 'order_supplier') {
-            include_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.commande.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.commande.class.php';
             $object_instance = new CommandeFournisseur($this->db);
         } elseif ($modulepart == 'contract') {
-            include_once DOL_DOCUMENT_ROOT . '/contrat/class/contrat.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Contrats/class/contrat.class.php';
             $object_instance = new Contrat($this->db);
         } elseif ($modulepart == 'product') {
-            include_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
             $object_instance = new Product($this->db);
         } elseif ($modulepart == 'tax') {
-            include_once DOL_DOCUMENT_ROOT . '/compta/sociales/class/chargesociales.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/sociales/class/chargesociales.class.php';
             $object_instance = new ChargeSociales($this->db);
         } elseif ($modulepart == 'project') {
-            include_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
             $object_instance = new Project($this->db);
         } elseif ($modulepart == 'fichinter') {
-            include_once DOL_DOCUMENT_ROOT . '/fichinter/class/fichinter.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Fichinter/class/fichinter.class.php';
             $object_instance = new Fichinter($this->db);
         } elseif ($modulepart == 'user') {
-            include_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php';
             $object_instance = new User($this->db);
         } elseif ($modulepart == 'expensereport') {
-            include_once DOL_DOCUMENT_ROOT . '/expensereport/class/expensereport.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/ExpenseReports/class/expensereport.class.php';
             $object_instance = new ExpenseReport($this->db);
         } elseif ($modulepart == 'holiday') {
-            include_once DOL_DOCUMENT_ROOT . '/holiday/class/holiday.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Holiday/class/holiday.class.php';
             $object_instance = new Holiday($this->db);
         } elseif ($modulepart == 'recruitment-recruitmentcandidature') {
             include_once DOL_DOCUMENT_ROOT . '/recruitment/class/recruitmentcandidature.class.php';
             $object_instance = new RecruitmentCandidature($this->db);
         } elseif ($modulepart == 'banque') {
-            include_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
             $object_instance = new Account($this->db);
         } elseif ($modulepart == 'mrp-mo') {
-            include_once DOL_DOCUMENT_ROOT . '/mrp/class/mo.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Mrp/class/mo.class.php';
             $object_instance = new Mo($this->db);
         } else {
             $parameters = ['modulepart' => $modulepart];

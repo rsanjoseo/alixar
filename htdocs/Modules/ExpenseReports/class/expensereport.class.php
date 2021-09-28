@@ -968,7 +968,7 @@ class ExpenseReport extends CommonObject
                     $author->fetch($objp->fk_user_author);
 
                     print '<tr>';
-                    print '<td><a href="' . DOL_URL_ROOT . '/expensereport/card.php?id=' . $objp->rowid . '">' . $objp->ref_num . '</a></td>';
+                    print '<td><a href="' . DOL_URL_ROOT . '/Modules/ExpenseReports/card.php?id=' . $objp->rowid . '">' . $objp->ref_num . '</a></td>';
                     print '<td class="center">' . dol_print_date($objp->date, 'day') . '</td>';
                     print '<td>' . $author->getNomUrl(1) . '</td>';
                     print '<td>' . $objp->comments . '</td>';
@@ -1606,7 +1606,7 @@ class ExpenseReport extends CommonObject
 
         $result = '';
 
-        $url = DOL_URL_ROOT . '/expensereport/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/ExpenseReports/card.php?id=' . $this->id;
 
         if ($short) {
             return $url;
@@ -2438,12 +2438,12 @@ class ExpenseReport extends CommonObject
                 $response->warning_delay = $conf->expensereport->approve->warning_delay / 60 / 60 / 24;
                 $response->label = $langs->trans("ExpenseReportsToApprove");
                 $response->labelShort = $langs->trans("ToApprove");
-                $response->url = DOL_URL_ROOT . '/expensereport/list.php?mainmenu=hrm&amp;statut=' . self::STATUS_VALIDATED;
+                $response->url = DOL_URL_ROOT . '/Modules/ExpenseReports/list.php?mainmenu=hrm&amp;statut=' . self::STATUS_VALIDATED;
             } else {
                 $response->warning_delay = $conf->expensereport->payment->warning_delay / 60 / 60 / 24;
                 $response->label = $langs->trans("ExpenseReportsToPay");
                 $response->labelShort = $langs->trans("StatusToPay");
-                $response->url = DOL_URL_ROOT . '/expensereport/list.php?mainmenu=hrm&amp;statut=' . self::STATUS_APPROVED;
+                $response->url = DOL_URL_ROOT . '/Modules/ExpenseReports/list.php?mainmenu=hrm&amp;statut=' . self::STATUS_APPROVED;
             }
             $response->img = img_object('', "trip");
 

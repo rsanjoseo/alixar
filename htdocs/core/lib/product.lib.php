@@ -46,13 +46,13 @@ function product_prepare_head($object)
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/card.php?id=" . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/card.php?id=" . $object->id;
     $head[$h][1] = $label;
     $head[$h][2] = 'card';
     $h++;
 
     if (!empty($object->status)) {
-        $head[$h][0] = DOL_URL_ROOT . "/product/price.php?id=" . $object->id;
+        $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/price.php?id=" . $object->id;
         $head[$h][1] = $langs->trans("SellingPrices");
         $head[$h][2] = 'price';
         $h++;
@@ -62,7 +62,7 @@ function product_prepare_head($object)
         if ((((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && $user->rights->fournisseur->lire)
             || (!empty($conf->margin->enabled) && $user->rights->margin->liretous)
         ) {
-            $head[$h][0] = DOL_URL_ROOT . "/product/fournisseurs.php?id=" . $object->id;
+            $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/fournisseurs.php?id=" . $object->id;
             $head[$h][1] = $langs->trans("BuyingPrices");
             $head[$h][2] = 'suppliers';
             $h++;
@@ -71,7 +71,7 @@ function product_prepare_head($object)
 
     // Multilangs
     if (!empty($conf->global->MAIN_MULTILANGS)) {
-        $head[$h][0] = DOL_URL_ROOT . "/product/traduction.php?id=" . $object->id;
+        $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/traduction.php?id=" . $object->id;
         $head[$h][1] = $langs->trans("Translation");
         $head[$h][2] = 'translation';
         $h++;
@@ -79,7 +79,7 @@ function product_prepare_head($object)
 
     // Sub products
     if (!empty($conf->global->PRODUIT_SOUSPRODUITS)) {
-        $head[$h][0] = DOL_URL_ROOT . "/product/composition/card.php?id=" . $object->id;
+        $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/composition/card.php?id=" . $object->id;
         $head[$h][1] = $langs->trans('AssociatedProducts');
 
         $nbFatherAndChild = $object->hasFatherOrChild();
@@ -112,7 +112,7 @@ function product_prepare_head($object)
 
     if ($object->isProduct() || ($object->isService() && !empty($conf->global->STOCK_SUPPORTS_SERVICES))) {    // If physical product we can stock (or service with option)
         if (!empty($conf->stock->enabled) && $user->rights->stock->lire) {
-            $head[$h][0] = DOL_URL_ROOT . "/product/stock/product.php?id=" . $object->id;
+            $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/stock/product.php?id=" . $object->id;
             $head[$h][1] = $langs->trans("Stock");
             $head[$h][2] = 'stock';
             $h++;
@@ -135,12 +135,12 @@ function product_prepare_head($object)
         }
     }
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/stats/facture.php?showmessage=1&id=" . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/stats/facture.php?showmessage=1&id=" . $object->id;
     $head[$h][1] = $langs->trans('Referers');
     $head[$h][2] = 'referers';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/stats/card.php?id=" . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/stats/card.php?id=" . $object->id;
     $head[$h][1] = $langs->trans('Statistics');
     $head[$h][2] = 'stats';
     $h++;
@@ -160,7 +160,7 @@ function product_prepare_head($object)
         if (!empty($object->note_public)) {
             $nbNote++;
         }
-        $head[$h][0] = DOL_URL_ROOT . '/product/note.php?id=' . $object->id;
+        $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/note.php?id=' . $object->id;
         $head[$h][1] = $langs->trans('Notes');
         if ($nbNote > 0) {
             $head[$h][1] .= '<span class="badge marginleftonlyshort">' . $nbNote . '</span>';
@@ -189,7 +189,7 @@ function product_prepare_head($object)
         $nbFiles += count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
     }
     $nbLinks = Link::count($db, $object->element, $object->id);
-    $head[$h][0] = DOL_URL_ROOT . '/product/document.php?id=' . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/document.php?id=' . $object->id;
     $head[$h][1] = $langs->trans('Documents');
     if (($nbFiles + $nbLinks) > 0) {
         $head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
@@ -200,7 +200,7 @@ function product_prepare_head($object)
     complete_head_from_modules($conf, $langs, $object, $head, $h, 'product', 'remove');
 
     // Log
-    $head[$h][0] = DOL_URL_ROOT . '/product/agenda.php?id=' . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/agenda.php?id=' . $object->id;
     $head[$h][1] = $langs->trans("Events");
     if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
         $head[$h][1] .= '/';
@@ -229,7 +229,7 @@ function productlot_prepare_head($object)
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/stock/productlot_card.php?id=" . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/stock/productlot_card.php?id=" . $object->id;
     $head[$h][1] = $langs->trans("Lot");
     $head[$h][2] = 'card';
     $h++;
@@ -240,7 +240,7 @@ function productlot_prepare_head($object)
     $upload_dir = $conf->productbatch->multidir_output[$object->entity] . '/' . dol_sanitizeFileName($object->ref);
     $nbFiles = count(dol_dir_list($upload_dir, 'files', 0, '', '(\.meta|_preview.*\.png)$'));
     $nbLinks = Link::count($db, $object->element, $object->id);
-    $head[$h][0] = DOL_URL_ROOT . "/product/stock/productlot_document.php?id=" . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/stock/productlot_document.php?id=" . $object->id;
     $head[$h][1] = $langs->trans("Documents");
     if (($nbFiles + $nbLinks) > 0) {
         $head[$h][1] .= '<span class="badge marginleftonlyshort">' . ($nbFiles + $nbLinks) . '</span>';
@@ -258,7 +258,7 @@ function productlot_prepare_head($object)
 
     // Log
     /*
-    $head[$h][0] = DOL_URL_ROOT.'/product/info.php?id='.$object->id;
+    $head[$h][0] = DOL_URL_ROOT.'/Modules/Products/info.php?id='.$object->id;
     $head[$h][1] = $langs->trans("Info");
     $head[$h][2] = 'info';
     $h++;
@@ -279,14 +279,14 @@ function product_admin_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/admin/product.php";
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/admin/product.php";
     $head[$h][1] = $langs->trans('Parameters');
     $head[$h][2] = 'general';
     $h++;
 
     if (!empty($conf->global->PRODUIT_MULTIPRICES) && !empty($conf->global->PRODUIT_MULTIPRICES_ALLOW_AUTOCALC_PRICELEVEL)) {
         $head[$h] = [
-            0 => DOL_URL_ROOT . "/product/admin/price_rules.php",
+            0 => DOL_URL_ROOT . "/Modules/Products/admin/price_rules.php",
             1 => $langs->trans('MultipriceRules'),
             2 => 'generator',
         ];
@@ -299,12 +299,12 @@ function product_admin_prepare_head()
     // $this->tabs = array('entity:-tabname);   												to remove a tab
     complete_head_from_modules($conf, $langs, null, $head, $h, 'product_admin');
 
-    $head[$h][0] = DOL_URL_ROOT . '/product/admin/product_extrafields.php';
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/admin/product_extrafields.php';
     $head[$h][1] = $langs->trans("ExtraFields");
     $head[$h][2] = 'attributes';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . '/product/admin/product_supplier_extrafields.php';
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/admin/product_supplier_extrafields.php';
     $head[$h][1] = $langs->trans("ProductSupplierExtraFields");
     $head[$h][2] = 'supplierAttributes';
     $h++;
@@ -326,7 +326,7 @@ function product_lot_admin_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/product/admin/product_lot.php";
+    $head[$h][0] = DOL_URL_ROOT . "/Modules/Products/admin/product_lot.php";
     $head[$h][1] = $langs->trans('Parameters');
     $head[$h][2] = 'settings';
     $h++;
@@ -337,7 +337,7 @@ function product_lot_admin_prepare_head()
     // $this->tabs = array('entity:-tabname);   												to remove a tab
     complete_head_from_modules($conf, $langs, null, $head, $h, 'product_lot_admin');
 
-    $head[$h][0] = DOL_URL_ROOT . '/product/admin/product_lot_extrafields.php';
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Products/admin/product_lot_extrafields.php';
     $head[$h][1] = $langs->trans("ExtraFields");
     $head[$h][2] = 'attributes';
     $h++;

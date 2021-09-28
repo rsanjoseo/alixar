@@ -2544,7 +2544,7 @@ class Form
 
             $i = 0;
             if ($num) {
-                include_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
                 $contactstatic = new Contact($this->db);
 
                 while ($i < $num) {
@@ -3084,7 +3084,7 @@ class Form
             $placeholder = '';
 
             if ($selected && empty($selected_input_value)) {
-                require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
                 $producttmpselect = new Product($this->db);
                 $producttmpselect->fetch($selected);
                 $selected_input_value = $producttmpselect->ref;
@@ -3104,7 +3104,7 @@ class Form
             if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES) && !empty($socid)) {
                 $urloption .= '&socid=' . $socid;
             }
-            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/product/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 1, $ajaxoptions);
+            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/Modules/Products/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 1, $ajaxoptions);
 
             if (!empty($conf->variants->enabled) && is_array($selected_combinations)) {
                 // Code to automatically insert with javascript the select of attributes under the select of product
@@ -3247,7 +3247,7 @@ class Form
 
         $warehouseStatusArray = [];
         if (!empty($warehouseStatus)) {
-            require_once DOL_DOCUMENT_ROOT . '/product/stock/class/entrepot.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/entrepot.class.php';
             if (preg_match('/warehouseclosed/', $warehouseStatus)) {
                 $warehouseStatusArray[] = Entrepot::STATUS_CLOSED;
             }
@@ -3337,7 +3337,7 @@ class Form
         if (!empty($conf->global->MAIN_MULTILANGS)) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_lang as pl ON pl.fk_product = p.rowid ";
             if (!empty($conf->global->PRODUIT_TEXTS_IN_THIRDPARTY_LANGUAGE) && !empty($socid)) {
-                require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
                 $soc = new Societe($db);
                 $result = $soc->fetch($socid);
                 if ($result > 0 && !empty($soc->default_lang)) {
@@ -3438,8 +3438,8 @@ class Form
         dol_syslog(get_class($this) . "::select_produits_list search products", LOG_DEBUG);
         $result = $this->db->query($sql);
         if ($result) {
-            require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
-            require_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
             require_once DOL_DOCUMENT_ROOT . '/core/lib/product.lib.php';
 
             $num = $this->db->num_rows($result);
@@ -3902,7 +3902,7 @@ class Form
         $selected_input_value = '';
         if (!empty($conf->use_javascript_ajax) && !empty($conf->global->PRODUIT_USE_SEARCH_TO_SELECT)) {
             if ($selected > 0) {
-                require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
                 $producttmpselect = new Product($this->db);
                 $producttmpselect->fetch($selected);
                 $selected_input_value = $producttmpselect->ref;
@@ -3911,7 +3911,7 @@ class Form
 
             // mode=2 means suppliers products
             $urloption = ($socid > 0 ? 'socid=' . $socid . '&' : '') . 'htmlname=' . $htmlname . '&outjson=1&price_level=' . $price_level . '&type=' . $filtertype . '&mode=2&status=' . $status . '&finished=' . $finished . '&alsoproductwithnosupplierprice=' . $alsoproductwithnosupplierprice;
-            print ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/product/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 0, $ajaxoptions);
+            print ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/Modules/Products/ajax/products.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 0, $ajaxoptions);
             print ($hidelabel ? '' : $langs->trans("RefOrLabel") . ' : ') . '<input type="text" class="minwidth300" name="search_' . $htmlname . '" id="search_' . $htmlname . '" value="' . $selected_input_value . '"' . ($placeholder ? ' placeholder="' . $placeholder . '"' : '') . '>';
         } else {
             print $this->select_produits_fournisseurs_list($socid, $selected, $htmlname, $filtertype, $filtre, '', $status, 0, 0, $alsoproductwithnosupplierprice, $morecss, 0, $placeholder);
@@ -4030,7 +4030,7 @@ class Form
         dol_syslog(get_class($this) . "::select_produits_fournisseurs_list", LOG_DEBUG);
         $result = $this->db->query($sql);
         if ($result) {
-            require_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
             require_once DOL_DOCUMENT_ROOT . '/core/lib/product.lib.php';
 
             $num = $this->db->num_rows($result);
@@ -4339,7 +4339,7 @@ class Form
             if (!$num) {
                 $form .= '<option value="0">-- ' . $langs->trans("NoSupplierPriceDefinedForThisProduct") . ' --</option>';
             } else {
-                require_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
                 $form .= '<option value="0">&nbsp;</option>';
 
                 $i = 0;
@@ -4785,7 +4785,7 @@ class Form
             $langs->load('banks');
 
             if ($selected) {
-                require_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
                 $bankstatic = new Account($this->db);
                 $result = $bankstatic->fetch($selected);
                 if ($result) {
@@ -5363,7 +5363,7 @@ class Form
             if ($selected) {
                 $projet = new Project($this->db);
                 $projet->fetch($selected);
-                //print '<a href="'.DOL_URL_ROOT.'/projet/card.php?id='.$selected.'">'.$projet->title.'</a>';
+                //print '<a href="'.DOL_URL_ROOT.'/Modules/Projects/card.php?id='.$selected.'">'.$projet->title.'</a>';
                 $out .= $projet->getNomUrl(0, '', 1);
             } else {
                 $out .= "&nbsp;";
@@ -5840,7 +5840,7 @@ class Form
             print '</form>';
         } else {
             if ($selected) {
-                require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php';
                 $theuser = new User($this->db);
                 $theuser->fetch($selected);
                 print $theuser->getNomUrl(1);
@@ -6546,14 +6546,14 @@ class Form
             $num = $this->num;
             if ($num == 0) {
                 $addcontact = (!empty($conf->global->SOCIETE_ADDRESSES_MANAGEMENT) ? $langs->trans("AddContact") : $langs->trans("AddContactAddress"));
-                print '<a href="' . DOL_URL_ROOT . '/contact/card.php?socid=' . $societe->id . '&amp;action=create&amp;backtoreferer=1">' . $addcontact . '</a>';
+                print '<a href="' . DOL_URL_ROOT . '/Modules/Contacts/card.php?socid=' . $societe->id . '&amp;action=create&amp;backtoreferer=1">' . $addcontact . '</a>';
             }
             print '</td>';
             print '<td class="left"><input type="submit" class="button smallpaddingimp" value="' . $langs->trans("Modify") . '"></td>';
             print '</tr></table></form>';
         } else {
             if ($selected) {
-                require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
                 $contact = new Contact($this->db);
                 $contact->fetch($selected);
                 print $contact->getFullName($langs);
@@ -6597,7 +6597,7 @@ class Form
             $out .= '</form>';
         } else {
             if ($selected) {
-                require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
                 $soc = new Societe($this->db);
                 $soc->fetch($selected);
                 $out .= $soc->getNomUrl($langs);
@@ -6651,7 +6651,7 @@ class Form
             // No immediate load of all database
             $placeholder = '';
             if ($selected && empty($selected_input_value)) {
-                require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
                 $societetmp = new Societe($this->db);
                 $societetmp->fetch($selected);
                 $selected_input_value = $societetmp->name;
@@ -6659,7 +6659,7 @@ class Form
             }
             // mode 1
             $urloption = 'htmlname=' . urlencode($htmlname) . '&outjson=1&filter=' . urlencode($filter) . (empty($excludeids) ? '' : '&excludeids=' . join(',', $excludeids)) . ($showtype ? '&showtype=' . urlencode($showtype) : '');
-            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/societe/ajax/company.php', $urloption, $conf->global->COMPANY_USE_SEARCH_TO_SELECT, 0, $ajaxoptions);
+            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/Modules/Societes/ajax/company.php', $urloption, $conf->global->COMPANY_USE_SEARCH_TO_SELECT, 0, $ajaxoptions);
 
             $out .= '<style type="text/css">.ui-autocomplete { z-index: 1003; }</style>';
             if (empty($hidelabel)) {
@@ -7431,14 +7431,14 @@ class Form
             $placeholder = '';
 
             if ($selected && empty($selected_input_value)) {
-                require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Tickets/class/ticket.class.php';
                 $tickettmpselect = new Ticket($this->db);
                 $tickettmpselect->fetch($selected);
                 $selected_input_value = $tickettmpselect->ref;
                 unset($tickettmpselect);
             }
 
-            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/ticket/ajax/tickets.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 1, $ajaxoptions);
+            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/Modules/Tickets/ajax/tickets.php', $urloption, $conf->global->PRODUIT_USE_SEARCH_TO_SELECT, 1, $ajaxoptions);
 
             if (empty($hidelabel)) {
                 $out .= $langs->trans("RefOrLabel") . ' : ';
@@ -7524,7 +7524,7 @@ class Form
         dol_syslog(get_class($this) . "::selectTicketsList search tickets", LOG_DEBUG);
         $result = $this->db->query($sql);
         if ($result) {
-            require_once DOL_DOCUMENT_ROOT . '/ticket/class/ticket.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Tickets/class/ticket.class.php';
             require_once DOL_DOCUMENT_ROOT . '/core/lib/ticket.lib.php';
 
             $num = $this->db->num_rows($result);
@@ -8348,7 +8348,7 @@ class Form
                 $listofidcompanytoscan .= ',' . $object->thirdparty->parent;
             }
             if (($object->fk_project > 0) && !empty($conf->global->THIRDPARTY_INCLUDE_PROJECT_THIRDPARY_IN_LINKTO)) {
-                include_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
                 $tmpproject = new Project($this->db);
                 $tmpproject->fetch($object->fk_project);
                 if ($tmpproject->socid > 0 && ($tmpproject->socid != $object->thirdparty->id)) {
@@ -9067,7 +9067,7 @@ class Form
 											method: "POST",
 											dataType: "json",
 											data: { fk_c_exp_tax_cat: $(this).val(), token: \'' . currentToken() . '\' },
-											url: "' . (DOL_URL_ROOT . '/expensereport/ajax/ajaxik.php?' . $params) . '",
+											url: "' . (DOL_URL_ROOT . '/Modules/ExpenseReports/ajax/ajaxik.php?' . $params) . '",
 										}).done(function( data, textStatus, jqXHR ) {
 											console.log(data);
 											if (typeof data.up != "undefined") {
@@ -9196,7 +9196,7 @@ class Form
     {
         global $user, $conf, $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
 
         if (is_null($usertofilter)) {
             $usertofilter = $user;

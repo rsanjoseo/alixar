@@ -892,7 +892,7 @@ class FormOther
     {
         global $user, $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/task.class.php';
 
         //print $modeproject.'-'.$modetask;
         $task = new Task($this->db);

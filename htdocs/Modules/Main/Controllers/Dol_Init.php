@@ -22,6 +22,7 @@
 
 // Descend to the htdocs folder
 chdir('../../..');
+define('BASE_FOLDER', getcwd());
 
 /**
  *    \file       htdocs/index.php

@@ -290,7 +290,7 @@ if (!empty($conf->global->ADD_UNSPLASH_LOGIN_BACKGROUND)) {
                         echo '<br>';
                         echo '<div class="center" style="margin-top: 5px;">';
                         if ($forgetpasslink) {
-                            $url = DOL_URL_ROOT . '/user/passwordforgotten.php' . $moreparam;
+                            $url = DOL_URL_ROOT . '/Modules/Users/passwordforgotten.php' . $moreparam;
                             if (!empty($conf->global->MAIN_PASSWORD_FORGOTLINK)) {
                                 $url = $conf->global->MAIN_PASSWORD_FORGOTLINK;
                             }

@@ -436,9 +436,9 @@ class Conf
 
                 $this->supplierproposal = new stdClass();
                 $this->supplierproposal->multidir_output = [$this->entity => $rootfordata . "/supplier_proposal"];
-                $this->supplierproposal->multidir_temp = [$this->entity => $rootfortemp . "/supplier_proposal/temp"];
+                $this->supplierproposal->multidir_temp = [$this->entity => $rootfortemp . "/Modules/SupplierProposal/temp"];
                 $this->supplierproposal->dir_output = $rootfordata . "/supplier_proposal"; // For backward compatibility
-                $this->supplierproposal->dir_temp = $rootfortemp . "/supplier_proposal/temp"; // For backward compatibility
+                $this->supplierproposal->dir_temp = $rootfortemp . "/Modules/SupplierProposal/temp"; // For backward compatibility
 
                 $this->fournisseur->payment = new stdClass();
                 $this->fournisseur->payment->multidir_output = [$this->entity => $rootfordata . "/fournisseur/payment"];

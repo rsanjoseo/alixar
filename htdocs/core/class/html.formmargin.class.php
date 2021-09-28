@@ -188,7 +188,7 @@ class FormMargin
 
         foreach ($object->lines as $line) {
             if (empty($line->pa_ht) && isset($line->fk_fournprice) && !$force_price) {
-                require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.product.class.php';
                 $product = new ProductFournisseur($this->db);
                 if ($product->fetch_product_fournisseur_price($line->fk_fournprice)) {
                     $line->pa_ht = $product->fourn_unitprice * (1 - $product->fourn_remise_percent / 100);

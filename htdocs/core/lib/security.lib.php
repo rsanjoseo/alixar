@@ -706,7 +706,7 @@ function checkUserAccessToObject($user, array $featuresarray, $objectid = 0, $ta
             if ($feature == 'agenda') {
                 // Also check owner or attendee for users without allactions->read
                 if ($objectid > 0 && empty($user->rights->agenda->allactions->read)) {
-                    require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
                     $action = new ActionComm($db);
                     $action->fetch($objectid);
                     if ($action->authorid != $user->id && $action->userownerid != $user->id && !(array_key_exists($user->id, $action->userassigned))) {
@@ -716,7 +716,7 @@ function checkUserAccessToObject($user, array $featuresarray, $objectid = 0, $ta
             }
         } elseif (in_array($feature, $checkproject)) {
             if (!empty($conf->projet->enabled) && empty($user->rights->projet->all->lire)) {
-                include_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
                 $projectstatic = new Project($db);
                 $tmps = $projectstatic->getProjectsAuthorizedForUser($user, 0, 1, 0);
 
@@ -735,7 +735,7 @@ function checkUserAccessToObject($user, array $featuresarray, $objectid = 0, $ta
                 $task = new Task($db);
                 $task->fetch($objectid);
 
-                include_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
                 $projectstatic = new Project($db);
                 $tmps = $projectstatic->getProjectsAuthorizedForUser($user, 0, 1, 0);
                 $tmparray = explode(',', $tmps);

@@ -1717,7 +1717,7 @@ class Product extends CommonObject
                 }
 
                 if (!empty($conf->dynamicprices->enabled) && !empty($this->fk_price_expression) && empty($ignore_expression)) {
-                    include_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+                    include_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
                     $priceparser = new PriceParser($this->db);
                     $price_result = $priceparser->parseProduct($this);
                     if ($price_result >= 0) {
@@ -2012,7 +2012,7 @@ class Product extends CommonObject
             $stock_commande_client = $this->stats_commande['qty'];
         }
         if (!empty($conf->expedition->enabled)) {
-            require_once DOL_DOCUMENT_ROOT . '/expedition/class/expedition.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
             $filterShipmentStatus = '';
             if (!empty($conf->global->STOCK_CALCULATE_ON_SHIPMENT)) {
                 $filterShipmentStatus = Expedition::STATUS_VALIDATED . ',' . Expedition::STATUS_CLOSED;
@@ -2887,7 +2887,7 @@ class Product extends CommonObject
             }
         } elseif (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) {
             // If price per customer
-            require_once DOL_DOCUMENT_ROOT . '/product/class/productcustomerprice.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/productcustomerprice.class.php';
 
             $prodcustprice = new Productcustomerprice($this->db);
 
@@ -2994,7 +2994,7 @@ class Product extends CommonObject
             $obj = $this->db->fetch_object($resql);
             if ($obj && $obj->quantity > 0) {        // If we found a supplier prices from the id of supplier price
                 if (!empty($conf->dynamicprices->enabled) && !empty($obj->fk_supplier_price_expression)) {
-                    include_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+                    include_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
                     $prod_supplier = new ProductFournisseur($this->db);
                     $prod_supplier->product_fourn_price_id = $obj->rowid;
                     $prod_supplier->id = $obj->fk_product;
@@ -3055,7 +3055,7 @@ class Product extends CommonObject
                     $obj = $this->db->fetch_object($resql);
                     if ($obj && $obj->quantity > 0) {        // If found
                         if (!empty($conf->dynamicprices->enabled) && !empty($obj->fk_supplier_price_expression)) {
-                            include_once DOL_DOCUMENT_ROOT . '/product/dynamic_price/class/price_parser.class.php';
+                            include_once DOL_DOCUMENT_ROOT . '/Modules/Products/dynamic_price/class/price_parser.class.php';
                             $prod_supplier = new ProductFournisseur($this->db);
                             $prod_supplier->product_fourn_price_id = $obj->rowid;
                             $prod_supplier->id = $obj->fk_product;
@@ -5239,13 +5239,13 @@ class Product extends CommonObject
         }
 
         if ($option == 'supplier' || $option == 'category') {
-            $url = DOL_URL_ROOT . '/product/fournisseurs.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Products/fournisseurs.php?id=' . $this->id;
         } elseif ($option == 'stock') {
-            $url = DOL_URL_ROOT . '/product/stock/product.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Products/stock/product.php?id=' . $this->id;
         } elseif ($option == 'composition') {
-            $url = DOL_URL_ROOT . '/product/composition/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Products/composition/card.php?id=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/product/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Products/card.php?id=' . $this->id;
         }
 
         if ($option !== 'nolink') {
@@ -5481,7 +5481,7 @@ class Product extends CommonObject
         if ($id_entrepot) {
             $this->db->begin();
 
-            include_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
 
             $op[0] = "+" . trim($nbpiece);
             $op[1] = "-" . trim($nbpiece);
@@ -5530,7 +5530,7 @@ class Product extends CommonObject
         if ($id_entrepot) {
             $this->db->begin();
 
-            include_once DOL_DOCUMENT_ROOT . '/product/stock/class/mouvementstock.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
 
             $op[0] = "+" . trim($nbpiece);
             $op[1] = "-" . trim($nbpiece);
@@ -5937,7 +5937,7 @@ class Product extends CommonObject
         $maxpricesupplier = 0;
 
         if (!empty($conf->global->PRODUCT_MINIMUM_RECOMMENDED_PRICE)) {
-            include_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.product.class.php';
             $product_fourn = new ProductFournisseur($this->db);
             $product_fourn_list = $product_fourn->list_product_fournisseur_price($this->id, '', '');
 

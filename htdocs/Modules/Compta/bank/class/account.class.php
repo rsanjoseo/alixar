@@ -477,7 +477,7 @@ class Account extends CommonObject
 
         // If this class is linked to a third party
         if (!empty($this->socid)) {
-            require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
             $company = new Societe($this->db);
             $result = $company->fetch($this->socid);
             if (!empty($company->country_code)) {
@@ -1385,7 +1385,7 @@ class Account extends CommonObject
             $response->warning_delay = $conf->bank->rappro->warning_delay / 60 / 60 / 24;
             $response->label = $langs->trans("TransactionsToConciliate");
             $response->labelShort = $langs->trans("TransactionsToConciliateShort");
-            $response->url = DOL_URL_ROOT . '/compta/bank/list.php?leftmenu=bank&amp;mainmenu=bank';
+            $response->url = DOL_URL_ROOT . '/Modules/Compta/bank/list.php?leftmenu=bank&amp;mainmenu=bank';
             $response->img = img_object('', "payment");
 
             while ($obj = $this->db->fetch_object($resql)) {
@@ -1519,11 +1519,11 @@ class Account extends CommonObject
 
         $linkclose = '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
 
-        $url = DOL_URL_ROOT . '/compta/bank/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Compta/bank/card.php?id=' . $this->id;
         if ($mode == 'transactions') {
-            $url = DOL_URL_ROOT . '/compta/bank/bankentries_list.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Compta/bank/bankentries_list.php?id=' . $this->id;
         } elseif ($mode == 'receipts') {
-            $url = DOL_URL_ROOT . '/compta/bank/releve.php?account=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Compta/bank/releve.php?account=' . $this->id;
         }
 
         if ($option != 'nolink') {
@@ -2378,7 +2378,7 @@ class AccountLine extends CommonObject
         $label = img_picto('', $this->picto) . ' <u>' . $langs->trans("Transaction") . '</u>:<br>';
         $label .= '<b>' . $langs->trans("Ref") . ':</b> ' . $this->ref;
 
-        $linkstart = '<a href="' . DOL_URL_ROOT . '/compta/bank/line.php?rowid=' . ((int) $this->id) . '&save_lastsearch_values=1" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
+        $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Compta/bank/line.php?rowid=' . ((int) $this->id) . '&save_lastsearch_values=1" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
         $linkend = '</a>';
 
         $result .= $linkstart;

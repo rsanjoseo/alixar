@@ -1523,7 +1523,7 @@ class User extends CommonObject
             }
 
             if (!empty($conf->global->MAIN_DEFAULT_WAREHOUSE_USER) && !empty($conf->global->STOCK_USERSTOCK_AUTOCREATE)) {
-                require_once DOL_DOCUMENT_ROOT . '/product/stock/class/entrepot.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/entrepot.class.php';
                 $langs->load("stocks");
                 $entrepot = new Entrepot($this->db);
                 $entrepot->label = $langs->trans("PersonalStock", $this->getFullName($langs));
@@ -1823,7 +1823,7 @@ class User extends CommonObject
                 if ($this->fk_member > 0 && !$nosyncmember) {
                     dol_syslog(get_class($this) . "::update user is linked with a member. We try to update member too.", LOG_DEBUG);
 
-                    require_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 
                     // This user is linked with a member, so we also update member information
                     // if this is an update.
@@ -1875,7 +1875,7 @@ class User extends CommonObject
                 if ($this->contact_id > 0 && !$nosynccontact) {
                     dol_syslog(get_class($this) . "::update user is linked with a contact. We try to update contact too.", LOG_DEBUG);
 
-                    require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
 
                     // This user is linked with a contact, so we also update contact information if this is an update.
                     $tmpobj = new Contact($this->db);
@@ -2017,7 +2017,7 @@ class User extends CommonObject
                     $this->pass_indatabase_crypted = $password_crypted;
 
                     if ($this->fk_member && !$nosyncmember) {
-                        require_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+                        require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 
                         // This user is linked with a member, so we also update members informations
                         // if this is an update.
@@ -2268,7 +2268,7 @@ class User extends CommonObject
             global $dolibarr_main_instance_unique_id;
 
             //print $password.'-'.$this->id.'-'.$dolibarr_main_instance_unique_id;
-            $url = $urlwithroot . '/user/passwordforgotten.php?action=validatenewpassword';
+            $url = $urlwithroot . '/Modules/Users/passwordforgotten.php?action=validatenewpassword';
             $url .= '&username=' . urlencode($this->login) . "&passworduidhash=" . urlencode(dol_hash($password . '-' . $this->id . '-' . $dolibarr_main_instance_unique_id));
 
             $msgishtml = 1;
@@ -2521,7 +2521,7 @@ class User extends CommonObject
      */
     public function getPhotoUrl($width, $height, $cssclass = '', $imagesize = '')
     {
-        $result = '<a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $this->id . '">';
+        $result = '<a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $this->id . '">';
         $result .= Form::showphoto('userphoto', $this, $width, $height, 0, $cssclass, $imagesize);
         $result .= '</a>';
 
@@ -2639,9 +2639,9 @@ class User extends CommonObject
             $label = '';
         }
 
-        $url = DOL_URL_ROOT . '/user/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $this->id;
         if ($option == 'leave') {
-            $url = DOL_URL_ROOT . '/holiday/list.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Holiday/list.php?id=' . $this->id;
         }
 
         if ($option != 'nolink') {
@@ -2790,7 +2790,7 @@ class User extends CommonObject
 
         $result = '';
 
-        $linkstart = '<a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $this->id . '">';
+        $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $this->id . '">';
         $linkend = '</a>';
 
         //Check user's rights to see an other user
@@ -2799,7 +2799,7 @@ class User extends CommonObject
         }
 
         if ($option == 'xxx') {
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $this->id . '">';
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $this->id . '">';
             $linkend = '</a>';
         }
 

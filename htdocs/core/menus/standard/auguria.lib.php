@@ -331,7 +331,7 @@ function print_left_auguria_menu($db, $menu_array_before, $menu_array_after, &$t
 
     // We update newmenu for special dynamic menus
     if ($conf->banque->enabled && $user->rights->banque->lire && $mainmenu == 'bank') {    // Entry for each bank account
-        include_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php'; // Required for to get Account::TYPE_CASH for example
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php'; // Required for to get Account::TYPE_CASH for example
 
         $sql = "SELECT rowid, label, courant, rappro, courant";
         $sql .= " FROM " . MAIN_DB_PREFIX . "bank_account";
@@ -345,14 +345,14 @@ function print_left_auguria_menu($db, $menu_array_before, $menu_array_after, &$t
             $i = 0;
 
             if ($numr > 0) {
-                $newmenu->add('/compta/bank/list.php', $langs->trans("BankAccounts"), 0, $user->rights->banque->lire);
+                $newmenu->add('/Modules/Compta/bank/list.php', $langs->trans("BankAccounts"), 0, $user->rights->banque->lire);
             }
 
             while ($i < $numr) {
                 $objp = $db->fetch_object($resql);
-                $newmenu->add('/compta/bank/card.php?id=' . $objp->rowid, $objp->label, 1, $user->rights->banque->lire);
+                $newmenu->add('/Modules/Compta/bank/card.php?id=' . $objp->rowid, $objp->label, 1, $user->rights->banque->lire);
                 if ($objp->rappro && $objp->courant != Account::TYPE_CASH && empty($objp->clos)) {  // If not cash account and not closed and can be reconciliate
-                    $newmenu->add('/compta/bank/bankentries_list.php?id=' . $objp->rowid, $langs->trans("Conciliate"), 2, $user->rights->banque->consolidate);
+                    $newmenu->add('/Modules/Compta/bank/bankentries_list.php?id=' . $objp->rowid, $langs->trans("Conciliate"), 2, $user->rights->banque->consolidate);
                 }
                 $i++;
             }

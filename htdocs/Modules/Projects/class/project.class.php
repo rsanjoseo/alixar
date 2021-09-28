@@ -687,7 +687,7 @@ class Project extends CommonObject
      */
     public function getLinesArray($user)
     {
-        require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/task.class.php';
         $taskstatic = new Task($this->db);
 
         $this->lines = $taskstatic->getTasksArray(0, $user, $this->id, 0, 0);
@@ -884,13 +884,13 @@ class Project extends CommonObject
             if (preg_match('/\.php$/', $option)) {
                 $url = dol_buildpath($option, 1) . '?id=' . $this->id;
             } elseif ($option == 'task') {
-                $url = DOL_URL_ROOT . '/projet/tasks.php?id=' . $this->id;
+                $url = DOL_URL_ROOT . '/Modules/Projects/tasks.php?id=' . $this->id;
             } elseif ($option == 'preview') {
-                $url = DOL_URL_ROOT . '/projet/element.php?id=' . $this->id;
+                $url = DOL_URL_ROOT . '/Modules/Projects/element.php?id=' . $this->id;
             } elseif ($option == 'eventorganization') {
                 $url = DOL_URL_ROOT . '/eventorganization/conferenceorbooth_list.php?projectid=' . $this->id;
             } else {
-                $url = DOL_URL_ROOT . '/projet/card.php?id=' . $this->id;
+                $url = DOL_URL_ROOT . '/Modules/Projects/card.php?id=' . $this->id;
             }
             // Add param to save lastsearch_values or not
             $add_save_lastsearch_values = ($save_lastsearch_value == 1 ? 1 : 0);
@@ -1266,7 +1266,7 @@ class Project extends CommonObject
 
             //Duplicate task
             if ($clone_task) {
-                require_once DOL_DOCUMENT_ROOT . '/projet/class/task.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/task.class.php';
 
                 $taskstatic = new Task($this->db);
 
@@ -1966,9 +1966,9 @@ class Project extends CommonObject
             $response->label = $langs->trans("OpenedProjects");
             $response->labelShort = $langs->trans("Opened");
             if ($user->rights->projet->all->lire) {
-                $response->url = DOL_URL_ROOT . '/projet/list.php?search_status=1&mainmenu=project';
+                $response->url = DOL_URL_ROOT . '/Modules/Projects/list.php?search_status=1&mainmenu=project';
             } else {
-                $response->url = DOL_URL_ROOT . '/projet/list.php?search_project_user=-1&search_status=1&mainmenu=project';
+                $response->url = DOL_URL_ROOT . '/Modules/Projects/list.php?search_project_user=-1&search_status=1&mainmenu=project';
             }
             $response->img = img_object('', "projectpub");
 

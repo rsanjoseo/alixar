@@ -1281,7 +1281,7 @@ class ActionComm extends CommonObject
                 $response->warning_delay = $conf->agenda->warning_delay / 60 / 60 / 24;
                 $response->label = $langs->trans("ActionsToDo");
                 $response->labelShort = $langs->trans("ActionsToDoShort");
-                $response->url = DOL_URL_ROOT . '/comm/action/list.php?action=show_list&actioncode=0&status=todo&mainmenu=agenda';
+                $response->url = DOL_URL_ROOT . '/Modules/Comm/action/list.php?action=show_list&actioncode=0&status=todo&mainmenu=agenda';
                 if ($user->rights->agenda->allactions->read) {
                     $response->url .= '&filtert=-1';
                 }
@@ -1538,11 +1538,11 @@ class ActionComm extends CommonObject
 
         $url = '';
         if ($option == 'birthday') {
-            $url = DOL_URL_ROOT . '/contact/perso.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Contacts/perso.php?id=' . $this->id;
         } elseif ($option == 'holiday') {
-            $url = DOL_URL_ROOT . '/holiday/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Holiday/card.php?id=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/comm/action/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Comm/action/card.php?id=' . $this->id;
         }
 
         if ($option !== 'nolink') {
@@ -1920,7 +1920,7 @@ class ActionComm extends CommonObject
                     $urlwithouturlroot = preg_replace('/' . preg_quote(DOL_URL_ROOT, '/') . '$/i', '', trim($dolibarr_main_url_root));
                     $urlwithroot = $urlwithouturlroot . DOL_URL_ROOT; // This is to use external domain name found into config file
                     //$urlwithroot=DOL_MAIN_URL_ROOT;						// This is to use same domain name than current
-                    $url = $urlwithroot . '/comm/action/card.php?id=' . $obj->id;
+                    $url = $urlwithroot . '/Modules/Comm/action/card.php?id=' . $obj->id;
                     $event['url'] = $url;
                     $event['created'] = $this->db->jdate($obj->datec) - (empty($conf->global->AGENDA_EXPORT_FIX_TZ) ? 0 : ($conf->global->AGENDA_EXPORT_FIX_TZ * 3600));
                     $event['modified'] = $this->db->jdate($obj->datem) - (empty($conf->global->AGENDA_EXPORT_FIX_TZ) ? 0 : ($conf->global->AGENDA_EXPORT_FIX_TZ * 3600));
@@ -2002,7 +2002,7 @@ class ActionComm extends CommonObject
 
                         $urlwithouturlroot = preg_replace('/' . preg_quote(DOL_URL_ROOT, '/') . '$/i', '', trim($dolibarr_main_url_root));
                         $urlwithroot = $urlwithouturlroot . DOL_URL_ROOT;
-                        $url = $urlwithroot . '/holiday/card.php?id=' . $obj->rowid;
+                        $url = $urlwithroot . '/Modules/Holiday/card.php?id=' . $obj->rowid;
 
                         $event['uid'] = 'dolibarrholiday-' . $this->db->database_name . '-' . $obj->rowid . "@" . $_SERVER["SERVER_NAME"];
                         $event['author'] = dolGetFirstLastname($obj->firstname, $obj->lastname);

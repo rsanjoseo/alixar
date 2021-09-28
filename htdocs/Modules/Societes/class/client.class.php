@@ -22,7 +22,7 @@
  *        \ingroup    societe
  *        \brief      File for class of customers
  */
-include_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 
 /**
  *    Class to manage customers or prospects

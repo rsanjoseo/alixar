@@ -738,9 +738,9 @@ class UserGroup extends CommonObject
         $label .= '</div>';
 
         if ($option == 'permissions') {
-            $url = DOL_URL_ROOT . '/user/group/perms.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Users/group/perms.php?id=' . $this->id;
         } else {
-            $url = DOL_URL_ROOT . '/user/group/card.php?id=' . $this->id;
+            $url = DOL_URL_ROOT . '/Modules/Users/group/card.php?id=' . $this->id;
         }
 
         if ($option != 'nolink') {

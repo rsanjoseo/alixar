@@ -619,7 +619,7 @@ class Entrepot extends CommonObject
             $label .= '<br><b>' . $langs->trans('LocationSummary') . ':</b> ' . $this->lieu;
         }
 
-        $url = DOL_URL_ROOT . '/product/stock/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Products/stock/card.php?id=' . $this->id;
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not

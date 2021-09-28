@@ -1763,7 +1763,7 @@ abstract class CommonObject
             return 0;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
         $contact = new Contact($this->db);
         $result = $contact->fetch($contactid);
         $this->contact = $contact;
@@ -1788,7 +1788,7 @@ abstract class CommonObject
             return 0;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 
         $idtofetch = isset($this->socid) ? $this->socid : (isset($this->fk_soc) ? $this->fk_soc : $this->fk_thirdparty);
         if ($force_thirdparty_id) {
@@ -1912,7 +1912,7 @@ abstract class CommonObject
     public function fetch_projet()
     {
         // phpcs:enable
-        include_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
 
         if (empty($this->fk_project) && !empty($this->fk_projet)) {
             $this->fk_project = $this->fk_projet; // For backward compatibility
@@ -5434,7 +5434,7 @@ abstract class CommonObject
     public function fetch_product()
     {
         // phpcs:enable
-        include_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
 
         if (empty($this->fk_product)) {
             return 0;
@@ -7908,7 +7908,7 @@ abstract class CommonObject
             // Get cost price for margin calculation
             if (!empty($fk_product) && $fk_product > 0) {
                 if (isset($conf->global->MARGIN_TYPE) && $conf->global->MARGIN_TYPE == 'costprice') {
-                    require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
                     $product = new Product($this->db);
                     $result = $product->fetch($fk_product);
                     if ($result <= 0) {
@@ -7921,7 +7921,7 @@ abstract class CommonObject
                         $buyPrice = $product->pmp;
                     }
                 } elseif (isset($conf->global->MARGIN_TYPE) && $conf->global->MARGIN_TYPE == 'pmp') {
-                    require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
                     $product = new Product($this->db);
                     $result = $product->fetch($fk_product);
                     if ($result <= 0) {
@@ -7934,7 +7934,7 @@ abstract class CommonObject
                 }
 
                 if (empty($buyPrice) && isset($conf->global->MARGIN_TYPE) && in_array($conf->global->MARGIN_TYPE, ['1', 'pmp', 'costprice'])) {
-                    require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.product.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.product.class.php';
                     $productFournisseur = new ProductFournisseur($this->db);
                     if (($result = $productFournisseur->find_min_price_product_fournisseur($fk_product)) > 0) {
                         $buyPrice = $productFournisseur->fourn_unitprice;

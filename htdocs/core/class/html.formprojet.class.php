@@ -84,13 +84,13 @@ class FormProjets
             $placeholder = '';
 
             if ($selected && empty($selected_input_value)) {
-                require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
                 $project = new Project($this->db);
                 $project->fetch($selected);
                 $selected_input_value = $project->ref;
             }
             $urloption = 'socid=' . $socid . '&htmlname=' . $htmlname . '&discardclosed=' . $discard_closed;
-            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/projet/ajax/projects.php', $urloption, $conf->global->PROJECT_USE_SEARCH_TO_SELECT, 0, [
+            $out .= ajax_autocompleter($selected, $htmlname, DOL_URL_ROOT . '/Modules/Projects/ajax/projects.php', $urloption, $conf->global->PROJECT_USE_SEARCH_TO_SELECT, 0, [
                 //  'update' => array(
                 //      'projectid' => 'id'
                 //  )
@@ -145,7 +145,7 @@ class FormProjets
         // phpcs:enable
         global $user, $conf, $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
 
         if (empty($htmlid)) {
             $htmlid = $htmlname;
@@ -320,7 +320,7 @@ class FormProjets
     {
         global $user, $conf, $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/projet/class/project.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
 
         if (is_null($usertofilter)) {
             $usertofilter = $user;

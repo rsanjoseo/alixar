@@ -1269,7 +1269,7 @@ class Ticket extends CommonObject
         $label .= '<b>' . $langs->trans('TicketTrackId') . ':</b> ' . $this->track_id . '<br>';
         $label .= '<b>' . $langs->trans('Subject') . ':</b> ' . $this->subject;
 
-        $url = DOL_URL_ROOT . '/ticket/card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Tickets/card.php?id=' . $this->id;
 
         if ($option != 'nolink') {
             // Add param to save lastsearch_values or not
@@ -1741,7 +1741,7 @@ class Ticket extends CommonObject
         $res = $this->db->query($sql);
         if ($res) {
             while ($rec = $this->db->fetch_array($res)) {
-                include_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
                 $contactstatic = new Contact($this->db);
                 $contactstatic->fetch($rec['rowid']);
                 $contacts[] = $contactstatic;
@@ -2188,7 +2188,7 @@ class Ticket extends CommonObject
                             }
 
                             // URL ticket
-                            $url_internal_ticket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
+                            $url_internal_ticket = dol_buildpath('/Modules/Tickets/card.php', 2) . '?track_id=' . $object->track_id;
                             $message .= '<br><br>';
                             $message .= $langs->trans('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url_internal_ticket . '">' . $object->track_id . '</a>';
 
@@ -2249,7 +2249,7 @@ class Ticket extends CommonObject
                             }
                             $message .= '<br>';
                             // URL ticket
-                            $url_internal_ticket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id;
+                            $url_internal_ticket = dol_buildpath('/Modules/Tickets/card.php', 2) . '?track_id=' . $object->track_id;
 
                             // altairis: make html link on url
                             $message .= '<br>' . $langs->trans('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url_internal_ticket . '">' . $object->track_id . '</a><br>';
@@ -2327,7 +2327,7 @@ class Ticket extends CommonObject
 
                                 // If public interface is not enable, use link to internal page into mail
                                 $url_public_ticket = (!empty($conf->global->TICKET_ENABLE_PUBLIC_INTERFACE) ?
-                                        (!empty($conf->global->TICKET_URL_PUBLIC_INTERFACE) ? $conf->global->TICKET_URL_PUBLIC_INTERFACE . '/view.php' : dol_buildpath('/public/ticket/view.php', 2)) : dol_buildpath('/ticket/card.php', 2)) . '?track_id=' . $object->track_id;
+                                        (!empty($conf->global->TICKET_URL_PUBLIC_INTERFACE) ? $conf->global->TICKET_URL_PUBLIC_INTERFACE . '/view.php' : dol_buildpath('/public/ticket/view.php', 2)) : dol_buildpath('/Modules/Tickets/card.php', 2)) . '?track_id=' . $object->track_id;
                                 $message .= '<br>' . $langs->trans('TicketNewEmailBodyInfosTrackUrlCustomer') . ' : <a href="' . $url_public_ticket . '">' . $object->track_id . '</a><br>';
 
                                 // Build final message
@@ -2481,7 +2481,7 @@ class Ticket extends CommonObject
         $this->db->begin();
 
         // Insert entry into agenda with code 'TICKET_MSG'
-        include_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
         $actioncomm = new ActionComm($this->db);
         $actioncomm->type_code = 'AC_OTH';
         $actioncomm->code = 'TICKET_MSG';
@@ -2551,7 +2551,7 @@ class Ticket extends CommonObject
 
         $langs->load("mails");
 
-        include_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
         //$contactstatic = new Contact($this->db);
 
         // If no receiver defined, load all ticket linked contacts
@@ -2676,7 +2676,7 @@ class Ticket extends CommonObject
             //$response->warning_delay = $delay_warning / 60 / 60 / 24;
             $response->label = $label;
             $response->labelShort = $labelShort;
-            $response->url = DOL_URL_ROOT . '/ticket/list.php?search_fk_statut[]=' . $status;
+            $response->url = DOL_URL_ROOT . '/Modules/Tickets/list.php?search_fk_statut[]=' . $status;
             $response->img = img_object('', "ticket");
 
             // This assignment in condition is not a bug. It allows walking the results.
@@ -2786,7 +2786,7 @@ class Ticket extends CommonObject
                 $message .= dol_html_entity_decode($log_message, ENT_QUOTES | ENT_HTML5) . "\n";
 
                 if ($info_sendto['source'] == 'internal') {
-                    $url_internal_ticket = dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $this->track_id;
+                    $url_internal_ticket = dol_buildpath('/Modules/Tickets/card.php', 2) . '?track_id=' . $this->track_id;
                     $message .= "\n" . $langs->transnoentities('TicketNotificationEmailBodyInfosTrackUrlinternal') . ' : <a href="' . $url_internal_ticket . '">' . $this->track_id . '</a>' . "\n";
                 } else {
                     $url_public_ticket = ($conf->global->TICKET_URL_PUBLIC_INTERFACE ? $conf->global->TICKET_URL_PUBLIC_INTERFACE . '/' : dol_buildpath('/public/ticket/view.php', 2)) . '?track_id=' . $this->track_id;

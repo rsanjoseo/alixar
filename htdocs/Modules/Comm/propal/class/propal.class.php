@@ -744,7 +744,7 @@ class Propal extends CommonObject
     {
         global $conf, $hookmanager;
 
-        dol_include_once('/projet/class/project.class.php');
+        dol_include_once('/Modules/Projects/class/project.class.php');
 
         $error = 0;
         $now = dol_now();
@@ -3375,8 +3375,8 @@ class Propal extends CommonObject
             $response->warning_delay = $delay_warning / 60 / 60 / 24;
             $response->label = $label;
             $response->labelShort = $labelShort;
-            $response->url = DOL_URL_ROOT . '/comm/propal/list.php?search_status=' . $status . '&mainmenu=commercial&leftmenu=propals';
-            $response->url_late = DOL_URL_ROOT . '/comm/propal/list.php?search_status=' . $status . '&mainmenu=commercial&leftmenu=propals&sortfield=p.datep&sortorder=asc';
+            $response->url = DOL_URL_ROOT . '/Modules/Comm/propal/list.php?search_status=' . $status . '&mainmenu=commercial&leftmenu=propals';
+            $response->url_late = DOL_URL_ROOT . '/Modules/Comm/propal/list.php?search_status=' . $status . '&mainmenu=commercial&leftmenu=propals&sortfield=p.datep&sortorder=asc';
             $response->img = img_object('', "propal");
 
             // This assignment in condition is not a bug. It allows walking the results.
@@ -3582,13 +3582,13 @@ class Propal extends CommonObject
             }
 
             if ($option == '') {
-                $url = DOL_URL_ROOT . '/comm/propal/card.php?id=' . $this->id . $get_params;
+                $url = DOL_URL_ROOT . '/Modules/Comm/propal/card.php?id=' . $this->id . $get_params;
             } elseif ($option == 'compta') {  // deprecated
-                $url = DOL_URL_ROOT . '/comm/propal/card.php?id=' . $this->id . $get_params;
+                $url = DOL_URL_ROOT . '/Modules/Comm/propal/card.php?id=' . $this->id . $get_params;
             } elseif ($option == 'expedition') {
-                $url = DOL_URL_ROOT . '/expedition/propal.php?id=' . $this->id . $get_params;
+                $url = DOL_URL_ROOT . '/Modules/Expedition/propal.php?id=' . $this->id . $get_params;
             } elseif ($option == 'document') {
-                $url = DOL_URL_ROOT . '/comm/propal/document.php?id=' . $this->id . $get_params;
+                $url = DOL_URL_ROOT . '/Modules/Comm/propal/document.php?id=' . $this->id . $get_params;
             }
 
             if ($option != 'nolink') {
@@ -3661,7 +3661,7 @@ class Propal extends CommonObject
 
             if ($txttoshow) {
                 $result .= ' <span class="note inline-block">';
-                $result .= '<a href="' . DOL_URL_ROOT . '/comm/propal/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($txttoshow) . '">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/Modules/Comm/propal/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($txttoshow) . '">';
                 $result .= img_picto('', 'note');
                 $result .= '</a>';
                 $result .= '</span>';

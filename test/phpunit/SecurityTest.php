@@ -850,28 +850,28 @@ class SecurityTest extends PHPUnit\Framework\TestCase
 		$conf=$this->savconf;
 		$user=$this->savuser;
 		$langs=$this->savlangs;
-		$db=$this->savdb;
+        $db = $this->savdb;
 
-		$result=dol_eval('1==1', 1, 0);
-		print "result = ".$result."\n";
-		$this->assertTrue($result);
+        $result = dol_eval('1==1', 1, 0);
+        print "result = " . $result . "\n";
+        $this->assertTrue($result);
 
-		$result=dol_eval('1==2', 1, 0);
-		print "result = ".$result."\n";
-		$this->assertFalse($result);
+        $result = dol_eval('1==2', 1, 0);
+        print "result = " . $result . "\n";
+        $this->assertFalse($result);
 
-		include_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
-		include_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-		$result=dol_eval('(($reloadedobj = new Task($db)) && ($reloadedobj->fetchNoCompute($object->id) > 0) && ($secondloadedobj = new Project($db)) && ($secondloadedobj->fetchNoCompute($reloadedobj->fk_project) > 0)) ? $secondloadedobj->ref: "Parent project not found"', 1, 1);
-		print "result = ".$result."\n";
-		$this->assertEquals('Parent project not found', $result);
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/project.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Projects/class/task.class.php';
+        $result = dol_eval('(($reloadedobj = new Task($db)) && ($reloadedobj->fetchNoCompute($object->id) > 0) && ($secondloadedobj = new Project($db)) && ($secondloadedobj->fetchNoCompute($reloadedobj->fk_project) > 0)) ? $secondloadedobj->ref: "Parent project not found"', 1, 1);
+        print "result = " . $result . "\n";
+        $this->assertEquals('Parent project not found', $result);
 
-		$result=dol_eval('$a=function() { }; $a;', 1, 1);
-		print "result = ".$result."\n";
-		$this->assertContains('Bad string syntax to evaluate', $result);
+        $result = dol_eval('$a=function() { }; $a;', 1, 1);
+        print "result = " . $result . "\n";
+        $this->assertContains('Bad string syntax to evaluate', $result);
 
-		$result=dol_eval('$a=exec("ls");', 1, 1);
-		print "result = ".$result."\n";
+        $result = dol_eval('$a=exec("ls");', 1, 1);
+        print "result = " . $result . "\n";
 		$this->assertContains('Bad string syntax to evaluate', $result);
 
 		$result=dol_eval('$a="test"; $$a;', 1, 0);

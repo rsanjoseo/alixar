@@ -76,7 +76,7 @@ class InterfaceContactRoles extends DolibarrTriggers
             $socid = (property_exists($object, 'socid') ? $object->socid : $object->fk_soc);
 
             if (!empty($socid) && $socid > 0) {
-                require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
                 $contactdefault = new Contact($this->db);
                 $contactdefault->socid = $socid;
                 $TContact = $contactdefault->getContactRoles($object->element);

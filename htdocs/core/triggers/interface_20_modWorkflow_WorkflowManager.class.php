@@ -71,7 +71,7 @@ class InterfaceWorkflowManager extends DolibarrTriggers
         if ($action == 'PROPAL_CLOSE_SIGNED') {
             dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
             if (!empty($conf->commande->enabled) && !empty($conf->global->WORKFLOW_PROPAL_AUTOCREATE_ORDER)) {
-                include_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
                 $newobject = new Commande($this->db);
 
                 $newobject->context['createfrompropal'] = 'createfrompropal';
@@ -91,7 +91,7 @@ class InterfaceWorkflowManager extends DolibarrTriggers
         if ($action == 'ORDER_CLOSE') {
             dol_syslog("Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id);
             if (!empty($conf->facture->enabled) && !empty($conf->global->WORKFLOW_ORDER_AUTOCREATE_INVOICE)) {
-                include_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+                include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
                 $newobject = new Facture($this->db);
 
                 $newobject->context['createfromorder'] = 'createfromorder';
@@ -296,7 +296,7 @@ class InterfaceWorkflowManager extends DolibarrTriggers
             ) {
                 $qtyshipped = [];
                 $qtyordred = [];
-                require_once DOL_DOCUMENT_ROOT . '/commande/class/commande.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
 
                 // Find all shipments on order origin
                 $order = new Commande($this->db);

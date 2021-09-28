@@ -40,8 +40,8 @@ if (substr($sapi_type, 0, 3) == 'cgi') {
 
 require_once $path."../../htdocs/master.inc.php";
 require_once DOL_DOCUMENT_ROOT."/core/lib/date.lib.php";
-require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
-require_once DOL_DOCUMENT_ROOT."/user/class/user.class.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/ldap.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Users/class/user.class.php";
 
 $langs->loadLangs(["main", "errors"]);
 

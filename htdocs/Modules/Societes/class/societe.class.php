@@ -1595,34 +1595,34 @@ class Societe extends CommonObject
 
         if ($option == 'customer' || $option == 'compta' || $option == 'category') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("Customer") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/card.php?socid=' . $this->id;
         } elseif ($option == 'prospect' && empty($conf->global->SOCIETE_DISABLE_PROSPECTS)) {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("Prospect") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/card.php?socid=' . $this->id;
         } elseif ($option == 'supplier' || $option == 'category_supplier') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("Supplier") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/fourn/card.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Fourn/card.php?socid=' . $this->id;
         } elseif ($option == 'agenda') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/societe/agenda.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/agenda.php?socid=' . $this->id;
         } elseif ($option == 'project') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/societe/project.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/project.php?socid=' . $this->id;
         } elseif ($option == 'margin') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
             $linkstart = '<a href="' . DOL_URL_ROOT . '/margin/tabs/thirdpartyMargins.php?socid=' . $this->id . '&type=1';
         } elseif ($option == 'contact') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/societe/contact.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/contact.php?socid=' . $this->id;
         } elseif ($option == 'ban') {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/societe/paymentmodes.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/paymentmodes.php?socid=' . $this->id;
         }
 
         // By default
         if (empty($linkstart)) {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/societe/card.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/card.php?socid=' . $this->id;
         }
         if (isset($this->status)) {
             $label .= ' ' . $this->getLibStatut(5);
@@ -1810,17 +1810,17 @@ class Societe extends CommonObject
         $s = '';
         if (empty($option) || preg_match('/prospect/', $option)) {
             if (($this->client == 2 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_PROSPECTS)) {
-                $s .= '<a class="customer-back opacitymedium" title="' . $langs->trans("Prospect") . '" href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Prospect"), 0, 1) . '</a>';
+                $s .= '<a class="customer-back opacitymedium" title="' . $langs->trans("Prospect") . '" href="' . DOL_URL_ROOT . '/Modules/Comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Prospect"), 0, 1) . '</a>';
             }
         }
         if (empty($option) || preg_match('/customer/', $option)) {
             if (($this->client == 1 || $this->client == 3) && empty($conf->global->SOCIETE_DISABLE_CUSTOMERS)) {
-                $s .= '<a class="customer-back" title="' . $langs->trans("Customer") . '" href="' . DOL_URL_ROOT . '/comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Customer"), 0, 1) . '</a>';
+                $s .= '<a class="customer-back" title="' . $langs->trans("Customer") . '" href="' . DOL_URL_ROOT . '/Modules/Comm/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Customer"), 0, 1) . '</a>';
             }
         }
         if (empty($option) || preg_match('/supplier/', $option)) {
             if (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) && $this->fournisseur) {
-                $s .= '<a class="vendor-back" title="' . $langs->trans("Supplier") . '" href="' . DOL_URL_ROOT . '/fourn/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Supplier"), 0, 1) . '</a>';
+                $s .= '<a class="vendor-back" title="' . $langs->trans("Supplier") . '" href="' . DOL_URL_ROOT . '/Modules/Fourn/card.php?socid=' . $this->id . '">' . dol_substr($langs->trans("Supplier"), 0, 1) . '</a>';
             }
         }
         return $s;
@@ -1978,7 +1978,7 @@ class Societe extends CommonObject
     public function contact_array_objects()
     {
         // phpcs:enable
-        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
         $contacts = [];
 
         $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "socpeople WHERE fk_soc = " . ((int) $this->id);
@@ -2055,7 +2055,7 @@ class Societe extends CommonObject
     public function display_rib($mode = 'label')
     {
         // phpcs:enable
-        require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/companybankaccount.class.php';
 
         $bac = new CompanyBankAccount($this->db);
         $bac->fetch(0, $this->id);
@@ -2065,7 +2065,7 @@ class Societe extends CommonObject
                 return $bac->getRibLabel(true);
             } elseif ($mode == 'rum') {
                 if (empty($bac->rum)) {
-                    require_once DOL_DOCUMENT_ROOT . '/compta/prelevement/class/bonprelevement.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/prelevement/class/bonprelevement.class.php';
                     $prelevement = new BonPrelevement($this->db);
                     $bac->fetch_thirdparty();
                     $bac->rum = $prelevement->buildRumNumber($bac->thirdparty->code_client, $bac->datec, $bac->id);
@@ -2091,7 +2091,7 @@ class Societe extends CommonObject
     public function get_all_rib()
     {
         // phpcs:enable
-        require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/companybankaccount.class.php';
         $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "societe_rib WHERE type='ban' AND fk_soc = " . ((int) $this->id);
         $result = $this->db->query($sql);
         if (!$result) {
@@ -3626,7 +3626,7 @@ class Societe extends CommonObject
                 if (!$error && $nbrowsaffected) {
                     // Update information on linked member if it is an update
                     if (!$nosyncmember && !empty($conf->adherent->enabled)) {
-                        require_once DOL_DOCUMENT_ROOT . '/adherents/class/adherent.class.php';
+                        require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 
                         dol_syslog(get_class($this) . "::update update linked member");
 
@@ -3872,7 +3872,7 @@ class Societe extends CommonObject
         $this->db->begin();
 
         // phpcs:enable
-        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
         $contact = new Contact($this->db);
 
         $contact->name = $this->name_bis;
@@ -4439,10 +4439,10 @@ class Societe extends CommonObject
             $arrayofref = [];
             $arrayofrefopened = [];
             if ($mode == 'supplier') {
-                require_once DOL_DOCUMENT_ROOT . '/fourn/class/fournisseur.facture.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.facture.class.php';
                 $tmpobject = new FactureFournisseur($this->db);
             } else {
-                require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
                 $tmpobject = new Facture($this->db);
             }
             while ($obj = $this->db->fetch_object($resql)) {
@@ -4546,7 +4546,7 @@ class Societe extends CommonObject
         if (!empty($moreparams) && !empty($moreparams['use_companybankid'])) {
             $modelpath = "core/modules/bank/doc/";
 
-            include_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/companybankaccount.class.php';
             $companybankaccount = new CompanyBankAccount($this->db);
             $result = $companybankaccount->fetch($moreparams['use_companybankid']);
             if (!$result) {
@@ -4565,7 +4565,7 @@ class Societe extends CommonObject
             }
 
             if (!isset($this->bank_account)) {
-                require_once DOL_DOCUMENT_ROOT . '/societe/class/companybankaccount.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/companybankaccount.class.php';
                 $bac = new CompanyBankAccount($this->db);
                 $result = $bac->fetch(0, $this->id);
                 if ($result > 0) {

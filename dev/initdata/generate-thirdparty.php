@@ -31,23 +31,22 @@ $path=dirname(__FILE__).'/';
 // Test si mode batch
 $sapi_type = php_sapi_name();
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit;
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit;
 }
 
 // Recupere root dolibarr
 //$path=preg_replace('/generate-societe.php/i','',$_SERVER["PHP_SELF"]);
-require __DIR__. '/../../htdocs/master.inc.php';
-include_once DOL_DOCUMENT_ROOT.'/societe/class/societe.class.php';
-include_once DOL_DOCUMENT_ROOT.'/contact/class/contact.class.php';
-include_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
-include_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
-include_once DOL_DOCUMENT_ROOT.'/compta/paiement/class/paiement.class.php';
-include_once DOL_DOCUMENT_ROOT.'/contrat/class/contrat.class.php';
+require __DIR__ . '/../../htdocs/master.inc.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/paiement/class/paiement.class.php';
+include_once DOL_DOCUMENT_ROOT . '/Modules/Contrats/class/contrat.class.php';
 
-$listoftown = array("Auray","Baden","Vannes","Pirouville","Haguenau","Souffelweiersheim","Illkirch-Graffenstaden","Lauterbourg","Picauville","Sainte-Mère Eglise","Le Bono");
-$listoflastname = array("Joe","Marc","Steve","Laurent","Nico","Isabelle","Dorothee","Saby","Brigitte","Karine","Jose-Anne","Celine","Virginie");
-
+$listoftown = ["Auray", "Baden", "Vannes", "Pirouville", "Haguenau", "Souffelweiersheim", "Illkirch-Graffenstaden", "Lauterbourg", "Picauville", "Sainte-Mère Eglise", "Le Bono"];
+$listoflastname = ["Joe", "Marc", "Steve", "Laurent", "Nico", "Isabelle", "Dorothee", "Saby", "Brigitte", "Karine", "Jose-Anne", "Celine", "Virginie"];
 
 /*
  * Parametre
@@ -55,8 +54,7 @@ $listoflastname = array("Joe","Marc","Steve","Laurent","Nico","Isabelle","Doroth
 
 define(GEN_NUMBER_SOCIETE, 10);
 
-
-$ret=$user->fetch('', 'admin');
+$ret = $user->fetch('', 'admin');
 if (! $ret > 0) {
 	print 'A user with login "admin" and all permissions must be created to use this script.'."\n";
 	exit;

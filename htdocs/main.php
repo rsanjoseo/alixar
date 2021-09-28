@@ -630,7 +630,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
             if ($_SESSION["dol_authmode"] != 'forceuser' && $_SESSION["dol_authmode"] != 'http') {
                 $logouthtmltext .= $langs->trans("Logout") . '<br>';
 
-                $logouttext .= '<a accesskey="l" href="' . DOL_URL_ROOT . '/user/logout.php">';
+                $logouttext .= '<a accesskey="l" href="' . DOL_URL_ROOT . '/Modules/Users/logout.php">';
                 $logouttext .= img_picto($langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin');
                 $logouttext .= '</a>';
             } else {
@@ -910,10 +910,10 @@ function top_menu_user($hideloginname = 0, $urllogout = '')
     }
 
     if (empty($urllogout)) {
-        $urllogout = DOL_URL_ROOT . '/user/logout.php';
+        $urllogout = DOL_URL_ROOT . '/Modules/Users/logout.php';
     }
     $logoutLink = '<a accesskey="l" href="' . $urllogout . '" class="button-top-menu-dropdown" ><i class="fa fa-sign-out-alt"></i> ' . $langs->trans("Logout") . '</a>';
-    $profilLink = '<a accesskey="l" href="' . DOL_URL_ROOT . '/user/card.php?id=' . $user->id . '" class="button-top-menu-dropdown" ><i class="fa fa-user"></i>  ' . $langs->trans("Card") . '</a>';
+    $profilLink = '<a accesskey="l" href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $user->id . '" class="button-top-menu-dropdown" ><i class="fa fa-user"></i>  ' . $langs->trans("Card") . '</a>';
 
     $profilName = $user->getFullName($langs) . ' (' . $user->login . ')';
 
@@ -939,7 +939,7 @@ function top_menu_user($hideloginname = 0, $urllogout = '')
     if (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
         $btnUser = '<!-- div for user link -->
 	    <div id="topmenu-login-dropdown" class="userimg atoplogin dropdown user user-menu inline-block">
-	        <a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $user->id . '" class="dropdown-toggle login-dropdown-a" data-toggle="dropdown">
+	        <a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $user->id . '" class="dropdown-toggle login-dropdown-a" data-toggle="dropdown">
 	            ' . $userImage . '<span class="hidden-xs maxwidth200 atoploginusername hideonsmartphone paddingleft">' . dol_trunc($user->firstname ? $user->firstname : $user->login, 10) . '</span>
 	        </a>
 	        <div class="dropdown-menu">
@@ -983,7 +983,7 @@ function top_menu_user($hideloginname = 0, $urllogout = '')
     } else {
         $btnUser = '<!-- div for user link -->
 	    <div id="topmenu-login-dropdown" class="userimg atoplogin dropdown user user-menu  inline-block">
-	    	<a href="' . DOL_URL_ROOT . '/user/card.php?id=' . $user->id . '">
+	    	<a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $user->id . '">
 	    	' . $userImage . '
 	    		<span class="hidden-xs maxwidth200 atoploginusername hideonsmartphone">' . dol_trunc($user->firstname ? $user->firstname : $user->login, 10) . '</span>
 	    		</a>
@@ -1053,7 +1053,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Thirdparty link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/societe/card.php?action=create" title="' . $langs->trans("MenuNewThirdParty") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Societes/card.php?action=create" title="' . $langs->trans("MenuNewThirdParty") . '">
                     ' . img_picto('', 'object_company') . '<br>' . $langs->trans("ThirdParty") . '</a>
                 </div>
                 ';
@@ -1064,7 +1064,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Contact link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/contact/card.php?action=create" title="' . $langs->trans("NewContactAddress") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Contacts/card.php?action=create" title="' . $langs->trans("NewContactAddress") . '">
                     ' . img_picto('', 'object_contact') . '<br>' . $langs->trans("Contact") . '</a>
                 </div>
                 ';
@@ -1075,7 +1075,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Propal link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/comm/propal/card.php?action=create" title="' . $langs->trans("NewPropal") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Comm/propal/card.php?action=create" title="' . $langs->trans("NewPropal") . '">
                     ' . img_picto('', 'object_propal') . '<br>' . $langs->trans("Proposal") . '</a>
                 </div>
                 ';
@@ -1086,7 +1086,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Order link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/commande/card.php?action=create" title="' . $langs->trans("NewOrder") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Commande/card.php?action=create" title="' . $langs->trans("NewOrder") . '">
                     ' . img_picto('', 'object_order') . '<br>' . $langs->trans("Order") . '</a>
                 </div>
                 ';
@@ -1097,7 +1097,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Invoice link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/compta/facture/card.php?action=create" title="' . $langs->trans("NewBill") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Compta/facture/card.php?action=create" title="' . $langs->trans("NewBill") . '">
                     ' . img_picto('', 'object_bill') . '<br>' . $langs->trans("Bill") . '</a>
                 </div>
                 ';
@@ -1108,7 +1108,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Contract link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/compta/facture/card.php?action=create" title="' . $langs->trans("NewContractSubscription") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Compta/facture/card.php?action=create" title="' . $langs->trans("NewContractSubscription") . '">
                     ' . img_picto('', 'object_contract') . '<br>' . $langs->trans("Contract") . '</a>
                 </div>
                 ';
@@ -1130,7 +1130,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Supplier order link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/fourn/commande/card.php?action=create" title="' . $langs->trans("NewSupplierOrderShort") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Fourn/commande/card.php?action=create" title="' . $langs->trans("NewSupplierOrderShort") . '">
                     ' . img_picto('', 'object_order') . '<br>' . $langs->trans("SupplierOrder") . '</a>
                 </div>
                 ';
@@ -1141,7 +1141,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Supplier invoice link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/fourn/facture/card.php?action=create" title="' . $langs->trans("NewBill") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Fourn/facture/card.php?action=create" title="' . $langs->trans("NewBill") . '">
                     ' . img_picto('', 'object_bill') . '<br>' . $langs->trans("SupplierBill") . '</a>
                 </div>
                 ';
@@ -1152,7 +1152,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Product link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/product/card.php?action=create&amp;type=0" title="' . $langs->trans("NewProduct") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Products/card.php?action=create&amp;type=0" title="' . $langs->trans("NewProduct") . '">
                     ' . img_picto('', 'object_product') . '<br>' . $langs->trans("Product") . '</a>
                 </div>
                 ';
@@ -1163,7 +1163,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Service link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/product/card.php?action=create&amp;type=1" title="' . $langs->trans("NewService") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Products/card.php?action=create&amp;type=1" title="' . $langs->trans("NewService") . '">
                     ' . img_picto('', 'object_service') . '<br>' . $langs->trans("Service") . '</a>
                 </div>
                 ';
@@ -1174,7 +1174,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Expense report link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/expensereport/card.php?action=create&fk_user_author=' . $user->id . '" title="' . $langs->trans("AddTrip") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/ExpenseReports/card.php?action=create&fk_user_author=' . $user->id . '" title="' . $langs->trans("AddTrip") . '">
                     ' . img_picto('', 'object_trip') . '<br>' . $langs->trans("ExpenseReport") . '</a>
                 </div>
                 ';
@@ -1185,7 +1185,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Holiday link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/holiday/card.php?action=create&fuserid=' . $user->id . '" title="' . $langs->trans("AddCP") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Holiday/card.php?action=create&fuserid=' . $user->id . '" title="' . $langs->trans("AddCP") . '">
                     ' . img_picto('', 'object_holiday') . '<br>' . $langs->trans("Holidays") . '</a>
                 </div>
                 ';
@@ -2381,7 +2381,7 @@ if (!empty($conf->global->MAIN_ONLY_LOGIN_ALLOWED)) { // It's false
         if (session_id() && isset($_SESSION["dol_login"]) && $_SESSION["dol_login"] != $conf->global->MAIN_ONLY_LOGIN_ALLOWED) {
             print 'Sorry, your application is offline.' . "\n";
             print 'You are logged with user "' . $_SESSION["dol_login"] . '" and only administrator user "' . $conf->global->MAIN_ONLY_LOGIN_ALLOWED . '" is allowed to connect for the moment.' . "\n";
-            $nexturl = DOL_URL_ROOT . '/user/logout.php';
+            $nexturl = DOL_URL_ROOT . '/Modules/Users/logout.php';
             print 'Please try later or <a href="' . $nexturl . '">click here to disconnect and change login user</a>...' . "\n";
         } else {
             print 'Sorry, your application is offline. Only administrator user "' . $conf->global->MAIN_ONLY_LOGIN_ALLOWED . '" is allowed to connect for the moment.' . "\n";

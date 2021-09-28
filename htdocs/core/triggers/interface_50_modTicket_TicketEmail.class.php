@@ -97,7 +97,7 @@ class InterfaceTicketEmail extends DolibarrTriggers
 
                             $message .= '</ul>';
                             $message .= '<p>' . $langs->trans('Message') . ' : <br>' . $object->message . '</p>';
-                            $message .= '<p><a href="' . dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id . '">' . $langs->trans('SeeThisTicketIntomanagementInterface') . '</a></p>';
+                            $message .= '<p><a href="' . dol_buildpath('/Modules/Tickets/card.php', 2) . '?track_id=' . $object->track_id . '">' . $langs->trans('SeeThisTicketIntomanagementInterface') . '</a></p>';
 
                             $sendto = $userstat->email;
                             $from = dolGetFirstLastname($user->firstname, $user->lastname) . '<' . $user->email . '>';
@@ -172,7 +172,7 @@ class InterfaceTicketEmail extends DolibarrTriggers
                             $message = dol_nl2br($message);
                         }
                         $message_admin .= '<p>' . $langs->trans('Message') . ' : <br>' . $message . '</p>';
-                        $message_admin .= '<p><a href="' . dol_buildpath('/ticket/card.php', 2) . '?track_id=' . $object->track_id . '">' . $langs->trans('SeeThisTicketIntomanagementInterface') . '</a></p>';
+                        $message_admin .= '<p><a href="' . dol_buildpath('/Modules/Tickets/card.php', 2) . '?track_id=' . $object->track_id . '">' . $langs->trans('SeeThisTicketIntomanagementInterface') . '</a></p>';
 
                         $from = $conf->global->MAIN_INFO_SOCIETE_NOM . '<' . $conf->global->TICKET_NOTIFICATION_EMAIL_FROM . '>';
                         $replyto = $from;

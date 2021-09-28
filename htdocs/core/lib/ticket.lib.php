@@ -80,14 +80,14 @@ function ticket_prepare_head($object)
 
     $h = 0;
     $head = [];
-    $head[$h][0] = DOL_URL_ROOT . '/ticket/card.php?action=view&track_id=' . $object->track_id;
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Tickets/card.php?action=view&track_id=' . $object->track_id;
     $head[$h][1] = $langs->trans("Ticket");
     $head[$h][2] = 'tabTicket';
     $h++;
 
     if (empty($conf->global->MAIN_DISABLE_CONTACTS_TAB) && empty($user->socid) && $conf->societe->enabled) {
         $nbContact = count($object->liste_contact(-1, 'internal')) + count($object->liste_contact(-1, 'external'));
-        $head[$h][0] = DOL_URL_ROOT . '/ticket/contact.php?track_id=' . $object->track_id;
+        $head[$h][0] = DOL_URL_ROOT . '/Modules/Tickets/contact.php?track_id=' . $object->track_id;
         $head[$h][1] = $langs->trans('ContactsAddresses');
         if ($nbContact > 0) {
             $head[$h][1] .= '<span class="badge marginleftonlyshort">' . $nbContact . '</span>';
@@ -102,7 +102,7 @@ function ticket_prepare_head($object)
     include_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
     $upload_dir = $conf->ticket->dir_output . "/" . $object->ref;
     $nbFiles = count(dol_dir_list($upload_dir, 'files'));
-    $head[$h][0] = DOL_URL_ROOT . '/ticket/document.php?id=' . $object->id;
+    $head[$h][0] = DOL_URL_ROOT . '/Modules/Tickets/document.php?id=' . $object->id;
     $head[$h][1] = $langs->trans("Documents");
     if ($nbFiles > 0) {
         $head[$h][1] .= '<span class="badge marginleftonlyshort">' . $nbFiles . '</span>';
@@ -120,10 +120,10 @@ function ticket_prepare_head($object)
     }
 
     if ($ticketViewType == "messaging") {
-        $head[$h][0] = DOL_URL_ROOT . '/ticket/messaging.php?track_id=' . $object->track_id;
+        $head[$h][0] = DOL_URL_ROOT . '/Modules/Tickets/messaging.php?track_id=' . $object->track_id;
     } else {
         // $ticketViewType == "list"
-        $head[$h][0] = DOL_URL_ROOT . '/ticket/agenda.php?track_id=' . $object->track_id;
+        $head[$h][0] = DOL_URL_ROOT . '/Modules/Tickets/agenda.php?track_id=' . $object->track_id;
     }
     $head[$h][1] = $langs->trans('Events');
     if (!empty($conf->agenda->enabled) && (!empty($user->rights->agenda->myactions->read) || !empty($user->rights->agenda->allactions->read))) {
@@ -287,7 +287,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
 
     global $param, $massactionbutton;
 
-    dol_include_once('/comm/action/class/actioncomm.class.php');
+    dol_include_once('/Modules/Comm/action/class/actioncomm.class.php');
 
     // Check parameters
     if (!is_object($filterobj) && !is_object($objcon)) {
@@ -570,10 +570,10 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
     if (!empty($conf->agenda->enabled) || (!empty($conf->mailing->enabled) && !empty($objcon->email))) {
         $delay_warning = $conf->global->MAIN_DELAY_ACTIONS_TODO * 24 * 60 * 60;
 
-        require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
         include_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
         require_once DOL_DOCUMENT_ROOT . '/core/class/html.formactions.class.php';
-        require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
 
         $formactions = new FormActions($db);
 
@@ -636,7 +636,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
         if ($donetodo) {
             $tmp = '';
             if (get_class($filterobj) == 'Societe') {
-                $tmp .= '<a href="' . DOL_URL_ROOT . '/comm/action/list.php?action=show_list&socid=' . $filterobj->id . '&status=done">';
+                $tmp .= '<a href="' . DOL_URL_ROOT . '/Modules/Comm/action/list.php?action=show_list&socid=' . $filterobj->id . '&status=done">';
             }
             $tmp .= ($donetodo != 'done' ? $langs->trans("ActionsToDoShort") : '');
             $tmp .= ($donetodo != 'done' && $donetodo != 'todo' ? ' / ' : '');
@@ -648,7 +648,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
             $out .= getTitleFieldOfList($tmp);
         }
 
-        //require_once DOL_DOCUMENT_ROOT.'/comm/action/class/cactioncomm.class.php';
+        //require_once DOL_DOCUMENT_ROOT.'/Modules/Comm/action/class/cactioncomm.class.php';
         //$caction=new CActionComm($db);
         //$arraylist=$caction->liste_array(1, 'code', '', (empty($conf->global->AGENDA_USE_EVENT_TYPE)?1:0), '', 1);
 
@@ -660,7 +660,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
             $actionstatic->type_picto = $histo[$key]['apicto'];
             $actionstatic->type_code = $histo[$key]['acode'];
 
-            $url = DOL_URL_ROOT . '/comm/action/card.php?id=' . $histo[$key]['id'];
+            $url = DOL_URL_ROOT . '/Modules/Comm/action/card.php?id=' . $histo[$key]['id'];
 
             $tmpa = dol_getdate($histo[$key]['datestart'], false);
             if ($actualCycleDate !== $tmpa['year'] . '-' . $tmpa['yday']) {
@@ -684,7 +684,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
             $out .= '<span class="timeline-header-action">';
 
             if (isset($histo[$key]['type']) && $histo[$key]['type'] == 'mailing') {
-                $out .= '<a class="timeline-btn" href="' . DOL_URL_ROOT . '/comm/mailing/card.php?id=' . $histo[$key]['id'] . '">' . img_object($langs->trans("ShowEMailing"), "email") . ' ';
+                $out .= '<a class="timeline-btn" href="' . DOL_URL_ROOT . '/Modules/Comm/mailing/card.php?id=' . $histo[$key]['id'] . '">' . img_object($langs->trans("ShowEMailing"), "email") . ' ';
                 $out .= $histo[$key]['id'];
                 $out .= '</a> ';
             } else {
@@ -698,7 +698,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
 
             if ($user->rights->agenda->allactions->create ||
                 (($actionstatic->authorid == $user->id || $actionstatic->userownerid == $user->id) && $user->rights->agenda->myactions->create)) {
-                $out .= '<a class="timeline-btn" href="' . DOL_MAIN_URL_ROOT . '/comm/action/card.php?action=edit&token=' . newToken() . '&id=' . $actionstatic->id . '"><i class="fa fa-pencil" title="' . $langs->trans("Modify") . '" ></i></a>';
+                $out .= '<a class="timeline-btn" href="' . DOL_MAIN_URL_ROOT . '/Modules/Comm/action/card.php?action=edit&token=' . newToken() . '&id=' . $actionstatic->id . '"><i class="fa fa-pencil" title="' . $langs->trans("Modify") . '" ></i></a>';
             }
 
             $out .= '</span>';
@@ -762,7 +762,7 @@ function show_ticket_messaging($conf, $langs, $db, $filterobj, $objcon = '', $no
                     $out .= dol_trunc($libelle, 120);
                 }
                 if (isset($histo[$key]['type']) && $histo[$key]['type'] == 'mailing') {
-                    $out .= '<a href="' . DOL_URL_ROOT . '/comm/mailing/card.php?id=' . $histo[$key]['id'] . '">' . img_object($langs->trans("ShowEMailing"), "email") . ' ';
+                    $out .= '<a href="' . DOL_URL_ROOT . '/Modules/Comm/mailing/card.php?id=' . $histo[$key]['id'] . '">' . img_object($langs->trans("ShowEMailing"), "email") . ' ';
                     $transcode = $langs->trans("Action" . $histo[$key]['acode']);
                     $libelle = ($transcode != "Action" . $histo[$key]['acode'] ? $transcode : 'Send mass mailing');
                     $out .= dol_trunc($libelle, 120);

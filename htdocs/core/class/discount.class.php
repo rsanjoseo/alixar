@@ -243,7 +243,7 @@ class DiscountAbsolute
 
         $userid = $user->id;
         if (!($userid > 0)) {        // For example when record is saved into an anonymous context with a not loaded object $user.
-            include_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
             $tmpinvoice = new Facture($this->db);
             $tmpinvoice->fetch($this->fk_facture_source);
             $userid = $tmpinvoice->fk_user_author; // We use the author of invoice
@@ -687,7 +687,7 @@ class DiscountAbsolute
 
         if ($option == 'invoice') {
             $facid = !empty($this->discount_type) ? $this->fk_invoice_supplier_source : $this->fk_facture_source;
-            $link = !empty($this->discount_type) ? '/fourn/facture/card.php' : '/compta/facture/card.php';
+            $link = !empty($this->discount_type) ? '/Modules/Fourn/facture/card.php' : '/Modules/Compta/facture/card.php';
             $label = $langs->trans("ShowSourceInvoice") . ': ' . $this->ref_facture_source;
             $link = '<a href="' . DOL_URL_ROOT . $link . '?facid=' . $facid . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
             $linkend = '</a>';
@@ -696,7 +696,7 @@ class DiscountAbsolute
         }
         if ($option == 'discount') {
             $label = $langs->trans("Discount");
-            $link = '<a href="' . DOL_URL_ROOT . '/comm/remx.php?id=' . $this->fk_soc . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
+            $link = '<a href="' . DOL_URL_ROOT . '/Modules/Comm/remx.php?id=' . $this->fk_soc . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip">';
             $linkend = '</a>';
             $ref = $langs->trans("Discount");
             $picto = 'generic';

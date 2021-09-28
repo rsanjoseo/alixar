@@ -30,18 +30,18 @@ if (!defined('NOSESSION')) {
 
 $sapi_type = php_sapi_name();
 $script_file = basename(__FILE__);
-$path = __DIR__.'/';
+$path = __DIR__ . '/';
 
 // Test if batch mode
 if (substr($sapi_type, 0, 3) == 'cgi') {
-	echo "Error: You are using PHP for CGI. To execute ".$script_file." from command line, you must use PHP for CLI mode.\n";
-	exit(-1);
+    echo "Error: You are using PHP for CGI. To execute " . $script_file . " from command line, you must use PHP for CLI mode.\n";
+    exit(-1);
 }
 
-require_once $path."../../htdocs/master.inc.php";
-require_once DOL_DOCUMENT_ROOT."/contact/class/contact.class.php";
-require_once DOL_DOCUMENT_ROOT."/user/class/user.class.php";
-require_once DOL_DOCUMENT_ROOT."/core/class/ldap.class.php";
+require_once $path . "../../htdocs/master.inc.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Contacts/class/contact.class.php";
+require_once DOL_DOCUMENT_ROOT . "/Modules/Users/class/user.class.php";
+require_once DOL_DOCUMENT_ROOT . "/core/class/ldap.class.php";
 
 // Global variables
 $version = DOL_VERSION;

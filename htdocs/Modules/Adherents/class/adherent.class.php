@@ -778,7 +778,7 @@ class Adherent extends CommonObject
             if (!$error && $nbrowsaffected) { // If something has change in main data
                 // Update information on linked user if it is an update
                 if (!$error && $this->user_id > 0 && !$nosyncuser) {
-                    require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php';
 
                     dol_syslog(get_class($this) . "::update update linked user");
 
@@ -831,7 +831,7 @@ class Adherent extends CommonObject
 
                 // Update information on linked thirdparty if it is an update
                 if (!$error && $this->fk_soc > 0 && !$nosyncthirdparty) {
-                    require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 
                     dol_syslog(get_class($this) . "::update update linked thirdparty");
 
@@ -947,7 +947,7 @@ class Adherent extends CommonObject
                 $this->pass_indatabase_crypted = $password_crypted;
 
                 if ($this->user_id && !$nosyncuser) {
-                    require_once DOL_DOCUMENT_ROOT . '/user/class/user.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php';
 
                     // This member is linked with a user, so we also update users informations
                     // if this is an update.
@@ -1363,7 +1363,7 @@ class Adherent extends CommonObject
         // phpcs:enable
         global $langs;
 
-        require_once DOL_DOCUMENT_ROOT . '/adherents/class/subscription.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/subscription.class.php';
 
         $sql = "SELECT c.rowid, c.fk_adherent, c.fk_type, c.subscription, c.note, c.fk_bank,";
         $sql .= " c.tms as datem,";
@@ -1482,7 +1482,7 @@ class Adherent extends CommonObject
     {
         global $conf, $langs, $user;
 
-        require_once DOL_DOCUMENT_ROOT . '/adherents/class/subscription.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/subscription.class.php';
 
         $error = 0;
 
@@ -1623,7 +1623,7 @@ class Adherent extends CommonObject
 
         // Insert into bank account directlty (if option choosed for) + link to llx_subscription if option is 'bankdirect'
         if ($option == 'bankdirect' && $accountid) {
-            require_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
 
             $acct = new Account($this->db);
             $result = $acct->fetch($accountid);
@@ -1632,7 +1632,7 @@ class Adherent extends CommonObject
 
             $insertid = $acct->addline($dateop, $operation, $label, $amount, $num_chq, '', $user, $emetteur_nom, $emetteur_banque);
             if ($insertid > 0) {
-                $inserturlid = $acct->add_url_line($insertid, $this->id, DOL_URL_ROOT . '/adherents/card.php?rowid=', $this->getFullname($langs), 'member');
+                $inserturlid = $acct->add_url_line($insertid, $this->id, DOL_URL_ROOT . '/Modules/Adherents/card.php?rowid=', $this->getFullname($langs), 'member');
                 if ($inserturlid > 0) {
                     // Update table subscription
                     $sql = "UPDATE " . MAIN_DB_PREFIX . "subscription SET fk_bank=" . ((int) $insertid);
@@ -1659,8 +1659,8 @@ class Adherent extends CommonObject
 
         // If option choosed, we create invoice
         if (($option == 'bankviainvoice' && $accountid) || $option == 'invoiceonly') {
-            require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/facture.class.php';
-            require_once DOL_DOCUMENT_ROOT . '/compta/facture/class/paymentterm.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/paymentterm.class.php';
 
             $invoice = new Facture($this->db);
             $customer = new Societe($this->db);
@@ -1778,8 +1778,8 @@ class Adherent extends CommonObject
 
             // Add payment onto invoice
             if (!$error && $option == 'bankviainvoice' && $accountid) {
-                require_once DOL_DOCUMENT_ROOT . '/compta/paiement/class/paiement.class.php';
-                require_once DOL_DOCUMENT_ROOT . '/compta/bank/class/account.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/paiement/class/paiement.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
                 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions.lib.php';
 
                 $amounts = [];
@@ -2167,9 +2167,9 @@ class Adherent extends CommonObject
         }
         $label .= '</div>';
 
-        $url = DOL_URL_ROOT . '/adherents/card.php?rowid=' . ((int) $this->id);
+        $url = DOL_URL_ROOT . '/Modules/Adherents/card.php?rowid=' . ((int) $this->id);
         if ($option == 'subscription') {
-            $url = DOL_URL_ROOT . '/adherents/subscription.php?rowid=' . ((int) $this->id);
+            $url = DOL_URL_ROOT . '/Modules/Adherents/subscription.php?rowid=' . ((int) $this->id);
         }
 
         if ($option != 'nolink') {
@@ -2244,7 +2244,7 @@ class Adherent extends CommonObject
             if ($this->note_private) {
                 $notetoshow = $langs->trans("ViewPrivateNote") . ':<br>' . dol_string_nohtmltag($this->note_private, 1);
                 $result .= ' <span class="note inline-block">';
-                $result .= '<a href="' . DOL_URL_ROOT . '/adherents/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
+                $result .= '<a href="' . DOL_URL_ROOT . '/Modules/Adherents/note.php?id=' . $this->id . '" class="classfortooltip" title="' . dol_escape_htmltag($notetoshow) . '">';
                 $result .= img_picto('', 'note');
                 $result .= '</a>';
                 $result .= '</span>';
@@ -2404,10 +2404,10 @@ class Adherent extends CommonObject
                 $warning_delay = $conf->adherent->subscription->warning_delay / 60 / 60 / 24;
                 $label = $langs->trans("MembersWithSubscriptionToReceive");
                 $labelShort = $langs->trans("MembersWithSubscriptionToReceiveShort");
-                $url = DOL_URL_ROOT . '/adherents/list.php?mainmenu=members&amp;statut=' . self::STATUS_VALIDATED . '&amp;filter=outofdate';
+                $url = DOL_URL_ROOT . '/Modules/Adherents/list.php?mainmenu=members&amp;statut=' . self::STATUS_VALIDATED . '&amp;filter=outofdate';
             } elseif ($mode == 'shift') {
                 $warning_delay = $conf->adherent->subscription->warning_delay / 60 / 60 / 24;
-                $url = DOL_URL_ROOT . '/adherents/list.php?mainmenu=members&amp;statut=' . self::STATUS_DRAFT;
+                $url = DOL_URL_ROOT . '/Modules/Adherents/list.php?mainmenu=members&amp;statut=' . self::STATUS_DRAFT;
                 $label = $langs->trans("MembersListToValid");
                 $labelShort = $langs->trans("ToValidate");
             }
@@ -2978,7 +2978,7 @@ class Adherent extends CommonObject
                                     $actionmsg = dol_concatdesc($actionmsg, $message);
                                 }
 
-                                require_once DOL_DOCUMENT_ROOT . '/comm/action/class/actioncomm.class.php';
+                                require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
 
                                 // Insert record of emails sent
                                 $actioncomm = new ActionComm($this->db);
