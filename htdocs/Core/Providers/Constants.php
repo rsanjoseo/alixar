@@ -114,6 +114,31 @@ class Constants extends Provider
         define('CONFIGURATION_PATH', BASE_FOLDER . '/config');
         define('DEFAULT_STRING_LENGTH', 50);
         define('DEFAULT_INTEGER_SIZE', 10);
+        /**
+         * Must be defined in main index.php file
+         * /
+         * ClassUtils::defineIfNotExists('VENDOR_FOLDER', basePath('vendor'));
+         * ClassUtils::defineIfNotExists('ALXARAFE_FOLDER', basePath('src' . DIRECTORY_SEPARATOR . 'Alxarafe' . DIRECTORY_SEPARATOR . 'Core'));
+         * ClassUtils::defineIfNotExists('VENDOR_URI', baseUrl('vendor'));
+         *
+         * ClassUtils::defineIfNotExists('CONFIGURATION_PATH', basePath('config'));
+         * ClassUtils::defineIfNotExists('DEFAULT_STRING_LENGTH', 50);
+         * ClassUtils::defineIfNotExists('DEFAULT_INTEGER_SIZE', 10);
+         *
+         * ClassUtils::defineIfNotExists('CALL_CONTROLLER', 'call');
+         * ClassUtils::defineIfNotExists('METHOD_CONTROLLER', 'method');
+         * ClassUtils::defineIfNotExists('DEFAULT_CONTROLLER', ($this->fileExists($this->getFilePath()) ? 'EditConfig' : 'CreateConfig'));
+         * ClassUtils::defineIfNotExists('DEFAULT_METHOD', 'index');
+         *
+         * // Use cache on Core
+         * ClassUtils::defineIfNotExists('CORE_CACHE_ENABLED', false);
+         *
+         * // Default number of rows per page.
+         * ClassUtils::defineIfNotExists('DEFAULT_ROWS_PER_PAGE', 25);
+         *
+         * // Carry Return (retorno de carro) & Line Feed (salto de línea).
+         * ClassUtils::defineIfNotExists('CRLF', "\n\t");
+         */
     }
 
     /**
