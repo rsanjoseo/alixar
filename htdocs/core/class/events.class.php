@@ -24,6 +24,8 @@
 
 /**
  *  Events class
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Events // extends CommonObject
 {

@@ -28,6 +28,8 @@
 
 /**
  *  Class to stock current configuration
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Conf
 {

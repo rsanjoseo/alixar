@@ -31,6 +31,8 @@
 
 /**
  *    Class to offer components to list and upload files
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormFile
 {
@@ -503,7 +505,7 @@ class FormFile
                 if (is_array($genallowed)) {
                     $modellist = $genallowed;
                 } else {
-                    include_once DOL_DOCUMENT_ROOT . '/core/modules/societe/modules_societe.class.php';
+                    include_once DOL_DOCUMENT_ROOT . '/Modules/Societes/mods/modules_societe.class.php';
                     $modellist = ModeleThirdPartyDoc::liste_modeles($this->db);
                 }
             } elseif ($modulepart == 'propal') {

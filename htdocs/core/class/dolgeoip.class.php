@@ -29,6 +29,8 @@
  *                    $geoip=new GeoIP('country',$datfile);
  *                    $geoip->getCountryCodeFromIP($ip);
  *                    $geoip->close();
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DolGeoIP
 {

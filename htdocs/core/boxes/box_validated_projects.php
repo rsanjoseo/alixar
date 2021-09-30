@@ -165,7 +165,7 @@ class box_validated_projects extends ModeleBoxes
                             'td' => 'class="tdoverflowmax150 maxwidth200onsmartphone"',
                             'text' => $obj2->name,
                             'asis' => 1,
-                            'url' => DOL_URL_ROOT . '/Modules/Societes/card.php?socid=' . urlencode($obj2->rowid),
+                            'url' => DOL_URL_ROOT . '/index.php?module=societes&controller=card&socid=' . urlencode($obj2->rowid),
                         ];
                     } else {
                         $this->info_box_contents[$i][] = [

@@ -31,6 +31,8 @@
 
 /**
  *    Parent class for documents generators
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonDocGenerator
 {

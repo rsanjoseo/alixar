@@ -25,6 +25,8 @@
 
 /**
  *      Class to manage barcode HTML
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormBarCode
 {

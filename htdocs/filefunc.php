@@ -279,21 +279,22 @@ if (!$found) {
 }
 //print "tmp1=".$tmp1." tmp2=".$tmp2." tmp3=".$tmp3." tmp=".$tmp."\n";
 if (!empty($dolibarr_main_force_https)) {
-	$tmp = preg_replace('/^http:/i', 'https:', $tmp);
+    $tmp = preg_replace('/^http:/i', 'https:', $tmp);
 }
 define('DOL_MAIN_URL_ROOT', $tmp); // URL absolute root (https://sss/dolibarr, ...)
 $uri = preg_replace('/^http(s?):\/\//i', '', constant('DOL_MAIN_URL_ROOT')); // $uri contains url without http*
 $suburi = strstr($uri, '/'); // $suburi contains url without domain:port
 if ($suburi == '/') {
-	$suburi = ''; // If $suburi is /, it is now ''
+    $suburi = ''; // If $suburi is /, it is now ''
 }
-define('DOL_URL_ROOT', $suburi); // URL relative root ('', '/dolibarr', ...)
 
+if (!defined('DOL_URL_ROOT')) {
+    define('DOL_URL_ROOT', $suburi); // URL relative root ('', '/dolibarr', ...)
+}
 //print DOL_MAIN_URL_ROOT.'-'.DOL_URL_ROOT."\n";
 
 // Define prefix MAIN_DB_PREFIX
 define('MAIN_DB_PREFIX', $dolibarr_main_db_prefix);
-
 
 /*
  * Define PATH to external libraries

@@ -23,6 +23,8 @@
 
 /**
  *    Class to manage standard extra languages
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class ExtraLanguages
 {

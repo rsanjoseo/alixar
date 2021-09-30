@@ -24,6 +24,8 @@
 
 /**
  *    Class of dictionary of nature of product (used by imports)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class CProductNature // extends CommonObject
 {

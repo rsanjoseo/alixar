@@ -32,6 +32,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * Class for EmailSenderProfile
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class EmailSenderProfile extends CommonObject
 {

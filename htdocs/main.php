@@ -1053,7 +1053,7 @@ function top_menu_quickadd()
         $dropDownQuickAddHtml .= '
                 <!-- Thirdparty link -->
                 <div class="quickaddblock center">
-                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/Modules/Societes/card.php?action=create" title="' . $langs->trans("MenuNewThirdParty") . '">
+                    <a class="quickadddropdown-icon-link" href="' . DOL_URL_ROOT . '/index.php?module=societes&controller=card&action=create" title="' . $langs->trans("MenuNewThirdParty") . '">
                     ' . img_picto('', 'object_company') . '<br>' . $langs->trans("ThirdParty") . '</a>
                 </div>
                 ';

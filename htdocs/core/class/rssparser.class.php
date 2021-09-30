@@ -23,6 +23,8 @@
 
 /**
  *    Class to parse RSS files
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class RssParser
 {

@@ -34,6 +34,8 @@
 /**
  *    Classe permettant la generation de composants html autre
  *    Only common components are here.
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormOther
 {
@@ -647,7 +649,7 @@ class FormOther
     {
         // phpcs:enable
         global $conf, $langs;
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         // For backward compatibility
         if (is_numeric($type)) {

@@ -35,6 +35,8 @@
  *
  * The `lessc_formatter` takes a CSS tree, and dumps it to a formatted string,
  * handling things like indentation.
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Lessc
 {

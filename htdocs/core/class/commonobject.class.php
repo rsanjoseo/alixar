@@ -38,6 +38,8 @@
 
 /**
  *    Parent class of all other business classes (invoices, contracts, proposals, orders, ...)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonObject
 {
@@ -2503,7 +2505,7 @@ abstract class CommonObject
             $aliastablesociete = 'te'; // te as table_element
         }
         $restrictiononfksoc = empty($this->restrictiononfksoc) ? 0 : $this->restrictiononfksoc;
-        $sql = "SELECT MAX(te." . $fieldid . ")";
+        $sql = "SELECT MAX(te." . $fieldid . ") AS value";
         $sql .= " FROM " . (empty($nodbprefix) ? MAIN_DB_PREFIX : '') . $this->table_element . " as te";
         if ($this->element == 'user' && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
             $sql .= "," . MAIN_DB_PREFIX . "usergroup_user as ug";
@@ -2565,15 +2567,18 @@ abstract class CommonObject
         }
         //print 'socid='.$socid.' restrictiononfksoc='.$restrictiononfksoc.' ismultientitymanaged = '.$this->ismultientitymanaged.' filter = '.$filter.' -> '.$sql."<br>";
 
-        $result = $this->db->query($sql);
+        // $result = $this->db->query($sql);
+        $result = $this->db->select($sql);
         if (!$result) {
             $this->error = $this->db->lasterror();
             return -1;
         }
-        $row = $this->db->fetch_row($result);
-        $this->ref_previous = $row[0];
 
-        $sql = "SELECT MIN(te." . $fieldid . ")";
+        // $row = $this->db->fetch_row($result);
+        // $this->ref_previous = $row[0];
+        $this->ref_previous = $result[0]['value'];
+
+        $sql = "SELECT MIN(te." . $fieldid . ") as value";
         $sql .= " FROM " . (empty($nodbprefix) ? MAIN_DB_PREFIX : '') . $this->table_element . " as te";
         if ($this->element == 'user' && !empty($conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
             $sql .= "," . MAIN_DB_PREFIX . "usergroup_user as ug";
@@ -2636,13 +2641,16 @@ abstract class CommonObject
         //print 'socid='.$socid.' restrictiononfksoc='.$restrictiononfksoc.' ismultientitymanaged = '.$this->ismultientitymanaged.' filter = '.$filter.' -> '.$sql."<br>";
         // Rem: Bug in some mysql version: SELECT MIN(rowid) FROM llx_socpeople WHERE rowid > 1 when one row in database with rowid=1, returns 1 instead of null
 
-        $result = $this->db->query($sql);
+        // $result = $this->db->query($sql);
+        $result = $this->db->select($sql);
         if (!$result) {
             $this->error = $this->db->lasterror();
             return -2;
         }
-        $row = $this->db->fetch_row($result);
-        $this->ref_next = $row[0];
+        // $row = $this->db->fetch_row($result);
+        // $this->ref_next = $row[0];
+
+        $this->ref_next = $result[0]['value'];
 
         return 1;
     }
@@ -9200,7 +9208,7 @@ abstract class CommonObject
      */
     public function getCategoriesCommon($type_categ)
     {
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         // Get current categories
         $c = new Categorie($this->db);
@@ -9226,7 +9234,7 @@ abstract class CommonObject
     {
         dol_syslog(get_class($this) . "::setCategoriesCommon Oject Id:" . $this->id . ' type_categ:' . $type_categ . ' nb tag add:' . count($categories), LOG_DEBUG);
 
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         if (empty($type_categ)) {
             dol_syslog(__METHOD__ . ': Type ' . $type_categ . 'is an unknown category type. Done nothing.', LOG_ERR);
@@ -9306,7 +9314,7 @@ abstract class CommonObject
             $type = $this->table_element;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
         $categorystatic = new Categorie($this->db);
 
         $sql = "INSERT INTO " . MAIN_DB_PREFIX . "categorie_" . (empty($categorystatic->MAP_CAT_TABLE[$type]) ? $type : $categorystatic->MAP_CAT_TABLE[$type]) . " (fk_categorie, fk_product)";

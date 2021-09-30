@@ -23,6 +23,8 @@
 
 /**
  *        Class to manage utility methods
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Utils
 {

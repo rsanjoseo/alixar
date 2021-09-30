@@ -34,6 +34,8 @@
  *    Class to send emails (with attachments or not)
  *  Usage: $mailfile = new CMailFile($subject,$sendto,$replyto,$message,$filepath,$mimetype,$filename,$cc,$ccc,$deliveryreceipt,$msgishtml,$errors_to,$css,$trackid,$moreinheader,$sendcontext,$replyto);
  *         $mailfile->sendfile();
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class CMailFile
 {

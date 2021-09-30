@@ -24,6 +24,8 @@
 
 /**
  *        Class to manage absolute discounts
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DiscountAbsolute
 {

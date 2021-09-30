@@ -29,6 +29,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * Class for MyObject
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DefaultValues extends CommonObject
 {

@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 /**
  *    Class to manage HTML output components for orders
  *    Before adding component here, check they are not into common part Form.class.php
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormOrder extends Form
 {

@@ -2034,7 +2034,7 @@ class Ticket extends CommonObject
         }
 
         // Get current categories
-        include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
         $c = new Categorie($this->db);
         $existing = $c->containing($this->id, Categorie::TYPE_TICKET, 'id');
 

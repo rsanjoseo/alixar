@@ -23,6 +23,8 @@
 
 /**
  *  Class to manage dictionary States (used by imports)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Cstate // extends CommonObject
 {

@@ -210,7 +210,7 @@ function project_prepare_head(Project $project, $moreparam = '')
 
     if ($conf->eventorganization->enabled && !empty($project->usage_organize_event)) {
         $langs->load('eventorganization');
-        $head[$h][0] = DOL_URL_ROOT . '/eventorganization/conferenceorbooth_list.php?projectid=' . $project->id;
+        $head[$h][0] = DOL_URL_ROOT . '/Modules/Eventorganization/conferenceorbooth_list.php?projectid=' . $project->id;
         $head[$h][1] = $langs->trans("EventOrganization");
 
         // Enable caching of conf or booth count
@@ -221,7 +221,7 @@ function project_prepare_head(Project $project, $moreparam = '')
         if (!is_null($dataretrieved)) {
             $nbConfOrBooth = $dataretrieved;
         } else {
-            require_once DOL_DOCUMENT_ROOT . '/eventorganization/class/conferenceorbooth.class.php';
+            require_once DOL_DOCUMENT_ROOT . '/Modules/Eventorganization/class/conferenceorbooth.class.php';
             $conforbooth = new ConferenceOrBooth($db);
             $result = $conforbooth->fetchAll('', '', 0, 0, ['t.fk_project' => $project->id]);
             //,

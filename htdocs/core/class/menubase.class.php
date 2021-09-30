@@ -25,6 +25,8 @@
 
 /**
  *  Class to manage menu entries
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Menubase
 {

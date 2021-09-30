@@ -1138,7 +1138,7 @@ class Societe extends CommonObject
             }
 
             if (!$error) {
-                require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+                require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
                 $static_cat = new Categorie($this->db);
                 $toute_categs = [];
 
@@ -1622,7 +1622,7 @@ class Societe extends CommonObject
         // By default
         if (empty($linkstart)) {
             $label .= img_picto('', $this->picto) . ' <u class="paddingrightonly">' . $langs->trans("ThirdParty") . '</u>';
-            $linkstart = '<a href="' . DOL_URL_ROOT . '/Modules/Societes/card.php?socid=' . $this->id;
+            $linkstart = '<a href="' . DOL_URL_ROOT . '/index.php?module=societes&controller=card&socid=' . $this->id;
         }
         if (isset($this->status)) {
             $label .= ' ' . $this->getLibStatut(5);
@@ -2256,7 +2256,7 @@ class Societe extends CommonObject
         if (!empty($conf->global->SOCIETE_CODECLIENT_ADDON)) {
             $module = $conf->global->SOCIETE_CODECLIENT_ADDON;
 
-            $dirsociete = array_merge(['/core/modules/societe/'], $conf->modules_parts['societe']);
+            $dirsociete = array_merge(['/Modules/Societes/mods/'], $conf->modules_parts['societe']);
             foreach ($dirsociete as $dirroot) {
                 $res = dol_include_once($dirroot . $module . '.php');
                 if ($res) {
@@ -4597,7 +4597,7 @@ class Societe extends CommonObject
      */
     public function setCategories($categories, $type_categ)
     {
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         // Decode type
         if (!in_array($type_categ, [Categorie::TYPE_CUSTOMER, Categorie::TYPE_SUPPLIER])) {

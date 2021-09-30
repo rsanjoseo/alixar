@@ -41,6 +41,8 @@
 /**
  *    Class to construct and send SMTP compliant email, even
  *    to a secure SMTP server, regardless of platform.
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class SMTPs
 {

@@ -28,6 +28,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/CMailFile.class.php';
 
 /**
  *      Class to manage notifications
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Notify
 {

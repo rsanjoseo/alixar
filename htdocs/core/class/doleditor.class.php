@@ -26,6 +26,8 @@
  *      Class to manage a WYSIWYG editor.
  *        Usage: $doleditor=new DolEditor('body',$message,320,'toolbar_mailing');
  *               $doleditor->Create();
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DolEditor
 {

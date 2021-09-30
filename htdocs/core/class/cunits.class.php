@@ -23,6 +23,8 @@
 
 /**
  *    Class of dictionary type of thirdparty (used by imports)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class CUnits // extends CommonObject
 {

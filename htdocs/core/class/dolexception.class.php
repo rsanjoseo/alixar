@@ -23,6 +23,8 @@
 
 /**
  *  Class to manage exceptions
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DolException extends Exception
 {

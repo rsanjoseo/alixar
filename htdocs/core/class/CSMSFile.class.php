@@ -31,6 +31,8 @@
  *        Class to send SMS
  *      Usage: $smsfile = new CSMSFile($subject,$sendto,$replyto,$message,$filepath,$mimetype,$filename,$cc,$ccc,$deliveryreceipt,$msgishtml,$errors_to);
  *             $smsfile->sendfile();
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class CSMSFile
 {

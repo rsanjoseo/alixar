@@ -26,6 +26,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/images.lib.php';
 
 /**
  *    This class is used to manage file upload using ajax
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class FileUpload
 {

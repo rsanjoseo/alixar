@@ -23,6 +23,8 @@
 
 /**
  *    Class to manage OpenID
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class SimpleOpenID
 {

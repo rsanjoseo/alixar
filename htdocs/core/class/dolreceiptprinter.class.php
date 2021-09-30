@@ -20,6 +20,8 @@
 /**
  *  \file           htdocs/core/class/dolreceiptprinter.class.php
  *  \brief          Print receipt ticket on various ESC/POS printer
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 
 /*
@@ -113,6 +115,8 @@ use Mike42\Escpos\EscposImage;
 
 /**
  * Class to manage Receipt Printers
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class dolReceiptPrinter extends Printer
 {

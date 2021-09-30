@@ -888,7 +888,7 @@ class Project extends CommonObject
             } elseif ($option == 'preview') {
                 $url = DOL_URL_ROOT . '/Modules/Projects/element.php?id=' . $this->id;
             } elseif ($option == 'eventorganization') {
-                $url = DOL_URL_ROOT . '/eventorganization/conferenceorbooth_list.php?projectid=' . $this->id;
+                $url = DOL_URL_ROOT . '/Modules/Eventorganization/conferenceorbooth_list.php?projectid=' . $this->id;
             } else {
                 $url = DOL_URL_ROOT . '/Modules/Projects/card.php?id=' . $this->id;
             }
@@ -2204,7 +2204,7 @@ class Project extends CommonObject
      */
     public function setCategories($categories)
     {
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
         return parent::setCategoriesCommon($categories, Categorie::TYPE_PROJECT);
     }
 }

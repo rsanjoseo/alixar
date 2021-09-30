@@ -36,6 +36,7 @@ const MAIN_HIDE_TOP_MENU = 0;
 const MAIN_HIDE_LEFT_MENU = 0;
 
 require 'main.php';
+
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 
 // If not defined, we select menu "home"

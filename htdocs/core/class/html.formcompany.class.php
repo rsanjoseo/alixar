@@ -34,6 +34,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 /**
  * Class of forms component to manage companies
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormCompany extends Form
 {

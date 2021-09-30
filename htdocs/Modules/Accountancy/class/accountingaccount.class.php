@@ -21,7 +21,7 @@
  */
 
 /**
- *  \file       htdocs/accountancy/class/accountingaccount.class.php
+ *  \file       htdocs/Modules/Accountancy/class/accountingaccount.class.php
  *  \ingroup    Accountancy (Double entries)
  *  \brief      File of class to manage accounting accounts
  */
@@ -475,13 +475,13 @@ class AccountingAccount extends CommonObject
         $url = '';
         $labelurl = '';
         if (empty($option) || $option == 'ledger') {
-            $url = DOL_URL_ROOT . '/accountancy/bookkeeping/listbyaccount.php?search_accountancy_code_start=' . urlencode($this->account_number) . '&search_accountancy_code_end=' . urlencode($this->account_number);
+            $url = DOL_URL_ROOT . '/Modules/Accountancy/bookkeeping/listbyaccount.php?search_accountancy_code_start=' . urlencode($this->account_number) . '&search_accountancy_code_end=' . urlencode($this->account_number);
             $labelurl = $langs->trans("ShowAccountingAccountInLedger");
         } elseif ($option == 'journals') {
-            $url = DOL_URL_ROOT . '/accountancy/bookkeeping/list.php?search_accountancy_code_start=' . urlencode($this->account_number) . '&search_accountancy_code_end=' . urlencode($this->account_number);
+            $url = DOL_URL_ROOT . '/Modules/Accountancy/bookkeeping/list.php?search_accountancy_code_start=' . urlencode($this->account_number) . '&search_accountancy_code_end=' . urlencode($this->account_number);
             $labelurl = $langs->trans("ShowAccountingAccountInJournals");
         } elseif ($option == 'accountcard') {
-            $url = DOL_URL_ROOT . '/accountancy/admin/card.php?id=' . urlencode($this->id);
+            $url = DOL_URL_ROOT . '/Modules/Accountancy/admin/card.php?id=' . urlencode($this->id);
             $labelurl = $langs->trans("ShowAccountingAccount");
         }
 

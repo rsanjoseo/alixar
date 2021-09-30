@@ -27,6 +27,8 @@ include_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
 
 /**
  *    Class to manage generation of HTML components for bank module
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormBank
 {

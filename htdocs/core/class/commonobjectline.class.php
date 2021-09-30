@@ -27,6 +27,8 @@
  *  This class is useless for the moment so no inherit are done on it
  *
  *  TODO For the moment we use the extends on CommonObject until PHP min is 5.4 so we can use Traits.
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonObjectLine extends CommonObject
 {

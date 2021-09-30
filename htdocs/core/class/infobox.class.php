@@ -25,6 +25,8 @@
 
 /**
  *    Class to manage boxes on pages. This is an utility class (all is static)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class InfoBox
 {

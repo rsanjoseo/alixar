@@ -35,6 +35,8 @@
  *    $dolgraph->setHeight('200');
  *    $dolgraph->draw('idofgraph');
  *    print $dolgraph->show($total?0:1);
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class DolGraph
 {

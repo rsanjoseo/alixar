@@ -32,6 +32,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
  *      Usage: $formail = new FormMail($db)
  *             $formmail->proprietes=1 ou chaine ou tableau de valeurs
  *             $formmail->show_form() affiche le formulaire
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormMail extends Form
 {

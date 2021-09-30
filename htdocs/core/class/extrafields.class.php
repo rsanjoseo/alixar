@@ -33,6 +33,8 @@
 
 /**
  *    Class to manage standard extra fields
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class ExtraFields
 {
@@ -1331,7 +1333,7 @@ class ExtraFields
                         print 'Error in request ' . $sql . ' ' . $this->db->lasterror() . '. Check setup of extra parameters.<br>';
                     }
                 } else {
-                    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
                     $data = $form->select_all_categories(Categorie::$MAP_ID_TO_CODE[$InfoFieldList[5]], '', 'parent', 64, $InfoFieldList[6], 1, 1);
                     $out .= '<option value="0">&nbsp;</option>';
                     foreach ($data as $data_key => $data_value) {
@@ -1554,7 +1556,7 @@ class ExtraFields
                         print 'Error in request ' . $sql . ' ' . $this->db->lasterror() . '. Check setup of extra parameters.<br>';
                     }
                 } else {
-                    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
                     $data = $form->select_all_categories(Categorie::$MAP_ID_TO_CODE[$InfoFieldList[5]], '', 'parent', 64, $InfoFieldList[6], 1, 1);
                     $out = $form->multiselectarray($keyprefix . $key . $keysuffix, $data, $value_arr, '', 0, '', 0, '100%');
                 }
@@ -1751,7 +1753,7 @@ class ExtraFields
                         }
                     }
                 } else {
-                    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
                     $toprint = [];
                     $obj = $this->db->fetch_object($resql);
@@ -1849,7 +1851,7 @@ class ExtraFields
                         }
                     }
                 } else {
-                    require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+                    require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
                     $toprint = [];
                     while ($obj = $this->db->fetch_object($resql)) {

@@ -23,6 +23,8 @@
 
 /**
  * Class to manage Google API
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class GoogleAPI
 {

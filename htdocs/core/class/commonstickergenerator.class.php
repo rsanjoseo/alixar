@@ -57,6 +57,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/lib/format_cards.lib.php';
 
 /**
  *    Class to generate stick sheet with format Avery or other personalised
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonStickerGenerator
 {

@@ -28,6 +28,8 @@
 
 /**
  *    Class to manage dictionary Countries (used by imports)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Ccountry // extends CommonObject
 {

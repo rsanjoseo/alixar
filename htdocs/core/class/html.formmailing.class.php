@@ -24,6 +24,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 /**
  *  Class to offer components to list and upload files
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormMailing extends Form
 {

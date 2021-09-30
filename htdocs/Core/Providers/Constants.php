@@ -94,21 +94,22 @@ class Constants extends Provider
     {
         define('APP_URI', pathinfo(filter_input(INPUT_SERVER, 'SCRIPT_NAME'), PATHINFO_DIRNAME));
 
-        // TODO: Dolibarr constants to eliminate...
-        $search = 'htdocs/';
-        $pos = strpos(constant('APP_URI'), $search) + strlen($search) - 1;
-        $uri = substr(constant('APP_URI'), 0, $pos);
-        define('DOL_URL_ROOT', $uri);
-        define('VENDOR_URI', DOL_URL_ROOT . '/vendor/');
-        // End TODO.
-
         define('SERVER_NAME', filter_input(INPUT_SERVER, 'SERVER_NAME'));
         define('SERVER_PORT', filter_input(INPUT_SERVER, 'SERVER_PORT'));
         define('APP_PROTOCOL', filter_input(INPUT_SERVER, 'REQUEST_SCHEME'));
         define('SITE_URL', APP_PROTOCOL . '://' . SERVER_NAME);
-        define('BASE_URI', SITE_URL . APP_URI);
+
+        // TODO: Dolibarr constants to eliminate...
+        $search = 'htdocs';
+        $pos = strpos(constant('APP_URI'), $search) + strlen($search);
+        $uri = substr(constant('APP_URI'), 0, $pos);
+        define('DOL_URL_ROOT', $uri);
+        define('VENDOR_URI', DOL_URL_ROOT . '/vendor/');
+        define('BASE_URI', SITE_URL . DOL_URL_ROOT);
+        // End TODO.
 
         // If does not exists the Dolibarr constants, may use define directly
+        Utils::defineIfNotExists('BASE_URI', SITE_URL . APP_URI);
         Utils::defineIfNotExists('VENDOR_URI', BASE_URI . '/vendor/');
 
         define('CONFIGURATION_PATH', BASE_FOLDER . '/config');

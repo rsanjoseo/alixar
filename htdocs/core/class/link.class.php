@@ -24,6 +24,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  *    Class to manage links
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Link extends CommonObject
 {

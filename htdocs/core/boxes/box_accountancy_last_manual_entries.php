@@ -72,7 +72,7 @@ class box_accountancy_last_manual_entries extends ModeleBoxes
     {
         global $user, $langs, $conf;
 
-        include_once DOL_DOCUMENT_ROOT . '/accountancy/class/bookkeeping.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Accountancy/class/bookkeeping.class.php';
 
         $bookkeepingstatic = new BookKeeping($this->db);
 

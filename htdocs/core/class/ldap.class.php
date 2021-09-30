@@ -30,6 +30,8 @@
 
 /**
  *    Class to manage LDAP features
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Ldap
 {

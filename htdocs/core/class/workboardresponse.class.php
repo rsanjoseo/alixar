@@ -20,6 +20,8 @@
 /**
  *    \file       htdocs/core/class/workboardresponse.class.php
  *    \brief      Class that represents response of load_board functions
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class WorkboardResponse
 {

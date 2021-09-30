@@ -26,6 +26,8 @@
 
 /**
  *    Parent class of statistics class
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class Stats
 {

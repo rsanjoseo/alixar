@@ -23,6 +23,8 @@
 
 /**
  *    Class to manage generation of HTML components for social contributions management
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormSocialContrib
 {

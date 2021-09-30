@@ -28,7 +28,9 @@
  *
  * Put here description of your class
  *
- * @see CommonObject
+ * @see        CommonObject
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Ctyperesource
 {

@@ -23,6 +23,8 @@
 
 /**
  *    Class to manage component html for module website
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormWebsite
 {

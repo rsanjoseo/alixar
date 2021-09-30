@@ -28,6 +28,8 @@
  * @param string $string String to encode
  *
  * @return    string                String encoded
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 function encode($string)
 {
@@ -42,6 +44,8 @@ function encode($string)
  * @param int    $line_max Max length of lines
  *
  * @return    string                Encoded string
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 function dol_quoted_printable_encode($input, $line_max = 76)
 {
@@ -83,6 +87,8 @@ function dol_quoted_printable_encode($input, $line_max = 76)
 
 /**
  *    Class to buld vCard files
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class vCard
 {

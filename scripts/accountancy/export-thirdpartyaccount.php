@@ -20,9 +20,9 @@
  */
 
 /**
- * \file 		scripts/accountancy/export-thirdpartyaccount.php
- * \ingroup		Accounting Expert
- * \brief		Page to detect empty accounting account
+ * \file        scripts/Modules/Accountancy/export-thirdpartyaccount.php
+ * \ingroup        Accounting Expert
+ * \brief        Page to detect empty accounting account
  */
 
 if (!defined('NOSESSION')) {

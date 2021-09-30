@@ -23,6 +23,8 @@
 
 /**
  *        Class toolbox to validate values
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Validate
 {

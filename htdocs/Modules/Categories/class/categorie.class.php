@@ -27,7 +27,7 @@
  */
 
 /**
- *    \file       htdocs/categories/class/categorie.class.php
+ *    \file       htdocs/Modules/Categories/class/categorie.class.php
  *    \ingroup    categorie
  *    \brief      File of class to manage categories
  */
@@ -1491,7 +1491,7 @@ class Categorie extends CommonObject
                 }
 
                 if ($url == '') {
-                    $link = '<a href="' . DOL_URL_ROOT . '/categories/viewcat.php?id=' . $cat->id . '&type=' . $cat->type . '" class="' . $forced_color . '">';
+                    $link = '<a href="' . DOL_URL_ROOT . '/Modules/Categories/viewcat.php?id=' . $cat->id . '&type=' . $cat->type . '" class="' . $forced_color . '">';
                     $linkend = '</a>';
                     $w[] = $link . ($addpicto ? img_object('', 'category', 'class="paddingright"') : '') . $cat->label . $linkend;
                 } elseif ($url == 'none') {
@@ -1743,7 +1743,7 @@ class Categorie extends CommonObject
             }
         }
 
-        $link = '<a href="' . DOL_URL_ROOT . '/categories/viewcat.php?id=' . $this->id . '&type=' . $this->type . $moreparam . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . ($moreparam ? '?' . $moreparam : '')) . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip ' . $forced_color . '">';
+        $link = '<a href="' . DOL_URL_ROOT . '/Modules/Categories/viewcat.php?id=' . $this->id . '&type=' . $this->type . $moreparam . '&backtopage=' . urlencode($_SERVER['PHP_SELF'] . ($moreparam ? '?' . $moreparam : '')) . '" title="' . dol_escape_htmltag($label, 1) . '" class="classfortooltip ' . $forced_color . '">';
         $linkend = '</a>';
 
         $picto = 'category';

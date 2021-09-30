@@ -24,6 +24,8 @@
 /**
  *    Classe permettant la generation de composants html autre
  *    Only common components are here.
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormMargin
 {

@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonincoterm.class.php';
 
 /**
  *      Superclass for orders classes
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonOrder extends CommonObject
 {
@@ -35,6 +37,8 @@ abstract class CommonOrder extends CommonObject
 
 /**
  *      Superclass for orders classes
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 abstract class CommonOrderLine extends CommonObjectLine
 {

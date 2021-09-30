@@ -18,6 +18,8 @@
 
 /**
  *    Class to manage comment
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Comment extends CommonObject
 {

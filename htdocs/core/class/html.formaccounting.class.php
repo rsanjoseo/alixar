@@ -28,6 +28,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 /**
  *    Class to manage generation of HTML components for accounting management
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormAccounting extends Form
 {

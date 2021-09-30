@@ -37,7 +37,9 @@ if (!class_exists('FormCompany')) {
  *            $formticket->proprietes=1 ou chaine ou tableau de valeurs
  *            $formticket->show_form() affiche le formulaire
  *
- * @package Ticket
+ * @package    Ticket
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormTicket
 {
@@ -331,7 +333,7 @@ class FormTicket
 
         // Categories
         if ($conf->categorie->enabled) {
-            include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+            include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
             $cate_arbo = $form->select_all_categories(Categorie::TYPE_TICKET, '', 'parent', 64, 0, 1);
 
             if (count($cate_arbo)) {

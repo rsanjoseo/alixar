@@ -33,6 +33,8 @@ require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncommreminder.
 
 /**
  *        Class to manage agenda events (actions)
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class ActionComm extends CommonObject
 {
@@ -1679,7 +1681,7 @@ class ActionComm extends CommonObject
         }
 
         // Get current categories
-        include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
         $c = new Categorie($this->db);
         $existing = $c->containing($this->id, Categorie::TYPE_ACTIONCOMM, 'id');
 

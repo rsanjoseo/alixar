@@ -24,6 +24,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  *  Class of a generic business object
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class GenericObject extends CommonObject
 {

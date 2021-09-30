@@ -24,6 +24,8 @@
 
 /**
  *    Class to manage generation of HTML components for contract module
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormContract
 {

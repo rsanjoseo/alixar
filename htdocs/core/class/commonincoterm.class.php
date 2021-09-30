@@ -23,6 +23,8 @@
 
 /**
  *      Superclass for incoterm classes
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 trait CommonIncoterm
 {

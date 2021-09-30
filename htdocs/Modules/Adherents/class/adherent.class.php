@@ -303,8 +303,6 @@ class Adherent extends CommonObject
 
     /**
      *    Constructor
-     *
-     * @param DoliDB $db Database handler
      */
     public function __construct($db)
     {
@@ -1217,7 +1215,9 @@ class Adherent extends CommonObject
         $sql = "SELECT d.rowid, d.ref, d.ref_ext, d.civility as civility_code, d.gender, d.firstname, d.lastname,";
         $sql .= " d.societe as company, d.fk_soc, d.statut, d.public, d.address, d.zip, d.town, d.note_private,";
         $sql .= " d.note_public,";
-        $sql .= " d.email, d.url, d.socialnetworks, d.phone, d.phone_perso, d.phone_mobile, d.login, d.pass, d.pass_crypted,";
+        $sql .= ' d.email,';
+        //        $sql .= ' d.url,'; // TODO: Why does this fail? "SQLSTATE[42S22]: Column not found: 1054 Unknown column 'd.url' in 'field list'"
+        $sql .= ' d.socialnetworks, d.phone, d.phone_perso, d.phone_mobile, d.login, d.pass, d.pass_crypted,';
         $sql .= " d.photo, d.fk_adherent_type, d.morphy, d.entity,";
         $sql .= " d.datec as datec,";
         $sql .= " d.tms as datem,";
@@ -1250,101 +1250,102 @@ class Adherent extends CommonObject
         }
 
         dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
-        $resql = $this->db->query($sql);
-        if ($resql) {
-            if ($this->db->num_rows($resql)) {
-                $obj = $this->db->fetch_object($resql);
 
-                $this->entity = $obj->entity;
-                $this->id = $obj->rowid;
-                $this->ref = $obj->ref;
-                $this->ref_ext = $obj->ref_ext;
-
-                $this->civility_id = $obj->civility_code; // Bad. Kept for backard compatibility
-                $this->civility_code = $obj->civility_code;
-                $this->civility = $obj->civility_code ? ($langs->trans("Civility" . $obj->civility_code) != ("Civility" . $obj->civility_code) ? $langs->trans("Civility" . $obj->civility_code) : $obj->civility_code) : '';
-
-                $this->firstname = $obj->firstname;
-                $this->lastname = $obj->lastname;
-                $this->gender = $obj->gender;
-                $this->login = $obj->login;
-                $this->societe = $obj->company;
-                $this->company = $obj->company;
-                $this->socid = $obj->fk_soc;
-                $this->fk_soc = $obj->fk_soc; // For backward compatibility
-                $this->address = $obj->address;
-                $this->zip = $obj->zip;
-                $this->town = $obj->town;
-
-                $this->pass = $obj->pass;
-                $this->pass_indatabase = $obj->pass;
-                $this->pass_indatabase_crypted = $obj->pass_crypted;
-
-                $this->state_id = $obj->state_id;
-                $this->state_code = $obj->state_id ? $obj->state_code : '';
-                $this->state = $obj->state_id ? $obj->state : '';
-
-                $this->country_id = $obj->country_id;
-                $this->country_code = $obj->country_code;
-                if ($langs->trans("Country" . $obj->country_code) != "Country" . $obj->country_code) {
-                    $this->country = $langs->transnoentitiesnoconv("Country" . $obj->country_code);
-                } else {
-                    $this->country = $obj->country;
-                }
-
-                $this->phone = $obj->phone;
-                $this->phone_perso = $obj->phone_perso;
-                $this->phone_mobile = $obj->phone_mobile;
-                $this->email = $obj->email;
-                $this->url = $obj->url;
-
-                $this->socialnetworks = (array) json_decode($obj->socialnetworks, true);
-
-                $this->photo = $obj->photo;
-                $this->statut = $obj->statut;
-                $this->public = $obj->public;
-
-                $this->datec = $this->db->jdate($obj->datec);
-                $this->date_creation = $this->db->jdate($obj->datec);
-                $this->datem = $this->db->jdate($obj->datem);
-                $this->date_modification = $this->db->jdate($obj->datem);
-                $this->datefin = $this->db->jdate($obj->datefin);
-                $this->datevalid = $this->db->jdate($obj->datev);
-                $this->date_validation = $this->db->jdate($obj->datev);
-                $this->birth = $this->db->jdate($obj->birthday);
-
-                $this->note_private = $obj->note_private;
-                $this->note_public = $obj->note_public;
-                $this->morphy = $obj->morphy;
-
-                $this->typeid = $obj->fk_adherent_type;
-                $this->type = $obj->type;
-                $this->need_subscription = $obj->subscription;
-
-                $this->user_id = $obj->user_id;
-                $this->user_login = $obj->user_login;
-
-                $this->model_pdf = $obj->model_pdf;
-
-                // Retrieve all extrafield
-                // fetch optionals attributes and labels
-                if ($fetch_optionals) {
-                    $this->fetch_optionals();
-                }
-
-                // Load other properties
-                if ($fetch_subscriptions) {
-                    $result = $this->fetch_subscriptions();
-                }
-
-                return $this->id;
-            } else {
-                return 0;
-            }
-        } else {
+        // $resql = $this->db->query($sql);
+        $resql = $this->db->select($sql);
+        if ($resql === false) {
             $this->error = $this->db->lasterror();
             return -1;
         }
+        if (empty($resql)) {
+            return 0;
+        }
+
+        $obj = $resql[0];
+
+        $this->entity = $obj->entity;
+        $this->id = $obj->rowid;
+        $this->ref = $obj->ref;
+        $this->ref_ext = $obj->ref_ext;
+
+        $this->civility_id = $obj->civility_code; // Bad. Kept for backard compatibility
+        $this->civility_code = $obj->civility_code;
+        $this->civility = $obj->civility_code ? ($langs->trans("Civility" . $obj->civility_code) != ("Civility" . $obj->civility_code) ? $langs->trans("Civility" . $obj->civility_code) : $obj->civility_code) : '';
+
+        $this->firstname = $obj->firstname;
+        $this->lastname = $obj->lastname;
+        $this->gender = $obj->gender;
+        $this->login = $obj->login;
+        $this->societe = $obj->company;
+        $this->company = $obj->company;
+        $this->socid = $obj->fk_soc;
+        $this->fk_soc = $obj->fk_soc; // For backward compatibility
+        $this->address = $obj->address;
+        $this->zip = $obj->zip;
+        $this->town = $obj->town;
+
+        $this->pass = $obj->pass;
+        $this->pass_indatabase = $obj->pass;
+        $this->pass_indatabase_crypted = $obj->pass_crypted;
+
+        $this->state_id = $obj->state_id;
+        $this->state_code = $obj->state_id ? $obj->state_code : '';
+        $this->state = $obj->state_id ? $obj->state : '';
+
+        $this->country_id = $obj->country_id;
+        $this->country_code = $obj->country_code;
+        if ($langs->trans("Country" . $obj->country_code) != "Country" . $obj->country_code) {
+            $this->country = $langs->transnoentitiesnoconv("Country" . $obj->country_code);
+        } else {
+            $this->country = $obj->country;
+        }
+
+        $this->phone = $obj->phone;
+        $this->phone_perso = $obj->phone_perso;
+        $this->phone_mobile = $obj->phone_mobile;
+        $this->email = $obj->email;
+        $this->url = $obj->url;
+
+        $this->socialnetworks = (array) json_decode($obj->socialnetworks, true);
+
+        $this->photo = $obj->photo;
+        $this->statut = $obj->statut;
+        $this->public = $obj->public;
+
+        $this->datec = $this->db->jdate($obj->datec);
+        $this->date_creation = $this->db->jdate($obj->datec);
+        $this->datem = $this->db->jdate($obj->datem);
+        $this->date_modification = $this->db->jdate($obj->datem);
+        $this->datefin = $this->db->jdate($obj->datefin);
+        $this->datevalid = $this->db->jdate($obj->datev);
+        $this->date_validation = $this->db->jdate($obj->datev);
+        $this->birth = $this->db->jdate($obj->birthday);
+
+        $this->note_private = $obj->note_private;
+        $this->note_public = $obj->note_public;
+        $this->morphy = $obj->morphy;
+
+        $this->typeid = $obj->fk_adherent_type;
+        $this->type = $obj->type;
+        $this->need_subscription = $obj->subscription;
+
+        $this->user_id = $obj->user_id;
+        $this->user_login = $obj->user_login;
+
+        $this->model_pdf = $obj->model_pdf;
+
+        // Retrieve all extrafield
+        // fetch optionals attributes and labels
+        if ($fetch_optionals) {
+            $this->fetch_optionals();
+        }
+
+        // Load other properties
+        if ($fetch_subscriptions) {
+            $result = $this->fetch_subscriptions();
+        }
+
+        return $this->id;
     }
 
 
@@ -2835,7 +2836,7 @@ class Adherent extends CommonObject
      */
     public function setCategories($categories)
     {
-        require_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
         return parent::setCategoriesCommon($categories, Categorie::TYPE_MEMBER);
     }
 

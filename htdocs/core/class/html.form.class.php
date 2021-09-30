@@ -47,6 +47,8 @@
  *    Only common components must be here.
  *
  *  TODO Merge all function load_cache_* and loadCache* (except load_cache_vatrates) into one generic function loadCacheTable
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class Form
 {
@@ -7924,7 +7926,7 @@ class Form
     {
         global $db;
 
-        include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         $cat = new Categorie($db);
         $categories = $cat->containing($id, $type);
@@ -7978,7 +7980,7 @@ class Form
         global $conf, $langs;
         $langs->load("categories");
 
-        include_once DOL_DOCUMENT_ROOT . '/categories/class/categorie.class.php';
+        include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         // For backward compatibility
         if (is_numeric($type)) {
@@ -8642,7 +8644,9 @@ class Form
             }
 
             $previous_ref = $object->ref_previous ? '<a accesskey="p" title="' . $stringforfirstkey . ' p" class="classfortooltip" href="' . $navurl . '?' . $paramid . '=' . urlencode($object->ref_previous) . $moreparam . '"><i class="fa fa-chevron-left"></i></a>' : '<span class="inactive"><i class="fa fa-chevron-left opacitymedium"></i></span>';
-            $next_ref = $object->ref_next ? '<a accesskey="n" title="' . $stringforfirstkey . ' n" class="classfortooltip" href="' . $navurl . '?' . $paramid . '=' . urlencode($object->ref_next) . $moreparam . '"><i class="fa fa-chevron-right"></i></a>' : '<span class="inactive"><i class="fa fa-chevron-right opacitymedium"></i></span>';
+            $next_ref = $object->ref_next
+                ? '<a accesskey="n" title="' . $stringforfirstkey . ' n" class="classfortooltip" href="' . $navurl . '?' . $paramid . '=' . urlencode($object->ref_next) . $moreparam . '"><i class="fa fa-chevron-right"></i></a>'
+                : '<span class="inactive"><i class="fa fa-chevron-right opacitymedium"></i></span>';
         }
 
         //print "xx".$previous_ref."x".$next_ref;

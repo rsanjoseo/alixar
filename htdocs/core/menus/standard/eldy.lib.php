@@ -129,7 +129,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
     ];
     $menu_arr[] = [
         'name' => 'Companies',
-        'link' => '/Modules/Societes/index.php?mainmenu=companies&amp;leftmenu=',
+        'link' => constant('BASE_URI') . '/index.php?module=societes', // '/Modules/Societes/index.php?mainmenu=companies&amp;leftmenu=',
         'title' => "ThirdParties",
         'level' => 0,
         'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
@@ -339,7 +339,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
     ];
     $menu_arr[] = [
         'name' => 'Accounting',
-        'link' => '/accountancy/index.php?mainmenu=accountancy&amp;leftmenu=',
+        'link' => '/Modules/Accountancy/index.php?mainmenu=accountancy&amp;leftmenu=',
         'title' => "MenuAccountancy",
         'level' => 0,
         'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
@@ -834,7 +834,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     $newmenu->add("/Modules/Users/hierarchy.php?leftmenu=users", $langs->trans("HierarchicView"), 2, $user->rights->user->user->lire || $user->admin);
                     if (!empty($conf->categorie->enabled)) {
                         $langs->load("categories");
-                        $newmenu->add("/categories/index.php?leftmenu=users&type=7", $langs->trans("UsersCategoriesShort"), 2, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                        $newmenu->add("/Modules/Categories/index.php?leftmenu=users&type=7", $langs->trans("UsersCategoriesShort"), 2, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                     }
                     $newmenu->add("", $langs->trans("Groups"), 1, ($user->rights->user->user->lire || $user->admin) && !(!empty($conf->multicompany->enabled) && $conf->entity > 1 && $conf->global->MULTICOMPANY_TRANSVERSE_MODE));
                     $newmenu->add("/Modules/Users/group/card.php?leftmenu=users&action=create", $langs->trans("NewGroup"), 2, ((!empty($conf->global->MAIN_USE_ADVANCED_PERMS) ? $user->rights->user->group_advance->write : $user->rights->user->user->creer) || $user->admin) && !(!empty($conf->multicompany->enabled) && $conf->entity > 1 && $conf->global->MULTICOMPANY_TRANSVERSE_MODE));
@@ -850,12 +850,13 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Societes
             if (!empty($conf->societe->enabled)) {
                 $langs->load("companies");
-                $newmenu->add("/Modules/Societes/index.php?leftmenu=thirdparties", $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
+                // $newmenu->add("/Modules/Societes/index.php?leftmenu=thirdparties", $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "/index.php?Modules=societes&leftmenu=thirdparties", $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
 
                 if ($user->rights->societe->creer) {
-                    $newmenu->add("/Modules/Societes/card.php?action=create", $langs->trans("MenuNewThirdParty"), 1);
+                    $newmenu->add("index.php?module=societes&controller=card&action=create", $langs->trans("MenuNewThirdParty"), 1);
                     if (!$conf->use_javascript_ajax) {
-                        $newmenu->add("/Modules/Societes/card.php?action=create&amp;private=1", $langs->trans("MenuNewPrivateIndividual"), 1);
+                        $newmenu->add("index.php?module=societes&controller=card&action=create&amp;private=1", $langs->trans("MenuNewPrivateIndividual"), 1);
                     }
                 }
             }
@@ -873,7 +874,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 if ($usemenuhider || empty($leftmenu) || $leftmenu=="prospects") $newmenu->add("/Modules/Societes/list.php?type=p&amp;sortfield=s.datec&amp;sortorder=desc&amp;begin=&amp;search_stcomm=2", $langs->trans("LastProspectContactInProcess"), 2, $user->rights->societe->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu=="prospects") $newmenu->add("/Modules/Societes/list.php?type=p&amp;sortfield=s.datec&amp;sortorder=desc&amp;begin=&amp;search_stcomm=3", $langs->trans("LastProspectContactDone"), 2, $user->rights->societe->lire);
                 */
-                $newmenu->add("/Modules/Societes/card.php?leftmenu=prospects&amp;action=create&amp;type=p", $langs->trans("MenuNewProspect"), 3, $user->rights->societe->creer);
+                $newmenu->add("index.php?module=societes&controller=card&leftmenu=prospects&amp;action=create&amp;type=p", $langs->trans("MenuNewProspect"), 3, $user->rights->societe->creer);
             }
 
             // Customers/Prospects
@@ -881,14 +882,14 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 $langs->load("commercial");
                 $newmenu->add("/Modules/Societes/list.php?type=c&amp;leftmenu=customers", $langs->trans("ListCustomersShort"), 2, $user->rights->societe->lire, '', $mainmenu, 'customers');
 
-                $newmenu->add("/Modules/Societes/card.php?leftmenu=customers&amp;action=create&amp;type=c", $langs->trans("MenuNewCustomer"), 3, $user->rights->societe->creer);
+                $newmenu->add("index.php?module=societes&controller=card&leftmenu=customers&amp;action=create&amp;type=c", $langs->trans("MenuNewCustomer"), 3, $user->rights->societe->creer);
             }
 
             // Suppliers
             if (!empty($conf->societe->enabled) && (((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) || !empty($conf->supplier_proposal->enabled))) {
                 $langs->load("suppliers");
                 $newmenu->add("/Modules/Societes/list.php?type=f&amp;leftmenu=suppliers", $langs->trans("ListSuppliersShort"), 2, ($user->rights->fournisseur->lire || $user->rights->supplier_order->lire || $user->rights->supplier_invoice->lire || $user->rights->supplier_proposal->lire), '', $mainmenu, 'suppliers');
-                $newmenu->add("/Modules/Societes/card.php?leftmenu=suppliers&amp;action=create&amp;type=f", $langs->trans("MenuNewSupplier"), 3, $user->rights->societe->creer && ($user->rights->fournisseur->lire || $user->rights->supplier_order->lire || $user->rights->supplier_invoice->lire || $user->rights->supplier_proposal->lire));
+                $newmenu->add("index.php?module=societes&controller=card&leftmenu=suppliers&amp;action=create&amp;type=f", $langs->trans("MenuNewSupplier"), 3, $user->rights->societe->creer && ($user->rights->fournisseur->lire || $user->rights->supplier_order->lire || $user->rights->supplier_invoice->lire || $user->rights->supplier_proposal->lire));
             }
 
             // Categories
@@ -903,11 +904,11 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     if (!empty($conf->global->SOCIETE_DISABLE_CUSTOMERS)) {
                         $menutoshow = $langs->trans("ProspectsCategoriesShort");
                     }
-                    $newmenu->add("/categories/index.php?leftmenu=cat&amp;type=2", $menutoshow, 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=cat&amp;type=2", $menutoshow, 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
                 // Categories suppliers
                 if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) {
-                    $newmenu->add("/categories/index.php?leftmenu=catfournish&amp;type=1", $langs->trans("SuppliersCategoriesShort"), 1, $user->rights->categorie->lire);
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=catfournish&amp;type=1", $langs->trans("SuppliersCategoriesShort"), 1, $user->rights->categorie->lire);
                 }
             }
 
@@ -932,7 +933,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->categorie->enabled)) {
                 $langs->load("categories");
                 // Categories Contact
-                $newmenu->add("/categories/index.php?leftmenu=catcontact&amp;type=4", $langs->trans("ContactCategoriesShort"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                $newmenu->add("/Modules/Categories/index.php?leftmenu=catcontact&amp;type=4", $langs->trans("ContactCategoriesShort"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
             }
         }
 
@@ -1210,24 +1211,24 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Accounting (Double entries)
             if (!empty($conf->accounting->enabled)) {
                 //$permtoshowmenu = (!empty($conf->accounting->enabled) || $user->rights->accounting->bind->write || $user->rights->compta->resultat->lire);
-                //$newmenu->add("/accountancy/index.php?leftmenu=accountancy", $langs->trans("MenuAccountancy"), 0, $permtoshowmenu, '', $mainmenu, 'accountancy');
+                //$newmenu->add("/Modules/Accountancy/index.php?leftmenu=accountancy", $langs->trans("MenuAccountancy"), 0, $permtoshowmenu, '', $mainmenu, 'accountancy');
 
                 // Configuration
-                $newmenu->add("/accountancy/index.php?leftmenu=accountancy_admin", $langs->trans("Setup"), 0, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin', 1, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add("/Modules/Accountancy/index.php?leftmenu=accountancy_admin", $langs->trans("Setup"), 0, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin', 1, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_admin/', $leftmenu)) {
-                    $newmenu->add("/accountancy/admin/index.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("General"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_general', 10);
+                    $newmenu->add("/Modules/Accountancy/admin/index.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("General"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_general', 10);
 
                     // Fiscal year - Not really yet used. In a future will lock some periods.
                     if ($conf->global->MAIN_FEATURES_LEVEL > 1) {
-                        $newmenu->add("/accountancy/admin/fiscalyear.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("FiscalPeriod"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'fiscalyear', 20);
+                        $newmenu->add("/Modules/Accountancy/admin/fiscalyear.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("FiscalPeriod"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'fiscalyear', 20);
                     }
 
-                    $newmenu->add("/accountancy/admin/journals_list.php?id=35&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("AccountingJournals"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_journal', 30);
-                    $newmenu->add("/accountancy/admin/accountmodel.php?id=31&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("Pcg_version"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chartmodel', 40);
-                    $newmenu->add("/accountancy/admin/account.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("Chartofaccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 41);
-                    $newmenu->add("/accountancy/admin/subaccount.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("ChartOfSubaccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 41);
-                    $newmenu->add("/accountancy/admin/categories_list.php?id=32&search_country_id=" . $mysoc->country_id . "&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("AccountingCategory"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 50);
-                    $newmenu->add("/accountancy/admin/defaultaccounts.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuDefaultAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_default', 60);
+                    $newmenu->add("/Modules/Accountancy/admin/journals_list.php?id=35&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("AccountingJournals"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_journal', 30);
+                    $newmenu->add("/Modules/Accountancy/admin/accountmodel.php?id=31&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("Pcg_version"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chartmodel', 40);
+                    $newmenu->add("/Modules/Accountancy/admin/account.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("Chartofaccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 41);
+                    $newmenu->add("/Modules/Accountancy/admin/subaccount.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("ChartOfSubaccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 41);
+                    $newmenu->add("/Modules/Accountancy/admin/categories_list.php?id=32&search_country_id=" . $mysoc->country_id . "&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("AccountingCategory"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_chart', 50);
+                    $newmenu->add("/Modules/Accountancy/admin/defaultaccounts.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuDefaultAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_default', 60);
                     if (!empty($conf->banque->enabled)) {
                         $newmenu->add("/Modules/Compta/bank/list.php?mainmenu=accountancy&leftmenu=accountancy_admin&search_status=-1", $langs->trans("MenuBankAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_bank', 70);
                     }
@@ -1240,37 +1241,37 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     if (!empty($conf->expensereport->enabled)) {
                         $newmenu->add("/admin/dict.php?id=17&from=accountancy&mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuExpenseReportAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_default', 100);
                     }
-                    $newmenu->add("/accountancy/admin/productaccount.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuProductsAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_product', 110);
+                    $newmenu->add("/Modules/Accountancy/admin/productaccount.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuProductsAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_product', 110);
                     if ($conf->global->MAIN_FEATURES_LEVEL > 1) {
-                        $newmenu->add("/accountancy/admin/closure.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuClosureAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_closure', 120);
+                        $newmenu->add("/Modules/Accountancy/admin/closure.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("MenuClosureAccounts"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_closure', 120);
                     }
-                    $newmenu->add("/accountancy/admin/export.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("ExportOptions"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_export', 130);
+                    $newmenu->add("/Modules/Accountancy/admin/export.php?mainmenu=accountancy&leftmenu=accountancy_admin", $langs->trans("ExportOptions"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_export', 130);
                 }
 
                 // Transfer in accounting
-                $newmenu->add("/accountancy/index.php?leftmenu=accountancy_transfer", $langs->trans("TransferInAccounting"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'transfer', 1, '', '', '', img_picto('', 'long-arrow-alt-right', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add("/Modules/Accountancy/index.php?leftmenu=accountancy_transfer", $langs->trans("TransferInAccounting"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'transfer', 1, '', '', '', img_picto('', 'long-arrow-alt-right', 'class="paddingright pictofixedwidth"'));
 
                 // Binding
                 // $newmenu->add("", $langs->trans("Binding"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch');
                 if (!empty($conf->facture->enabled) && empty($conf->global->ACCOUNTING_DISABLE_BINDING_ON_SALES)) {
-                    $newmenu->add("/accountancy/customer/index.php?leftmenu=accountancy_dispatch_customer&amp;mainmenu=accountancy", $langs->trans("CustomersVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_customer');
+                    $newmenu->add("/Modules/Accountancy/customer/index.php?leftmenu=accountancy_dispatch_customer&amp;mainmenu=accountancy", $langs->trans("CustomersVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_customer');
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_dispatch_customer/', $leftmenu)) {
-                        $newmenu->add("/accountancy/customer/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_customer", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
-                        $newmenu->add("/accountancy/customer/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_customer", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/customer/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_customer", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/customer/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_customer", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
                     }
                 }
                 if (!empty($conf->supplier_invoice->enabled) && empty($conf->global->ACCOUNTING_DISABLE_BINDING_ON_PURCHASES)) {
-                    $newmenu->add("/accountancy/supplier/index.php?leftmenu=accountancy_dispatch_supplier&amp;mainmenu=accountancy", $langs->trans("SuppliersVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_supplier');
+                    $newmenu->add("/Modules/Accountancy/supplier/index.php?leftmenu=accountancy_dispatch_supplier&amp;mainmenu=accountancy", $langs->trans("SuppliersVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_supplier');
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_dispatch_supplier/', $leftmenu)) {
-                        $newmenu->add("/accountancy/supplier/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_supplier", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
-                        $newmenu->add("/accountancy/supplier/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_supplier", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/supplier/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_supplier", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/supplier/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_supplier", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
                     }
                 }
                 if (!empty($conf->expensereport->enabled) && empty($conf->global->ACCOUNTING_DISABLE_BINDING_ON_EXPENSEREPORTS)) {
-                    $newmenu->add("/accountancy/expensereport/index.php?leftmenu=accountancy_dispatch_expensereport&amp;mainmenu=accountancy", $langs->trans("ExpenseReportsVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_expensereport');
+                    $newmenu->add("/Modules/Accountancy/expensereport/index.php?leftmenu=accountancy_dispatch_expensereport&amp;mainmenu=accountancy", $langs->trans("ExpenseReportsVentilation"), 1, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch_expensereport');
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_dispatch_expensereport/', $leftmenu)) {
-                        $newmenu->add("/accountancy/expensereport/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_expensereport", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
-                        $newmenu->add("/accountancy/expensereport/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_expensereport", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/expensereport/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_expensereport", $langs->trans("ToBind"), 2, $user->rights->accounting->bind->write);
+                        $newmenu->add("/Modules/Accountancy/expensereport/lines.php?mainmenu=accountancy&amp;leftmenu=accountancy_dispatch_expensereport", $langs->trans("Binded"), 2, $user->rights->accounting->bind->write);
                     }
                 }
 
@@ -1331,7 +1332,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                                 if ($nature) {
                                     $langs->load('accountancy');
                                     $journallabel = $langs->transnoentities($objp->label); // Labels in this table are set by loading llx_accounting_abc.sql. Label can be 'ACCOUNTING_SELL_JOURNAL', 'InventoryJournal', ...
-                                    $newmenu->add('/accountancy/journal/' . $nature . 'journal.php?mainmenu=accountancy&leftmenu=accountancy_journal&id_journal=' . $objp->rowid, $journallabel, 2, $user->rights->accounting->comptarapport->lire);
+                                    $newmenu->add('/Modules/Accountancy/journal/' . $nature . 'journal.php?mainmenu=accountancy&leftmenu=accountancy_journal&id_journal=' . $objp->rowid, $journallabel, 2, $user->rights->accounting->comptarapport->lire);
                                 }
                                 $i++;
                             }
@@ -1346,16 +1347,16 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Accounting
-                $newmenu->add("/accountancy/index.php?leftmenu=accountancy_accountancy", $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add("/Modules/Accountancy/index.php?leftmenu=accountancy_accountancy", $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
 
                 // General Ledger
-                $newmenu->add("/accountancy/bookkeeping/listbyaccount.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("Bookkeeping"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add("/Modules/Accountancy/bookkeeping/listbyaccount.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("Bookkeeping"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Journals
-                $newmenu->add("/accountancy/bookkeeping/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("Journals"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add("/Modules/Accountancy/bookkeeping/list.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("Journals"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Account Balance
-                $newmenu->add("/accountancy/bookkeeping/balance.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("AccountBalance"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add("/Modules/Accountancy/bookkeeping/balance.php?mainmenu=accountancy&amp;leftmenu=accountancy_accountancy", $langs->trans("AccountBalance"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Files
                 if (empty($conf->global->ACCOUNTANCY_HIDE_EXPORT_FILES_MENU)) {
@@ -1363,10 +1364,10 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Closure
-                $newmenu->add("/accountancy/closure/index.php?mainmenu=accountancy&amp;leftmenu=accountancy_closure", $langs->trans("MenuAccountancyClosure"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'closure');
+                $newmenu->add("/Modules/Accountancy/closure/index.php?mainmenu=accountancy&amp;leftmenu=accountancy_closure", $langs->trans("MenuAccountancyClosure"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'closure');
 
                 // Reports
-                $newmenu->add("/accountancy/index.php?leftmenu=accountancy_report", $langs->trans("Reportings"), 1, $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'ca');
+                $newmenu->add("/Modules/Accountancy/index.php?leftmenu=accountancy_report", $langs->trans("Reportings"), 1, $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'ca');
 
                 if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
                     $newmenu->add("/Modules/Compta/resultat/index.php?leftmenu=accountancy_report", $langs->trans("MenuReportInOut"), 2, $user->rights->accounting->comptarapport->lire);
@@ -1526,7 +1527,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             if (!empty($conf->categorie->enabled)) {
                 $langs->load("categories");
-                $newmenu->add("/categories/index.php?type=5", $langs->trans("Rubriques"), 1, $user->rights->categorie->creer, '', $mainmenu, 'tags');
+                $newmenu->add("/Modules/Categories/index.php?type=5", $langs->trans("Rubriques"), 1, $user->rights->categorie->creer, '', $mainmenu, 'tags');
                 $newmenu->add("/Modules/Compta/bank/categ.php", $langs->trans("RubriquesTransactions"), 1, $user->rights->banque->configurer, '', $mainmenu, 'tags');
             }
 
@@ -1603,8 +1604,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add("/categories/index.php?leftmenu=cat&amp;type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
-                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add("/categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=cat&amp;type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add("/Modules/Categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
                 }
             }
 
@@ -1619,8 +1620,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add("/categories/index.php?leftmenu=cat&amp;type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
-                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add("/categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=cat&amp;type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add("/Modules/Categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
                 }
             }
 
@@ -1640,7 +1641,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
                 // Categories for warehouses
                 if (!empty($conf->categorie->enabled)) {
-                    $newmenu->add("/categories/index.php?leftmenu=stock&amp;type=9", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=stock&amp;type=9", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
             }
 
@@ -1763,7 +1764,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add("/categories/index.php?leftmenu=cat&amp;type=6", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=cat&amp;type=6", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
                 if (empty($conf->global->PROJECT_HIDE_TASKS)) {
@@ -1903,7 +1904,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add("/categories/index.php?leftmenu=cat&amp;type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add("/Modules/Categories/index.php?leftmenu=cat&amp;type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
                 $newmenu->add("/Modules/Adherents/index.php?leftmenu=members&amp;mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));

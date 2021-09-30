@@ -26,6 +26,8 @@
 
 /**
  *      Class to scan for virus
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class AntiVir
 {

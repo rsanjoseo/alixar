@@ -11,6 +11,8 @@
 
 /**
  * A class containing functions for computing diffs and formatting the output.
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Diff
 {

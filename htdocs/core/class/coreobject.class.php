@@ -29,6 +29,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * CoreObject
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class CoreObject extends CommonObject
 {

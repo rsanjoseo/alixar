@@ -25,6 +25,8 @@
 
 /**
  *      Class to generate html code for admin pages
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormAdmin
 {

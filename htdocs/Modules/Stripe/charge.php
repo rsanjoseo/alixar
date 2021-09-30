@@ -27,7 +27,7 @@ require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/bank/class/account.class.php';
 require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
 require_once DOL_DOCUMENT_ROOT . '/Modules/Compta/facture/class/facture.class.php';
 if (!empty($conf->accounting->enabled)) {
-    require_once DOL_DOCUMENT_ROOT . '/accountancy/class/accountingjournal.class.php';
+    require_once DOL_DOCUMENT_ROOT . '/Modules/Accountancy/class/accountingjournal.class.php';
 }
 
 // Load translation files required by the page

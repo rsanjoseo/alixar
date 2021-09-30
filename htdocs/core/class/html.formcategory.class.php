@@ -25,6 +25,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 
 /**
  *    Class to manage forms for categories
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormCategory extends Form
 {

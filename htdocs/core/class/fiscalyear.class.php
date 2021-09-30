@@ -27,6 +27,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 
 /**
  * Class to manage fiscal year
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Fiscalyear extends CommonObject
 {
@@ -294,7 +296,7 @@ class Fiscalyear extends CommonObject
 
         $result = '';
 
-        $url = DOL_URL_ROOT . '/accountancy/admin/fiscalyear_card.php?id=' . $this->id;
+        $url = DOL_URL_ROOT . '/Modules/Accountancy/admin/fiscalyear_card.php?id=' . $this->id;
 
         if (!$user->rights->accounting->fiscalyear->write) {
             $option = 'nolink';

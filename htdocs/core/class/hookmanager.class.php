@@ -25,6 +25,8 @@
 
 /**
  *    Class to manage hooks
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class HookManager
 {

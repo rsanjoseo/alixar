@@ -24,6 +24,8 @@
 
 /**
  *      Class to manage building of HTML components
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormCron extends Form
 {

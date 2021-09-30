@@ -29,6 +29,8 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
  *      Usage: $formsms = new FormSms($db)
  *             $formsms->proprietes=1 ou chaine ou tableau de valeurs
  *             $formsms->show_form() affiche le formulaire
+ *
+ * @deprecated Dolibarr's html classes will all be completely rewritten using Twig.
  */
 class FormSms
 {

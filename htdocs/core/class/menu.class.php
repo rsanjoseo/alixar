@@ -24,6 +24,8 @@
 
 /**
  *    Class to manage left menus
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Menu
 {

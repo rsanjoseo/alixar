@@ -24,6 +24,8 @@
 
 /**
  *    Class to manage canvas
+ *
+ * @deprecated Dolibarr classes will all be completely rewritten.
  */
 class Canvas
 {
