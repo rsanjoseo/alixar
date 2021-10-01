@@ -120,9 +120,13 @@ abstract class Globals
             Constants::defineConstants();
             $hasConfig = Constants::loadConstants();
             if (!$hasConfig) {
-                $data = new EditConfig();
-                $data->main();
+                redirectTo(constant('BASE_URI') . '/Modules/Install/Controllers/Dol_Init.php');
                 die();
+
+                // This would be the normal treatment if it were not Dolibarr
+                // $data = new EditConfig();
+                // $data->main();
+                // die();
             }
         }
 

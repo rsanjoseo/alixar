@@ -185,18 +185,6 @@ class Translator extends Provider
     }
 
     /**
-     * Sets the language code in use.
-     *
-     * @param string $lang
-     *
-     * @return void
-     */
-    public function setlocale(string $lang): void
-    {
-        self::$translator->setLocale($lang);
-    }
-
-    /**
      * Returns an array with the languages with available translations.
      *
      * @return array
@@ -219,6 +207,11 @@ class Translator extends Provider
             }
         }
         return $languages;
+    }
+
+    public function get_available_languages($langdir = DOL_DOCUMENT_ROOT, $maxlength = 0, $usecode = 0, $mainlangonly = 0)
+    {
+        return $this->getAvailableLanguages();
     }
 
     /**
@@ -367,6 +360,32 @@ class Translator extends Provider
         } else {
             return $this->trans($str);
         }
+    }
+
+    public function setDefaultLang($srclang = 'en_US')
+    {
+        if (empty($srclang) || $srclang == 'auto') {
+            // $_SERVER['HTTP_ACCEPT_LANGUAGE'] can be 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,it;q=0.6' but can contains also malicious content
+            $langpref = empty($_SERVER['HTTP_ACCEPT_LANGUAGE']) ? '' : $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+            $langpref = preg_replace("/;([^,]*)/i", "", $langpref); // Remove the 'q=x.y,' part
+            $langpref = str_replace("-", "_", $langpref);
+            $langlist = preg_split("/[;,]/", $langpref);
+            $srclang = preg_replace('/[^_a-zA-Z]/', '', $langlist[0]);
+        }
+
+        $this->setlocale($srclang);
+    }
+
+    /**
+     * Sets the language code in use.
+     *
+     * @param string $lang
+     *
+     * @return void
+     */
+    public function setlocale(string $lang): void
+    {
+        self::$translator->setLocale($lang);
     }
 
     public function getDefaultLang($mode = 0)

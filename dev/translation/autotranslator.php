@@ -51,8 +51,8 @@ $error=0;
 
 // -------------------- START OF YOUR CODE HERE --------------------
 @set_time_limit(0);
-print "***** ".$script_file." (".$version.") *****\n";
-$dir=DOL_DOCUMENT_ROOT."/langs";
+print "***** " . $script_file . " (" . $version . ") *****\n";
+$dir = DOL_DOCUMENT_ROOT . '/langs';
 
 // Check parameters
 if (! isset($argv[3])) {
