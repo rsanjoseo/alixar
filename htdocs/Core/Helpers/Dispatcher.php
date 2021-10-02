@@ -19,7 +19,6 @@
 namespace Alxarafe\Core\Helpers;
 
 use Alxarafe\Core\Base\Globals;
-use Alxarafe\Core\Singletons\DebugTool;
 use DebugBar\DebugBarException;
 use Alxarafe\Core\Singletons\Config;
 
@@ -149,8 +148,13 @@ class Dispatcher extends Globals
         $className = 'Alxarafe\\Modules\\' . $module . '\\Controllers\\' . $controller;
         $filename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/' . $controller . '.php';
 
+        if (file_exists(constant('BASE_FOLDER') . '/installing.lock')) {
+            redirectTo(constant('BASE_URI') . '/Modules/Install/Controllers/Dol_Init.php');
+            die();
+        }
+
         $nexo = '?';
-        $oldFilename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/Dol_' . $controller . '.php';
+        $oldFilename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/Dol_' . ucfirst($controller) . '.php';
         if (file_exists($oldFilename)) {
             $oldUrl = constant('BASE_URI') . '/Modules/' . $module . '/Controllers/Dol_' . $controller . '.php';
             foreach ($_GET as $get => $value) {

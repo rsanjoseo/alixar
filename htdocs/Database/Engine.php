@@ -76,6 +76,13 @@ abstract class Engine
     private $_results;
 
     /**
+     * @var bool
+     *
+     * @deprecated for Dolibarr compatibility... To eliminate.
+     */
+    public bool $connected;
+
+    /**
      * Engine constructor
      *
      * @param array $dbConfig
@@ -84,6 +91,8 @@ abstract class Engine
     {
         self::$dbConfig = $dbConfig;
         self::$debug = DebugTool::getInstance();
+
+        $this->connected = false;
     }
 
     /**
@@ -144,7 +153,7 @@ abstract class Engine
      * @return bool
      * @throws PDOException if there is no transaction started
      */
-    final public function rollBack(): bool
+    final public function rollback(): bool
     {
         $ret = true;
 
@@ -243,6 +252,8 @@ abstract class Engine
             // http://phpdebugbar.com/docs/base-collectors.html
             self::$dbHandler = new TraceablePDO(new PDO(self::$dsn, self::$dbConfig['dbUser'], self::$dbConfig['dbPass'], $config));
             self::$debug->debugBar->addCollector(new PDOCollector(self::$dbHandler));
+
+            $this->connected = isset(self::$dbHandler);
         } catch (PDOException $e) {
             self::$debug->addException($e);
             return false;
@@ -609,4 +620,78 @@ abstract class Engine
     {
         return $this->commit();
     }
+
+    public function getVersion()
+    {
+        $data = $this->select('SELECT version() AS version');
+        if (count($data) > 0) {
+            return $data[0]['version'];
+        }
+        return '';
+    }
+
+    /**
+     * @return bool
+     *
+     * @deprecated use beginTransaction();
+     */
+    public function begin()
+    {
+        return $this->beginTransaction();
+    }
+
+    public function getDefaultCollationDatabase()
+    {
+        $data = $this->select('SHOW VARIABLES LIKE \'collation_database\'');
+        if (count($data) > 0) {
+            return $data[0]['Value'];
+        }
+        return '';
+    }
+
+    public function getDefaultCharacterSetDatabase()
+    {
+        $data = $this->select('SHOW VARIABLES LIKE \'character_set_database\'');
+        if (count($data) > 0) {
+            return $data[0]['Value'];
+        }
+        return '';
+    }
+
+    public function encrypt($fieldorvalue, $withQuotes = 1)
+    {
+        global $conf;
+
+        // Type of encryption (2: AES (recommended), 1: DES , 0: no encryption)
+        $cryptType = (!empty($conf->db->dolibarr_main_db_encryption) ? $conf->db->dolibarr_main_db_encryption : 0);
+
+        //Encryption key
+        $cryptKey = (!empty($conf->db->dolibarr_main_db_cryptkey) ? $conf->db->dolibarr_main_db_cryptkey : '');
+
+        $escapedstringwithquotes = ($withQuotes ? "'" : "") . $this->escape($fieldorvalue) . ($withQuotes ? "'" : "");
+
+        if ($cryptType && !empty($cryptKey)) {
+            if ($cryptType == 2) {
+                $escapedstringwithquotes = "AES_ENCRYPT(" . $escapedstringwithquotes . ", '" . $this->escape($cryptKey) . "')";
+            } elseif ($cryptType == 1) {
+                $escapedstringwithquotes = "DES_ENCRYPT(" . $escapedstringwithquotes . ", '" . $this->escape($cryptKey) . "')";
+            }
+        }
+
+        return $escapedstringwithquotes;
+    }
+
+    public function last_insert_id($tab, $fieldid = 'rowid')
+    {
+        return self::$dbHandler->lastInsertId($tab);
+        // phpcs:enable
+        dump($this->db);
+        return $this->db->insert_id;
+    }
+
+    public function affected_rows($sql)
+    {
+        return $this->num_rows($sql);
+    }
+
 }

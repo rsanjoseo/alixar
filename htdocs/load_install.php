@@ -29,8 +29,6 @@ if (!defined('BASE_FOLDER')) {
     define('BASE_FOLDER', __DIR__);
 }
 
-use Alxarafe\Core\Controllers\EditConfig;
-use Alxarafe\Core\Controllers\Install;
 use Alxarafe\Core\Providers\Constants;
 use Alxarafe\Core\Providers\RegionalInfo;
 use Alxarafe\Core\Providers\Translator;
@@ -40,6 +38,92 @@ use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
 use Alxarafe\Core\Singletons\Session;
 use Alxarafe\Core\Singletons\TemplateRender;
+
+/**
+ * Checks if it is possible to connect to the database, according to the Alixar configuration.
+ *
+ * @return bool
+ */
+function testAlixarConnection(): bool
+{
+    $config = Config::getInstance();
+    return $config->loadConfig() && $config->connectToDatabase();
+}
+
+/**
+ * Create the Alixar config file, necessary to be able to connect to the database.
+ * Returns true if it is possible to connect to the database.
+ */
+function createAlixarConfig($dbType, $dbHost, $dbUser, $dbPass, $dbPort, $dbName = 'dolibarr_test', $dbPrefix = 'llx_', $lang = 'es')
+{
+    $config = Config::getInstance();
+
+    $config->setVar('templaterender', 'main', 'skin', 'default');
+    $config->setVar('database', 'main', 'dbEngineName', $dbType);
+
+    $dolibarrDbVars = [
+        'dbUser' => $dbUser,
+        'dbPass' => $dbPass,
+        'dbName' => $dbName,
+        'dbHost' => $dbHost,
+        'dbPort' => $dbPort,
+        'dbPrefix' => $dbPrefix,
+    ];
+
+    foreach ($dolibarrDbVars as $name => $dolibarrVar) {
+        $config->setVar('database', 'main', $name, $dolibarrVar);
+    }
+
+    $config->setVar('translator', 'main', 'language', $lang);
+
+    $ok = $config->saveConfigFile();
+
+    if (!$ok) {
+        return false;
+    }
+
+    return testAlixarConnection();
+}
+
+function getConnetion($dbType, $dbHost, $dbUser, $dbPass, $dbPort, $dbName = 'dolibarr_test', $dbPrefix = 'llx_', $lang = 'es')
+{
+    if (!createAlixarConfig($dbType, $dbHost, $dbUser, $dbPass, $dbPort, $dbName, $dbPrefix, $lang)) {
+        return null;
+    }
+
+    $alxConfig = Config::getInstance();
+    $alxConfig->loadConfig();
+    $result = $alxConfig->connectToDatabase();
+    if (!$result) {
+        dump($alxConfig);
+        die('Database not found in load_install');
+    }
+    return $alxConfig->getEngine();
+}
+
+/**
+ * Create Alixar config from Dolibarr config.
+ *
+ * @return bool
+ */
+function createAlixarConfigFromDolibarrConfig(): bool
+{
+    $configDolibarrFile = constant('BASE_FOLDER') . '/conf/conf.php';
+    if (!file_exists($configDolibarrFile)) {
+        return false;
+    }
+    require_once $configDolibarrFile;
+
+    return createAlixarConfig(
+        $dolibarr_main_db_type,
+        $dolibarr_main_db_host,
+        $dolibarr_main_db_user,
+        $dolibarr_main_db_pass,
+        $dolibarr_main_db_port,
+        $dolibarr_main_db_name,
+        $dolibarr_main_db_prefix
+    );
+}
 
 require_once 'vendor/autoload.php';
 

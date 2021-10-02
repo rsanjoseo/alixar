@@ -80,9 +80,14 @@ function getDolGlobalInt($key)
  * @param int    $port Port of database server
  *
  * @return    DoliDB                A DoliDB instance
+ *
+ * @deprecated Use (Config::getInstance())->getEngine() instead
  */
 function getDoliDBInstance($type, $host, $user, $pass, $name, $port)
 {
+    dump(debug_backtrace());
+    die('Use (Config::getInstance())->getEngine() instead.');
+
     require_once DOL_DOCUMENT_ROOT . "/core/db/" . $type . '.class.php';
 
     $class = 'DoliDB' . ucfirst($type);

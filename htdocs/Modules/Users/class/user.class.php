@@ -1477,19 +1477,16 @@ class User extends CommonObject
         // Check if login already exists in same entity or into entity 0.
         if ($this->login) {
             $sqltochecklogin = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "user WHERE entity IN (" . $this->db->sanitize((int) $this->entity) . ", 0) AND login = '" . $this->db->escape($this->login) . "'";
-            $resqltochecklogin = $this->db->query($sqltochecklogin);
-            if ($resqltochecklogin) {
-                $objtochecklogin = $this->db->fetch_object($resqltochecklogin);
-                if ($objtochecklogin && $objtochecklogin->nb > 0) {
-                    $langs->load("errors");
-                    $this->error = $langs->trans("ErrorLoginAlreadyExists", $this->login);
-                    dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
-                    $this->db->rollback();
-                    return -6;
-                }
-                $this->db->free($resqltochecklogin);
+            $resqltochecklogin = $this->db->select($sqltochecklogin);
+            if ($resqltochecklogin[0]['nb'] > 0) {
+                $langs->load("errors");
+                $this->error = $langs->trans("ErrorLoginAlreadyExists", $this->login);
+                dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
+                $this->db->rollback();
+                return -6;
             }
         }
+
         if ($this->email !== '') {
             $sqltochecklogin = "SELECT COUNT(*) as nb FROM " . MAIN_DB_PREFIX . "user WHERE entity IN (" . $this->db->sanitize((int) $this->entity) . ", 0) AND email = '" . $this->db->escape($this->email) . "'";
             $resqltochecklogin = $this->db->query($sqltochecklogin);
@@ -1785,6 +1782,7 @@ class User extends CommonObject
         dol_syslog(get_class($this) . "::update", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
+            // $nbrowsaffected += $this->db->affected_rows($resql);
             $nbrowsaffected += $this->db->affected_rows($resql);
 
             // Update password

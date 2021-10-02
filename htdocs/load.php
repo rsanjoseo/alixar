@@ -71,12 +71,12 @@ $session = Session::getInstance();
 $langs = Translator::getInstance();
 
 $alxConfig->loadConfig();
-$langs->setlocale(Config::getVar('translator', 'main', 'language'));
+$langs->setlocale(Config::getVar('translator', 'main', 'language') ?? 'es');
 
 $result = $alxConfig->connectToDatabase();
 if (!$result) {
     dump($alxConfig);
-    die('database_not_found');
+    die('Database not found in load!');
 }
 $db = $alxConfig->getEngine();
 $debugbar = $alxDebug;

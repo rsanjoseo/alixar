@@ -38,40 +38,14 @@ include_once DOL_DOCUMENT_ROOT . '/Modules/Install/inc.php';
 include_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
 include_once DOL_DOCUMENT_ROOT . '/core/class/html.formadmin.class.php';
 
-$err = 0;
-
 // If the config file exists and is filled, we're not on first install so we skip the language selection page
 if (file_exists($conffile) && isset($dolibarr_main_url_root)) {
-    // header("Location: check.php?testget=ok");
-    header("Location: " . BASE_URI . "?module=install&controller=check&testget=ok");
+    header("Location: " . BASE_URI . "/Modules/Install/Controllers/Dol_Check?testget=ok");
     exit;
 }
 
+$err = 0;
+
 $langs->load("admin");
 
-/*
- * View
- */
-
-$formadmin = new FormAdmin(''); // Note: $db does not exist yet but we don't need it, so we put ''.
-
-pHeader("", "check"); // Next step = check
-
-// Ask installation language
-print '<br><br><div class="center">';
-print '<table>';
-
-print '<tr>';
-print '<td>' . $langs->trans("DefaultLanguage") . ' : </td><td>';
-print $formadmin->select_language('auto', 'selectlang', 1, 0, 0, 1);
-print '</td>';
-print '</tr>';
-
-print '</table></div>';
-
-print '<br><br><span class="opacitymedium">' . $langs->trans("SomeTranslationAreUncomplete") . '</span>';
-
-// If there's no error, we display the next step button
-if ($err == 0) {
-    pFooter(0);
-}
+require_once DOL_DOCUMENT_ROOT . '/Modules/Install/Views/index.php';

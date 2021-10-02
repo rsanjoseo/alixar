@@ -556,6 +556,8 @@ function dolibarr_install_syslog($message, $level = LOG_DEBUG)
  */
 function detect_dolibarr_main_document_root()
 {
+    return DOL_DOCUMENT_ROOT;
+    /*
     // If PHP is in CGI mode, SCRIPT_FILENAME is PHP's path.
     // Since that's not what we want, we suggest $_SERVER["DOCUMENT_ROOT"]
     if ($_SERVER["SCRIPT_FILENAME"] == 'php' || preg_match('/[\\/]php$/i', $_SERVER["SCRIPT_FILENAME"]) || preg_match('/php\.exe$/i', $_SERVER["SCRIPT_FILENAME"])) {
@@ -570,6 +572,7 @@ function detect_dolibarr_main_document_root()
     }
 
     return $dolibarr_main_document_root;
+    */
 }
 
 /**
