@@ -69,18 +69,16 @@ abstract class Engine
      * @var int
      */
     static protected int $transactionDepth = 0;
-
-    /**
-     * @deprecated Dolibarr inheritance
-     */
-    private $_results;
-
     /**
      * @var bool
      *
      * @deprecated for Dolibarr compatibility... To eliminate.
      */
     public bool $connected;
+    /**
+     * @deprecated Dolibarr inheritance
+     */
+    private $_results;
 
     /**
      * Engine constructor
@@ -300,50 +298,6 @@ abstract class Engine
     }
 
     /**
-     * Start transaction
-     * source: https://www.ibm.com/support/knowledgecenter/es/SSEPGG_9.1.0/com.ibm.db2.udb.apdv.php.doc/doc/t0023166.htm
-     *
-     * @return bool
-     */
-    final public function beginTransaction(): bool
-    {
-        if (self::$transactionDepth == 0 || !self::$savePointsSupport) {
-            $ret = self::$dbHandler->beginTransaction();
-        } else {
-            $ret = $this->exec('SAVEPOINT LEVEL' . self::$transactionDepth);
-        }
-
-        if (!$ret) {
-            return false;
-        }
-        self::$transactionDepth++;
-        self::$debug->addMessage('SQL', 'Transaction started, savepoint LEVEL' . self::$transactionDepth . ' saved');
-
-        return true;
-    }
-
-    /**
-     * Commit current transaction
-     *
-     * @return bool
-     */
-    final public function commit(): bool
-    {
-        $ret = true;
-
-        self::$debug->addMessage('SQL', 'Commit, savepoint LEVEL' . self::$transactionDepth);
-        self::$transactionDepth--;
-
-        if (self::$transactionDepth == 0 || !self::$savePointsSupport) {
-            $ret = self::$dbHandler->commit();
-        } else {
-            $this->exec('RELEASE SAVEPOINT LEVEL' . self::$transactionDepth);
-        }
-
-        return $ret;
-    }
-
-    /**
      *    Decrypt sensitive data in database
      *
      * @param string $value Value to decrypt
@@ -460,22 +414,6 @@ abstract class Engine
     }
 
     /**
-     *    Return number of lines for result of a SELECT
-     *
-     * @param mysqli_result $resultset Resulset of requests
-     *
-     * @return    int                Nb of lines
-     * @see    affected_rows()
-     */
-    public function num_rows($resultset)
-    {
-        if (!is_object($resultset)) {
-            $resultset = $this->_results;
-        }
-        return $resultset->rowCount();
-    }
-
-    /**
      *    Returns the current line (as an object) for the resultset cursor
      *
      * @param mysqli_result $resultset Curseur de la requete voulue
@@ -490,20 +428,6 @@ abstract class Engine
             $resultset = $this->_results;
         }
         return $resultset->fetchObject();
-    }
-
-    /**
-     *    Escape a string to insert data
-     *
-     * @param string $stringtoencode String to escape
-     *
-     * @return    string                        String escaped
-     *
-     * @deprecated use prepare
-     */
-    public function escape($stringtoencode)
-    {
-        return $stringtoencode;
     }
 
     /**
@@ -621,6 +545,27 @@ abstract class Engine
         return $this->commit();
     }
 
+    /**
+     * Commit current transaction
+     *
+     * @return bool
+     */
+    final public function commit(): bool
+    {
+        $ret = true;
+
+        self::$debug->addMessage('SQL', 'Commit, savepoint LEVEL' . self::$transactionDepth);
+        self::$transactionDepth--;
+
+        if (self::$transactionDepth == 0 || !self::$savePointsSupport) {
+            $ret = self::$dbHandler->commit();
+        } else {
+            $this->exec('RELEASE SAVEPOINT LEVEL' . self::$transactionDepth);
+        }
+
+        return $ret;
+    }
+
     public function getVersion()
     {
         $data = $this->select('SELECT version() AS version');
@@ -638,6 +583,29 @@ abstract class Engine
     public function begin()
     {
         return $this->beginTransaction();
+    }
+
+    /**
+     * Start transaction
+     * source: https://www.ibm.com/support/knowledgecenter/es/SSEPGG_9.1.0/com.ibm.db2.udb.apdv.php.doc/doc/t0023166.htm
+     *
+     * @return bool
+     */
+    final public function beginTransaction(): bool
+    {
+        if (self::$transactionDepth == 0 || !self::$savePointsSupport) {
+            $ret = self::$dbHandler->beginTransaction();
+        } else {
+            $ret = $this->exec('SAVEPOINT LEVEL' . self::$transactionDepth);
+        }
+
+        if (!$ret) {
+            return false;
+        }
+        self::$transactionDepth++;
+        self::$debug->addMessage('SQL', 'Transaction started, savepoint LEVEL' . self::$transactionDepth . ' saved');
+
+        return true;
     }
 
     public function getDefaultCollationDatabase()
@@ -681,12 +649,23 @@ abstract class Engine
         return $escapedstringwithquotes;
     }
 
+    /**
+     *    Escape a string to insert data
+     *
+     * @param string $stringtoencode String to escape
+     *
+     * @return    string                        String escaped
+     *
+     * @deprecated use prepare
+     */
+    public function escape($stringtoencode)
+    {
+        return $stringtoencode;
+    }
+
     public function last_insert_id($tab, $fieldid = 'rowid')
     {
         return self::$dbHandler->lastInsertId($tab);
-        // phpcs:enable
-        dump($this->db);
-        return $this->db->insert_id;
     }
 
     public function affected_rows($sql)
@@ -694,4 +673,42 @@ abstract class Engine
         return $this->num_rows($sql);
     }
 
+    /**
+     *    Return number of lines for result of a SELECT
+     *
+     * @param mysqli_result $resultset Resulset of requests
+     *
+     * @return    int                Nb of lines
+     * @see    affected_rows()
+     */
+    public function num_rows($resultset)
+    {
+        if (!is_object($resultset)) {
+            $resultset = $this->_results;
+        }
+        return $resultset->rowCount();
+    }
+
+    public function lastqueryerror()
+    {
+        $data = self::$dbHandler->errorInfo();
+        return $data[0];
+    }
+
+    public function lasterrno()
+    {
+        $data = self::$dbHandler->errorInfo();
+        return $data[1];
+    }
+
+    public function lasterror()
+    {
+        $data = self::$dbHandler->errorInfo();
+        return $data[2];
+    }
+
+    public function lastquery()
+    {
+        return $this->lastquery;
+    }
 }

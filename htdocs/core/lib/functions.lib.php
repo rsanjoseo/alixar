@@ -4705,6 +4705,8 @@ function dol_print_error($db = '', $error = '', $errors = null)
     }
 
     dol_syslog("Error " . $syslog, LOG_ERR);
+
+    dump(debug_backtrace());
 }
 
 /**

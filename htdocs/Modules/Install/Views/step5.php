@@ -318,7 +318,8 @@ if ($action == "set" && $success) {
 
         print "<br>";
 
-        $morehtml = '<br><div class="center"><a href="../index.php?mainmenu=home' . (isset($login) ? '&username=' . urlencode($login) : '') . '">';
+        // $morehtml = '<br><div class="center"><a href="../index.php?mainmenu=home' . (isset($login) ? '&username=' . urlencode($login) : '') . '">';
+        $morehtml = '<br><div class="center"><a href="?module=Admin&mainmenu=home' . (isset($login) ? '&username=' . urlencode($login) : '') . '">';
         $morehtml .= '<span class="fas fa-link-alt"></span> ' . $langs->trans("GoToDolibarr") . '...';
         $morehtml .= '</a></div><br>';
     } else {
