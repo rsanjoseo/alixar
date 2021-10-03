@@ -673,7 +673,7 @@ class Menubase
         //dol_syslog(get_class($this)."::menuLoad mymainmenu=".$mymainmenu." myleftmenu=".$myleftmenu." type_user=".$type_user." menu_handler=".$menu_handler." tabMenu size=".count($tabMenu)."", LOG_DEBUG);
         //		$resql = $this->db->query($sql);
         $resql = $this->db->select($sql);
-        if ($resql) {
+        if (is_array($resql)) {
             // $numa = $this->db->num_rows($resql);
             $numa = count($resql);
 

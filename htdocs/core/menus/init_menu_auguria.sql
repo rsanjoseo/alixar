@@ -96,7 +96,8 @@ values ('', '$user->admin', __ HANDLER__, 'left', 100__ + MAX_llx_menu__, 'home'
 insert into llx_menu (module, enabled, menu_handler, type, rowid, mainmenu, leftmenu, fk_menu, url, titre, level, langs,
                       perms, target, usertype, position, entity)
 values ('', '$leftmenu=="setup"', __ HANDLER__, 'left', 101__ + MAX_llx_menu__, 'home', '', 100__ + MAX_llx_menu__,
-        '/admin/company.php?mainmenu=home&amp;leftmenu=setup', 'MenuCompanySetup', 1, 'admin', '', '', 2, 1, __
+        '?module=Admin&controller=company&mainmenu=home&amp;leftmenu=setup', 'MenuCompanySetup', 1, 'admin', '', '', 2,
+        1, __
         ENTITY__);
 insert into llx_menu (module, enabled, menu_handler, type, rowid, mainmenu, leftmenu, fk_menu, url, titre, level, langs,
                       perms, target, usertype, position, entity)

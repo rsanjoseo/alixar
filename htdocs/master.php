@@ -72,12 +72,11 @@ if (!defined('NOREQUIREUSER')) {
     require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/user.class.php'; // Need 500ko memory
 }
 if (!defined('NOREQUIRETRAN')) {
-	require_once DOL_DOCUMENT_ROOT . '/core/class/translate.class.php';
+    require_once DOL_DOCUMENT_ROOT . '/core/class/translate.class.php';
 }
 if (!defined('NOREQUIRESOC')) {
     require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 }
-
 
 /*
  * Creation objet $langs (must be before all other code)
@@ -126,7 +125,7 @@ if (!defined('NOREQUIREDB')) {
  * Object $user
  */
 if (!defined('NOREQUIREUSER')) {
-	$user = new User($db);
+    $user = new User($db);
 }
 
 /*
@@ -151,7 +150,7 @@ if (session_id() && !empty($_SESSION["dol_entity"])) {
 
 // Sanitize entity
 if (!is_numeric($conf->entity)) {
-	$conf->entity = 1;
+    $conf->entity = 1;
 }
 
 //print "We work with data into entity instance number '".$conf->entity."'";
@@ -159,8 +158,11 @@ if (!is_numeric($conf->entity)) {
 // Here we read database (llx_const table) and define $conf->global->XXX var.
 $conf->setValues($db);
 
+$requiredb = !defined('NOREQUIREDB') || !constant('NOREQUIREDB');
+$requiresoc = !defined('NOREQUIRESOC') || !constant('NOREQUIRESOC');
+
 // Create object $mysoc (A thirdparty object that contains properties of companies managed by Dolibarr.
-if (!defined('NOREQUIREDB') && !defined('NOREQUIRESOC')) {
+if ($requiredb && $requiresoc) {
     require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
 
     $mysoc = new Societe($db);
@@ -186,6 +188,6 @@ include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
 $hookmanager = new HookManager($db);
 
 if (!defined('MAIN_LABEL_MENTION_NPR')) {
-	define('MAIN_LABEL_MENTION_NPR', 'NPR');
+    define('MAIN_LABEL_MENTION_NPR', 'NPR');
 }
 //if (! defined('PCLZIP_TEMPORARY_DIR')) define('PCLZIP_TEMPORARY_DIR', $conf->user->dir_temp);

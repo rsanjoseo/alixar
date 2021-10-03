@@ -630,7 +630,7 @@ function top_menu($head, $title = '', $target = '', $disablejs = 0, $disablehead
             if ($_SESSION["dol_authmode"] != 'forceuser' && $_SESSION["dol_authmode"] != 'http') {
                 $logouthtmltext .= $langs->trans("Logout") . '<br>';
 
-                $logouttext .= '<a accesskey="l" href="' . DOL_URL_ROOT . '/Modules/Users/logout.php">';
+                $logouttext .= '<a accesskey="l" href="' . DOL_URL_ROOT . '?module=Users&controller=logout">';
                 $logouttext .= img_picto($langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin');
                 $logouttext .= '</a>';
             } else {
@@ -910,7 +910,7 @@ function top_menu_user($hideloginname = 0, $urllogout = '')
     }
 
     if (empty($urllogout)) {
-        $urllogout = DOL_URL_ROOT . '/Modules/Users/logout.php';
+        $urllogout = DOL_URL_ROOT . '?module=Users&controller=logout';
     }
     $logoutLink = '<a accesskey="l" href="' . $urllogout . '" class="button-top-menu-dropdown" ><i class="fa fa-sign-out-alt"></i> ' . $langs->trans("Logout") . '</a>';
     $profilLink = '<a accesskey="l" href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $user->id . '" class="button-top-menu-dropdown" ><i class="fa fa-user"></i>  ' . $langs->trans("Card") . '</a>';
@@ -2096,26 +2096,6 @@ if (!function_exists("llxFooter")) {
 }
 
 /**
- *    \file       htdocs/main.inc.php
- *    \ingroup    core
- *    \brief      File that defines environment for Dolibarr GUI pages only (file not required by scripts)
- */
-
-//@ini_set('memory_limit', '128M');	// This may be useless if memory is hard limited by your PHP
-
-// For optional tuning. Enabled if environment variable MAIN_SHOW_TUNING_INFO is defined.
-$micro_start_time = 0;
-if (!empty($_SERVER['MAIN_SHOW_TUNING_INFO'])) {
-    [$usec, $sec] = explode(" ", microtime());
-    $micro_start_time = ((float) $usec + (float) $sec);
-    // Add Xdebug code coverage
-    //define('XDEBUGCOVERAGE',1);
-    if (defined('XDEBUGCOVERAGE')) {
-        xdebug_start_code_coverage();
-    }
-}
-
-/**
  * Return the real char for a numeric entities.
  * WARNING: This function is required by testSqlAndScriptInject() and the GETPOST 'restricthtml'. Regex calling must be similar.
  *
@@ -2278,6 +2258,26 @@ function analyseVarsForSqlAndScriptsInjection(&$var, $type)
     }
 }
 
+/**
+ *    \file       htdocs/main.inc.php
+ *    \ingroup    core
+ *    \brief      File that defines environment for Dolibarr GUI pages only (file not required by scripts)
+ */
+
+//@ini_set('memory_limit', '128M');	// This may be useless if memory is hard limited by your PHP
+
+// For optional tuning. Enabled if environment variable MAIN_SHOW_TUNING_INFO is defined.
+$micro_start_time = 0;
+if (!empty($_SERVER['MAIN_SHOW_TUNING_INFO'])) {
+    [$usec, $sec] = explode(" ", microtime());
+    $micro_start_time = ((float) $usec + (float) $sec);
+    // Add Xdebug code coverage
+    //define('XDEBUGCOVERAGE',1);
+    if (defined('XDEBUGCOVERAGE')) {
+        xdebug_start_code_coverage();
+    }
+}
+
 // Check consistency of NOREQUIREXXX DEFINES
 if ((defined('NOREQUIREDB') || defined('NOREQUIRETRAN')) && !defined('NOREQUIREMENU')) {
     print 'If define NOREQUIREDB or NOREQUIRETRAN are set, you must also set NOREQUIREMENU or not set them.';
@@ -2381,7 +2381,7 @@ if (!empty($conf->global->MAIN_ONLY_LOGIN_ALLOWED)) { // It's false
         if (session_id() && isset($_SESSION["dol_login"]) && $_SESSION["dol_login"] != $conf->global->MAIN_ONLY_LOGIN_ALLOWED) {
             print 'Sorry, your application is offline.' . "\n";
             print 'You are logged with user "' . $_SESSION["dol_login"] . '" and only administrator user "' . $conf->global->MAIN_ONLY_LOGIN_ALLOWED . '" is allowed to connect for the moment.' . "\n";
-            $nexturl = DOL_URL_ROOT . '/Modules/Users/logout.php';
+            $nexturl = DOL_URL_ROOT . '?module=Users&controller=logout';
             print 'Please try later or <a href="' . $nexturl . '">click here to disconnect and change login user</a>...' . "\n";
         } else {
             print 'Sorry, your application is offline. Only administrator user "' . $conf->global->MAIN_ONLY_LOGIN_ALLOWED . '" is allowed to connect for the moment.' . "\n";
@@ -2476,17 +2476,18 @@ if (!defined('NOLOGIN') && !defined('NOIPCHECK') && !empty($dolibarr_main_restri
 }
 
 // Loading of additional presentation includes
-if (!defined('NOREQUIREHTML')) {
+if (!defined('NOREQUIREHTML') || !constant('NOREQUIREHTML')) {
     require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php'; // Need 660ko memory (800ko in 2.2)
 }
-if (!defined('NOREQUIREAJAX')) {
+if (!defined('NOREQUIREAJAX' || !constant('NOREQUIREAJAX'))) {
     require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php'; // Need 22ko memory
 }
 
 // If install or upgrade process not done or not completely finished, we call the install page.
 if (!empty($conf->global->MAIN_NOT_INSTALLED) || !empty($conf->global->MAIN_NOT_UPGRADED)) {
     dol_syslog("main.inc: A previous install or upgrade was not complete. Redirect to install page.", LOG_WARNING);
-    header("Location: " . DOL_URL_ROOT . "/install/index.php");
+    // header("Location: " . DOL_URL_ROOT . "/install/index.php");
+    header("Location: " . DOL_URL_ROOT . "/Modules/Install/Dol_Init.php");
     exit;
 }
 
@@ -2500,7 +2501,8 @@ if ((!empty($conf->global->MAIN_VERSION_LAST_UPGRADE) && ($conf->global->MAIN_VE
     $rescomp = versioncompare($dolibarrversionprogram, $dolibarrversionlastupgrade);
     if ($rescomp > 0) {   // Programs have a version higher than database. We did not add "&& $rescomp < 3" because we want upgrade process for build upgrades
         dol_syslog("main.inc: database version " . $versiontocompare . " is lower than programs version " . DOL_VERSION . ". Redirect to install page.", LOG_WARNING);
-        header("Location: " . DOL_URL_ROOT . "/install/index.php");
+        // header("Location: " . DOL_URL_ROOT . "/install/index.php");
+        header("Location: " . DOL_URL_ROOT . "/Modules/Install/Dol_Init.php");
         exit;
     }
 }

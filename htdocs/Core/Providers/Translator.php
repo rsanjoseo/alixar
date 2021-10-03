@@ -410,4 +410,8 @@ class Translator extends Provider
     public function load($domain, $alt = 0, $stopafterdirection = 0, $forcelangdir = '', $loadfromfileonly = 0, $forceloadifalreadynotfound = 0)
     {
     }
+
+    public function loadCacheCurrencies()
+    {
+    }
 }

@@ -757,7 +757,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     $langs->load("errors");
                     $warnpicto = img_warning($langs->trans("WarningMandatorySetupNotComplete"));
                 }
-                $newmenu->add("/admin/company.php?mainmenu=home", $langs->trans("MenuCompanySetup") . $warnpicto, 1);
+                $newmenu->add(BASE_URI . "?module=Admin&controller=company&mainmenu=home", $langs->trans("MenuCompanySetup") . $warnpicto, 1);
 
                 $warnpicto = '';
                 if (count($conf->modules) <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only user module enabled

@@ -61,8 +61,8 @@ foreach ($files as $file) {
 
 print "<tr><td>" . $langs->trans("ReferenceDataLoading") . "</td>";
 if ($ok) {
-    print '<td><img src="../theme/eldy/img/tick.png" alt="Ok"></td></tr>';
+    print '<td><img src="' . BASE_URI . '/theme/eldy/img/tick.png" alt="Ok"></td></tr>';
 } else {
-    print '<td><img src="../theme/eldy/img/error.png" alt="Error"></td></tr>';
+    print '<td><img src="' . BASE_URI . '/theme/eldy/img/error.png" alt="Error"></td></tr>';
     $ok = 1; // Data loading are not blocking errors
 }

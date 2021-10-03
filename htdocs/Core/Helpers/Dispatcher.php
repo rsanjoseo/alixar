@@ -148,6 +148,7 @@ class Dispatcher extends Globals
         $className = 'Alxarafe\\Modules\\' . $module . '\\Controllers\\' . $controller;
         $filename = constant('BASE_FOLDER') . '/Modules/' . $module . '/Controllers/' . $controller . '.php';
 
+        // TODO: Is this being used?
         if (file_exists(constant('BASE_FOLDER') . '/installing.lock')) {
             redirectTo(constant('BASE_URI') . '/Modules/Install/Controllers/Dol_Init.php');
             die();

@@ -188,7 +188,7 @@ class MenuManager
                     $submenu = new Menu();
 
                     $langs->load("admin"); // Load translation file admin.lang
-                    $submenu->add("/admin/index.php?leftmenu=setup", $langs->trans("Setup"), 0);
+                    $submenu->add(BASE_URI . "/admin/index.php?leftmenu=setup", $langs->trans("Setup"), 0);
                     $submenu->add("/admin/company.php", $langs->trans("MenuCompanySetup"), 1);
                     $submenu->add("/admin/modules.php", $langs->trans("Modules"), 1);
                     $submenu->add("/admin/menus.php", $langs->trans("Menus"), 1);
@@ -330,7 +330,7 @@ class MenuManager
             // ***** START *****
 
             $langs->load("admin"); // Load translation file admin.lang
-            $this->menu->add("/admin/index.php?leftmenu=setup", $langs->trans("Setup"), 0);
+            $this->menu->add(BASE_URI . "/admin/index.php?leftmenu=setup", $langs->trans("Setup"), 0);
             $this->menu->add("/admin/company.php", $langs->trans("MenuCompanySetup"), 1);
             $this->menu->add("/admin/modules.php", $langs->trans("Modules"), 1);
             $this->menu->add("/admin/menus.php", $langs->trans("Menus"), 1);

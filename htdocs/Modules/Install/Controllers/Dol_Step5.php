@@ -104,17 +104,17 @@ $error = 0;
 // If install, check password and password_verification used to create admin account
 if ($action == "set") {
     if ($pass <> $pass_verif) {
-        header("Location: step4.php?error=1&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
+        header("Location: Dol_Step4.php?error=1&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
         exit;
     }
 
     if (dol_strlen(trim($pass)) == 0) {
-        header("Location: step4.php?error=2&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
+        header("Location: Dol_Step4.php?error=2&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
         exit;
     }
 
     if (dol_strlen(trim($login)) == 0) {
-        header("Location: step4.php?error=3&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
+        header("Location: Dol_Step4.php?error=3&selectlang=$setuplang" . (isset($login) ? '&login=' . $login : ''));
         exit;
     }
 }
