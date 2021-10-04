@@ -183,6 +183,7 @@ if ($action == "set" || empty($action) || preg_match('/upgrade/i', $action)) {
                     }
                 }
 
+                // TODO: It seems that here it does not arrive during the installation. The record is cleared manually.
                 dolibarr_install_syslog('step5: remove MAIN_NOT_INSTALLED const');
                 $resql = $db->query("DELETE FROM " . MAIN_DB_PREFIX . "const WHERE " . $db->decrypt('name') . "='MAIN_NOT_INSTALLED'");
                 if (!$resql) {

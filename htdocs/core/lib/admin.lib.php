@@ -1893,22 +1893,22 @@ function company_admin_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/company.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company';
     $head[$h][1] = $langs->trans("Company");
     $head[$h][2] = 'company';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/openinghours.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Openinghours';
     $head[$h][1] = $langs->trans("OpeningHours");
     $head[$h][2] = 'openinghours';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/accountant.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Accountant';
     $head[$h][1] = $langs->trans("Accountant");
     $head[$h][2] = 'accountant';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/company_socialnetworks.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company_socialnetworks';
     $head[$h][1] = $langs->trans("SocialNetworksInformation");
     $head[$h][2] = 'socialnetworks';
     $h++;

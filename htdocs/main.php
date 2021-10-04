@@ -2485,9 +2485,12 @@ if (!defined('NOREQUIREAJAX' || !constant('NOREQUIREAJAX'))) {
 
 // If install or upgrade process not done or not completely finished, we call the install page.
 if (!empty($conf->global->MAIN_NOT_INSTALLED) || !empty($conf->global->MAIN_NOT_UPGRADED)) {
+    dump($conf->global->MAIN_NOT_INSTALLED);
+    dump($conf->global->MAIN_NOT_UPGRADED);
     dol_syslog("main.inc: A previous install or upgrade was not complete. Redirect to install page.", LOG_WARNING);
     // header("Location: " . DOL_URL_ROOT . "/install/index.php");
-    header("Location: " . DOL_URL_ROOT . "/Modules/Install/Dol_Init.php");
+    die("1 Location: " . DOL_URL_ROOT . "/Modules/Install/Controller/Dol_Init.php");
+    header("Location: " . DOL_URL_ROOT . "/Modules/Install/Controller/Dol_Init.php");
     exit;
 }
 
@@ -2502,7 +2505,8 @@ if ((!empty($conf->global->MAIN_VERSION_LAST_UPGRADE) && ($conf->global->MAIN_VE
     if ($rescomp > 0) {   // Programs have a version higher than database. We did not add "&& $rescomp < 3" because we want upgrade process for build upgrades
         dol_syslog("main.inc: database version " . $versiontocompare . " is lower than programs version " . DOL_VERSION . ". Redirect to install page.", LOG_WARNING);
         // header("Location: " . DOL_URL_ROOT . "/install/index.php");
-        header("Location: " . DOL_URL_ROOT . "/Modules/Install/Dol_Init.php");
+        die("2 Location: " . DOL_URL_ROOT . "/Modules/Install/Controller/Dol_Init.php");
+        header("Location: " . DOL_URL_ROOT . "/Modules/Install/Controller/Dol_Init.php");
         exit;
     }
 }
