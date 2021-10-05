@@ -980,11 +980,11 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
             $sql .= " WHERE " . $this->db->decrypt('name') . " = '" . $this->db->escape($name) . "'";
             $sql .= " AND entity = " . ((int) $entity);
 
-            $result = $this->db->query($sql);
-            if ($result) {
-                $row = $this->db->fetch_row($result);
-
-                if ($row[0] == 0) {   // If not found
+            // $result = $this->db->query($sql);
+            $result = $this->db->select($sql);
+            if ($result !== false) {
+                $row = $result[0]['count(*)'];
+                if ($row !== '0') {   // If not found
                     $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const (name,type,value,note,visible,entity)";
                     $sql .= " VALUES (";
                     $sql .= $this->db->encrypt($name);

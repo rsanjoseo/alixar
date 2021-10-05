@@ -635,7 +635,7 @@ function modules_prepare_head($nbofactivatedmodules, $nboftotalmodules)
     $h = 0;
     $head = [];
     $mode = empty($conf->global->MAIN_MODULE_SETUP_ON_LIST_BY_DEFAULT) ? 'commonkanban' : 'common';
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modules.php?mode=" . $mode;
+    $head[$h][0] = constant('BASE_URI') . '?modules=Admin&controller=Modules&mode=' . $mode;
     if ($nbofactivatedmodules <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only minimal initial modules enabled)
         $head[$h][1] = $form->textwithpicto($langs->trans("AvailableModules"), $desc);
         $head[$h][1] .= img_warning($langs->trans("YouMustEnableOneModule"));
@@ -646,17 +646,17 @@ function modules_prepare_head($nbofactivatedmodules, $nboftotalmodules)
     $head[$h][2] = 'modules';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modules.php?mode=marketplace";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=marketplace';
     $head[$h][1] = $langs->trans("ModulesMarketPlaces");
     $head[$h][2] = 'marketplace';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modules.php?mode=deploy";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=deploy';
     $head[$h][1] = $langs->trans("AddExtensionThemeModuleOrOther");
     $head[$h][2] = 'deploy';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modules.php?mode=develop";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=develop';
     $head[$h][1] = $langs->trans("ModulesDevelopYourModule");
     $head[$h][2] = 'develop';
     $h++;
@@ -675,22 +675,22 @@ function ihm_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/ihm.php?mode=other";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Ihm&mode=other';
     $head[$h][1] = $langs->trans("LanguageAndPresentation");
     $head[$h][2] = 'other';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/ihm.php?mode=template";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Ihm&mode=template';
     $head[$h][1] = $langs->trans("SkinAndColors");
     $head[$h][2] = 'template';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/ihm.php?mode=dashboard";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Ihm&mode=dashboard';
     $head[$h][1] = $langs->trans("Dashboard");
     $head[$h][2] = 'dashboard';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/ihm.php?mode=login";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Ihm&mode=login';
     $head[$h][1] = $langs->trans("LoginPage");
     $head[$h][2] = 'login';
     $h++;
@@ -713,17 +713,17 @@ function security_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/security_other.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Security_other';
     $head[$h][1] = $langs->trans("Miscellaneous");
     $head[$h][2] = 'misc';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/security.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Security';
     $head[$h][1] = $langs->trans("Passwords");
     $head[$h][2] = 'passwords';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/security_file.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Security_file';
     $head[$h][1] = $langs->trans("Files") . ' (' . $langs->trans("Upload") . ')';
     $head[$h][2] = 'file';
     $h++;
@@ -735,12 +735,12 @@ function security_prepare_head()
     $h++;
     */
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/proxy.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Proxy';
     $head[$h][1] = $langs->trans("ExternalAccess");
     $head[$h][2] = 'proxy';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/events.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Events';
     $head[$h][1] = $langs->trans("Audit");
     $head[$h][2] = 'audit';
     $h++;
@@ -765,7 +765,7 @@ function security_prepare_head()
         dol_print_error($db);
     }
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/perms.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Perms';
     $head[$h][1] = $langs->trans("DefaultRights");
     if ($nbPerms > 0) {
         $head[$h][1] .= (empty($conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) ? '<span class="badge marginleftonlyshort">' . $nbPerms . '</span>' : '');
@@ -792,18 +792,18 @@ function modulehelp_prepare_head($object)
     // FIX for compatibity habitual tabs
     $object->id = $object->numero;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modulehelp.php?id=" . $object->id . '&mode=desc';
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modulehelp&id=' . $object->id . '&mode=desc';
     $head[$h][1] = $langs->trans("Description");
     $head[$h][2] = 'desc';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/modulehelp.php?id=" . $object->id . '&mode=feature';
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modulehelp&id=' . $object->id . '&mode=feature';
     $head[$h][1] = $langs->trans("TechnicalServicesProvided");
     $head[$h][2] = 'feature';
     $h++;
 
     if ($object->isCoreOrExternalModule() == 'external') {
-        $head[$h][0] = DOL_URL_ROOT . "/admin/modulehelp.php?id=" . $object->id . '&mode=changelog';
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modulehelp&id=' . $object->id . '&mode=changelog';
         $head[$h][1] = $langs->trans("ChangeLog");
         $head[$h][2] = 'changelog';
         $h++;
@@ -827,12 +827,12 @@ function translation_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/translation.php?mode=searchkey";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=searchkey';
     $head[$h][1] = $langs->trans("TranslationKeySearch");
     $head[$h][2] = 'searchkey';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/translation.php?mode=overwrite";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=overwrite';
     $head[$h][1] = $langs->trans("TranslationOverwriteKey") . '<span class="fa fa-plus-circle valignmiddle paddingleft"></span>';
     $head[$h][2] = 'overwrite';
     $h++;
@@ -855,28 +855,28 @@ function defaultvalues_prepare_head()
     $h = 0;
     $head = [];
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/defaultvalues.php?mode=createform";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Defaultvalues&mode=createform';
     $head[$h][1] = $langs->trans("DefaultCreateForm");
     $head[$h][2] = 'createform';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/defaultvalues.php?mode=filters";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Defaultvalues&mode=filters';
     $head[$h][1] = $langs->trans("DefaultSearchFilters");
     $head[$h][2] = 'filters';
     $h++;
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/defaultvalues.php?mode=sortorder";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Defaultvalues&mode=sortorder';
     $head[$h][1] = $langs->trans("DefaultSortOrder");
     $head[$h][2] = 'sortorder';
     $h++;
 
     if (!empty($conf->use_javascript_ajax)) {
-        $head[$h][0] = DOL_URL_ROOT . "/admin/defaultvalues.php?mode=focus";
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Defaultvalues&mode=focus';
         $head[$h][1] = $langs->trans("DefaultFocus");
         $head[$h][2] = 'focus';
         $h++;
 
-        $head[$h][0] = DOL_URL_ROOT . "/admin/defaultvalues.php?mode=mandatory";
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Defaultvalues&mode=mandatory';
         $head[$h][1] = $langs->trans("DefaultMandatory");
         $head[$h][2] = 'mandatory';
         $h++;
@@ -1933,20 +1933,20 @@ function email_admin_prepare_head()
     $head = [];
 
     if (!empty($user->admin) && (empty($_SESSION['leftmenu']) || $_SESSION['leftmenu'] != 'email_templates')) {
-        $head[$h][0] = DOL_URL_ROOT . "/admin/mails.php";
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Mails';
         $head[$h][1] = $langs->trans("OutGoingEmailSetup");
         $head[$h][2] = 'common';
         $h++;
 
         if (!empty($conf->mailing->enabled)) {
-            $head[$h][0] = DOL_URL_ROOT . "/admin/mails_emailing.php";
+            $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Mails_emailing';
             $head[$h][1] = $langs->trans("OutGoingEmailSetupForEmailing", $langs->transnoentitiesnoconv("EMailing"));
             $head[$h][2] = 'common_emailing';
             $h++;
         }
 
         if (!empty($conf->ticket->enabled)) {
-            $head[$h][0] = DOL_URL_ROOT . "/admin/mails_ticket.php";
+            $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Mails_ticket';
             $head[$h][1] = $langs->trans("OutGoingEmailSetupForEmailing", $langs->transnoentitiesnoconv("Ticket"));
             $head[$h][2] = 'common_ticket';
             $h++;
@@ -1955,13 +1955,13 @@ function email_admin_prepare_head()
 
     // admin and non admin can view this menu entry, but it is not shown yet when we on user menu "Email templates"
     if (empty($_SESSION['leftmenu']) || $_SESSION['leftmenu'] != 'email_templates') {
-        $head[$h][0] = DOL_URL_ROOT . "/admin/mails_senderprofile_list.php";
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Mails_senderprofile_list';
         $head[$h][1] = $langs->trans("EmailSenderProfiles");
         $head[$h][2] = 'senderprofiles';
         $h++;
     }
 
-    $head[$h][0] = DOL_URL_ROOT . "/admin/mails_templates.php";
+    $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Mails_templates';
     $head[$h][1] = $langs->trans("EMailTemplates");
     $head[$h][2] = 'templates';
     $h++;

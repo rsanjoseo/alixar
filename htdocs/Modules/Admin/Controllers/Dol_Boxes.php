@@ -32,6 +32,7 @@ define('BASE_FOLDER', getcwd());
  */
 const MAIN_HIDE_TOP_MENU = 0;
 const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
 
 require 'main.php';
 
