@@ -32,6 +32,7 @@ define('BASE_FOLDER', getcwd());
  */
 const MAIN_HIDE_TOP_MENU = 0;
 const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
 
 require 'main.php';
 
@@ -203,7 +204,7 @@ print '<input type="hidden" name="constname" value="USER_PASSWORD_GENERATED">';
 print '<input type="hidden" name="consttype" value="yesno">';
 
 // Charge tableau des modules generation
-$dir = "../core/modules/security/generate";
+$dir = DOL_DOCUMENT_ROOT . "/core/modules/security/generate";
 clearstatcache();
 $handle = opendir($dir);
 $i = 1;

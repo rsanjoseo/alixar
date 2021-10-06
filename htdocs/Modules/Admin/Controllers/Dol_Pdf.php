@@ -33,15 +33,18 @@ define('BASE_FOLDER', getcwd());
  */
 const MAIN_HIDE_TOP_MENU = 0;
 const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
 
 require 'main.php';
 
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formadmin.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/usergroups.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/pdf.lib.php';
+require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 
 // Load translation files required by the page
 $langs->loadLangs(['admin', 'languages', 'other', 'companies', 'products', 'members', 'stocks', 'Trips']);
