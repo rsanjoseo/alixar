@@ -1347,32 +1347,32 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Accounting
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=index&leftmenu=accountancy_accountancy", $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_accountancy', $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
 
                 // General Ledger
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=bookkeeping/listbyaccount&mainmenu=accountancy&leftmenu=accountancy_accountancy", $langs->trans("Bookkeeping"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=bookkeeping_listbyaccount&mainmenu=accountancy&leftmenu=accountancy_accountancy', $langs->trans("Bookkeeping"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Journals
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=bookkeeping/list&mainmenu=accountancy&leftmenu=accountancy_accountancy", $langs->trans("Journals"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=bookkeeping_list&mainmenu=accountancy&leftmenu=accountancy_accountancy', $langs->trans("Journals"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Account Balance
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=bookkeeping/balance&mainmenu=accountancy&leftmenu=accountancy_accountancy", $langs->trans("AccountBalance"), 1, $user->rights->accounting->mouvements->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=bookkeeping_balance&mainmenu=accountancy&leftmenu=accountancy_accountancy', $langs->trans("AccountBalance"), 1, $user->rights->accounting->mouvements->lire);
 
                 // Files
                 if (empty($conf->global->ACCOUNTANCY_HIDE_EXPORT_FILES_MENU)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=accounting-files&mainmenu=accountancy&leftmenu=accountancy_files", $langs->trans("AccountantFiles"), 1, $user->rights->accounting->mouvements->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=accounting-files&mainmenu=accountancy&leftmenu=accountancy_files', $langs->trans("AccountantFiles"), 1, $user->rights->accounting->mouvements->lire);
                 }
 
                 // Closure
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=closure/index&mainmenu=accountancy&leftmenu=accountancy_closure", $langs->trans("MenuAccountancyClosure"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'closure');
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=closure_index&mainmenu=accountancy&leftmenu=accountancy_closure', $langs->trans("MenuAccountancyClosure"), 1, $user->rights->accounting->fiscalyear->write, '', $mainmenu, 'closure');
 
                 // Reports
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Accountancy&controller=index&leftmenu=accountancy_report", $langs->trans("Reportings"), 1, $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'ca');
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_report', $langs->trans("Reportings"), 1, $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'ca');
 
                 if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/index&leftmenu=accountancy_report", $langs->trans("MenuReportInOut"), 2, $user->rights->accounting->comptarapport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/clientfourn&leftmenu=accountancy_report", $langs->trans("ByPredefinedAccountGroups"), 3, $user->rights->accounting->comptarapport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/result&leftmenu=accountancy_report", $langs->trans("ByPersonalizedAccountGroups"), 3, $user->rights->accounting->comptarapport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_index&leftmenu=accountancy_report', $langs->trans("MenuReportInOut"), 2, $user->rights->accounting->comptarapport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_clientfourn&leftmenu=accountancy_report', $langs->trans("ByPredefinedAccountGroups"), 3, $user->rights->accounting->comptarapport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_result&leftmenu=accountancy_report', $langs->trans("ByPersonalizedAccountGroups"), 3, $user->rights->accounting->comptarapport->lire);
                 }
 
                 $modecompta = 'CREANCES-DETTES';
@@ -1381,11 +1381,11 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
                 if ($modecompta) {
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/index&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportTurnover"), 2, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/casoc&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyuser&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByUsers"), 3, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyprodserv&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByProductsAndServices"), 3, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/byratecountry&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByVatRate"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_index&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ReportTurnover"), 2, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_casoc&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyuser&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByUsers"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyprodserv&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByProductsAndServices"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_byratecountry&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByVatRate"), 3, $user->rights->accounting->comptarapport->lire);
                     }
                 }
 
@@ -1393,11 +1393,11 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 //if (! empty($conf->accounting->enabled) && ! empty($user->rights->accounting->comptarapport->lire) && $mainmenu == 'accountancy') $modecompta='';	// Not yet implemented. Should be BOOKKEEPINGCOLLECTED
                 if ($modecompta) {
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/index&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportTurnoverCollected"), 2, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/casoc&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyuser&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByUsers"), 3, $user->rights->accounting->comptarapport->lire);
-                        //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyprodserv&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByProductsAndServices"),3,$user->rights->accounting->comptarapport->lire);
-                        //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/byratecountry&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByVatRate"),3,$user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_index&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ReportTurnoverCollected"), 2, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_casoc&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyuser&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByUsers"), 3, $user->rights->accounting->comptarapport->lire);
+                        //$newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/cabyprodserv&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByProductsAndServices"),3,$user->rights->accounting->comptarapport->lire);
+                        //$newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/byratecountry&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByVatRate"),3,$user->rights->accounting->comptarapport->lire);
                     }
                 }
 
@@ -1407,9 +1407,9 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
                 if ($modecompta && ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_invoice->enabled))) {
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportPurchaseTurnover"), 2, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover_by_prodserv&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByProductsAndServices"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/supplier_turnover&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportPurchaseTurnover"), 2, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/supplier_turnover_by_prodserv&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByProductsAndServices"), 3, $user->rights->accounting->comptarapport->lire);
                     }
                 }
 
@@ -1419,8 +1419,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
                 if ($modecompta && ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_invoice->enabled))) {
                     if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_report/', $leftmenu)) {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportPurchaseTurnoverCollected"), 2, $user->rights->accounting->comptarapport->lire);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_supplier_turnover&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ReportPurchaseTurnoverCollected"), 2, $user->rights->accounting->comptarapport->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 3, $user->rights->accounting->comptarapport->lire);
                     }
                 }
             }
@@ -1429,18 +1429,18 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->comptabilite->enabled)) {
                 // Files
                 if (empty($conf->global->ACCOUNTANCY_HIDE_EXPORT_FILES_MENU)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=accounting-files&mainmenu=accountancy&leftmenu=accountancy_files", $langs->trans("AccountantFiles"), 0, $user->rights->compta->resultat->lire, '', $mainmenu, 'files');
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=accounting-files&mainmenu=accountancy&leftmenu=accountancy_files', $langs->trans("AccountantFiles"), 0, $user->rights->compta->resultat->lire, '', $mainmenu, 'files');
                 }
 
                 // Bilan, resultats
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/index&leftmenu=report&mainmenu=accountancy", $langs->trans("Reportings"), 0, $user->rights->compta->resultat->lire, '', $mainmenu, 'ca');
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_index&leftmenu=report&mainmenu=accountancy', $langs->trans("Reportings"), 0, $user->rights->compta->resultat->lire, '', $mainmenu, 'ca');
 
                 if ($usemenuhider || empty($leftmenu) || preg_match('/report/', $leftmenu)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/index&leftmenu=report", $langs->trans("MenuReportInOut"), 1, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=resultat/clientfourn&leftmenu=report", $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_index&leftmenu=report', $langs->trans("MenuReportInOut"), 1, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=resultat_clientfourn&leftmenu=report', $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
                     /* On verra ca avec module compabilite expert
                     $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=resultat/compteres&leftmenu=report","Compte de resultat",2,$user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') "?module=Compta&controller=resultat/bilan&leftmenu=report","Bilan",2,$user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=resultat/bilan&leftmenu=report","Bilan",2,$user->rights->compta->resultat->lire);
                     */
 
                     /*
@@ -1452,56 +1452,56 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     */
 
                     $modecompta = 'CREANCES-DETTES';
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/index&leftmenu=report&modecompta=" . $modecompta, $langs->trans("ReportTurnover"), 1, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/casoc&leftmenu=report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyuser&leftmenu=report&modecompta=" . $modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyprodserv&leftmenu=report&modecompta=" . $modecompta, $langs->trans("ByProductsAndServices"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/byratecountry&leftmenu=report&modecompta=" . $modecompta, $langs->trans("ByVatRate"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_index&leftmenu=report&modecompta=' . $modecompta, $langs->trans("ReportTurnover"), 1, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_casoc&leftmenu=report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyuser&leftmenu=report&modecompta=' . $modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyprodserv&leftmenu=report&modecompta=' . $modecompta, $langs->trans("ByProductsAndServices"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_byratecountry&leftmenu=report&modecompta=' . $modecompta, $langs->trans("ByVatRate"), 2, $user->rights->compta->resultat->lire);
 
                     $modecompta = 'RECETTES-DEPENSES';
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/index&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportTurnoverCollected"), 1, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/casoc&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/cabyuser&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_index&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ReportTurnoverCollected"), 1, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_casoc&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_cabyuser&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
 
                     //Achats
                     $modecompta = 'CREANCES-DETTES';
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ReportPurchaseTurnover"), 1, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=stats/supplier_turnover_by_prodserv&leftmenu=accountancy_report&modecompta=" . $modecompta, $langs->trans("ByProductsAndServices"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_supplier_turnover&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ReportPurchaseTurnover"), 1, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_supplier_turnover_by_thirdparty&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=stats_supplier_turnover_by_prodserv&leftmenu=accountancy_report&modecompta=' . $modecompta, $langs->trans("ByProductsAndServices"), 2, $user->rights->compta->resultat->lire);
 
                     /*
                     $modecompta = 'RECETTES-DEPENSES';
                     $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/index&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ReportPurchaseTurnoverCollected"), 1, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') "?module=Compta&controller=stats/casoc&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
-                    $newmenu->add(constant('BASE_URI') "?module=Compta&controller=stats/cabyuser&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/casoc&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByCompanies"), 2, $user->rights->compta->resultat->lire);
+                    $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=stats/cabyuser&leftmenu=accountancy_report&modecompta=".$modecompta, $langs->trans("ByUsers"), 2, $user->rights->compta->resultat->lire);
                     */
 
                     // Journals
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=journal/sellsjournal&leftmenu=report", $langs->trans("SellsJournal"), 1, $user->rights->compta->resultat->lire, '', '', '', 50);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=journal/purchasesjournal&leftmenu=report", $langs->trans("PurchasesJournal"), 1, $user->rights->compta->resultat->lire, '', '', '', 51);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=journal_sellsjournal&leftmenu=report', $langs->trans("SellsJournal"), 1, $user->rights->compta->resultat->lire, '', '', '', 50);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=journal_purchasesjournal&leftmenu=report', $langs->trans("PurchasesJournal"), 1, $user->rights->compta->resultat->lire, '', '', '', 51);
                 }
-                //if ($leftmenu=="ca") $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=journaux/index&leftmenu=ca",$langs->trans("Journals"),1,$user->rights->compta->resultat->lire||$user->rights->accounting->comptarapport->lire);
+                //if ($leftmenu=="ca") $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=journaux/index&leftmenu=ca",$langs->trans("Journals"),1,$user->rights->compta->resultat->lire||$user->rights->accounting->comptarapport->lire);
             }
 
             // Intracomm report
             if (!empty($conf->intracommreport->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/intracommreport/list&leftmenu=intracommreport", $langs->trans("MenuIntracommReport"), 0, $user->rights->intracommreport->read, '', $mainmenu, 'intracommreport', 1);
-                if ($usemenuhider || empty($leftmenu) || preg_match('/intracommreport/', $leftmenu)) {
+                $newmenu->add(constant('BASE_URI') . '?module=intracommreport&controller=list&leftmenu=intracommreport', $langs->trans("MenuIntracommReport"), 0, $user->rights->intracommreport->read, '', $mainmenu, 'intracommreport', 1);
+                if ($usemenuhider || empty($leftmenu) || preg_match('?module=intracommreport&controller=', $leftmenu)) {
                     // DEB / DES
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/intracommreport/card&action=create&leftmenu=intracommreport", $langs->trans("MenuIntracommReportNew"), 1, $user->rights->intracommreport->write, '', $mainmenu, 'intracommreport', 1);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/intracommreport/list&leftmenu=intracommreport", $langs->trans("MenuIntracommReportList"), 1, $user->rights->intracommreport->read, '', $mainmenu, 'intracommreport', 1);
+                    $newmenu->add(constant('BASE_URI') . '?module=intracommreport&controller=card&action=create&leftmenu=intracommreport', $langs->trans("MenuIntracommReportNew"), 1, $user->rights->intracommreport->write, '', $mainmenu, 'intracommreport', 1);
+                    $newmenu->add(constant('BASE_URI') . '?module=intracommreport&controller=list&leftmenu=intracommreport', $langs->trans("MenuIntracommReportList"), 1, $user->rights->intracommreport->read, '', $mainmenu, 'intracommreport', 1);
                 }
             }
 
             // Assets
             if (!empty($conf->asset->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/list&leftmenu=asset&mainmenu=accountancy", $langs->trans("MenuAssets"), 0, $user->rights->asset->read, '', $mainmenu, 'asset', 100, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/card&leftmenu=asset&action=create", $langs->trans("MenuNewAsset"), 1, $user->rights->asset->write);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/list&leftmenu=asset&mainmenu=accountancy", $langs->trans("MenuListAssets"), 1, $user->rights->asset->read);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/type&leftmenu=asset_type", $langs->trans("MenuTypeAssets"), 1, $user->rights->asset->read, '', $mainmenu, 'asset_type');
+                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=list&leftmenu=asset&mainmenu=accountancy', $langs->trans("MenuAssets"), 0, $user->rights->asset->read, '', $mainmenu, 'asset', 100, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=card&leftmenu=asset&action=create', $langs->trans("MenuNewAsset"), 1, $user->rights->asset->write);
+                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=list&leftmenu=asset&mainmenu=accountancy', $langs->trans("MenuListAssets"), 1, $user->rights->asset->read);
+                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=type&leftmenu=asset_type', $langs->trans("MenuTypeAssets"), 1, $user->rights->asset->read, '', $mainmenu, 'asset_type');
                 if ($usemenuhider || empty($leftmenu) || preg_match('/asset_type/', $leftmenu)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/type&leftmenu=asset_type&action=create", $langs->trans("MenuNewTypeAssets"), 2, $user->rights->asset->setup_advance);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/asset/type&leftmenu=asset_type", $langs->trans("MenuListTypeAssets"), 2, $user->rights->asset->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=asset&controller=type&leftmenu=asset_type&action=create', $langs->trans("MenuNewTypeAssets"), 2, $user->rights->asset->setup_advance);
+                    $newmenu->add(constant('BASE_URI') . '?module=asset&controller=type&leftmenu=asset_type', $langs->trans("MenuListTypeAssets"), 2, $user->rights->asset->read);
                 }
             }
         }
@@ -1515,65 +1515,65 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Bank-Cash account
             if (!empty($conf->banque->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/list&leftmenu=bank&mainmenu=bank", $langs->trans("MenuBankCash"), 0, $user->rights->banque->lire, '', $mainmenu, 'bank', 0, '', '', '', img_picto('', 'bank_account', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_list&leftmenu=bank&mainmenu=bank', $langs->trans("MenuBankCash"), 0, $user->rights->banque->lire, '', $mainmenu, 'bank', 0, '', '', '', img_picto('', 'bank_account', 'class="paddingright pictofixedwidth"'));
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/card&action=create", $langs->trans("MenuNewFinancialAccount"), 1, $user->rights->banque->configurer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/list&leftmenu=bank&mainmenu=bank", $langs->trans("List"), 1, $user->rights->banque->lire, '', $mainmenu, 'bank');
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/bankentries_list.php", $langs->trans("ListTransactions"), 1, $user->rights->banque->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/budget.php", $langs->trans("ListTransactionsByCategory"), 1, $user->rights->banque->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_card&action=create', $langs->trans("MenuNewFinancialAccount"), 1, $user->rights->banque->configurer);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_list&leftmenu=bank&mainmenu=bank', $langs->trans("List"), 1, $user->rights->banque->lire, '', $mainmenu, 'bank');
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_bankentries_list.php', $langs->trans("ListTransactions"), 1, $user->rights->banque->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_budget.php', $langs->trans("ListTransactionsByCategory"), 1, $user->rights->banque->lire);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/transfer.php", $langs->trans("MenuBankInternalTransfer"), 1, $user->rights->banque->transfer);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_transfer.php', $langs->trans("MenuBankInternalTransfer"), 1, $user->rights->banque->transfer);
             }
 
             if (!empty($conf->categorie->enabled)) {
                 $langs->load("categories");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&type=5", $langs->trans("Rubriques"), 1, $user->rights->categorie->creer, '', $mainmenu, 'tags');
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=bank/categ.php", $langs->trans("RubriquesTransactions"), 1, $user->rights->banque->configurer, '', $mainmenu, 'tags');
+                $newmenu->add(constant('BASE_URI') . '?module=Categories&controller=index&type=5', $langs->trans("Rubriques"), 1, $user->rights->categorie->creer, '', $mainmenu, 'tags');
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_categ.php', $langs->trans("RubriquesTransactions"), 1, $user->rights->banque->configurer, '', $mainmenu, 'tags');
             }
 
             // Direct debit order
             if (!empty($conf->prelevement->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/index&leftmenu=withdraw&mainmenu=bank", $langs->trans("PaymentByDirectDebit"), 0, $user->rights->prelevement->bons->lire, '', $mainmenu, 'withdraw', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_index&leftmenu=withdraw&mainmenu=bank', $langs->trans("PaymentByDirectDebit"), 0, $user->rights->prelevement->bons->lire, '', $mainmenu, 'withdraw', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
 
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "withdraw") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/create&mainmenu=bank", $langs->trans("NewStandingOrder"), 1, $user->rights->prelevement->bons->creer);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_create&mainmenu=bank', $langs->trans("NewStandingOrder"), 1, $user->rights->prelevement->bons->creer);
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/orders_list&mainmenu=bank", $langs->trans("WithdrawalsReceipts"), 1, $user->rights->prelevement->bons->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/list&mainmenu=bank", $langs->trans("WithdrawalsLines"), 1, $user->rights->prelevement->bons->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/rejets&mainmenu=bank", $langs->trans("Rejects"), 1, $user->rights->prelevement->bons->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/stats&mainmenu=bank", $langs->trans("Statistics"), 1, $user->rights->prelevement->bons->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_orders_list&mainmenu=bank', $langs->trans("WithdrawalsReceipts"), 1, $user->rights->prelevement->bons->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_list&mainmenu=bank', $langs->trans("WithdrawalsLines"), 1, $user->rights->prelevement->bons->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_rejets&mainmenu=bank', $langs->trans("Rejects"), 1, $user->rights->prelevement->bons->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_stats&mainmenu=bank', $langs->trans("Statistics"), 1, $user->rights->prelevement->bons->lire);
                 }
             }
 
             // Bank transfer order
             if (!empty($conf->paymentbybanktransfer->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=paymentbybanktransfer/index&leftmenu=banktransfer&mainmenu=bank", $langs->trans("PaymentByBankTransfer"), 0, $user->rights->paymentbybanktransfer->read, '', $mainmenu, 'banktransfer', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paymentbybanktransfer_index&leftmenu=banktransfer&mainmenu=bank', $langs->trans("PaymentByBankTransfer"), 0, $user->rights->paymentbybanktransfer->read, '', $mainmenu, 'banktransfer', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
 
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "banktransfer") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/create&type=bank-transfer&mainmenu=bank", $langs->trans("NewPaymentByBankTransfer"), 1, $user->rights->paymentbybanktransfer->create);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_create&type=bank-transfer&mainmenu=bank', $langs->trans("NewPaymentByBankTransfer"), 1, $user->rights->paymentbybanktransfer->create);
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/orders_list&type=bank-transfer&mainmenu=bank", $langs->trans("PaymentByBankTransferReceipts"), 1, $user->rights->paymentbybanktransfer->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/list&type=bank-transfer&mainmenu=bank", $langs->trans("PaymentByBankTransferLines"), 1, $user->rights->paymentbybanktransfer->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/rejets&type=bank-transfer&mainmenu=bank", $langs->trans("Rejects"), 1, $user->rights->paymentbybanktransfer->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=prelevement/stats&type=bank-transfer&mainmenu=bank", $langs->trans("Statistics"), 1, $user->rights->paymentbybanktransfer->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_orders_list&type=bank-transfer&mainmenu=bank', $langs->trans("PaymentByBankTransferReceipts"), 1, $user->rights->paymentbybanktransfer->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_list&type=bank-transfer&mainmenu=bank', $langs->trans("PaymentByBankTransferLines"), 1, $user->rights->paymentbybanktransfer->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_rejets&type=bank-transfer&mainmenu=bank', $langs->trans("Rejects"), 1, $user->rights->paymentbybanktransfer->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_stats&type=bank-transfer&mainmenu=bank', $langs->trans("Statistics"), 1, $user->rights->paymentbybanktransfer->read);
                 }
             }
 
             // Management of checks
             if (empty($conf->global->BANK_DISABLE_CHECK_DEPOSIT) && !empty($conf->banque->enabled) && (!empty($conf->facture->enabled) || !empty($conf->global->MAIN_MENU_CHEQUE_DEPOSIT_ON))) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=paiement/cheque/index&leftmenu=checks&mainmenu=bank", $langs->trans("MenuChequeDeposits"), 0, $user->rights->banque->cheque, '', $mainmenu, 'checks', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_index&leftmenu=checks&mainmenu=bank', $langs->trans("MenuChequeDeposits"), 0, $user->rights->banque->cheque, '', $mainmenu, 'checks', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
                 if (preg_match('/checks/', $leftmenu)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=paiement/cheque/card&leftmenu=checks_bis&action=new&mainmenu=bank", $langs->trans("NewChequeDeposit"), 1, $user->rights->banque->cheque);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=paiement/cheque/list&leftmenu=checks_bis&mainmenu=bank", $langs->trans("List"), 1, $user->rights->banque->cheque);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_card&leftmenu=checks_bis&action=new&mainmenu=bank', $langs->trans("NewChequeDeposit"), 1, $user->rights->banque->cheque);
+                    $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_list&leftmenu=checks_bis&mainmenu=bank', $langs->trans("List"), 1, $user->rights->banque->cheque);
                 }
             }
 
             // Cash Control
             if (!empty($conf->takepos->enabled) || !empty($conf->cashdesk->enabled)) {
                 $permtomakecashfence = ($user->hasRight('cashdesk', 'run') || $user->hasRight('takepos', 'run'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=cashcontrol/cashcontrol_list&action=list", $langs->trans("POS"), 0, $permtomakecashfence, '', $mainmenu, 'cashcontrol', 0, '', '', '', img_picto('', 'pos', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=cashcontrol/cashcontrol_card&action=create", $langs->trans("NewCashFence"), 1, $permtomakecashfence);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=cashcontrol/cashcontrol_list&action=list", $langs->trans("List"), 1, $permtomakecashfence);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_list&action=list', $langs->trans("POS"), 0, $permtomakecashfence, '', $mainmenu, 'cashcontrol', 0, '', '', '', img_picto('', 'pos', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_card&action=create', $langs->trans("NewCashFence"), 1, $permtomakecashfence);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_list&action=list', $langs->trans("List"), 1, $permtomakecashfence);
             }
         }
 
@@ -1583,65 +1583,65 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
         if ($mainmenu == 'products') {
             // Products
             if (!empty($conf->product->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/index&leftmenu=product&type=0", $langs->trans("Products"), 0, $user->rights->produit->lire, '', $mainmenu, 'product', 0, '', '', '', img_picto('', 'product', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/card&leftmenu=product&action=create&type=0", $langs->trans("NewProduct"), 1, $user->rights->produit->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/list&leftmenu=product&type=0", $langs->trans("List"), 1, $user->rights->produit->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=product&type=0', $langs->trans("Products"), 0, $user->rights->produit->lire, '', $mainmenu, 'product', 0, '', '', '', img_picto('', 'product', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=card&leftmenu=product&action=create&type=0', $langs->trans("NewProduct"), 1, $user->rights->produit->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=list&leftmenu=product&type=0', $langs->trans("List"), 1, $user->rights->produit->lire);
                 if (!empty($conf->stock->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/reassort&type=0", $langs->trans("MenuStocks"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=reassort&type=0', $langs->trans("MenuStocks"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
                 }
                 if (!empty($conf->productbatch->enabled)) {
                     $langs->load("stocks");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/reassortlot&type=0", $langs->trans("StocksByLotSerial"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/productlot_list.php", $langs->trans("LotSerial"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=reassortlot&type=0', $langs->trans("StocksByLotSerial"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock/productlot_list', $langs->trans("LotSerial"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
                 }
                 if (!empty($conf->variants->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/variants/list.php", $langs->trans("VariantAttributes"), 1, $user->rights->produit->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Variants&controller=List.php', $langs->trans("VariantAttributes"), 1, $user->rights->produit->lire);
                 }
                 if (!empty($conf->propal->enabled) || (!empty($conf->commande->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->facture->enabled) || !empty($conf->fournisseur->enabled) || !empty($conf->supplier_proposal->enabled) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stats/card&id=all&leftmenu=stats&type=0", $langs->trans("Statistics"), 1, $user->rights->produit->lire && $user->rights->propale->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stats_card&id=all&leftmenu=stats&type=0', $langs->trans("Statistics"), 1, $user->rights->produit->lire && $user->rights->propale->lire);
                 }
 
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&leftmenu=cat&type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
-                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Categories&controller=index&leftmenu=cat&type=0', $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add(constant('BASE_URI') . "?module=Categories&controller=list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
                 }
             }
 
             // Services
             if (!empty($conf->service->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/index&leftmenu=service&type=1", $langs->trans("Services"), 0, $user->rights->service->lire, '', $mainmenu, 'service', 0, '', '', '', img_picto('', 'service', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/card&leftmenu=service&action=create&type=1", $langs->trans("NewService"), 1, $user->rights->service->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/list&leftmenu=service&type=1", $langs->trans("List"), 1, $user->rights->service->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=service&type=1', $langs->trans("Services"), 0, $user->rights->service->lire, '', $mainmenu, 'service', 0, '', '', '', img_picto('', 'service', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=card&leftmenu=service&action=create&type=1', $langs->trans("NewService"), 1, $user->rights->service->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=list&leftmenu=service&type=1', $langs->trans("List"), 1, $user->rights->service->lire);
                 if (!empty($conf->propal->enabled) || !empty($conf->commande->enabled) || !empty($conf->facture->enabled) || (!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_proposal->enabled) || !empty($conf->supplier_oder->enabled) || !empty($conf->supplier_invoice->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stats/card&id=all&leftmenu=stats&type=1", $langs->trans("Statistics"), 1, $user->rights->service->lire && $user->rights->propale->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stats_card&id=all&leftmenu=stats&type=1', $langs->trans("Statistics"), 1, $user->rights->service->lire && $user->rights->propale->lire);
                 }
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&leftmenu=cat&type=0", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
-                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Categories&controller=index&leftmenu=cat&type=0', $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    //if ($usemenuhider || empty($leftmenu) || $leftmenu=="cat") $newmenu->add(constant('BASE_URI') . "?module=Categories&controller=list.php", $langs->trans("List"), 1, $user->rights->categorie->lire);
                 }
             }
 
             // Warehouse
             if (!empty($conf->stock->enabled)) {
                 $langs->load("stocks");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/index&leftmenu=stock", $langs->trans("Warehouses"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'stock', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/card&action=create", $langs->trans("MenuNewWarehouse"), 1, $user->rights->stock->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/list.php", $langs->trans("List"), 1, $user->rights->stock->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/movement_list.php", $langs->trans("Movements"), 1, $user->rights->stock->mouvement->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_index&leftmenu=stock', $langs->trans("Warehouses"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'stock', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_card&action=create', $langs->trans("MenuNewWarehouse"), 1, $user->rights->stock->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_list', $langs->trans("List"), 1, $user->rights->stock->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_movement_list', $langs->trans("Movements"), 1, $user->rights->stock->mouvement->lire);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/massstockmove.php", $langs->trans("MassStockTransferShort"), 1, $user->rights->stock->mouvement->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_massstockmove', $langs->trans("MassStockTransferShort"), 1, $user->rights->stock->mouvement->creer);
                 if ($conf->supplier_order->enabled) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/replenish.php", $langs->trans("Replenishment"), 1, $user->rights->stock->mouvement->creer && $user->rights->fournisseur->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_replenish', $langs->trans("Replenishment"), 1, $user->rights->stock->mouvement->creer && $user->rights->fournisseur->lire);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/stock/stockatdate.php", $langs->trans("StockAtDate"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_stockatdate', $langs->trans("StockAtDate"), 1, $user->rights->produit->lire && $user->rights->stock->lire);
 
                 // Categories for warehouses
                 if (!empty($conf->categorie->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&leftmenu=stock&type=9", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add(constant('BASE_URI') . '?module=Categories&controller=index&leftmenu=stock&type=9', $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
             }
 
@@ -1649,16 +1649,16 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->stock->enabled)) {
                 $langs->load("stocks");
                 if (empty($conf->global->MAIN_USE_ADVANCED_PERMS)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/list&leftmenu=stock_inventories", $langs->trans("Inventories"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
                     if ($usemenuhider || empty($leftmenu) || $leftmenu == "stock_inventories") {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/card&action=create&leftmenu=stock_inventories", $langs->trans("NewInventory"), 1, $user->rights->stock->creer);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/list&leftmenu=stock_inventories", $langs->trans("List"), 1, $user->rights->stock->lire);
+                        $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_card&action=create&leftmenu=stock_inventories', $langs->trans("NewInventory"), 1, $user->rights->stock->creer);
+                        $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("List"), 1, $user->rights->stock->lire);
                     }
                 } else {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/list&leftmenu=stock_inventories", $langs->trans("Inventories"), 0, $user->rights->stock->inventory_advance->read, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->inventory_advance->read, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
                     if ($usemenuhider || empty($leftmenu) || $leftmenu == "stock_inventories") {
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/card&action=create&leftmenu=stock_inventories", $langs->trans("NewInventory"), 1, $user->rights->stock->inventory_advance->write);
-                        $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Products/inventory/list&leftmenu=stock_inventories", $langs->trans("List"), 1, $user->rights->stock->inventory_advance->read);
+                        $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_card&action=create&leftmenu=stock_inventories', $langs->trans("NewInventory"), 1, $user->rights->stock->inventory_advance->write);
+                        $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("List"), 1, $user->rights->stock->inventory_advance->read);
                     }
                 }
             }
@@ -1666,33 +1666,33 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Shipments
             if (!empty($conf->expedition->enabled)) {
                 $langs->load("sendings");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/index&leftmenu=sendings", $langs->trans("Shipments"), 0, $user->rights->expedition->lire, '', $mainmenu, 'sendings', 0, '', '', '', img_picto('', 'shipment', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/card&action=create2&leftmenu=sendings", $langs->trans("NewSending"), 1, $user->rights->expedition->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/list&leftmenu=sendings", $langs->trans("List"), 1, $user->rights->expedition->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=index&leftmenu=sendings', $langs->trans("Shipments"), 0, $user->rights->expedition->lire, '', $mainmenu, 'sendings', 0, '', '', '', img_picto('', 'shipment', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=card&action=create2&leftmenu=sendings', $langs->trans("NewSending"), 1, $user->rights->expedition->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=list&leftmenu=sendings', $langs->trans("List"), 1, $user->rights->expedition->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "sendings") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/list&leftmenu=sendings&search_status=0", $langs->trans("StatusSendingDraftShort"), 2, $user->rights->expedition->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/list&leftmenu=sendings&search_status=1", $langs->trans("StatusSendingValidatedShort"), 2, $user->rights->expedition->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/list&leftmenu=sendings&search_status=2", $langs->trans("StatusSendingProcessedShort"), 2, $user->rights->expedition->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=list&leftmenu=sendings&search_status=0', $langs->trans("StatusSendingDraftShort"), 2, $user->rights->expedition->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=list&leftmenu=sendings&search_status=1', $langs->trans("StatusSendingValidatedShort"), 2, $user->rights->expedition->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=list&leftmenu=sendings&search_status=2', $langs->trans("StatusSendingProcessedShort"), 2, $user->rights->expedition->lire);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/expedition/stats/index&leftmenu=sendings", $langs->trans("Statistics"), 1, $user->rights->expedition->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=stats_index&leftmenu=sendings', $langs->trans("Statistics"), 1, $user->rights->expedition->lire);
             }
 
             // Receptions
             if (!empty($conf->reception->enabled)) {
                 $langs->load("receptions");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/index&leftmenu=receptions", $langs->trans("Receptions"), 0, $user->rights->reception->lire, '', $mainmenu, 'receptions', 0, '', '', '', img_picto('', 'dollyrevert', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/card&action=create2&leftmenu=receptions", $langs->trans("NewReception"), 1, $user->rights->reception->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/list&leftmenu=receptions", $langs->trans("List"), 1, $user->rights->reception->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=index&leftmenu=receptions', $langs->trans("Receptions"), 0, $user->rights->reception->lire, '', $mainmenu, 'receptions', 0, '', '', '', img_picto('', 'dollyrevert', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=card&action=create2&leftmenu=receptions', $langs->trans("NewReception"), 1, $user->rights->reception->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=list&leftmenu=receptions', $langs->trans("List"), 1, $user->rights->reception->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "receptions") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/list&leftmenu=receptions&search_status=0", $langs->trans("StatusReceptionDraftShort"), 2, $user->rights->reception->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=list&leftmenu=receptions&search_status=0', $langs->trans("StatusReceptionDraftShort"), 2, $user->rights->reception->lire);
                 }
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "receptions") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/list&leftmenu=receptions&search_status=1", $langs->trans("StatusReceptionValidatedShort"), 2, $user->rights->reception->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=list&leftmenu=receptions&search_status=1', $langs->trans("StatusReceptionValidatedShort"), 2, $user->rights->reception->lire);
                 }
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "receptions") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/list&leftmenu=receptions&search_status=2", $langs->trans("StatusReceptionProcessedShort"), 2, $user->rights->reception->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=list&leftmenu=receptions&search_status=2', $langs->trans("StatusReceptionProcessedShort"), 2, $user->rights->reception->lire);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/reception/stats/index&leftmenu=receptions", $langs->trans("Statistics"), 1, $user->rights->reception->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=stats/index&leftmenu=receptions', $langs->trans("Statistics"), 1, $user->rights->reception->lire);
             }
         }
 
@@ -1704,17 +1704,17 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->bom->enabled) || !empty($conf->mrp->enabled)) {
                 $langs->load("mrp");
 
-                $newmenu->add(constant('BASE_URI') . "", $langs->trans("MenuBOM"), 0, $user->rights->bom->read, '', $mainmenu, 'bom', 0, '', '', '', img_picto('', 'bom', 'class="paddingrightonly pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/bom/bom_card&leftmenu=bom&action=create", $langs->trans("NewBOM"), 1, $user->rights->bom->write, '', $mainmenu, 'bom');
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/bom/bom_list&leftmenu=bom", $langs->trans("List"), 1, $user->rights->bom->read, '', $mainmenu, 'bom');
+                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuBOM"), 0, $user->rights->bom->read, '', $mainmenu, 'bom', 0, '', '', '', img_picto('', 'bom', 'class="paddingrightonly pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Bom&controller=bom_card&leftmenu=bom&action=create', $langs->trans("NewBOM"), 1, $user->rights->bom->write, '', $mainmenu, 'bom');
+                $newmenu->add(constant('BASE_URI') . '?module=Bom&controller=bom_list&leftmenu=bom', $langs->trans("List"), 1, $user->rights->bom->read, '', $mainmenu, 'bom');
             }
 
             if (!empty($conf->mrp->enabled)) {
                 $langs->load("mrp");
 
-                $newmenu->add(constant('BASE_URI') . "", $langs->trans("MenuMRP"), 0, $user->rights->mrp->read, '', $mainmenu, 'mo', 0, '', '', '', img_picto('', 'mrp', 'class="paddingrightonly pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/mrp/mo_card&leftmenu=mo&action=create", $langs->trans("NewMO"), 1, $user->rights->mrp->write, '', $mainmenu, 'mo');
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/mrp/mo_list&leftmenu=mo", $langs->trans("List"), 1, $user->rights->mrp->read, '', $mainmenu, 'mo');
+                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuMRP"), 0, $user->rights->mrp->read, '', $mainmenu, 'mo', 0, '', '', '', img_picto('', 'mrp', 'class="paddingrightonly pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Mrp&controller=mo_card&leftmenu=mo&action=create', $langs->trans("NewMO"), 1, $user->rights->mrp->write, '', $mainmenu, 'mo');
+                $newmenu->add(constant('BASE_URI') . '?module=Mrp&controller=mo_list&leftmenu=mo', $langs->trans("List"), 1, $user->rights->mrp->read, '', $mainmenu, 'mo');
             }
         }
 
@@ -1746,35 +1746,35 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Project assigned to user
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/index&leftmenu=projects" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', img_picto('', 'project', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/card&leftmenu=projects&action=create" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titlenew, 1, $user->rights->projet->creer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=index&leftmenu=projects" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', img_picto('', 'project', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=card&leftmenu=projects&action=create" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titlenew, 1, $user->rights->projet->creer);
 
                 if (empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : '') . '&search_status=99', $langs->trans("List"), 1, $showmode, '', 'project', 'list');
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : '') . '&search_status=99', $langs->trans("List"), 1, $showmode, '', 'project', 'list');
                 } elseif (isset($conf->global->PROJECT_USE_OPPORTUNITIES) && $conf->global->PROJECT_USE_OPPORTUNITIES == 1) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $showmode, '', 'project', 'list');
-                    $newmenu->add('/Modules/Projects/list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99&search_opp_status=openedopp&contextpage=lead', $langs->trans("ListOpenLeads"), 2, $showmode);
-                    $newmenu->add('/Modules/Projects/list&mainmenu=project&leftmenu=list&search_opp_status=notopenedopp&search_status=99&contextpage=project', $langs->trans("ListOpenProjects"), 2, $showmode);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $showmode, '', 'project', 'list');
+                    $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99&search_opp_status=openedopp&contextpage=lead', $langs->trans("ListOpenLeads"), 2, $showmode);
+                    $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_opp_status=notopenedopp&search_status=99&contextpage=project', $langs->trans("ListOpenProjects"), 2, $showmode);
                 } elseif (isset($conf->global->PROJECT_USE_OPPORTUNITIES) && $conf->global->PROJECT_USE_OPPORTUNITIES == 2) {    // 2 = leads only
-                    $newmenu->add('/Modules/Projects/list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99', $langs->trans("List"), 2, $showmode);
+                    $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99', $langs->trans("List"), 2, $showmode);
                 }
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
 
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&leftmenu=cat&type=6", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Categories&controller=index&leftmenu=cat&type=6", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
                 if (empty($conf->global->PROJECT_HIDE_TASKS)) {
                     // Project affected to user
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/activity/index&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', img_picto('', 'projecttask', 'class="pictofixedwidth"'));
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/tasks&leftmenu=tasks&action=create", $langs->trans("NewTask"), 1, $user->rights->projet->creer);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/tasks/list&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $user->rights->projet->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/tasks/stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/index&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', img_picto('', 'projecttask', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks&leftmenu=tasks&action=create", $langs->trans("NewTask"), 1, $user->rights->projet->creer);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks/list&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $user->rights->projet->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks/stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1787,9 +1787,9 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->hrm->enabled)) {
                 $langs->load("hrm");
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Users/list&mainmenu=hrm&leftmenu=hrm&mode=employee", $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'user', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Users/card&mainmenu=hrm&leftmenu=hrm&action=create&employee=1", $langs->trans("NewEmployee"), 1, $user->rights->user->user->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Users/list&mainmenu=hrm&leftmenu=hrm&mode=employee&contextpage=employeelist", $langs->trans("List"), 1, $user->rights->user->user->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee", $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'user', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=card&mainmenu=hrm&leftmenu=hrm&action=create&employee=1", $langs->trans("NewEmployee"), 1, $user->rights->user->user->creer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee&contextpage=employeelist", $langs->trans("List"), 1, $user->rights->user->user->lire);
             }
 
             // Leave/Holiday/Vacation module
@@ -1797,19 +1797,19 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["holiday", "trips"]);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&mainmenu=hrm&leftmenu=hrm", $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/card&mainmenu=hrm&leftmenu=holiday&action=create", $langs->trans("New"), 1, $user->rights->holiday->write);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&mainmenu=hrm&leftmenu=hrm", $langs->trans("List"), 1, $user->rights->holiday->read);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm", $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=card&mainmenu=hrm&leftmenu=holiday&action=create", $langs->trans("New"), 1, $user->rights->holiday->write);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm", $langs->trans("List"), 1, $user->rights->holiday->read);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "hrm") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&search_status=1&mainmenu=hrm&leftmenu=hrm", $langs->trans("DraftCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&search_status=2&mainmenu=hrm&leftmenu=hrm", $langs->trans("ToReviewCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&search_status=3&mainmenu=hrm&leftmenu=hrm", $langs->trans("ApprovedCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&search_status=4&mainmenu=hrm&leftmenu=hrm", $langs->trans("CancelCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/list&search_status=5&mainmenu=hrm&leftmenu=hrm", $langs->trans("RefuseCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=1&mainmenu=hrm&leftmenu=hrm", $langs->trans("DraftCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=2&mainmenu=hrm&leftmenu=hrm", $langs->trans("ToReviewCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=3&mainmenu=hrm&leftmenu=hrm", $langs->trans("ApprovedCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=4&mainmenu=hrm&leftmenu=hrm", $langs->trans("CancelCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=5&mainmenu=hrm&leftmenu=hrm", $langs->trans("RefuseCP"), 2, $user->rights->holiday->read);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/define_holiday&mainmenu=hrm&action=request", $langs->trans("MenuConfCP"), 1, $user->rights->holiday->read);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/month_report&mainmenu=hrm&leftmenu=holiday", $langs->trans("MenuReportMonth"), 1, $user->rights->holiday->readall);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Holiday/view_log&mainmenu=hrm&leftmenu=holiday&action=request", $langs->trans("MenuLogCP"), 1, $user->rights->holiday->define_holiday);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=define_holiday&mainmenu=hrm&action=request", $langs->trans("MenuConfCP"), 1, $user->rights->holiday->read);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=month_report&mainmenu=hrm&leftmenu=holiday", $langs->trans("MenuReportMonth"), 1, $user->rights->holiday->readall);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=view_log&mainmenu=hrm&leftmenu=holiday&action=request", $langs->trans("MenuLogCP"), 1, $user->rights->holiday->define_holiday);
             }
 
             // Trips and expenses (old module)
@@ -1824,18 +1824,18 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Expense report
             if (!empty($conf->expensereport->enabled)) {
                 $langs->load("trips");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/card&action=create&leftmenu=expensereport&mainmenu=hrm", $langs->trans("New"), 1, $user->rights->expensereport->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&leftmenu=expensereport&mainmenu=hrm", $langs->trans("List"), 1, $user->rights->expensereport->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=card&action=create&leftmenu=expensereport&mainmenu=hrm", $langs->trans("New"), 1, $user->rights->expensereport->creer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&leftmenu=expensereport&mainmenu=hrm", $langs->trans("List"), 1, $user->rights->expensereport->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "expensereport") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=0&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Draft"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=2&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Validated"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=5&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Approved"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=6&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Paid"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=4&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Canceled"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/list&search_status=99&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Refused"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=0&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Draft"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=2&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Validated"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=5&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Approved"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=6&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Paid"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=4&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Canceled"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=99&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Refused"), 2, $user->rights->expensereport->lire);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/ExpenseReports/stats/index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Statistics"), 1, $user->rights->expensereport->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=stats/index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Statistics"), 1, $user->rights->expensereport->lire);
             }
 
             if (!empty($conf->projet->enabled)) {
@@ -1844,7 +1844,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
                     $search_project_user = GETPOST('search_project_user', 'int');
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Projects/activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1866,15 +1866,15 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             if (!empty($conf->export->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/exports/index&leftmenu=export", $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/exports/export&leftmenu=export", $langs->trans("NewExport"), 1, $user->rights->export->creer);
-                //$newmenu->add(constant('BASE_URI') . /* TODO */ "/exports/export&leftmenu=export",$langs->trans("List"),1, $user->rights->export->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=index&leftmenu=export", $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=export&leftmenu=export", $langs->trans("NewExport"), 1, $user->rights->export->creer);
+                //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=export&leftmenu=export",$langs->trans("List"),1, $user->rights->export->lire);
             }
 
             if (!empty($conf->import->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/imports/index&leftmenu=import", $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/imports/import&leftmenu=import", $langs->trans("NewImport"), 1, $user->rights->import->run);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Imports&controller=index&leftmenu=import", $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Imports&controller=import&leftmenu=import", $langs->trans("NewImport"), 1, $user->rights->import->run);
             }
         }
 
@@ -1886,39 +1886,39 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["members", "compta"]);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/card&leftmenu=members&action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=-1", $langs->trans("MenuMembersToValidate"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=1", $langs->trans("MenuMembersValidated"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=1&filter=withoutsubscription", $langs->trans("WithoutSubscription"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=1&filter=uptodate", $langs->trans("UpToDate"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=1&filter=outofdate", $langs->trans("OutOfDate"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=0", $langs->trans("MenuMembersResiliated"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=card&leftmenu=members&action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=-1", $langs->trans("MenuMembersToValidate"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1", $langs->trans("MenuMembersValidated"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=withoutsubscription", $langs->trans("WithoutSubscription"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=uptodate", $langs->trans("UpToDate"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=outofdate", $langs->trans("OutOfDate"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=0", $langs->trans("MenuMembersResiliated"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/cartes/carte&leftmenu=export", $langs->trans("MembersCards"), 1, $user->rights->adherent->export);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=cartes/carte&leftmenu=export", $langs->trans("MembersCards"), 1, $user->rights->adherent->export);
                 if (!empty($conf->global->MEMBER_LINK_TO_HTPASSWDFILE) && ($usemenuhider || empty($leftmenu) || $leftmenu == 'none' || $leftmenu == "members" || $leftmenu == "export")) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/htpasswd&leftmenu=export", $langs->trans("Filehtpasswd"), 1, $user->rights->adherent->export);
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=htpasswd&leftmenu=export", $langs->trans("Filehtpasswd"), 1, $user->rights->adherent->export);
                 }
 
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Categories/index&leftmenu=cat&type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Categories&controller=index&leftmenu=cat&type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/list&leftmenu=members&statut=-1,1&mainmenu=members", $langs->trans("NewSubscription"), 1, $user->rights->adherent->cotisation->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/subscription/list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->cotisation->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=-1,1&mainmenu=members", $langs->trans("NewSubscription"), 1, $user->rights->adherent->cotisation->creer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=subscription/list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->cotisation->lire);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
 
-                //$newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/index&leftmenu=export&mainmenu=members",$langs->trans("Tools"),0,$user->rights->adherent->export, '', $mainmenu, 'export');
-                //if (! empty($conf->export->enabled) && ($usemenuhider || empty($leftmenu) || $leftmenu=="export")) $newmenu->add(constant('BASE_URI') . /* TODO */ "/exports/index&leftmenu=export",$langs->trans("Datas"),1,$user->rights->adherent->export);
+                //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=export&mainmenu=members",$langs->trans("Tools"),0,$user->rights->adherent->export, '', $mainmenu, 'export');
+                //if (! empty($conf->export->enabled) && ($usemenuhider || empty($leftmenu) || $leftmenu=="export")) $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=index&leftmenu=export",$langs->trans("Datas"),1,$user->rights->adherent->export);
 
                 // Type
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/type&leftmenu=setup&mainmenu=members&action=create", $langs->trans("New"), 1, $user->rights->adherent->configurer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "/Modules/Adherents/type&leftmenu=setup&mainmenu=members", $langs->trans("List"), 1, $user->rights->adherent->configurer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members&action=create", $langs->trans("New"), 1, $user->rights->adherent->configurer);
+                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("List"), 1, $user->rights->adherent->configurer);
             }
         }
 
