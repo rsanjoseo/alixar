@@ -1746,35 +1746,35 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Project assigned to user
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=index&leftmenu=projects" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', img_picto('', 'project', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=card&leftmenu=projects&action=create" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titlenew, 1, $user->rights->projet->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=index&leftmenu=projects' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', img_picto('', 'project', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=card&leftmenu=projects&action=create' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titlenew, 1, $user->rights->projet->creer);
 
                 if (empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : '') . '&search_status=99', $langs->trans("List"), 1, $showmode, '', 'project', 'list');
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=list&leftmenu=projets' . ($search_project_user ? '&search_project_user=' . $search_project_user : '') . '&search_status=99', $langs->trans("List"), 1, $showmode, '', 'project', 'list');
                 } elseif (isset($conf->global->PROJECT_USE_OPPORTUNITIES) && $conf->global->PROJECT_USE_OPPORTUNITIES == 1) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=list&leftmenu=projets" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $showmode, '', 'project', 'list');
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=list&leftmenu=projets' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $showmode, '', 'project', 'list');
                     $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99&search_opp_status=openedopp&contextpage=lead', $langs->trans("ListOpenLeads"), 2, $showmode);
                     $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_opp_status=notopenedopp&search_status=99&contextpage=project', $langs->trans("ListOpenProjects"), 2, $showmode);
                 } elseif (isset($conf->global->PROJECT_USE_OPPORTUNITIES) && $conf->global->PROJECT_USE_OPPORTUNITIES == 2) {    // 2 = leads only
                     $newmenu->add('?module=Projects&controller=list&mainmenu=project&leftmenu=list&search_usage_opportunity=1&search_status=99', $langs->trans("List"), 2, $showmode);
                 }
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=stats_index&leftmenu=projects', $langs->trans("Statistics"), 1, $user->rights->projet->lire);
 
                 // Categories
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Categories&controller=index&leftmenu=cat&type=6", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add(constant('BASE_URI') . '?module=Categories&controller=index&leftmenu=cat&type=6', $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
                 if (empty($conf->global->PROJECT_HIDE_TASKS)) {
                     // Project affected to user
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/index&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', img_picto('', 'projecttask', 'class="pictofixedwidth"'));
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks&leftmenu=tasks&action=create", $langs->trans("NewTask"), 1, $user->rights->projet->creer);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks/list&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $user->rights->projet->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=tasks/stats/index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_index&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', img_picto('', 'projecttask', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks&leftmenu=tasks&action=create", $langs->trans("NewTask"), 1, $user->rights->projet->creer);
+                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks_list&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $user->rights->projet->lire);
+                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks_stats_index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1787,9 +1787,9 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->hrm->enabled)) {
                 $langs->load("hrm");
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee", $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'user', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=card&mainmenu=hrm&leftmenu=hrm&action=create&employee=1", $langs->trans("NewEmployee"), 1, $user->rights->user->user->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee&contextpage=employeelist", $langs->trans("List"), 1, $user->rights->user->user->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee', $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'user', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Users&controller=card&mainmenu=hrm&leftmenu=hrm&action=create&employee=1', $langs->trans("NewEmployee"), 1, $user->rights->user->user->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee&contextpage=employeelist', $langs->trans("List"), 1, $user->rights->user->user->lire);
             }
 
             // Leave/Holiday/Vacation module
@@ -1797,45 +1797,45 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["holiday", "trips"]);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm", $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=card&mainmenu=hrm&leftmenu=holiday&action=create", $langs->trans("New"), 1, $user->rights->holiday->write);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm", $langs->trans("List"), 1, $user->rights->holiday->read);
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm', $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=card&mainmenu=hrm&leftmenu=holiday&action=create', $langs->trans("New"), 1, $user->rights->holiday->write);
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm', $langs->trans("List"), 1, $user->rights->holiday->read);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "hrm") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=1&mainmenu=hrm&leftmenu=hrm", $langs->trans("DraftCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=2&mainmenu=hrm&leftmenu=hrm", $langs->trans("ToReviewCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=3&mainmenu=hrm&leftmenu=hrm", $langs->trans("ApprovedCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=4&mainmenu=hrm&leftmenu=hrm", $langs->trans("CancelCP"), 2, $user->rights->holiday->read);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=list&search_status=5&mainmenu=hrm&leftmenu=hrm", $langs->trans("RefuseCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&search_status=1&mainmenu=hrm&leftmenu=hrm', $langs->trans("DraftCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&search_status=2&mainmenu=hrm&leftmenu=hrm', $langs->trans("ToReviewCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&search_status=3&mainmenu=hrm&leftmenu=hrm', $langs->trans("ApprovedCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&search_status=4&mainmenu=hrm&leftmenu=hrm', $langs->trans("CancelCP"), 2, $user->rights->holiday->read);
+                    $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&search_status=5&mainmenu=hrm&leftmenu=hrm', $langs->trans("RefuseCP"), 2, $user->rights->holiday->read);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=define_holiday&mainmenu=hrm&action=request", $langs->trans("MenuConfCP"), 1, $user->rights->holiday->read);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=month_report&mainmenu=hrm&leftmenu=holiday", $langs->trans("MenuReportMonth"), 1, $user->rights->holiday->readall);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Holiday&controller=view_log&mainmenu=hrm&leftmenu=holiday&action=request", $langs->trans("MenuLogCP"), 1, $user->rights->holiday->define_holiday);
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=define_holiday&mainmenu=hrm&action=request', $langs->trans("MenuConfCP"), 1, $user->rights->holiday->read);
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=month_report&mainmenu=hrm&leftmenu=holiday', $langs->trans("MenuReportMonth"), 1, $user->rights->holiday->readall);
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=view_log&mainmenu=hrm&leftmenu=holiday&action=request', $langs->trans("MenuLogCP"), 1, $user->rights->holiday->define_holiday);
             }
 
             // Trips and expenses (old module)
             if (!empty($conf->deplacement->enabled)) {
                 $langs->load("trips");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=deplacement/index&leftmenu=tripsandexpenses&mainmenu=hrm", $langs->trans("TripsAndExpenses"), 0, $user->rights->deplacement->lire, '', $mainmenu, 'tripsandexpenses', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=deplacement/card&action=create&leftmenu=tripsandexpenses&mainmenu=hrm", $langs->trans("New"), 1, $user->rights->deplacement->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=deplacement/list&leftmenu=tripsandexpenses&mainmenu=hrm", $langs->trans("List"), 1, $user->rights->deplacement->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Compta&controller=deplacement/stats/index&leftmenu=tripsandexpenses&mainmenu=hrm", $langs->trans("Statistics"), 1, $user->rights->deplacement->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_index&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->deplacement->lire, '', $mainmenu, 'tripsandexpenses', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_card&action=create&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("New"), 1, $user->rights->deplacement->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_list&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("List"), 1, $user->rights->deplacement->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_stats/index&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("Statistics"), 1, $user->rights->deplacement->lire);
             }
 
             // Expense report
             if (!empty($conf->expensereport->enabled)) {
                 $langs->load("trips");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=card&action=create&leftmenu=expensereport&mainmenu=hrm", $langs->trans("New"), 1, $user->rights->expensereport->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&leftmenu=expensereport&mainmenu=hrm", $langs->trans("List"), 1, $user->rights->expensereport->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=index&leftmenu=expensereport&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=card&action=create&leftmenu=expensereport&mainmenu=hrm', $langs->trans("New"), 1, $user->rights->expensereport->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&leftmenu=expensereport&mainmenu=hrm', $langs->trans("List"), 1, $user->rights->expensereport->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "expensereport") {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=0&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Draft"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=2&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Validated"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=5&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Approved"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=6&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Paid"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=4&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Canceled"), 2, $user->rights->expensereport->lire);
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=list&search_status=99&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Refused"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=0&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Draft"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=2&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Validated"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=5&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Approved"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=6&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Paid"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=4&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Canceled"), 2, $user->rights->expensereport->lire);
+                    $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&search_status=99&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Refused"), 2, $user->rights->expensereport->lire);
                 }
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=ExpenseReports&controller=stats/index&leftmenu=expensereport&mainmenu=hrm", $langs->trans("Statistics"), 1, $user->rights->expensereport->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=stats_index&leftmenu=expensereport&mainmenu=hrm', $langs->trans("Statistics"), 1, $user->rights->expensereport->lire);
             }
 
             if (!empty($conf->projet->enabled)) {
@@ -1844,7 +1844,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
                     $search_project_user = GETPOST('search_project_user', 'int');
 
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_perweek&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1855,26 +1855,26 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
         if ($mainmenu == 'tools') {
             if (empty($user->socid)) { // limit to internal users
                 $langs->load("mails");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Admin&controller=mails_templates&leftmenu=email_templates", $langs->trans("EMailTemplates"), 0, 1, '', $mainmenu, 'email_templates', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Admin&controller=mails_templates&leftmenu=email_templates', $langs->trans("EMailTemplates"), 0, 1, '', $mainmenu, 'email_templates', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
             }
 
             if (!empty($conf->mailing->enabled)) {
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Comm&controller=mailing/index&leftmenu=mailing", $langs->trans("EMailings"), 0, $user->rights->mailing->lire, '', $mainmenu, 'mailing', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Comm&controller=mailing/card&leftmenu=mailing&action=create", $langs->trans("NewMailing"), 1, $user->rights->mailing->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Comm&controller=mailing/list&leftmenu=mailing", $langs->trans("List"), 1, $user->rights->mailing->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_index&leftmenu=mailing', $langs->trans("EMailings"), 0, $user->rights->mailing->lire, '', $mainmenu, 'mailing', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_card&leftmenu=mailing&action=create', $langs->trans("NewMailing"), 1, $user->rights->mailing->creer);
+                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_list&leftmenu=mailing', $langs->trans("List"), 1, $user->rights->mailing->lire);
             }
 
             if (!empty($conf->export->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=index&leftmenu=export", $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=export&leftmenu=export", $langs->trans("NewExport"), 1, $user->rights->export->creer);
-                //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=export&leftmenu=export",$langs->trans("List"),1, $user->rights->export->lire);
+                $newmenu->add(constant('BASE_URI') . '?module=Exports&controller=index&leftmenu=export', $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Exports&controller=export&leftmenu=export', $langs->trans("NewExport"), 1, $user->rights->export->creer);
+                //$newmenu->add(constant('BASE_URI') . "?module=Exports&controller=export&leftmenu=export",$langs->trans("List"),1, $user->rights->export->lire);
             }
 
             if (!empty($conf->import->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Imports&controller=index&leftmenu=import", $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Imports&controller=import&leftmenu=import", $langs->trans("NewImport"), 1, $user->rights->import->run);
+                $newmenu->add(constant('BASE_URI') . '?module=Imports&controller=index&leftmenu=import', $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Imports&controller=import&leftmenu=import', $langs->trans("NewImport"), 1, $user->rights->import->run);
             }
         }
 
@@ -1886,39 +1886,39 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["members", "compta"]);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=card&leftmenu=members&action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=-1", $langs->trans("MenuMembersToValidate"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1", $langs->trans("MenuMembersValidated"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=withoutsubscription", $langs->trans("WithoutSubscription"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=uptodate", $langs->trans("UpToDate"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=outofdate", $langs->trans("OutOfDate"), 3, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=0", $langs->trans("MenuMembersResiliated"), 2, $user->rights->adherent->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=card&leftmenu=members&action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=-1", $langs->trans("MenuMembersToValidate"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=1", $langs->trans("MenuMembersValidated"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=withoutsubscription", $langs->trans("WithoutSubscription"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=uptodate", $langs->trans("UpToDate"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=1&filter=outofdate", $langs->trans("OutOfDate"), 3, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=0", $langs->trans("MenuMembersResiliated"), 2, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=stats_index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=cartes/carte&leftmenu=export", $langs->trans("MembersCards"), 1, $user->rights->adherent->export);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=cartes_carte&leftmenu=export", $langs->trans("MembersCards"), 1, $user->rights->adherent->export);
                 if (!empty($conf->global->MEMBER_LINK_TO_HTPASSWDFILE) && ($usemenuhider || empty($leftmenu) || $leftmenu == 'none' || $leftmenu == "members" || $leftmenu == "export")) {
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=htpasswd&leftmenu=export", $langs->trans("Filehtpasswd"), 1, $user->rights->adherent->export);
+                    $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=htpasswd&leftmenu=export", $langs->trans("Filehtpasswd"), 1, $user->rights->adherent->export);
                 }
 
                 if (!empty($conf->categorie->enabled)) {
                     $langs->load("categories");
-                    $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Categories&controller=index&leftmenu=cat&type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
+                    $newmenu->add(constant('BASE_URI') . "?module=Categories&controller=index&leftmenu=cat&type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=list&leftmenu=members&statut=-1,1&mainmenu=members", $langs->trans("NewSubscription"), 1, $user->rights->adherent->cotisation->creer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=subscription/list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->cotisation->lire);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=stats/index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=-1,1&mainmenu=members", $langs->trans("NewSubscription"), 1, $user->rights->adherent->cotisation->creer);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=subscription_list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->cotisation->lire);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=stats_index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
 
-                //$newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=index&leftmenu=export&mainmenu=members",$langs->trans("Tools"),0,$user->rights->adherent->export, '', $mainmenu, 'export');
+                //$newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=export&mainmenu=members",$langs->trans("Tools"),0,$user->rights->adherent->export, '', $mainmenu, 'export');
                 //if (! empty($conf->export->enabled) && ($usemenuhider || empty($leftmenu) || $leftmenu=="export")) $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=index&leftmenu=export",$langs->trans("Datas"),1,$user->rights->adherent->export);
 
                 // Type
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members&action=create", $langs->trans("New"), 1, $user->rights->adherent->configurer);
-                $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("List"), 1, $user->rights->adherent->configurer);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members&action=create", $langs->trans("New"), 1, $user->rights->adherent->configurer);
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("List"), 1, $user->rights->adherent->configurer);
             }
         }
 
