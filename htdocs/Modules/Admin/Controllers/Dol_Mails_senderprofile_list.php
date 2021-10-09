@@ -16,13 +16,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
 /**
  *    \file       htdocs/admin/mails_senderprofile_list.php
  *        \ingroup    core
  *        \brief      Page to adminsiter email sender profiles
  */
 
-require '../main.inc.php';
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+
+require 'main.php';
+
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formcompany.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';

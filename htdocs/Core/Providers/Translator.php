@@ -10,6 +10,7 @@ use Alxarafe\Core\Base\Provider;
 use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
+use NumberFormatter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
 use Symfony\Component\Translation\Translator as SymfonyTranslator;
@@ -335,9 +336,15 @@ class Translator extends Provider
         return self::trans($txt, $parameters);
     }
 
-    public function getCurrencySymbol($currency_code, $forceloadall = 0)
+    public function getCurrencyAmount($currency_code, $amount = 0)
     {
-        return '€'; // TODO Cambiar por el símbolo que correspoda según la configuración
+        $obj = new NumberFormatter(null, NumberFormatter::CURRENCY);
+        return $obj->formatCurrency($amount, $currency_code);
+    }
+
+    public function getCurrencySymbol($currency_code)
+    {
+        return trim($this->getCurrencyAmount($currency_code), '0,.');
     }
 
     public function convToOutputCharset($str, $pagecodefrom = 'UTF-8')

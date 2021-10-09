@@ -15,12 +15,22 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>.
 */
 
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
 /**
  *     \file       htdocs/admin/system/xdebug.php
  *     \brief      Page administration XDebug
  */
 
-require '../../main.inc.php';
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
 
 $langs->load("admin");
 
