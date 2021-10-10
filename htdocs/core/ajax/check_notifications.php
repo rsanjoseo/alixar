@@ -57,7 +57,17 @@ if (!defined('NOREQUIRETRAN')) {
 //if (! defined("NOREDIRECTBYMAINTOLOGIN"))  define('NOREDIRECTBYMAINTOLOGIN', '1');		// The main.inc.php does not make a redirect if not logged, instead show simple error message
 //if (! defined("XFRAMEOPTIONS_ALLOWALL"))   define('XFRAMEOPTIONS_ALLOWALL', '1');			// Do not add the HTTP header 'X-Frame-Options: SAMEORIGIN' but 'X-Frame-Options: ALLOWALL'
 
-require '../../main.inc.php';
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
 
 //$time = (int) GETPOST('time', 'int'); // Use the time parameter that is always increased by time_update, even if call is late
 $time = dol_now();

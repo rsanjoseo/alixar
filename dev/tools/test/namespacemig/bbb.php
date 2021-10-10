@@ -3,13 +3,20 @@
 //use \Aaa as Aaa;
 
 use Dolibarr\Aaa as Aaa;
-use function Dolibarr\faaa as faaa;	// Need php 5.6+
+use function Dolibarr\faaa as faaa;
+
+// Need php 5.6+
+
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
 
 //use const Dolibarr\AAA;
 
 //use Bbb as Bbb;
 
-require './main.inc.php';
+require 'main.php';
+
 require './aaa.class.php';
 require './bbb.class.php';
 

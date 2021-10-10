@@ -25,7 +25,18 @@
  *      \brief      Page of user groups
  */
 
-require '../../main.inc.php';
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
+
 require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/usergroup.class.php';
 
 // Load translation files required by page

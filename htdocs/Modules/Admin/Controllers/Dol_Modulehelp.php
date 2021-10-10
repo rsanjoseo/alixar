@@ -28,7 +28,18 @@ if (!defined('NOTOKENRENEWAL')) {
     define('NOTOKENRENEWAL', '1'); // Disabled because this page is into a popup on module search page and we want to avoid to have an Anti CSRF token error (done if MAIN_SECURITY_CSRF_WITH_TOKEN is on) when we make a second search after closing popup.
 }
 
-require '../main.inc.php';
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
+
 require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';

@@ -52,7 +52,7 @@ if (!defined('EVEN_IF_ONLY_LOGIN_ALLOWED')) {
 }
 */
 
-//require_once '../main.inc.php';
+//require_once  '../main.inc.php';
 
 // This can happen only with a bookmark or forged url call.
 if (!empty($_SESSION["dol_authmode"]) && ($_SESSION["dol_authmode"] == 'forceuser' || $_SESSION["dol_authmode"] == 'http')) {

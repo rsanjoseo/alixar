@@ -42,25 +42,35 @@ if (! defined('NOREQUIREMENU')) {
 if (! defined('NOREQUIREHTML')) {
 	define('NOREQUIREHTML', '1'); // If we don't need to load the html.form.class.php
 }
-if (! defined('NOREQUIREAJAX')) {
-	define('NOREQUIREAJAX', '1');
+if (!defined('NOREQUIREAJAX')) {
+    define('NOREQUIREAJAX', '1');
 }
-if (! defined("NOLOGIN")) {
-	define("NOLOGIN", '1');       // If this page is public (can be called outside logged session)
+if (!defined("NOLOGIN")) {
+    define("NOLOGIN", '1');       // If this page is public (can be called outside logged session)
 }
-if (! defined("NOSESSION")) {
-	define("NOSESSION", '1');
+if (!defined("NOSESSION")) {
+    define("NOSESSION", '1');
 }
 
-require_once dirname(__FILE__).'/../../htdocs/main.inc.php';
-require_once dirname(__FILE__).'/../../htdocs/core/lib/security.lib.php';
-require_once dirname(__FILE__).'/../../htdocs/core/lib/security2.lib.php';
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
 
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
+
+require_once dirname(__FILE__) . '/../../htdocs/core/lib/security.lib.php';
+require_once dirname(__FILE__) . '/../../htdocs/core/lib/security2.lib.php';
 
 if (empty($user->id)) {
-	print "Load permissions for admin user nb 1\n";
-	$user->fetch(1);
-	$user->getrights();
+    print "Load permissions for admin user nb 1\n";
+    $user->fetch(1);
+    $user->getrights();
 }
 $conf->global->MAIN_DISABLE_ALL_MAILS=1;
 

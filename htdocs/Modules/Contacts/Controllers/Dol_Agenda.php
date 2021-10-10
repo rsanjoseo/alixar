@@ -29,7 +29,18 @@
  *       \brief      Card of a contact
  */
 
-require '../main.inc.php';
+// Descend to the htdocs folder
+chdir('../../..');
+define('BASE_FOLDER', getcwd());
+
+const MAIN_HIDE_TOP_MENU = 0;
+const MAIN_HIDE_LEFT_MENU = 0;
+const NOREQUIREHTML = 0;
+const NOREQUIREDB = 0;      // Si aparece el mensaje: "Call to member function useLocalTax() on null"
+const NOREQUIRESOC = 0;     // Es que no se ha asignado a $mysoc el valor correspondiente.
+
+require 'main.php';
+
 require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/action/class/actioncomm.class.php';
 require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
 require_once DOL_DOCUMENT_ROOT . '/core/lib/contact.lib.php';
