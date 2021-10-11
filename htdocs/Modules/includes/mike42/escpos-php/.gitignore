@@ -1,0 +1,14 @@
+# Eclipse files
+.settings/*
+.project
+.buildpath
+
+# doxygen files
+doc
+
+# composer files
+vendor/
+
+# other build files
+build/*
+*.phar

@@ -1,0 +1,19 @@
+# Dolibarr language file - en_US - hrm
+# Admin
+HRM_EMAIL_EXTERNAL_SERVICE=İKY dış hizmetine engel olmak için e-posta
+Establishments=Kuruluşlar
+Establishment=Kuruluş
+NewEstablishment=Yeni kuruluş
+DeleteEstablishment=Kuruluş sil
+ConfirmDeleteEstablishment=Bu kuruluşu silmek istediğinizden emin misiniz?
+OpenEtablishment=Kuruluş aç
+CloseEtablishment=Kuruluş kapat
+# Dictionary
+DictionaryPublicHolidays=Leave - Public holidays
+DictionaryDepartment=İKY - Departman listesi
+DictionaryFunction=HRM - Job positions
+# Module
+Employees=Çalışanlar
+Employee=Çalışan
+NewEmployee=Yeni çalışan
+ListOfEmployees=Çalışanlar listesi
