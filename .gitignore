@@ -47,6 +47,8 @@ package-lock.json
 doc/install.lock
 
 # Fully or partially migrated code
+htdocs/Modules/debugbar/*
+htdocs/Modules/includes/*
 htdocs/install/
 htdocs/install_old/
 htdocs/core/db/
