@@ -63,7 +63,7 @@ abstract class View extends Globals
     public array $submenu;
 
     public bool $hasMenu = false;
-
+    public BasicController $controller;
     /**
      * Array that contains the variables that will be passed to the template.
      * Among others it will contain the user name, the view and the controller.
@@ -83,6 +83,8 @@ abstract class View extends Globals
     public function __construct(BasicController $controller)
     {
         parent::__construct();
+
+        $this->controller = $controller;
 
         $title = ClassUtils::getShortName($controller, $controller);
         $this->title = $this->trans(strtolower($title)) . ' - ' . self::APP_NAME . ' ' . self::APP_VERSION;
@@ -530,6 +532,9 @@ abstract class View extends Globals
      */
     public function __destruct()
     {
+        if (!isset($this->render)) {
+            return;
+        }
         if (!$this->render->hasTemplate()) {
             $this->render->setTemplate('default');
         }

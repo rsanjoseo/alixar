@@ -15,6 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\HookManager;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
 /**
  *      \file       htdocs/core/ajax/selectsearchbox.php
  *      \ingroup    core
@@ -52,12 +55,15 @@ if (!isset($usedbyinclude) || empty($usedbyinclude)) {
     }
 }
 
-include_once DOL_DOCUMENT_ROOT . '/core/lib/json.lib.php';
+//include_once DOL_DOCUMENT_ROOT . '/core/lib/json.lib.php';
 
 //global $hookmanager;
+
+$hookmanager = new HookManager();
+
 $hookmanager->initHooks(['searchform']);
 
-$search_boxvalue = GETPOST('q', 'restricthtml');
+$search_boxvalue = DolibarrFunctions::GETPOST('q', 'restricthtml');
 
 $arrayresult = [];
 
@@ -190,7 +196,7 @@ if (!empty($conf->global->DEFAULT_SEARCH_INTO_MODULE)) {
 }
 
 // Sort on position
-$arrayresult = dol_sort_array($arrayresult, 'position');
+$arrayresult = DolibarrFunctions::dol_sort_array($arrayresult, 'position');
 
 // Print output if called by ajax or do nothing (var $arrayresult will be used) if called by an include
 if (!isset($usedbyinclude) || empty($usedbyinclude)) {

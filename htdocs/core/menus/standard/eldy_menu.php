@@ -21,6 +21,8 @@
  *    \brief      Menu eldy manager
  */
 
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
 /**
  *    Class to manage menu Eldy
  */
@@ -65,17 +67,17 @@ class MenuManager
         global $conf, $user, $langs;
 
         // We save into session the main menu selected
-        if (GETPOSTISSET("mainmenu")) {
-            $_SESSION["mainmenu"] = GETPOST("mainmenu", 'aZ09');
+        if (DolibarrFunctions::GETPOSTISSET("mainmenu")) {
+            $_SESSION["mainmenu"] = DolibarrFunctions::GETPOST("mainmenu", 'aZ09');
         }
-        if (GETPOSTISSET("idmenu")) {
-            $_SESSION["idmenu"] = GETPOST("idmenu", 'int');
+        if (DolibarrFunctions::GETPOSTISSET("idmenu")) {
+            $_SESSION["idmenu"] = DolibarrFunctions::GETPOST("idmenu", 'int');
         }
 
         // Read now mainmenu and leftmenu that define which menu to show
-        if (GETPOSTISSET("mainmenu")) {
+        if (DolibarrFunctions::GETPOSTISSET("mainmenu")) {
             // On sauve en session le menu principal choisi
-            $mainmenu = GETPOST("mainmenu", 'aZ09');
+            $mainmenu = DolibarrFunctions::GETPOST("mainmenu", 'aZ09');
             $_SESSION["mainmenu"] = $mainmenu;
             $_SESSION["leftmenuopened"] = "";
         } else {
@@ -86,9 +88,9 @@ class MenuManager
             $mainmenu = $forcemainmenu;
         }
 
-        if (GETPOSTISSET("leftmenu")) {
+        if (DolibarrFunctions::GETPOSTISSET("leftmenu")) {
             // On sauve en session le menu principal choisi
-            $leftmenu = GETPOST("leftmenu", 'aZ09');
+            $leftmenu = DolibarrFunctions::GETPOST("leftmenu", 'aZ09');
             $_SESSION["leftmenu"] = $leftmenu;
 
             if ($_SESSION["leftmenuopened"] == $leftmenu) {    // To collapse

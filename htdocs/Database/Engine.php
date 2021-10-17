@@ -8,6 +8,8 @@ namespace Alxarafe\Database;
 
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Core\Singletons\DebugTool;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use DebugBar\DataCollector\PDO\PDOCollector;
 use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DebugBarException;
@@ -340,13 +342,13 @@ abstract class Engine
      */
     public function query($query, $usesavepoint = 0, $type = 'auto', $result_mode = 0)
     {
-        global $conf, $dolibarr_main_db_readonly;
+        //global $conf, $dolibarr_main_db_readonly;
 
         $query = trim($query);
 
         if (!in_array($query, ['BEGIN', 'COMMIT', 'ROLLBACK'])) {
             $SYSLOG_SQL_LIMIT = 10000; // limit log to 10kb per line to limit DOS attacks
-            dol_syslog('sql=' . substr($query, 0, $SYSLOG_SQL_LIMIT), LOG_DEBUG);
+            DolibarrFunctions::dol_syslog('sql=' . substr($query, 0, $SYSLOG_SQL_LIMIT), LOG_DEBUG);
         }
         if (empty($query)) {
             return false; // Return false = error if empty request
@@ -379,9 +381,9 @@ abstract class Engine
                 $this->lasterrno = $this->errno();
 
                 if ($conf->global->SYSLOG_LEVEL < LOG_DEBUG) {
-                    dol_syslog(get_class($this) . "::query SQL Error query: " . $query, LOG_ERR); // Log of request was not yet done previously
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::query SQL Error query: " . $query, LOG_ERR); // Log of request was not yet done previously
                 }
-                dol_syslog(get_class($this) . "::query SQL Error message: " . $this->lasterrno . " " . $this->lasterror, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::query SQL Error message: " . $this->lasterrno . " " . $this->lasterror, LOG_ERR);
                 //var_dump(debug_print_backtrace());
             }
             $this->lastquery = $query;
@@ -497,7 +499,7 @@ abstract class Engine
         }
         $string = preg_replace('/([^0-9])/i', '', $string);
         $tmp = $string . '000000';
-        $date = dol_mktime((int) substr($tmp, 8, 2), (int) substr($tmp, 10, 2), (int) substr($tmp, 12, 2), (int) substr($tmp, 4, 2), (int) substr($tmp, 6, 2), (int) substr($tmp, 0, 4), $gm);
+        $date = DolibarrFunctions::dol_mktime((int) substr($tmp, 8, 2), (int) substr($tmp, 10, 2), (int) substr($tmp, 12, 2), (int) substr($tmp, 4, 2), (int) substr($tmp, 6, 2), (int) substr($tmp, 0, 4), $gm);
         return $date;
     }
 

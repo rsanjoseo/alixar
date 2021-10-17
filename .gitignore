@@ -53,7 +53,7 @@ htdocs/install/
 htdocs/install_old/
 htdocs/core/db/
 htdocs/core/db_old/
-htdocs/core/class/translate.class*.php
+htdocs/core/class/
 htdocs/langs
 htdocs/main.inc.php
 htdocs/master.inc.php
