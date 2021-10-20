@@ -22,6 +22,7 @@
  */
 
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Dolibarr\Classes\MenuBase;
 
 /**
  *    Class to manage menu Eldy
@@ -107,9 +108,9 @@ class MenuManager
             $leftmenu = $forceleftmenu;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/core/class/menubase.class.php';
+        //        require_once DOL_DOCUMENT_ROOT . '/core/class/menubase.class.php';
         $tabMenu = [];
-        $menuArbo = new Menubase($this->db, 'eldy');
+        $menuArbo = new MenuBase($this->db, 'eldy');
         $menuArbo->menuLoad($mainmenu, $leftmenu, $this->type_user, 'eldy', $tabMenu);
         $this->tabMenu = $tabMenu;
         //var_dump($tabMenu);

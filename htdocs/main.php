@@ -30,6 +30,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Core\Providers\DebugTool;
+
 require_once('load.php');
 
 // Functions
@@ -234,7 +236,7 @@ function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arr
         // Mobile appli like icon
         $manifest = DOL_URL_ROOT . '/theme/' . $conf->theme . '/manifest.json.php';
         if (!empty($manifest)) {
-            print '<link rel="manifest" href="' . $manifest . '" />' . "\n";
+            print '<link rel="manifest" href="/' . $manifest . '" />' . "\n";
         }
 
         if (!empty($conf->global->THEME_ELDY_TOPMENU_BACK1)) {
@@ -2409,8 +2411,8 @@ if (!empty($conf->debugbar->enabled) && !GETPOST('dol_use_jmobile') && empty($_S
 
     $debugbar['time']->startMeasure('pageaftermaster', 'Page generation (after environment init)');
 }
-*/
 $debugbar->debugBar['time']->startMeasure('pageaftermaster', 'Page generation (after environment init)');
+*/
 
 // Detection browser
 if (isset($_SERVER["HTTP_USER_AGENT"])) {
@@ -2566,7 +2568,6 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
                 $langs->loadLangs(["errors", "install"]);
                 print $langs->trans("ErrorFileSizeTooLarge") . ' ';
                 print $langs->trans("ErrorGoBackAndCorrectParameters");
-                die;
             } else {
                 if (defined('CSRFCHECK_WITH_TOKEN')) {
                     dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (CSRFCHECK_WITH_TOKEN protection) in main.inc.php. Token not provided.", LOG_WARNING);
@@ -2576,8 +2577,8 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
                     print "Access to this page this way (POST method or GET with a sensible value for 'action' parameter) is refused by CSRF protection in main.inc.php. Token not provided.\n";
                     print "If you access your server behind a proxy using url rewriting and the parameter is provided by caller, you might check that all HTTP header are propagated (or add the line \$dolibarr_nocsrfcheck=1 into your conf.php file or MAIN_SECURITY_CSRF_WITH_TOKEN to 0 into setup).\n";
                 }
-                die;
             }
+            die;
         }
     }
 

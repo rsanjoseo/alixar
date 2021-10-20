@@ -54,11 +54,11 @@ class DolibarrFilefunc
     public function defineConsts(): bool
     {
         if (!defined('DOL_APPLICATION_TITLE')) {
-            define('DOL_APPLICATION_TITLE', 'Alixar');
+            define('DOL_APPLICATION_TITLE', 'Dolibarr');
         }
 
         if (!defined('DOL_VERSION')) {
-            define('DOL_VERSION', '0.0.0-beta'); // a.b.c-alpha, a.b.c-beta, a.b.c-rcX or a.b.c
+            define('DOL_VERSION', '15.0.0-alpha'); // a.b.c-alpha, a.b.c-beta, a.b.c-rcX or a.b.c
         }
 
         if (!defined('EURO')) {
@@ -91,7 +91,7 @@ class DolibarrFilefunc
 
         // Define localization of conf file
         // --- Start of part replaced by Dolibarr packager makepack-dolibarr
-        $conffile = "conf/conf.php";
+        $conffile = BASE_FOLDER . "/conf/conf.php";
         $conffiletoshow = "htdocs/conf/conf.php";
 
         // For debian/redhat like systems
@@ -102,7 +102,7 @@ class DolibarrFilefunc
         // --- End of part replaced by Dolibarr packager makepack-dolibarr
 
         // Include configuration
-        $result = @include_once $conffile; // Keep @ because with some error reporting this break the redirect done when file not found
+        $result = @include $conffile; // Keep @ because with some error reporting this break the redirect done when file not found
 
         if (!$result && !empty($_SERVER["GATEWAY_INTERFACE"])) {    // If install not done and we are in a web session
             if (!empty($_SERVER["CONTEXT_PREFIX"])) {    // CONTEXT_PREFIX and CONTEXT_DOCUMENT_ROOT are not defined on all apache versions

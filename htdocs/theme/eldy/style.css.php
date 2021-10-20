@@ -20,6 +20,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Descend to the htdocs folder
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;chdir('../..');
+define('BASE_FOLDER', getcwd());
+
 /**
  *		\file       htdocs/theme/eldy/style.css.php
  *		\brief      File for CSS style sheet Eldy
@@ -50,17 +54,17 @@ if (!defined('NOREQUIREAJAX')) {
 
 define('ISLOADEDBYSTEELSHEET', '1');
 
+require 'main.php';
 
 require __DIR__.'/theme_vars.inc.php';
 if (defined('THEME_ONLY_CONSTANT')) {
 	return;
 }
 
-
 session_cache_limiter('public');
 
-require_once __DIR__.'/../../main.php'; // __DIR__ allow this script to be included in custom themes
-require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+// require_once __DIR__.'/../../main.php'; // __DIR__ allow this script to be included in custom themes
+// require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 // Load user to have $user->conf loaded (not done into main because of NOLOGIN constant defined)
 // and permission, so we can later calculate number of top menu ($nbtopmenuentries) according to user profile.
@@ -188,7 +192,7 @@ if (!empty($user->conf->THEME_ELDY_ENABLE_PERSONALIZED)) {
 
 
 // Set text color to black or white
-$colorbackhmenu1 = join(',', colorStringToArray($colorbackhmenu1)); // Normalize value to 'x,y,z'
+$colorbackhmenu1 = join(',', DolibarrFunctions2::colorStringToArray($colorbackhmenu1)); // Normalize value to 'x,y,z'
 $tmppart = explode(',', $colorbackhmenu1);
 $tmpval = (!empty($tmppart[0]) ? $tmppart[0] : 0) + (!empty($tmppart[1]) ? $tmppart[1] : 0) + (!empty($tmppart[2]) ? $tmppart[2] : 0);
 if ($tmpval <= 460) {
@@ -197,7 +201,7 @@ if ($tmpval <= 460) {
 	$colortextbackhmenu = '000000';
 }
 
-$colorbackvmenu1 = join(',', colorStringToArray($colorbackvmenu1)); // Normalize value to 'x,y,z'
+$colorbackvmenu1 = join(',', DolibarrFunctions2::colorStringToArray($colorbackvmenu1)); // Normalize value to 'x,y,z'
 $tmppart = explode(',', $colorbackvmenu1);
 $tmpval = (!empty($tmppart[0]) ? $tmppart[0] : 0) + (!empty($tmppart[1]) ? $tmppart[1] : 0) + (!empty($tmppart[2]) ? $tmppart[2] : 0);
 if ($tmpval <= 460) {
@@ -206,7 +210,7 @@ if ($tmpval <= 460) {
 	$colortextbackvmenu = '000000';
 }
 
-$colorbacktitle1 = join(',', colorStringToArray($colorbacktitle1)); // Normalize value to 'x,y,z'
+$colorbacktitle1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacktitle1)); // Normalize value to 'x,y,z'
 $tmppart = explode(',', $colorbacktitle1);
 if ($colortexttitle == '') {
 	$tmpval = (!empty($tmppart[0]) ? $tmppart[0] : 0) + (!empty($tmppart[1]) ? $tmppart[1] : 0) + (!empty($tmppart[2]) ? $tmppart[2] : 0);
@@ -219,7 +223,7 @@ if ($colortexttitle == '') {
 	$colorshadowtitle = '888888';
 }
 
-$colorbacktabcard1 = join(',', colorStringToArray($colorbacktabcard1)); // Normalize value to 'x,y,z'
+$colorbacktabcard1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacktabcard1)); // Normalize value to 'x,y,z'
 $tmppart = explode(',', $colorbacktabcard1);
 $tmpval = (!empty($tmppart[0]) ? $tmppart[0] : 0) + (!empty($tmppart[1]) ? $tmppart[1] : 0) + (!empty($tmppart[2]) ? $tmppart[2] : 0);
 if ($tmpval <= 460) {
@@ -230,26 +234,26 @@ if ($tmpval <= 460) {
 
 
 // Format color value to match expected format (may be 'FFFFFF' or '255,255,255')
-$colorbackhmenu1 = join(',', colorStringToArray($colorbackhmenu1));
-$colorbackvmenu1 = join(',', colorStringToArray($colorbackvmenu1));
-$colorbacktitle1 = join(',', colorStringToArray($colorbacktitle1));
-$colorbacktabcard1 = join(',', colorStringToArray($colorbacktabcard1));
-$colorbacktabactive = join(',', colorStringToArray($colorbacktabactive));
-$colorbacklineimpair1 = join(',', colorStringToArray($colorbacklineimpair1));
-$colorbacklineimpair2 = join(',', colorStringToArray($colorbacklineimpair2));
-$colorbacklinepair1 = join(',', colorStringToArray($colorbacklinepair1));
-$colorbacklinepair2 = join(',', colorStringToArray($colorbacklinepair2));
+$colorbackhmenu1 = join(',', DolibarrFunctions2::colorStringToArray($colorbackhmenu1));
+$colorbackvmenu1 = join(',', DolibarrFunctions2::colorStringToArray($colorbackvmenu1));
+$colorbacktitle1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacktitle1));
+$colorbacktabcard1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacktabcard1));
+$colorbacktabactive = join(',', DolibarrFunctions2::colorStringToArray($colorbacktabactive));
+$colorbacklineimpair1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacklineimpair1));
+$colorbacklineimpair2 = join(',', DolibarrFunctions2::colorStringToArray($colorbacklineimpair2));
+$colorbacklinepair1 = join(',', DolibarrFunctions2::colorStringToArray($colorbacklinepair1));
+$colorbacklinepair2 = join(',', DolibarrFunctions2::colorStringToArray($colorbacklinepair2));
 if ($colorbacklinepairhover != '') {
-	$colorbacklinepairhover = join(',', colorStringToArray($colorbacklinepairhover));
+	$colorbacklinepairhover = join(',', DolibarrFunctions2::colorStringToArray($colorbacklinepairhover));
 }
 if ($colorbacklinepairchecked != '') {
-	$colorbacklinepairchecked = join(',', colorStringToArray($colorbacklinepairchecked));
+	$colorbacklinepairchecked = join(',', DolibarrFunctions2::colorStringToArray($colorbacklinepairchecked));
 }
-$colorbackbody = join(',', colorStringToArray($colorbackbody));
-$colortexttitlenotab = join(',', colorStringToArray($colortexttitlenotab));
-$colortexttitle = join(',', colorStringToArray($colortexttitle));
-$colortext = join(',', colorStringToArray($colortext));
-$colortextlink = join(',', colorStringToArray($colortextlink));
+$colorbackbody = join(',', DolibarrFunctions2::colorStringToArray($colorbackbody));
+$colortexttitlenotab = join(',', DolibarrFunctions2::colorStringToArray($colortexttitlenotab));
+$colortexttitle = join(',', DolibarrFunctions2::colorStringToArray($colortexttitle));
+$colortext = join(',', DolibarrFunctions2::colorStringToArray($colortext));
+$colortextlink = join(',', DolibarrFunctions2::colorStringToArray($colortextlink));
 
 $nbtopmenuentries = $menumanager->showmenu('topnb');
 

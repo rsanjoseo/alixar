@@ -30,7 +30,11 @@ class DefaultValuesView extends DolibarrView
 {
     function printPage(): string
     {
+
         $this->llxHeader('', $this->langs->trans("Setup"), $wikihelp);
+
+        echo 'DefaultValuesView::printPage()';
+
         /*
         $form = new Form($db);
         $formadmin = new FormAdmin($db);

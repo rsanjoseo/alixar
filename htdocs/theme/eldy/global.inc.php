@@ -1,14 +1,19 @@
-<?php if (!defined('ISLOADEDBYSTEELSHEET')) {
-	die('Must be call by steelsheet');
+<?php use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
+
+if (!defined('ISLOADEDBYSTEELSHEET')) {
+    die('Must be call by steelsheet');
 } ?>
-/* <style type="text/css" > */
+/*
+<style type="text/css"> *
 
-/* ============================================================================== */
-/* Default styles                                                                 */
-/* ============================================================================== */
+    /
 
-:root {
-	--colorbackhmenu1: rgb(<?php print $colorbackhmenu1; ?>);
+    /* ============================================================================== */
+    /* Default styles                                                                 */
+    /* ============================================================================== */
+
+    :root {
+        --colorbackhmenu1: rgb(<?php print $colorbackhmenu1; ?>);
 	--colorbackvmenu1: rgb(<?php print $colorbackvmenu1; ?>);
 	--colorbacktitle1: rgb(<?php print $colorbacktitle1; ?>);
 	--colorbacktabcard1: rgb(<?php print $colorbacktabcard1; ?>);
@@ -2242,10 +2247,10 @@ img.photorefnoborder {
 div#id-top {
 <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?>
 	display:none;
-<?php } else { ?>
-	background: var(--colorbackhmenu1);
-	/* background-image: linear-gradient(-45deg, <?php echo colorAdjustBrightness(colorArrayToHex(colorStringToArray($colorbackhmenu1)), '5'); ?>, var(--colorbackhmenu1)); */
-	/* box-shadow: 0px 0px 5px #eee; */
+<?php } else { ?> background: var(--colorbackhmenu1);
+    /* background-image: linear-gradient(-45deg,
+<?php echo DolibarrFunctions2::colorAdjustBrightness(DolibarrFunctions2::colorArrayToHex(DolibarrFunctions2::colorStringToArray($colorbackhmenu1)), '5'); ?> , var(--colorbackhmenu1)); */
+    /* box-shadow: 0px 0px 5px #eee; */
 <?php } ?>
 }
 

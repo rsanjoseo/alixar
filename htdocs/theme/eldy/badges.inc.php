@@ -1,13 +1,16 @@
 <?php
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
+
 if (!defined('ISLOADEDBYSTEELSHEET')) {
-	die('Must be call by steelsheet');
+    die('Must be call by steelsheet');
 }
 ?>
-/* Badge style is based on boostrap framework */
+    /* Badge style is based on boostrap framework */
 
-.badge {
-	display: inline-block;
-	padding: .1em .35em;
+    .badge {
+    display: inline-block;
+    padding: .1em .35em;
 	font-size: 80%;
 	font-weight: 700 !important;
 	line-height: 1;
@@ -66,140 +69,140 @@ span.badgeneutral {
 	background-color: #e4e4e4;
 	color: #666;
 	border-radius: 10px;
-}
+    }
 
 
-/* PRIMARY */
-.badge-primary{
-	color: #fff !important;
-	background-color: <?php print $badgePrimary; ?>;
-}
-a.badge-primary.focus, a.badge-primary:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgePrimary, 0.5); ?>;
-}
-a.badge-primary:focus, a.badge-primary:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgePrimary, 10); ?>;
-}
+    /* PRIMARY */
+    .badge-primary{
+    color: #fff !important;
+    background-color: <?php print $badgePrimary; ?>;
+    }
+    a.badge-primary.focus, a.badge-primary:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgePrimary, 0.5); ?>;
+    }
+    a.badge-primary:focus, a.badge-primary:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgePrimary, 10); ?>;
+    }
 
-/* SECONDARY */
-.badge-secondary, .tabs .badge {
-	color: #fff !important;
-	background-color: <?php print $badgeSecondary; ?>;
-}
-a.badge-secondary.focus, a.badge-secondary:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeSecondary, 0.5); ?>;
-}
-a.badge-secondary:focus, a.badge-secondary:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgeSecondary, 10); ?>;
-}
+    /* SECONDARY */
+    .badge-secondary, .tabs .badge {
+    color: #fff !important;
+    background-color: <?php print $badgeSecondary; ?>;
+    }
+    a.badge-secondary.focus, a.badge-secondary:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeSecondary, 0.5); ?>;
+    }
+    a.badge-secondary:focus, a.badge-secondary:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeSecondary, 10); ?>;
+    }
 
-/* SUCCESS */
-.badge-success {
-	color: #fff !important;
-	background-color: <?php print $badgeSuccess; ?>;
-}
-a.badge-success.focus, a.badge-success:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeSuccess, 0.5); ?>;
-}
-a.badge-success:focus, a.badge-success:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgeSuccess, 10); ?>;
-}
+    /* SUCCESS */
+    .badge-success {
+    color: #fff !important;
+    background-color: <?php print $badgeSuccess; ?>;
+    }
+    a.badge-success.focus, a.badge-success:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeSuccess, 0.5); ?>;
+    }
+    a.badge-success:focus, a.badge-success:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeSuccess, 10); ?>;
+    }
 
-/* DANGER */
-.badge-danger {
-	color: #fff !important;
-	background-color: <?php print $badgeDanger; ?>;
-}
-a.badge-danger.focus, a.badge-danger:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeDanger, 0.5); ?>;
-}
-a.badge-danger:focus, a.badge-danger:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgeDanger, 10); ?>;
-}
+    /* DANGER */
+    .badge-danger {
+    color: #fff !important;
+    background-color: <?php print $badgeDanger; ?>;
+    }
+    a.badge-danger.focus, a.badge-danger:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeDanger, 0.5); ?>;
+    }
+    a.badge-danger:focus, a.badge-danger:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeDanger, 10); ?>;
+    }
 
-/* WARNING */
-.badge-warning {
-	color: #fff !important;
-	background-color: <?php print $badgeWarning; ?>;
-}
-a.badge-warning.focus, a.badge-warning:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeWarning, 0.5); ?>;
-}
-a.badge-warning:focus, a.badge-warning:hover {
-	color: #212529 !important;
-	background-color: <?php print colorDarker($badgeWarning, 10); ?>;
-}
+    /* WARNING */
+    .badge-warning {
+    color: #fff !important;
+    background-color: <?php print $badgeWarning; ?>;
+    }
+    a.badge-warning.focus, a.badge-warning:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeWarning, 0.5); ?>;
+    }
+    a.badge-warning:focus, a.badge-warning:hover {
+    color: #212529 !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeWarning, 10); ?>;
+    }
 
-/* WARNING colorblind */
-body[class*="colorblind-"] .badge-warning {
-	  background-color: <?php print $colorblind_deuteranopes_badgeWarning; ?>;
-  }
-body[class*="colorblind-"] a.badge-warning.focus,body[class^="colorblind-"] a.badge-warning:focus {
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($colorblind_deuteranopes_badgeWarning, 0.5); ?>;
-}
-body[class*="colorblind-"] a.badge-warning:focus, a.badge-warning:hover {
-	background-color: <?php print colorDarker($colorblind_deuteranopes_badgeWarning, 10); ?>;
-}
+    /* WARNING colorblind */
+    body[class*="colorblind-"] .badge-warning {
+    background-color: <?php print $colorblind_deuteranopes_badgeWarning; ?>;
+    }
+    body[class*="colorblind-"] a.badge-warning.focus,body[class^="colorblind-"] a.badge-warning:focus {
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($colorblind_deuteranopes_badgeWarning, 0.5); ?>;
+    }
+    body[class*="colorblind-"] a.badge-warning:focus, a.badge-warning:hover {
+    background-color: <?php print DolibarrFunctions2::colorDarker($colorblind_deuteranopes_badgeWarning, 10); ?>;
+    }
 
-/* INFO */
-.badge-info {
-	color: #fff !important;
-	background-color: <?php print $badgeInfo; ?>;
-}
-a.badge-info.focus, a.badge-info:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeInfo, 0.5); ?>;
-}
-a.badge-info:focus, a.badge-info:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgeInfo, 10); ?>;
-}
+    /* INFO */
+    .badge-info {
+    color: #fff !important;
+    background-color: <?php print $badgeInfo; ?>;
+    }
+    a.badge-info.focus, a.badge-info:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeInfo, 0.5); ?>;
+    }
+    a.badge-info:focus, a.badge-info:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeInfo, 10); ?>;
+    }
 
-/* LIGHT */
-.badge-light {
-	color: #212529 !important;
-	background-color: <?php print $badgeLight; ?>;
-}
-a.badge-light.focus, a.badge-light:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeLight, 0.5); ?>;
-}
-a.badge-light:focus, a.badge-light:hover {
-	color: #212529 !important;
-	background-color: <?php print colorDarker($badgeLight, 10); ?>;
-}
+    /* LIGHT */
+    .badge-light {
+    color: #212529 !important;
+    background-color: <?php print $badgeLight; ?>;
+    }
+    a.badge-light.focus, a.badge-light:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeLight, 0.5); ?>;
+    }
+    a.badge-light:focus, a.badge-light:hover {
+    color: #212529 !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeLight, 10); ?>;
+    }
 
-/* DARK */
-.badge-dark {
-	color: #fff !important;
-	background-color: <?php print $badgeDark; ?>;
-}
-a.badge-dark.focus, a.badge-dark:focus {
-	outline: 0;
-	box-shadow: 0 0 0 0.2rem <?php print colorHexToRgb($badgeDark, 0.5); ?>;
-}
-a.badge-dark:focus, a.badge-dark:hover {
-	color: #fff !important;
-	background-color: <?php print colorDarker($badgeDark, 10); ?>;
-}
+    /* DARK */
+    .badge-dark {
+    color: #fff !important;
+    background-color: <?php print $badgeDark; ?>;
+    }
+    a.badge-dark.focus, a.badge-dark:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem <?php print DolibarrFunctions2::colorHexToRgb($badgeDark, 0.5); ?>;
+    }
+    a.badge-dark:focus, a.badge-dark:hover {
+    color: #fff !important;
+    background-color: <?php print DolibarrFunctions2::colorDarker($badgeDark, 10); ?>;
+    }
 
 
-@media only screen and (max-width: 570px)
-{
-	span.badge.badge-status {
-		overflow: hidden;
-		max-width: 130px;
-		text-overflow: ellipsis;
-	}
+    @media only screen and (max-width: 570px)
+    {
+    span.badge.badge-status {
+    overflow: hidden;
+    max-width: 130px;
+    text-overflow: ellipsis;
+    }
 }
 
 
@@ -268,15 +271,15 @@ function _createStatusBadgeCss($statusName, $statusVarNamePrefix = '', $commentL
 		print "}\n";
 
 		print $cssPrefix.".badge-status".$statusName.".focus, ".$cssPrefix.".badge-status".$statusName.":focus {\n";
-		print "    outline: 0;\n";
-		print "    box-shadow: 0 0 0 0.2rem ".colorHexToRgb($thisBadgeBackgroundColor, 0.5)." !important;\n";
-		print "}\n";
+        print "    outline: 0;\n";
+        print "    box-shadow: 0 0 0 0.2rem " . DolibarrFunctions2::colorHexToRgb($thisBadgeBackgroundColor, 0.5) . " !important;\n";
+        print "}\n";
 
 		print $cssPrefix.".badge-status".$statusName.":focus, ".$cssPrefix.".badge-status".$statusName.":hover {\n";
 		print "    color: ".$thisBadgeTextColor." !important;\n";
-		//print "    background-color: " . colorDarker($thisBadgeBackgroundColor, 10) . ";\n";
+        //print "    background-color: " . DolibarrFunctions2::colorDarker($thisBadgeBackgroundColor, 10) . ";\n";
 		if (in_array((string) $statusName, $TBadgeBorderOnly)) {
-			print "        border-color: ".colorDarker($thisBadgeBorderColor, 10)." !important;\n";
+            print "        border-color: " . DolibarrFunctions2::colorDarker($thisBadgeBorderColor, 10) . " !important;\n";
 		}
 		print "}\n";
 	}
