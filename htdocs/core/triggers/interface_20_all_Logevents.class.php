@@ -23,6 +23,9 @@
  *  \brief      Trigger file for
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
 
 /**

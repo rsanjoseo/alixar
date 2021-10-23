@@ -16,6 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 /**
  *    \file       htdocs/core/triggers/interface_50_modEventOrganization_EventOrganization.class.php
  *  \ingroup    eventorganization

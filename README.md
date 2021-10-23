@@ -4,27 +4,29 @@
 [![Build Status](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/build.png?b=master)](https://scrutinizer-ci.com/g/rsanjoseo/alixar/build-status/master)
 [![Code Intelligence Status](https://scrutinizer-ci.com/g/rsanjoseo/alixar/badges/code-intelligence.svg?b=master)](https://scrutinizer-ci.com/code-intelligence)
 
-# Alixar ERP & CRM, una refactorización completa de Dolibarr
+# Alixar ERP & CRM, a complete refactoring of Dolibarr
 
-Alixar es una refactorización completa del paquete Dolibarr (https://github.com/dolibarr/dolibarr).
+### VERY IMPORTANT: Do not use Alixar in production, because the refactoring process is in progress and will take us some time.
 
-Puede encontrar información adicional en https://alxarafe.es
+Alixar is a complete refactoring of the Dolibarr package (https://github.com/dolibarr/dolibarr).
 
-Dolibarr ERP & CRM es una completa aplicación de gestión empresarial que ayuda a gestionar la actividad de su
-organización (contactos, proveedores, facturas, pedidos, stocks, agenda…).
+You can find additional information at https://alxarafe.com
 
-Es un paquete de software de código abierto (escrito en PHP con mejoras opcionales de JavaScript) diseñado para
-pequeñas, medianas o grandes empresas, fundaciones y autónomos.
+Dolibarr ERP & CRM is a complete business management application that helps manage the activity of your organization (
+contacts, suppliers, invoices, orders, stocks, agenda...).
 
-Puede utilizarlo, estudiarlo, modificarlo o distribuirlo libremente según su licencia.
+It is an open source software package (written in PHP with optional JavaScript enhancements) designed to small, medium
+or large companies, foundations and freelancers.
 
-Puede usarlo como una aplicación independiente o como una aplicación web para acceder a él desde Internet o una LAN.
+You can use it, study it, modify it or distribute it freely according to your license.
 
-Dolibarr tiene una potente y activa comunidad, pero la tecnología sobre la que se basa, está totalmente obsoleta.
+You can use it as a standalone application or as a web application to access it from the Internet or a LAN.
 
-## NOTICIAS Y REDES SOCIALES
+Dolibarr has a powerful and active community, but the technology on which it is based is totally outdated.
 
-Puede seguir a Dolibarr en los siguientes enlaces:
+## NEWS AND SOCIAL MEDIA
+
+You can follow Dolibarr at the following links:
 
 - [Facebook](https://www.facebook.com/dolibarr)
 - [Twitter](https://www.twitter.com/dolibarr)
@@ -34,11 +36,11 @@ Puede seguir a Dolibarr en los siguientes enlaces:
 
 ### Alixar
 
-Alixar pretende realizar modificaciones en el código para su mejora, pero estos cambios, lo harán incompatible con el
-original.
+Alixar intends to make modifications to the code for its improvement, but these changes will make it incompatible with
+the original.
 
-- [Página web del proyecto en inglés](https://alxarafe.com)
-- [Página web del proyecto](https://alxarafe.es)
+- [Project website in English](https://alxarafe.com)
+- [Project website](https://alxarafe.es)
 
 - [GitHub Alxarafe](https://github.com/rsanjoseo/alxarafe)
 - [GitHub Alixar](https://github.com/rsanjoseo/alixar)

@@ -55,7 +55,6 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
     $login = '';
 
     if (!empty($usertotest)) {
-        require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
         DolibarrFunctions::dol_syslog("functions_dolibarr::check_user_password_dolibarr usertotest=" . $usertotest . " passwordtotest=" . preg_replace('/./', '*', $passwordtotest) . " entitytotest=" . $entitytotest);
 
         // If test username/password asked, we define $test=false if ko and $login var to login if ok, set also $_SESSION["dol_loginmesg"] if ko

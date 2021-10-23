@@ -1,34 +1,3 @@
-/*
-colorbackbody=255,255,255
-colorbackvmenu1=250,250,250
-colorbackhmenu1=38,60,92
-colorbacktitle1=233,234,237
-colorbacklineimpair1=255,255,255
-colorbacklineimpair2=255,255,255
-colorbacklinepair1=250,250,250
-colorbacklinepair2=250,250,250
-colorbacklinepairhover=230,237,244
-colorbacklinepairchecked=230,237,244
-$colortexttitlenotab=35,135,140
-$colortexttitle=40, 40, 60
-$colortext=0,0,0
-$colortextlink=10, 20, 100
-$colortextbackhmenu=FFFFFF
-$colortextbackvmenu=000000
-dol_hide_topmenu=
-dol_hide_leftmenu=
-dol_optimize_smallscreen=
-dol_no_mouse_hover=
-dol_screenwidth=
-dol_screenheight=
-fontsize=0.90em
-nbtopmenuentries=6
-fontsizesmaller=0.75em
-topMenuFontSize=1.1em
-toolTipBgColor=rgba(255, 255, 255, 0.96)
-toolTipFontColor=#333
-conf->global->THEME_SATURATE_RATIO= (must be between 0 and 1)
-*/
 /* <style type="text/css" > */
 
 /* ============================================================================== */

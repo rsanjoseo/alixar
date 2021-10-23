@@ -32,6 +32,11 @@ abstract class DolibarrController extends Controller
         $dolConf = DolibarrConfig::getInstance();
         $this->vars = $dolConf->getVars();
         $this->conf = $dolConf->getConf();
+
+        $auth = new DolibarrAuthentication($this);
+        if (!$auth->authenticated()) {
+            $auth->login();
+        }
     }
 
     public function setView(): View

@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 /**
  * \file    core/triggers/interface_99_modZapier_ZapierTriggers.class.php
  * \ingroup zapier

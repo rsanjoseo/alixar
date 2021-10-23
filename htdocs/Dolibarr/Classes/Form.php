@@ -592,6 +592,8 @@ class Form
                         }
                     }
                 }
+                dump('1 ' . $nophoto);
+                die('here');
 
                 if (!empty($conf->gravatar->enabled) && $email && empty($noexternsourceoverwrite)) {
                     // see https://gravatar.com/site/implement/images/php/

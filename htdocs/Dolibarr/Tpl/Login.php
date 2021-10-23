@@ -26,10 +26,9 @@
 namespace Alxarafe\Dolibarr\Tpl;
 
 use Alxarafe\Core\Base\BasicController;
-use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
 
 class Login extends DolibarrView
 {
@@ -50,7 +49,7 @@ class Login extends DolibarrView
             exit;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+        // require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
 
         header('Cache-Control: Public, must-revalidate');
         header("Content-type: text/html; charset=" . $this->conf->file->character_set_client);
@@ -111,7 +110,7 @@ class Login extends DolibarrView
             $this->conf->global->THEME_ELDY_TOPMENU_BACK1 = $colorbackhmenu1;
         }
         $colorbackhmenu1 = empty($user->conf->THEME_ELDY_ENABLE_PERSONALIZED) ? (empty($this->conf->global->THEME_ELDY_TOPMENU_BACK1) ? $colorbackhmenu1 : $this->conf->global->THEME_ELDY_TOPMENU_BACK1) : (empty($user->conf->THEME_ELDY_TOPMENU_BACK1) ? $colorbackhmenu1 : $user->conf->THEME_ELDY_TOPMENU_BACK1);
-        $colorbackhmenu1 = join(',', colorStringToArray($colorbackhmenu1)); // Normalize value to 'x,y,z'
+        $colorbackhmenu1 = join(',', DolibarrFunctions2::colorStringToArray($colorbackhmenu1)); // Normalize value to 'x,y,z'
 
         print "<!-- BEGIN PHP TEMPLATE LOGIN.TPL.PHP -->\n";
 

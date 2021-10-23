@@ -16,6 +16,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 /**
  *  \file       htdocs/core/triggers/interface_80_modStripe_Stripe.class.php
  *  \ingroup    core

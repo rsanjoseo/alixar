@@ -23,6 +23,8 @@ namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Exception;
+use LogHandlerInterface;
 use stdClass;
 
 /**
@@ -904,8 +906,8 @@ class Conf
                         $dirsyslogs = array_merge($dirsyslogs, $this->modules_parts['syslog']);
                     }
                     foreach ($dirsyslogs as $reldir) {
-                        $dir = dol_buildpath($reldir, 0);
-                        $newdir = dol_osencode($dir);
+                        $dir = DolibarrFunctions::dol_buildpath($reldir, 0);
+                        $newdir = DolibarrFunctions::dol_osencode($dir);
                         if (is_dir($newdir)) {
                             $file = $newdir . $handler . '.php';
                             if (file_exists($file)) {

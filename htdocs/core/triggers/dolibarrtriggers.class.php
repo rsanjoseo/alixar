@@ -15,6 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 /**
  * Class that all the triggers must extend
  */

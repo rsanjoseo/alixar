@@ -34,7 +34,6 @@ namespace Alxarafe\Dolibarr\Classes;
 use Adherent;
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use stdClass;
 
 /**
@@ -1238,7 +1237,7 @@ class User extends CommonObject
                 $this->db->free($result);
             } else {
                 $this->error = "USERNOTFOUND";
-                dol_syslog(get_class($this) . "::fetch user not found", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::fetch user not found", LOG_DEBUG);
 
                 $this->db->free($result);
                 return 0;
@@ -2160,7 +2159,7 @@ class User extends CommonObject
     public function update_last_login_date()
     {
         // phpcs:enable
-        $now = dol_now();
+        $now = DolibarrFunctions::dol_now();
 
         $sql = "UPDATE " . MAIN_DB_PREFIX . "user SET";
         $sql .= " datepreviouslogin = datelastlogin,";
@@ -2168,7 +2167,7 @@ class User extends CommonObject
         $sql .= " tms = tms"; // La date de derniere modif doit changer sauf pour la mise a jour de date de derniere connexion
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::update_last_login_date user->id=" . $this->id . " " . $sql, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update_last_login_date user->id=" . $this->id . " " . $sql, LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $this->datepreviouslogin = $this->datelastlogin;

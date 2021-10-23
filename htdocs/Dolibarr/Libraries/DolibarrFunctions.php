@@ -1370,7 +1370,7 @@ abstract class DolibarrFunctions
                 'ip' => false,
             ];
 
-            $remoteip = getUserRemoteIP(); // Get ip when page run on a web server
+            $remoteip = self::getUserRemoteIP(); // Get ip when page run on a web server
             if (!empty($remoteip)) {
                 $data['ip'] = $remoteip;
                 // This is when server run behind a reverse proxy

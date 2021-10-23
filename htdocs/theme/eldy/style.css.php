@@ -21,7 +21,7 @@
  */
 
 // Descend to the htdocs folder
-use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;chdir('../..');
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;chdir('../..');
 define('BASE_FOLDER', getcwd());
 
 /**
@@ -86,14 +86,14 @@ if (empty($dolibarr_nocache)) {
 	header('Cache-Control: no-cache');
 }
 
-if (GETPOST('theme', 'alpha')) {
-	$conf->theme = GETPOST('theme', 'alpha'); // If theme was forced on URL
+if (DolibarrFunctions::GETPOST('theme', 'alpha')) {
+	$conf->theme = DolibarrFunctions::GETPOST('theme', 'alpha'); // If theme was forced on URL
 }
-if (GETPOST('lang', 'aZ09')) {
-	$langs->setDefaultLang(GETPOST('lang', 'aZ09')); // If language was forced on URL
+if (DolibarrFunctions::GETPOST('lang', 'aZ09')) {
+	$langs->setDefaultLang(DolibarrFunctions::GETPOST('lang', 'aZ09')); // If language was forced on URL
 }
-if (GETPOST('THEME_DARKMODEENABLED', 'int')) {
-	$conf->global->THEME_DARKMODEENABLED = GETPOST('THEME_DARKMODEENABLED', 'int'); // If darkmode was forced on URL
+if (DolibarrFunctions::GETPOST('THEME_DARKMODEENABLED', 'int')) {
+	$conf->global->THEME_DARKMODEENABLED = DolibarrFunctions::GETPOST('THEME_DARKMODEENABLED', 'int'); // If darkmode was forced on URL
 }
 
 //$langs->load("main", 0, 1);

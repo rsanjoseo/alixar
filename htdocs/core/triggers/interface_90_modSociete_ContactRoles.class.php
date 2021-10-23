@@ -21,6 +21,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Classes\Conf;
+
 /**
  * \file htdocs/core/triggers/interface_90_modSociete_ContactRoles.class.php
  * \ingroup agenda

@@ -87,9 +87,9 @@ abstract class DolibarrSecurity2
         $login = '';
 
         // Validation of login/pass/entity with standard modules
-        if (empty($login)) {
             $test = true;
             foreach ($authmode as $mode) {
+                dump($mode);
                 if ($test && $mode && !$login) {
                     // Validation of login/pass/entity for mode $mode
                     $mode = trim($mode);
@@ -134,7 +134,6 @@ abstract class DolibarrSecurity2
                     }
                 }
             }
-        }
 
         return $login;
     }
@@ -324,6 +323,8 @@ abstract class DolibarrSecurity2
 
         // Include login page template
         // include $template_dir . 'login.tpl.php';
+
+        // TODO: Show the login form if the user is not identified. Includes side menú
         new Login($controller);
 
         // Global html output events ($mesgs, $errors, $warnings)
