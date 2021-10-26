@@ -1,13 +1,19 @@
 <?php
-if (!defined('ISLOADEDBYSTEELSHEET')) {
-	die('Must be call by steelsheet');
-} ?>
-/* <style type="text/css" > */
 
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+if (!defined('ISLOADEDBYSTEELSHEET')) {
+    die('Must be call by steelsheet');
+} ?>
 /*
- * Component: Info Box
- * -------------------
- */
+<style type="text/css"> *
+
+    /
+
+    /*
+     * Component: Info Box
+     * -------------------
+     */
 
 .info-box-module.--external span.info-box-icon-version {
 	background: #bbb;
@@ -253,8 +259,8 @@ if (!empty($conf->global->THEME_INFOBOX_COLOR_ON_BACKGROUND)) {
 if (!isset($conf->global->THEME_SATURATE_RATIO)) {
 	$conf->global->THEME_SATURATE_RATIO = 0.7;
 }
-if (GETPOSTISSET('THEME_SATURATE_RATIO')) {
-	$conf->global->THEME_SATURATE_RATIO = GETPOST('THEME_SATURATE_RATIO', 'int');
+if (DolibarrFunctions::GETPOSTISSET('THEME_SATURATE_RATIO')) {
+	$conf->global->THEME_SATURATE_RATIO = DolibarrFunctions::GETPOST('THEME_SATURATE_RATIO', 'int');
 }
 
 ?>

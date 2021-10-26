@@ -40,6 +40,7 @@ use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
 use Alxarafe\Core\Singletons\Session;
 use Alxarafe\Core\Singletons\TemplateRender;
+use Alxarafe\Dolibarr\Classes\User;
 
 require_once 'vendor/autoload.php';
 
@@ -80,3 +81,5 @@ if (!$result) {
 }
 $db = $alxConfig->getEngine();
 $debugbar = $alxDebug;
+
+$user = new User();

@@ -245,7 +245,7 @@ class DolibarrAuthentication
         // No authentication mode
         if (!count($this->authmode)) {
             //    $this->langs->load('main');
-            dol_print_error('', $this->langs->trans("ErrorConfigParameterNotDefined", 'dolibarr_main_authentication'));
+            DolibarrFunctions::dol_print_error('', $this->langs->trans("ErrorConfigParameterNotDefined", 'dolibarr_main_authentication'));
             exit;
         }
 
@@ -423,7 +423,7 @@ class DolibarrAuthentication
             if ($this->error) {
                 $this->db->rollbackTransactions();
                 session_destroy();
-                dol_print_error($db, 'Error in some triggers USER_LOGIN or in some hooks afterLogin');
+                DolibarrFunctions::dol_print_error($db, 'Error in some triggers USER_LOGIN or in some hooks afterLogin');
                 exit;
             } else {
                 $this->db->commit();

@@ -28,8 +28,8 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Providers\DolibarrConfig;
-use HookManager;
 
 /**
  * Class DolibarrSecurity
@@ -879,6 +879,7 @@ abstract class DolibarrSecurity
         if ($printfooter && function_exists("llxFooter")) {
             llxFooter();
         }
+        dump(debug_backtrace());
         exit(0);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
 
 if (!defined('ISLOADEDBYSTEELSHEET')) {
@@ -239,10 +240,10 @@ function _createStatusBadgeCss($statusName, $statusVarNamePrefix = '', $commentL
 
 		$thisBadgeBackgroundColor = $thisBadgeBorderColor = ${$statusVarNamePrefix.'badgeStatus'.$statusName};
 
-		$TBadgeBorderOnly = array('0', '1b', '3', '4b', '5', '7', '10');
-		$thisBadgeTextColor = colorIsLight(${$statusVarNamePrefix.'badgeStatus'.$statusName}) ? '#212529' : '#ffffff';
+        $TBadgeBorderOnly = ['0', '1b', '3', '4b', '5', '7', '10'];
+        $thisBadgeTextColor = DolibarrFunctions::colorIsLight(${$statusVarNamePrefix . 'badgeStatus' . $statusName}) ? '#212529' : '#ffffff';
 
-		if (!empty(${$statusVarNamePrefix.'badgeStatus_textColor'.$statusName})) {
+        if (!empty(${$statusVarNamePrefix.'badgeStatus_textColor'.$statusName})) {
 			$thisBadgeTextColor = ${$statusVarNamePrefix.'badgeStatus_textColor'.$statusName};
 		}
 

@@ -21,6 +21,9 @@
  */
 
 // Descend to the htdocs folder
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Dolibarr\Classes\HookManager;
+
 chdir('../../..');
 define('BASE_FOLDER', getcwd());
 
@@ -40,9 +43,10 @@ require 'main.php';
 require_once DOL_DOCUMENT_ROOT . '/core/class/html.formother.class.php';
 
 // If not defined, we select menu "home"
-$_GET['mainmenu'] = GETPOST('mainmenu', 'aZ09') ? GETPOST('mainmenu', 'aZ09') : 'home';
-$action = GETPOST('action', 'aZ09');
+$_GET['mainmenu'] = DolibarrFunctions::GETPOST('mainmenu', 'aZ09') ? DolibarrFunctions::GETPOST('mainmenu', 'aZ09') : 'home';
+$action = DolibarrFunctions::GETPOST('action', 'aZ09');
 
+$hookmanager = new HookManager();
 $hookmanager->initHooks(['index']);
 
 /*
@@ -59,12 +63,12 @@ if (count($conf->modules) <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FO
     exit;
 }
 
-if (GETPOST('addbox')) {    // Add box (when submit is done from a form when ajax disabled)
+if (DolibarrFunctions::GETPOST('addbox')) {    // Add box (when submit is done from a form when ajax disabled)
     require_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
-    $zone = GETPOST('areacode', 'int');
-    $userid = GETPOST('userid', 'int');
-    $boxorder = GETPOST('boxorder', 'aZ09');
-    $boxorder .= GETPOST('boxcombo', 'aZ09');
+    $zone = DolibarrFunctions::GETPOST('areacode', 'int');
+    $userid = DolibarrFunctions::GETPOST('userid', 'int');
+    $boxorder = DolibarrFunctions::GETPOST('boxorder', 'aZ09');
+    $boxorder .= DolibarrFunctions::GETPOST('boxcombo', 'aZ09');
 
     $result = InfoBox::saveboxorder($db, $zone, $boxorder, $userid);
     if ($result > 0) {

@@ -1,4 +1,5 @@
-<?php use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
+<?php use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
 
 if (!defined('ISLOADEDBYSTEELSHEET')) {
     die('Must be call by steelsheet');
@@ -112,7 +113,7 @@ if (!empty($conf->global->THEME_DARKMODEENABLED)) {
 ?>
 
     body {
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?> background-color: #FFFFFF;
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') {  ?> background-color: #FFFFFF;
     <?php } ?> font-size: <?php print is_numeric($fontsize) ? $fontsize.'px' : $fontsize; ?>;
         line-height: 1.4;
         font-family: <?php print $fontlist ?>;
@@ -375,33 +376,33 @@ if (!empty($conf->global->THEME_DARKMODEENABLED)) {
     }
 
     input.buttonpaymentcb {
-        background-image: url(<?php echo dol_buildpath($path.'/theme/common/credit_card.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/common/credit_card.png', 1) ?>);
         background-size: 26px;
         background-repeat: no-repeat;
         background-position: 5px 11px;
     }
 
     input.buttonpaymentcheque {
-        background-image: url(<?php echo dol_buildpath($path.'/theme/common/cheque.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/common/cheque.png', 1) ?>);
         background-size: 24px;
         background-repeat: no-repeat;
         background-position: 5px 8px;
     }
 
     input.buttonpaymentpaypal {
-        background-image: url(<?php echo dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
         background-repeat: no-repeat;
         background-position: 8px 11px;
     }
 
     input.buttonpaymentpaybox {
-        background-image: url(<?php echo dol_buildpath($path.'/paybox/img/object_paybox.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/paybox/img/object_paybox.png', 1) ?>);
         background-repeat: no-repeat;
         background-position: 8px 11px;
     }
 
     input.buttonpaymentstripe {
-        background-image: url(<?php echo dol_buildpath($path.'/stripe/img/object_stripe.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/stripe/img/object_stripe.png', 1) ?>);
         background-repeat: no-repeat;
         background-position: 8px 11px;
     }
@@ -1099,7 +1100,7 @@ td.leftborder, td.hide6 {
 
     /* Themes for badges */
 
-    <?php include dol_buildpath($path.'/theme/'.$theme.'/badges.inc.php', 0); ?>
+    <?php include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/badges.inc.php', 0); ?>
 
     .borderrightlight {
         border-right: 1px solid #DDD;
@@ -2248,7 +2249,7 @@ if ($conf->browser->layout == 'phone') {
 
         #tooltip {
             position: absolute;
-            width: <?php print dol_size(300, 'width'); ?>px;
+            width: <?php print DolibarrFunctions::dol_size(300, 'width'); ?>px;
         }
 
         /* intput, input[type=text], */
@@ -2304,7 +2305,7 @@ if ($conf->browser->layout == 'phone') {
         color: var(--tableforfieldcolor);
     }
 
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') { ?>
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') { ?>
     .hideonprint {
         display: none !important;
     }
@@ -2569,8 +2570,8 @@ if ($conf->browser->layout == 'phone') {
 
 
     div.fiche {
-        margin- <?php print $left; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 6 : (empty($conf->dol_optimize_smallscreen) ? '34' : '6')); ?>px;
-        margin- <?php print $right; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 6 : (empty($conf->dol_optimize_smallscreen) ? '30' : '6')); ?>px;
+        margin- <?php print $left; ?>: <?php print (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print' ? 6 : (empty($conf->dol_optimize_smallscreen) ? '34' : '6')); ?>px;
+        margin- <?php print $right; ?>: <?php print (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print' ? 6 : (empty($conf->dol_optimize_smallscreen) ? '30' : '6')); ?>px;
     <?php if (!empty($dol_hide_leftmenu)) {
 		print 'margin-bottom: 12px;'."\n";
 	} ?> <?php if (!empty($dol_hide_leftmenu)) {
@@ -2656,8 +2657,8 @@ div.secondcolumn div.box {
     /* Force values on one colum for small screen */
     @media only screen and (max-width: 1000px) {
         div.fiche {
-            margin- <?php print $left; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 6 : ($dol_hide_leftmenu ? '6' : '20')); ?>px;
-            margin- <?php print $right; ?>: <?php print (GETPOST('optioncss', 'aZ09') == 'print' ? 8 : 6); ?>px;
+            margin- <?php print $left; ?>: <?php print (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print' ? 6 : ($dol_hide_leftmenu ? '6' : '20')); ?>px;
+            margin- <?php print $right; ?>: <?php print (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print' ? 8 : 6); ?>px;
         }
 
         div.fichecenter {
@@ -2945,18 +2946,19 @@ div.statusref {
     /* ============================================================================== */
 
     div#id-top {
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
     <?php } else { ?> background: var(--colorbackhmenu1);
         /* background-image: linear-gradient(-45deg,
 
 
-    <?php echo DolibarrFunctions2::colorAdjustBrightness(DolibarrFunctions2::colorArrayToHex(DolibarrFunctions2::colorStringToArray($colorbackhmenu1)), '5'); ?>   , var(--colorbackhmenu1)); */
+
+    <?php echo DolibarrFunctions2::colorAdjustBrightness(DolibarrFunctions2::colorArrayToHex(DolibarrFunctions2::colorStringToArray($colorbackhmenu1)), '5'); ?>    , var(--colorbackhmenu1)); */
         /* box-shadow: 0px 0px 5px #eee; */
     <?php } ?>
     }
 
     div#tmenu_tooltip {
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
     <?php } else { ?> padding- <?php echo $right; ?>: <?php echo ($maxwidthloginblock - 10); ?>px;
     <?php } ?> -webkit-touch-callout: none; /* iOS Safari */
         -webkit-user-select: none; /* Safari */
@@ -2976,7 +2978,7 @@ div.statusref {
     }
 
     div.tmenudiv {
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
     <?php } else { ?> position: relative;
         display: block;
         white-space: nowrap;
@@ -3130,7 +3132,7 @@ div.statusref {
     /* For mainmenu, we always load the img */
 
     div.mainmenu.menu {
-        background-image: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/menus/menu.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/menus/menu.png', 1) ?>);
     <?php print $disableimages ? '' : 'top: 7px'; ?>
     }
 
@@ -3150,7 +3152,7 @@ div.statusref {
     /* Do not load menu img for other if hidden to save bandwidth */
 
     <?php if (empty($dol_hide_topmenu)) { ?>
-    <?php include dol_buildpath($path.'/theme/'.$theme.'/main_menu_fa_icons.inc.php', 0); ?>
+    <?php include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/main_menu_fa_icons.inc.php', 0); ?>
 
     <?php
 	// Add here more div for other menu entries. moduletomainmenu=array('module name'=>'name of class for div')
@@ -3187,7 +3189,7 @@ div.statusref {
 		$found = 0; $url = '';
 		foreach ($conf->file->dol_document_root as $dirroot) {
 			if (file_exists($dirroot."/".$val."/img/".$val.".png")) {
-				$url = dol_buildpath('/'.$val.'/img/'.$val.'.png', 1);
+				$url = DolibarrFunctions::dol_buildpath('/'.$val.'/img/'.$val.'.png', 1);
 				$found = 1;
 				break;
 			}
@@ -3202,7 +3204,7 @@ div.statusref {
                 }'."\n";
 			} else {
 				print "/* A mainmenu entry was found but img file ".$val.".png not found (check /".$val."/img/".$val.".png), so we use a generic one */\n";
-				$url = dol_buildpath($path.'/theme/'.$theme.'/img/menus/generic'.(min($generic, 4))."_over.png", 1);
+				$url = DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/menus/generic'.(min($generic, 4))."_over.png", 1);
 				print "div.mainmenu.".$val." {\n";
 				print "	background-image: url(".$url.");\n";
 				print "}\n";
@@ -3392,7 +3394,7 @@ if (!empty($conf->global->MAIN_LOGIN_BACKGROUND)) {
     <?php print $right; ?>: 0;
         top: <?php print $disableimages ? '4px' : '0'; ?>;
         line-height: 10px;
-    <?php // echo (empty($disableimages) && $maxwidthloginblock)?'max-width: '.$maxwidthloginblock.'px;':''; ?> <?php if (GETPOST('optioncss', 'aZ09') == 'print') { ?> display: none;
+    <?php // echo (empty($disableimages) && $maxwidthloginblock)?'max-width: '.$maxwidthloginblock.'px;':''; ?> <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') { ?> display: none;
     <?php } ?>
     }
 
@@ -3536,12 +3538,12 @@ if (!empty($conf->global->MAIN_LOGIN_BACKGROUND)) {
     }
 
     .span-icon-user {
-        background-image: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/object_user.png', 1); ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/object_user.png', 1); ?>);
         background-repeat: no-repeat;
     }
 
     .span-icon-password {
-        background-image: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/lock.png', 1); ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/lock.png', 1); ?>);
         background-repeat: no-repeat;
     }
 
@@ -3562,7 +3564,7 @@ if (!empty($conf->global->MAIN_LOGIN_BACKGROUND)) {
     .vmenu {
         width: 190px;
         margin-left: 6px;
-    <?php if (GETPOST('optioncss', 'aZ09') == 'print') { ?> display: none;
+    <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') { ?> display: none;
     <?php } ?>
     }
 
@@ -3997,7 +3999,8 @@ div.tabsElem a.tabactive::before, div.tabsElem a.tabunactive::before {
         /*
 	background: var(--colorbacktabcard1), 0.5)  url(
 
-    <?php echo dol_buildpath($path.'/theme/'.$theme.'/img/nav-overlay3.png', 1); ?>  ) 50% 0 repeat-x;
+
+    <?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/nav-overlay3.png', 1); ?>   ) 50% 0 repeat-x;
 	color: var(--colortextbacktab);
 	*/
         text-decoration: underline;
@@ -4033,7 +4036,7 @@ div.tabsElem a.tabactive::before, div.tabsElem a.tabunactive::before {
     /* ============================================================================== */
     /* Buttons for actions                                                            */
     /* ============================================================================== */
-    <?php include dol_buildpath($path.'/theme/'.$theme.'/btn.inc.php', 0); ?>
+    <?php include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/btn.inc.php', 0); ?>
 
 
     /* ============================================================================== */
@@ -5470,12 +5473,12 @@ div.pagination li:not(.paginationbeforearrows,.paginationafterarrows,.title-butt
     }
 
     .logo_setup {
-        content: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/logo_setup.svg', 1) ?>); /* content is used to best fit the container */
+        content: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/logo_setup.svg', 1) ?>); /* content is used to best fit the container */
         display: inline-block;
     }
 
     .nographyet {
-        content: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/nographyet.svg', 1) ?>);
+        content: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/nographyet.svg', 1) ?>);
         display: inline-block;
         opacity: 0.1;
         background-repeat: no-repeat;
@@ -5692,7 +5695,7 @@ div.pagination li:not(.paginationbeforearrows,.paginationafterarrows,.title-butt
     }
 
     div.ui-tooltip {
-        max-width: <?php print dol_size(600, 'width'); ?>px !important;
+        max-width: <?php print DolibarrFunctions::dol_size(600, 'width'); ?>px !important;
     }
 
     div.ui-tooltip.mytooltip {
@@ -6290,7 +6293,7 @@ div.pagination li:not(.paginationbeforearrows,.paginationafterarrows,.title-butt
     }
 
     .ui-autocomplete-loading {
-        background: white url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/working.gif', 1) ?>) right center no-repeat;
+        background: white url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/working.gif', 1) ?>) right center no-repeat;
     }
 
     .ui-autocomplete {
@@ -6328,14 +6331,14 @@ div.pagination li:not(.paginationbeforearrows,.paginationafterarrows,.title-butt
     /* ============================================================================== */
 
     .editkey_textarea, .editkey_ckeditor, .editkey_string, .editkey_email, .editkey_numeric, .editkey_select, .editkey_autocomplete {
-        background: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/edit.png', 1) ?>) right top no-repeat;
+        background: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/edit.png', 1) ?>) right top no-repeat;
         cursor: pointer;
         margin-right: 3px;
         margin-top: 3px;
     }
 
     .editkey_datepicker {
-        background: url(<?php echo dol_buildpath($path.'/theme/'.$theme.'/img/calendar.png', 1) ?>) right center no-repeat;
+        background: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/calendar.png', 1) ?>) right center no-repeat;
         margin-right: 3px;
         cursor: pointer;
         margin-right: 3px;
@@ -6961,17 +6964,17 @@ span.cke_skin_kama { padding: 0 !important; }*/
 
     .ecmjqft LI.directory {
         font-weight: normal;
-        background: url(<?php echo dol_buildpath($path.'/theme/common/treemenu/folder2.png', 1); ?>) left top no-repeat;
+        background: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/common/treemenu/folder2.png', 1); ?>) left top no-repeat;
     }
 
     .ecmjqft LI.expanded {
         font-weight: normal;
-        background: url(<?php echo dol_buildpath($path.'/theme/common/treemenu/folder2-expanded.png', 1); ?>) left top no-repeat;
+        background: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/theme/common/treemenu/folder2-expanded.png', 1); ?>) left top no-repeat;
     }
 
     .ecmjqft LI.wait {
         font-weight: normal;
-        background: url(<?php echo dol_buildpath('/theme/'.$theme.'/img/working.gif', 1); ?>) left top no-repeat;
+        background: url(<?php echo DolibarrFunctions::dol_buildpath('/theme/'.$theme.'/img/working.gif', 1); ?>) left top no-repeat;
     }
 
 
@@ -7043,19 +7046,19 @@ span.cke_skin_kama { padding: 0 !important; }*/
     }
 
     .sorting_asc {
-        background: url('<?php echo dol_buildpath('/theme/'.$theme.'/img/sort_asc.png', 1); ?>') no-repeat center right !important;
+        background: url('<?php echo DolibarrFunctions::dol_buildpath('/theme/'.$theme.'/img/sort_asc.png', 1); ?>') no-repeat center right !important;
     }
 
     .sorting_desc {
-        background: url('<?php echo dol_buildpath('/theme/'.$theme.'/img/sort_desc.png', 1); ?>') no-repeat center right !important;
+        background: url('<?php echo DolibarrFunctions::dol_buildpath('/theme/'.$theme.'/img/sort_desc.png', 1); ?>') no-repeat center right !important;
     }
 
     .sorting_asc_disabled {
-        background: url('<?php echo dol_buildpath('/theme/'.$theme.'/img/sort_asc_disabled.png', 1); ?>') no-repeat center right !important;
+        background: url('<?php echo DolibarrFunctions::dol_buildpath('/theme/'.$theme.'/img/sort_asc_disabled.png', 1); ?>') no-repeat center right !important;
     }
 
     .sorting_desc_disabled {
-        background: url('<?php echo dol_buildpath('/theme/'.$theme.'/img/sort_desc_disabled.png', 1); ?>') no-repeat center right !important;
+        background: url('<?php echo DolibarrFunctions::dol_buildpath('/theme/'.$theme.'/img/sort_desc_disabled.png', 1); ?>') no-repeat center right !important;
     }
 
     .dataTables_paginate {
@@ -8508,7 +8511,7 @@ span.cke_skin_kama { padding: 0 !important; }*/
 
         #tooltip {
             position: absolute;
-            width: <?php print dol_size(350, 'width'); ?>px;
+            width: <?php print DolibarrFunctions::dol_size(350, 'width'); ?>px;
         }
 
         div.tabBar {
@@ -8640,7 +8643,7 @@ span.cke_skin_kama { padding: 0 !important; }*/
         }
 
         div#tmenu_tooltip {
-        <?php if (GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
+        <?php if (DolibarrFunctions::GETPOST('optioncss', 'aZ09') == 'print') {  ?> display: none;
         <?php } else { ?> padding- <?php echo $right; ?>: 0;
         <?php } ?>
         }
@@ -8776,10 +8779,10 @@ span.cke_skin_kama { padding: 0 !important; }*/
 
 
     <?php
-include dol_buildpath($path.'/theme/'.$theme.'/dropdown.inc.php', 0);
-include dol_buildpath($path.'/theme/'.$theme.'/info-box.inc.php', 0);
-include dol_buildpath($path.'/theme/'.$theme.'/progress.inc.php', 0);
-include dol_buildpath($path.'/theme/'.$theme.'/timeline.inc.php', 0);
+include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/dropdown.inc.php', 0);
+include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/info-box.inc.php', 0);
+include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/progress.inc.php', 0);
+include DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/timeline.inc.php', 0);
 
 if (!empty($conf->global->THEME_CUSTOM_CSS)) {
 	print $conf->global->THEME_CUSTOM_CSS;

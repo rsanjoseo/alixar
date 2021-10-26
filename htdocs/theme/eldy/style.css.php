@@ -78,7 +78,7 @@ $menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
 $menumanager->loadMenu();
 
 // Define css type
-top_httphead('text/css');
+$mw->top_httphead('text/css');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
 if (empty($dolibarr_nocache)) {
 	header('Cache-Control: max-age=10800, public, must-revalidate');
@@ -110,7 +110,7 @@ if (!empty($conf->global->MAIN_OVERWRITE_THEME_RES)) {
 $fontlist = 'arial,tahoma,verdana,helvetica'; //$fontlist='helvetica, verdana, arial, sans-serif';
 //$fontlist='"open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;';
 $img_head = '';
-$img_button = dol_buildpath($path.'/theme/'.$theme.'/img/button_bg.png', 1);
+$img_button = DolibarrFunctions::dol_buildpath($path.'/theme/'.$theme.'/img/button_bg.png', 1);
 $dol_hide_topmenu = $conf->dol_hide_topmenu;
 $dol_hide_leftmenu = $conf->dol_hide_leftmenu;
 $dol_optimize_smallscreen = $conf->dol_optimize_smallscreen;

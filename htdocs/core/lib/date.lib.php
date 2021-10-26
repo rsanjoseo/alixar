@@ -25,6 +25,8 @@
  *  \brief        Set of function to manipulate dates
  */
 
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
 /**
  *  Return an array with timezone values
  *
@@ -314,8 +316,8 @@ function dolSqlDateFilter($datefield, $day_date, $month_date, $year_date, $exclu
             $sqldate .= ($excludefirstand ? "" : " AND ") . $datefield . " BETWEEN '" . $db->idate(dol_get_first_day($year_date, $month_date, $gm));
             $sqldate .= "' AND '" . $db->idate(dol_get_last_day($year_date, $month_date, $gm)) . "'";
         } elseif ($year_date > 0 && !empty($day_date)) {
-            $sqldate .= ($excludefirstand ? "" : " AND ") . $datefield . " BETWEEN '" . $db->idate(dol_mktime(0, 0, 0, $month_date, $day_date, $year_date, $gm));
-            $sqldate .= "' AND '" . $db->idate(dol_mktime(23, 59, 59, $month_date, $day_date, $year_date, $gm)) . "'";
+            $sqldate .= ($excludefirstand ? "" : " AND ") . $datefield . " BETWEEN '" . $db->idate(DolibarrFunctions::dol_mktime(0, 0, 0, $month_date, $day_date, $year_date, $gm));
+            $sqldate .= "' AND '" . $db->idate(DolibarrFunctions::dol_mktime(23, 59, 59, $month_date, $day_date, $year_date, $gm)) . "'";
         } else {
             // This case is not reliable on TZ, but we should not need it.
             $sqldate .= ($excludefirstand ? "" : " AND ") . " date_format( " . $datefield . ", '%c') = '" . $db->escape($month_date) . "'";
@@ -345,7 +347,7 @@ function dolSqlDateFilter($datefield, $day_date, $month_date, $year_date, $exclu
  *                                19700101020000 -> 7200 with gm=1
  *                                19700101000000 -> 0 with gm=1
  *
- * @see    dol_print_date(), dol_mktime(), dol_getdate()
+ * @see    dol_print_date(), DolibarrFunctions::dol_mktime(), DolibarrFunctions::dol_getdate()
  */
 function dol_stringtotime($string, $gm = 1)
 {
@@ -383,7 +385,7 @@ function dol_stringtotime($string, $gm = 1)
 
     $string = preg_replace('/([^0-9])/i', '', $string);
     $tmp = $string . '000000';
-    $date = dol_mktime(substr($tmp, 8, 2), substr($tmp, 10, 2), substr($tmp, 12, 2), substr($tmp, 4, 2), substr($tmp, 6, 2), substr($tmp, 0, 4), ($gm ? 1 : 0));
+    $date = DolibarrFunctions::dol_mktime(substr($tmp, 8, 2), substr($tmp, 10, 2), substr($tmp, 12, 2), substr($tmp, 4, 2), substr($tmp, 6, 2), substr($tmp, 0, 4), ($gm ? 1 : 0));
     return $date;
 }
 
@@ -398,9 +400,9 @@ function dol_stringtotime($string, $gm = 1)
  */
 function dol_get_prev_day($day, $month, $year)
 {
-    $time = dol_mktime(12, 0, 0, $month, $day, $year, 1, 0);
+    $time = DolibarrFunctions::dol_mktime(12, 0, 0, $month, $day, $year, 1, 0);
     $time -= 24 * 60 * 60;
-    $tmparray = dol_getdate($time, true);
+    $tmparray = DolibarrFunctions::dol_getdate($time, true);
     return ['year' => $tmparray['year'], 'month' => $tmparray['mon'], 'day' => $tmparray['mday']];
 }
 
@@ -415,9 +417,9 @@ function dol_get_prev_day($day, $month, $year)
  */
 function dol_get_next_day($day, $month, $year)
 {
-    $time = dol_mktime(12, 0, 0, $month, $day, $year, 1, 0);
+    $time = DolibarrFunctions::dol_mktime(12, 0, 0, $month, $day, $year, 1, 0);
     $time += 24 * 60 * 60;
-    $tmparray = dol_getdate($time, true);
+    $tmparray = DolibarrFunctions::dol_getdate($time, true);
     return ['year' => $tmparray['year'], 'month' => $tmparray['mon'], 'day' => $tmparray['mday']];
 }
 
@@ -475,9 +477,9 @@ function dol_get_prev_week($day, $week, $month, $year)
 {
     $tmparray = dol_get_first_day_week($day, $month, $year);
 
-    $time = dol_mktime(12, 0, 0, $month, $tmparray['first_day'], $year, 1, 0);
+    $time = DolibarrFunctions::dol_mktime(12, 0, 0, $month, $tmparray['first_day'], $year, 1, 0);
     $time -= 24 * 60 * 60 * 7;
-    $tmparray = dol_getdate($time, true);
+    $tmparray = DolibarrFunctions::dol_getdate($time, true);
     return ['year' => $tmparray['year'], 'month' => $tmparray['mon'], 'day' => $tmparray['mday']];
 }
 
@@ -495,9 +497,9 @@ function dol_get_next_week($day, $week, $month, $year)
 {
     $tmparray = dol_get_first_day_week($day, $month, $year);
 
-    $time = dol_mktime(12, 0, 0, $tmparray['first_month'], $tmparray['first_day'], $tmparray['first_year'], 1, 0);
+    $time = DolibarrFunctions::dol_mktime(12, 0, 0, $tmparray['first_month'], $tmparray['first_day'], $tmparray['first_year'], 1, 0);
     $time += 24 * 60 * 60 * 7;
-    $tmparray = dol_getdate($time, true);
+    $tmparray = DolibarrFunctions::dol_getdate($time, true);
 
     return ['year' => $tmparray['year'], 'month' => $tmparray['mon'], 'day' => $tmparray['mday']];
 }
@@ -519,7 +521,7 @@ function dol_get_first_day($year, $month = 1, $gm = false)
     if ($year > 9999) {
         return '';
     }
-    return dol_mktime(0, 0, 0, $month, 1, $year, $gm);
+    return DolibarrFunctions::dol_mktime(0, 0, 0, $month, 1, $year, $gm);
 }
 
 /**
@@ -546,7 +548,7 @@ function dol_get_last_day($year, $month = 12, $gm = false)
     }
 
     // On se deplace au debut du mois suivant, et on retire un jour
-    $datelim = dol_mktime(23, 59, 59, $month, 1, $year, $gm);
+    $datelim = DolibarrFunctions::dol_mktime(23, 59, 59, $month, 1, $year, $gm);
     $datelim -= (3600 * 24);
 
     return $datelim;
@@ -563,8 +565,8 @@ function dol_get_last_day($year, $month = 12, $gm = false)
  */
 function dol_get_last_hour($date, $gm = 'tzserver')
 {
-    $tmparray = dol_getdate($date, false, ($gm == 'gmt' ? 'gmt' : ''));
-    return dol_mktime(23, 59, 59, $tmparray['mon'], $tmparray['mday'], $tmparray['year'], $gm);
+    $tmparray = DolibarrFunctions::dol_getdate($date, false, ($gm == 'gmt' ? 'gmt' : ''));
+    return DolibarrFunctions::dol_mktime(23, 59, 59, $tmparray['mon'], $tmparray['mday'], $tmparray['year'], $gm);
 }
 
 /**
@@ -578,8 +580,8 @@ function dol_get_last_hour($date, $gm = 'tzserver')
  */
 function dol_get_first_hour($date, $gm = 'tzserver')
 {
-    $tmparray = dol_getdate($date, false, ($gm == 'gmt' ? 'gmt' : ''));
-    return dol_mktime(0, 0, 0, $tmparray['mon'], $tmparray['mday'], $tmparray['year'], $gm);
+    $tmparray = DolibarrFunctions::dol_getdate($date, false, ($gm == 'gmt' ? 'gmt' : ''));
+    return DolibarrFunctions::dol_mktime(0, 0, 0, $tmparray['mon'], $tmparray['mday'], $tmparray['year'], $gm);
 }
 
 /**    Return first day of week for a date. First day of week may be monday if option MAIN_START_WEEK is 1.
@@ -597,12 +599,12 @@ function dol_get_first_day_week($day, $month, $year, $gm = false)
     global $conf;
 
     //$day=2; $month=2; $year=2015;
-    $date = dol_mktime(0, 0, 0, $month, $day, $year, $gm);
+    $date = DolibarrFunctions::dol_mktime(0, 0, 0, $month, $day, $year, $gm);
 
     //Checking conf of start week
     $start_week = (isset($conf->global->MAIN_START_WEEK) ? $conf->global->MAIN_START_WEEK : 1);
 
-    $tmparray = dol_getdate($date, true); // detail of current day
+    $tmparray = DolibarrFunctions::dol_getdate($date, true); // detail of current day
 
     //Calculate days = offset from current day
     $days = $start_week - $tmparray['wday'];
@@ -634,9 +636,9 @@ function dol_get_first_day_week($day, $month, $year, $gm = false)
     $tmpyear = $prev_year;
 
     //Get first day of next week
-    $tmptime = dol_mktime(12, 0, 0, $month, $tmpday, $year, 1, 0);
+    $tmptime = DolibarrFunctions::dol_mktime(12, 0, 0, $month, $tmpday, $year, 1, 0);
     $tmptime -= 24 * 60 * 60 * 7;
-    $tmparray = dol_getdate($tmptime, true);
+    $tmparray = DolibarrFunctions::dol_getdate($tmptime, true);
     $prev_day = $tmparray['mday'];
 
     //Check prev day of week is in same month than first day or not
@@ -650,7 +652,7 @@ function dol_get_first_day_week($day, $month, $year, $gm = false)
         }
     }
 
-    $week = date("W", dol_mktime(0, 0, 0, $tmpmonth, $tmpday, $tmpyear, $gm));
+    $week = date("W", DolibarrFunctions::dol_mktime(0, 0, 0, $tmpmonth, $tmpday, $tmpyear, $gm));
 
     return ['year' => $year, 'month' => $month, 'week' => $week, 'first_day' => $tmpday, 'first_month' => $tmpmonth, 'first_year' => $tmpyear, 'prev_year' => $prev_year, 'prev_month' => $prev_month, 'prev_day' => $prev_day];
 }

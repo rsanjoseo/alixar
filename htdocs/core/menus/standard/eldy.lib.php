@@ -27,6 +27,9 @@
  *  \file        htdocs/core/menus/standard/eldy.lib.php
  *  \brief        Library for file eldy menus
  */
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
 require_once DOL_DOCUMENT_ROOT . '/core/class/menubase.class.php';
 
 /**
@@ -53,7 +56,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
     $id = 'mainmenu';
     $listofmodulesforexternal = explode(',', $conf->global->MAIN_MODULES_FOR_EXTERNAL);
 
-    $substitarray = getCommonSubstitutionArray($langs, 0, null, null);
+    $substitarray = DolibarrFunctions::getCommonSubstitutionArray($langs, 0, null, null);
 
     if (empty($noout)) {
         print_start_menu_array();
@@ -103,7 +106,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Adherents&mainmenu=members&leftmenu=',
         'title' => "MenuMembers",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "members",
         'leftmenu' => '',
@@ -111,7 +114,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'members',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "members") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'member', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'member', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "members") ? 0 : 1),
         'loadLangs' => [],
         'submenus' => [],
@@ -132,7 +135,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Societes', // '/Modules/Societes/index&mainmenu=companies&leftmenu=',
         'title' => "ThirdParties",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "companies",
         'leftmenu' => '',
@@ -140,7 +143,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'companies',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "companies") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'company', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'company', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "companies") ? 0 : 1),
         'loadLangs' => ["companies", "suppliers"],
         'submenus' => [],
@@ -159,7 +162,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
             ? (["TMenuProducts", " | ", "TMenuServices"])
             : (!empty($conf->product->enabled) ? "TMenuProducts" : "TMenuServices"),
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "products",
         'leftmenu' => '',
@@ -167,7 +170,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'products',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "products") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'product', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'product', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "products") ? 0 : 1),
         'loadLangs' => ["products"],
         'submenus' => [],
@@ -184,7 +187,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Mrp&mainmenu=mrp&leftmenu=',
         'title' => "TMenuMRP",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "mrp",
         'leftmenu' => '',
@@ -192,7 +195,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'mrp',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "mrp") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'mrp', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'mrp', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "mrp") ? 0 : 1),
         'loadLangs' => ["mrp"],
         'submenus' => [],
@@ -209,7 +212,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Projects&mainmenu=project&leftmenu=',
         'title' => (!empty($conf->global->PROJECT_USE_OPPORTUNITIES) && $conf->global->PROJECT_USE_OPPORTUNITIES == 2 ? "Leads" : "Projects"),
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "project",
         'leftmenu' => '',
@@ -217,7 +220,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'project',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "project") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'project', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'project', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "project") ? 0 : 1),
         'loadLangs' => ["projects"],
         'submenus' => [],
@@ -260,7 +263,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
                 : '?module=Comm&mainmenu=commercial&leftmenu='),
         'title' => "Commercial",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "commercial",
         'leftmenu' => '',
@@ -268,7 +271,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'commercial',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "commercial") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'contract', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'contract', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "commercial") ? 0 : 1),
         'loadLangs' => ["commercial"],
         'submenus' => [],
@@ -294,7 +297,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Compta&mainmenu=billing&leftmenu=',
         'title' => "MenuFinancial",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "billing",
         'leftmenu' => '',
@@ -302,7 +305,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'billing',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "billing") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'bill', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'bill', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "billing") ? 0 : 1),
         'loadLangs' => ["compta"],
         'submenus' => [],
@@ -319,7 +322,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Compta&controller=BankList&mainmenu=bank&leftmenu=',
         'title' => "MenuBankCash",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "bank",
         'leftmenu' => '',
@@ -327,7 +330,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'bank',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "bank") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'bank_account', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'bank_account', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "bank") ? 0 : 1),
         'loadLangs' => ["compta", "banks"],
         'submenus' => [],
@@ -344,7 +347,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Accountancy&mainmenu=accountancy&leftmenu=',
         'title' => "MenuAccountancy",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "accountancy",
         'leftmenu' => '',
@@ -352,7 +355,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'accountancy',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "accountancy") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'accountancy', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'accountancy', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "accountancy") ? 0 : 1),
         'loadLangs' => ["compta", "accountancy", "assets", "intracommreport"],
         'submenus' => [],
@@ -370,7 +373,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Hrm&mainmenu=hrm&leftmenu=',
         'title' => "HRM",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "hrm",
         'leftmenu' => '',
@@ -378,7 +381,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'hrm',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "hrm") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'hrm', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'hrm', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "hrm") ? 0 : 1),
         'loadLangs' => ["holiday"],
         'submenus' => [],
@@ -401,7 +404,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Tickets&mainmenu=ticket&leftmenu=',
         'title' => "Tickets",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "ticket",
         'leftmenu' => '',
@@ -409,7 +412,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'ticket',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "ticket") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'ticket', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'ticket', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "ticket") ? 0 : 1),
         'loadLangs' => ["other"],
         'submenus' => [],
@@ -426,7 +429,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'link' => constant('BASE_URI') . '?module=Tools&mainmenu=tools&leftmenu=', // /core/tools.php
         'title' => "Tools",
         'level' => 0,
-        'enabled' => $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
+        'enabled' => $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal),
         'target' => $atarget,
         'mainmenu' => "tools",
         'leftmenu' => '',
@@ -434,7 +437,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         'id' => $id,
         'idsel' => 'tools',
         'classname' => $classname = (!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "tools") ? 'class="tmenusel"' : 'class="tmenu"',
-        'prefix' => img_picto('', 'tools', 'class="fa-fw paddingright"'),
+        'prefix' => DolibarrFunctions::img_picto('', 'tools', 'class="fa-fw paddingright"'),
         'session' => ((!empty($_SESSION["mainmenu"]) && $_SESSION["mainmenu"] == "tools") ? 0 : 1),
         'loadLangs' => ["other"],
         'submenus' => [],
@@ -478,7 +481,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
         //var_dump($type_user.' '.$newTabMenu[$i]['url'].' '.$showmode.' '.$newTabMenu[$i]['perms']);
         $idsel = (empty($newTabMenu[$i]['mainmenu']) ? 'none' : $newTabMenu[$i]['mainmenu']);
 
-        $newTabMenu[$i]['url'] = make_substitutions($newTabMenu[$i]['url'], $substitarray);
+        $newTabMenu[$i]['url'] = DolibarrFunctions::make_substitutions($newTabMenu[$i]['url'], $substitarray);
 
         // url = url from host, shorturl = relative path into dolibarr sources
         $url = $shorturl = $newTabMenu[$i]['url'];
@@ -491,7 +494,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
                 $param .= ($param ? '&' : '') . 'mainmenu=' . $newTabMenu[$i]['mainmenu'] . '&leftmenu=';
             }
             //$url.="idmenu=".$newTabMenu[$i]['rowid'];    // Already done by menuLoad
-            $url = dol_buildpath($url, 1) . ($param ? '?' . $param : '');
+            $url = DolibarrFunctions::dol_buildpath($url, 1) . ($param ? '?' . $param : '');
             //$shorturl = $shorturl.($param?'?'.$param:'');
             $shorturl = $url;
             if (DOL_URL_ROOT) {
@@ -499,7 +502,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
             }
         }
 
-        $showmode = isVisibleToUserType($type_user, $newTabMenu[$i], $listofmodulesforexternal);
+        $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $newTabMenu[$i], $listofmodulesforexternal);
         if ($showmode == 1) {
             // Define the class (top menu selected or not)
             if (!empty($_SESSION['idmenu']) && $newTabMenu[$i]['rowid'] == $_SESSION['idmenu']) {
@@ -530,7 +533,7 @@ function print_eldy_menu($db, $atarget, $type_user, &$tabMenu, &$menu, $noout = 
     }
 
     // Sort on position
-    $menu->liste = dol_sort_array($menu->liste, 'position');
+    $menu->liste = DolibarrFunctions::dol_sort_array($menu->liste, 'position');
 
     // Output menu entries
     // Show logo company
@@ -729,7 +732,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
         print "<!-- End Bookmarks -->\n";
     }
 
-    $substitarray = getCommonSubstitutionArray($langs, 0, null, null);
+    $substitarray = DolibarrFunctions::getCommonSubstitutionArray($langs, 0, null, null);
 
     $listofmodulesforexternal = explode(',', $conf->global->MAIN_MODULES_FOR_EXTERNAL);
 
@@ -826,7 +829,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
             }
 
-            $newmenu->add(constant('BASE_URI') . '?module=Users&controller=Home&leftmenu=users', $langs->trans("MenuUsersAndGroups"), 0, $user->rights->user->user->lire, '', $mainmenu, 'users', 0, '', '', '', img_picto('', 'user', 'class="paddingright pictofixedwidth"'));
+            $newmenu->add(constant('BASE_URI') . '?module=Users&controller=Home&leftmenu=users', $langs->trans("MenuUsersAndGroups"), 0, $user->rights->user->user->lire, '', $mainmenu, 'users', 0, '', '', '', DolibarrFunctions::img_picto('', 'user', 'class="paddingright pictofixedwidth"'));
             if ($user->rights->user->user->lire) {
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "users") {
                     $newmenu->add(constant('BASE_URI') . "", $langs->trans("Users"), 1, $user->rights->user->user->lire || $user->admin);
@@ -851,8 +854,8 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Societes
             if (!empty($conf->societe->enabled)) {
                 $langs->load("companies");
-                // $newmenu->add(constant('BASE_URI') . "/Modules/Societes/index&leftmenu=thirdparties", $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
-                $newmenu->add(constant('BASE_URI') . '?module=Societes&leftmenu=thirdparties', $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
+                // $newmenu->add(constant('BASE_URI') . "/Modules/Societes/index&leftmenu=thirdparties", $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', DolibarrFunctions::img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Societes&leftmenu=thirdparties', $langs->trans("ThirdParty"), 0, $user->rights->societe->lire, '', $mainmenu, 'thirdparties', 0, '', '', '', DolibarrFunctions::img_picto('', 'company', 'class="paddingright pictofixedwidth"'));
 
                 if ($user->rights->societe->creer) {
                     $newmenu->add(constant('BASE_URI') . '?module=Societes&controller=Card&action=create', $langs->trans("MenuNewThirdParty"), 1);
@@ -914,7 +917,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             }
 
             // Contacts
-            $newmenu->add(constant('BASE_URI') . '?module=Societes&leftmenu=thirdparties', (!empty($conf->global->SOCIETE_ADDRESSES_MANAGEMENT) ? $langs->trans("Contacts") : $langs->trans("ContactsAddresses")), 0, $user->rights->societe->contact->lire, '', $mainmenu, 'contacts', 0, '', '', '', img_picto('', 'contact', 'class="paddingright pictofixedwidth"'));
+            $newmenu->add(constant('BASE_URI') . '?module=Societes&leftmenu=thirdparties', (!empty($conf->global->SOCIETE_ADDRESSES_MANAGEMENT) ? $langs->trans("Contacts") : $langs->trans("ContactsAddresses")), 0, $user->rights->societe->contact->lire, '', $mainmenu, 'contacts', 0, '', '', '', DolibarrFunctions::img_picto('', 'contact', 'class="paddingright pictofixedwidth"'));
 
             $newmenu->add(constant('BASE_URI') . '?module=Contacts&controller=Card&leftmenu=contacts&action=create', (!empty($conf->global->SOCIETE_ADDRESSES_MANAGEMENT) ? $langs->trans("NewContact") : $langs->trans("NewContactAddress")), 1, $user->rights->societe->contact->creer);
             $newmenu->add(constant('BASE_URI') . '?module=Contacts&controller=List&leftmenu=contacts', $langs->trans("List"), 1, $user->rights->societe->contact->lire);
@@ -947,7 +950,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Customer proposal
             if (!empty($conf->propal->enabled)) {
                 $langs->load("propal");
-                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=Propal/index&leftmenu=propals', $langs->trans("Proposals"), 0, $user->rights->propale->lire, '', $mainmenu, 'propals', 100, '', '', '', img_picto('', 'propal', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=Propal/index&leftmenu=propals', $langs->trans("Proposals"), 0, $user->rights->propale->lire, '', $mainmenu, 'propals', 100, '', '', '', DolibarrFunctions::img_picto('', 'propal', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=Propal_card&action=create&leftmenu=propals', $langs->trans("NewPropal"), 1, $user->rights->propale->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=Propal_list&leftmenu=propals', $langs->trans("List"), 1, $user->rights->propale->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "propals") {
@@ -964,7 +967,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Customers orders
             if (!empty($conf->commande->enabled)) {
                 $langs->load("orders");
-                $newmenu->add(constant('BASE_URI') . "?module=Commande&leftmenu=orders", $langs->trans("CustomersOrders"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 200, '', '', '', img_picto('', 'order', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Commande&leftmenu=orders", $langs->trans("CustomersOrders"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 200, '', '', '', DolibarrFunctions::img_picto('', 'order', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . "?module=Commande&controller=Card&action=create&leftmenu=orders", $langs->trans("NewOrder"), 1, $user->rights->commande->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Commande&controller=List&leftmenu=orders', $langs->trans("List"), 1, $user->rights->commande->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "orders") {
@@ -982,7 +985,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Supplier proposal
             if (!empty($conf->supplier_proposal->enabled)) {
                 $langs->load("supplier_proposal");
-                $newmenu->add(constant('BASE_URI') . '?module=SupplierProposal&leftmenu=propals_supplier', $langs->trans("SupplierProposalsShort"), 0, $user->rights->supplier_proposal->lire, '', $mainmenu, 'propals_supplier', 300, '', '', '', img_picto('', 'supplier_proposal', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=SupplierProposal&leftmenu=propals_supplier', $langs->trans("SupplierProposalsShort"), 0, $user->rights->supplier_proposal->lire, '', $mainmenu, 'propals_supplier', 300, '', '', '', DolibarrFunctions::img_picto('', 'supplier_proposal', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=SupplierProposal&controller=Card&action=create&leftmenu=supplier_proposals', $langs->trans("SupplierProposalNew"), 1, $user->rights->supplier_proposal->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=SupplierProposal&controller=List&leftmenu=supplier_proposals', $langs->trans("List"), 1, $user->rights->supplier_proposal->lire);
                 $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=Propal_Stats_Index&leftmenu=supplier_proposals&mode=supplier', $langs->trans("Statistics"), 1, $user->rights->supplier_proposal->lire);
@@ -991,7 +994,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Suppliers orders
             if (!empty($conf->supplier_order->enabled)) {
                 $langs->load("orders");
-                $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_index&leftmenu=orders_suppliers', $langs->trans("SuppliersOrders"), 0, $user->rights->fournisseur->commande->lire, '', $mainmenu, 'orders_suppliers', 400, '', '', '', img_picto('', 'supplier_order', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_index&leftmenu=orders_suppliers', $langs->trans("SuppliersOrders"), 0, $user->rights->fournisseur->commande->lire, '', $mainmenu, 'orders_suppliers', 400, '', '', '', DolibarrFunctions::img_picto('', 'supplier_order', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_card&action=create&leftmenu=orders_suppliers', $langs->trans("NewSupplierOrderShort"), 1, $user->rights->fournisseur->commande->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_list&leftmenu=orders_suppliers', $langs->trans("List"), 1, $user->rights->fournisseur->commande->lire);
 
@@ -1015,7 +1018,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Contrat
             if (!empty($conf->contrat->enabled)) {
                 $langs->load("contracts");
-                $newmenu->add(constant('BASE_URI') . '/Modules/Contracts/index&leftmenu=contracts', $langs->trans("ContractsSubscriptions"), 0, $user->rights->contrat->lire, '', $mainmenu, 'contracts', 2000, '', '', '', img_picto('', 'contract', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '/Modules/Contracts/index&leftmenu=contracts', $langs->trans("ContractsSubscriptions"), 0, $user->rights->contrat->lire, '', $mainmenu, 'contracts', 2000, '', '', '', DolibarrFunctions::img_picto('', 'contract', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '/Modules/Contracts/card&action=create&leftmenu=contracts', $langs->trans("NewContractSubscription"), 1, $user->rights->contrat->creer);
                 $newmenu->add(constant('BASE_URI') . '/Modules/Contracts/list&leftmenu=contracts', $langs->trans("List"), 1, $user->rights->contrat->lire);
                 $newmenu->add(constant('BASE_URI') . '/Modules/Contracts/services_list&leftmenu=contracts', $langs->trans("MenuServices"), 1, $user->rights->contrat->lire);
@@ -1030,7 +1033,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Interventions
             if (!empty($conf->ficheinter->enabled)) {
                 $langs->load("interventions");
-                $newmenu->add(constant('BASE_URI') . '?module=Fichinter&controller=index&leftmenu=ficheinter', $langs->trans("Interventions"), 0, $user->rights->ficheinter->lire, '', $mainmenu, 'ficheinter', 2200, '', '', '', img_picto('', 'intervention', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Fichinter&controller=index&leftmenu=ficheinter', $langs->trans("Interventions"), 0, $user->rights->ficheinter->lire, '', $mainmenu, 'ficheinter', 2200, '', '', '', DolibarrFunctions::img_picto('', 'intervention', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Fichinter&controller=card&action=create&leftmenu=ficheinter', $langs->trans("NewIntervention"), 1, $user->rights->ficheinter->creer, '', '', '', 201);
                 $newmenu->add(constant('BASE_URI') . '?module=Fichinter&controller=list&leftmenu=ficheinter', $langs->trans("List"), 1, $user->rights->ficheinter->lire, '', '', '', 202);
                 if ($conf->global->MAIN_FEATURES_LEVEL >= 2) {
@@ -1049,7 +1052,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Customers invoices
             if (!empty($conf->facture->enabled)) {
                 $langs->load("bills");
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=Facture_index&leftmenu=customers_bills', $langs->trans("BillsCustomers"), 0, $user->rights->facture->lire, '', $mainmenu, 'customers_bills', 0, '', '', '', img_picto('', 'bill', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=Facture_index&leftmenu=customers_bills', $langs->trans("BillsCustomers"), 0, $user->rights->facture->lire, '', $mainmenu, 'customers_bills', 0, '', '', '', DolibarrFunctions::img_picto('', 'bill', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=Facture_card&action=create', $langs->trans("NewBill"), 1, $user->rights->facture->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=Facture_list&leftmenu=customers_bills', $langs->trans("List"), 1, $user->rights->facture->lire, '', $mainmenu, 'customers_bills_list');
 
@@ -1074,7 +1077,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Suppliers invoices
             if (!empty($conf->societe->enabled) && !empty($conf->supplier_invoice->enabled)) {
                 $langs->load("bills");
-                $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Facture_index&leftmenu=suppliers_bills', $langs->trans("BillsSuppliers"), 0, $user->rights->fournisseur->facture->lire, '', $mainmenu, 'suppliers_bills', 0, '', '', '', img_picto('', 'supplier_invoice', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Facture_index&leftmenu=suppliers_bills', $langs->trans("BillsSuppliers"), 0, $user->rights->fournisseur->facture->lire, '', $mainmenu, 'suppliers_bills', 0, '', '', '', DolibarrFunctions::img_picto('', 'supplier_invoice', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Facture_card&leftmenu=suppliers_bills&action=create', $langs->trans("NewBill"), 1, ($user->rights->fournisseur->facture->creer || $user->rights->supplier_invoice->creer), '', $mainmenu, 'suppliers_bills_create');
                 $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Facture_list&leftmenu=suppliers_bills', $langs->trans("List"), 1, $user->rights->fournisseur->facture->lire, '', $mainmenu, 'suppliers_bills_list');
 
@@ -1095,7 +1098,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->commande->enabled)) {
                 $langs->load("orders");
                 if (!empty($conf->facture->enabled)) {
-                    $newmenu->add(constant('BASE_URI') . '?module=Commande&controller=List&leftmenu=orders&search_status=-3&billed=0&contextpage=billableorders', $langs->trans("MenuOrdersToBill2"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 0, '', '', '', img_picto('', 'order', 'class="paddingright pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Commande&controller=List&leftmenu=orders&search_status=-3&billed=0&contextpage=billableorders', $langs->trans("MenuOrdersToBill2"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 0, '', '', '', DolibarrFunctions::img_picto('', 'order', 'class="paddingright pictofixedwidth"'));
                 }
                 //if ($usemenuhider || empty($leftmenu) || $leftmenu=="orders") $newmenu->add(constant('BASE_URI') . "?module=Commande&controller=", $langs->trans("StatusOrderToBill"), 1, $user->rights->commande->lire);
             }
@@ -1104,7 +1107,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->supplier_invoice->enabled)) {
                 if (!empty($conf->global->SUPPLIER_MENU_ORDER_RECEIVED_INTO_INVOICE)) {
                     $langs->load("supplier");
-                    $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_list&leftmenu=orders&search_status=5&billed=0', $langs->trans("MenuOrdersSupplierToBill"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 0, '', '', '', img_picto('', 'supplier_order', 'class="paddingright pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Fourn&controller=Commande_list&leftmenu=orders&search_status=5&billed=0', $langs->trans("MenuOrdersSupplierToBill"), 0, $user->rights->commande->lire, '', $mainmenu, 'orders', 0, '', '', '', DolibarrFunctions::img_picto('', 'supplier_order', 'class="paddingright pictofixedwidth"'));
                     //if ($usemenuhider || empty($leftmenu) || $leftmenu=="orders") $newmenu->add(constant('BASE_URI') . "?module=Commande&controller=", $langs->trans("StatusOrderToBill"), 1, $user->rights->commande->lire);
                 }
             }
@@ -1112,7 +1115,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Donations
             if (!empty($conf->don->enabled)) {
                 $langs->load("donations");
-                $newmenu->add(constant('BASE_URI') . '?module=Don&leftmenu=donations&mainmenu=billing', $langs->trans("Donations"), 0, $user->rights->don->lire, '', $mainmenu, 'donations', 0, '', '', '', img_picto('', 'donation', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Don&leftmenu=donations&mainmenu=billing', $langs->trans("Donations"), 0, $user->rights->don->lire, '', $mainmenu, 'donations', 0, '', '', '', DolibarrFunctions::img_picto('', 'donation', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "donations") {
                     $newmenu->add(constant('BASE_URI') . '?module=Don&controller=Card&leftmenu=donations&action=create', $langs->trans("NewDonation"), 1, $user->rights->don->creer);
                     $newmenu->add(constant('BASE_URI') . '?module=Don&controller=List&leftmenu=donations', $langs->trans("List"), 1, $user->rights->don->lire);
@@ -1122,7 +1125,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Taxes and social contributions
             if (!empty($conf->tax->enabled)) {
-                $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=Charges/index&leftmenu=tax&mainmenu=billing", $langs->trans("MenuTaxesAndSpecialExpenses"), 0, $user->rights->tax->charges->lire, '', $mainmenu, 'tax', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=Charges/index&leftmenu=tax&mainmenu=billing", $langs->trans("MenuTaxesAndSpecialExpenses"), 0, $user->rights->tax->charges->lire, '', $mainmenu, 'tax', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
 
                 $newmenu->add(constant('BASE_URI') . "?module=Compta&controller=Sociales_list&leftmenu=tax_social", $langs->trans("MenuSocialContributions"), 1, $user->rights->tax->charges->lire);
                 if ($usemenuhider || empty($leftmenu) || preg_match('/^tax_social/i', $leftmenu)) {
@@ -1172,7 +1175,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Salaries
             if (!empty($conf->salaries->enabled)) {
                 $langs->load("salaries");
-                $newmenu->add(constant('BASE_URI') . '?module=Salaries&controller=List&leftmenu=tax_salary&mainmenu=billing', $langs->trans("Salaries"), 0, $user->rights->salaries->read, '', $mainmenu, 'tax_salary', 0, '', '', '', img_picto('', 'salary', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Salaries&controller=List&leftmenu=tax_salary&mainmenu=billing', $langs->trans("Salaries"), 0, $user->rights->salaries->read, '', $mainmenu, 'tax_salary', 0, '', '', '', DolibarrFunctions::img_picto('', 'salary', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || preg_match('/^tax_salary/i', $leftmenu)) {
                     $newmenu->add(constant('BASE_URI') . '?module=Salaries&controller=Card&leftmenu=tax_salary&action=create', $langs->trans("New"), 1, $user->rights->salaries->write);
                     $newmenu->add(constant('BASE_URI') . '?module=Salaries&controller=List&leftmenu=tax_salary', $langs->trans("List"), 1, $user->rights->salaries->read);
@@ -1184,7 +1187,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Loan
             if (!empty($conf->loan->enabled)) {
                 $langs->load("loan");
-                $newmenu->add(constant('BASE_URI') . '?module=Loan&controller=list&leftmenu=tax_loan&mainmenu=billing', $langs->trans("Loans"), 0, $user->rights->loan->read, '', $mainmenu, 'tax_loan', 0, '', '', '', img_picto('', 'loan', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Loan&controller=list&leftmenu=tax_loan&mainmenu=billing', $langs->trans("Loans"), 0, $user->rights->loan->read, '', $mainmenu, 'tax_loan', 0, '', '', '', DolibarrFunctions::img_picto('', 'loan', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || preg_match('/^tax_loan/i', $leftmenu)) {
                     $newmenu->add(constant('BASE_URI') . '?module=Loan&controller=card&leftmenu=tax_loan&action=create', $langs->trans("NewLoan"), 1, $user->rights->loan->write);
                     //$newmenu->add(constant('BASE_URI') . "?module=Loan&controller=payment_list&leftmenu=tax_loan",$langs->trans("Payments"),2,$user->rights->loan->read);
@@ -1194,7 +1197,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Various payment
             if (!empty($conf->banque->enabled) && empty($conf->global->BANK_USE_OLD_VARIOUS_PAYMENT)) {
                 $langs->load("banks");
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_various_payment_list&leftmenu=tax_various&mainmenu=billing', $langs->trans("MenuVariousPayment"), 0, $user->rights->banque->lire, '', $mainmenu, 'tax_various', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_various_payment_list&leftmenu=tax_various&mainmenu=billing', $langs->trans("MenuVariousPayment"), 0, $user->rights->banque->lire, '', $mainmenu, 'tax_various', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || preg_match('/^tax_various/i', $leftmenu)) {
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_various_payment_card&leftmenu=tax_various&action=create', $langs->trans("New"), 1, $user->rights->banque->modifier);
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_various_payment_list&leftmenu=tax_various', $langs->trans("List"), 1, $user->rights->banque->lire);
@@ -1214,7 +1217,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 //$newmenu->add(constant('BASE_URI') . "?module=Accountancy&controller=index&leftmenu=accountancy", $langs->trans("MenuAccountancy"), 0, $permtoshowmenu, '', $mainmenu, 'accountancy');
 
                 // Configuration
-                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_admin', $langs->trans("Setup"), 0, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin', 1, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_admin', $langs->trans("Setup"), 0, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin', 1, '', '', '', DolibarrFunctions::img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
                 if ($usemenuhider || empty($leftmenu) || preg_match('/accountancy_admin/', $leftmenu)) {
                     $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=admin_index&mainmenu=accountancy&leftmenu=accountancy_admin', $langs->trans("General"), 1, $user->rights->accounting->chartofaccount, '', $mainmenu, 'accountancy_admin_general', 10);
 
@@ -1249,7 +1252,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Transfer in accounting
-                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_transfer', $langs->trans("TransferInAccounting"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'transfer', 1, '', '', '', img_picto('', 'long-arrow-alt-right', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_transfer', $langs->trans("TransferInAccounting"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'transfer', 1, '', '', '', DolibarrFunctions::img_picto('', 'long-arrow-alt-right', 'class="paddingright pictofixedwidth"'));
 
                 // Binding
                 // $newmenu->add(constant('BASE_URI') . "", $langs->trans("Binding"), 0, $user->rights->accounting->bind->write, '', $mainmenu, 'dispatch');
@@ -1347,7 +1350,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Accounting
-                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_accountancy', $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=index&leftmenu=accountancy_accountancy', $langs->trans("MenuAccountancy"), 0, $user->rights->accounting->mouvements->lire || $user->rights->accounting->comptarapport->lire, '', $mainmenu, 'accountancy', 1, '', '', '', DolibarrFunctions::img_picto('', 'accountancy', 'class="paddingright pictofixedwidth"'));
 
                 // General Ledger
                 $newmenu->add(constant('BASE_URI') . '?module=Accountancy&controller=bookkeeping_listbyaccount&mainmenu=accountancy&leftmenu=accountancy_accountancy', $langs->trans("Bookkeeping"), 1, $user->rights->accounting->mouvements->lire);
@@ -1495,7 +1498,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Assets
             if (!empty($conf->asset->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=list&leftmenu=asset&mainmenu=accountancy', $langs->trans("MenuAssets"), 0, $user->rights->asset->read, '', $mainmenu, 'asset', 100, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=asset&controller=list&leftmenu=asset&mainmenu=accountancy', $langs->trans("MenuAssets"), 0, $user->rights->asset->read, '', $mainmenu, 'asset', 100, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=asset&controller=card&leftmenu=asset&action=create', $langs->trans("MenuNewAsset"), 1, $user->rights->asset->write);
                 $newmenu->add(constant('BASE_URI') . '?module=asset&controller=list&leftmenu=asset&mainmenu=accountancy', $langs->trans("MenuListAssets"), 1, $user->rights->asset->read);
                 $newmenu->add(constant('BASE_URI') . '?module=asset&controller=type&leftmenu=asset_type', $langs->trans("MenuTypeAssets"), 1, $user->rights->asset->read, '', $mainmenu, 'asset_type');
@@ -1515,7 +1518,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Bank-Cash account
             if (!empty($conf->banque->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_list&leftmenu=bank&mainmenu=bank', $langs->trans("MenuBankCash"), 0, $user->rights->banque->lire, '', $mainmenu, 'bank', 0, '', '', '', img_picto('', 'bank_account', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_list&leftmenu=bank&mainmenu=bank', $langs->trans("MenuBankCash"), 0, $user->rights->banque->lire, '', $mainmenu, 'bank', 0, '', '', '', DolibarrFunctions::img_picto('', 'bank_account', 'class="paddingright pictofixedwidth"'));
 
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_card&action=create', $langs->trans("MenuNewFinancialAccount"), 1, $user->rights->banque->configurer);
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=bank_list&leftmenu=bank&mainmenu=bank', $langs->trans("List"), 1, $user->rights->banque->lire, '', $mainmenu, 'bank');
@@ -1533,7 +1536,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Direct debit order
             if (!empty($conf->prelevement->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_index&leftmenu=withdraw&mainmenu=bank', $langs->trans("PaymentByDirectDebit"), 0, $user->rights->prelevement->bons->lire, '', $mainmenu, 'withdraw', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_index&leftmenu=withdraw&mainmenu=bank', $langs->trans("PaymentByDirectDebit"), 0, $user->rights->prelevement->bons->lire, '', $mainmenu, 'withdraw', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
 
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "withdraw") {
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_create&mainmenu=bank', $langs->trans("NewStandingOrder"), 1, $user->rights->prelevement->bons->creer);
@@ -1547,7 +1550,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Bank transfer order
             if (!empty($conf->paymentbybanktransfer->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paymentbybanktransfer_index&leftmenu=banktransfer&mainmenu=bank', $langs->trans("PaymentByBankTransfer"), 0, $user->rights->paymentbybanktransfer->read, '', $mainmenu, 'banktransfer', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paymentbybanktransfer_index&leftmenu=banktransfer&mainmenu=bank', $langs->trans("PaymentByBankTransfer"), 0, $user->rights->paymentbybanktransfer->read, '', $mainmenu, 'banktransfer', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
 
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "banktransfer") {
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=prelevement_create&type=bank-transfer&mainmenu=bank', $langs->trans("NewPaymentByBankTransfer"), 1, $user->rights->paymentbybanktransfer->create);
@@ -1561,7 +1564,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Management of checks
             if (empty($conf->global->BANK_DISABLE_CHECK_DEPOSIT) && !empty($conf->banque->enabled) && (!empty($conf->facture->enabled) || !empty($conf->global->MAIN_MENU_CHEQUE_DEPOSIT_ON))) {
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_index&leftmenu=checks&mainmenu=bank', $langs->trans("MenuChequeDeposits"), 0, $user->rights->banque->cheque, '', $mainmenu, 'checks', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_index&leftmenu=checks&mainmenu=bank', $langs->trans("MenuChequeDeposits"), 0, $user->rights->banque->cheque, '', $mainmenu, 'checks', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
                 if (preg_match('/checks/', $leftmenu)) {
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_card&leftmenu=checks_bis&action=new&mainmenu=bank', $langs->trans("NewChequeDeposit"), 1, $user->rights->banque->cheque);
                     $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=paiement_cheque_list&leftmenu=checks_bis&mainmenu=bank', $langs->trans("List"), 1, $user->rights->banque->cheque);
@@ -1571,7 +1574,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Cash Control
             if (!empty($conf->takepos->enabled) || !empty($conf->cashdesk->enabled)) {
                 $permtomakecashfence = ($user->hasRight('cashdesk', 'run') || $user->hasRight('takepos', 'run'));
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_list&action=list', $langs->trans("POS"), 0, $permtomakecashfence, '', $mainmenu, 'cashcontrol', 0, '', '', '', img_picto('', 'pos', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_list&action=list', $langs->trans("POS"), 0, $permtomakecashfence, '', $mainmenu, 'cashcontrol', 0, '', '', '', DolibarrFunctions::img_picto('', 'pos', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_card&action=create', $langs->trans("NewCashFence"), 1, $permtomakecashfence);
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=cashcontrol_cashcontrol_list&action=list', $langs->trans("List"), 1, $permtomakecashfence);
             }
@@ -1583,7 +1586,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
         if ($mainmenu == 'products') {
             // Products
             if (!empty($conf->product->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=product&type=0', $langs->trans("Products"), 0, $user->rights->produit->lire, '', $mainmenu, 'product', 0, '', '', '', img_picto('', 'product', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=product&type=0', $langs->trans("Products"), 0, $user->rights->produit->lire, '', $mainmenu, 'product', 0, '', '', '', DolibarrFunctions::img_picto('', 'product', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=card&leftmenu=product&action=create&type=0', $langs->trans("NewProduct"), 1, $user->rights->produit->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=list&leftmenu=product&type=0', $langs->trans("List"), 1, $user->rights->produit->lire);
                 if (!empty($conf->stock->enabled)) {
@@ -1611,7 +1614,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // Services
             if (!empty($conf->service->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=service&type=1', $langs->trans("Services"), 0, $user->rights->service->lire, '', $mainmenu, 'service', 0, '', '', '', img_picto('', 'service', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=index&leftmenu=service&type=1', $langs->trans("Services"), 0, $user->rights->service->lire, '', $mainmenu, 'service', 0, '', '', '', DolibarrFunctions::img_picto('', 'service', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=card&leftmenu=service&action=create&type=1', $langs->trans("NewService"), 1, $user->rights->service->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=list&leftmenu=service&type=1', $langs->trans("List"), 1, $user->rights->service->lire);
                 if (!empty($conf->propal->enabled) || !empty($conf->commande->enabled) || !empty($conf->facture->enabled) || (!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_proposal->enabled) || !empty($conf->supplier_oder->enabled) || !empty($conf->supplier_invoice->enabled)) {
@@ -1628,7 +1631,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Warehouse
             if (!empty($conf->stock->enabled)) {
                 $langs->load("stocks");
-                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_index&leftmenu=stock', $langs->trans("Warehouses"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'stock', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_index&leftmenu=stock', $langs->trans("Warehouses"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', DolibarrFunctions::img_picto('', 'stock', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_card&action=create', $langs->trans("MenuNewWarehouse"), 1, $user->rights->stock->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_list', $langs->trans("List"), 1, $user->rights->stock->lire);
                 $newmenu->add(constant('BASE_URI') . '?module=Products&controller=stock_movement_list', $langs->trans("Movements"), 1, $user->rights->stock->mouvement->lire);
@@ -1649,13 +1652,13 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->stock->enabled)) {
                 $langs->load("stocks");
                 if (empty($conf->global->MAIN_USE_ADVANCED_PERMS)) {
-                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->lire, '', $mainmenu, 'stock', 0, '', '', '', DolibarrFunctions::img_picto('', 'inventory', 'class="pictofixedwidth"'));
                     if ($usemenuhider || empty($leftmenu) || $leftmenu == "stock_inventories") {
                         $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_card&action=create&leftmenu=stock_inventories', $langs->trans("NewInventory"), 1, $user->rights->stock->creer);
                         $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("List"), 1, $user->rights->stock->lire);
                     }
                 } else {
-                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->inventory_advance->read, '', $mainmenu, 'stock', 0, '', '', '', img_picto('', 'inventory', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("Inventories"), 0, $user->rights->stock->inventory_advance->read, '', $mainmenu, 'stock', 0, '', '', '', DolibarrFunctions::img_picto('', 'inventory', 'class="pictofixedwidth"'));
                     if ($usemenuhider || empty($leftmenu) || $leftmenu == "stock_inventories") {
                         $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_card&action=create&leftmenu=stock_inventories', $langs->trans("NewInventory"), 1, $user->rights->stock->inventory_advance->write);
                         $newmenu->add(constant('BASE_URI') . '?module=Products&controller=inventory_list&leftmenu=stock_inventories', $langs->trans("List"), 1, $user->rights->stock->inventory_advance->read);
@@ -1666,7 +1669,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Shipments
             if (!empty($conf->expedition->enabled)) {
                 $langs->load("sendings");
-                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=index&leftmenu=sendings', $langs->trans("Shipments"), 0, $user->rights->expedition->lire, '', $mainmenu, 'sendings', 0, '', '', '', img_picto('', 'shipment', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=index&leftmenu=sendings', $langs->trans("Shipments"), 0, $user->rights->expedition->lire, '', $mainmenu, 'sendings', 0, '', '', '', DolibarrFunctions::img_picto('', 'shipment', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=card&action=create2&leftmenu=sendings', $langs->trans("NewSending"), 1, $user->rights->expedition->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Expedition&controller=list&leftmenu=sendings', $langs->trans("List"), 1, $user->rights->expedition->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "sendings") {
@@ -1680,7 +1683,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Receptions
             if (!empty($conf->reception->enabled)) {
                 $langs->load("receptions");
-                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=index&leftmenu=receptions', $langs->trans("Receptions"), 0, $user->rights->reception->lire, '', $mainmenu, 'receptions', 0, '', '', '', img_picto('', 'dollyrevert', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=index&leftmenu=receptions', $langs->trans("Receptions"), 0, $user->rights->reception->lire, '', $mainmenu, 'receptions', 0, '', '', '', DolibarrFunctions::img_picto('', 'dollyrevert', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=card&action=create2&leftmenu=receptions', $langs->trans("NewReception"), 1, $user->rights->reception->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Reception&controller=list&leftmenu=receptions', $langs->trans("List"), 1, $user->rights->reception->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "receptions") {
@@ -1704,7 +1707,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->bom->enabled) || !empty($conf->mrp->enabled)) {
                 $langs->load("mrp");
 
-                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuBOM"), 0, $user->rights->bom->read, '', $mainmenu, 'bom', 0, '', '', '', img_picto('', 'bom', 'class="paddingrightonly pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuBOM"), 0, $user->rights->bom->read, '', $mainmenu, 'bom', 0, '', '', '', DolibarrFunctions::img_picto('', 'bom', 'class="paddingrightonly pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Bom&controller=bom_card&leftmenu=bom&action=create', $langs->trans("NewBOM"), 1, $user->rights->bom->write, '', $mainmenu, 'bom');
                 $newmenu->add(constant('BASE_URI') . '?module=Bom&controller=bom_list&leftmenu=bom', $langs->trans("List"), 1, $user->rights->bom->read, '', $mainmenu, 'bom');
             }
@@ -1712,7 +1715,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->mrp->enabled)) {
                 $langs->load("mrp");
 
-                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuMRP"), 0, $user->rights->mrp->read, '', $mainmenu, 'mo', 0, '', '', '', img_picto('', 'mrp', 'class="paddingrightonly pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '', $langs->trans("MenuMRP"), 0, $user->rights->mrp->read, '', $mainmenu, 'mo', 0, '', '', '', DolibarrFunctions::img_picto('', 'mrp', 'class="paddingrightonly pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Mrp&controller=mo_card&leftmenu=mo&action=create', $langs->trans("NewMO"), 1, $user->rights->mrp->write, '', $mainmenu, 'mo');
                 $newmenu->add(constant('BASE_URI') . '?module=Mrp&controller=mo_list&leftmenu=mo', $langs->trans("List"), 1, $user->rights->mrp->read, '', $mainmenu, 'mo');
             }
@@ -1725,14 +1728,14 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->projet->enabled)) {
                 $langs->load("projects");
 
-                $search_project_user = GETPOST('search_project_user', 'int');
+                $search_project_user = DolibarrFunctions::GETPOST('search_project_user', 'int');
 
                 $tmpentry = [
                     'enabled' => (!empty($conf->projet->enabled)),
                     'perms' => (!empty($user->rights->projet->lire)),
                     'module' => 'projet',
                 ];
-                $showmode = isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal);
+                $showmode = DolibarrFunctions::isVisibleToUserType($type_user, $tmpentry, $listofmodulesforexternal);
 
                 $titleboth = $langs->trans("LeadsOrProjects");
                 $titlenew = $langs->trans("NewLeadOrProject"); // Leads and opportunities by default
@@ -1746,7 +1749,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 }
 
                 // Project assigned to user
-                $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=index&leftmenu=projects' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', img_picto('', 'project', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=index&leftmenu=projects' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titleboth, 0, $user->rights->projet->lire, '', $mainmenu, 'projects', 0, '', '', '', DolibarrFunctions::img_picto('', 'project', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=card&leftmenu=projects&action=create' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $titlenew, 1, $user->rights->projet->creer);
 
                 if (empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
@@ -1769,12 +1772,12 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
                 if (empty($conf->global->PROJECT_HIDE_TASKS)) {
                     // Project affected to user
-                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_index&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', img_picto('', 'projecttask', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_index&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("Activities"), 0, $user->rights->projet->lire, '', 'project', 'tasks', 0, '', '', '', DolibarrFunctions::img_picto('', 'projecttask', 'class="pictofixedwidth"'));
                     $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks&leftmenu=tasks&action=create", $langs->trans("NewTask"), 1, $user->rights->projet->creer);
                     $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks_list&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("List"), 1, $user->rights->projet->lire);
                     $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=tasks_stats_index&leftmenu=projects", $langs->trans("Statistics"), 1, $user->rights->projet->lire);
 
-                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . "?module=Projects&controller=activity/perweek&leftmenu=tasks" . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', 'project', 'timespent', 0, '', '', '', DolibarrFunctions::img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1787,7 +1790,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             if (!empty($conf->hrm->enabled)) {
                 $langs->load("hrm");
 
-                $newmenu->add(constant('BASE_URI') . '?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee', $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'user', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee', $langs->trans("Employees"), 0, $user->rights->user->user->lire, '', $mainmenu, 'hrm', 0, '', '', '', DolibarrFunctions::img_picto('', 'user', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Users&controller=card&mainmenu=hrm&leftmenu=hrm&action=create&employee=1', $langs->trans("NewEmployee"), 1, $user->rights->user->user->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Users&controller=list&mainmenu=hrm&leftmenu=hrm&mode=employee&contextpage=employeelist', $langs->trans("List"), 1, $user->rights->user->user->lire);
             }
@@ -1797,7 +1800,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["holiday", "trips"]);
 
-                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm', $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', img_picto('', 'holiday', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm', $langs->trans("CPTitreMenu"), 0, $user->rights->holiday->read, '', $mainmenu, 'hrm', 0, '', '', '', DolibarrFunctions::img_picto('', 'holiday', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=card&mainmenu=hrm&leftmenu=holiday&action=create', $langs->trans("New"), 1, $user->rights->holiday->write);
                 $newmenu->add(constant('BASE_URI') . '?module=Holiday&controller=list&mainmenu=hrm&leftmenu=hrm', $langs->trans("List"), 1, $user->rights->holiday->read);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "hrm") {
@@ -1815,7 +1818,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Trips and expenses (old module)
             if (!empty($conf->deplacement->enabled)) {
                 $langs->load("trips");
-                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_index&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->deplacement->lire, '', $mainmenu, 'tripsandexpenses', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_index&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->deplacement->lire, '', $mainmenu, 'tripsandexpenses', 0, '', '', '', DolibarrFunctions::img_picto('', 'trip', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_card&action=create&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("New"), 1, $user->rights->deplacement->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_list&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("List"), 1, $user->rights->deplacement->lire);
                 $newmenu->add(constant('BASE_URI') . '?module=Compta&controller=deplacement_stats/index&leftmenu=tripsandexpenses&mainmenu=hrm', $langs->trans("Statistics"), 1, $user->rights->deplacement->lire);
@@ -1824,7 +1827,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
             // Expense report
             if (!empty($conf->expensereport->enabled)) {
                 $langs->load("trips");
-                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=index&leftmenu=expensereport&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', img_picto('', 'trip', 'class="pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=index&leftmenu=expensereport&mainmenu=hrm', $langs->trans("TripsAndExpenses"), 0, $user->rights->expensereport->lire, '', $mainmenu, 'expensereport', 0, '', '', '', DolibarrFunctions::img_picto('', 'trip', 'class="pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=card&action=create&leftmenu=expensereport&mainmenu=hrm', $langs->trans("New"), 1, $user->rights->expensereport->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=ExpenseReports&controller=list&leftmenu=expensereport&mainmenu=hrm', $langs->trans("List"), 1, $user->rights->expensereport->lire);
                 if ($usemenuhider || empty($leftmenu) || $leftmenu == "expensereport") {
@@ -1842,9 +1845,9 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 if (empty($conf->global->PROJECT_HIDE_TASKS)) {
                     $langs->load("projects");
 
-                    $search_project_user = GETPOST('search_project_user', 'int');
+                    $search_project_user = DolibarrFunctions::GETPOST('search_project_user', 'int');
 
-                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_perweek&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', img_picto('', 'timespent', 'class="pictofixedwidth"'));
+                    $newmenu->add(constant('BASE_URI') . '?module=Projects&controller=activity_perweek&leftmenu=tasks' . ($search_project_user ? '&search_project_user=' . $search_project_user : ''), $langs->trans("NewTimeSpent"), 0, $user->rights->projet->lire, '', $mainmenu, 'timespent', 0, '', '', '', DolibarrFunctions::img_picto('', 'timespent', 'class="pictofixedwidth"'));
                 }
             }
         }
@@ -1855,25 +1858,25 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
         if ($mainmenu == 'tools') {
             if (empty($user->socid)) { // limit to internal users
                 $langs->load("mails");
-                $newmenu->add(constant('BASE_URI') . '?module=Admin&controller=mails_templates&leftmenu=email_templates', $langs->trans("EMailTemplates"), 0, 1, '', $mainmenu, 'email_templates', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Admin&controller=mails_templates&leftmenu=email_templates', $langs->trans("EMailTemplates"), 0, 1, '', $mainmenu, 'email_templates', 0, '', '', '', DolibarrFunctions::img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
             }
 
             if (!empty($conf->mailing->enabled)) {
-                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_index&leftmenu=mailing', $langs->trans("EMailings"), 0, $user->rights->mailing->lire, '', $mainmenu, 'mailing', 0, '', '', '', img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_index&leftmenu=mailing', $langs->trans("EMailings"), 0, $user->rights->mailing->lire, '', $mainmenu, 'mailing', 0, '', '', '', DolibarrFunctions::img_picto('', 'email', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_card&leftmenu=mailing&action=create', $langs->trans("NewMailing"), 1, $user->rights->mailing->creer);
                 $newmenu->add(constant('BASE_URI') . '?module=Comm&controller=mailing_list&leftmenu=mailing', $langs->trans("List"), 1, $user->rights->mailing->lire);
             }
 
             if (!empty($conf->export->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . '?module=Exports&controller=index&leftmenu=export', $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Exports&controller=index&leftmenu=export', $langs->trans("FormatedExport"), 0, $user->rights->export->lire, '', $mainmenu, 'export', 0, '', '', '', DolibarrFunctions::img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Exports&controller=export&leftmenu=export', $langs->trans("NewExport"), 1, $user->rights->export->creer);
                 //$newmenu->add(constant('BASE_URI') . "?module=Exports&controller=export&leftmenu=export",$langs->trans("List"),1, $user->rights->export->lire);
             }
 
             if (!empty($conf->import->enabled)) {
                 $langs->load("exports");
-                $newmenu->add(constant('BASE_URI') . '?module=Imports&controller=index&leftmenu=import', $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . '?module=Imports&controller=index&leftmenu=import', $langs->trans("FormatedImport"), 0, $user->rights->import->run, '', $mainmenu, 'import', 0, '', '', '', DolibarrFunctions::img_picto('', 'technic', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . '?module=Imports&controller=import&leftmenu=import', $langs->trans("NewImport"), 1, $user->rights->import->run);
             }
         }
@@ -1886,7 +1889,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 // Load translation files required by the page
                 $langs->loadLangs(["members", "compta"]);
 
-                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Members"), 0, $user->rights->adherent->lire, '', $mainmenu, 'members', 0, '', '', '', DolibarrFunctions::img_picto('', 'member', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=card&leftmenu=members&action=create", $langs->trans("NewMember"), 1, $user->rights->adherent->creer);
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->lire);
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=-1", $langs->trans("MenuMembersToValidate"), 2, $user->rights->adherent->lire);
@@ -1907,7 +1910,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     $newmenu->add(constant('BASE_URI') . "?module=Categories&controller=index&leftmenu=cat&type=3", $langs->trans("Categories"), 1, $user->rights->categorie->lire, '', $mainmenu, 'cat');
                 }
 
-                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=index&leftmenu=members&mainmenu=members", $langs->trans("Subscriptions"), 0, $user->rights->adherent->cotisation->lire, '', $mainmenu, 'members', 0, '', '', '', DolibarrFunctions::img_picto('', 'payment', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=list&leftmenu=members&statut=-1,1&mainmenu=members", $langs->trans("NewSubscription"), 1, $user->rights->adherent->cotisation->creer);
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=subscription_list&leftmenu=members", $langs->trans("List"), 1, $user->rights->adherent->cotisation->lire);
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=stats_index&leftmenu=members", $langs->trans("MenuMembersStats"), 1, $user->rights->adherent->lire);
@@ -1916,7 +1919,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                 //if (! empty($conf->export->enabled) && ($usemenuhider || empty($leftmenu) || $leftmenu=="export")) $newmenu->add(constant('BASE_URI') . /* TODO */ "?module=Exports&controller=index&leftmenu=export",$langs->trans("Datas"),1,$user->rights->adherent->export);
 
                 // Type
-                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
+                $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("MembersTypes"), 0, $user->rights->adherent->configurer, '', $mainmenu, 'setup', 0, '', '', '', DolibarrFunctions::img_picto('', 'members', 'class="paddingright pictofixedwidth"'));
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members&action=create", $langs->trans("New"), 1, $user->rights->adherent->configurer);
                 $newmenu->add(constant('BASE_URI') . "?module=Adherents&controller=type&leftmenu=setup&mainmenu=members", $langs->trans("List"), 1, $user->rights->adherent->configurer);
             }
@@ -2035,7 +2038,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
 
             // $menu_array[$i]['url'] can be a relative url, a full external url. We try substitution
 
-            $menu_array[$i]['url'] = make_substitutions($menu_array[$i]['url'], $substitarray);
+            $menu_array[$i]['url'] = DolibarrFunctions::make_substitutions($menu_array[$i]['url'], $substitarray);
 
             $url = $shorturl = $shorturlwithoutparam = $menu_array[$i]['url'];
             if (!preg_match("/^(http:\/\/|https:\/\/)/i", $menu_array[$i]['url'])) {
@@ -2051,7 +2054,7 @@ function print_left_eldy_menu($db, $menu_array_before, $menu_array_after, &$tabM
                     $param .= ($param ? '&' : '') . 'leftmenu=';
                 }
                 //$url.="idmenu=".$menu_array[$i]['rowid'];    // Already done by menuLoad
-                $url = dol_buildpath($url, 1) . ($param ? '?' . $param : '');
+                $url = DolibarrFunctions::dol_buildpath($url, 1) . ($param ? '?' . $param : '');
                 $shorturlwithoutparam = $shorturl;
                 $shorturl = $shorturl . ($param ? '?' . $param : '');
             }

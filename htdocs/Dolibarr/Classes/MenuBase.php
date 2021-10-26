@@ -25,6 +25,7 @@ namespace Alxarafe\Dolibarr\Classes;
  */
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
@@ -696,8 +697,8 @@ class MenuBase
                     if ($leftmenu == 'all') {
                         $tmpcond = preg_replace('/\$leftmenu\s*==\s*["\'a-zA-Z_]+/', '1==1', $tmpcond); // Force part of condition to true
                     }
-                    $perms = verifCond($tmpcond);
-                    //print "verifCond rowid=".$menu['rowid']." ".$tmpcond.":".$perms."<br>\n";
+                    $perms = DolibarrFunctions::verifCond($tmpcond);
+                    //print "DolibarrFunctions::verifCond rowid=".$menu['rowid']." ".$tmpcond.":".$perms."<br>\n";
                 }
 
                 // Define $enabled
@@ -707,7 +708,7 @@ class MenuBase
                     if ($leftmenu == 'all') {
                         $tmpcond = preg_replace('/\$leftmenu\s*==\s*["\'a-zA-Z_]+/', '1==1', $tmpcond); // Force part of condition to true
                     }
-                    $enabled = verifCond($tmpcond);
+                    $enabled = DolibarrFunctions::verifCond($tmpcond);
                 }
 
                 // Define $title
@@ -721,7 +722,7 @@ class MenuBase
                         }
 
                         $substitarray = ['__LOGIN__' => $user->login, '__USER_ID__' => $user->id, '__USER_SUPERVISOR_ID__' => $user->fk_user];
-                        $menu['titre'] = make_substitutions($menu['titre'], $substitarray);
+                        $menu['titre'] = DolibarrFunctions::make_substitutions($menu['titre'], $substitarray);
 
                         if (preg_match("/\//", $menu['titre'])) { // To manage translation when title is string1/string2
                             $tab_titre = explode("/", $menu['titre']);
@@ -730,7 +731,7 @@ class MenuBase
                             // To manage different translation (Title||AltTitle@ConditionForAltTitle)
                             $tab_title = explode("||", $menu['titre']);
                             $alt_title = explode("@", $tab_title[1]);
-                            $title_enabled = verifCond($alt_title[1]);
+                            $title_enabled = DolibarrFunctions::verifCond($alt_title[1]);
                             $title = ($title_enabled ? $langs->trans($alt_title[0]) : $langs->trans($tab_title[0]));
                         } else {
                             $title = $langs->trans($menu['titre']);

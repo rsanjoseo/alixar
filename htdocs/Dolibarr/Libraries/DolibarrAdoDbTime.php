@@ -378,6 +378,8 @@
  * First implementation.
  */
 
+namespace Alxarafe\Dolibarr\Libraries;
+
 /* Initialization */
 
 /*

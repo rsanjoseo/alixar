@@ -44,6 +44,8 @@ namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrView;
+use Alxarafe\Dolibarr\Classes\HookManager;
+use Alxarafe\Dolibarr\Libraries\DolibarrAdoDbTime;
 use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use DateTime;
 use DateTimeZone;
@@ -335,7 +337,419 @@ abstract class DolibarrFunctions
             $depth = $db->transaction_opened;
             $disconnectdone = $db->close();
         }
-        dol_syslog("--- End access to " . $_SERVER["PHP_SELF"] . (($disconnectdone && $depth) ? ' (Warn: db disconnection forced, transaction depth was ' . $depth . ')' : ''), (($disconnectdone && $depth) ? LOG_WARNING : LOG_INFO));
+        DolibarrFunctions::dol_syslog("--- End access to " . $_SERVER["PHP_SELF"] . (($disconnectdone && $depth) ? ' (Warn: db disconnection forced, transaction depth was ' . $depth . ')' : ''), (($disconnectdone && $depth) ? LOG_WARNING : LOG_INFO));
+    }
+
+    /**
+     *    Write log message into outputs. Possible outputs can be:
+     *    SYSLOG_HANDLERS = ["mod_syslog_file"]        file name is then defined by SYSLOG_FILE
+     *    SYSLOG_HANDLERS = ["mod_syslog_syslog"]    facility is then defined by SYSLOG_FACILITY
+     *  Warning, syslog functions are bugged on Windows, generating memory protection faults. To solve
+     *  this, use logging to files instead of syslog (see setup of module).
+     *  Note: If constant 'SYSLOG_FILE_NO_ERROR' defined, we never output any error message when writing to log fails.
+     *  Note: You can get log message into html sources by adding parameter &logtohtml=1 (constant MAIN_LOGTOHTML must be set)
+     *  This function works only if syslog module is enabled.
+     *    This must not use any call to other function calling DolibarrFunctions::dol_syslog (avoid infinite loop).
+     *
+     * @param string     $message                     Line to log. ''=Show nothing
+     * @param int        $level                       Log level
+     *                                                On Windows LOG_ERR=4, LOG_WARNING=5, LOG_NOTICE=LOG_INFO=6, LOG_DEBUG=6 si define_syslog_variables ou PHP 5.3+, 7 si dolibarr
+     *                                                On Linux   LOG_ERR=3, LOG_WARNING=4, LOG_NOTICE=5, LOG_INFO=6, LOG_DEBUG=7
+     * @param int        $ident                       1=Increase ident of 1, -1=Decrease ident of 1
+     * @param string     $suffixinfilename            When output is a file, append this suffix into default log filename.
+     * @param string     $restricttologhandler        Force output of log only to this log handler
+     * @param array|null $logcontext                  If defined, an array with extra informations (can be used by some log handlers)
+     *
+     * @return    void
+     */
+    static public function dol_syslog($message, $level = LOG_INFO, $ident = 0, $suffixinfilename = '', $restricttologhandler = '', $logcontext = null)
+    {
+        global $conf, $user, $debugbar;
+
+        // If syslog module enabled
+        if (empty($conf->syslog->enabled)) {
+            return;
+        }
+
+        // Check if we are into execution of code of a website
+        if (defined('USEEXTERNALSERVER') && !defined('USEDOLIBARRSERVER') && !defined('USEDOLIBARREDITOR')) {
+            global $website, $websitekey;
+            if (is_object($website) && !empty($website->ref)) {
+                $suffixinfilename .= '_website_' . $website->ref;
+            } elseif (!empty($websitekey)) {
+                $suffixinfilename .= '_website_' . $websitekey;
+            }
+        }
+
+        if ($ident < 0) {
+            foreach ($conf->loghandlers as $loghandlerinstance) {
+                $loghandlerinstance->setIdent($ident);
+            }
+        }
+
+        if (!empty($message)) {
+            // Test log level
+            $logLevels = [LOG_EMERG => 'EMERG', LOG_ALERT => 'ALERT', LOG_CRIT => 'CRITICAL', LOG_ERR => 'ERR', LOG_WARNING => 'WARN', LOG_NOTICE => 'NOTICE', LOG_INFO => 'INFO', LOG_DEBUG => 'DEBUG'];
+            if (!array_key_exists($level, $logLevels)) {
+                throw new Exception('Incorrect log level');
+            }
+            if ($level > $conf->global->SYSLOG_LEVEL) {
+                return;
+            }
+
+            if (empty($conf->global->MAIN_SHOW_PASSWORD_INTO_LOG)) {
+                $message = preg_replace('/password=\'[^\']*\'/', 'password=\'hidden\'', $message); // protection to avoid to have value of password in log
+            }
+
+            // If adding log inside HTML page is required
+            if ((!empty($_REQUEST['logtohtml']) && !empty($conf->global->MAIN_ENABLE_LOG_TO_HTML))
+                || (!empty($user->rights->debugbar->read) && is_object($debugbar))) {
+                $conf->logbuffer[] = self::dol_print_date(time(), "%Y-%m-%d %H:%M:%S") . " " . $logLevels[$level] . " " . $message;
+            }
+
+            //TODO: Remove this. MAIN_ENABLE_LOG_INLINE_HTML should be deprecated and use a log handler dedicated to HTML output
+            // If html log tag enabled and url parameter log defined, we show output log on HTML comments
+            if (!empty($conf->global->MAIN_ENABLE_LOG_INLINE_HTML) && !empty($_GET["log"])) {
+                print "\n\n<!-- Log start\n";
+                print DolibarrFunctions::dol_escape_htmltag($message) . "\n";
+                print "Log end -->\n";
+            }
+
+            $data = [
+                'message' => $message,
+                'script' => (isset($_SERVER['PHP_SELF']) ? basename($_SERVER['PHP_SELF'], '.php') : false),
+                'level' => $level,
+                'user' => ((is_object($user) && $user->id) ? $user->login : false),
+                'ip' => false,
+            ];
+
+            $remoteip = self::getUserRemoteIP(); // Get ip when page run on a web server
+            if (!empty($remoteip)) {
+                $data['ip'] = $remoteip;
+                // This is when server run behind a reverse proxy
+                if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != $remoteip) {
+                    $data['ip'] = $_SERVER['HTTP_X_FORWARDED_FOR'] . ' -> ' . $data['ip'];
+                } elseif (!empty($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP'] != $remoteip) {
+                    $data['ip'] = $_SERVER['HTTP_CLIENT_IP'] . ' -> ' . $data['ip'];
+                }
+            } elseif (!empty($_SERVER['SERVER_ADDR'])) {
+                // This is when PHP session is ran inside a web server but not inside a client request (example: init code of apache)
+                $data['ip'] = $_SERVER['SERVER_ADDR'];
+            } elseif (!empty($_SERVER['COMPUTERNAME'])) {
+                // This is when PHP session is ran outside a web server, like from Windows command line (Not always defined, but useful if OS defined it).
+                $data['ip'] = $_SERVER['COMPUTERNAME'] . (empty($_SERVER['USERNAME']) ? '' : '@' . $_SERVER['USERNAME']);
+            } elseif (!empty($_SERVER['LOGNAME'])) {
+                // This is when PHP session is ran outside a web server, like from Linux command line (Not always defined, but usefull if OS defined it).
+                $data['ip'] = '???@' . $_SERVER['LOGNAME'];
+            }
+            // Loop on each log handler and send output
+            foreach ($conf->loghandlers as $loghandlerinstance) {
+                if ($restricttologhandler && $loghandlerinstance->code != $restricttologhandler) {
+                    continue;
+                }
+                $loghandlerinstance->export($data, $suffixinfilename);
+            }
+            unset($data);
+        }
+
+        if ($ident > 0) {
+            foreach ($conf->loghandlers as $loghandlerinstance) {
+                $loghandlerinstance->setIdent($ident);
+            }
+        }
+    }
+
+    /**
+     *    Output date in a string format according to outputlangs (or langs if not defined).
+     *    Return charset is always UTF-8, except if encodetoouput is defined. In this case charset is output charset
+     *
+     * @param int       $time                 GM Timestamps date
+     * @param string    $format               Output date format (tag of strftime function)
+     *                                        "%d %b %Y",
+     *                                        "%d/%m/%Y %H:%M",
+     *                                        "%d/%m/%Y %H:%M:%S",
+     *                                        "%B"=Long text of month, "%A"=Long text of day, "%b"=Short text of month, "%a"=Short text of day
+     *                                        "day", "daytext", "dayhour", "dayhourldap", "dayhourtext", "dayrfc", "dayhourrfc", "...inputnoreduce", "...reduceformat"
+     * @param string    $tzoutput             true or 'gmt' => string is for Greenwich location
+     *                                        false or 'tzserver' => output string is for local PHP server TZ usage
+     *                                        'tzuser' => output string is for user TZ (current browser TZ with current dst) => In a future, we should have same behaviour than 'tzuserrel'
+     *                                        'tzuserrel' => output string is for user TZ (current browser TZ with dst or not, depending on date position) (TODO not implemented yet)
+     * @param Translate $outputlangs          Object lang that contains language for text translation.
+     * @param boolean   $encodetooutput       false=no convert into output pagecode
+     *
+     * @return string                    Formated date or '' if time is null
+     *
+     * @see        self::dol_mktime(), self::dol_stringtotime(), DolibarrFunctions::dol_getdate()
+     */
+    static public function dol_print_date($time, $format = '', $tzoutput = 'auto', $outputlangs = '', $encodetooutput = false)
+    {
+        $conf = DolibarrConfig::getInstance()->getConf();
+        $langs = Translator::getInstance();
+
+        if ($tzoutput === 'auto') {
+            $tzoutput = (empty($conf) ? 'tzserver' : (isset($conf->tzuserinputkey) ? $conf->tzuserinputkey : 'tzserver'));
+        }
+
+        // Clean parameters
+        $to_gmt = false;
+        $offsettz = $offsetdst = 0;
+        if ($tzoutput) {
+            $to_gmt = true; // For backward compatibility
+            if (is_string($tzoutput)) {
+                if ($tzoutput == 'tzserver') {
+                    $to_gmt = false;
+                    $offsettzstring = @date_default_timezone_get(); // Example 'Europe/Berlin' or 'Indian/Reunion'
+                    $offsettz = 0;    // Timezone offset with server timezone, so 0
+                    $offsetdst = 0;    // Dst offset with server timezone, so 0
+                } elseif ($tzoutput == 'tzuser' || $tzoutput == 'tzuserrel') {
+                    $to_gmt = true;
+                    $offsettzstring = (empty($_SESSION['dol_tz_string']) ? 'UTC' : $_SESSION['dol_tz_string']); // Example 'Europe/Berlin' or 'Indian/Reunion'
+                    $offsettz = (empty($_SESSION['dol_tz']) ? 0 : $_SESSION['dol_tz']) * 60 * 60; // Will not be used anymore
+                    $offsetdst = (empty($_SESSION['dol_dst']) ? 0 : $_SESSION['dol_dst']) * 60 * 60; // Will not be used anymore
+                }
+            }
+        }
+        if (!is_object($outputlangs)) {
+            $outputlangs = $langs;
+        }
+        if (!$format) {
+            $format = 'daytextshort';
+        }
+
+        // Do we have to reduce the length of date (year on 2 chars) to save space.
+        // Note: dayinputnoreduce is same than day but no reduction of year length will be done
+        $reduceformat = (!empty($conf->dol_optimize_smallscreen) && in_array($format, ['day', 'dayhour'])) ? 1 : 0;    // Test on original $format param.
+        $format = preg_replace('/inputnoreduce/', '', $format);    // so format 'dayinputnoreduce' is processed like day
+        $formatwithoutreduce = preg_replace('/reduceformat/', '', $format);
+        if ($formatwithoutreduce != $format) {
+            $format = $formatwithoutreduce;
+            $reduceformat = 1;
+        }  // so format 'dayreduceformat' is processed like day
+
+        // Change predefined format into computer format. If found translation in lang file we use it, otherwise we use default.
+        // TODO Add format daysmallyear and dayhoursmallyear
+        if ($format == 'day') {
+            $format = ($outputlangs->trans("FormatDateShort") != "FormatDateShort" ? $outputlangs->trans("FormatDateShort") : $conf->format_date_short);
+        } elseif ($format == 'hour') {
+            $format = ($outputlangs->trans("FormatHourShort") != "FormatHourShort" ? $outputlangs->trans("FormatHourShort") : $conf->format_hour_short);
+        } elseif ($format == 'hourduration') {
+            $format = ($outputlangs->trans("FormatHourShortDuration") != "FormatHourShortDuration" ? $outputlangs->trans("FormatHourShortDuration") : $conf->format_hour_short_duration);
+        } elseif ($format == 'daytext') {
+            $format = ($outputlangs->trans("FormatDateText") != "FormatDateText" ? $outputlangs->trans("FormatDateText") : $conf->format_date_text);
+        } elseif ($format == 'daytextshort') {
+            $format = ($outputlangs->trans("FormatDateTextShort") != "FormatDateTextShort" ? $outputlangs->trans("FormatDateTextShort") : $conf->format_date_text_short);
+        } elseif ($format == 'dayhour') {
+            $format = ($outputlangs->trans("FormatDateHourShort") != "FormatDateHourShort" ? $outputlangs->trans("FormatDateHourShort") : $conf->format_date_hour_short);
+        } elseif ($format == 'dayhoursec') {
+            $format = ($outputlangs->trans("FormatDateHourSecShort") != "FormatDateHourSecShort" ? $outputlangs->trans("FormatDateHourSecShort") : $conf->format_date_hour_sec_short);
+        } elseif ($format == 'dayhourtext') {
+            $format = ($outputlangs->trans("FormatDateHourText") != "FormatDateHourText" ? $outputlangs->trans("FormatDateHourText") : $conf->format_date_hour_text);
+        } elseif ($format == 'dayhourtextshort') {
+            $format = ($outputlangs->trans("FormatDateHourTextShort") != "FormatDateHourTextShort" ? $outputlangs->trans("FormatDateHourTextShort") : $conf->format_date_hour_text_short);
+        } elseif ($format == 'dayhourlog') {
+            // Format not sensitive to language
+            $format = '%Y%m%d%H%M%S';
+        } elseif ($format == 'dayhourldap') {
+            $format = '%Y%m%d%H%M%SZ';
+        } elseif ($format == 'dayhourxcard') {
+            $format = '%Y%m%dT%H%M%SZ';
+        } elseif ($format == 'dayxcard') {
+            $format = '%Y%m%d';
+        } elseif ($format == 'dayrfc') {
+            $format = '%Y-%m-%d'; // DATE_RFC3339
+        } elseif ($format == 'dayhourrfc') {
+            $format = '%Y-%m-%dT%H:%M:%SZ'; // DATETIME RFC3339
+        } elseif ($format == 'standard') {
+            $format = '%Y-%m-%d %H:%M:%S';
+        }
+
+        if ($reduceformat) {
+            $format = str_replace('%Y', '%y', $format);
+            $format = str_replace('yyyy', 'yy', $format);
+        }
+
+        // If date undefined or "", we return ""
+        if (DolibarrFunctions::dol_strlen($time) == 0) {
+            return ''; // $time=0 allowed (it means 01/01/1970 00:00:00)
+        }
+
+        // Clean format
+        if (preg_match('/%b/i', $format)) {        // There is some text to translate
+            // We inhibate translation to text made by strftime functions. We will use trans instead later.
+            $format = str_replace('%b', '__b__', $format);
+            $format = str_replace('%B', '__B__', $format);
+        }
+        if (preg_match('/%a/i', $format)) {        // There is some text to translate
+            // We inhibate translation to text made by strftime functions. We will use trans instead later.
+            $format = str_replace('%a', '__a__', $format);
+            $format = str_replace('%A', '__A__', $format);
+        }
+
+        // Analyze date
+        $reg = [];
+        if (preg_match('/^([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])$/i', $time, $reg)) {    // Deprecated. Ex: 1970-01-01, 1970-01-01 01:00:00, 19700101010000
+            dol_print_error("Functions.lib::dol_print_date function called with a bad value from page " . $_SERVER["PHP_SELF"]);
+            return '';
+        } elseif (preg_match('/^([0-9]+)\-([0-9]+)\-([0-9]+) ?([0-9]+)?:?([0-9]+)?:?([0-9]+)?/i', $time, $reg)) {    // Still available to solve problems in extrafields of type date
+            // This part of code should not be used anymore.
+            DolibarrFunctions::dol_syslog("Functions.lib::dol_print_date function called with a bad value from page " . $_SERVER["PHP_SELF"], LOG_WARNING);
+            //if (function_exists('debug_print_backtrace')) debug_print_backtrace();
+            // Date has format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'
+            $syear = (!empty($reg[1]) ? $reg[1] : '');
+            $smonth = (!empty($reg[2]) ? $reg[2] : '');
+            $sday = (!empty($reg[3]) ? $reg[3] : '');
+            $shour = (!empty($reg[4]) ? $reg[4] : '');
+            $smin = (!empty($reg[5]) ? $reg[5] : '');
+            $ssec = (!empty($reg[6]) ? $reg[6] : '');
+
+            $time = self::dol_mktime($shour, $smin, $ssec, $smonth, $sday, $syear, true);
+            $ret = DolibarrAdoDbTime::adodb_strftime($format, $time + $offsettz + $offsetdst, $to_gmt);
+        } else {
+            // Date is a timestamps
+            if ($time < 100000000000) {    // Protection against bad date values
+                $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
+
+                $ret = DolibarrAdoDbTime::adodb_strftime($format, $timetouse, $to_gmt);    // If to_gmt = false then DolibarrAdoDbTime::adodb_strftime use TZ of server
+            } else {
+                $ret = 'Bad value ' . $time . ' for date';
+            }
+        }
+
+        if (preg_match('/__b__/i', $format)) {
+            $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
+
+            // Here ret is string in PHP setup language (strftime was used). Now we convert to $outputlangs.
+            $month = DolibarrAdoDbTime::adodb_strftime('%m', $timetouse, $to_gmt);        // If to_gmt = false then DolibarrAdoDbTime::adodb_strftime use TZ of server
+            $month = sprintf("%02d", $month); // $month may be return with format '06' on some installation and '6' on other, so we force it to '06'.
+            if ($encodetooutput) {
+                $monthtext = $outputlangs->transnoentities('Month' . $month);
+                $monthtextshort = $outputlangs->transnoentities('MonthShort' . $month);
+            } else {
+                $monthtext = $outputlangs->transnoentitiesnoconv('Month' . $month);
+                $monthtextshort = $outputlangs->transnoentitiesnoconv('MonthShort' . $month);
+            }
+            //print 'monthtext='.$monthtext.' monthtextshort='.$monthtextshort;
+            $ret = str_replace('__b__', $monthtextshort, $ret);
+            $ret = str_replace('__B__', $monthtext, $ret);
+            //print 'x'.$outputlangs->charset_output.'-'.$ret.'x';
+            //return $ret;
+        }
+        if (preg_match('/__a__/i', $format)) {
+            //print "time=$time offsettz=$offsettz offsetdst=$offsetdst offsettzstring=$offsettzstring";
+            $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
+
+            $w = DolibarrAdoDbTime::adodb_strftime('%w', $timetouse, $to_gmt);        // If to_gmt = false then DolibarrAdoDbTime::adodb_strftime use TZ of server
+            $dayweek = $outputlangs->transnoentitiesnoconv('Day' . $w);
+            $ret = str_replace('__A__', $dayweek, $ret);
+            $ret = str_replace('__a__', self::dol_substr($dayweek, 0, 3), $ret);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Make a strlen call. Works even if mbstring module not enabled
+     *
+     * @param string $string         String to calculate length
+     * @param string $stringencoding Encoding of string
+     *
+     * @return  int                                Length of string
+     */
+    static public function dol_strlen($string, $stringencoding = 'UTF-8')
+    {
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($string, $stringencoding);
+        } else {
+            return strlen($string);
+        }
+    }
+
+    /**
+     *  Returns text escaped for inclusion in HTML alt or title tags, or into values of HTML input fields.
+     *
+     * @param string $stringtoescape     String to escape
+     * @param int    $keepb              1=Keep b tags, 0=remove them completely
+     * @param int    $keepn              1=Preserve \r\n strings (otherwise, replace them with escaped value). Set to 1 when escaping for a <textarea>.
+     * @param string $noescapetags       '' or 'common' or list of tags to not escape. TODO Does not works yet when there is attributes to tag.
+     * @param int    $escapeonlyhtmltags 1=Escape only html tags, not the special chars like accents.
+     *
+     * @return     string                                Escaped string
+     * @see        self::dol_string_nohtmltag(), self::dol_string_nospecial(), self::dol_string_unaccent()
+     */
+    static public function dol_escape_htmltag($stringtoescape, $keepb = 0, $keepn = 0, $noescapetags = '', $escapeonlyhtmltags = 0)
+    {
+        if ($noescapetags == 'common') {
+            $noescapetags = 'html,body,a,b,em,hr,i,u,ul,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody';
+        }
+
+        // escape quotes and backslashes, newlines, etc.
+        if ($escapeonlyhtmltags) {
+            $tmp = htmlspecialchars_decode($stringtoescape, ENT_COMPAT);
+        } else {
+            $tmp = html_entity_decode($stringtoescape, ENT_COMPAT, 'UTF-8');
+        }
+        if (!$keepb) {
+            $tmp = strtr($tmp, ["<b>" => '', '</b>' => '']);
+        }
+        if (!$keepn) {
+            $tmp = strtr($tmp, ["\r" => '\\r', "\n" => '\\n']);
+        }
+
+        if ($escapeonlyhtmltags) {
+            return htmlspecialchars($tmp, ENT_COMPAT, 'UTF-8');
+        } else {
+            // Escape tags to keep
+            // TODO Does not works yet when there is attributes to tag
+            $tmparrayoftags = [];
+            if ($noescapetags) {
+                $tmparrayoftags = explode(',', $noescapetags);
+            }
+            if (count($tmparrayoftags)) {
+                foreach ($tmparrayoftags as $tagtoreplace) {
+                    $tmp = str_ireplace('<' . $tagtoreplace . '>', '__BEGINTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
+                    $tmp = str_ireplace('</' . $tagtoreplace . '>', '__ENDTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
+                    $tmp = str_ireplace('<' . $tagtoreplace . ' />', '__BEGINENDTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
+                }
+            }
+
+            $result = htmlentities($tmp, ENT_COMPAT, 'UTF-8');
+
+            if (count($tmparrayoftags)) {
+                foreach ($tmparrayoftags as $tagtoreplace) {
+                    $result = str_ireplace('__BEGINTAGTOREPLACE' . $tagtoreplace . '__', '<' . $tagtoreplace . '>', $result);
+                    $result = str_ireplace('__ENDTAGTOREPLACE' . $tagtoreplace . '__', '</' . $tagtoreplace . '>', $result);
+                    $result = str_ireplace('__BEGINENDTAGTOREPLACE' . $tagtoreplace . '__', '<' . $tagtoreplace . ' />', $result);
+                }
+            }
+
+            return $result;
+        }
+    }
+
+    /**
+     * Return the IP of remote user.
+     * Take HTTP_X_FORWARDED_FOR (defined when using proxy)
+     * Then HTTP_CLIENT_IP if defined (rare)
+     * Then REMOTE_ADDR (no way to be modified by user but may be wrong if user is using a proxy)
+     *
+     * @return    string        Ip of remote user.
+     */
+    static public function getUserRemoteIP()
+    {
+        if (empty($_SERVER['HTTP_X_FORWARDED_FOR']) || preg_match('/[^0-9\.\:,\[\]]/', $_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            if (empty($_SERVER['HTTP_CLIENT_IP']) || preg_match('/[^0-9\.\:,\[\]]/', $_SERVER['HTTP_CLIENT_IP'])) {
+                if (empty($_SERVER["HTTP_CF_CONNECTING_IP"])) {
+                    $ip = (empty($_SERVER['REMOTE_ADDR']) ? '' : $_SERVER['REMOTE_ADDR']);    // value may have been the IP of the proxy and not the client
+                } else {
+                    $ip = $_SERVER["HTTP_CF_CONNECTING_IP"];    // value here may have been forged by client
+                }
+            } else {
+                $ip = $_SERVER['HTTP_CLIENT_IP']; // value is clean here but may have been forged by proxy
+            }
+        } else {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR']; // value is clean here but may have been forged by proxy
+        }
+        return $ip;
     }
 
     /**
@@ -424,7 +838,7 @@ abstract class DolibarrFunctions
             return 'BadFirstParameterForGETPOST';
         }
         if (empty($check)) {
-            dol_syslog("Deprecated use of GETPOST, called with 1st param = " . $paramname . " and 2nd param is '', when calling page " . $_SERVER["PHP_SELF"], LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Deprecated use of GETPOST, called with 1st param = " . $paramname . " and 2nd param is '', when calling page " . $_SERVER["PHP_SELF"], LOG_WARNING);
             // Enable this line to know who call the GETPOST with '' $check parameter.
             //var_dump(debug_backtrace()[0]);
         }
@@ -493,7 +907,7 @@ abstract class DolibarrFunctions
                                     $qualified = 0;
                                     if ($defkey != '_noquery_') {
                                         $tmpqueryarraytohave = explode('&', $defkey);
-                                        $tmpqueryarraywehave = explode('&', self::self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
+                                        $tmpqueryarraywehave = explode('&', DolibarrFunctions::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
                                         $foundintru = 0;
                                         foreach ($tmpqueryarraytohave as $tmpquerytohave) {
                                             if (!in_array($tmpquerytohave, $tmpqueryarraywehave)) {
@@ -530,7 +944,7 @@ abstract class DolibarrFunctions
                                         $qualified = 0;
                                         if ($defkey != '_noquery_') {
                                             $tmpqueryarraytohave = explode('&', $defkey);
-                                            $tmpqueryarraywehave = explode('&', self::self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
+                                            $tmpqueryarraywehave = explode('&', self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
                                             $foundintru = 0;
                                             foreach ($tmpqueryarraytohave as $tmpquerytohave) {
                                                 if (!in_array($tmpquerytohave, $tmpqueryarraywehave)) {
@@ -567,7 +981,7 @@ abstract class DolibarrFunctions
                                     $qualified = 0;
                                     if ($defkey != '_noquery_') {
                                         $tmpqueryarraytohave = explode('&', $defkey);
-                                        $tmpqueryarraywehave = explode('&', self::self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
+                                        $tmpqueryarraywehave = explode('&', self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
                                         $foundintru = 0;
                                         foreach ($tmpqueryarraytohave as $tmpquerytohave) {
                                             if (!in_array($tmpquerytohave, $tmpqueryarraywehave)) {
@@ -616,35 +1030,35 @@ abstract class DolibarrFunctions
                 $newout = '';
 
                 if ($reg[1] == 'DAY') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $newout = $tmp['mday'];
                 } elseif ($reg[1] == 'MONTH') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $newout = $tmp['mon'];
                 } elseif ($reg[1] == 'YEAR') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $newout = $tmp['year'];
                 } elseif ($reg[1] == 'PREVIOUS_DAY') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $tmp2 = dol_get_prev_day($tmp['mday'], $tmp['mon'], $tmp['year']);
                     $newout = $tmp2['day'];
                 } elseif ($reg[1] == 'PREVIOUS_MONTH') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $tmp2 = dol_get_prev_month($tmp['mon'], $tmp['year']);
                     $newout = $tmp2['month'];
                 } elseif ($reg[1] == 'PREVIOUS_YEAR') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $newout = ($tmp['year'] - 1);
                 } elseif ($reg[1] == 'NEXT_DAY') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $tmp2 = dol_get_next_day($tmp['mday'], $tmp['mon'], $tmp['year']);
                     $newout = $tmp2['day'];
                 } elseif ($reg[1] == 'NEXT_MONTH') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $tmp2 = dol_get_next_month($tmp['mon'], $tmp['year']);
                     $newout = $tmp2['month'];
                 } elseif ($reg[1] == 'NEXT_YEAR') {
-                    $tmp = dol_getdate(dol_now(), true);
+                    $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
                     $newout = ($tmp['year'] + 1);
                 } elseif ($reg[1] == 'MYCOMPANY_COUNTRY_ID' || $reg[1] == 'MYCOUNTRY_ID' || $reg[1] == 'MYCOUNTRYID') {
                     $newout = $mysoc->country_id;
@@ -801,7 +1215,7 @@ abstract class DolibarrFunctions
                 }
                 break;
             case 'nohtml':        // No html
-                $out = self::self::dol_string_nohtmltag($out, 0);
+                $out = self::dol_string_nohtmltag($out, 0);
                 break;
             case 'alpha':        // No html and no ../ and "
             case 'alphanohtml':    // Recommended for most scalar parameters and search parameters
@@ -989,7 +1403,7 @@ abstract class DolibarrFunctions
      *
      * @return string                            String cleaned
      *
-     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::self::dol_string_nohtmltag() self::dol_string_neverthesehtmltags()
+     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::dol_string_nohtmltag() self::dol_string_neverthesehtmltags()
      */
     static public function dol_string_onlythesehtmltags($stringtoclean, $cleanalsosomestyles = 1, $removeclassattribute = 1, $cleanalsojavascript = 0, $allowiframe = 0)
     {
@@ -1067,7 +1481,7 @@ abstract class DolibarrFunctions
      *
      * @return string                            String cleaned
      *
-     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::self::dol_string_nohtmltag() self::dol_string_onlythesehtmltags() self::dol_string_neverthesehtmltags()
+     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::dol_string_nohtmltag() self::dol_string_onlythesehtmltags() self::dol_string_neverthesehtmltags()
      */
     static public function dol_string_onlythesehtmlattributes($stringtoclean, $allowed_attributes = ["allow", "allowfullscreen", "alt", "class", "contenteditable", "data-html", "frameborder", "height", "href", "id", "name", "src", "style", "target", "title", "width"])
     {
@@ -1285,187 +1699,6 @@ abstract class DolibarrFunctions
         }
 
         return $res;
-    }
-
-    /**
-     *    Write log message into outputs. Possible outputs can be:
-     *    SYSLOG_HANDLERS = ["mod_syslog_file"]        file name is then defined by SYSLOG_FILE
-     *    SYSLOG_HANDLERS = ["mod_syslog_syslog"]    facility is then defined by SYSLOG_FACILITY
-     *  Warning, syslog functions are bugged on Windows, generating memory protection faults. To solve
-     *  this, use logging to files instead of syslog (see setup of module).
-     *  Note: If constant 'SYSLOG_FILE_NO_ERROR' defined, we never output any error message when writing to log fails.
-     *  Note: You can get log message into html sources by adding parameter &logtohtml=1 (constant MAIN_LOGTOHTML must be set)
-     *  This function works only if syslog module is enabled.
-     *    This must not use any call to other function calling dol_syslog (avoid infinite loop).
-     *
-     * @param string     $message                     Line to log. ''=Show nothing
-     * @param int        $level                       Log level
-     *                                                On Windows LOG_ERR=4, LOG_WARNING=5, LOG_NOTICE=LOG_INFO=6, LOG_DEBUG=6 si define_syslog_variables ou PHP 5.3+, 7 si dolibarr
-     *                                                On Linux   LOG_ERR=3, LOG_WARNING=4, LOG_NOTICE=5, LOG_INFO=6, LOG_DEBUG=7
-     * @param int        $ident                       1=Increase ident of 1, -1=Decrease ident of 1
-     * @param string     $suffixinfilename            When output is a file, append this suffix into default log filename.
-     * @param string     $restricttologhandler        Force output of log only to this log handler
-     * @param array|null $logcontext                  If defined, an array with extra informations (can be used by some log handlers)
-     *
-     * @return    void
-     */
-    static public function dol_syslog($message, $level = LOG_INFO, $ident = 0, $suffixinfilename = '', $restricttologhandler = '', $logcontext = null)
-    {
-        global $conf, $user, $debugbar;
-
-        // If syslog module enabled
-        if (empty($conf->syslog->enabled)) {
-            return;
-        }
-
-        // Check if we are into execution of code of a website
-        if (defined('USEEXTERNALSERVER') && !defined('USEDOLIBARRSERVER') && !defined('USEDOLIBARREDITOR')) {
-            global $website, $websitekey;
-            if (is_object($website) && !empty($website->ref)) {
-                $suffixinfilename .= '_website_' . $website->ref;
-            } elseif (!empty($websitekey)) {
-                $suffixinfilename .= '_website_' . $websitekey;
-            }
-        }
-
-        if ($ident < 0) {
-            foreach ($conf->loghandlers as $loghandlerinstance) {
-                $loghandlerinstance->setIdent($ident);
-            }
-        }
-
-        if (!empty($message)) {
-            // Test log level
-            $logLevels = [LOG_EMERG => 'EMERG', LOG_ALERT => 'ALERT', LOG_CRIT => 'CRITICAL', LOG_ERR => 'ERR', LOG_WARNING => 'WARN', LOG_NOTICE => 'NOTICE', LOG_INFO => 'INFO', LOG_DEBUG => 'DEBUG'];
-            if (!array_key_exists($level, $logLevels)) {
-                throw new Exception('Incorrect log level');
-            }
-            if ($level > $conf->global->SYSLOG_LEVEL) {
-                return;
-            }
-
-            if (empty($conf->global->MAIN_SHOW_PASSWORD_INTO_LOG)) {
-                $message = preg_replace('/password=\'[^\']*\'/', 'password=\'hidden\'', $message); // protection to avoid to have value of password in log
-            }
-
-            // If adding log inside HTML page is required
-            if ((!empty($_REQUEST['logtohtml']) && !empty($conf->global->MAIN_ENABLE_LOG_TO_HTML))
-                || (!empty($user->rights->debugbar->read) && is_object($debugbar))) {
-                $conf->logbuffer[] = dol_print_date(time(), "%Y-%m-%d %H:%M:%S") . " " . $logLevels[$level] . " " . $message;
-            }
-
-            //TODO: Remove this. MAIN_ENABLE_LOG_INLINE_HTML should be deprecated and use a log handler dedicated to HTML output
-            // If html log tag enabled and url parameter log defined, we show output log on HTML comments
-            if (!empty($conf->global->MAIN_ENABLE_LOG_INLINE_HTML) && !empty($_GET["log"])) {
-                print "\n\n<!-- Log start\n";
-                print DolibarrFunctions::dol_escape_htmltag($message) . "\n";
-                print "Log end -->\n";
-            }
-
-            $data = [
-                'message' => $message,
-                'script' => (isset($_SERVER['PHP_SELF']) ? basename($_SERVER['PHP_SELF'], '.php') : false),
-                'level' => $level,
-                'user' => ((is_object($user) && $user->id) ? $user->login : false),
-                'ip' => false,
-            ];
-
-            $remoteip = self::getUserRemoteIP(); // Get ip when page run on a web server
-            if (!empty($remoteip)) {
-                $data['ip'] = $remoteip;
-                // This is when server run behind a reverse proxy
-                if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != $remoteip) {
-                    $data['ip'] = $_SERVER['HTTP_X_FORWARDED_FOR'] . ' -> ' . $data['ip'];
-                } elseif (!empty($_SERVER['HTTP_CLIENT_IP']) && $_SERVER['HTTP_CLIENT_IP'] != $remoteip) {
-                    $data['ip'] = $_SERVER['HTTP_CLIENT_IP'] . ' -> ' . $data['ip'];
-                }
-            } elseif (!empty($_SERVER['SERVER_ADDR'])) {
-                // This is when PHP session is ran inside a web server but not inside a client request (example: init code of apache)
-                $data['ip'] = $_SERVER['SERVER_ADDR'];
-            } elseif (!empty($_SERVER['COMPUTERNAME'])) {
-                // This is when PHP session is ran outside a web server, like from Windows command line (Not always defined, but useful if OS defined it).
-                $data['ip'] = $_SERVER['COMPUTERNAME'] . (empty($_SERVER['USERNAME']) ? '' : '@' . $_SERVER['USERNAME']);
-            } elseif (!empty($_SERVER['LOGNAME'])) {
-                // This is when PHP session is ran outside a web server, like from Linux command line (Not always defined, but usefull if OS defined it).
-                $data['ip'] = '???@' . $_SERVER['LOGNAME'];
-            }
-            // Loop on each log handler and send output
-            foreach ($conf->loghandlers as $loghandlerinstance) {
-                if ($restricttologhandler && $loghandlerinstance->code != $restricttologhandler) {
-                    continue;
-                }
-                $loghandlerinstance->export($data, $suffixinfilename);
-            }
-            unset($data);
-        }
-
-        if ($ident > 0) {
-            foreach ($conf->loghandlers as $loghandlerinstance) {
-                $loghandlerinstance->setIdent($ident);
-            }
-        }
-    }
-
-    /**
-     *  Returns text escaped for inclusion in HTML alt or title tags, or into values of HTML input fields.
-     *
-     * @param string $stringtoescape     String to escape
-     * @param int    $keepb              1=Keep b tags, 0=remove them completely
-     * @param int    $keepn              1=Preserve \r\n strings (otherwise, replace them with escaped value). Set to 1 when escaping for a <textarea>.
-     * @param string $noescapetags       '' or 'common' or list of tags to not escape. TODO Does not works yet when there is attributes to tag.
-     * @param int    $escapeonlyhtmltags 1=Escape only html tags, not the special chars like accents.
-     *
-     * @return     string                                Escaped string
-     * @see        self::self::dol_string_nohtmltag(), self::dol_string_nospecial(), self::dol_string_unaccent()
-     */
-    static public function dol_escape_htmltag($stringtoescape, $keepb = 0, $keepn = 0, $noescapetags = '', $escapeonlyhtmltags = 0)
-    {
-        if ($noescapetags == 'common') {
-            $noescapetags = 'html,body,a,b,em,hr,i,u,ul,li,br,div,img,font,p,span,strong,table,tr,td,th,tbody';
-        }
-
-        // escape quotes and backslashes, newlines, etc.
-        if ($escapeonlyhtmltags) {
-            $tmp = htmlspecialchars_decode($stringtoescape, ENT_COMPAT);
-        } else {
-            $tmp = html_entity_decode($stringtoescape, ENT_COMPAT, 'UTF-8');
-        }
-        if (!$keepb) {
-            $tmp = strtr($tmp, ["<b>" => '', '</b>' => '']);
-        }
-        if (!$keepn) {
-            $tmp = strtr($tmp, ["\r" => '\\r', "\n" => '\\n']);
-        }
-
-        if ($escapeonlyhtmltags) {
-            return htmlspecialchars($tmp, ENT_COMPAT, 'UTF-8');
-        } else {
-            // Escape tags to keep
-            // TODO Does not works yet when there is attributes to tag
-            $tmparrayoftags = [];
-            if ($noescapetags) {
-                $tmparrayoftags = explode(',', $noescapetags);
-            }
-            if (count($tmparrayoftags)) {
-                foreach ($tmparrayoftags as $tagtoreplace) {
-                    $tmp = str_ireplace('<' . $tagtoreplace . '>', '__BEGINTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
-                    $tmp = str_ireplace('</' . $tagtoreplace . '>', '__ENDTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
-                    $tmp = str_ireplace('<' . $tagtoreplace . ' />', '__BEGINENDTAGTOREPLACE' . $tagtoreplace . '__', $tmp);
-                }
-            }
-
-            $result = htmlentities($tmp, ENT_COMPAT, 'UTF-8');
-
-            if (count($tmparrayoftags)) {
-                foreach ($tmparrayoftags as $tagtoreplace) {
-                    $result = str_ireplace('__BEGINTAGTOREPLACE' . $tagtoreplace . '__', '<' . $tagtoreplace . '>', $result);
-                    $result = str_ireplace('__ENDTAGTOREPLACE' . $tagtoreplace . '__', '</' . $tagtoreplace . '>', $result);
-                    $result = str_ireplace('__BEGINENDTAGTOREPLACE' . $tagtoreplace . '__', '<' . $tagtoreplace . ' />', $result);
-                }
-            }
-
-            return $result;
-        }
     }
 
     /**
@@ -1847,7 +2080,8 @@ abstract class DolibarrFunctions
      */
     static public function dol_get_fiche_head($links = [], $active = '', $title = '', $notab = 0, $picto = '', $pictoisfullpath = 0, $morehtmlright = '', $morecss = '', $limittoshow = 0, $moretabssuffix = '')
     {
-        global $conf, $langs, $hookmanager;
+        //        global $conf, $langs, $hookmanager;
+        $hookmanager = new HookManager();
 
         // Show title
         $showtitle = 1;
@@ -1873,7 +2107,7 @@ abstract class DolibarrFunctions
             if ($picto) {
                 $out .= DolibarrFunctions::img_picto($title, ($pictoisfullpath ? '' : 'object_') . $picto, '', $pictoisfullpath, 0, 0, '', 'imgTabTitle') . ' ';
             }
-            $out .= '<span class="tabTitleText">' . DolibarrFunctions::dol_escape_htmltag(dol_trunc($title, $limittitle)) . '</span>';
+            $out .= '<span class="tabTitleText">' . DolibarrFunctions::dol_escape_htmltag(self::dol_trunc($title, $limittitle)) . '</span>';
             $out .= '</a>';
         }
 
@@ -2784,211 +3018,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     *    Output date in a string format according to outputlangs (or langs if not defined).
-     *    Return charset is always UTF-8, except if encodetoouput is defined. In this case charset is output charset
-     *
-     * @param int       $time                 GM Timestamps date
-     * @param string    $format               Output date format (tag of strftime function)
-     *                                        "%d %b %Y",
-     *                                        "%d/%m/%Y %H:%M",
-     *                                        "%d/%m/%Y %H:%M:%S",
-     *                                        "%B"=Long text of month, "%A"=Long text of day, "%b"=Short text of month, "%a"=Short text of day
-     *                                        "day", "daytext", "dayhour", "dayhourldap", "dayhourtext", "dayrfc", "dayhourrfc", "...inputnoreduce", "...reduceformat"
-     * @param string    $tzoutput             true or 'gmt' => string is for Greenwich location
-     *                                        false or 'tzserver' => output string is for local PHP server TZ usage
-     *                                        'tzuser' => output string is for user TZ (current browser TZ with current dst) => In a future, we should have same behaviour than 'tzuserrel'
-     *                                        'tzuserrel' => output string is for user TZ (current browser TZ with dst or not, depending on date position) (TODO not implemented yet)
-     * @param Translate $outputlangs          Object lang that contains language for text translation.
-     * @param boolean   $encodetooutput       false=no convert into output pagecode
-     *
-     * @return string                    Formated date or '' if time is null
-     *
-     * @see        dol_mktime(), self::dol_stringtotime(), dol_getdate()
-     */
-    static public function dol_print_date($time, $format = '', $tzoutput = 'auto', $outputlangs = '', $encodetooutput = false)
-    {
-        $conf = DolibarrConfig::getInstance()->getConf();
-        $langs = Translator::getInstance();
-
-        if ($tzoutput === 'auto') {
-            $tzoutput = (empty($conf) ? 'tzserver' : (isset($conf->tzuserinputkey) ? $conf->tzuserinputkey : 'tzserver'));
-        }
-
-        // Clean parameters
-        $to_gmt = false;
-        $offsettz = $offsetdst = 0;
-        if ($tzoutput) {
-            $to_gmt = true; // For backward compatibility
-            if (is_string($tzoutput)) {
-                if ($tzoutput == 'tzserver') {
-                    $to_gmt = false;
-                    $offsettzstring = @date_default_timezone_get(); // Example 'Europe/Berlin' or 'Indian/Reunion'
-                    $offsettz = 0;    // Timezone offset with server timezone, so 0
-                    $offsetdst = 0;    // Dst offset with server timezone, so 0
-                } elseif ($tzoutput == 'tzuser' || $tzoutput == 'tzuserrel') {
-                    $to_gmt = true;
-                    $offsettzstring = (empty($_SESSION['dol_tz_string']) ? 'UTC' : $_SESSION['dol_tz_string']); // Example 'Europe/Berlin' or 'Indian/Reunion'
-                    $offsettz = (empty($_SESSION['dol_tz']) ? 0 : $_SESSION['dol_tz']) * 60 * 60; // Will not be used anymore
-                    $offsetdst = (empty($_SESSION['dol_dst']) ? 0 : $_SESSION['dol_dst']) * 60 * 60; // Will not be used anymore
-                }
-            }
-        }
-        if (!is_object($outputlangs)) {
-            $outputlangs = $langs;
-        }
-        if (!$format) {
-            $format = 'daytextshort';
-        }
-
-        // Do we have to reduce the length of date (year on 2 chars) to save space.
-        // Note: dayinputnoreduce is same than day but no reduction of year length will be done
-        $reduceformat = (!empty($conf->dol_optimize_smallscreen) && in_array($format, ['day', 'dayhour'])) ? 1 : 0;    // Test on original $format param.
-        $format = preg_replace('/inputnoreduce/', '', $format);    // so format 'dayinputnoreduce' is processed like day
-        $formatwithoutreduce = preg_replace('/reduceformat/', '', $format);
-        if ($formatwithoutreduce != $format) {
-            $format = $formatwithoutreduce;
-            $reduceformat = 1;
-        }  // so format 'dayreduceformat' is processed like day
-
-        // Change predefined format into computer format. If found translation in lang file we use it, otherwise we use default.
-        // TODO Add format daysmallyear and dayhoursmallyear
-        if ($format == 'day') {
-            $format = ($outputlangs->trans("FormatDateShort") != "FormatDateShort" ? $outputlangs->trans("FormatDateShort") : $conf->format_date_short);
-        } elseif ($format == 'hour') {
-            $format = ($outputlangs->trans("FormatHourShort") != "FormatHourShort" ? $outputlangs->trans("FormatHourShort") : $conf->format_hour_short);
-        } elseif ($format == 'hourduration') {
-            $format = ($outputlangs->trans("FormatHourShortDuration") != "FormatHourShortDuration" ? $outputlangs->trans("FormatHourShortDuration") : $conf->format_hour_short_duration);
-        } elseif ($format == 'daytext') {
-            $format = ($outputlangs->trans("FormatDateText") != "FormatDateText" ? $outputlangs->trans("FormatDateText") : $conf->format_date_text);
-        } elseif ($format == 'daytextshort') {
-            $format = ($outputlangs->trans("FormatDateTextShort") != "FormatDateTextShort" ? $outputlangs->trans("FormatDateTextShort") : $conf->format_date_text_short);
-        } elseif ($format == 'dayhour') {
-            $format = ($outputlangs->trans("FormatDateHourShort") != "FormatDateHourShort" ? $outputlangs->trans("FormatDateHourShort") : $conf->format_date_hour_short);
-        } elseif ($format == 'dayhoursec') {
-            $format = ($outputlangs->trans("FormatDateHourSecShort") != "FormatDateHourSecShort" ? $outputlangs->trans("FormatDateHourSecShort") : $conf->format_date_hour_sec_short);
-        } elseif ($format == 'dayhourtext') {
-            $format = ($outputlangs->trans("FormatDateHourText") != "FormatDateHourText" ? $outputlangs->trans("FormatDateHourText") : $conf->format_date_hour_text);
-        } elseif ($format == 'dayhourtextshort') {
-            $format = ($outputlangs->trans("FormatDateHourTextShort") != "FormatDateHourTextShort" ? $outputlangs->trans("FormatDateHourTextShort") : $conf->format_date_hour_text_short);
-        } elseif ($format == 'dayhourlog') {
-            // Format not sensitive to language
-            $format = '%Y%m%d%H%M%S';
-        } elseif ($format == 'dayhourldap') {
-            $format = '%Y%m%d%H%M%SZ';
-        } elseif ($format == 'dayhourxcard') {
-            $format = '%Y%m%dT%H%M%SZ';
-        } elseif ($format == 'dayxcard') {
-            $format = '%Y%m%d';
-        } elseif ($format == 'dayrfc') {
-            $format = '%Y-%m-%d'; // DATE_RFC3339
-        } elseif ($format == 'dayhourrfc') {
-            $format = '%Y-%m-%dT%H:%M:%SZ'; // DATETIME RFC3339
-        } elseif ($format == 'standard') {
-            $format = '%Y-%m-%d %H:%M:%S';
-        }
-
-        if ($reduceformat) {
-            $format = str_replace('%Y', '%y', $format);
-            $format = str_replace('yyyy', 'yy', $format);
-        }
-
-        // If date undefined or "", we return ""
-        if (DolibarrFunctions::dol_strlen($time) == 0) {
-            return ''; // $time=0 allowed (it means 01/01/1970 00:00:00)
-        }
-
-        // Clean format
-        if (preg_match('/%b/i', $format)) {        // There is some text to translate
-            // We inhibate translation to text made by strftime functions. We will use trans instead later.
-            $format = str_replace('%b', '__b__', $format);
-            $format = str_replace('%B', '__B__', $format);
-        }
-        if (preg_match('/%a/i', $format)) {        // There is some text to translate
-            // We inhibate translation to text made by strftime functions. We will use trans instead later.
-            $format = str_replace('%a', '__a__', $format);
-            $format = str_replace('%A', '__A__', $format);
-        }
-
-        // Analyze date
-        $reg = [];
-        if (preg_match('/^([0-9][0-9][0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])([0-9][0-9])$/i', $time, $reg)) {    // Deprecated. Ex: 1970-01-01, 1970-01-01 01:00:00, 19700101010000
-            dol_print_error("Functions.lib::dol_print_date function called with a bad value from page " . $_SERVER["PHP_SELF"]);
-            return '';
-        } elseif (preg_match('/^([0-9]+)\-([0-9]+)\-([0-9]+) ?([0-9]+)?:?([0-9]+)?:?([0-9]+)?/i', $time, $reg)) {    // Still available to solve problems in extrafields of type date
-            // This part of code should not be used anymore.
-            dol_syslog("Functions.lib::dol_print_date function called with a bad value from page " . $_SERVER["PHP_SELF"], LOG_WARNING);
-            //if (function_exists('debug_print_backtrace')) debug_print_backtrace();
-            // Date has format 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS'
-            $syear = (!empty($reg[1]) ? $reg[1] : '');
-            $smonth = (!empty($reg[2]) ? $reg[2] : '');
-            $sday = (!empty($reg[3]) ? $reg[3] : '');
-            $shour = (!empty($reg[4]) ? $reg[4] : '');
-            $smin = (!empty($reg[5]) ? $reg[5] : '');
-            $ssec = (!empty($reg[6]) ? $reg[6] : '');
-
-            $time = dol_mktime($shour, $smin, $ssec, $smonth, $sday, $syear, true);
-            $ret = adodb_strftime($format, $time + $offsettz + $offsetdst, $to_gmt);
-        } else {
-            // Date is a timestamps
-            if ($time < 100000000000) {    // Protection against bad date values
-                $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
-
-                $ret = adodb_strftime($format, $timetouse, $to_gmt);    // If to_gmt = false then adodb_strftime use TZ of server
-            } else {
-                $ret = 'Bad value ' . $time . ' for date';
-            }
-        }
-
-        if (preg_match('/__b__/i', $format)) {
-            $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
-
-            // Here ret is string in PHP setup language (strftime was used). Now we convert to $outputlangs.
-            $month = adodb_strftime('%m', $timetouse, $to_gmt);        // If to_gmt = false then adodb_strftime use TZ of server
-            $month = sprintf("%02d", $month); // $month may be return with format '06' on some installation and '6' on other, so we force it to '06'.
-            if ($encodetooutput) {
-                $monthtext = $outputlangs->transnoentities('Month' . $month);
-                $monthtextshort = $outputlangs->transnoentities('MonthShort' . $month);
-            } else {
-                $monthtext = $outputlangs->transnoentitiesnoconv('Month' . $month);
-                $monthtextshort = $outputlangs->transnoentitiesnoconv('MonthShort' . $month);
-            }
-            //print 'monthtext='.$monthtext.' monthtextshort='.$monthtextshort;
-            $ret = str_replace('__b__', $monthtextshort, $ret);
-            $ret = str_replace('__B__', $monthtext, $ret);
-            //print 'x'.$outputlangs->charset_output.'-'.$ret.'x';
-            //return $ret;
-        }
-        if (preg_match('/__a__/i', $format)) {
-            //print "time=$time offsettz=$offsettz offsetdst=$offsetdst offsettzstring=$offsettzstring";
-            $timetouse = $time + $offsettz + $offsetdst; // TODO Replace this with function Date PHP. We also should not use anymore offsettz and offsetdst but only offsettzstring.
-
-            $w = adodb_strftime('%w', $timetouse, $to_gmt);        // If to_gmt = false then adodb_strftime use TZ of server
-            $dayweek = $outputlangs->transnoentitiesnoconv('Day' . $w);
-            $ret = str_replace('__A__', $dayweek, $ret);
-            $ret = str_replace('__a__', dol_substr($dayweek, 0, 3), $ret);
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Make a strlen call. Works even if mbstring module not enabled
-     *
-     * @param string $string         String to calculate length
-     * @param string $stringencoding Encoding of string
-     *
-     * @return  int                                Length of string
-     */
-    static public function dol_strlen($string, $stringencoding = 'UTF-8')
-    {
-        if (function_exists('mb_strlen')) {
-            return mb_strlen($string, $stringencoding);
-        } else {
-            return strlen($string);
-        }
-    }
-
-    /**
      *  Return an array with locale date info.
      *  WARNING: This function use PHP server timezone by default to return locale informations.
      *  Be aware to add the third parameter to "UTC" if you need to work on UTC.
@@ -3007,7 +3036,7 @@ abstract class DolibarrFunctions
      *                                        'year' => $year,
      *                                        'yday' => floor($secsInYear/$_day_power)
      *                                        '0' => original timestamp
-     * @see                                dol_print_date(), self::dol_stringtotime(), dol_mktime()
+     * @see                                dol_print_date(), self::dol_stringtotime(), self::dol_mktime()
      */
     static public function dol_getdate($timestamp, $fast = false, $forcetimezone = '')
     {
@@ -3052,7 +3081,7 @@ abstract class DolibarrFunctions
      * @param int   $check                    0=No check on parameters (Can use day 32, etc...)
      *
      * @return    int|string                    Date as a timestamp, '' or false if error
-     * @see                                dol_print_date(), self::dol_stringtotime(), dol_getdate()
+     * @see                                dol_print_date(), self::dol_stringtotime(), DolibarrFunctions::dol_getdate()
      */
     static public function dol_mktime($hour, $minute, $second, $month, $day, $year, $gm = 'auto', $check = 1)
     {
@@ -3106,7 +3135,7 @@ abstract class DolibarrFunctions
             try {
                 $localtz = new DateTimeZone($default_timezone);
             } catch (Exception $e) {
-                dol_syslog("Warning dol_tz_string contains an invalid value " . $_SESSION["dol_tz_string"], LOG_WARNING);
+                DolibarrFunctions::dol_syslog("Warning dol_tz_string contains an invalid value " . $_SESSION["dol_tz_string"], LOG_WARNING);
                 $default_timezone = @date_default_timezone_get();
             }
         } elseif (strrpos($gm, "tz,") !== false) {
@@ -3114,7 +3143,7 @@ abstract class DolibarrFunctions
             try {
                 $localtz = new DateTimeZone($timezone);
             } catch (Exception $e) {
-                dol_syslog("Warning passed timezone contains an invalid value " . $timezone, LOG_WARNING);
+                DolibarrFunctions::dol_syslog("Warning passed timezone contains an invalid value " . $timezone, LOG_WARNING);
             }
         }
 
@@ -3155,18 +3184,18 @@ abstract class DolibarrFunctions
         } elseif ($mode == 'tzserver') {        // Time for now with PHP server timezone added
             require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
             $tzsecond = getServerTimeZoneInt('now'); // Contains tz+dayling saving time
-            $ret = (int) (dol_now('gmt') + ($tzsecond * 3600));
+            $ret = (int) (self::dol_now('gmt') + ($tzsecond * 3600));
             //} elseif ($mode == 'tzref') {// Time for now with parent company timezone is added
             //	require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
             //	$tzsecond=getParentCompanyTimeZoneInt();    // Contains tz+dayling saving time
-            //	$ret=dol_now('gmt')+($tzsecond*3600);
+            //	$ret=self::dol_now('gmt')+($tzsecond*3600);
             //}
         } elseif ($mode == 'tzuser' || $mode == 'tzuserrel') {
             // Time for now with user timezone added
             //print 'time: '.time();
             $offsettz = (empty($_SESSION['dol_tz']) ? 0 : $_SESSION['dol_tz']) * 60 * 60;
             $offsetdst = (empty($_SESSION['dol_dst']) ? 0 : $_SESSION['dol_dst']) * 60 * 60;
-            $ret = (int) (dol_now('gmt') + ($offsettz + $offsetdst));
+            $ret = (int) (self::dol_now('gmt') + ($offsettz + $offsetdst));
         }
 
         return $ret;
@@ -3241,7 +3270,7 @@ abstract class DolibarrFunctions
         if (!preg_match('/^http/i', $url)) {
             $link .= 'http://';
         }
-        $link .= dol_trunc($url, $max);
+        $link .= self::dol_trunc($url, $max);
         $link .= '</a>';
         return '<div class="nospan float" style="margin-right: 10px">' . ($withpicto ? DolibarrFunctions::img_picto($langs->trans("Url"), 'globe') . ' ' : '') . $link . '</div>';
     }
@@ -3280,7 +3309,7 @@ abstract class DolibarrFunctions
             }
             $newemail .= $email;
             $newemail .= '">';
-            $newemail .= dol_trunc($email, $max);
+            $newemail .= self::dol_trunc($email, $max);
             $newemail .= '</a>';
             if ($showinvalid && !isValidEmail($email)) {
                 $langs->load("errors");
@@ -3756,32 +3785,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     * Return the IP of remote user.
-     * Take HTTP_X_FORWARDED_FOR (defined when using proxy)
-     * Then HTTP_CLIENT_IP if defined (rare)
-     * Then REMOTE_ADDR (no way to be modified by user but may be wrong if user is using a proxy)
-     *
-     * @return    string        Ip of remote user.
-     */
-    static public function getUserRemoteIP()
-    {
-        if (empty($_SERVER['HTTP_X_FORWARDED_FOR']) || preg_match('/[^0-9\.\:,\[\]]/', $_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            if (empty($_SERVER['HTTP_CLIENT_IP']) || preg_match('/[^0-9\.\:,\[\]]/', $_SERVER['HTTP_CLIENT_IP'])) {
-                if (empty($_SERVER["HTTP_CF_CONNECTING_IP"])) {
-                    $ip = (empty($_SERVER['REMOTE_ADDR']) ? '' : $_SERVER['REMOTE_ADDR']);    // value may have been the IP of the proxy and not the client
-                } else {
-                    $ip = $_SERVER["HTTP_CF_CONNECTING_IP"];    // value here may have been forged by client
-                }
-            } else {
-                $ip = $_SERVER['HTTP_CLIENT_IP']; // value is clean here but may have been forged by proxy
-            }
-        } else {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR']; // value is clean here but may have been forged by proxy
-        }
-        return $ip;
-    }
-
-    /**
      * Return if we are using a HTTPS connexion
      * Check HTTPS (no way to be modified by user but may be empty or wrong if user is using a proxy)
      * Take HTTP_X_FORWARDED_PROTO (defined when using proxy)
@@ -4054,35 +4057,35 @@ abstract class DolibarrFunctions
 
         // We go always here
         if ($trunc == 'right') {
-            $newstring = self::dol_textishtml($string) ? self::self::dol_string_nohtmltag($string, 1) : $string;
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
             if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
                 // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
-                return dol_substr($newstring, 0, $size, $stringencoding) . ($nodot ? '' : '…');
+                return self::dol_substr($newstring, 0, $size, $stringencoding) . ($nodot ? '' : '…');
             } else {
                 //return 'u'.$size.'-'.$newstring.'-'.DolibarrFunctions::dol_strlen($newstring,$stringencoding).'-'.$string;
                 return $string;
             }
         } elseif ($trunc == 'middle') {
-            $newstring = self::dol_textishtml($string) ? self::self::dol_string_nohtmltag($string, 1) : $string;
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
             if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > 2 && DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
                 $size1 = round($size / 2);
                 $size2 = round($size / 2);
-                return dol_substr($newstring, 0, $size1, $stringencoding) . '…' . dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size2, $size2, $stringencoding);
+                return self::dol_substr($newstring, 0, $size1, $stringencoding) . '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size2, $size2, $stringencoding);
             } else {
                 return $string;
             }
         } elseif ($trunc == 'left') {
-            $newstring = self::dol_textishtml($string) ? self::self::dol_string_nohtmltag($string, 1) : $string;
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
             if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
                 // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
-                return '…' . dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $size, $stringencoding);
+                return '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $size, $stringencoding);
             } else {
                 return $string;
             }
         } elseif ($trunc == 'wrap') {
-            $newstring = self::dol_textishtml($string) ? self::self::dol_string_nohtmltag($string, 1) : $string;
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
             if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
-                return dol_substr($newstring, 0, $size, $stringencoding) . "\n" . dol_trunc(dol_substr($newstring, $size, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $stringencoding), $size, $trunc);
+                return self::dol_substr($newstring, 0, $size, $stringencoding) . "\n" . self::dol_trunc(self::dol_substr($newstring, $size, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $stringencoding), $size, $trunc);
             } else {
                 return $string;
             }
@@ -4906,13 +4909,13 @@ abstract class DolibarrFunctions
             }
             $langs->loadLangs(["main", "errors"]); // Reload main because language may have been set only on previous line so we have to reload files we need.
             // This should not happen, except if there is a bug somewhere. Enabled and check log in such case.
-            print 'This website or feature is currently temporarly not available or failed after a technical error.<br><br>This may be due to a maintenance operation. Current status of operation (' . dol_print_date(dol_now(), 'dayhourrfc') . ') are on next line...<br><br>' . "\n";
+            print 'This website or feature is currently temporarly not available or failed after a technical error.<br><br>This may be due to a maintenance operation. Current status of operation (' . dol_print_date(self::dol_now(), 'dayhourrfc') . ') are on next line...<br><br>' . "\n";
             print $langs->trans("DolibarrHasDetectedError") . '. ';
             print $langs->trans("YouCanSetOptionDolibarrMainProdToZero");
             define("MAIN_CORE_ERROR", 1);
         }
 
-        dol_syslog("Error " . $syslog, LOG_ERR);
+        DolibarrFunctions::dol_syslog("Error " . $syslog, LOG_ERR);
 
         dump(debug_backtrace());
     }
@@ -4937,7 +4940,7 @@ abstract class DolibarrFunctions
         }
 
         $langs->load("errors");
-        $now = dol_now();
+        $now = self::dol_now();
 
         print '<br><div class="center login_main_message"><div class="' . $morecss . '">';
         print $langs->trans("ErrorContactEMail", $email, $prefixcode . dol_print_date($now, '%Y%m%d%H%M%S'));
@@ -4971,7 +4974,7 @@ abstract class DolibarrFunctions
      */
     static public function print_liste_field_titre($name, $file = "", $field = "", $begin = "", $moreparam = "", $moreattrib = "", $sortfield = "", $sortorder = "", $prefix = "", $tooltip = "", $forcenowrapcolumntitle = 0)
     {
-        print getTitleFieldOfList($name, 0, $file, $field, $begin, $moreparam, $moreattrib, $sortfield, $sortorder, $prefix, 0, $tooltip, $forcenowrapcolumntitle);
+        print self::getTitleFieldOfList($name, 0, $file, $field, $begin, $moreparam, $moreattrib, $sortfield, $sortorder, $prefix, 0, $tooltip, $forcenowrapcolumntitle);
     }
 
     /**
@@ -4995,8 +4998,10 @@ abstract class DolibarrFunctions
      */
     static public function getTitleFieldOfList($name, $thead = 0, $file = "", $field = "", $begin = "", $moreparam = "", $moreattrib = "", $sortfield = "", $sortorder = "", $prefix = "", $disablesortlink = 0, $tooltip = '', $forcenowrapcolumntitle = 0)
     {
-        global $conf, $langs, $form;
+        //        global $conf, $langs, $form;
         //print "$name, $file, $field, $begin, $options, $moreattrib, $sortfield, $sortorder<br>\n";
+
+        $langs = Translator::getInstance();
 
         if ($moreattrib == 'class="right"') {
             $prefix .= 'right '; // For backward compatibility
@@ -5117,7 +5122,7 @@ abstract class DolibarrFunctions
      */
     static public function print_titre($title)
     {
-        dol_syslog(__FUNCTION__ . " is deprecated", LOG_WARNING);
+        DolibarrFunctions::dol_syslog(__FUNCTION__ . " is deprecated", LOG_WARNING);
 
         print '<div class="titre">' . $title . '</div>';
     }
@@ -5777,7 +5782,7 @@ abstract class DolibarrFunctions
             $thirdparty_seller = $mysoc;
         }
 
-        dol_syslog("get_localtax tva=" . $vatrate . " local=" . $local . " thirdparty_buyer id=" . (is_object($thirdparty_buyer) ? $thirdparty_buyer->id : '') . "/country_code=" . (is_object($thirdparty_buyer) ? $thirdparty_buyer->country_code : '') . " thirdparty_seller id=" . $thirdparty_seller->id . "/country_code=" . $thirdparty_seller->country_code . " thirdparty_seller localtax1_assuj=" . $thirdparty_seller->localtax1_assuj . "  thirdparty_seller localtax2_assuj=" . $thirdparty_seller->localtax2_assuj);
+        DolibarrFunctions::dol_syslog("get_localtax tva=" . $vatrate . " local=" . $local . " thirdparty_buyer id=" . (is_object($thirdparty_buyer) ? $thirdparty_buyer->id : '') . "/country_code=" . (is_object($thirdparty_buyer) ? $thirdparty_buyer->country_code : '') . " thirdparty_seller id=" . $thirdparty_seller->id . "/country_code=" . $thirdparty_seller->country_code . " thirdparty_seller localtax1_assuj=" . $thirdparty_seller->localtax1_assuj . "  thirdparty_seller localtax2_assuj=" . $thirdparty_seller->localtax2_assuj);
 
         $vatratecleaned = $vatrate;
         $reg = [];
@@ -5961,7 +5966,7 @@ abstract class DolibarrFunctions
     {
         global $db, $mysoc;
 
-        dol_syslog("getTaxesFromId vat id or rate = " . $vatrate);
+        DolibarrFunctions::dol_syslog("getTaxesFromId vat id or rate = " . $vatrate);
 
         // Search local taxes
         $sql = "SELECT t.rowid, t.code, t.taux as rate, t.recuperableonly as npr, t.accountancy_code_sell, t.accountancy_code_buy,";
@@ -6035,7 +6040,7 @@ abstract class DolibarrFunctions
     {
         global $db, $mysoc;
 
-        dol_syslog("getLocalTaxesFromRate vatrate=" . $vatrate . " local=" . $local);
+        DolibarrFunctions::dol_syslog("getLocalTaxesFromRate vatrate=" . $vatrate . " local=" . $local);
 
         // Search local taxes
         $sql = "SELECT t.taux as rate, t.code, t.localtax1, t.localtax1_type, t.localtax2, t.localtax2_type, t.accountancy_code_sell, t.accountancy_code_buy";
@@ -6155,7 +6160,7 @@ abstract class DolibarrFunctions
             }
         }
 
-        dol_syslog("get_product_vat_for_country: ret=" . $ret);
+        DolibarrFunctions::dol_syslog("get_product_vat_for_country: ret=" . $ret);
         return $ret;
     }
 
@@ -6220,7 +6225,7 @@ abstract class DolibarrFunctions
             }
         }
 
-        dol_syslog("get_product_localtax_for_country: ret=" . $ret);
+        DolibarrFunctions::dol_syslog("get_product_localtax_for_country: ret=" . $ret);
         return $ret;
     }
 
@@ -6256,7 +6261,7 @@ abstract class DolibarrFunctions
         $buyer_country_code = $thirdparty_buyer->country_code;
         $buyer_in_cee = isInEEC($thirdparty_buyer);
 
-        dol_syslog("get_default_tva: seller use vat=" . $seller_use_vat . ", seller country=" . $seller_country_code . ", seller in cee=" . $seller_in_cee . ", buyer vat number=" . $thirdparty_buyer->tva_intra . " buyer country=" . $buyer_country_code . ", buyer in cee=" . $buyer_in_cee . ", idprod=" . $idprod . ", idprodfournprice=" . $idprodfournprice . ", SERVICE_ARE_ECOMMERCE_200238EC=" . (!empty($conf->global->SERVICES_ARE_ECOMMERCE_200238EC) ? $conf->global->SERVICES_ARE_ECOMMERCE_200238EC : ''));
+        DolibarrFunctions::dol_syslog("get_default_tva: seller use vat=" . $seller_use_vat . ", seller country=" . $seller_country_code . ", seller in cee=" . $seller_in_cee . ", buyer vat number=" . $thirdparty_buyer->tva_intra . " buyer country=" . $buyer_country_code . ", buyer in cee=" . $buyer_in_cee . ", idprod=" . $idprod . ", idprodfournprice=" . $idprodfournprice . ", SERVICE_ARE_ECOMMERCE_200238EC=" . (!empty($conf->global->SERVICES_ARE_ECOMMERCE_200238EC) ? $conf->global->SERVICES_ARE_ECOMMERCE_200238EC : ''));
 
         // If services are eServices according to EU Council Directive 2002/38/EC (http://ec.europa.eu/taxation_customs/taxation/vat/traders/e-commerce/article_1610_en.htm)
         // we use the buyer VAT.
@@ -6547,7 +6552,7 @@ abstract class DolibarrFunctions
     {
         global $conf;
 
-        dol_syslog("functions.lib::dol_mkdir: dir=" . $dir, LOG_INFO);
+        DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: dir=" . $dir, LOG_INFO);
 
         $dir_osencoded = dol_osencode($dir);
         if (@is_dir($dir_osencoded)) {
@@ -6581,7 +6586,7 @@ abstract class DolibarrFunctions
             if ($ccdir) {
                 $ccdir_osencoded = dol_osencode($ccdir);
                 if (!@is_dir($ccdir_osencoded)) {
-                    dol_syslog("functions.lib::dol_mkdir: Directory '" . $ccdir . "' does not exists or is outside open_basedir PHP setting.", LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: Directory '" . $ccdir . "' does not exists or is outside open_basedir PHP setting.", LOG_DEBUG);
 
                     umask(0);
                     $dirmaskdec = octdec($newmask);
@@ -6591,10 +6596,10 @@ abstract class DolibarrFunctions
                     $dirmaskdec |= octdec('0111'); // Set x bit required for directories
                     if (!@mkdir($ccdir_osencoded, $dirmaskdec)) {
                         // Si le is_dir a renvoye une fausse info, alors on passe ici.
-                        dol_syslog("functions.lib::dol_mkdir: Fails to create directory '" . $ccdir . "' or directory already exists.", LOG_WARNING);
+                        DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: Fails to create directory '" . $ccdir . "' or directory already exists.", LOG_WARNING);
                         $nberr++;
                     } else {
-                        dol_syslog("functions.lib::dol_mkdir: Directory '" . $ccdir . "' created", LOG_DEBUG);
+                        DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: Directory '" . $ccdir . "' created", LOG_DEBUG);
                         $nberr = 0; // On remet a zero car si on arrive ici, cela veut dire que les echecs precedents peuvent etre ignore
                         $nbcreated++;
                     }
@@ -6626,7 +6631,7 @@ abstract class DolibarrFunctions
      *
      * @return string                            String cleaned
      *
-     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::self::dol_string_nohtmltag() self::dol_string_onlythesehtmltags() self::dol_string_onlythesehtmlattributes()
+     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::dol_string_nohtmltag() self::dol_string_onlythesehtmltags() self::dol_string_onlythesehtmlattributes()
      */
     static public function dol_string_neverthesehtmltags($stringtoclean, $disallowed_tags = ['textarea'], $cleanalsosomestyles = 0)
     {
@@ -6651,7 +6656,7 @@ abstract class DolibarrFunctions
      * @param string $charset   Charset of $text string (UTF-8 by default)
      *
      * @return    string                Output text
-     * @see dol_nboflines_bis(), self::self::dol_string_nohtmltag(), DolibarrFunctions::dol_escape_htmltag()
+     * @see dol_nboflines_bis(), self::dol_string_nohtmltag(), DolibarrFunctions::dol_escape_htmltag()
      */
     static public function dolGetFirstLineOfText($text, $nboflines = 1, $charset = 'UTF-8')
     {
@@ -6957,7 +6962,7 @@ abstract class DolibarrFunctions
             // this will include signature content first and then replace var found into content of signature
             $signature = $user->signature;
             $substitutionarray = array_merge($substitutionarray, [
-                '__USER_SIGNATURE__' => (string) (($signature && empty($conf->global->MAIN_MAIL_DO_NOT_USE_SIGN)) ? ($onlykey == 2 ? dol_trunc(self::dol_string_nohtmltag($signature), 30) : $signature) : ''),
+                '__USER_SIGNATURE__' => (string) (($signature && empty($conf->global->MAIN_MAIL_DO_NOT_USE_SIGN)) ? ($onlykey == 2 ? self::dol_trunc(self::dol_string_nohtmltag($signature), 30) : $signature) : ''),
             ]);
 
             if (is_object($user)) {
@@ -6969,7 +6974,7 @@ abstract class DolibarrFunctions
                     '__USER_FIRSTNAME__' => (string) $user->firstname,
                     '__USER_FULLNAME__' => (string) $user->getFullName($outputlangs),
                     '__USER_SUPERVISOR_ID__' => (string) ($user->fk_user ? $user->fk_user : '0'),
-                    '__USER_REMOTE_IP__' => (string) getUserRemoteIP(),
+                    '__USER_REMOTE_IP__' => (string) self::getUserRemoteIP(),
                 ]);
             }
         }
@@ -7385,7 +7390,7 @@ abstract class DolibarrFunctions
         if (empty($exclude) || !in_array('date', $exclude)) {
             include_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
-            $tmp = dol_getdate(dol_now(), true);
+            $tmp = DolibarrFunctions::dol_getdate(self::dol_now(), true);
             $tmp2 = dol_get_prev_day($tmp['mday'], $tmp['mon'], $tmp['year']);
             $tmp3 = dol_get_prev_month($tmp['mon'], $tmp['year']);
             $tmp4 = dol_get_next_day($tmp['mday'], $tmp['mon'], $tmp['year']);
@@ -7396,8 +7401,8 @@ abstract class DolibarrFunctions
             $substitutionarray = array_merge($substitutionarray, [
                 '__DAY__' => (string) $tmp['mday'],
                 '__DAY_TEXT__' => $daytext, // Monday
-                '__DAY_TEXT_SHORT__' => dol_trunc($daytext, 3, 'right', 'UTF-8', 1), // Mon
-                '__DAY_TEXT_MIN__' => dol_trunc($daytext, 1, 'right', 'UTF-8', 1), // M
+                '__DAY_TEXT_SHORT__' => self::dol_trunc($daytext, 3, 'right', 'UTF-8', 1), // Mon
+                '__DAY_TEXT_MIN__' => self::dol_trunc($daytext, 1, 'right', 'UTF-8', 1), // M
                 '__MONTH__' => (string) $tmp['mon'],
                 '__MONTH_TEXT__' => $outputlangs->trans('Month' . sprintf("%02d", $tmp['mon'])),
                 '__MONTH_TEXT_SHORT__' => $outputlangs->trans('MonthShort' . sprintf("%02d", $tmp['mon'])),
@@ -7497,7 +7502,7 @@ abstract class DolibarrFunctions
         $reg = [];
         while (preg_match('/__\[([^\]]+)\]__/', $text, $reg)) {
             $keyfound = $reg[1];
-            if (isASecretKey($keyfound)) {
+            if (self::isASecretKey($keyfound)) {
                 $value = '*****forbidden*****';
             } else {
                 $value = empty($conf->global->$keyfound) ? '' : $conf->global->$keyfound;
@@ -7590,7 +7595,7 @@ abstract class DolibarrFunctions
                 if (preg_match('/functions_(.*)\.lib\.php/i', $substitfile['name'], $reg)) {
                     $module = $reg[1];
 
-                    dol_syslog("Library " . $substitfile['name'] . " found into " . $dir);
+                    DolibarrFunctions::dol_syslog("Library " . $substitfile['name'] . " found into " . $dir);
                     // Include the user's functions file
                     require_once $dir . $substitfile['name'];
                     // Call the user's function, and only if it is defined
@@ -7705,35 +7710,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     *    Set event message in dol_events session object. Will be output by calling dol_htmloutput_events.
-     *  Note: Calling dol_htmloutput_events is done into pages by standard llxFooter() function.
-     *  Note: Prefer to use setEventMessages instead.
-     *
-     * @param string|string[] $mesgs Message string or array
-     * @param string          $style Which style to use ('mesgs' by default, 'warnings', 'errors')
-     *
-     * @return    void
-     * @see    dol_htmloutput_events()
-     */
-    static public function setEventMessage($mesgs, $style = 'mesgs')
-    {
-        //dol_syslog(__FUNCTION__ . " is deprecated", LOG_WARNING);		This is not deprecated, it is used by setEventMessages function
-        if (!is_array($mesgs)) {
-            // If mesgs is a string
-            if ($mesgs) {
-                $_SESSION['dol_events'][$style][] = $mesgs;
-            }
-        } else {
-            // If mesgs is an array
-            foreach ($mesgs as $mesg) {
-                if ($mesg) {
-                    $_SESSION['dol_events'][$style][] = $mesg;
-                }
-            }
-        }
-    }
-
-    /**
      *    Set event messages in dol_events session object. Will be output by calling dol_htmloutput_events.
      *  Note: Calling dol_htmloutput_events is done into pages by standard llxFooter() function.
      *
@@ -7748,7 +7724,7 @@ abstract class DolibarrFunctions
     static public function setEventMessages($mesg, $mesgs, $style = 'mesgs', $messagekey = '')
     {
         if (empty($mesg) && empty($mesgs)) {
-            dol_syslog("Try to add a message in stack with empty message", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Try to add a message in stack with empty message", LOG_WARNING);
         } else {
             if ($messagekey) {
                 // Complete message with a js link to set a cookie "DOLHIDEMESSAGE".$messagekey;
@@ -7760,12 +7736,41 @@ abstract class DolibarrFunctions
                     dol_print_error('', 'Bad parameter style=' . $style . ' for setEventMessages');
                 }
                 if (empty($mesgs)) {
-                    setEventMessage($mesg, $style);
+                    self::setEventMessage($mesg, $style);
                 } else {
                     if (!empty($mesg) && !in_array($mesg, $mesgs)) {
-                        setEventMessage($mesg, $style); // Add message string if not already into array
+                        self::setEventMessage($mesg, $style); // Add message string if not already into array
                     }
-                    setEventMessage($mesgs, $style);
+                    self::setEventMessage($mesgs, $style);
+                }
+            }
+        }
+    }
+
+    /**
+     *    Set event message in dol_events session object. Will be output by calling dol_htmloutput_events.
+     *  Note: Calling dol_htmloutput_events is done into pages by standard llxFooter() function.
+     *  Note: Prefer to use setEventMessages instead.
+     *
+     * @param string|string[] $mesgs Message string or array
+     * @param string          $style Which style to use ('mesgs' by default, 'warnings', 'errors')
+     *
+     * @return    void
+     * @see    dol_htmloutput_events()
+     */
+    static public function setEventMessage($mesgs, $style = 'mesgs')
+    {
+        //DolibarrFunctions::dol_syslog(__FUNCTION__ . " is deprecated", LOG_WARNING);		This is not deprecated, it is used by setEventMessages function
+        if (!is_array($mesgs)) {
+            // If mesgs is a string
+            if ($mesgs) {
+                $_SESSION['dol_events'][$style][] = $mesgs;
+            }
+        } else {
+            // If mesgs is an array
+            foreach ($mesgs as $mesg) {
+                if ($mesg) {
+                    $_SESSION['dol_events'][$style][] = $mesg;
                 }
             }
         }
@@ -7959,7 +7964,7 @@ abstract class DolibarrFunctions
                         $tmpmesgstring = preg_replace('/<\/div>/', '', $tmpmesgstring);
                         $newmesgarray[] = $tmpmesgstring;
                     } else {
-                        dol_syslog("Error call of dol_htmloutput_mesg with an array with a value that is not a string", LOG_WARNING);
+                        DolibarrFunctions::dol_syslog("Error call of dol_htmloutput_mesg with an array with a value that is not a string", LOG_WARNING);
                     }
                 }
                 $mesgarray = $newmesgarray;
@@ -8165,7 +8170,7 @@ abstract class DolibarrFunctions
             return $cache_codes[$tablename][$key][$fieldid]; // Found in cache
         }
 
-        dol_syslog('dol_getIdFromCode (value for field ' . $fieldid . ' from key ' . $key . ' not found into cache)', LOG_DEBUG);
+        DolibarrFunctions::dol_syslog('dol_getIdFromCode (value for field ' . $fieldid . ' from key ' . $key . ' not found into cache)', LOG_DEBUG);
 
         $sql = "SELECT " . $fieldid . " as valuetoget";
         $sql .= " FROM " . MAIN_DB_PREFIX . $tablename;
@@ -8206,7 +8211,7 @@ abstract class DolibarrFunctions
         $rights = true;
         if ($strRights != '') {
             $str = 'if(!(' . $strRights . ')) { $rights = false; }';
-            dol_eval($str); // The dol_eval must contains all the global $xxx used into a condition
+            self::dol_eval($str); // The dol_eval must contains all the global $xxx used into a condition
         }
         return $rights;
     }
@@ -8252,7 +8257,7 @@ abstract class DolibarrFunctions
         } while ($oldstringtoclean != $s);
 
         if (strpos($s, '__forbiddenstring__') !== false) {
-            dol_syslog('Bad string syntax to evaluate: ' . $s, LOG_WARNING);
+            DolibarrFunctions::dol_syslog('Bad string syntax to evaluate: ' . $s, LOG_WARNING);
             return 'Bad string syntax to evaluate: ' . $s;
         }
 
@@ -8726,7 +8731,7 @@ abstract class DolibarrFunctions
                 }
             }
         } else {
-            dol_syslog("Warning Exention php-intl is not available", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Warning Exention php-intl is not available", LOG_WARNING);
         }
 
         return null;
@@ -8762,9 +8767,9 @@ abstract class DolibarrFunctions
      *
      * @return    void
      */
-    function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, $mode = 'add')
+    static function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, $mode = 'add')
     {
-        global $hookmanager;
+        // global $hookmanager;
 
         if (isset($conf->modules_parts['tabs'][$type]) && is_array($conf->modules_parts['tabs'][$type])) {
             foreach ($conf->modules_parts['tabs'][$type] as $value) {
@@ -8794,7 +8799,7 @@ abstract class DolibarrFunctions
                             $h++;
                         }
                     } elseif (count($values) == 5) {       // deprecated
-                        dol_syslog('Passing 5 values in tabs module_parts is deprecated. Please update to 6 with permissions.', LOG_WARNING);
+                        DolibarrFunctions::dol_syslog('Passing 5 values in tabs module_parts is deprecated. Please update to 6 with permissions.', LOG_WARNING);
 
                         if ($values[0] != $type) {
                             continue;
@@ -8857,11 +8862,14 @@ abstract class DolibarrFunctions
      *
      * @return    void
      */
-    function printCommonFooter($zone = 'private')
+    static function printCommonFooter($zone = 'private')
     {
-        global $conf, $hookmanager, $user, $debugbar;
-        global $action;
-        global $micro_start_time;
+        //        global $conf, $hookmanager, $user, $debugbar;
+        //        global $action;
+        //        global $micro_start_time;
+        $hookmanager = new HookManager();
+        $conf = DolibarrConfig::getInstance()->getConf();
+        $langs = Translator::getInstance();
 
         if ($zone == 'private') {
             print "\n" . '<!-- Common footer for private page -->' . "\n";
@@ -8905,7 +8913,7 @@ abstract class DolibarrFunctions
                     }
                     $relativepathstring = preg_replace('/^\//', '', $relativepathstring);
                     $relativepathstring = preg_replace('/^custom\//', '', $relativepathstring);
-                    //$tmpqueryarraywehave = explode('&', self::self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
+                    //$tmpqueryarraywehave = explode('&', self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
                     if (!empty($user->default_values[$relativepathstring]['focus'])) {
                         foreach ($user->default_values[$relativepathstring]['focus'] as $defkey => $defval) {
                             $qualified = 0;
@@ -9875,7 +9883,7 @@ abstract class DolibarrFunctions
      *
      * @return    int                            -1 : Error with argument passed |0 : color is dark | 1 : color is light
      */
-    function colorIsLight($stringcolor)
+    static function colorIsLight($stringcolor)
     {
         $stringcolor = str_replace('#', '', $stringcolor);
         $res = -1;
@@ -9911,7 +9919,7 @@ abstract class DolibarrFunctions
      *
      * @return    int                                        0=Hide, 1=Show, 2=Show gray
      */
-    function isVisibleToUserType($type_user, &$menuentry, &$listofmodulesforexternal)
+    static function isVisibleToUserType($type_user, &$menuentry, &$listofmodulesforexternal)
     {
         global $conf;
 

@@ -29,7 +29,6 @@ namespace Alxarafe\Dolibarr\Libraries;
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Providers\DolibarrConfig;
-use Alxarafe\Dolibarr\Tpl\Login;
 
 /**
  * Class DolibarrSecurity2
@@ -157,7 +156,7 @@ abstract class DolibarrSecurity2
         $langs = Translator::getInstance();
         $hookmanager = new HookManager($conf->db);
 
-        //		$langs->loadLangs(array("main", "other", "help", "admin"));
+        $langs->loadLangs(["main", "other", "help", "admin"]);
 
         // Instantiate hooks of thirdparty module only if not already define
         $hookmanager->initHooks(['mainloginpage']);
@@ -325,7 +324,7 @@ abstract class DolibarrSecurity2
         // include $template_dir . 'login.tpl.php';
 
         // TODO: Show the login form if the user is not identified. Includes side menú
-        new Login($controller);
+        new DolibarrLogin($controller);
 
         // Global html output events ($mesgs, $errors, $warnings)
         DolibarrFunctions::dol_htmloutput_events(0);

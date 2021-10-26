@@ -38,6 +38,7 @@
 
 namespace Alxarafe\Dolibarr\Classes;
 
+use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
@@ -770,7 +771,8 @@ class Form
      */
     public function textwithpicto($text, $htmltext, $direction = 1, $type = 'help', $extracss = '', $noencodehtmltext = 0, $notabs = 3, $tooltiptrigger = '', $forcenowrap = 0)
     {
-        global $conf, $langs;
+        // global $conf, $langs;
+        $langs = Translator::getInstance();
 
         $alt = '';
         if ($tooltiptrigger) {

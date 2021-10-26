@@ -36,7 +36,7 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  *
  * @deprecated Dolibarr classes will all be completely rewritten.
  */
-class DefaultValues extends CommonObject
+class DefaultValuesClass extends CommonObject
 {
     /**
      * @var string ID to identify managed object.
@@ -296,29 +296,23 @@ class DefaultValues extends CommonObject
             $sql .= $this->db->plimit($limit, $offset);
         }
 
-        $resql = $this->db->query($sql);
-        if ($resql) {
-            $num = $this->db->num_rows($resql);
-            $i = 0;
-            while ($i < ($limit ? min($limit, $num) : $num)) {
-                $obj = $this->db->fetch_object($resql);
+        // TODO: A ver por qué casca esta consulta ¿?
+        // $resql = $this->db->select($sql);
+        $resql = [];
 
-                $record = new self($this->db);
-                $record->setVarsFromFetchObj($obj);
-
-                $records[$record->id] = $record;
-
-                $i++;
-            }
-            $this->db->free($resql);
-
-            return $records;
-        } else {
+        if ($resql === false) {
             $this->errors[] = 'Error ' . $this->db->lasterror();
             DolibarrFunctions::dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
-
             return -1;
         }
+
+        foreach ($resql as $obj) {
+            $record = new self($this->db);
+            $record->setVarsFromFetchObj($obj);
+            $records[$record->id] = $record;
+        }
+
+        return $records;
     }
 
     /**

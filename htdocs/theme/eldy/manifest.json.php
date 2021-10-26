@@ -42,14 +42,17 @@ if (!defined('NOTOKENRENEWAL')) {
 	define('NOTOKENRENEWAL', '1');
 }
 */
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
 if (!defined('NOLOGIN')) {
-	define('NOLOGIN', '1');
+    define('NOLOGIN', '1');
 }
 if (!defined('NOREQUIREMENU')) {
-	define('NOREQUIREMENU', '1');
+    define('NOREQUIREMENU', '1');
 }
 if (!defined('NOREQUIREHTML')) {
-	define('NOREQUIREHTML', '1');
+    define('NOREQUIREHTML', '1');
 }
 /*
 if (!defined('NOREQUIREAJAX')) {
@@ -62,13 +65,12 @@ if (!defined('NOSESSION')) {
 
 require_once __DIR__ . '/../../main.php';
 
-
-top_httphead('text/json');
+$mw->top_httphead('text/json');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
 if (empty($dolibarr_nocache)) {
 	header('Cache-Control: max-age=10800, public, must-revalidate');
 	// For a text/json, we must set an Expires to avoid to have it forced to an expired value by the web server
-	header('Expires: '.gmdate('D, d M Y H:i:s', dol_now('gmt') + 10800) . ' GMT');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', DolibarrFunctions::dol_now('gmt') + 10800) . ' GMT');
 } else {
 	header('Cache-Control: no-cache');
 }

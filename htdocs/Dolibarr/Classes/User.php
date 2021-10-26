@@ -42,8 +42,8 @@ use stdClass;
  *  \ingroup    core
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/usergroup.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Users/class/usergroup.class.php';
 
 /**
  *    Class to manage Dolibarr users
@@ -1297,7 +1297,7 @@ class User extends CommonObject
             // Load user->default_values for user. TODO Save this in memcached ?
             //            require_once DOL_DOCUMENT_ROOT . '/core/class/defaultvalues.class.php';
 
-            $defaultValues = new DefaultValues($this->db);
+            $defaultValues = new DefaultValuesClass($this->db);
             $result = $defaultValues->fetchAll('', '', 0, 0, ['t.user_id' => [0, $this->id], 'entity' => [(isset($this->entity) ? $this->entity : $this->conf->entity), $this->conf->entity]]);    // User 0 (all) + me (if defined)
 
             if (!is_array($result) && $result < 0) {
@@ -1318,6 +1318,7 @@ class User extends CommonObject
                     }
                 }
             }
+
             if (!empty($this->default_values)) {
                 foreach ($this->default_values as $a => $b) {
                     foreach ($b as $c => $d) {
