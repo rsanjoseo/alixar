@@ -27,8 +27,6 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  *   \brief            Fichier de la classe de gestion des triggers
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
-
 /**
  *   Class to manage triggers
  *

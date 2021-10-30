@@ -50,6 +50,7 @@ use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Classes\Societe;
 use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Libraries\DolibarrBookmarks;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
 
@@ -69,7 +70,7 @@ class DolibarrView extends View
     public string $sessionname;
     public string $forcehttps;
     private $db;
-    private Societe $mysoc;
+    private ?Societe $mysoc;
     private HookManager $hookmanager;
     private MenuManager $menumanager;
 
@@ -77,15 +78,15 @@ class DolibarrView extends View
     {
         parent::__construct($controller);
 
+        $this->langs = $controller->langs;
+        $this->db = $controller->db;
+        $this->user = $controller->user;
+        $this->mysoc = $controller->mysoc;
+        $this->hookmanager = $controller->hookmanager;
+        $this->menumanager = $controller->menumanager;
+
         $this->conf = DolibarrGlobals::getConf();
         $this->forcehttps = $this->conf->file->main_force_https;
-
-        $this->langs = Translator::getInstance();
-        $this->db = Config::getInstance()->getEngine();
-        $this->user = new User();
-        $this->mysoc = new Societe();
-        $this->hookmanager = new HookManager();
-        $this->menumanager = new MenuManager($this->db, empty($this->user->socid) ? 0 : 1);
 
         // Init session. Name of session is specific to Dolibarr instance.
         // Must be done after the include of filefunc.inc.php so global variables of conf file are defined (like $dolibarr_main_instance_unique_id or $this->forcehttps).
@@ -1790,13 +1791,13 @@ class DolibarrView extends View
         }
 
         if (!defined('JS_JQUERY_DISABLE_DROPDOWN') && !empty($this->conf->use_javascript_ajax)) {        // This may be set by some pages that use different jquery version to avoid errors
-            include_once DOL_DOCUMENT_ROOT . '/Modules/Bookmarks/bookmarks.lib.php';
+            // include_once DOL_DOCUMENT_ROOT . '/Modules/Bookmarks/bookmarks.lib.php';
 
             $this->langs->load("bookmarks");
 
             if (!empty($this->conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
                 $html .= '<div id="topmenu-bookmark-dropdown" class="dropdown inline-block">';
-                $html .= printDropdownBookmarksList();
+                $html .= DolibarrBookmarks::printDropdownBookmarksList();
                 $html .= '</div>';
             } else {
                 $html .= '<!-- div for bookmark link -->
@@ -1805,7 +1806,7 @@ class DolibarrView extends View
 	                <i class="fa fa-star" ></i>
 	            </a>
 	            <div class="dropdown-menu">
-	                ' . printDropdownBookmarksList() . '
+	                ' . DolibarrBookmarks::printDropdownBookmarksList() . '
 	            </div>
 	        </div>';
 
@@ -1908,7 +1909,7 @@ class DolibarrView extends View
 
         // login infos
         if (!empty($this->user->admin)) {
-            $dropdownBody .= '<br><b>' . $this->langs->trans("Administrator") . '</b>: ' . yn($this->user->admin);
+            $dropdownBody .= '<br><b>' . $this->langs->trans("Administrator") . '</b>: ' . DolibarrFunctions::yn($this->user->admin);
         }
         if (!empty($this->user->socid)) {    // Add thirdparty for external users
             $thirdpartystatic = new Societe($db);
@@ -1938,8 +1939,8 @@ class DolibarrView extends View
         $dropdownBody .= '<br><b>' . $this->langs->trans("ClientTZ") . ':</b> ' . ($tz ? ($tz >= 0 ? '+' : '') . $tz : '');
         $dropdownBody .= ' (' . $_SESSION['dol_tz_string'] . ')';
         //$dropdownBody .= ' &nbsp; &nbsp; &nbsp; '.$this->langs->trans("DaylingSavingTime").': ';
-        //if ($_SESSION['dol_dst'] > 0) $dropdownBody .= yn(1);
-        //else $dropdownBody .= yn(0);
+        //if ($_SESSION['dol_dst'] > 0) $dropdownBody .= DolibarrFunctions::yn(1);
+        //else $dropdownBody .= DolibarrFunctions::yn(0);
 
         $dropdownBody .= '<br><b>' . $this->langs->trans("Browser") . ':</b> ' . $this->conf->browser->name . ($this->conf->browser->version ? ' ' . $this->conf->browser->version : '') . ' (' . DolibarrFunctions::dol_escape_htmltag($_SERVER['HTTP_USER_AGENT']) . ')';
         $dropdownBody .= '<br><b>' . $this->langs->trans("Layout") . ':</b> ' . $this->conf->browser->layout;

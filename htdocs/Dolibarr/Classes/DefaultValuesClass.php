@@ -295,11 +295,9 @@ class DefaultValuesClass extends CommonObject
         if (!empty($limit)) {
             $sql .= $this->db->plimit($limit, $offset);
         }
+        $sql .= ';';
 
-        // TODO: A ver por qué casca esta consulta ¿?
-        // $resql = $this->db->select($sql);
-        $resql = [];
-
+        $resql = $this->db->select($sql);
         if ($resql === false) {
             $this->errors[] = 'Error ' . $this->db->lasterror();
             DolibarrFunctions::dol_syslog(__METHOD__ . ' ' . join(',', $this->errors), LOG_ERR);
@@ -307,9 +305,7 @@ class DefaultValuesClass extends CommonObject
         }
 
         foreach ($resql as $obj) {
-            $record = new self($this->db);
-            $record->setVarsFromFetchObj($obj);
-            $records[$record->id] = $record;
+            $records[$obj['rowid']] = (object) $obj;
         }
 
         return $records;

@@ -71,9 +71,8 @@ abstract class DolibarrSecurity2
      */
     static function checkLoginPassEntity($usertotest, $passwordtotest, $entitytotest, $authmode, $context = '')
     {
-        global $conf, $langs;
         $conf = DolibarrGlobals::getConf();
-        //global $dolauthmode;    // To return authentication finally used
+        $langs = DolibarrGlobals::getLangs();
 
         // Check parameters
         if ($entitytotest == '') {
@@ -86,7 +85,6 @@ abstract class DolibarrSecurity2
         // Validation of login/pass/entity with standard modules
             $test = true;
             foreach ($authmode as $mode) {
-                dump($mode);
                 if ($test && $mode && !$login) {
                     // Validation of login/pass/entity for mode $mode
                     $mode = trim($mode);
@@ -113,6 +111,7 @@ abstract class DolibarrSecurity2
                         // Call function to check user/password
                         $function = 'check_user_password_' . $mode;
                         $login = call_user_func($function, $usertotest, $passwordtotest, $entitytotest, $context);
+
                         if ($login && $login != '--bad-login-validity--') {    // Login is successfull
                             $test = false; // To stop once at first login success
                             $conf->authmode = $mode; // This properties is defined only when logged to say what mode was successfully used

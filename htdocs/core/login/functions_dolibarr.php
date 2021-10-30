@@ -25,6 +25,7 @@
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
 
@@ -40,10 +41,9 @@ use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
  */
 function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotest = 1)
 {
-    //    global $db, $conf, $langs;
-    $db = Config::getInstance()->getEngine();
-    $langs = Translator::getInstance();
     $conf = DolibarrGlobals::getConf();
+    $langs = DolibarrGlobals::getLangs();
+    $db = DolibarrGlobals::getDb();
 
     // Force master entity in transversal mode
     $entity = $entitytotest;
@@ -76,8 +76,10 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
         $sql .= " ORDER BY entity DESC";
 
         $resql = $db->select($sql);
+
         if (count($resql) > 0) {
             $obj = (object) $resql[0];
+
             if ($obj) {
                 $now = DolibarrFunctions::dol_now();
                 if ($obj->datestartvalidity && $db->jdate($obj->datestartvalidity) > $now) {
@@ -126,8 +128,6 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
                         DolibarrFunctions::dol_syslog("functions_dolibarr::check_user_password_dolibarr Authentification ok - found pass in database");
                     }
                 }
-
-                $passok = true; // TODO:
 
                 // Password ok ?
                 if ($passok) {

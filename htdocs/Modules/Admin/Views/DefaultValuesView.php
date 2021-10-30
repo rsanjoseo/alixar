@@ -27,6 +27,7 @@ use Alxarafe\Dolibarr\Classes\FormAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Sabre\DAV\Exception;
+use stdClass;
 
 /**
  * Class Login
@@ -40,25 +41,25 @@ class DefaultValuesView extends DolibarrView
     public function __construct(BasicController $controller)
     {
         parent::__construct($controller);
-        $this->object = new DefaultValuesClass();
+        $this->object = $controller->object;
     }
 
     function printPage(): string
     {
-        $db = Config::getInstance()->getEngine();
+        // $db = Config::getInstance()->getEngine();
         //        $langs = Translator::getInstance();
-        //        $conf = DolibarrConfig::getInstance()->getConf();
+        //        $this->conf = DolibarrConfig::getInstance()->getConf();
 
-        $form = new Form($db);
-        $formadmin = new FormAdmin($db);
+        $form = new Form();
+        $formadmin = new FormAdmin();
 
         $wikihelp = 'EN:First_setup|FR:Premiers_paramétrages|ES:Primeras_configuraciones';
         $this->llxHeader('', $this->langs->trans("Setup"), $wikihelp);
 
-        $param = '&mode=' . $mode;
+        $param = '&mode=' . $this->controller->mode;
 
         $enabledisablehtml = $this->langs->trans("EnableDefaultValues") . ' ';
-        if (empty($conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
+        if (empty($this->conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
             // Button off, click to enable
             $enabledisablehtml .= '<a class="reposition valignmiddle" href="' . $_SERVER["PHP_SELF"] . '?action=setMAIN_ENABLE_DEFAULT_VALUES&token=' . DolibarrFunctions::newToken() . '&value=1' . $param . '">';
             $enabledisablehtml .= DolibarrFunctions::img_picto($this->langs->trans("Disabled"), 'switch_off');
@@ -78,73 +79,77 @@ class DefaultValuesView extends DolibarrView
         if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
             $param .= '&contextpage=' . urlencode($contextpage);
         }
-        if ($limit > 0 && $limit != $conf->liste_limit) {
-            $param .= '&limit=' . urlencode($limit);
+        if ($this->controller->limit > 0 && $this->controller->limit != $this->conf->liste_limit) {
+            $param .= '&limit=' . urlencode($this->controller->limit);
         }
-        if ($optioncss != '') {
-            $param .= '&optioncss=' . urlencode($optioncss);
+        if ($this->controller->optioncss != '') {
+            $param .= '&optioncss=' . urlencode($this->controller->optioncss);
         }
-        if ($defaulturl) {
-            $param .= '&defaulturl=' . urlencode($defaulturl);
+        if ($this->controller->defaulturl) {
+            $param .= '&defaulturl=' . urlencode($this->controller->defaulturl);
         }
-        if ($defaultkey) {
-            $param .= '&defaultkey=' . urlencode($defaultkey);
+        if ($this->controller->defaultkey) {
+            $param .= '&defaultkey=' . urlencode($this->controller->defaultkey);
         }
-        if ($defaultvalue) {
-            $param .= '&defaultvalue=' . urlencode($defaultvalue);
+        if ($this->controller->defaultvalue) {
+            $param .= '&defaultvalue=' . urlencode($this->controller->defaultvalue);
         }
 
-        print '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
-        if ($optioncss != '') {
-            print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
+        $url = $_SERVER['PHP_SELF'] .
+            '?' . self::MODULE_GET_VAR . '=' . $_GET[self::MODULE_GET_VAR] .
+            '&' . self::CONTROLLER_GET_VAR . '=' . $_GET[self::CONTROLLER_GET_VAR];
+        print '<form action="' . $url . '" method="POST">';
+
+        if ($this->controller->optioncss != '') {
+            print '<input type="hidden" name="optioncss" value="' . $this->controller->optioncss . '">';
         }
         print '<input type="hidden" name="token" value="' . DolibarrFunctions::newToken() . '">';
         print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
         print '<input type="hidden" name="action" value="list">';
-        print '<input type="hidden" name="sortfield" value="' . $sortfield . '">';
-        print '<input type="hidden" name="sortorder" value="' . $sortorder . '">';
-        print '<input type="hidden" name="page" value="' . $page . '">';
+        print '<input type="hidden" name="sortfield" value="' . $this->controller->sortfield . '">';
+        print '<input type="hidden" name="sortorder" value="' . $this->controller->sortorder . '">';
+        print '<input type="hidden" name="page" value="' . $this->controller->page . '">';
 
         $head = DolibarrAdmin::defaultvalues_prepare_head();
 
-        print DolibarrFunctions::dol_get_fiche_head($head, $mode, '', -1, '');
+        print DolibarrFunctions::dol_get_fiche_head($head, $this->controller->mode, '', -1, '');
 
-        if ($mode == 'sortorder') {
+        if ($this->controller->mode == 'sortorder') {
             print DolibarrFunctions::info_admin($this->langs->trans("WarningSettingSortOrder")) . '<br>';
         }
-        if ($mode == 'mandatory') {
+        if ($this->controller->mode == 'mandatory') {
             print DolibarrFunctions::info_admin($this->langs->trans("FeatureSupportedOnTextFieldsOnly")) . '<br>';
         }
 
         print '<input type="hidden" name="token" value="' . DolibarrFunctions::newToken() . '">';
         print '<input type="hidden" id="action" name="action" value="">';
-        print '<input type="hidden" id="mode" name="mode" value="' . DolibarrFunctions::dol_escape_htmltag($mode) . '">';
+        print '<input type="hidden" id="mode" name="mode" value="' . DolibarrFunctions::dol_escape_htmltag($this->controller->mode) . '">';
 
         print '<div class="div-table-responsive-no-min">';
         print '<table class="noborder centpercent">';
         print '<tr class="liste_titre">';
         // Page
         $texthelp = $this->langs->trans("PageUrlForDefaultValues");
-        if ($mode == 'createform') {
+        if ($this->controller->mode == 'createform') {
             $texthelp .= $this->langs->trans("PageUrlForDefaultValuesCreate", 'societe/card.php', 'societe/card.php?abc=val1&def=val2');
         } else {
             $texthelp .= $this->langs->trans("PageUrlForDefaultValuesList", 'societe/list.php', 'societe/list.php?abc=val1&def=val2');
         }
         $texthelp .= '<br><br>' . $this->langs->trans("AlsoDefaultValuesAreEffectiveForActionCreate");
         $texturl = $form->textwithpicto($this->langs->trans("RelativeURL"), $texthelp);
-        DolibarrFunctions::print_liste_field_titre($texturl, $_SERVER["PHP_SELF"], 'page,param', '', $param, '', $sortfield, $sortorder);
+        DolibarrFunctions::print_liste_field_titre($texturl, $_SERVER["PHP_SELF"], 'page,param', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         // Field
         $texthelp = $this->langs->trans("TheKeyIsTheNameOfHtmlField");
-        if ($mode != 'sortorder') {
+        if ($this->controller->mode != 'sortorder') {
             $textkey = $form->textwithpicto($this->langs->trans("Field"), $texthelp);
         } else {
             $texthelp = 'field or alias.field';
             $textkey = $form->textwithpicto($this->langs->trans("Field"), $texthelp);
         }
-        DolibarrFunctions::print_liste_field_titre($textkey, $_SERVER["PHP_SELF"], 'param', '', $param, '', $sortfield, $sortorder);
+        DolibarrFunctions::print_liste_field_titre($textkey, $_SERVER["PHP_SELF"], 'param', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         // Value
-        if ($mode != 'focus' && $mode != 'mandatory') {
-            if ($mode != 'sortorder') {
+        if ($this->controller->mode != 'focus' && $this->controller->mode != 'mandatory') {
+            if ($this->controller->mode != 'sortorder') {
                 $substitutionarray = DolibarrFunctions::getCommonSubstitutionArray($this->langs, 2, ['object', 'objectamount']); // Must match list into DolibarrFunctions::GETPOST
                 unset($substitutionarray['__USER_SIGNATURE__']);
                 $texthelp = $this->langs->trans("FollowingConstantsWillBeSubstituted") . '<br>';
@@ -156,17 +161,18 @@ class DefaultValuesView extends DolibarrView
                 $texthelp = 'ASC or DESC';
                 $textvalue = $form->textwithpicto($this->langs->trans("SortOrder"), $texthelp);
             }
-            DolibarrFunctions::print_liste_field_titre($textvalue, $_SERVER["PHP_SELF"], 'value', '', $param, '', $sortfield, $sortorder);
+            DolibarrFunctions::print_liste_field_titre($textvalue, $_SERVER["PHP_SELF"], 'value', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         }
 
         // Entity
-        if (!empty($conf->multicompany->enabled) && !$user->entity) {
-            DolibarrFunctions::print_liste_field_titre("Entity", $_SERVER["PHP_SELF"], 'entity,page', '', $param, '', $sortfield, $sortorder);
+        if (!empty($this->conf->multicompany->enabled) && !$this->controller->user->entity) {
+            DolibarrFunctions::print_liste_field_titre("Entity", $_SERVER["PHP_SELF"], 'entity,page', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         } else {
-            DolibarrFunctions::print_liste_field_titre("", $_SERVER["PHP_SELF"], '', '', $param, '', $sortfield, $sortorder);
+            DolibarrFunctions::print_liste_field_titre("", $_SERVER["PHP_SELF"], '', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         }
+
         // Actions
-        DolibarrFunctions::print_liste_field_titre("", $_SERVER["PHP_SELF"], '', '', $param, '', $sortfield, $sortorder);
+        DolibarrFunctions::print_liste_field_titre("", $_SERVER["PHP_SELF"], '', '', $param, '', $this->controller->sortfield, $this->controller->sortorder);
         print "</tr>\n";
 
         // Line to add new record
@@ -182,34 +188,34 @@ class DefaultValuesView extends DolibarrView
         print '<input type="text" class="flat maxwidth100onsmartphone" name="defaultkey" value="' . DolibarrFunctions::dol_escape_htmltag(DolibarrFunctions::GETPOST('defaultkey', 'alphanohtml')) . '">';
         print '</td>';
         // Value
-        if ($mode != 'focus' && $mode != 'mandatory') {
+        if ($this->controller->mode != 'focus' && $this->controller->mode != 'mandatory') {
             print '<td>';
             print '<input type="text" class="flat maxwidth100onsmartphone" name="defaultvalue" value="">';
             print '</td>';
         }
         // Limit to superadmin
-        if (!empty($conf->multicompany->enabled) && !$user->entity) {
+        if (!empty($this->conf->multicompany->enabled) && !$this->controller->user->entity) {
             print '<td>';
-            print '<input type="text" class="flat" size="1" disabled name="entity" value="' . $conf->entity . '">'; // We see environment, but to change it we must switch on other entity
+            print '<input type="text" class="flat" size="1" disabled name="entity" value="' . $this->conf->entity . '">'; // We see environment, but to change it we must switch on other entity
             print '</td>';
         } else {
             print '<td class="center">';
-            print '<input type="hidden" name="entity" value="' . $conf->entity . '">';
+            print '<input type="hidden" name="entity" value="' . $this->conf->entity . '">';
             print '</td>';
         }
         print '<td class="center">';
         $disabled = '';
-        if (empty($conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
+        if (empty($this->conf->global->MAIN_ENABLE_DEFAULT_VALUES)) {
             $disabled = ' disabled="disabled"';
         }
         print '<input type="submit" class="button"' . $disabled . ' value="' . $this->langs->trans("Add") . '" name="add">';
         print "</td>\n";
         print '</tr>';
 
-        $result = $this->object->fetchAll($sortorder, $sortfield, 0, 0, ['t.type' => $mode, 't.entity' => [$this->user->entity, $this->conf->entity]]);
+        $result = $this->object->fetchAll($this->controller->sortorder, $this->controller->sortfield, 0, 0, ['t.type' => $this->controller->mode, 't.entity' => [$this->controller->user->entity, $this->conf->entity]]);
 
         if (!is_array($result) && $result < 0) {
-            setEventMessages($this->object->error, $this->object->errors, 'errors');
+            DolibarrFunctions::setEventMessages($this->object->error, $this->object->errors, 'errors');
         } elseif (count($result) > 0) {
             foreach ($result as $key => $defaultvalue) {
                 print "\n";
@@ -218,7 +224,7 @@ class DefaultValuesView extends DolibarrView
 
                 // Page
                 print '<td>';
-                if ($action != 'edit' || DolibarrFunctions::GETPOST('rowid', 'int') != $defaultvalue->id) {
+                if ($this->controller->action != 'edit' || DolibarrFunctions::GETPOST('rowid', 'int') != $defaultvalue->id) {
                     print $defaultvalue->page;
                 } else {
                     print '<input type="text" name="urlpage" value="' . DolibarrFunctions::dol_escape_htmltag($defaultvalue->page) . '">';
@@ -227,7 +233,7 @@ class DefaultValuesView extends DolibarrView
 
                 // Field
                 print '<td>';
-                if ($action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
+                if ($this->controller->action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
                     print $defaultvalue->param;
                 } else {
                     print '<input type="text" name="key" value="' . DolibarrFunctions::dol_escape_htmltag($defaultvalue->param) . '">';
@@ -235,14 +241,14 @@ class DefaultValuesView extends DolibarrView
                 print '</td>' . "\n";
 
                 // Value
-                if ($mode != 'focus' && $mode != 'mandatory') {
+                if ($this->controller->mode != 'focus' && $this->controller->mode != 'mandatory') {
                     print '<td>';
                     /*print '<input type="hidden" name="const['.$i.'][rowid]" value="'.$obj->rowid.'">';
                     print '<input type="hidden" name="const['.$i.'][lang]" value="'.$obj->lang.'">';
                     print '<input type="hidden" name="const['.$i.'][name]" value="'.$obj->transkey.'">';
                     print '<input type="text" id="value_'.$i.'" class="flat inputforupdate" size="30" name="const['.$i.'][value]" value="'.DolibarrFunctions::dol_escape_htmltag($obj->transvalue).'">';
                     */
-                    if ($action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
+                    if ($this->controller->action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
                         print DolibarrFunctions::dol_escape_htmltag($defaultvalue->value);
                     } else {
                         print '<input type="text" name="value" value="' . DolibarrFunctions::dol_escape_htmltag($defaultvalue->value) . '">';
@@ -254,12 +260,12 @@ class DefaultValuesView extends DolibarrView
 
                 // Actions
                 print '<td class="center">';
-                if ($action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
-                    print '<a class="editfielda marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $defaultvalue->id . '&entity=' . $defaultvalue->entity . '&mode=' . $mode . '&action=edit&token=' . DolibarrFunctions::newToken() . '">' . img_edit() . '</a>';
-                    print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $defaultvalue->id . '&entity=' . $defaultvalue->entity . '&mode=' . $mode . '&action=delete&token=' . DolibarrFunctions::newToken() . '">' . img_delete() . '</a>';
+                if ($this->controller->action != 'edit' || DolibarrFunctions::GETPOST('rowid') != $defaultvalue->id) {
+                    print '<a class="editfielda marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $defaultvalue->id . '&entity=' . $defaultvalue->entity . '&mode=' . $this->controller->mode . '&action=edit&token=' . DolibarrFunctions::newToken() . '">' . DolibarrFunctions::img_edit() . '</a>';
+                    print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $defaultvalue->id . '&entity=' . $defaultvalue->entity . '&mode=' . $this->controller->mode . '&action=delete&token=' . DolibarrFunctions::newToken() . '">' . DolibarrFunctions::img_delete() . '</a>';
                 } else {
-                    print '<input type="hidden" name="page" value="' . $page . '">';
-                    print '<input type="hidden" name="rowid" value="' . $id . '">';
+                    print '<input type="hidden" name="page" value="' . $this->controller->page . '">';
+                    print '<input type="hidden" name="rowid" value="' . $this->controller->id . '">';
                     print '<div name="' . (!empty($defaultvalue->id) ? $defaultvalue->id : 'none') . '"></div>';
                     print '<input type="submit" class="button button-edit" name="actionmodify" value="' . $this->langs->trans("Modify") . '">';
                     print '<input type="submit" class="button button-cancel" name="actioncancel" value="' . $this->langs->trans("Cancel") . '">';
@@ -281,7 +287,7 @@ class DefaultValuesView extends DolibarrView
 
         // End of page
         $this->llxFooter();
-        $db->close();
+        // $db->close();
 
         return parent::printPage();
     }

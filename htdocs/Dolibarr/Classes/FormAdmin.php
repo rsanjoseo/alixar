@@ -19,6 +19,8 @@
 
 namespace Alxarafe\Dolibarr\Classes;
 
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+
 /**
  *      \file       htdocs/core/class/html.formadmin.class.php
  *      \ingroup    core
@@ -40,9 +42,9 @@ class FormAdmin
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = DolibarrGlobals::getDb();
     }
 
     // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

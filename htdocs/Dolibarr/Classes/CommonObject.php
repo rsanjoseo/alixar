@@ -497,7 +497,7 @@ abstract class CommonObject
             $sql .= " AND entity = " . ((int) $this->conf->entity);
         }
 
-        dol_syslog(get_class() . "::isExistingObject", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class() . "::isExistingObject", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $num = $this->db->num_rows($resql);
@@ -982,7 +982,7 @@ abstract class CommonObject
         $sql .= " WHERE type_object = '" . $this->db->escape($element) . "'";
         $sql .= " AND fk_object = " . ((int) $this->id);
 
-        //dol_syslog(get_class($this)."::fetch_optionals get extrafields data for ".$this->table_element, LOG_DEBUG);		// Too verbose
+        //DolibarrFunctions::dol_syslog(get_class($this)."::fetch_optionals get extrafields data for ".$this->table_element, LOG_DEBUG);		// Too verbose
         $resql = $this->db->query($sql);
         if ($resql) {
             $numrows = $this->db->num_rows($resql);
@@ -1187,7 +1187,7 @@ abstract class CommonObject
         }
         $sql .= " ORDER BY t.lastname ASC";
 
-        dol_syslog(get_class($this) . "::liste_contact", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::liste_contact", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $num = $this->db->num_rows($resql);
@@ -1245,19 +1245,19 @@ abstract class CommonObject
     {
         // phpcs:enable
 
-        dol_syslog(get_class($this) . "::add_contact $fk_socpeople, $type_contact, $source, $notrigger");
+        DolibarrFunctions::dol_syslog(get_class($this) . "::add_contact $fk_socpeople, $type_contact, $source, $notrigger");
 
         // Check parameters
         if ($fk_socpeople <= 0) {
             $this->langs->load("errors");
             $this->error = $this->langs->trans("ErrorWrongValueForParameterX", "1");
-            dol_syslog(get_class($this) . "::add_contact " . $this->error, LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::add_contact " . $this->error, LOG_ERR);
             return -1;
         }
         if (!$type_contact) {
             $this->langs->load("errors");
             $this->error = $this->langs->trans("ErrorWrongValueForParameterX", "2");
-            dol_syslog(get_class($this) . "::add_contact " . $this->error, LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::add_contact " . $this->error, LOG_ERR);
             return -2;
         }
 
@@ -1283,11 +1283,11 @@ abstract class CommonObject
 
         if ($id_type_contact == 0) {
             $this->error = 'CODE_NOT_VALID_FOR_THIS_ELEMENT';
-            dol_syslog("CODE_NOT_VALID_FOR_THIS_ELEMENT: Code type of contact '" . $type_contact . "' does not exists or is not active for element " . $this->element . ", we can ignore it");
+            DolibarrFunctions::dol_syslog("CODE_NOT_VALID_FOR_THIS_ELEMENT: Code type of contact '" . $type_contact . "' does not exists or is not active for element " . $this->element . ", we can ignore it");
             return -3;
         }
 
-        $datecreate = dol_now();
+        $datecreate = DolibarrFunctions::dol_now();
 
         // Socpeople must have already been added by some trigger, then we have to check it to avoid DB_ERROR_RECORD_ALREADY_EXISTS error
         $TListeContacts = $this->liste_contact(-1, $source);
@@ -1398,7 +1398,7 @@ abstract class CommonObject
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "element_contact";
         $sql .= " WHERE rowid = " . ((int) $rowid);
 
-        dol_syslog(get_class($this) . "::delete_contact", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete_contact", LOG_DEBUG);
         if ($this->db->query($sql)) {
             if (!$notrigger) {
                 $result = $this->call_trigger(strtoupper($this->element) . '_DELETE_CONTACT', $user);
@@ -1442,7 +1442,7 @@ abstract class CommonObject
             $sql .= " AND fk_c_type_contact IN (" . $this->db->sanitize($listId) . ")";
         }
 
-        dol_syslog(get_class($this) . "::delete_linked_contact", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete_linked_contact", LOG_DEBUG);
         if ($this->db->query($sql)) {
             return 1;
         } else {
@@ -1533,7 +1533,7 @@ abstract class CommonObject
         $sql .= " AND ec.fk_c_type_contact=tc.rowid";
         $sql .= " AND tc.element = '" . $this->db->escape($this->element) . "'";
 
-        dol_syslog(get_class($this) . "::swapContactStatus", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::swapContactStatus", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $obj = $this->db->fetch_object($resql);
@@ -1631,7 +1631,7 @@ abstract class CommonObject
 
         $sql .= $this->db->order('tc.element, tc.position', 'ASC');
 
-        dol_syslog(__METHOD__, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(__METHOD__, LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $num = $this->db->num_rows($resql);
@@ -1730,7 +1730,7 @@ abstract class CommonObject
             $sql .= " AND ec.statut = " . ((int) $status);
         }
 
-        dol_syslog(get_class($this) . "::getIdContact", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::getIdContact", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -1857,7 +1857,7 @@ abstract class CommonObject
     {
         // phpcs:enable
 
-        dol_syslog(get_class($this) . '::fetch_barcode this->element=' . $this->element . ' this->barcode_type=' . $this->barcode_type);
+        DolibarrFunctions::dol_syslog(get_class($this) . '::fetch_barcode this->element=' . $this->element . ' this->barcode_type=' . $this->barcode_type);
 
         $idtype = $this->barcode_type;
         if (empty($idtype) && $idtype != '0') {    // If type of barcode no set, we try to guess. If set to '0' it means we forced to have type remain not defined
@@ -1866,7 +1866,7 @@ abstract class CommonObject
             } elseif ($this->element == 'societe') {
                 $idtype = $this->conf->global->GENBARCODE_BARCODETYPE_THIRDPARTY;
             } else {
-                dol_syslog('Call fetch_barcode with barcode_type not defined and cant be guessed', LOG_WARNING);
+                DolibarrFunctions::dol_syslog('Call fetch_barcode with barcode_type not defined and cant be guessed', LOG_WARNING);
             }
         }
 
@@ -1875,7 +1875,7 @@ abstract class CommonObject
                 $sql = "SELECT rowid, code, libelle as label, coder";
                 $sql .= " FROM " . MAIN_DB_PREFIX . "c_barcode_type";
                 $sql .= " WHERE rowid = " . ((int) $idtype);
-                dol_syslog(get_class($this) . '::fetch_barcode', LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . '::fetch_barcode', LOG_DEBUG);
                 $resql = $this->db->query($sql);
                 if ($resql) {
                     $obj = $this->db->fetch_object($resql);
@@ -1994,7 +1994,7 @@ abstract class CommonObject
             $sql .= " AND entity = " . ((int) $this->conf->entity);
         }
 
-        dol_syslog(get_class($this) . '::fetchObjectFrom', LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . '::fetchObjectFrom', LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $row = $this->db->fetch_row($resql);
@@ -2023,7 +2023,7 @@ abstract class CommonObject
             $sql = "SELECT " . $field . " FROM " . MAIN_DB_PREFIX . $table;
             $sql .= " WHERE rowid = " . ((int) $id);
 
-            dol_syslog(get_class($this) . '::getValueFrom', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::getValueFrom', LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $row = $this->db->fetch_row($resql);
@@ -2097,7 +2097,7 @@ abstract class CommonObject
 
         $sql .= " WHERE " . $id_field . " = " . ((int) $id);
 
-        dol_syslog(__METHOD__ . "", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(__METHOD__ . "", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             if ($trigkey) {
@@ -2389,7 +2389,7 @@ abstract class CommonObject
             $optionsArray = (!empty($extrafields->attributes[$this->table_element]['label']) ? $extrafields->attributes[$this->table_element]['label'] : null);
         } else {
             global $extrafields;
-            dol_syslog("Warning: fetch_optionals was called with param optionsArray defined when you should pass null now", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Warning: fetch_optionals was called with param optionsArray defined when you should pass null now", LOG_WARNING);
         }
 
         $table_element = $this->table_element;
@@ -2408,7 +2408,7 @@ abstract class CommonObject
             $sql .= " FROM " . MAIN_DB_PREFIX . $table_element . "_extrafields";
             $sql .= " WHERE fk_object = " . ((int) $rowid);
 
-            //dol_syslog(get_class($this)."::fetch_optionals get extrafields data for ".$this->table_element, LOG_DEBUG);		// Too verbose
+            //DolibarrFunctions::dol_syslog(get_class($this)."::fetch_optionals get extrafields data for ".$this->table_element, LOG_DEBUG);		// Too verbose
             $resql = $this->db->query($sql);
             if ($resql) {
                 $numrows = $this->db->num_rows($resql);
@@ -2684,7 +2684,7 @@ abstract class CommonObject
     public function setProject($projectid)
     {
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::setProject was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setProject was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
 
@@ -2713,7 +2713,7 @@ abstract class CommonObject
             $sql .= " WHERE rowid = " . ((int) $this->id);
         }
 
-        dol_syslog(get_class($this) . "::setProject", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setProject", LOG_DEBUG);
         if ($this->db->query($sql)) {
             $this->fk_project = ((int) $projectid);
             return 1;
@@ -2732,7 +2732,7 @@ abstract class CommonObject
      */
     public function setPaymentMethods($id)
     {
-        dol_syslog(get_class($this) . '::setPaymentMethods(' . $id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentMethods(' . $id . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             // TODO uniformize field name
             $fieldname = 'fk_mode_reglement';
@@ -2761,12 +2761,12 @@ abstract class CommonObject
                 }
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setPaymentMethods Error ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentMethods Error ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setPaymentMethods, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentMethods, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -2783,7 +2783,7 @@ abstract class CommonObject
      */
     public function setMulticurrencyCode($code)
     {
-        dol_syslog(get_class($this) . '::setMulticurrencyCode(' . $code . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyCode(' . $code . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             $fieldname = 'multicurrency_code';
 
@@ -2801,12 +2801,12 @@ abstract class CommonObject
 
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setMulticurrencyCode Error ' . $sql . ' - ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyCode Error ' . $sql . ' - ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setMulticurrencyCode, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyCode, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -2824,7 +2824,7 @@ abstract class CommonObject
      */
     public function setMulticurrencyRate($rate, $mode = 1)
     {
-        dol_syslog(get_class($this) . '::setMulticurrencyRate(' . $rate . ',' . $mode . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyRate(' . $rate . ',' . $mode . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             $fieldname = 'multicurrency_tx';
 
@@ -2998,7 +2998,7 @@ abstract class CommonObject
                                 );
                                 break;
                             default:
-                                dol_syslog(get_class($this) . '::setMulticurrencyRate no updateline defined', LOG_DEBUG);
+                                DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyRate no updateline defined', LOG_DEBUG);
                                 break;
                         }
                     }
@@ -3006,12 +3006,12 @@ abstract class CommonObject
 
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setMulticurrencyRate Error ' . $sql . ' - ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyRate Error ' . $sql . ' - ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setMulticurrencyRate, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setMulticurrencyRate, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -3026,7 +3026,7 @@ abstract class CommonObject
      */
     public function setPaymentTerms($id)
     {
-        dol_syslog(get_class($this) . '::setPaymentTerms(' . $id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentTerms(' . $id . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             // TODO uniformize field name
             $fieldname = 'fk_cond_reglement';
@@ -3050,12 +3050,12 @@ abstract class CommonObject
                 $this->cond_reglement = $id; // for compatibility
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setPaymentTerms Error ' . $sql . ' - ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentTerms Error ' . $sql . ' - ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setPaymentTerms, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setPaymentTerms, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -3072,7 +3072,7 @@ abstract class CommonObject
      */
     public function setTransportMode($id)
     {
-        dol_syslog(get_class($this) . '::setTransportMode(' . $id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setTransportMode(' . $id . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             $fieldname = 'fk_transport_mode';
             if ($this->element == 'societe') {
@@ -3094,12 +3094,12 @@ abstract class CommonObject
                 }
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setTransportMode Error ' . $sql . ' - ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setTransportMode Error ' . $sql . ' - ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setTransportMode, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setTransportMode, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -3114,7 +3114,7 @@ abstract class CommonObject
      */
     public function setRetainedWarrantyPaymentTerms($id)
     {
-        dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms(' . $id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms(' . $id . ')');
         if ($this->statut >= 0 || $this->element == 'societe') {
             $fieldname = 'retained_warranty_fk_cond_reglement';
 
@@ -3126,12 +3126,12 @@ abstract class CommonObject
                 $this->retained_warranty_fk_cond_reglement = $id;
                 return 1;
             } else {
-                dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms Error ' . $sql . ' - ' . $this->db->error());
+                DolibarrFunctions::dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms Error ' . $sql . ' - ' . $this->db->error());
                 $this->error = $this->db->error();
                 return -1;
             }
         } else {
-            dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms, status of the object is incompatible');
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setRetainedWarrantyPaymentTerms, status of the object is incompatible');
             $this->error = 'Status of the object is incompatible ' . $this->statut;
             return -2;
         }
@@ -3161,7 +3161,7 @@ abstract class CommonObject
             return 1;
         } else {
             $this->error = $this->db->error();
-            dol_syslog(get_class($this) . '::setDeliveryAddress Error ' . $this->error);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setDeliveryAddress Error ' . $this->error);
             return -1;
         }
     }
@@ -3186,7 +3186,7 @@ abstract class CommonObject
         $error = 0;
 
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::setShippingMethod was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setShippingMethod was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
 
@@ -3195,14 +3195,14 @@ abstract class CommonObject
         if ($shipping_method_id < 0) {
             $shipping_method_id = 'NULL';
         }
-        dol_syslog(get_class($this) . '::setShippingMethod(' . $shipping_method_id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setShippingMethod(' . $shipping_method_id . ')');
 
         $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
         $sql .= " SET fk_shipping_method = " . ((int) $shipping_method_id);
         $sql .= " WHERE rowid=" . ((int) $this->id);
         $resql = $this->db->query($sql);
         if (!$resql) {
-            dol_syslog(get_class($this) . '::setShippingMethod Error ', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setShippingMethod Error ', LOG_DEBUG);
             $this->error = $this->db->lasterror();
             $error++;
         } else {
@@ -3236,13 +3236,13 @@ abstract class CommonObject
     public function setWarehouse($warehouse_id)
     {
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::setWarehouse was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setWarehouse was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
         if ($warehouse_id < 0) {
             $warehouse_id = 'NULL';
         }
-        dol_syslog(get_class($this) . '::setWarehouse(' . $warehouse_id . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setWarehouse(' . $warehouse_id . ')');
 
         $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
         $sql .= " SET fk_warehouse = " . ((int) $warehouse_id);
@@ -3252,7 +3252,7 @@ abstract class CommonObject
             $this->warehouse_id = ($warehouse_id == 'NULL') ? null : $warehouse_id;
             return 1;
         } else {
-            dol_syslog(get_class($this) . '::setWarehouse Error ', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setWarehouse Error ', LOG_DEBUG);
             $this->error = $this->db->error();
             return 0;
         }
@@ -3271,7 +3271,7 @@ abstract class CommonObject
     public function setDocModel($user, $modelpdf)
     {
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::setDocModel was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setDocModel was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
 
@@ -3281,7 +3281,7 @@ abstract class CommonObject
         $sql .= " SET model_pdf = '" . $this->db->escape($newmodelpdf) . "'";
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::setDocModel", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setDocModel", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $this->model_pdf = $modelpdf;
@@ -3315,7 +3315,7 @@ abstract class CommonObject
         $error = 0;
 
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::setBankAccount was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setBankAccount was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
         $this->db->begin();
@@ -3323,7 +3323,7 @@ abstract class CommonObject
         if ($fk_account < 0) {
             $fk_account = 'NULL';
         }
-        dol_syslog(get_class($this) . '::setBankAccount(' . $fk_account . ')');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setBankAccount(' . $fk_account . ')');
 
         $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
         $sql .= " SET fk_account = " . ((int) $fk_account);
@@ -3331,7 +3331,7 @@ abstract class CommonObject
 
         $resql = $this->db->query($sql);
         if (!$resql) {
-            dol_syslog(get_class($this) . '::setBankAccount Error ' . $sql . ' - ' . $this->db->error());
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setBankAccount Error ' . $sql . ' - ' . $this->db->error());
             $this->error = $this->db->lasterror();
             $error++;
         } else {
@@ -3393,11 +3393,11 @@ abstract class CommonObject
     {
         // phpcs:enable
         if (!$this->table_element_line) {
-            dol_syslog(get_class($this) . "::line_order was called on objet with property table_element_line not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::line_order was called on objet with property table_element_line not defined", LOG_ERR);
             return -1;
         }
         if (!$this->fk_element) {
-            dol_syslog(get_class($this) . "::line_order was called on objet with property fk_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::line_order was called on objet with property fk_element not defined", LOG_ERR);
             return -1;
         }
 
@@ -3412,7 +3412,7 @@ abstract class CommonObject
             $sql .= ' AND rang <> 0';
         }
 
-        dol_syslog(get_class($this) . "::line_order", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::line_order", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $row = $this->db->fetch_row($resql);
@@ -3432,7 +3432,7 @@ abstract class CommonObject
             }
             $sql .= " ORDER BY rang ASC, rowid " . $rowidorder;
 
-            dol_syslog(get_class($this) . "::line_order search all parent lines", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::line_order search all parent lines", LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $i = 0;
@@ -3481,7 +3481,7 @@ abstract class CommonObject
         $sql .= ' AND fk_parent_line = ' . ((int) $id);
         $sql .= ' ORDER BY rang ASC';
 
-        dol_syslog(get_class($this) . "::getChildrenOfLine search children lines for line " . $id, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::getChildrenOfLine search children lines for line " . $id, LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             if ($this->db->num_rows($resql) > 0) {
@@ -3517,7 +3517,7 @@ abstract class CommonObject
         $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element_line . " SET " . $fieldposition . " = " . ((int) $rang);
         $sql .= ' WHERE rowid = ' . ((int) $rowid);
 
-        dol_syslog(get_class($this) . "::updateRangOfLine", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::updateRangOfLine", LOG_DEBUG);
         if (!$this->db->query($sql)) {
             dol_print_error($this->db);
         }
@@ -3538,7 +3538,7 @@ abstract class CommonObject
         $sql = 'SELECT rang FROM ' . MAIN_DB_PREFIX . $this->table_element_line;
         $sql .= ' WHERE rowid =' . ((int) $rowid);
 
-        dol_syslog(get_class($this) . "::getRangOfLine", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::getRangOfLine", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $row = $this->db->fetch_row($resql);
@@ -3621,7 +3621,7 @@ abstract class CommonObject
             $sql .= " WHERE " . $this->fk_element . " = " . ((int) $this->id);
             $sql .= ' AND fk_parent_line = ' . ((int) $fk_parent_line);
 
-            dol_syslog(get_class($this) . "::line_max", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::line_max", LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $row = $this->db->fetch_row($resql);
@@ -3636,7 +3636,7 @@ abstract class CommonObject
             $sql = "SELECT max(" . $positionfield . ") FROM " . MAIN_DB_PREFIX . $this->table_element_line;
             $sql .= " WHERE " . $this->fk_element . " = " . ((int) $this->id);
 
-            dol_syslog(get_class($this) . "::line_max", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::line_max", LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $row = $this->db->fetch_row($resql);
@@ -3723,7 +3723,7 @@ abstract class CommonObject
     {
         // phpcs:enable
         if (!$this->table_element) {
-            dol_syslog(get_class($this) . "::update_ref_ext was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::update_ref_ext was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
 
@@ -3731,7 +3731,7 @@ abstract class CommonObject
         $sql .= " SET ref_ext = '" . $this->db->escape($ref_ext) . "'";
         $sql .= " WHERE " . (isset($this->table_rowid) ? $this->table_rowid : 'rowid') . " = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::update_ref_ext", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update_ref_ext", LOG_DEBUG);
         if ($this->db->query($sql)) {
             $this->ref_ext = $ref_ext;
             return 1;
@@ -3771,12 +3771,12 @@ abstract class CommonObject
 
         if (!$this->table_element) {
             $this->error = 'update_note was called on objet with property table_element not defined';
-            dol_syslog(get_class($this) . "::update_note was called on objet with property table_element not defined", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::update_note was called on objet with property table_element not defined", LOG_ERR);
             return -1;
         }
         if (!in_array($suffix, ['', '_public', '_private'])) {
             $this->error = 'update_note Parameter suffix must be empty, \'_private\' or \'_public\'';
-            dol_syslog(get_class($this) . "::update_note Parameter suffix must be empty, '_private' or '_public'", LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::update_note Parameter suffix must be empty, '_private' or '_public'", LOG_ERR);
             return -2;
         }
 
@@ -3798,7 +3798,7 @@ abstract class CommonObject
         $sql .= ", " . $fieldusermod . " = " . ((int) $user->id);
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::update_note", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update_note", LOG_DEBUG);
         if ($this->db->query($sql)) {
             if ($suffix == '_public') {
                 $this->note_public = $note;
@@ -3915,7 +3915,7 @@ abstract class CommonObject
         }
         $sql .= ' ORDER by rowid'; // We want to be sure to always use same order of line to not change lines differently when option MAIN_ROUNDOFTOTAL_NOT_TOTALOFROUND is used
 
-        dol_syslog(get_class($this) . "::update_price", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update_price", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $this->total_ht = 0;
@@ -3944,14 +3944,14 @@ abstract class CommonObject
                     $localtax_array = [$obj->localtax1_type, $obj->localtax1_tx, $obj->localtax2_type, $obj->localtax2_tx];
                     $tmpcal = calcul_price_total($obj->qty, $obj->up, $obj->remise_percent, $obj->vatrate, $obj->localtax1_tx, $obj->localtax2_tx, 0, 'HT', $obj->info_bits, $obj->product_type, $seller, $localtax_array, (isset($obj->situation_percent) ? $obj->situation_percent : 100), $multicurrency_tx);
 
-                    $diff_when_using_price_ht = price2num($tmpcal[1] - $obj->total_tva, 'MT', 1); // If price was set with tax price adn unit price HT has a low number of digits, then we may have a diff on recalculation from unit price HT.
-                    $diff_on_current_total = price2num($obj->total_ttc - $obj->total_ht - $obj->total_tva - $obj->total_localtax1 - $obj->total_localtax2, 'MT', 1);
+                    $diff_when_using_price_ht = DolibarrFunctions::price2num($tmpcal[1] - $obj->total_tva, 'MT', 1); // If price was set with tax price adn unit price HT has a low number of digits, then we may have a diff on recalculation from unit price HT.
+                    $diff_on_current_total = DolibarrFunctions::price2num($obj->total_ttc - $obj->total_ht - $obj->total_tva - $obj->total_localtax1 - $obj->total_localtax2, 'MT', 1);
                     //var_dump($obj->total_ht.' '.$obj->total_tva.' '.$obj->total_localtax1.' '.$obj->total_localtax2.' =? '.$obj->total_ttc);
                     //var_dump($diff_when_using_price_ht.' '.$diff_on_current_total);
 
                     if ($diff_when_using_price_ht && $diff_on_current_total) {
-                        $sqlfix = "UPDATE " . MAIN_DB_PREFIX . $this->table_element_line . " SET " . $fieldtva . " = " . price2num((float) $tmpcal[1]) . ", total_ttc = " . price2num((float) $tmpcal[2]) . " WHERE rowid = " . ((int) $obj->rowid);
-                        dol_syslog('We found unconsistent data into detailed line (diff_when_using_price_ht = ' . $diff_when_using_price_ht . ' and diff_on_current_total = ' . $diff_on_current_total . ') for line rowid = ' . $obj->rowid . " (total vat of line calculated=" . $tmpcal[1] . ", database=" . $obj->total_tva . "). We fix the total_vat and total_ttc of line by running sqlfix = " . $sqlfix, LOG_WARNING);
+                        $sqlfix = "UPDATE " . MAIN_DB_PREFIX . $this->table_element_line . " SET " . $fieldtva . " = " . DolibarrFunctions::price2num((float) $tmpcal[1]) . ", total_ttc = " . DolibarrFunctions::price2num((float) $tmpcal[2]) . " WHERE rowid = " . ((int) $obj->rowid);
+                        DolibarrFunctions::dol_syslog('We found unconsistent data into detailed line (diff_when_using_price_ht = ' . $diff_when_using_price_ht . ' and diff_on_current_total = ' . $diff_on_current_total . ') for line rowid = ' . $obj->rowid . " (total vat of line calculated=" . $tmpcal[1] . ", database=" . $obj->total_tva . "). We fix the total_vat and total_ttc of line by running sqlfix = " . $sqlfix, LOG_WARNING);
                         $resqlfix = $this->db->query($sqlfix);
                         if (!$resqlfix) {
                             dol_print_error($this->db, 'Failed to update line');
@@ -3984,18 +3984,18 @@ abstract class CommonObject
                 $total_ttc_by_vats[$obj->vatrate] += $obj->total_ttc;
 
                 if ($forcedroundingmode == '1') {    // Check if we need adjustement onto line for vat. TODO This works on the company currency but not on multicurrency
-                    $tmpvat = price2num($total_ht_by_vats[$obj->vatrate] * $obj->vatrate / 100, 'MT', 1);
-                    $diff = price2num($total_tva_by_vats[$obj->vatrate] - $tmpvat, 'MT', 1);
+                    $tmpvat = DolibarrFunctions::price2num($total_ht_by_vats[$obj->vatrate] * $obj->vatrate / 100, 'MT', 1);
+                    $diff = DolibarrFunctions::price2num($total_tva_by_vats[$obj->vatrate] - $tmpvat, 'MT', 1);
                     //print 'Line '.$i.' rowid='.$obj->rowid.' vat_rate='.$obj->vatrate.' total_ht='.$obj->total_ht.' total_tva='.$obj->total_tva.' total_ttc='.$obj->total_ttc.' total_ht_by_vats='.$total_ht_by_vats[$obj->vatrate].' total_tva_by_vats='.$total_tva_by_vats[$obj->vatrate].' (new calculation = '.$tmpvat.') total_ttc_by_vats='.$total_ttc_by_vats[$obj->vatrate].($diff?" => DIFF":"")."<br>\n";
                     if ($diff) {
                         if (abs($diff) > 0.1) {
                             $errmsg = 'A rounding difference was detected into TOTAL but is too high to be corrected. Some data in your line may be corrupted. Try to edit each line manually.';
-                            dol_syslog($errmsg, LOG_WARNING);
+                            DolibarrFunctions::dol_syslog($errmsg, LOG_WARNING);
                             dol_print_error('', $errmsg);
                             exit;
                         }
-                        $sqlfix = "UPDATE " . MAIN_DB_PREFIX . $this->table_element_line . " SET " . $fieldtva . " = " . price2num($obj->total_tva - $diff) . ", total_ttc = " . price2num($obj->total_ttc - $diff) . " WHERE rowid = " . ((int) $obj->rowid);
-                        dol_syslog('We found a difference of ' . $diff . ' for line rowid = ' . $obj->rowid . ". We fix the total_vat and total_ttc of line by running sqlfix = " . $sqlfix);
+                        $sqlfix = "UPDATE " . MAIN_DB_PREFIX . $this->table_element_line . " SET " . $fieldtva . " = " . DolibarrFunctions::price2num($obj->total_tva - $diff) . ", total_ttc = " . DolibarrFunctions::price2num($obj->total_ttc - $diff) . " WHERE rowid = " . ((int) $obj->rowid);
+                        DolibarrFunctions::dol_syslog('We found a difference of ' . $diff . ' for line rowid = ' . $obj->rowid . ". We fix the total_vat and total_ttc of line by running sqlfix = " . $sqlfix);
                         $resqlfix = $this->db->query($sqlfix);
                         if (!$resqlfix) {
                             dol_print_error($this->db, 'Failed to update line');
@@ -4063,17 +4063,17 @@ abstract class CommonObject
 
             if (empty($nodatabaseupdate)) {
                 $sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element . ' SET';
-                $sql .= " " . $fieldht . " = " . ((float) price2num($this->total_ht)) . ",";
-                $sql .= " " . $fieldtva . " = " . ((float) price2num($this->total_tva)) . ",";
-                $sql .= " " . $fieldlocaltax1 . " = " . ((float) price2num($this->total_localtax1)) . ",";
-                $sql .= " " . $fieldlocaltax2 . " = " . ((float) price2num($this->total_localtax2)) . ",";
-                $sql .= " " . $fieldttc . " = " . ((float) price2num($this->total_ttc));
-                $sql .= ", multicurrency_total_ht = " . ((float) price2num($this->multicurrency_total_ht, 'MT', 1));
-                $sql .= ", multicurrency_total_tva = " . ((float) price2num($this->multicurrency_total_tva, 'MT', 1));
-                $sql .= ", multicurrency_total_ttc = " . ((float) price2num($this->multicurrency_total_ttc, 'MT', 1));
+                $sql .= " " . $fieldht . " = " . ((float) DolibarrFunctions::price2num($this->total_ht)) . ",";
+                $sql .= " " . $fieldtva . " = " . ((float) DolibarrFunctions::price2num($this->total_tva)) . ",";
+                $sql .= " " . $fieldlocaltax1 . " = " . ((float) DolibarrFunctions::price2num($this->total_localtax1)) . ",";
+                $sql .= " " . $fieldlocaltax2 . " = " . ((float) DolibarrFunctions::price2num($this->total_localtax2)) . ",";
+                $sql .= " " . $fieldttc . " = " . ((float) DolibarrFunctions::price2num($this->total_ttc));
+                $sql .= ", multicurrency_total_ht = " . ((float) DolibarrFunctions::price2num($this->multicurrency_total_ht, 'MT', 1));
+                $sql .= ", multicurrency_total_tva = " . ((float) DolibarrFunctions::price2num($this->multicurrency_total_tva, 'MT', 1));
+                $sql .= ", multicurrency_total_ttc = " . ((float) DolibarrFunctions::price2num($this->multicurrency_total_ttc, 'MT', 1));
                 $sql .= " WHERE rowid = " . ((int) $this->id);
 
-                dol_syslog(get_class($this) . "::update_price", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::update_price", LOG_DEBUG);
                 $resql = $this->db->query($sql);
 
                 if (!$resql) {
@@ -4141,7 +4141,7 @@ abstract class CommonObject
         $sql .= ", '" . $this->db->escape($this->element) . "'";
         $sql .= ")";
 
-        dol_syslog(get_class($this) . "::add_object_linked", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::add_object_linked", LOG_DEBUG);
         if ($this->db->query($sql)) {
             if (!$notrigger) {
                 // Call trigger
@@ -4220,7 +4220,7 @@ abstract class CommonObject
 
         /*if (empty($sourceid) && empty($targetid))
 		 {
-		 dol_syslog('Bad usage of function. No source nor target id defined (nor as parameter nor as object id)', LOG_ERR);
+		 DolibarrFunctions::dol_syslog('Bad usage of function. No source nor target id defined (nor as parameter nor as object id)', LOG_ERR);
 		 return -1;
 		 }*/
 
@@ -4246,7 +4246,7 @@ abstract class CommonObject
         }
         $sql .= ' ORDER BY ' . $orderby;
 
-        dol_syslog(get_class($this) . "::fetchObjectLink", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::fetchObjectLink", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $num = $this->db->num_rows($resql);
@@ -4433,7 +4433,7 @@ abstract class CommonObject
             $sql .= " AND sourcetype = '" . $this->db->escape($this->element) . "'";
         }
 
-        dol_syslog(get_class($this) . "::updateObjectLinked", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::updateObjectLinked", LOG_DEBUG);
         if ($this->db->query($sql)) {
             if (!$notrigger) {
                 // Call trigger
@@ -4532,7 +4532,7 @@ abstract class CommonObject
                 }
             }
 
-            dol_syslog(get_class($this) . "::deleteObjectLinked", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::deleteObjectLinked", LOG_DEBUG);
             if (!$this->db->query($sql)) {
                 $this->error = $this->db->lasterror();
                 $this->errors[] = $this->error;
@@ -4599,7 +4599,7 @@ abstract class CommonObject
         }
         $sql .= " WHERE rowid=" . ((int) $elementId);
 
-        dol_syslog(get_class($this) . "::setStatut", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setStatut", LOG_DEBUG);
         if ($this->db->query($sql)) {
             $error = 0;
 
@@ -4645,7 +4645,7 @@ abstract class CommonObject
                 return 1;
             } else {
                 $this->db->rollback();
-                dol_syslog(get_class($this) . "::setStatut " . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::setStatut " . $this->error, LOG_ERR);
                 return -1;
             }
         } else {
@@ -4756,7 +4756,7 @@ abstract class CommonObject
                 $nb++;
             }
         }
-        dol_syslog(get_class($this) . '::hasProductsOrServices we found ' . $nb . ' qualified lines of products/servcies');
+        DolibarrFunctions::dol_syslog(get_class($this) . '::hasProductsOrServices we found ' . $nb . ' qualified lines of products/servcies');
         return $nb;
     }
 
@@ -4776,7 +4776,7 @@ abstract class CommonObject
             $sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element_line;
             $sql .= " WHERE " . $this->fk_element . " = " . ((int) $this->id);
 
-            dol_syslog(get_class($this) . '::getTotalDiscount', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::getTotalDiscount', LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $num = $this->db->num_rows($resql);
@@ -4788,7 +4788,7 @@ abstract class CommonObject
                     $qty = $obj->qty;
                     $total_ht = $obj->total_ht;
 
-                    $total_discount_line = floatval(price2num(($pu_ht * $qty) - $total_ht, 'MT'));
+                    $total_discount_line = floatval(DolibarrFunctions::price2num(($pu_ht * $qty) - $total_ht, 'MT'));
                     $total_discount += $total_discount_line;
 
                     $i++;
@@ -4796,7 +4796,7 @@ abstract class CommonObject
             }
 
             //print $total_discount; exit;
-            return price2num($total_discount);
+            return DolibarrFunctions::price2num($total_discount);
         }
 
         return null;
@@ -4915,7 +4915,7 @@ abstract class CommonObject
         $sql .= " SET extraparams = " . (!empty($extraparams) ? "'" . $this->db->escape($extraparams) . "'" : "null");
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::setExtraParameters", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setExtraParameters", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if (!$resql) {
             $this->error = $this->db->lasterror();
@@ -5142,7 +5142,7 @@ abstract class CommonObject
                 $description .= (!empty($this->conf->global->PRODUIT_DESC_IN_FORM) ? '' : dol_htmlentitiesbr($line->description)); // Description is what to show on popup. We shown nothing if already into desc.
             }
 
-            $line->pu_ttc = price2num($line->subprice * (1 + ($line->tva_tx / 100)), 'MU');
+            $line->pu_ttc = DolibarrFunctions::price2num($line->subprice * (1 + ($line->tva_tx / 100)), 'MU');
 
             // Output template part (modules that overwrite templates must declare this into descriptor)
             // Use global variables + $dateSelector + $seller and $buyer
@@ -5170,7 +5170,7 @@ abstract class CommonObject
         if ($this->statut == 0 && $action == 'editline' && $selected == $line->id) {
             $label = (!empty($line->label) ? $line->label : (($line->fk_product > 0) ? $line->product_label : ''));
 
-            $line->pu_ttc = price2num($line->subprice * (1 + ($line->tva_tx / 100)), 'MU');
+            $line->pu_ttc = DolibarrFunctions::price2num($line->subprice * (1 + ($line->tva_tx / 100)), 'MU');
 
             // Output template part (modules that overwrite templates must declare this into descriptor)
             // Use global variables + $dateSelector + $seller and $buyer
@@ -5468,7 +5468,7 @@ abstract class CommonObject
         $sql .= ", '" . $this->db->escape($mandatory) . "'";
         $sql .= ")";
 
-        dol_syslog(get_class($this) . "::add_element_resource", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::add_element_resource", LOG_DEBUG);
         if ($this->db->query($sql)) {
             $this->db->commit();
             return 1;
@@ -5498,7 +5498,7 @@ abstract class CommonObject
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "element_resources";
         $sql .= " WHERE rowid = " . ((int) $rowid);
 
-        dol_syslog(get_class($this) . "::delete_resource", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete_resource", LOG_DEBUG);
 
         $resql = $this->db->query($sql);
         if (!$resql) {
@@ -5595,7 +5595,7 @@ abstract class CommonObject
             $newelement = 'order';
         }
         if (empty($newelement)) {
-            dol_syslog("Ask a default value using common method getDefaultCreateValueForField on an object with no property ->element defined. Return empty string.", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Ask a default value using common method getDefaultCreateValueForField on an object with no property ->element defined. Return empty string.", LOG_WARNING);
             return '';
         }
 
@@ -5670,7 +5670,7 @@ abstract class CommonObject
                 }
             } elseif (in_array($key_type, ['price', 'double'])) {
                 $value_arr = GETPOST($postfieldkey, 'alpha');
-                $value_key = price2num($value_arr);
+                $value_key = DolibarrFunctions::price2num($value_arr);
             } else {
                 $value_key = GETPOST($postfieldkey);
                 if (in_array($key_type, ['link']) && $value_key == '-1') {
@@ -5741,8 +5741,8 @@ abstract class CommonObject
                 $attributeType = $this->fields[$attributeKey]['type'];
                 $attributeLabel = $this->fields[$attributeKey]['label'];
 
-                //dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
-                //dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
+                //DolibarrFunctions::dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
+                //DolibarrFunctions::dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
 
                 switch ($attributeType) {
                     case 'int':
@@ -5754,15 +5754,15 @@ abstract class CommonObject
                         }
                         break;
                     case 'double':
-                        $value = price2num($value);
+                        $value = DolibarrFunctions::price2num($value);
                         if (!is_numeric($value) && $value != '') {
-                            dol_syslog($this->langs->trans("ExtraLanguageHasWrongValue") . " sur " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
+                            DolibarrFunctions::dol_syslog($this->langs->trans("ExtraLanguageHasWrongValue") . " sur " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
                             $this->errors[] = $this->langs->trans("ExtraLanguageHasWrongValue", $attributeLabel);
                             return -1;
                         } elseif ($value == '') {
                             $new_array_languages[$key] = null;
                         }
-                        //dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
+                        //DolibarrFunctions::dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
                         $new_array_languages[$key] = $value;
                         break;
                     /*case 'select':	// Not required, we chosed value='0' for undefined values
@@ -5781,7 +5781,7 @@ abstract class CommonObject
                 $table_element = 'categories'; // For compatibility
             }
 
-            dol_syslog(get_class($this) . "::insertExtraLanguages delete then insert", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::insertExtraLanguages delete then insert", LOG_DEBUG);
 
             foreach ($new_array_languages as $key => $langcodearray) {    // $key = 'name', 'town', ...
                 foreach ($langcodearray as $langcode => $value) {
@@ -5878,19 +5878,19 @@ abstract class CommonObject
                 }
                 if ($mandatorypb) {
                     $this->langs->load("errors");
-                    dol_syslog("Mandatory field 'options_" . $key . "' is empty during update and set to required into definition of extrafields");
+                    DolibarrFunctions::dol_syslog("Mandatory field 'options_" . $key . "' is empty during update and set to required into definition of extrafields");
                     $this->errors[] = $this->langs->trans('ErrorFieldRequired', $attributeLabel);
                     return -1;
                 }
             }
 
-            //dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
-            //dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
+            //DolibarrFunctions::dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
+            //DolibarrFunctions::dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
 
             if (!empty($attrfieldcomputed)) {
                 if (!empty($this->conf->global->MAIN_STORE_COMPUTED_EXTRAFIELDS)) {
                     $value = dol_eval($attrfieldcomputed, 1, 0);
-                    dol_syslog($this->langs->trans("Extrafieldcomputed") . " sur " . $attributeLabel . "(" . $value . ")", LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog($this->langs->trans("Extrafieldcomputed") . " sur " . $attributeLabel . "(" . $value . ")", LOG_DEBUG);
                     $this->array_options["options_" . $key] = $value;
                 } else {
                     $this->array_options["options_" . $key] = null;
@@ -5907,15 +5907,15 @@ abstract class CommonObject
                     }
                     break;
                 case 'double':
-                    $value = price2num($value);
+                    $value = DolibarrFunctions::price2num($value);
                     if (!is_numeric($value) && $value != '') {
-                        dol_syslog($this->langs->trans("ExtraFieldHasWrongValue") . " sur " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
+                        DolibarrFunctions::dol_syslog($this->langs->trans("ExtraFieldHasWrongValue") . " sur " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
                         $this->errors[] = $this->langs->trans("ExtraFieldHasWrongValue", $attributeLabel);
                         return -1;
                     } elseif ($value === '') {
                         $this->array_options["options_" . $key] = null;
                     }
-                    //dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
+                    //DolibarrFunctions::dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
                     $this->array_options["options_" . $key] = $value;
                     break;
                 /*case 'select':	// Not required, we chosed value='0' for undefined values
@@ -5925,7 +5925,7 @@ abstract class CommonObject
 					 }
 					 break;*/
                 case 'price':
-                    $this->array_options["options_" . $key] = price2num($this->array_options["options_" . $key]);
+                    $this->array_options["options_" . $key] = DolibarrFunctions::price2num($this->array_options["options_" . $key]);
                     break;
                 case 'date':
                 case 'datetime':
@@ -5960,7 +5960,7 @@ abstract class CommonObject
 							}
 						}
 					} else {
-						dol_syslog('Error bad setup of extrafield', LOG_WARNING);
+						DolibarrFunctions::dol_syslog('Error bad setup of extrafield', LOG_WARNING);
 					}
 					break;
 				*/
@@ -6010,7 +6010,7 @@ abstract class CommonObject
             }
 
             if ($error) {
-                dol_syslog(__METHOD__ . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(__METHOD__ . $this->error, LOG_ERR);
                 $this->db->rollback();
                 return -1;
             } else {
@@ -6086,19 +6086,19 @@ abstract class CommonObject
                     }
                     if ($mandatorypb) {
                         $this->langs->load("errors");
-                        dol_syslog("Mandatory field '" . $key . "' is empty during create and set to required into definition of extrafields");
+                        DolibarrFunctions::dol_syslog("Mandatory field '" . $key . "' is empty during create and set to required into definition of extrafields");
                         $this->errors[] = $this->langs->trans('ErrorFieldRequired', $attributeLabel);
                         return -1;
                     }
                 }
 
-                //dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
-                //dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
+                //DolibarrFunctions::dol_syslog("attributeLabel=".$attributeLabel, LOG_DEBUG);
+                //DolibarrFunctions::dol_syslog("attributeType=".$attributeType, LOG_DEBUG);
 
                 if (!empty($attrfieldcomputed)) {
                     if (!empty($this->conf->global->MAIN_STORE_COMPUTED_EXTRAFIELDS)) {
                         $value = dol_eval($attrfieldcomputed, 1, 0);
-                        dol_syslog($this->langs->trans("Extrafieldcomputed") . " sur " . $attributeLabel . "(" . $value . ")", LOG_DEBUG);
+                        DolibarrFunctions::dol_syslog($this->langs->trans("Extrafieldcomputed") . " sur " . $attributeLabel . "(" . $value . ")", LOG_DEBUG);
                         $new_array_options[$key] = $value;
                     } else {
                         $new_array_options[$key] = null;
@@ -6116,15 +6116,15 @@ abstract class CommonObject
                         break;
                     case 'price':
                     case 'double':
-                        $value = price2num($value);
+                    $value = DolibarrFunctions::price2num($value);
                         if (!is_numeric($value) && $value != '') {
-                            dol_syslog($this->langs->trans("ExtraFieldHasWrongValue") . " for " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
+                            DolibarrFunctions::dol_syslog($this->langs->trans("ExtraFieldHasWrongValue") . " for " . $attributeLabel . "(" . $value . "is not '" . $attributeType . "')", LOG_DEBUG);
                             $this->errors[] = $this->langs->trans("ExtraFieldHasWrongValue", $attributeLabel);
                             return -1;
                         } elseif ($value == '') {
                             $new_array_options[$key] = null;
                         }
-                        //dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
+                    //DolibarrFunctions::dol_syslog("double value"." sur ".$attributeLabel."(".$value." is '".$attributeType."')", LOG_DEBUG);
                         $new_array_options[$key] = $value;
                         break;
                     /*case 'select':	// Not required, we chosed value='0' for undefined values
@@ -6195,7 +6195,7 @@ abstract class CommonObject
                                 }
                             }
                         } else {
-                            dol_syslog('Error bad setup of extrafield', LOG_WARNING);
+                            DolibarrFunctions::dol_syslog('Error bad setup of extrafield', LOG_WARNING);
                         }
                         break;
                 }
@@ -6208,7 +6208,7 @@ abstract class CommonObject
                 $table_element = 'categories'; // For compatibility
             }
 
-            dol_syslog(get_class($this) . "::insertExtraFields delete then insert", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::insertExtraFields delete then insert", LOG_DEBUG);
 
             $sql_del = "DELETE FROM " . MAIN_DB_PREFIX . $table_element . "_extrafields WHERE fk_object = " . ((int) $this->id);
             $this->db->query($sql_del);
@@ -6612,7 +6612,7 @@ abstract class CommonObject
 
                 $sql .= ' ORDER BY ' . implode(', ', $fields_label);
 
-                dol_syslog(get_class($this) . '::showInputField type=sellist', LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . '::showInputField type=sellist', LOG_DEBUG);
                 $resql = $this->db->query($sql);
                 if ($resql) {
                     $out .= '<option value="0">&nbsp;</option>';
@@ -6763,7 +6763,7 @@ abstract class CommonObject
                 // print $sql;
 
                 $sql .= $sqlwhere;
-                dol_syslog(get_class($this) . '::showInputField type=chkbxlst', LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . '::showInputField type=chkbxlst', LOG_DEBUG);
                 $resql = $this->db->query($sql);
                 if ($resql) {
                     $num = $this->db->num_rows($resql);
@@ -7198,7 +7198,7 @@ abstract class CommonObject
 
             //$sql.= ' AND entity = '.$this->conf->entity;
 
-            dol_syslog(get_class($this) . ':showOutputField:$type=sellist', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . ':showOutputField:$type=sellist', LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $value = ''; // value was used, so now we reste it to use it to build final output
@@ -7232,7 +7232,7 @@ abstract class CommonObject
                     }
                 }
             } else {
-                dol_syslog(get_class($this) . '::showOutputField error ' . $this->db->lasterror(), LOG_WARNING);
+                DolibarrFunctions::dol_syslog(get_class($this) . '::showOutputField error ' . $this->db->lasterror(), LOG_WARNING);
             }
         } elseif ($type == 'radio') {
             $value = $param['options'][$value];
@@ -7274,7 +7274,7 @@ abstract class CommonObject
             // $sql.= " WHERE ".$selectkey."='".$this->db->escape($value)."'";
             // $sql.= ' AND entity = '.$this->conf->entity;
 
-            dol_syslog(get_class($this) . ':showOutputField:$type=chkbxlst', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . ':showOutputField:$type=chkbxlst', LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $value = ''; // value was used, so now we reste it to use it to build final output
@@ -7310,7 +7310,7 @@ abstract class CommonObject
                 }
                 $value = '<div class="select2-container-multi-dolibarr" style="width: 90%;"><ul class="select2-choices-dolibarr">' . implode(' ', $toprint) . '</ul></div>';
             } else {
-                dol_syslog(get_class($this) . '::showOutputField error ' . $this->db->lasterror(), LOG_WARNING);
+                DolibarrFunctions::dol_syslog(get_class($this) . '::showOutputField error ' . $this->db->lasterror(), LOG_WARNING);
             }
         } elseif ($type == 'link') {
             $out = '';
@@ -7336,7 +7336,7 @@ abstract class CommonObject
                         $value = $object->getNomUrl($getnomurlparam, $getnomurlparam2);
                     }
                 } else {
-                    dol_syslog('Error bad setup of extrafield', LOG_WARNING);
+                    DolibarrFunctions::dol_syslog('Error bad setup of extrafield', LOG_WARNING);
                     return 'Error bad setup of extrafield';
                 }
             } else {
@@ -7766,7 +7766,7 @@ abstract class CommonObject
                         }
                         // Convert float submited string into real php numeric (value in memory must be a php numeric)
                         if (in_array($extrafields->attributes[$this->table_element]['type'][$key], ['price', 'double'])) {
-                            $value = (GETPOSTISSET($keyprefix . 'options_' . $key . $keysuffix) || $value) ? price2num($value) : $this->array_options['options_' . $key];
+                            $value = (GETPOSTISSET($keyprefix . 'options_' . $key . $keysuffix) || $value) ? DolibarrFunctions::price2num($value) : $this->array_options['options_' . $key];
                         }
 
                         // HTML, text, select, integer and varchar: take into account default value in database if in create mode
@@ -8190,11 +8190,11 @@ abstract class CommonObject
      */
     public function createCommon(User $user, $notrigger = false)
     {
-        dol_syslog(get_class($this) . "::createCommon create", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::createCommon create", LOG_DEBUG);
 
         $error = 0;
 
-        $now = dol_now();
+        $now = DolibarrFunctions::dol_now();
 
         $fieldvalues = $this->setSaveQuery();
 
@@ -8230,7 +8230,7 @@ abstract class CommonObject
             if (isset($this->fields[$key]['notnull']) && $this->fields[$key]['notnull'] == 1 && (!isset($values[$key]) || $values[$key] === 'NULL') && is_null($this->fields[$key]['default'])) {
                 $error++;
                 $this->langs->load("errors");
-                dol_syslog("Mandatory field '" . $key . "' is empty and required into ->fields definition of class");
+                DolibarrFunctions::dol_syslog("Mandatory field '" . $key . "' is empty and required into ->fields definition of class");
                 $this->errors[] = $this->langs->trans("ErrorFieldRequired", $this->fields[$key]['label']);
             }
 
@@ -8435,7 +8435,7 @@ abstract class CommonObject
         if (is_null($value)) {
             return 'NULL';
         } elseif (preg_match('/^(int|double|real|price)/i', $fieldsentry['type'])) {
-            return price2num("$value");
+            return DolibarrFunctions::price2num("$value");
         } elseif ($fieldsentry['type'] == 'boolean') {
             if ($value) {
                 return 'true';
@@ -8507,11 +8507,11 @@ abstract class CommonObject
      */
     public function updateCommon(User $user, $notrigger = false)
     {
-        dol_syslog(get_class($this) . "::updateCommon update", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::updateCommon update", LOG_DEBUG);
 
         $error = 0;
 
-        $now = dol_now();
+        $now = DolibarrFunctions::dol_now();
 
         $fieldvalues = $this->setSaveQuery();
 
@@ -8605,7 +8605,7 @@ abstract class CommonObject
      */
     public function deleteCommon(User $user, $notrigger = false, $forcechilddeletion = 0)
     {
-        dol_syslog(get_class($this) . "::deleteCommon delete", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::deleteCommon delete", LOG_DEBUG);
 
         $error = 0;
 
@@ -8625,7 +8625,7 @@ abstract class CommonObject
         } elseif (!empty($this->fk_element) && !empty($this->childtables)) {    // If object has childs linked with a foreign key field, we check all child tables.
             $objectisused = $this->isObjectUsed($this->id);
             if (!empty($objectisused)) {
-                dol_syslog(get_class($this) . "::deleteCommon Can't delete record as it has some child", LOG_WARNING);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::deleteCommon Can't delete record as it has some child", LOG_WARNING);
                 $this->error = 'ErrorRecordHasChildren';
                 $this->errors[] = $this->error;
                 $this->db->rollback();
@@ -8884,7 +8884,7 @@ abstract class CommonObject
             $table_element = 'categories'; // For compatibility
         }
 
-        dol_syslog(get_class($this) . "::deleteExtraFields delete", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::deleteExtraFields delete", LOG_DEBUG);
 
         $sql_del = "DELETE FROM " . MAIN_DB_PREFIX . $table_element . "_extrafields WHERE fk_object = " . ((int) $this->id);
 
@@ -8988,7 +8988,7 @@ abstract class CommonObject
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . $this->table_element_line;
         $sql .= " WHERE rowid = " . ((int) $idline);
 
-        dol_syslog(get_class($this) . "::deleteLineCommon", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::deleteLineCommon", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if (!$resql) {
             $this->error = "Error " . $this->db->lasterror();
@@ -9012,7 +9012,7 @@ abstract class CommonObject
             $this->db->commit();
             return 1;
         } else {
-            dol_syslog(get_class($this) . "::deleteLineCommon ERROR:" . $this->error, LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::deleteLineCommon ERROR:" . $this->error, LOG_ERR);
             $this->db->rollback();
             return -1;
         }
@@ -9090,11 +9090,11 @@ abstract class CommonObject
             'qty' => 123.12,
             'note_public' => 'Public note',
             'note_private' => 'Private note',
-            'date_creation' => (dol_now() - 3600 * 48),
-            'date_modification' => (dol_now() - 3600 * 24),
+            'date_creation' => (DolibarrFunctions::dol_now() - 3600 * 48),
+            'date_modification' => (DolibarrFunctions::dol_now() - 3600 * 24),
             'fk_user_creat' => $user->id,
             'fk_user_modif' => $user->id,
-            'date' => dol_now(),
+            'date' => DolibarrFunctions::dol_now(),
         ];
         foreach ($fields as $key => $value) {
             if (array_key_exists($key, $this->fields)) {
@@ -9193,12 +9193,12 @@ abstract class CommonObject
      */
     public function setCategoriesCommon($categories, $type_categ = '', $remove_existing = true)
     {
-        dol_syslog(get_class($this) . "::setCategoriesCommon Oject Id:" . $this->id . ' type_categ:' . $type_categ . ' nb tag add:' . count($categories), LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setCategoriesCommon Oject Id:" . $this->id . ' type_categ:' . $type_categ . ' nb tag add:' . count($categories), LOG_DEBUG);
 
         require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
         if (empty($type_categ)) {
-            dol_syslog(__METHOD__ . ': Type ' . $type_categ . 'is an unknown category type. Done nothing.', LOG_ERR);
+            DolibarrFunctions::dol_syslog(__METHOD__ . ': Type ' . $type_categ . 'is an unknown category type. Done nothing.', LOG_ERR);
             return -1;
         }
 
@@ -9318,7 +9318,7 @@ abstract class CommonObject
         $reshook = $hookmanager->executeHooks('commonGenerateDocument', $parameters, $this, $action); // Note that $action and $object may have been modified by some hooks
 
         if (empty($reshook)) {
-            dol_syslog("commonGenerateDocument modele=" . $modele . " outputlangs->defaultlang=" . (is_object($outputlangs) ? $outputlangs->defaultlang : 'null'));
+            DolibarrFunctions::dol_syslog("commonGenerateDocument modele=" . $modele . " outputlangs->defaultlang=" . (is_object($outputlangs) ? $outputlangs->defaultlang : 'null'));
 
             if (empty($modele)) {
                 $this->error = 'BadValueForParameterModele';
@@ -9416,7 +9416,7 @@ abstract class CommonObject
 
                 if ($obj->type == 'odt' && !empty($srctemplatepath)) {
                     if (!dol_is_file($srctemplatepath)) {
-                        dol_syslog("Failed to locate template file " . $srctemplatepath, LOG_WARNING);
+                        DolibarrFunctions::dol_syslog("Failed to locate template file " . $srctemplatepath, LOG_WARNING);
                         $this->error = 'ErrorGenerationAskedForOdtTemplateWithSrcFileNotFound';
                         return -1;
                     }
@@ -9542,7 +9542,7 @@ abstract class CommonObject
                             }
                         }
                     } else {
-                        dol_syslog('Method ->write_file was called on object ' . get_class($obj) . ' and return a success but the return array ->result["fullpath"] was not set.', LOG_WARNING);
+                        DolibarrFunctions::dol_syslog('Method ->write_file was called on object ' . get_class($obj) . ' and return a success but the return array ->result["fullpath"] was not set.', LOG_WARNING);
                     }
 
                     // Success in building document. We build meta file.

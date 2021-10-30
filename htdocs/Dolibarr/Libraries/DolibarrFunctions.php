@@ -42,7 +42,6 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
-use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Classes\HookManager;
@@ -127,7 +126,9 @@ abstract class DolibarrFunctions
      */
     static public function getEntity($element, $shared = 1, $currentobject = null)
     {
-        global $conf, $mc, $hookmanager, $object, $action;
+        //global $conf, $mc, $hookmanager, $object, $action;
+        $conf = DolibarrGlobals::getConf();
+        $hookmanager = DolibarrGlobals::getHookManager();
 
         // fix different element names (France to English)
         switch ($element) {
@@ -763,7 +764,7 @@ abstract class DolibarrFunctions
      */
     static public function dol_substr($string, $start, $length, $stringencoding = '', $trunconbytes = 0)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if (empty($stringencoding)) {
             $stringencoding = $langs->charset_output;
@@ -954,7 +955,10 @@ abstract class DolibarrFunctions
      */
     static public function GETPOST($paramname, $check = 'alphanohtml', $method = 0, $filter = null, $options = null, $noreplace = 0)
     {
-        global $mysoc, $user, $conf;
+        // global $mysoc, $user, $conf;
+        $conf = DolibarrGlobals::getConf();
+        $user = DolibarrGlobals::getUser();
+        $mysoc = DolibarrGlobals::getMySoc();
 
         if (empty($paramname)) {
             return 'BadFirstParameterForGETPOST';
@@ -3212,7 +3216,8 @@ abstract class DolibarrFunctions
      */
     static public function fieldLabel($langkey, $fieldkey, $fieldrequired = 0)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
+
         $ret = '';
         if ($fieldrequired) {
             $ret .= '<span class="fieldrequired">';
@@ -3398,7 +3403,7 @@ abstract class DolibarrFunctions
      */
     static public function dol_print_url($url, $target = '_blank', $max = 32, $withpicto = 0)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if (empty($url)) {
             return '';
@@ -4173,7 +4178,7 @@ abstract class DolibarrFunctions
      */
     static public function img_weather($titlealt, $picto, $moreatt = '', $pictoisfullpath = 0, $morecss = '')
     {
-        global $conf;
+        $conf = DolibarrGlobals::getConf();
 
         if (is_numeric($picto)) {
             //$leveltopicto = array(0=>'weather-clear.png', 1=>'weather-few-clouds.png', 2=>'weather-clouds.png', 3=>'weather-many-clouds.png', 4=>'weather-storm.png');
@@ -4203,7 +4208,7 @@ abstract class DolibarrFunctions
      */
     static public function img_action($titlealt, $numaction, $picto = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if (empty($titlealt) || $titlealt == 'default') {
             if ($numaction == '-1' || $numaction == 'ST_NO') {
@@ -4243,7 +4248,7 @@ abstract class DolibarrFunctions
      */
     static public function img_pdf($titlealt = 'default', $size = 3)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Show');
@@ -4262,7 +4267,7 @@ abstract class DolibarrFunctions
      */
     static public function img_edit_add($titlealt = 'default', $other = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Add');
@@ -4281,7 +4286,7 @@ abstract class DolibarrFunctions
      */
     static public function img_edit_remove($titlealt = 'default', $other = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Remove');
@@ -4301,7 +4306,7 @@ abstract class DolibarrFunctions
      */
     static public function img_edit($titlealt = 'default', $float = 0, $other = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Modify');
@@ -4321,7 +4326,7 @@ abstract class DolibarrFunctions
      */
     static public function img_view($titlealt = 'default', $float = 0, $other = 'class="valignmiddle"')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('View');
@@ -4343,7 +4348,7 @@ abstract class DolibarrFunctions
      */
     static public function img_delete($titlealt = 'default', $other = 'class="pictodelete"', $morecss = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Delete');
@@ -4362,7 +4367,8 @@ abstract class DolibarrFunctions
      */
     static public function img_printer($titlealt = "default", $other = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
+
         if ($titlealt == "default") {
             $titlealt = $langs->trans("Print");
         }
@@ -4379,7 +4385,7 @@ abstract class DolibarrFunctions
      */
     static public function img_split($titlealt = 'default', $other = 'class="pictosplit"')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Split');
@@ -4398,7 +4404,7 @@ abstract class DolibarrFunctions
      */
     static public function img_help($usehelpcursor = 1, $usealttitle = 1)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($usealttitle) {
             if (is_string($usealttitle)) {
@@ -4420,7 +4426,7 @@ abstract class DolibarrFunctions
      */
     static public function img_info($titlealt = 'default')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Informations');
@@ -4440,7 +4446,7 @@ abstract class DolibarrFunctions
      */
     static public function img_warning($titlealt = 'default', $moreatt = '', $morecss = 'pictowarning')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Warning');
@@ -4459,7 +4465,7 @@ abstract class DolibarrFunctions
      */
     static public function img_error($titlealt = 'default')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Error');
@@ -4478,7 +4484,7 @@ abstract class DolibarrFunctions
      */
     static public function img_next($titlealt = 'default', $moreatt = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Next');
@@ -4498,7 +4504,7 @@ abstract class DolibarrFunctions
      */
     static public function img_previous($titlealt = 'default', $moreatt = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Previous');
@@ -4506,46 +4512,6 @@ abstract class DolibarrFunctions
 
         //return DolibarrFunctions::img_picto($titlealt, 'previous.png', $moreatt);
         return '<span class="fa fa-chevron-left paddingright paddingleft" title="' . DolibarrFunctions::dol_escape_htmltag($titlealt) . '"></span>';
-    }
-
-    /**
-     *    Show down arrow logo
-     *
-     * @param string $titlealt  Text on alt and title of image. Alt only if param notitle is set to 1. If text is "TextA:TextB", use Text A on alt and Text B on title.
-     * @param int    $selected  Selected
-     * @param string $moreclass Add more CSS classes
-     *
-     * @return string            Return img tag
-     */
-    static public function img_down($titlealt = 'default', $selected = 0, $moreclass = '')
-    {
-        global $langs;
-
-        if ($titlealt == 'default') {
-            $titlealt = $langs->trans('Down');
-        }
-
-        return DolibarrFunctions::img_picto($titlealt, ($selected ? '1downarrow_selected.png' : '1downarrow.png'), 'class="imgdown' . ($moreclass ? " " . $moreclass : "") . '"');
-    }
-
-    /**
-     *    Show top arrow logo
-     *
-     * @param string $titlealt  Text on alt and title of image. Alt only if param notitle is set to 1. If text is "TextA:TextB", use Text A on alt and Text B on title.
-     * @param int    $selected  Selected
-     * @param string $moreclass Add more CSS classes
-     *
-     * @return string            Return img tag
-     */
-    static public function img_up($titlealt = 'default', $selected = 0, $moreclass = '')
-    {
-        global $langs;
-
-        if ($titlealt == 'default') {
-            $titlealt = $langs->trans('Up');
-        }
-
-        return DolibarrFunctions::img_picto($titlealt, ($selected ? '1uparrow_selected.png' : '1uparrow.png'), 'class="imgup' . ($moreclass ? " " . $moreclass : "") . '"');
     }
 
     /**
@@ -4559,7 +4525,7 @@ abstract class DolibarrFunctions
      */
     static public function img_left($titlealt = 'default', $selected = 0, $moreatt = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Left');
@@ -4579,7 +4545,7 @@ abstract class DolibarrFunctions
      */
     static public function img_right($titlealt = 'default', $selected = 0, $moreatt = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Right');
@@ -4598,7 +4564,7 @@ abstract class DolibarrFunctions
      */
     static public function img_allow($allow, $titlealt = 'default')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($titlealt == 'default') {
             $titlealt = $langs->trans('Active');
@@ -4731,7 +4697,9 @@ abstract class DolibarrFunctions
      */
     static public function info_admin($text, $infoonimgalt = 0, $nodiv = 0, $admin = '1', $morecss = '', $textfordropdown = '')
     {
-        global $conf, $langs;
+        // global $conf, $langs;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         if ($infoonimgalt) {
             $result = DolibarrFunctions::img_picto($text, 'info', 'class="hideonsmartphone' . ($morecss ? ' ' . $morecss : '') . '"');
@@ -4985,10 +4953,12 @@ abstract class DolibarrFunctions
      */
     static public function getTitleFieldOfList($name, $thead = 0, $file = "", $field = "", $begin = "", $moreparam = "", $moreattrib = "", $sortfield = "", $sortorder = "", $prefix = "", $disablesortlink = 0, $tooltip = '', $forcenowrapcolumntitle = 0)
     {
-        //        global $conf, $langs, $form;
+        global $form;   // $form would have to be passed as a parameter
+
         //print "$name, $file, $field, $begin, $options, $moreattrib, $sortfield, $sortorder<br>\n";
 
-        $langs = Translator::getInstance();
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         if ($moreattrib == 'class="right"') {
             $prefix .= 'right '; // For backward compatibility
@@ -5075,18 +5045,18 @@ abstract class DolibarrFunctions
             }
 
             if (!$sortorder || $field1 != $sortfield1) {
-                //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.img_down("A-Z",0).'</a>';
-                //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.img_up("Z-A",0).'</a>';
+                //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.self::img_down("A-Z",0).'</a>';
+                //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.self::img_up("Z-A",0).'</a>';
             } else {
                 if (preg_match('/^DESC/', $sortorder)) {
-                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.img_down("A-Z",0).'</a>';
-                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.img_up("Z-A",1).'</a>';
-                    $sortimg .= '<span class="nowrap">' . img_up("Z-A", 0, 'paddingleft') . '</span>';
+                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.self::img_down("A-Z",0).'</a>';
+                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.self::img_up("Z-A",1).'</a>';
+                    $sortimg .= '<span class="nowrap">' . self::img_up("Z-A", 0, 'paddingleft') . '</span>';
                 }
                 if (preg_match('/^ASC/', $sortorder)) {
-                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.img_down("A-Z",1).'</a>';
-                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.img_up("Z-A",0).'</a>';
-                    $sortimg .= '<span class="nowrap">' . img_down("A-Z", 0, 'paddingleft') . '</span>';
+                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=asc&begin='.$begin.$options.'">'.self::img_down("A-Z",1).'</a>';
+                    //$out.= '<a href="'.$file.'?sortfield='.$field.'&sortorder=desc&begin='.$begin.$options.'">'.self::img_up("Z-A",0).'</a>';
+                    $sortimg .= '<span class="nowrap">' . self::img_down("A-Z", 0, 'paddingleft') . '</span>';
                 }
             }
         }
@@ -5096,6 +5066,46 @@ abstract class DolibarrFunctions
         $out .= '</' . $tag . '>';
 
         return $out;
+    }
+
+    /**
+     *    Show top arrow logo
+     *
+     * @param string $titlealt  Text on alt and title of image. Alt only if param notitle is set to 1. If text is "TextA:TextB", use Text A on alt and Text B on title.
+     * @param int    $selected  Selected
+     * @param string $moreclass Add more CSS classes
+     *
+     * @return string            Return img tag
+     */
+    static public function img_up($titlealt = 'default', $selected = 0, $moreclass = '')
+    {
+        $langs = DolibarrGlobals::getLangs();
+
+        if ($titlealt == 'default') {
+            $titlealt = $langs->trans('Up');
+        }
+
+        return DolibarrFunctions::img_picto($titlealt, ($selected ? '1uparrow_selected.png' : '1uparrow.png'), 'class="imgup' . ($moreclass ? " " . $moreclass : "") . '"');
+    }
+
+    /**
+     *    Show down arrow logo
+     *
+     * @param string $titlealt  Text on alt and title of image. Alt only if param notitle is set to 1. If text is "TextA:TextB", use Text A on alt and Text B on title.
+     * @param int    $selected  Selected
+     * @param string $moreclass Add more CSS classes
+     *
+     * @return string            Return img tag
+     */
+    static public function img_down($titlealt = 'default', $selected = 0, $moreclass = '')
+    {
+        $langs = DolibarrGlobals::getLangs();
+
+        if ($titlealt == 'default') {
+            $titlealt = $langs->trans('Down');
+        }
+
+        return DolibarrFunctions::img_picto($titlealt, ($selected ? '1downarrow_selected.png' : '1downarrow.png'), 'class="imgdown' . ($moreclass ? " " . $moreclass : "") . '"');
     }
 
     /**
@@ -5600,7 +5610,9 @@ abstract class DolibarrFunctions
      */
     static public function price2num($amount, $rounding = '', $option = 0)
     {
-        global $langs, $conf;
+        //global $langs, $conf;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         // Round PHP function does not allow number like '1,234.56' nor '1.234,56' nor '1 234,56'
         // Numbers must be '1234.56'
@@ -6424,7 +6436,8 @@ abstract class DolibarrFunctions
      */
     static public function yn($yesno, $case = 1, $color = 0)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
+
         $result = 'unknown';
         $classname = '';
         if ($yesno == 1 || strtolower($yesno) == 'yes' || strtolower($yesno) == 'true') {    // A mettre avant test sur no a cause du == 0
@@ -7643,7 +7656,7 @@ abstract class DolibarrFunctions
      */
     static public function get_date_range($date_start, $date_end, $format = '', $outputlangs = '', $withparenthesis = 1)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         $out = '';
 
@@ -9469,7 +9482,8 @@ abstract class DolibarrFunctions
      */
     function ajax_autoselect($htmlname, $addlink = '')
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
+
         $out = '<script>
                jQuery(document).ready(function () {
 				    jQuery("' . ((strpos($htmlname, '.') === 0 ? '' : '#') . $htmlname) . '").click(function() { jQuery(this).select(); } );
@@ -10506,7 +10520,7 @@ abstract class DolibarrFunctions
      */
     function startSimpleTable($header, $link = "", $arguments = "", $emptyRows = 0, $number = -1)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         print '<div class="div-table-responsive-no-min">';
         print '<table class="noborder centpercent">';
@@ -10589,7 +10603,7 @@ abstract class DolibarrFunctions
      */
     function addSummaryTableLine($tableColumnCount, $num, $nbofloop = 0, $total = 0, $noneWord = "None", $extraRightColumn = false)
     {
-        global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         if ($num === 0) {
             print '<tr class="oddeven">';

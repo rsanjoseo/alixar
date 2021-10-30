@@ -8,8 +8,13 @@ namespace Alxarafe\Dolibarr\Base;
 
 use Alxarafe\Core\Base\Controller;
 use Alxarafe\Core\Base\View;
-use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Database\Engine;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\HookManager;
+use Alxarafe\Dolibarr\Classes\MenuManager;
+use Alxarafe\Dolibarr\Classes\Societe;
+use Alxarafe\Dolibarr\Classes\User;
 use DebugBar\DebugBarException;
 
 /**
@@ -21,10 +26,12 @@ abstract class DolibarrController extends Controller
 {
     public array $vars;
     public Conf $conf;
-    public $user;
-    public $hookmanager;
-
-    abstract function getDolibarrActions();
+    public User $user;
+    public HookManager $hookmanager;
+    public MenuManager $menumanager;
+    public Engine $db;
+    public Translator $langs;
+    public ?Societe $mysoc;
 
     /**
      * @throws DebugBarException
@@ -37,20 +44,36 @@ abstract class DolibarrController extends Controller
         $this->conf = $globals->getConf();
         $this->user = $globals->getUser();
         $this->hookmanager = $globals->getHookManager();
+        $this->menumanager = $globals->getMenuManager();
         $this->db = $globals->getDb();
+        $this->langs = $globals->getLangs();
+        $this->mysoc = $globals->getMySoc();
 
-        DolibarrFilefunc::defineVars();
+        $this->vars = DolibarrFilefunc::defineVars();
 
+        $this->getDolibarrVars();
         $this->getDolibarrActions();
-
-        // $filefunc=new DolibarrFilefunc();
-        // $this->vars = $filefunc->defineVars();
 
         $auth = new DolibarrAuthentication($this);
         if (!$auth->authenticated()) {
             $auth->login();
         }
     }
+
+    /**
+     * By changing the variables for attributes, each of the POST and GET parameters will be
+     * assigned to them, after filtering their content.
+     * They have to be attributes, in order to be used in the other methods and in the view.
+     */
+    abstract function getDolibarrVars(): void;
+
+    /**
+     * Gets the action to perform in the $this->action attribute.
+     * Dolibarr does not define a specific action, but in Alixar defined and determined
+     * actions will be used.
+     * The doAction method will take care of executing the requested action (if there is any).
+     */
+    abstract function getDolibarrActions(): void;
 
     public function setView(): View
     {

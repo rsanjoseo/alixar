@@ -274,22 +274,21 @@ class DolibarrGlobals
         if (isset(self::$mysoc)) {
             return self::$mysoc;
         }
-
         $requiredb = !defined('NOREQUIREDB') || !constant('NOREQUIREDB');
         $requiresoc = !defined('NOREQUIRESOC') || !constant('NOREQUIRESOC');
         if (!$requiredb || !$requiresoc) {
             return null;
         }
 
-        $mysoc = new Societe();
-        $mysoc->setMysoc(self::$conf);
+        self::$mysoc = new Societe();
+        self::$mysoc->setMysoc(self::$conf);
 
         // For some countries, we need to invert our address with customer address
-        if ($mysoc->country_code == 'DE' && !isset($conf->global->MAIN_INVERT_SENDER_RECIPIENT)) {
+        if (self::$mysoc->country_code == 'DE' && !isset($conf->global->MAIN_INVERT_SENDER_RECIPIENT)) {
             self::$conf->global->MAIN_INVERT_SENDER_RECIPIENT = 1;
         }
 
-        return $mysoc;
+        return self::$mysoc;
     }
 
     static function getMenuManager()

@@ -39,7 +39,7 @@
 namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Providers\Translator;
-use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
@@ -86,7 +86,7 @@ class Form
 
     public function __construct()
     {
-        $this->db = Config::getInstance()->getEngine();
+        $this->db = DolibarrGlobals::getDb();
     }
 
     /**

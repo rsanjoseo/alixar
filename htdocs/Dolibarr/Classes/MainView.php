@@ -296,7 +296,7 @@ class MainView
                 if (!empty($this->conf->global->MAIN_USE_JQUERY_THEME)) {
                     $jquerytheme = $this->conf->global->MAIN_USE_JQUERY_THEME;
                 }
-                if (constant('JS_JQUERY_UI')) {
+                if (defined('JS_JQUERY_UI') && constant('JS_JQUERY_UI')) {
                     print '<link rel="stylesheet" type="text/css" href="' . JS_JQUERY_UI . 'css/' . $jquerytheme . '/jquery-ui.min.css' . ($ext ? '?' . $ext : '') . '">' . "\n"; // Forced JQuery
                 } else {
                     print '<link rel="stylesheet" type="text/css" href="' . DOL_URL_ROOT . '/includes/jquery/css/' . $jquerytheme . '/jquery-ui.css' . ($ext ? '?' . $ext : '') . '">' . "\n"; // JQuery
@@ -443,7 +443,7 @@ class MainView
                     print '<!-- Includes JS for CKEditor -->' . "\n";
                     $pathckeditor = DOL_URL_ROOT . '/includes/ckeditor/ckeditor/';
                     $jsckeditor = 'ckeditor.js';
-                    if (constant('JS_CKEDITOR')) {
+                    if (defined('JS_CKEDITOR') && constant('JS_CKEDITOR')) {
                         // To use external ckeditor 4 js lib
                         $pathckeditor = constant('JS_CKEDITOR');
                     }

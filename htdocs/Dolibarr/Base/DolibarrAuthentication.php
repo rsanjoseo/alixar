@@ -605,8 +605,8 @@ class DolibarrAuthentication
         // If ok, the variable login will be returned
         // If error, we will put error message in session under the name dol_loginmesg
         if ($test && $goontestloop && (DolibarrFunctions::GETPOST('actionlogin', 'aZ09') == 'login' || $this->dolibarr_main_authentication != 'dolibarr')) {
-            die('check');
             $this->login = DolibarrSecurity2::checkLoginPassEntity($this->usertotest, $passwordtotest, $entitytotest, $this->authmode);
+
             if ($this->login === '--bad-login-validity--') {
                 $this->login = '';
             }
@@ -680,10 +680,7 @@ class DolibarrAuthentication
             exit;
         }
 
-        die('Validate?');
-
         $resultFetchUser = $this->user->fetch('', $this->login, '', 1, ($entitytotest > 0 ? $entitytotest : -1)); // login was retrieved previously when checking password.
-
         if ($resultFetchUser <= 0) {
             DolibarrFunctions::dol_syslog('User not found, connexion refused');
             session_destroy();

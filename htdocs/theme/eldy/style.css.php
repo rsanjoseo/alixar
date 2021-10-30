@@ -66,6 +66,11 @@ session_cache_limiter('public');
 // require_once __DIR__.'/../../main.php'; // __DIR__ allow this script to be included in custom themes
 // require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
+new DolibarrGlobals();
+$user=DolibarrGlobals::getUser();
+$conf=DolibarrGlobals::getConf();
+$langs=DolibarrGlobals::getLangs();
+
 // Load user to have $user->conf loaded (not done into main because of NOLOGIN constant defined)
 // and permission, so we can later calculate number of top menu ($nbtopmenuentries) according to user profile.
 if (empty($user->id) && !empty($_SESSION['dol_login'])) {
@@ -78,7 +83,6 @@ require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
 $menumanager=DolibarrGlobals::getMenuManager();
 $menumanager->loadMenu();
 
-/*
 // Define css type
 $mw->top_httphead('text/css');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
@@ -87,7 +91,6 @@ if (empty($dolibarr_nocache)) {
 } else {
 	header('Cache-Control: no-cache');
 }
-*/
 
 if (DolibarrFunctions::GETPOST('theme', 'alpha')) {
 	$conf->theme = DolibarrFunctions::GETPOST('theme', 'alpha'); // If theme was forced on URL
