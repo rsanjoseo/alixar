@@ -270,6 +270,7 @@ class Login extends MainView
                 exit;
             }
 
+            dump('user in Dolibarr/Tpl/Login!');
             dump($this->user);
             $resultFetchUser = $this->user->fetch('', $login, '', 1, ($entitytotest > 0 ? $entitytotest : -1)); // login was retrieved previously when checking password.
             if ($resultFetchUser <= 0) {
@@ -574,6 +575,7 @@ class Login extends MainView
         // Protection to avoid direct call of template
         if (empty($conf) || !is_object($conf)) {
             print "Error, template page can't be called as URL";
+            dump(debug_backtrace());
             exit;
         }
 

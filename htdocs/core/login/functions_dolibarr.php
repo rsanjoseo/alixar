@@ -27,7 +27,6 @@ use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
  * Check validity of user/password/entity
@@ -44,7 +43,7 @@ function check_user_password_dolibarr($usertotest, $passwordtotest, $entitytotes
     //    global $db, $conf, $langs;
     $db = Config::getInstance()->getEngine();
     $langs = Translator::getInstance();
-    $conf = DolibarrConfig::getInstance()->getConf();
+    $conf = DolibarrGlobals::getConf();
 
     // Force master entity in transversal mode
     $entity = $entitytotest;

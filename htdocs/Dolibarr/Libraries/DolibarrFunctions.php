@@ -43,10 +43,9 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Classes\HookManager;
-use Alxarafe\Dolibarr\Libraries\DolibarrAdoDbTime;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use DateTime;
 use DateTimeZone;
 use Exception;
@@ -188,18 +187,6 @@ abstract class DolibarrFunctions
         } else {
             return ((is_object($currentobject) && $currentobject->id > 0 && $currentobject->entity > 0) ? $currentobject->entity : $conf->entity);
         }
-    }
-
-    /**
-     *    Return if string has a name dedicated to store a secret
-     *
-     * @param string $keyname Name of key to test
-     *
-     * @return    boolean                True if key is used to store a secret
-     */
-    static public function isASecretKey($keyname)
-    {
-        return preg_match('/(_pass|password|_pw|_key|securekey|serverkey|secret\d?|p12key|exportkey|_PW_[a-z]+|token)$/i', $keyname);
     }
 
     /**
@@ -483,8 +470,8 @@ abstract class DolibarrFunctions
      */
     static public function dol_print_date($time, $format = '', $tzoutput = 'auto', $outputlangs = '', $encodetooutput = false)
     {
-        $conf = DolibarrConfig::getInstance()->getConf();
-        $langs = Translator::getInstance();
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         if ($tzoutput === 'auto') {
             $tzoutput = (empty($conf) ? 'tzserver' : (isset($conf->tzuserinputkey) ? $conf->tzuserinputkey : 'tzserver'));
@@ -662,6 +649,141 @@ abstract class DolibarrFunctions
         } else {
             return strlen($string);
         }
+    }
+
+    /**
+     *    Return a timestamp date built from detailed informations (by default a local PHP server timestamp)
+     *    Replace function mktime not available under Windows if year < 1970
+     *    PHP mktime is restricted to the years 1901-2038 on Unix and 1970-2038 on Windows
+     *
+     * @param int   $hour                     Hour    (can be -1 for undefined)
+     * @param int   $minute                   Minute    (can be -1 for undefined)
+     * @param int   $second                   Second    (can be -1 for undefined)
+     * @param int   $month                    Month (1 to 12)
+     * @param int   $day                      Day (1 to 31)
+     * @param int   $year                     Year
+     * @param mixed $gm                       True or 1 or 'gmt'=Input informations are GMT values
+     *                                        False or 0 or 'tzserver' = local to server TZ
+     *                                        'auto'
+     *                                        'tzuser' = local to user TZ taking dst into account at the current date. Not yet implemented.
+     *                                        'tzuserrel' = local to user TZ taking dst into account at the given date. Use this one to convert date input from user into a GMT date.
+     *                                        'tz,TimeZone' = use specified timezone
+     * @param int   $check                    0=No check on parameters (Can use day 32, etc...)
+     *
+     * @return    int|string                    Date as a timestamp, '' or false if error
+     * @see                                dol_print_date(), self::dol_stringtotime(), DolibarrFunctions::dol_getdate()
+     */
+    static public function dol_mktime($hour, $minute, $second, $month, $day, $year, $gm = 'auto', $check = 1)
+    {
+        global $conf;
+        //print "- ".$hour.",".$minute.",".$second.",".$month.",".$day.",".$year.",".$_SERVER["WINDIR"]." -";
+        //print 'gm:'.$gm.' gm==auto:'.($gm == 'auto').'<br>';
+
+        if ($gm === 'auto') {
+            $gm = (empty($conf) ? 'tzserver' : $conf->tzuserinputkey);
+        }
+
+        // Clean parameters
+        if ($hour == -1 || empty($hour)) {
+            $hour = 0;
+        }
+        if ($minute == -1 || empty($minute)) {
+            $minute = 0;
+        }
+        if ($second == -1 || empty($second)) {
+            $second = 0;
+        }
+
+        // Check parameters
+        if ($check) {
+            if (!$month || !$day) {
+                return '';
+            }
+            if ($day > 31) {
+                return '';
+            }
+            if ($month > 12) {
+                return '';
+            }
+            if ($hour < 0 || $hour > 24) {
+                return '';
+            }
+            if ($minute < 0 || $minute > 60) {
+                return '';
+            }
+            if ($second < 0 || $second > 60) {
+                return '';
+            }
+        }
+
+        if (empty($gm) || ($gm === 'server' || $gm === 'tzserver')) {
+            $default_timezone = @date_default_timezone_get(); // Example 'Europe/Berlin'
+            $localtz = new DateTimeZone($default_timezone);
+        } elseif ($gm === 'user' || $gm === 'tzuser' || $gm === 'tzuserrel') {
+            // We use dol_tz_string first because it is more reliable.
+            $default_timezone = (empty($_SESSION["dol_tz_string"]) ? @date_default_timezone_get() : $_SESSION["dol_tz_string"]); // Example 'Europe/Berlin'
+            try {
+                $localtz = new DateTimeZone($default_timezone);
+            } catch (Exception $e) {
+                DolibarrFunctions::dol_syslog("Warning dol_tz_string contains an invalid value " . $_SESSION["dol_tz_string"], LOG_WARNING);
+                $default_timezone = @date_default_timezone_get();
+            }
+        } elseif (strrpos($gm, "tz,") !== false) {
+            $timezone = str_replace("tz,", "", $gm); // Example 'tz,Europe/Berlin'
+            try {
+                $localtz = new DateTimeZone($timezone);
+            } catch (Exception $e) {
+                DolibarrFunctions::dol_syslog("Warning passed timezone contains an invalid value " . $timezone, LOG_WARNING);
+            }
+        }
+
+        if (empty($localtz)) {
+            $localtz = new DateTimeZone('UTC');
+        }
+        //var_dump($localtz);
+        //var_dump($year.'-'.$month.'-'.$day.'-'.$hour.'-'.$minute);
+        $dt = new DateTime(null, $localtz);
+        $dt->setDate((int) $year, (int) $month, (int) $day);
+        $dt->setTime((int) $hour, (int) $minute, (int) $second);
+        $date = $dt->getTimestamp(); // should include daylight saving time
+        //var_dump($date);
+        return $date;
+    }
+
+    /**
+     * Make a substring. Works even if mbstring module is not enabled for better compatibility.
+     *
+     * @param string $string         String to scan
+     * @param string $start          Start position
+     * @param int    $length         Length (in nb of characters or nb of bytes depending on trunconbytes param)
+     * @param string $stringencoding Page code used for input string encoding
+     * @param int    $trunconbytes   1=Length is max of bytes instead of max of characters
+     *
+     * @return  string                        substring
+     */
+    static public function dol_substr($string, $start, $length, $stringencoding = '', $trunconbytes = 0)
+    {
+        global $langs;
+
+        if (empty($stringencoding)) {
+            $stringencoding = $langs->charset_output;
+        }
+
+        $ret = '';
+        if (empty($trunconbytes)) {
+            if (function_exists('mb_substr')) {
+                $ret = mb_substr($string, $start, $length, $stringencoding);
+            } else {
+                $ret = substr($string, $start, $length);
+            }
+        } else {
+            if (function_exists('mb_strcut')) {
+                $ret = mb_strcut($string, $start, $length, $stringencoding);
+            } else {
+                $ret = substr($string, $start, $length);
+            }
+        }
+        return $ret;
     }
 
     /**
@@ -1128,6 +1250,89 @@ abstract class DolibarrFunctions
     }
 
     /**
+     *    Clean a string from all HTML tags and entities.
+     *  This function differs from strip_tags because:
+     *  - <br> are replaced with \n if removelinefeed=0 or 1
+     *  - if entities are found, they are decoded BEFORE the strip
+     *  - you can decide to convert line feed into a space
+     *
+     * @param string  $stringtoclean      String to clean
+     * @param integer $removelinefeed     1=Replace all new lines by 1 space, 0=Only ending new lines are removed others are replaced with \n, 2=Ending new lines are removed but others are kept with a same number of \n than nb of <br> when there is both "...<br>\n..."
+     * @param string  $pagecodeto         Encoding of input/output string
+     * @param integer $strip_tags         0=Use internal strip, 1=Use strip_tags() php function (bugged when text contains a < char that is not for a html tag or when tags is not closed like '<img onload=aaa')
+     * @param integer $removedoublespaces Replace double space into one space
+     *
+     * @return string                        String cleaned
+     *
+     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::dol_string_onlythesehtmltags() self::dol_string_neverthesehtmltags(), dolStripPhpCode()
+     */
+    static public function dol_string_nohtmltag($stringtoclean, $removelinefeed = 1, $pagecodeto = 'UTF-8', $strip_tags = 0, $removedoublespaces = 1)
+    {
+        if ($removelinefeed == 2) {
+            $stringtoclean = preg_replace('/<br[^>]*>(\n|\r)+/ims', '<br>', $stringtoclean);
+        }
+        $temp = preg_replace('/<br[^>]*>/i', "\n", $stringtoclean);
+
+        // We remove entities BEFORE stripping (in case of an open separator char that is entity encoded and not the closing other, the strip will fails)
+        $temp = self::dol_html_entity_decode($temp, ENT_COMPAT | ENT_HTML5, $pagecodeto);
+
+        $temp = str_replace('< ', '__ltspace__', $temp);
+
+        if ($strip_tags) {
+            $temp = strip_tags($temp);
+        } else {
+            $temp = str_replace('<>', '', $temp);    // No reason to have this into a text, except if value is to try bypass the next html cleaning
+            $pattern = "/<[^<>]+>/";
+            // Example of $temp: <a href="/myurl" title="<u>A title</u>">0000-021</a>
+            $temp = preg_replace($pattern, "", $temp); // pass 1 - $temp after pass 1: <a href="/myurl" title="A title">0000-021
+            $temp = preg_replace($pattern, "", $temp); // pass 2 - $temp after pass 2: 0000-021
+            // Remove '<' into remainging, so remove non closing html tags like '<abc' or '<<abc'. Note: '<123abc' is not a html tag (can be kept), but '<abc123' is (must be removed).
+            $temp = preg_replace('/<+([a-z]+)/i', '\1', $temp);
+        }
+
+        $temp = self::dol_html_entity_decode($temp, ENT_COMPAT, $pagecodeto);
+
+        // Remove also carriage returns
+        if ($removelinefeed == 1) {
+            $temp = str_replace(["\r\n", "\r", "\n"], " ", $temp);
+        }
+
+        // And double quotes
+        if ($removedoublespaces) {
+            while (strpos($temp, "  ")) {
+                $temp = str_replace("  ", " ", $temp);
+            }
+        }
+
+        $temp = str_replace('__ltspace__', '< ', $temp);
+
+        return trim($temp);
+    }
+
+    /**
+     * Replace html_entity_decode functions to manage errors
+     *
+     * @param string $a                Operand a
+     * @param string $b                Operand b (ENT_QUOTES|ENT_HTML5=convert simple, double quotes, colon, e accent, ...)
+     * @param string $c                Operand c
+     * @param string $keepsomeentities Entities but &, <, >, " are not converted.
+     *
+     * @return  string                        String decoded
+     */
+    static public function dol_html_entity_decode($a, $b, $c = 'UTF-8', $keepsomeentities = 0)
+    {
+        $newstring = $a;
+        if ($keepsomeentities) {
+            $newstring = strtr($newstring, ['&amp;' => '__andamp__', '&lt;' => '__andlt__', '&gt;' => '__andgt__', '"' => '__dquot__']);
+        }
+        $newstring = html_entity_decode($newstring, $b, $c);
+        if ($keepsomeentities) {
+            $newstring = strtr($newstring, ['__andamp__' => '&amp;', '__andlt__' => '&lt;', '__andgt__' => '&gt;', '__dquot__' => '"']);
+        }
+        return $newstring;
+    }
+
+    /**
      *    Clean a string from all punctuation characters to use it as a ref or login.
      *  This is a more complete function than dol_sanitizeFileName.
      *
@@ -1154,6 +1359,91 @@ abstract class DolibarrFunctions
         }
 
         return str_replace($forbidden_chars_to_replace, $newstr, str_replace($forbidden_chars_to_remove, "", $str));
+    }
+
+    /**
+     *  Return an array with locale date info.
+     *  WARNING: This function use PHP server timezone by default to return locale informations.
+     *  Be aware to add the third parameter to "UTC" if you need to work on UTC.
+     *
+     * @param int     $timestamp     Timestamp
+     * @param boolean $fast          Fast mode. deprecated.
+     * @param string  $forcetimezone '' to use the PHP server timezone. Or use a form like 'gmt', 'Europe/Paris' or '+0200' to force timezone.
+     *
+     * @return    array                        Array of informations
+     *                                        'seconds' => $secs,
+     *                                        'minutes' => $min,
+     *                                        'hours' => $hour,
+     *                                        'mday' => $day,
+     *                                        'wday' => $dow,        0=sunday, 6=saturday
+     *                                        'mon' => $month,
+     *                                        'year' => $year,
+     *                                        'yday' => floor($secsInYear/$_day_power)
+     *                                        '0' => original timestamp
+     * @see                                dol_print_date(), self::dol_stringtotime(), self::dol_mktime()
+     */
+    static public function dol_getdate($timestamp, $fast = false, $forcetimezone = '')
+    {
+        //$datetimeobj = new DateTime('@'.$timestamp);
+        $datetimeobj = new DateTime();
+        $datetimeobj->setTimestamp($timestamp); // Use local PHP server timezone
+        if ($forcetimezone) {
+            $datetimeobj->setTimezone(new DateTimeZone($forcetimezone == 'gmt' ? 'UTC' : $forcetimezone)); //  (add timezone relative to the date entered)
+        }
+        $arrayinfo = [
+            'year' => ((int) date_format($datetimeobj, 'Y')),
+            'mon' => ((int) date_format($datetimeobj, 'm')),
+            'mday' => ((int) date_format($datetimeobj, 'd')),
+            'wday' => ((int) date_format($datetimeobj, 'w')),
+            'yday' => ((int) date_format($datetimeobj, 'z')),
+            'hours' => ((int) date_format($datetimeobj, 'H')),
+            'minutes' => ((int) date_format($datetimeobj, 'i')),
+            'seconds' => ((int) date_format($datetimeobj, 's')),
+            '0' => $timestamp,
+        ];
+
+        return $arrayinfo;
+    }
+
+    /**
+     *  Return date for now. In most cases, we use this function without parameters (that means GMT time).
+     *
+     * @param string $mode            'auto' => for backward compatibility (avoid this),
+     *                                'gmt' => we return GMT timestamp,
+     *                                'tzserver' => we add the PHP server timezone
+     *                                'tzref' => we add the company timezone. Not implemented.
+     *                                'tzuser' or 'tzuserrel' => we add the user timezone
+     *
+     * @return int   $date    Timestamp
+     */
+    static public function dol_now($mode = 'auto')
+    {
+        $ret = 0;
+
+        if ($mode === 'auto') {
+            $mode = 'gmt';
+        }
+
+        if ($mode == 'gmt') {
+            $ret = time(); // Time for now at greenwich.
+        } elseif ($mode == 'tzserver') {        // Time for now with PHP server timezone added
+            require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+            $tzsecond = getServerTimeZoneInt('now'); // Contains tz+dayling saving time
+            $ret = (int) (self::dol_now('gmt') + ($tzsecond * 3600));
+            //} elseif ($mode == 'tzref') {// Time for now with parent company timezone is added
+            //	require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
+            //	$tzsecond=getParentCompanyTimeZoneInt();    // Contains tz+dayling saving time
+            //	$ret=self::dol_now('gmt')+($tzsecond*3600);
+            //}
+        } elseif ($mode == 'tzuser' || $mode == 'tzuserrel') {
+            // Time for now with user timezone added
+            //print 'time: '.time();
+            $offsettz = (empty($_SESSION['dol_tz']) ? 0 : $_SESSION['dol_tz']) * 60 * 60;
+            $offsetdst = (empty($_SESSION['dol_dst']) ? 0 : $_SESSION['dol_dst']) * 60 * 60;
+            $ret = (int) (self::dol_now('gmt') + ($offsettz + $offsetdst));
+        }
+
+        return $ret;
     }
 
     /**
@@ -1306,89 +1596,6 @@ abstract class DolibarrFunctions
         }
 
         return $out;
-    }
-
-    /**
-     *    Clean a string from all HTML tags and entities.
-     *  This function differs from strip_tags because:
-     *  - <br> are replaced with \n if removelinefeed=0 or 1
-     *  - if entities are found, they are decoded BEFORE the strip
-     *  - you can decide to convert line feed into a space
-     *
-     * @param string  $stringtoclean      String to clean
-     * @param integer $removelinefeed     1=Replace all new lines by 1 space, 0=Only ending new lines are removed others are replaced with \n, 2=Ending new lines are removed but others are kept with a same number of \n than nb of <br> when there is both "...<br>\n..."
-     * @param string  $pagecodeto         Encoding of input/output string
-     * @param integer $strip_tags         0=Use internal strip, 1=Use strip_tags() php function (bugged when text contains a < char that is not for a html tag or when tags is not closed like '<img onload=aaa')
-     * @param integer $removedoublespaces Replace double space into one space
-     *
-     * @return string                        String cleaned
-     *
-     * @see    DolibarrFunctions::dol_escape_htmltag() strip_tags() self::dol_string_onlythesehtmltags() self::dol_string_neverthesehtmltags(), dolStripPhpCode()
-     */
-    static public function dol_string_nohtmltag($stringtoclean, $removelinefeed = 1, $pagecodeto = 'UTF-8', $strip_tags = 0, $removedoublespaces = 1)
-    {
-        if ($removelinefeed == 2) {
-            $stringtoclean = preg_replace('/<br[^>]*>(\n|\r)+/ims', '<br>', $stringtoclean);
-        }
-        $temp = preg_replace('/<br[^>]*>/i', "\n", $stringtoclean);
-
-        // We remove entities BEFORE stripping (in case of an open separator char that is entity encoded and not the closing other, the strip will fails)
-        $temp = self::dol_html_entity_decode($temp, ENT_COMPAT | ENT_HTML5, $pagecodeto);
-
-        $temp = str_replace('< ', '__ltspace__', $temp);
-
-        if ($strip_tags) {
-            $temp = strip_tags($temp);
-        } else {
-            $temp = str_replace('<>', '', $temp);    // No reason to have this into a text, except if value is to try bypass the next html cleaning
-            $pattern = "/<[^<>]+>/";
-            // Example of $temp: <a href="/myurl" title="<u>A title</u>">0000-021</a>
-            $temp = preg_replace($pattern, "", $temp); // pass 1 - $temp after pass 1: <a href="/myurl" title="A title">0000-021
-            $temp = preg_replace($pattern, "", $temp); // pass 2 - $temp after pass 2: 0000-021
-            // Remove '<' into remainging, so remove non closing html tags like '<abc' or '<<abc'. Note: '<123abc' is not a html tag (can be kept), but '<abc123' is (must be removed).
-            $temp = preg_replace('/<+([a-z]+)/i', '\1', $temp);
-        }
-
-        $temp = self::dol_html_entity_decode($temp, ENT_COMPAT, $pagecodeto);
-
-        // Remove also carriage returns
-        if ($removelinefeed == 1) {
-            $temp = str_replace(["\r\n", "\r", "\n"], " ", $temp);
-        }
-
-        // And double quotes
-        if ($removedoublespaces) {
-            while (strpos($temp, "  ")) {
-                $temp = str_replace("  ", " ", $temp);
-            }
-        }
-
-        $temp = str_replace('__ltspace__', '< ', $temp);
-
-        return trim($temp);
-    }
-
-    /**
-     * Replace html_entity_decode functions to manage errors
-     *
-     * @param string $a                Operand a
-     * @param string $b                Operand b (ENT_QUOTES|ENT_HTML5=convert simple, double quotes, colon, e accent, ...)
-     * @param string $c                Operand c
-     * @param string $keepsomeentities Entities but &, <, >, " are not converted.
-     *
-     * @return  string                        String decoded
-     */
-    static public function dol_html_entity_decode($a, $b, $c = 'UTF-8', $keepsomeentities = 0)
-    {
-        $newstring = $a;
-        if ($keepsomeentities) {
-            $newstring = strtr($newstring, ['&amp;' => '__andamp__', '&lt;' => '__andlt__', '&gt;' => '__andgt__', '"' => '__dquot__']);
-        }
-        $newstring = html_entity_decode($newstring, $b, $c);
-        if ($keepsomeentities) {
-            $newstring = strtr($newstring, ['__andamp__' => '&amp;', '__andlt__' => '&lt;', '__andgt__' => '&gt;', '__dquot__' => '"']);
-        }
-        return $newstring;
     }
 
     /**
@@ -2542,6 +2749,130 @@ abstract class DolibarrFunctions
     }
 
     /**
+     *    Truncate a string to a particular length adding '…' if string larger than length.
+     *    If length = max length+1, we do no truncate to avoid having just 1 char replaced with '…'.
+     *  MAIN_DISABLE_TRUNC=1 can disable all truncings
+     *
+     * @param string $string         String to truncate
+     * @param int    $size           Max string size visible (excluding …). 0 for no limit. WARNING: Final string size can have 3 more chars (if we added …, or if size was max+1 so it does not worse to replace with ...)
+     * @param string $trunc          Where to trunc: 'right', 'left', 'middle' (size must be a 2 power), 'wrap'
+     * @param string $stringencoding Tell what is source string encoding
+     * @param int    $nodot          Truncation do not add … after truncation. So it's an exact truncation.
+     * @param int    $display        Trunc is used to display data and can be changed for small screen. TODO Remove this param (must be dealt with CSS)
+     *
+     * @return string                        Truncated string. WARNING: length is never higher than $size if $nodot is set, but can be 3 chars higher otherwise.
+     */
+    static public function dol_trunc($string, $size = 40, $trunc = 'right', $stringencoding = 'UTF-8', $nodot = 0, $display = 0)
+    {
+        global $conf;
+
+        if (empty($size) || !empty($conf->global->MAIN_DISABLE_TRUNC)) {
+            return $string;
+        }
+
+        if (empty($stringencoding)) {
+            $stringencoding = 'UTF-8';
+        }
+        // reduce for small screen
+        if ($conf->dol_optimize_smallscreen == 1 && $display == 1) {
+            $size = round($size / 3);
+        }
+
+        // We go always here
+        if ($trunc == 'right') {
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
+            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
+                // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
+                return self::dol_substr($newstring, 0, $size, $stringencoding) . ($nodot ? '' : '…');
+            } else {
+                //return 'u'.$size.'-'.$newstring.'-'.DolibarrFunctions::dol_strlen($newstring,$stringencoding).'-'.$string;
+                return $string;
+            }
+        } elseif ($trunc == 'middle') {
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
+            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > 2 && DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
+                $size1 = round($size / 2);
+                $size2 = round($size / 2);
+                return self::dol_substr($newstring, 0, $size1, $stringencoding) . '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size2, $size2, $stringencoding);
+            } else {
+                return $string;
+            }
+        } elseif ($trunc == 'left') {
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
+            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
+                // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
+                return '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $size, $stringencoding);
+            } else {
+                return $string;
+            }
+        } elseif ($trunc == 'wrap') {
+            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
+            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
+                return self::dol_substr($newstring, 0, $size, $stringencoding) . "\n" . self::dol_trunc(self::dol_substr($newstring, $size, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $stringencoding), $size, $trunc);
+            } else {
+                return $string;
+            }
+        } else {
+            return 'BadParam3CallingDolTrunc';
+        }
+    }
+
+    /**
+     *    Return if a text is a html content
+     *
+     * @param string $msg    Content to check
+     * @param int    $option 0=Full detection, 1=Fast check
+     *
+     * @return    boolean                true/false
+     * @see    dol_concatdesc()
+     */
+    static public function dol_textishtml($msg, $option = 0)
+    {
+        if ($option == 1) {
+            if (preg_match('/<html/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<body/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<\/textarea/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<(b|em|i|u)>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<br/i', $msg)) {
+                return true;
+            }
+            return false;
+        } else {
+            if (preg_match('/<html/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<body/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<\/textarea/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<(b|em|i|u)>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<br\/>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<(br|div|font|li|p|span|strong|table)>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<(br|div|font|li|p|span|strong|table)\s+[^<>\/]*\/?>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/<img\s+[^<>]*src[^<>]*>/i', $msg)) {
+                return true; // must accept <img src="http://example.com/aaa.png" />
+            } elseif (preg_match('/<a\s+[^<>]*href[^<>]*>/i', $msg)) {
+                return true; // must accept <a href="http://example.com/aaa.png" />
+            } elseif (preg_match('/<h[0-9]>/i', $msg)) {
+                return true;
+            } elseif (preg_match('/&[A-Z0-9]{1,6};/i', $msg)) {
+                return true; // Html entities names (http://www.w3schools.com/tags/ref_entities.asp)
+            } elseif (preg_match('/&#[0-9]{2,3};/i', $msg)) {
+                return true; // Html entities numbers (http://www.w3schools.com/tags/ref_entities.asp)
+            }
+
+            return false;
+        }
+    }
+
+    /**
      *  Show tab footer of a card
      *
      * @param int $notab -1 or 0=Add tab footer, 1=no tab footer
@@ -3015,190 +3346,6 @@ abstract class DolibarrFunctions
         } else {
             return 'Error date into a not supported range';
         }
-    }
-
-    /**
-     *  Return an array with locale date info.
-     *  WARNING: This function use PHP server timezone by default to return locale informations.
-     *  Be aware to add the third parameter to "UTC" if you need to work on UTC.
-     *
-     * @param int     $timestamp     Timestamp
-     * @param boolean $fast          Fast mode. deprecated.
-     * @param string  $forcetimezone '' to use the PHP server timezone. Or use a form like 'gmt', 'Europe/Paris' or '+0200' to force timezone.
-     *
-     * @return    array                        Array of informations
-     *                                        'seconds' => $secs,
-     *                                        'minutes' => $min,
-     *                                        'hours' => $hour,
-     *                                        'mday' => $day,
-     *                                        'wday' => $dow,        0=sunday, 6=saturday
-     *                                        'mon' => $month,
-     *                                        'year' => $year,
-     *                                        'yday' => floor($secsInYear/$_day_power)
-     *                                        '0' => original timestamp
-     * @see                                dol_print_date(), self::dol_stringtotime(), self::dol_mktime()
-     */
-    static public function dol_getdate($timestamp, $fast = false, $forcetimezone = '')
-    {
-        //$datetimeobj = new DateTime('@'.$timestamp);
-        $datetimeobj = new DateTime();
-        $datetimeobj->setTimestamp($timestamp); // Use local PHP server timezone
-        if ($forcetimezone) {
-            $datetimeobj->setTimezone(new DateTimeZone($forcetimezone == 'gmt' ? 'UTC' : $forcetimezone)); //  (add timezone relative to the date entered)
-        }
-        $arrayinfo = [
-            'year' => ((int) date_format($datetimeobj, 'Y')),
-            'mon' => ((int) date_format($datetimeobj, 'm')),
-            'mday' => ((int) date_format($datetimeobj, 'd')),
-            'wday' => ((int) date_format($datetimeobj, 'w')),
-            'yday' => ((int) date_format($datetimeobj, 'z')),
-            'hours' => ((int) date_format($datetimeobj, 'H')),
-            'minutes' => ((int) date_format($datetimeobj, 'i')),
-            'seconds' => ((int) date_format($datetimeobj, 's')),
-            '0' => $timestamp,
-        ];
-
-        return $arrayinfo;
-    }
-
-    /**
-     *    Return a timestamp date built from detailed informations (by default a local PHP server timestamp)
-     *    Replace function mktime not available under Windows if year < 1970
-     *    PHP mktime is restricted to the years 1901-2038 on Unix and 1970-2038 on Windows
-     *
-     * @param int   $hour                     Hour    (can be -1 for undefined)
-     * @param int   $minute                   Minute    (can be -1 for undefined)
-     * @param int   $second                   Second    (can be -1 for undefined)
-     * @param int   $month                    Month (1 to 12)
-     * @param int   $day                      Day (1 to 31)
-     * @param int   $year                     Year
-     * @param mixed $gm                       True or 1 or 'gmt'=Input informations are GMT values
-     *                                        False or 0 or 'tzserver' = local to server TZ
-     *                                        'auto'
-     *                                        'tzuser' = local to user TZ taking dst into account at the current date. Not yet implemented.
-     *                                        'tzuserrel' = local to user TZ taking dst into account at the given date. Use this one to convert date input from user into a GMT date.
-     *                                        'tz,TimeZone' = use specified timezone
-     * @param int   $check                    0=No check on parameters (Can use day 32, etc...)
-     *
-     * @return    int|string                    Date as a timestamp, '' or false if error
-     * @see                                dol_print_date(), self::dol_stringtotime(), DolibarrFunctions::dol_getdate()
-     */
-    static public function dol_mktime($hour, $minute, $second, $month, $day, $year, $gm = 'auto', $check = 1)
-    {
-        global $conf;
-        //print "- ".$hour.",".$minute.",".$second.",".$month.",".$day.",".$year.",".$_SERVER["WINDIR"]." -";
-        //print 'gm:'.$gm.' gm==auto:'.($gm == 'auto').'<br>';
-
-        if ($gm === 'auto') {
-            $gm = (empty($conf) ? 'tzserver' : $conf->tzuserinputkey);
-        }
-
-        // Clean parameters
-        if ($hour == -1 || empty($hour)) {
-            $hour = 0;
-        }
-        if ($minute == -1 || empty($minute)) {
-            $minute = 0;
-        }
-        if ($second == -1 || empty($second)) {
-            $second = 0;
-        }
-
-        // Check parameters
-        if ($check) {
-            if (!$month || !$day) {
-                return '';
-            }
-            if ($day > 31) {
-                return '';
-            }
-            if ($month > 12) {
-                return '';
-            }
-            if ($hour < 0 || $hour > 24) {
-                return '';
-            }
-            if ($minute < 0 || $minute > 60) {
-                return '';
-            }
-            if ($second < 0 || $second > 60) {
-                return '';
-            }
-        }
-
-        if (empty($gm) || ($gm === 'server' || $gm === 'tzserver')) {
-            $default_timezone = @date_default_timezone_get(); // Example 'Europe/Berlin'
-            $localtz = new DateTimeZone($default_timezone);
-        } elseif ($gm === 'user' || $gm === 'tzuser' || $gm === 'tzuserrel') {
-            // We use dol_tz_string first because it is more reliable.
-            $default_timezone = (empty($_SESSION["dol_tz_string"]) ? @date_default_timezone_get() : $_SESSION["dol_tz_string"]); // Example 'Europe/Berlin'
-            try {
-                $localtz = new DateTimeZone($default_timezone);
-            } catch (Exception $e) {
-                DolibarrFunctions::dol_syslog("Warning dol_tz_string contains an invalid value " . $_SESSION["dol_tz_string"], LOG_WARNING);
-                $default_timezone = @date_default_timezone_get();
-            }
-        } elseif (strrpos($gm, "tz,") !== false) {
-            $timezone = str_replace("tz,", "", $gm); // Example 'tz,Europe/Berlin'
-            try {
-                $localtz = new DateTimeZone($timezone);
-            } catch (Exception $e) {
-                DolibarrFunctions::dol_syslog("Warning passed timezone contains an invalid value " . $timezone, LOG_WARNING);
-            }
-        }
-
-        if (empty($localtz)) {
-            $localtz = new DateTimeZone('UTC');
-        }
-        //var_dump($localtz);
-        //var_dump($year.'-'.$month.'-'.$day.'-'.$hour.'-'.$minute);
-        $dt = new DateTime(null, $localtz);
-        $dt->setDate((int) $year, (int) $month, (int) $day);
-        $dt->setTime((int) $hour, (int) $minute, (int) $second);
-        $date = $dt->getTimestamp(); // should include daylight saving time
-        //var_dump($date);
-        return $date;
-    }
-
-    /**
-     *  Return date for now. In most cases, we use this function without parameters (that means GMT time).
-     *
-     * @param string $mode            'auto' => for backward compatibility (avoid this),
-     *                                'gmt' => we return GMT timestamp,
-     *                                'tzserver' => we add the PHP server timezone
-     *                                'tzref' => we add the company timezone. Not implemented.
-     *                                'tzuser' or 'tzuserrel' => we add the user timezone
-     *
-     * @return int   $date    Timestamp
-     */
-    static public function dol_now($mode = 'auto')
-    {
-        $ret = 0;
-
-        if ($mode === 'auto') {
-            $mode = 'gmt';
-        }
-
-        if ($mode == 'gmt') {
-            $ret = time(); // Time for now at greenwich.
-        } elseif ($mode == 'tzserver') {        // Time for now with PHP server timezone added
-            require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
-            $tzsecond = getServerTimeZoneInt('now'); // Contains tz+dayling saving time
-            $ret = (int) (self::dol_now('gmt') + ($tzsecond * 3600));
-            //} elseif ($mode == 'tzref') {// Time for now with parent company timezone is added
-            //	require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
-            //	$tzsecond=getParentCompanyTimeZoneInt();    // Contains tz+dayling saving time
-            //	$ret=self::dol_now('gmt')+($tzsecond*3600);
-            //}
-        } elseif ($mode == 'tzuser' || $mode == 'tzuserrel') {
-            // Time for now with user timezone added
-            //print 'time: '.time();
-            $offsettz = (empty($_SESSION['dol_tz']) ? 0 : $_SESSION['dol_tz']) * 60 * 60;
-            $offsetdst = (empty($_SESSION['dol_dst']) ? 0 : $_SESSION['dol_dst']) * 60 * 60;
-            $ret = (int) (self::dol_now('gmt') + ($offsettz + $offsetdst));
-        }
-
-        return $ret;
     }
 
     /**
@@ -3987,166 +4134,6 @@ abstract class DolibarrFunctions
     static public function isValidPhone($phone)
     {
         return true;
-    }
-
-    /**
-     * Make a substring. Works even if mbstring module is not enabled for better compatibility.
-     *
-     * @param string $string         String to scan
-     * @param string $start          Start position
-     * @param int    $length         Length (in nb of characters or nb of bytes depending on trunconbytes param)
-     * @param string $stringencoding Page code used for input string encoding
-     * @param int    $trunconbytes   1=Length is max of bytes instead of max of characters
-     *
-     * @return  string                        substring
-     */
-    static public function dol_substr($string, $start, $length, $stringencoding = '', $trunconbytes = 0)
-    {
-        global $langs;
-
-        if (empty($stringencoding)) {
-            $stringencoding = $langs->charset_output;
-        }
-
-        $ret = '';
-        if (empty($trunconbytes)) {
-            if (function_exists('mb_substr')) {
-                $ret = mb_substr($string, $start, $length, $stringencoding);
-            } else {
-                $ret = substr($string, $start, $length);
-            }
-        } else {
-            if (function_exists('mb_strcut')) {
-                $ret = mb_strcut($string, $start, $length, $stringencoding);
-            } else {
-                $ret = substr($string, $start, $length);
-            }
-        }
-        return $ret;
-    }
-
-    /**
-     *    Truncate a string to a particular length adding '…' if string larger than length.
-     *    If length = max length+1, we do no truncate to avoid having just 1 char replaced with '…'.
-     *  MAIN_DISABLE_TRUNC=1 can disable all truncings
-     *
-     * @param string $string         String to truncate
-     * @param int    $size           Max string size visible (excluding …). 0 for no limit. WARNING: Final string size can have 3 more chars (if we added …, or if size was max+1 so it does not worse to replace with ...)
-     * @param string $trunc          Where to trunc: 'right', 'left', 'middle' (size must be a 2 power), 'wrap'
-     * @param string $stringencoding Tell what is source string encoding
-     * @param int    $nodot          Truncation do not add … after truncation. So it's an exact truncation.
-     * @param int    $display        Trunc is used to display data and can be changed for small screen. TODO Remove this param (must be dealt with CSS)
-     *
-     * @return string                        Truncated string. WARNING: length is never higher than $size if $nodot is set, but can be 3 chars higher otherwise.
-     */
-    static public function dol_trunc($string, $size = 40, $trunc = 'right', $stringencoding = 'UTF-8', $nodot = 0, $display = 0)
-    {
-        global $conf;
-
-        if (empty($size) || !empty($conf->global->MAIN_DISABLE_TRUNC)) {
-            return $string;
-        }
-
-        if (empty($stringencoding)) {
-            $stringencoding = 'UTF-8';
-        }
-        // reduce for small screen
-        if ($conf->dol_optimize_smallscreen == 1 && $display == 1) {
-            $size = round($size / 3);
-        }
-
-        // We go always here
-        if ($trunc == 'right') {
-            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
-            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
-                // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
-                return self::dol_substr($newstring, 0, $size, $stringencoding) . ($nodot ? '' : '…');
-            } else {
-                //return 'u'.$size.'-'.$newstring.'-'.DolibarrFunctions::dol_strlen($newstring,$stringencoding).'-'.$string;
-                return $string;
-            }
-        } elseif ($trunc == 'middle') {
-            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
-            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > 2 && DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
-                $size1 = round($size / 2);
-                $size2 = round($size / 2);
-                return self::dol_substr($newstring, 0, $size1, $stringencoding) . '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size2, $size2, $stringencoding);
-            } else {
-                return $string;
-            }
-        } elseif ($trunc == 'left') {
-            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
-            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + ($nodot ? 0 : 1))) {
-                // If nodot is 0 and size is 1 chars more, we don't trunc and don't add …
-                return '…' . self::dol_substr($newstring, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $size, $stringencoding);
-            } else {
-                return $string;
-            }
-        } elseif ($trunc == 'wrap') {
-            $newstring = self::dol_textishtml($string) ? self::dol_string_nohtmltag($string, 1) : $string;
-            if (DolibarrFunctions::dol_strlen($newstring, $stringencoding) > ($size + 1)) {
-                return self::dol_substr($newstring, 0, $size, $stringencoding) . "\n" . self::dol_trunc(self::dol_substr($newstring, $size, DolibarrFunctions::dol_strlen($newstring, $stringencoding) - $size, $stringencoding), $size, $trunc);
-            } else {
-                return $string;
-            }
-        } else {
-            return 'BadParam3CallingDolTrunc';
-        }
-    }
-
-    /**
-     *    Return if a text is a html content
-     *
-     * @param string $msg    Content to check
-     * @param int    $option 0=Full detection, 1=Fast check
-     *
-     * @return    boolean                true/false
-     * @see    dol_concatdesc()
-     */
-    static public function dol_textishtml($msg, $option = 0)
-    {
-        if ($option == 1) {
-            if (preg_match('/<html/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<body/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<\/textarea/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<(b|em|i|u)>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<br/i', $msg)) {
-                return true;
-            }
-            return false;
-        } else {
-            if (preg_match('/<html/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<body/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<\/textarea/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<(b|em|i|u)>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<br\/>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<(br|div|font|li|p|span|strong|table)>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<(br|div|font|li|p|span|strong|table)\s+[^<>\/]*\/?>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/<img\s+[^<>]*src[^<>]*>/i', $msg)) {
-                return true; // must accept <img src="http://example.com/aaa.png" />
-            } elseif (preg_match('/<a\s+[^<>]*href[^<>]*>/i', $msg)) {
-                return true; // must accept <a href="http://example.com/aaa.png" />
-            } elseif (preg_match('/<h[0-9]>/i', $msg)) {
-                return true;
-            } elseif (preg_match('/&[A-Z0-9]{1,6};/i', $msg)) {
-                return true; // Html entities names (http://www.w3schools.com/tags/ref_entities.asp)
-            } elseif (preg_match('/&#[0-9]{2,3};/i', $msg)) {
-                return true; // Html entities numbers (http://www.w3schools.com/tags/ref_entities.asp)
-            }
-
-            return false;
-        }
     }
 
     /**
@@ -7558,6 +7545,18 @@ abstract class DolibarrFunctions
     }
 
     /**
+     *    Return if string has a name dedicated to store a secret
+     *
+     * @param string $keyname Name of key to test
+     *
+     * @return    boolean                True if key is used to store a secret
+     */
+    static public function isASecretKey($keyname)
+    {
+        return preg_match('/(_pass|password|_pw|_key|securekey|serverkey|secret\d?|p12key|exportkey|_PW_[a-z]+|token)$/i', $keyname);
+    }
+
+    /**
      *  Complete the $substitutionarray with more entries coming from external module that had set the "substitutions=1" into module_part array.
      *  In this case, method completesubstitutionarray provided by module is called.
      *
@@ -7784,14 +7783,14 @@ abstract class DolibarrFunctions
      * @param int $disabledoutputofmessages Clear all messages stored into session without diplaying them
      *
      * @return    void
-     * @see                                        dol_htmloutput_mesg()
+     * @see                                        self::dol_htmloutput_mesg()
      */
     static public function dol_htmloutput_events($disabledoutputofmessages = 0)
     {
         // Show mesgs
         if (isset($_SESSION['dol_events']['mesgs'])) {
             if (empty($disabledoutputofmessages)) {
-                dol_htmloutput_mesg('', $_SESSION['dol_events']['mesgs']);
+                self::dol_htmloutput_mesg('', $_SESSION['dol_events']['mesgs']);
             }
             unset($_SESSION['dol_events']['mesgs']);
         }
@@ -7799,7 +7798,7 @@ abstract class DolibarrFunctions
         // Show errors
         if (isset($_SESSION['dol_events']['errors'])) {
             if (empty($disabledoutputofmessages)) {
-                dol_htmloutput_mesg('', $_SESSION['dol_events']['errors'], 'error');
+                self::dol_htmloutput_mesg('', $_SESSION['dol_events']['errors'], 'error');
             }
             unset($_SESSION['dol_events']['errors']);
         }
@@ -7807,9 +7806,80 @@ abstract class DolibarrFunctions
         // Show warnings
         if (isset($_SESSION['dol_events']['warnings'])) {
             if (empty($disabledoutputofmessages)) {
-                dol_htmloutput_mesg('', $_SESSION['dol_events']['warnings'], 'warning');
+                self::dol_htmloutput_mesg('', $_SESSION['dol_events']['warnings'], 'warning');
             }
             unset($_SESSION['dol_events']['warnings']);
+        }
+    }
+
+    /**
+     *    Print formated messages to output (Used to show messages on html output).
+     *
+     * @param string   $mesgstring   Message string or message key
+     * @param string[] $mesgarray    Array of message strings or message keys
+     * @param string   $style        Which style to use ('ok', 'warning', 'error')
+     * @param int      $keepembedded Set to 1 if message must be kept embedded into its html place (this disable jnotify)
+     *
+     * @return    void
+     *
+     * @see    dol_print_error()
+     * @see    dol_htmloutput_errors()
+     * @see    setEventMessages()
+     */
+    static public function dol_htmloutput_mesg($mesgstring = '', $mesgarray = [], $style = 'ok', $keepembedded = 0)
+    {
+        if (empty($mesgstring) && (!is_array($mesgarray) || count($mesgarray) == 0)) {
+            return;
+        }
+
+        $iserror = 0;
+        $iswarning = 0;
+        if (is_array($mesgarray)) {
+            foreach ($mesgarray as $val) {
+                if ($val && preg_match('/class="error"/i', $val)) {
+                    $iserror++;
+                    break;
+                }
+                if ($val && preg_match('/class="warning"/i', $val)) {
+                    $iswarning++;
+                    break;
+                }
+            }
+        } elseif ($mesgstring && preg_match('/class="error"/i', $mesgstring)) {
+            $iserror++;
+        } elseif ($mesgstring && preg_match('/class="warning"/i', $mesgstring)) {
+            $iswarning++;
+        }
+        if ($style == 'error') {
+            $iserror++;
+        }
+        if ($style == 'warning') {
+            $iswarning++;
+        }
+
+        if ($iserror || $iswarning) {
+            // Remove div from texts
+            $mesgstring = preg_replace('/<\/div><div class="(error|warning)">/', '<br>', $mesgstring);
+            $mesgstring = preg_replace('/<div class="(error|warning)">/', '', $mesgstring);
+            $mesgstring = preg_replace('/<\/div>/', '', $mesgstring);
+            // Remove div from texts array
+            if (is_array($mesgarray)) {
+                $newmesgarray = [];
+                foreach ($mesgarray as $val) {
+                    if (is_string($val)) {
+                        $tmpmesgstring = preg_replace('/<\/div><div class="(error|warning)">/', '<br>', $val);
+                        $tmpmesgstring = preg_replace('/<div class="(error|warning)">/', '', $tmpmesgstring);
+                        $tmpmesgstring = preg_replace('/<\/div>/', '', $tmpmesgstring);
+                        $newmesgarray[] = $tmpmesgstring;
+                    } else {
+                        DolibarrFunctions::dol_syslog("Error call of self::dol_htmloutput_mesg with an array with a value that is not a string", LOG_WARNING);
+                    }
+                }
+                $mesgarray = $newmesgarray;
+            }
+            print self::get_htmloutput_mesg($mesgstring, $mesgarray, ($iserror ? 'error' : 'warning'), $keepembedded);
+        } else {
+            print self::get_htmloutput_mesg($mesgstring, $mesgarray, 'ok', $keepembedded);
         }
     }
 
@@ -7830,7 +7900,9 @@ abstract class DolibarrFunctions
      */
     static public function get_htmloutput_mesg($mesgstring = '', $mesgarray = '', $style = 'ok', $keepembedded = 0)
     {
-        global $conf, $langs;
+        //        global $conf, $langs;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         $ret = 0;
         $return = '';
@@ -7897,82 +7969,11 @@ abstract class DolibarrFunctions
      * @return string                        Return html output
      *
      * @see    dol_print_error()
-     * @see    dol_htmloutput_mesg()
+     * @see    self::dol_htmloutput_mesg()
      */
     static public function get_htmloutput_errors($mesgstring = '', $mesgarray = [], $keepembedded = 0)
     {
-        return get_htmloutput_mesg($mesgstring, $mesgarray, 'error', $keepembedded);
-    }
-
-    /**
-     *    Print formated messages to output (Used to show messages on html output).
-     *
-     * @param string   $mesgstring   Message string or message key
-     * @param string[] $mesgarray    Array of message strings or message keys
-     * @param string   $style        Which style to use ('ok', 'warning', 'error')
-     * @param int      $keepembedded Set to 1 if message must be kept embedded into its html place (this disable jnotify)
-     *
-     * @return    void
-     *
-     * @see    dol_print_error()
-     * @see    dol_htmloutput_errors()
-     * @see    setEventMessages()
-     */
-    static public function dol_htmloutput_mesg($mesgstring = '', $mesgarray = [], $style = 'ok', $keepembedded = 0)
-    {
-        if (empty($mesgstring) && (!is_array($mesgarray) || count($mesgarray) == 0)) {
-            return;
-        }
-
-        $iserror = 0;
-        $iswarning = 0;
-        if (is_array($mesgarray)) {
-            foreach ($mesgarray as $val) {
-                if ($val && preg_match('/class="error"/i', $val)) {
-                    $iserror++;
-                    break;
-                }
-                if ($val && preg_match('/class="warning"/i', $val)) {
-                    $iswarning++;
-                    break;
-                }
-            }
-        } elseif ($mesgstring && preg_match('/class="error"/i', $mesgstring)) {
-            $iserror++;
-        } elseif ($mesgstring && preg_match('/class="warning"/i', $mesgstring)) {
-            $iswarning++;
-        }
-        if ($style == 'error') {
-            $iserror++;
-        }
-        if ($style == 'warning') {
-            $iswarning++;
-        }
-
-        if ($iserror || $iswarning) {
-            // Remove div from texts
-            $mesgstring = preg_replace('/<\/div><div class="(error|warning)">/', '<br>', $mesgstring);
-            $mesgstring = preg_replace('/<div class="(error|warning)">/', '', $mesgstring);
-            $mesgstring = preg_replace('/<\/div>/', '', $mesgstring);
-            // Remove div from texts array
-            if (is_array($mesgarray)) {
-                $newmesgarray = [];
-                foreach ($mesgarray as $val) {
-                    if (is_string($val)) {
-                        $tmpmesgstring = preg_replace('/<\/div><div class="(error|warning)">/', '<br>', $val);
-                        $tmpmesgstring = preg_replace('/<div class="(error|warning)">/', '', $tmpmesgstring);
-                        $tmpmesgstring = preg_replace('/<\/div>/', '', $tmpmesgstring);
-                        $newmesgarray[] = $tmpmesgstring;
-                    } else {
-                        DolibarrFunctions::dol_syslog("Error call of dol_htmloutput_mesg with an array with a value that is not a string", LOG_WARNING);
-                    }
-                }
-                $mesgarray = $newmesgarray;
-            }
-            print get_htmloutput_mesg($mesgstring, $mesgarray, ($iserror ? 'error' : 'warning'), $keepembedded);
-        } else {
-            print get_htmloutput_mesg($mesgstring, $mesgarray, 'ok', $keepembedded);
-        }
+        return self::get_htmloutput_mesg($mesgstring, $mesgarray, 'error', $keepembedded);
     }
 
     /**
@@ -7985,11 +7986,11 @@ abstract class DolibarrFunctions
      * @return    void
      *
      * @see    dol_print_error()
-     * @see    dol_htmloutput_mesg()
+     * @see    self::dol_htmloutput_mesg()
      */
     static public function dol_htmloutput_errors($mesgstring = '', $mesgarray = [], $keepembedded = 0)
     {
-        dol_htmloutput_mesg($mesgstring, $mesgarray, 'error', $keepembedded);
+        self::dol_htmloutput_mesg($mesgstring, $mesgarray, 'error', $keepembedded);
     }
 
     /**
@@ -8494,6 +8495,402 @@ abstract class DolibarrFunctions
     }
 
     /**
+     *  Complete or removed entries into a head array (used to build tabs).
+     *  For example, with value added by external modules. Such values are declared into $conf->modules_parts['tab'].
+     *  Or by change using hook completeTabsHead
+     *
+     * @param Conf        $conf                   Object conf
+     * @param Translate   $langs                  Object langs
+     * @param object|null $object                 Object object
+     * @param array       $head                   Object head
+     * @param int         $h                      New position to fill
+     * @param string      $type                   Value for object where objectvalue can be
+     *                                            'thirdparty'       to add a tab in third party view
+     *                                            'intervention'     to add a tab in intervention view
+     *                                            'supplier_order'   to add a tab in supplier order view
+     *                                            'supplier_invoice' to add a tab in supplier invoice view
+     *                                            'invoice'          to add a tab in customer invoice view
+     *                                            'order'            to add a tab in customer order view
+     *                                            'contract'           to add a tabl in contract view
+     *                                            'product'          to add a tab in product view
+     *                                            'propal'           to add a tab in propal view
+     *                                            'user'             to add a tab in user view
+     *                                            'group'            to add a tab in group view
+     *                                            'member'           to add a tab in fundation member view
+     *                                            'categories_x'       to add a tab in category view ('x': type of category (0=product, 1=supplier, 2=customer, 3=member)
+     *                                            'ecm'               to add a tab for another ecm view
+     *                                            'stock'            to add a tab for warehouse view
+     * @param string      $mode                   'add' to complete head, 'remove' to remove entries
+     *
+     * @return    void
+     */
+    static function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, $mode = 'add')
+    {
+        // global $hookmanager;
+
+        if (isset($conf->modules_parts['tabs'][$type]) && is_array($conf->modules_parts['tabs'][$type])) {
+            foreach ($conf->modules_parts['tabs'][$type] as $value) {
+                $values = explode(':', $value);
+
+                if ($mode == 'add' && !preg_match('/^\-/', $values[1])) {
+                    if (count($values) == 6) {       // new declaration with permissions:  $value='objecttype:+tabname1:Title1:langfile@mymodule:$user->rights->mymodule->read:/mymodule/mynewtab1.php?id=__ID__'
+                        if ($values[0] != $type) {
+                            continue;
+                        }
+
+                        if (verifCond($values[4])) {
+                            if ($values[3]) {
+                                $langs->load($values[3]);
+                            }
+                            if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
+                                $substitutionarray = [];
+                                complete_substitutions_array($substitutionarray, $langs, $object, ['needforkey' => $values[2]]);
+                                $label = make_substitutions($reg[1], $substitutionarray);
+                            } else {
+                                $label = $langs->trans($values[2]);
+                            }
+
+                            $head[$h][0] = dol_buildpath(preg_replace('/__ID__/i', ((is_object($object) && !empty($object->id)) ? $object->id : ''), $values[5]), 1);
+                            $head[$h][1] = $label;
+                            $head[$h][2] = str_replace('+', '', $values[1]);
+                            $h++;
+                        }
+                    } elseif (count($values) == 5) {       // deprecated
+                        DolibarrFunctions::dol_syslog('Passing 5 values in tabs module_parts is deprecated. Please update to 6 with permissions.', LOG_WARNING);
+
+                        if ($values[0] != $type) {
+                            continue;
+                        }
+                        if ($values[3]) {
+                            $langs->load($values[3]);
+                        }
+                        if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
+                            $substitutionarray = [];
+                            complete_substitutions_array($substitutionarray, $langs, $object, ['needforkey' => $values[2]]);
+                            $label = make_substitutions($reg[1], $substitutionarray);
+                        } else {
+                            $label = $langs->trans($values[2]);
+                        }
+
+                        $head[$h][0] = dol_buildpath(preg_replace('/__ID__/i', ((is_object($object) && !empty($object->id)) ? $object->id : ''), $values[4]), 1);
+                        $head[$h][1] = $label;
+                        $head[$h][2] = str_replace('+', '', $values[1]);
+                        $h++;
+                    }
+                } elseif ($mode == 'remove' && preg_match('/^\-/', $values[1])) {
+                    if ($values[0] != $type) {
+                        continue;
+                    }
+                    $tabname = str_replace('-', '', $values[1]);
+                    foreach ($head as $key => $val) {
+                        $condition = (!empty($values[3]) ? verifCond($values[3]) : 1);
+                        //var_dump($key.' - '.$tabname.' - '.$head[$key][2].' - '.$values[3].' - '.$condition);
+                        if ($head[$key][2] == $tabname && $condition) {
+                            unset($head[$key]);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // No need to make a return $head. Var is modified as a reference
+        if (!empty($hookmanager)) {
+            $parameters = ['object' => $object, 'mode' => $mode, 'head' => &$head];
+            $reshook = $hookmanager->executeHooks('completeTabsHead', $parameters);
+            if ($reshook > 0) {        // Hook ask to replace completely the array
+                $head = $hookmanager->resArray;
+            } else {                // Hook
+                $head = array_merge($head, $hookmanager->resArray);
+            }
+            $h = count($head);
+        }
+    }
+
+    /**
+     * Print common footer :
+     *        conf->global->MAIN_HTML_FOOTER
+     *      js for switch of menu hider
+     *        js for conf->global->MAIN_GOOGLE_AN_ID
+     *        js for conf->global->MAIN_SHOW_TUNING_INFO or $_SERVER["MAIN_SHOW_TUNING_INFO"]
+     *        js for conf->logbuffer
+     *
+     * @param string $zone 'private' (for private pages) or 'public' (for public pages)
+     *
+     * @return    void
+     */
+    static function printCommonFooter($zone = 'private')
+    {
+        //        global $conf, $hookmanager, $user, $debugbar;
+        //        global $action;
+        //        global $micro_start_time;
+        $conf = DolibarrGlobals::getConf();
+        $hookmanager = DolibarrGlobals::getHookManager();
+        $langs = DolibarrGlobals::getLangs();
+
+        if ($zone == 'private') {
+            print "\n" . '<!-- Common footer for private page -->' . "\n";
+        } else {
+            print "\n" . '<!-- Common footer for public page -->' . "\n";
+        }
+
+        // A div to store page_y POST parameter so we can read it using javascript
+        print "\n<!-- A div to store page_y POST parameter -->\n";
+        print '<div id="page_y" style="display: none;">' . (empty($_POST['page_y']) ? '' : $_POST['page_y']) . '</div>' . "\n";
+
+        $parameters = [];
+        $reshook = $hookmanager->executeHooks('printCommonFooter', $parameters); // Note that $action and $object may have been modified by some hooks
+        if (empty($reshook)) {
+            if (!empty($conf->global->MAIN_HTML_FOOTER)) {
+                print $conf->global->MAIN_HTML_FOOTER . "\n";
+            }
+
+            print "\n";
+            if (!empty($conf->use_javascript_ajax)) {
+                print '<script>' . "\n";
+                print 'jQuery(document).ready(function() {' . "\n";
+
+                if ($zone == 'private' && empty($conf->dol_use_jmobile)) {
+                    print "\n";
+                    print '/* JS CODE TO ENABLE to manage handler to switch left menu page (menuhider) */' . "\n";
+                    print 'jQuery("li.menuhider").click(function(event) {';
+                    print '  if (!$( "body" ).hasClass( "sidebar-collapse" )){ event.preventDefault(); }' . "\n";
+                    print '  console.log("We click on .menuhider");' . "\n";
+                    print '  $("body").toggleClass("sidebar-collapse")' . "\n";
+                    print '});' . "\n";
+                }
+
+                // Management of focus and mandatory for fields
+                if ($action == 'create' || $action == 'edit' || (empty($action) && (preg_match('/new\.php/', $_SERVER["PHP_SELF"])))) {
+                    print '/* JS CODE TO ENABLE to manage focus and mandatory form fields */' . "\n";
+                    $relativepathstring = $_SERVER["PHP_SELF"];
+                    // Clean $relativepathstring
+                    if (constant('DOL_URL_ROOT')) {
+                        $relativepathstring = preg_replace('/^' . preg_quote(constant('DOL_URL_ROOT'), '/') . '/', '', $relativepathstring);
+                    }
+                    $relativepathstring = preg_replace('/^\//', '', $relativepathstring);
+                    $relativepathstring = preg_replace('/^custom\//', '', $relativepathstring);
+                    //$tmpqueryarraywehave = explode('&', self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
+                    if (!empty($user->default_values[$relativepathstring]['focus'])) {
+                        foreach ($user->default_values[$relativepathstring]['focus'] as $defkey => $defval) {
+                            $qualified = 0;
+                            if ($defkey != '_noquery_') {
+                                $tmpqueryarraytohave = explode('&', $defkey);
+                                $foundintru = 0;
+                                foreach ($tmpqueryarraytohave as $tmpquerytohave) {
+                                    $tmpquerytohaveparam = explode('=', $tmpquerytohave);
+                                    //print "console.log('".$tmpquerytohaveparam[0]." ".$tmpquerytohaveparam[1]." ".GETPOST($tmpquerytohaveparam[0])."');";
+                                    if (!GETPOSTISSET($tmpquerytohaveparam[0]) || ($tmpquerytohaveparam[1] != GETPOST($tmpquerytohaveparam[0]))) {
+                                        $foundintru = 1;
+                                    }
+                                }
+                                if (!$foundintru) {
+                                    $qualified = 1;
+                                }
+                                //var_dump($defkey.'-'.$qualified);
+                            } else {
+                                $qualified = 1;
+                            }
+
+                            if ($qualified) {
+                                foreach ($defval as $paramkey => $paramval) {
+                                    // Set focus on field
+                                    print 'jQuery("input[name=\'' . $paramkey . '\']").focus();' . "\n";
+                                    print 'jQuery("textarea[name=\'' . $paramkey . '\']").focus();' . "\n";
+                                    print 'jQuery("select[name=\'' . $paramkey . '\']").focus();' . "\n"; // Not really usefull, but we keep it in case of.
+                                }
+                            }
+                        }
+                    }
+                    if (!empty($user->default_values[$relativepathstring]['mandatory'])) {
+                        foreach ($user->default_values[$relativepathstring]['mandatory'] as $defkey => $defval) {
+                            $qualified = 0;
+                            if ($defkey != '_noquery_') {
+                                $tmpqueryarraytohave = explode('&', $defkey);
+                                $foundintru = 0;
+                                foreach ($tmpqueryarraytohave as $tmpquerytohave) {
+                                    $tmpquerytohaveparam = explode('=', $tmpquerytohave);
+                                    //print "console.log('".$tmpquerytohaveparam[0]." ".$tmpquerytohaveparam[1]." ".GETPOST($tmpquerytohaveparam[0])."');";
+                                    if (!GETPOSTISSET($tmpquerytohaveparam[0]) || ($tmpquerytohaveparam[1] != GETPOST($tmpquerytohaveparam[0]))) {
+                                        $foundintru = 1;
+                                    }
+                                }
+                                if (!$foundintru) {
+                                    $qualified = 1;
+                                }
+                                //var_dump($defkey.'-'.$qualified);
+                            } else {
+                                $qualified = 1;
+                            }
+
+                            if ($qualified) {
+                                foreach ($defval as $paramkey => $paramval) {
+                                    // Add property 'required' on input
+                                    print 'jQuery("input[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
+                                    print 'jQuery("textarea[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
+                                    print '// required on a select works only if key is "", so we add the required attributes but also we reset the key -1 or 0 to an empty string' . "\n";
+                                    print 'jQuery("select[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
+                                    print 'jQuery("select[name=\'' . $paramkey . '\'] option[value=\'-1\']").prop(\'value\', \'\');' . "\n";
+                                    print 'jQuery("select[name=\'' . $paramkey . '\'] option[value=\'0\']").prop(\'value\', \'\');' . "\n";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                print '});' . "\n";
+
+                // End of tuning
+                if (!empty($_SERVER['MAIN_SHOW_TUNING_INFO']) || !empty($conf->global->MAIN_SHOW_TUNING_INFO)) {
+                    print "\n";
+                    print "/* JS CODE TO ENABLE to add memory info */\n";
+                    print 'window.console && console.log("';
+                    if (!empty($conf->global->MEMCACHED_SERVER)) {
+                        print 'MEMCACHED_SERVER=' . $conf->global->MEMCACHED_SERVER . ' - ';
+                    }
+                    print 'MAIN_OPTIMIZE_SPEED=' . (isset($conf->global->MAIN_OPTIMIZE_SPEED) ? $conf->global->MAIN_OPTIMIZE_SPEED : 'off');
+                    if (!empty($micro_start_time)) {   // Works only if MAIN_SHOW_TUNING_INFO is defined at $_SERVER level. Not in global variable.
+                        $micro_end_time = microtime(true);
+                        print ' - Build time: ' . ceil(1000 * ($micro_end_time - $micro_start_time)) . ' ms';
+                    }
+
+                    if (function_exists("memory_get_usage")) {
+                        print ' - Mem: ' . memory_get_usage(); // Do not use true here, it seems it takes the peak amount
+                    }
+                    if (function_exists("memory_get_peak_usage")) {
+                        print ' - Real mem peak: ' . memory_get_peak_usage(true);
+                    }
+                    if (function_exists("zend_loader_file_encoded")) {
+                        print ' - Zend encoded file: ' . (zend_loader_file_encoded() ? 'yes' : 'no');
+                    }
+                    print '");' . "\n";
+                }
+
+                print "\n" . '</script>' . "\n";
+
+                // Google Analytics
+                // TODO Add a hook here
+                if (!empty($conf->google->enabled) && !empty($conf->global->MAIN_GOOGLE_AN_ID)) {
+                    $tmptagarray = explode(',', $conf->global->MAIN_GOOGLE_AN_ID);
+                    foreach ($tmptagarray as $tmptag) {
+                        print "\n";
+                        print "<!-- JS CODE TO ENABLE for google analtics tag -->\n";
+                        print "
+					<!-- Global site tag (gtag.js) - Google Analytics -->
+					<script async src=\"https://www.googletagmanager.com/gtag/js?id=" . trim($tmptag) . "\"></script>
+					<script>
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					gtag('js', new Date());
+
+					gtag('config', '" . trim($tmptag) . "');
+					</script>";
+                        print "\n";
+                    }
+                }
+            }
+
+            // Add Xdebug coverage of code
+            if (defined('XDEBUGCOVERAGE')) {
+                print_r(xdebug_get_code_coverage());
+            }
+
+            // Add DebugBar data
+            if (!empty($user->rights->debugbar->read) && is_object($debugbar)) {
+                $debugbar->debugBar['time']->stopMeasure('pageaftermaster');
+                print '<!-- Output debugbar data -->' . "\n";
+                print $debugbar->getRenderer();
+            } elseif (count($conf->logbuffer)) {    // If there is some logs in buffer to show
+                print "\n";
+                print "<!-- Start of log output\n";
+                //print '<div class="hidden">'."\n";
+                foreach ($conf->logbuffer as $logline) {
+                    print $logline . "<br>\n";
+                }
+                //print '</div>'."\n";
+                print "End of log output -->\n";
+            }
+        }
+    }
+
+    /**
+     *    Return true if the color is light
+     *
+     * @param string $stringcolor String with hex (FFFFFF) or comma RGB ('255,255,255')
+     *
+     * @return    int                            -1 : Error with argument passed |0 : color is dark | 1 : color is light
+     */
+    static function colorIsLight($stringcolor)
+    {
+        $stringcolor = str_replace('#', '', $stringcolor);
+        $res = -1;
+        if (!empty($stringcolor)) {
+            $res = 0;
+            $tmp = explode(',', $stringcolor);
+            if (count($tmp) > 1) {   // This is a comma RGB ('255','255','255')
+                $r = $tmp[0];
+                $g = $tmp[1];
+                $b = $tmp[2];
+            } else {
+                $hexr = $stringcolor[0] . $stringcolor[1];
+                $hexg = $stringcolor[2] . $stringcolor[3];
+                $hexb = $stringcolor[4] . $stringcolor[5];
+                $r = hexdec($hexr);
+                $g = hexdec($hexg);
+                $b = hexdec($hexb);
+            }
+            $bright = (max($r, $g, $b) + min($r, $g, $b)) / 510.0; // HSL algorithm
+            if ($bright > 0.6) {
+                $res = 1;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * Function to test if an entry is enabled or not
+     *
+     * @param string $type_user                0=We test for internal user, 1=We test for external user
+     * @param array  $menuentry                Array for feature entry to test
+     * @param array  $listofmodulesforexternal Array with list of modules allowed to external users
+     *
+     * @return    int                                        0=Hide, 1=Show, 2=Show gray
+     */
+    static function isVisibleToUserType($type_user, &$menuentry, &$listofmodulesforexternal)
+    {
+        global $conf;
+
+        //print 'type_user='.$type_user.' module='.$menuentry['module'].' enabled='.$menuentry['enabled'].' perms='.$menuentry['perms'];
+        //print 'ok='.in_array($menuentry['module'], $listofmodulesforexternal);
+        if (empty($menuentry['enabled'])) {
+            return 0; // Entry disabled by condition
+        }
+        if ($type_user && $menuentry['module']) {
+            $tmploops = explode('|', $menuentry['module']);
+            $found = 0;
+            foreach ($tmploops as $tmploop) {
+                if (in_array($tmploop, $listofmodulesforexternal)) {
+                    $found++;
+                    break;
+                }
+            }
+            if (!$found) {
+                return 0; // Entry is for menus all excluded to external users
+            }
+        }
+        if (!$menuentry['perms'] && $type_user) {
+            return 0; // No permissions and user is external
+        }
+        if (!$menuentry['perms'] && !empty($conf->global->MAIN_MENU_HIDE_UNAUTHORIZED)) {
+            return 0; // No permissions and option to hide when not allowed, even for internal user, is on
+        }
+        if (!$menuentry['perms']) {
+            return 2; // No permissions and user is external
+        }
+        return 1;
+    }
+
+    /**
      * Return if var element is ok
      *
      * @param string $element Variable to check
@@ -8735,325 +9132,6 @@ abstract class DolibarrFunctions
         }
 
         return null;
-    }
-
-    /**
-     *  Complete or removed entries into a head array (used to build tabs).
-     *  For example, with value added by external modules. Such values are declared into $conf->modules_parts['tab'].
-     *  Or by change using hook completeTabsHead
-     *
-     * @param Conf        $conf                   Object conf
-     * @param Translate   $langs                  Object langs
-     * @param object|null $object                 Object object
-     * @param array       $head                   Object head
-     * @param int         $h                      New position to fill
-     * @param string      $type                   Value for object where objectvalue can be
-     *                                            'thirdparty'       to add a tab in third party view
-     *                                            'intervention'     to add a tab in intervention view
-     *                                            'supplier_order'   to add a tab in supplier order view
-     *                                            'supplier_invoice' to add a tab in supplier invoice view
-     *                                            'invoice'          to add a tab in customer invoice view
-     *                                            'order'            to add a tab in customer order view
-     *                                            'contract'           to add a tabl in contract view
-     *                                            'product'          to add a tab in product view
-     *                                            'propal'           to add a tab in propal view
-     *                                            'user'             to add a tab in user view
-     *                                            'group'            to add a tab in group view
-     *                                            'member'           to add a tab in fundation member view
-     *                                            'categories_x'       to add a tab in category view ('x': type of category (0=product, 1=supplier, 2=customer, 3=member)
-     *                                            'ecm'               to add a tab for another ecm view
-     *                                            'stock'            to add a tab for warehouse view
-     * @param string      $mode                   'add' to complete head, 'remove' to remove entries
-     *
-     * @return    void
-     */
-    static function complete_head_from_modules($conf, $langs, $object, &$head, &$h, $type, $mode = 'add')
-    {
-        // global $hookmanager;
-
-        if (isset($conf->modules_parts['tabs'][$type]) && is_array($conf->modules_parts['tabs'][$type])) {
-            foreach ($conf->modules_parts['tabs'][$type] as $value) {
-                $values = explode(':', $value);
-
-                if ($mode == 'add' && !preg_match('/^\-/', $values[1])) {
-                    if (count($values) == 6) {       // new declaration with permissions:  $value='objecttype:+tabname1:Title1:langfile@mymodule:$user->rights->mymodule->read:/mymodule/mynewtab1.php?id=__ID__'
-                        if ($values[0] != $type) {
-                            continue;
-                        }
-
-                        if (verifCond($values[4])) {
-                            if ($values[3]) {
-                                $langs->load($values[3]);
-                            }
-                            if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
-                                $substitutionarray = [];
-                                complete_substitutions_array($substitutionarray, $langs, $object, ['needforkey' => $values[2]]);
-                                $label = make_substitutions($reg[1], $substitutionarray);
-                            } else {
-                                $label = $langs->trans($values[2]);
-                            }
-
-                            $head[$h][0] = dol_buildpath(preg_replace('/__ID__/i', ((is_object($object) && !empty($object->id)) ? $object->id : ''), $values[5]), 1);
-                            $head[$h][1] = $label;
-                            $head[$h][2] = str_replace('+', '', $values[1]);
-                            $h++;
-                        }
-                    } elseif (count($values) == 5) {       // deprecated
-                        DolibarrFunctions::dol_syslog('Passing 5 values in tabs module_parts is deprecated. Please update to 6 with permissions.', LOG_WARNING);
-
-                        if ($values[0] != $type) {
-                            continue;
-                        }
-                        if ($values[3]) {
-                            $langs->load($values[3]);
-                        }
-                        if (preg_match('/SUBSTITUTION_([^_]+)/i', $values[2], $reg)) {
-                            $substitutionarray = [];
-                            complete_substitutions_array($substitutionarray, $langs, $object, ['needforkey' => $values[2]]);
-                            $label = make_substitutions($reg[1], $substitutionarray);
-                        } else {
-                            $label = $langs->trans($values[2]);
-                        }
-
-                        $head[$h][0] = dol_buildpath(preg_replace('/__ID__/i', ((is_object($object) && !empty($object->id)) ? $object->id : ''), $values[4]), 1);
-                        $head[$h][1] = $label;
-                        $head[$h][2] = str_replace('+', '', $values[1]);
-                        $h++;
-                    }
-                } elseif ($mode == 'remove' && preg_match('/^\-/', $values[1])) {
-                    if ($values[0] != $type) {
-                        continue;
-                    }
-                    $tabname = str_replace('-', '', $values[1]);
-                    foreach ($head as $key => $val) {
-                        $condition = (!empty($values[3]) ? verifCond($values[3]) : 1);
-                        //var_dump($key.' - '.$tabname.' - '.$head[$key][2].' - '.$values[3].' - '.$condition);
-                        if ($head[$key][2] == $tabname && $condition) {
-                            unset($head[$key]);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // No need to make a return $head. Var is modified as a reference
-        if (!empty($hookmanager)) {
-            $parameters = ['object' => $object, 'mode' => $mode, 'head' => &$head];
-            $reshook = $hookmanager->executeHooks('completeTabsHead', $parameters);
-            if ($reshook > 0) {        // Hook ask to replace completely the array
-                $head = $hookmanager->resArray;
-            } else {                // Hook
-                $head = array_merge($head, $hookmanager->resArray);
-            }
-            $h = count($head);
-        }
-    }
-
-    /**
-     * Print common footer :
-     *        conf->global->MAIN_HTML_FOOTER
-     *      js for switch of menu hider
-     *        js for conf->global->MAIN_GOOGLE_AN_ID
-     *        js for conf->global->MAIN_SHOW_TUNING_INFO or $_SERVER["MAIN_SHOW_TUNING_INFO"]
-     *        js for conf->logbuffer
-     *
-     * @param string $zone 'private' (for private pages) or 'public' (for public pages)
-     *
-     * @return    void
-     */
-    static function printCommonFooter($zone = 'private')
-    {
-        //        global $conf, $hookmanager, $user, $debugbar;
-        //        global $action;
-        //        global $micro_start_time;
-        $hookmanager = new HookManager();
-        $conf = DolibarrConfig::getInstance()->getConf();
-        $langs = Translator::getInstance();
-
-        if ($zone == 'private') {
-            print "\n" . '<!-- Common footer for private page -->' . "\n";
-        } else {
-            print "\n" . '<!-- Common footer for public page -->' . "\n";
-        }
-
-        // A div to store page_y POST parameter so we can read it using javascript
-        print "\n<!-- A div to store page_y POST parameter -->\n";
-        print '<div id="page_y" style="display: none;">' . (empty($_POST['page_y']) ? '' : $_POST['page_y']) . '</div>' . "\n";
-
-        $parameters = [];
-        $reshook = $hookmanager->executeHooks('printCommonFooter', $parameters); // Note that $action and $object may have been modified by some hooks
-        if (empty($reshook)) {
-            if (!empty($conf->global->MAIN_HTML_FOOTER)) {
-                print $conf->global->MAIN_HTML_FOOTER . "\n";
-            }
-
-            print "\n";
-            if (!empty($conf->use_javascript_ajax)) {
-                print '<script>' . "\n";
-                print 'jQuery(document).ready(function() {' . "\n";
-
-                if ($zone == 'private' && empty($conf->dol_use_jmobile)) {
-                    print "\n";
-                    print '/* JS CODE TO ENABLE to manage handler to switch left menu page (menuhider) */' . "\n";
-                    print 'jQuery("li.menuhider").click(function(event) {';
-                    print '  if (!$( "body" ).hasClass( "sidebar-collapse" )){ event.preventDefault(); }' . "\n";
-                    print '  console.log("We click on .menuhider");' . "\n";
-                    print '  $("body").toggleClass("sidebar-collapse")' . "\n";
-                    print '});' . "\n";
-                }
-
-                // Management of focus and mandatory for fields
-                if ($action == 'create' || $action == 'edit' || (empty($action) && (preg_match('/new\.php/', $_SERVER["PHP_SELF"])))) {
-                    print '/* JS CODE TO ENABLE to manage focus and mandatory form fields */' . "\n";
-                    $relativepathstring = $_SERVER["PHP_SELF"];
-                    // Clean $relativepathstring
-                    if (constant('DOL_URL_ROOT')) {
-                        $relativepathstring = preg_replace('/^' . preg_quote(constant('DOL_URL_ROOT'), '/') . '/', '', $relativepathstring);
-                    }
-                    $relativepathstring = preg_replace('/^\//', '', $relativepathstring);
-                    $relativepathstring = preg_replace('/^custom\//', '', $relativepathstring);
-                    //$tmpqueryarraywehave = explode('&', self::dol_string_nohtmltag($_SERVER['QUERY_STRING']));
-                    if (!empty($user->default_values[$relativepathstring]['focus'])) {
-                        foreach ($user->default_values[$relativepathstring]['focus'] as $defkey => $defval) {
-                            $qualified = 0;
-                            if ($defkey != '_noquery_') {
-                                $tmpqueryarraytohave = explode('&', $defkey);
-                                $foundintru = 0;
-                                foreach ($tmpqueryarraytohave as $tmpquerytohave) {
-                                    $tmpquerytohaveparam = explode('=', $tmpquerytohave);
-                                    //print "console.log('".$tmpquerytohaveparam[0]." ".$tmpquerytohaveparam[1]." ".GETPOST($tmpquerytohaveparam[0])."');";
-                                    if (!GETPOSTISSET($tmpquerytohaveparam[0]) || ($tmpquerytohaveparam[1] != GETPOST($tmpquerytohaveparam[0]))) {
-                                        $foundintru = 1;
-                                    }
-                                }
-                                if (!$foundintru) {
-                                    $qualified = 1;
-                                }
-                                //var_dump($defkey.'-'.$qualified);
-                            } else {
-                                $qualified = 1;
-                            }
-
-                            if ($qualified) {
-                                foreach ($defval as $paramkey => $paramval) {
-                                    // Set focus on field
-                                    print 'jQuery("input[name=\'' . $paramkey . '\']").focus();' . "\n";
-                                    print 'jQuery("textarea[name=\'' . $paramkey . '\']").focus();' . "\n";
-                                    print 'jQuery("select[name=\'' . $paramkey . '\']").focus();' . "\n"; // Not really usefull, but we keep it in case of.
-                                }
-                            }
-                        }
-                    }
-                    if (!empty($user->default_values[$relativepathstring]['mandatory'])) {
-                        foreach ($user->default_values[$relativepathstring]['mandatory'] as $defkey => $defval) {
-                            $qualified = 0;
-                            if ($defkey != '_noquery_') {
-                                $tmpqueryarraytohave = explode('&', $defkey);
-                                $foundintru = 0;
-                                foreach ($tmpqueryarraytohave as $tmpquerytohave) {
-                                    $tmpquerytohaveparam = explode('=', $tmpquerytohave);
-                                    //print "console.log('".$tmpquerytohaveparam[0]." ".$tmpquerytohaveparam[1]." ".GETPOST($tmpquerytohaveparam[0])."');";
-                                    if (!GETPOSTISSET($tmpquerytohaveparam[0]) || ($tmpquerytohaveparam[1] != GETPOST($tmpquerytohaveparam[0]))) {
-                                        $foundintru = 1;
-                                    }
-                                }
-                                if (!$foundintru) {
-                                    $qualified = 1;
-                                }
-                                //var_dump($defkey.'-'.$qualified);
-                            } else {
-                                $qualified = 1;
-                            }
-
-                            if ($qualified) {
-                                foreach ($defval as $paramkey => $paramval) {
-                                    // Add property 'required' on input
-                                    print 'jQuery("input[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
-                                    print 'jQuery("textarea[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
-                                    print '// required on a select works only if key is "", so we add the required attributes but also we reset the key -1 or 0 to an empty string' . "\n";
-                                    print 'jQuery("select[name=\'' . $paramkey . '\']").prop(\'required\',true);' . "\n";
-                                    print 'jQuery("select[name=\'' . $paramkey . '\'] option[value=\'-1\']").prop(\'value\', \'\');' . "\n";
-                                    print 'jQuery("select[name=\'' . $paramkey . '\'] option[value=\'0\']").prop(\'value\', \'\');' . "\n";
-                                }
-                            }
-                        }
-                    }
-                }
-
-                print '});' . "\n";
-
-                // End of tuning
-                if (!empty($_SERVER['MAIN_SHOW_TUNING_INFO']) || !empty($conf->global->MAIN_SHOW_TUNING_INFO)) {
-                    print "\n";
-                    print "/* JS CODE TO ENABLE to add memory info */\n";
-                    print 'window.console && console.log("';
-                    if (!empty($conf->global->MEMCACHED_SERVER)) {
-                        print 'MEMCACHED_SERVER=' . $conf->global->MEMCACHED_SERVER . ' - ';
-                    }
-                    print 'MAIN_OPTIMIZE_SPEED=' . (isset($conf->global->MAIN_OPTIMIZE_SPEED) ? $conf->global->MAIN_OPTIMIZE_SPEED : 'off');
-                    if (!empty($micro_start_time)) {   // Works only if MAIN_SHOW_TUNING_INFO is defined at $_SERVER level. Not in global variable.
-                        $micro_end_time = microtime(true);
-                        print ' - Build time: ' . ceil(1000 * ($micro_end_time - $micro_start_time)) . ' ms';
-                    }
-
-                    if (function_exists("memory_get_usage")) {
-                        print ' - Mem: ' . memory_get_usage(); // Do not use true here, it seems it takes the peak amount
-                    }
-                    if (function_exists("memory_get_peak_usage")) {
-                        print ' - Real mem peak: ' . memory_get_peak_usage(true);
-                    }
-                    if (function_exists("zend_loader_file_encoded")) {
-                        print ' - Zend encoded file: ' . (zend_loader_file_encoded() ? 'yes' : 'no');
-                    }
-                    print '");' . "\n";
-                }
-
-                print "\n" . '</script>' . "\n";
-
-                // Google Analytics
-                // TODO Add a hook here
-                if (!empty($conf->google->enabled) && !empty($conf->global->MAIN_GOOGLE_AN_ID)) {
-                    $tmptagarray = explode(',', $conf->global->MAIN_GOOGLE_AN_ID);
-                    foreach ($tmptagarray as $tmptag) {
-                        print "\n";
-                        print "<!-- JS CODE TO ENABLE for google analtics tag -->\n";
-                        print "
-					<!-- Global site tag (gtag.js) - Google Analytics -->
-					<script async src=\"https://www.googletagmanager.com/gtag/js?id=" . trim($tmptag) . "\"></script>
-					<script>
-					window.dataLayer = window.dataLayer || [];
-					function gtag(){dataLayer.push(arguments);}
-					gtag('js', new Date());
-
-					gtag('config', '" . trim($tmptag) . "');
-					</script>";
-                        print "\n";
-                    }
-                }
-            }
-
-            // Add Xdebug coverage of code
-            if (defined('XDEBUGCOVERAGE')) {
-                print_r(xdebug_get_code_coverage());
-            }
-
-            // Add DebugBar data
-            if (!empty($user->rights->debugbar->read) && is_object($debugbar)) {
-                $debugbar->debugBar['time']->stopMeasure('pageaftermaster');
-                print '<!-- Output debugbar data -->' . "\n";
-                print $debugbar->getRenderer();
-            } elseif (count($conf->logbuffer)) {    // If there is some logs in buffer to show
-                print "\n";
-                print "<!-- Start of log output\n";
-                //print '<div class="hidden">'."\n";
-                foreach ($conf->logbuffer as $logline) {
-                    print $logline . "<br>\n";
-                }
-                //print '</div>'."\n";
-                print "End of log output -->\n";
-            }
-        }
     }
 
     /**
@@ -9874,83 +9952,6 @@ abstract class DolibarrFunctions
             }
             return '';
         }
-    }
-
-    /**
-     *    Return true if the color is light
-     *
-     * @param string $stringcolor String with hex (FFFFFF) or comma RGB ('255,255,255')
-     *
-     * @return    int                            -1 : Error with argument passed |0 : color is dark | 1 : color is light
-     */
-    static function colorIsLight($stringcolor)
-    {
-        $stringcolor = str_replace('#', '', $stringcolor);
-        $res = -1;
-        if (!empty($stringcolor)) {
-            $res = 0;
-            $tmp = explode(',', $stringcolor);
-            if (count($tmp) > 1) {   // This is a comma RGB ('255','255','255')
-                $r = $tmp[0];
-                $g = $tmp[1];
-                $b = $tmp[2];
-            } else {
-                $hexr = $stringcolor[0] . $stringcolor[1];
-                $hexg = $stringcolor[2] . $stringcolor[3];
-                $hexb = $stringcolor[4] . $stringcolor[5];
-                $r = hexdec($hexr);
-                $g = hexdec($hexg);
-                $b = hexdec($hexb);
-            }
-            $bright = (max($r, $g, $b) + min($r, $g, $b)) / 510.0; // HSL algorithm
-            if ($bright > 0.6) {
-                $res = 1;
-            }
-        }
-        return $res;
-    }
-
-    /**
-     * Function to test if an entry is enabled or not
-     *
-     * @param string $type_user                0=We test for internal user, 1=We test for external user
-     * @param array  $menuentry                Array for feature entry to test
-     * @param array  $listofmodulesforexternal Array with list of modules allowed to external users
-     *
-     * @return    int                                        0=Hide, 1=Show, 2=Show gray
-     */
-    static function isVisibleToUserType($type_user, &$menuentry, &$listofmodulesforexternal)
-    {
-        global $conf;
-
-        //print 'type_user='.$type_user.' module='.$menuentry['module'].' enabled='.$menuentry['enabled'].' perms='.$menuentry['perms'];
-        //print 'ok='.in_array($menuentry['module'], $listofmodulesforexternal);
-        if (empty($menuentry['enabled'])) {
-            return 0; // Entry disabled by condition
-        }
-        if ($type_user && $menuentry['module']) {
-            $tmploops = explode('|', $menuentry['module']);
-            $found = 0;
-            foreach ($tmploops as $tmploop) {
-                if (in_array($tmploop, $listofmodulesforexternal)) {
-                    $found++;
-                    break;
-                }
-            }
-            if (!$found) {
-                return 0; // Entry is for menus all excluded to external users
-            }
-        }
-        if (!$menuentry['perms'] && $type_user) {
-            return 0; // No permissions and user is external
-        }
-        if (!$menuentry['perms'] && !empty($conf->global->MAIN_MENU_HIDE_UNAUTHORIZED)) {
-            return 0; // No permissions and option to hide when not allowed, even for internal user, is on
-        }
-        if (!$menuentry['perms']) {
-            return 2; // No permissions and user is external
-        }
-        return 1;
     }
 
     /**

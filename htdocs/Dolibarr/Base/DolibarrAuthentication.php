@@ -33,15 +33,10 @@
 
 namespace Alxarafe\Dolibarr\Base;
 
-use Alxarafe\Core\Providers\Translator;
-use Alxarafe\Core\Singletons\Config;
-use Alxarafe\Dolibarr\Classes\HookManager;
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Libraries\DolibarrDate;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity2;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use Exception;
 
 class DolibarrAuthentication
@@ -65,11 +60,13 @@ class DolibarrAuthentication
     public function __construct($controller)
     {
         $this->controller = $controller;
-        $this->hookmanager = new HookManager();
-        $this->conf = DolibarrConfig::getInstance()->getConf();
-        $this->langs = Translator::getInstance();
-        $this->db = Config::getInstance()->getEngine();
-        $this->user = new User();
+
+        $this->hookmanager = DolibarrGlobals::getHookManager();
+        $this->conf = DolibarrGlobals::getConf();
+        $this->langs = DolibarrGlobals::getLangs();
+        $this->db = DolibarrGlobals::getDb();
+        $this->user = DolibarrGlobals::getUser();
+
         $this->login = $_POST['username'];
         $this->password = $_POST['password'];
 
@@ -255,7 +252,7 @@ class DolibarrAuthentication
         $resultFetchUser = '';
         $test = true;
 
-        if (!isset($_SESSION["dol_login"])) {
+        if (!isset($_SESSION["dol_login"])) {   // dol_login must contain the user login request
             $this->request_login();
         } else {
             // We are already into an authenticated session
@@ -315,6 +312,8 @@ class DolibarrAuthentication
                 header('Location: ' . DOL_URL_ROOT . '/index.php' . (count($paramsurl) ? '?' . implode('&', $paramsurl) : ''));
                 exit;
             } else {
+                // The user has been located and it's active
+
                 // Initialize technical object to manage hooks of page. Note that conf->hooks_modules contains array of hook context
                 $this->hookmanager->initHooks(['main']);
 
@@ -406,6 +405,7 @@ class DolibarrAuthentication
 
             // Call trigger
             $result = $this->user->call_trigger('USER_LOGIN', $this->user);
+            dump($result);
             if ($result < 0) {
                 $this->error++;
             }
@@ -526,6 +526,7 @@ class DolibarrAuthentication
         $action = '';
         $this->hookmanager->initHooks(['login']);
         $parameters = [];
+        $test = true;
         $reshook = $this->hookmanager->executeHooks('beforeLoginAuthentication', $parameters, $this->user, $action); // Note that $action and $object may have been modified by some hooks
         if ($reshook < 0) {
             $test = false;
@@ -678,6 +679,8 @@ class DolibarrAuthentication
             }
             exit;
         }
+
+        die('Validate?');
 
         $resultFetchUser = $this->user->fetch('', $this->login, '', 1, ($entitytotest > 0 ? $entitytotest : -1)); // login was retrieved previously when checking password.
 

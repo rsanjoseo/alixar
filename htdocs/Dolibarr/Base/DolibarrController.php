@@ -8,8 +8,8 @@ namespace Alxarafe\Dolibarr\Base;
 
 use Alxarafe\Core\Base\Controller;
 use Alxarafe\Core\Base\View;
+use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Classes\Conf;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use DebugBar\DebugBarException;
 
 /**
@@ -21,6 +21,10 @@ abstract class DolibarrController extends Controller
 {
     public array $vars;
     public Conf $conf;
+    public $user;
+    public $hookmanager;
+
+    abstract function getDolibarrActions();
 
     /**
      * @throws DebugBarException
@@ -29,9 +33,18 @@ abstract class DolibarrController extends Controller
     {
         parent::__construct();
 
-        $dolConf = DolibarrConfig::getInstance();
-        $this->vars = $dolConf->getVars();
-        $this->conf = $dolConf->getConf();
+        $globals = new DolibarrGlobals();
+        $this->conf = $globals->getConf();
+        $this->user = $globals->getUser();
+        $this->hookmanager = $globals->getHookManager();
+        $this->db = $globals->getDb();
+
+        DolibarrFilefunc::defineVars();
+
+        $this->getDolibarrActions();
+
+        // $filefunc=new DolibarrFilefunc();
+        // $this->vars = $filefunc->defineVars();
 
         $auth = new DolibarrAuthentication($this);
         if (!$auth->authenticated()) {

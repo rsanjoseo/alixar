@@ -26,9 +26,8 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Base\BasicController;
+use Alxarafe\Dolibarr\Base\DolibarrController;
 use Alxarafe\Dolibarr\Base\DolibarrView;
-use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
 
 /**
  * Class DolibarrLogin
@@ -53,6 +52,7 @@ class DolibarrLogin extends DolibarrView
         // Protection to avoid direct call of template
         if (empty($this->conf) || !is_object($this->conf)) {
             print "Error, template page can't be called as URL";
+            dump(debug_backtrace());
             exit;
         }
 

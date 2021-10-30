@@ -20,7 +20,7 @@
 namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Singletons\Config;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**
  *    \file       htdocs/core/class/hookmanager.class.php
@@ -64,7 +64,7 @@ class HookManager
     public function __construct()
     {
         $this->db = Config::getInstance()->getEngine();
-        $this->conf = DolibarrConfig::getInstance()->getConf();
+        $this->conf = DolibarrGlobals::getConf();
     }
 
     /**

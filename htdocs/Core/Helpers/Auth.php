@@ -78,8 +78,7 @@ class Auth extends Singleton
      */
     public function login()
     {
-        //        dump(debug_backtrace());
-        new Login();
+        // new Login();
     }
 
     /**

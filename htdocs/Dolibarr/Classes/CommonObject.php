@@ -34,8 +34,8 @@ namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
  *    \file       htdocs/core/class/commonobject.class.php
@@ -461,7 +461,7 @@ abstract class CommonObject
     public function __construct()
     {
         $this->db = Config::getInstance()->getEngine();
-        $this->conf = DolibarrConfig::getInstance()->getConf();
+        $this->conf = DolibarrGlobals::getConf();
         $this->langs = Translator::getInstance();
     }
 

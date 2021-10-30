@@ -212,6 +212,9 @@ class Config extends Singleton
         $sqlEngine = '\\Alxarafe\\Database\\SqlHelpers\\' . $helperName;
         $engine = '\\Alxarafe\\Database\\Engines\\' . $dbEngineName;
         try {
+            if (!defined('MAIN_DB_PREFIX')) {
+                define('MAIN_DB_PREFIX', self::$global['database'][$db]['dbPrefix']);
+            }
             $this->sqlHelper = new $sqlEngine();
             $this->dbEngine = new $engine([
                 'dbUser' => self::$global['database'][$db]['dbUser'],

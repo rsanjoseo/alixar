@@ -27,9 +27,7 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
-use Alxarafe\Core\Providers\Translator;
-use Alxarafe\Dolibarr\Classes\HookManager;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**
  * Class DolibarrSecurity
@@ -123,7 +121,7 @@ abstract class DolibarrSecurity
     static public function dol_verifyHash($chain, $hash, $type = '0')
     {
         // global $conf;
-        $conf = DolibarrConfig::getInstance()->getConf();
+        $conf = DolibarrGlobals::getConf();
 
         if ($type == '0' && !empty($conf->global->MAIN_SECURITY_HASH_ALGO) && $conf->global->MAIN_SECURITY_HASH_ALGO == 'password_hash' && function_exists('password_verify')) {
             if ($hash[0] == '$') {
@@ -154,7 +152,7 @@ abstract class DolibarrSecurity
     static public function dol_hash($chain, $type = '0')
     {
         // global $conf;
-        $conf = DolibarrConfig::getInstance()->getConf();
+        $conf = DolibarrGlobals::getConf();
 
         // No need to add salt for password_hash
         if (($type == '0' || $type == 'auto') && !empty($conf->global->MAIN_SECURITY_HASH_ALGO) && $conf->global->MAIN_SECURITY_HASH_ALGO == 'password_hash' && function_exists('password_hash')) {

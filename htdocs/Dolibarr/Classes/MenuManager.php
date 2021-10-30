@@ -19,8 +19,8 @@ namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
  *        \file       htdocs/core/menus/standard/empty.php
@@ -45,12 +45,12 @@ class MenuManager
 
     public $tabMenu;
 
-    public function __construct($db, $type_user)
+    public function __construct($type_user)
     {
         $this->type_user = $type_user;
         $this->db = Config::getInstance()->getEngine();
-        $this->conf = DolibarrConfig::getInstance()->getConf();
-        $this->langs = Translator::getInstance();
+        $this->conf = DolibarrGlobals::getConf();
+        $this->langs = DolibarrGlobals::getLangs();
     }
 
     /**

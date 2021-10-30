@@ -25,8 +25,8 @@ namespace Alxarafe\Dolibarr\Classes;
  */
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
  *  Class to manage menu entries
@@ -656,8 +656,8 @@ class MenuBase
     {
         // global $langs, $user, $conf; // To export to dol_eval function
         // global $mainmenu, $leftmenu; // To export to dol_eval function
-        $conf = DolibarrConfig::getInstance()->getConf();
-        $langs = Translator::getInstance();
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         $mainmenu = $mymainmenu; // To export to dol_eval function
         $leftmenu = $myleftmenu; // To export to dol_eval function

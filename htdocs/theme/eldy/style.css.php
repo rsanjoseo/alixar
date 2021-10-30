@@ -21,7 +21,7 @@
  */
 
 // Descend to the htdocs folder
-use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;chdir('../..');
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;chdir('../..');
 define('BASE_FOLDER', getcwd());
 
 /**
@@ -74,9 +74,11 @@ if (empty($user->id) && !empty($_SESSION['dol_login'])) {
 }
 require_once DOL_DOCUMENT_ROOT.'/core/menus/standard/eldy_menu.php';
 // Reload menu now we have the good user (and we need the good menu to have ->showmenu('topnb') correct.
-$menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
+// $menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
+$menumanager=DolibarrGlobals::getMenuManager();
 $menumanager->loadMenu();
 
+/*
 // Define css type
 $mw->top_httphead('text/css');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
@@ -85,6 +87,7 @@ if (empty($dolibarr_nocache)) {
 } else {
 	header('Cache-Control: no-cache');
 }
+*/
 
 if (DolibarrFunctions::GETPOST('theme', 'alpha')) {
 	$conf->theme = DolibarrFunctions::GETPOST('theme', 'alpha'); // If theme was forced on URL

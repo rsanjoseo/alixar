@@ -49,6 +49,7 @@ foreach ($files as $file) {
         } catch (PDOException $e) {
             if ($e->getCode() !== '23000') {
                 $ok = false;
+                dump('step2_load_data');
                 dump($request);
                 dump($e);
                 $db->rollback();

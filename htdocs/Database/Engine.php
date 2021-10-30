@@ -9,7 +9,6 @@ namespace Alxarafe\Database;
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use DebugBar\DataCollector\PDO\PDOCollector;
 use DebugBar\DataCollector\PDO\TraceablePDO;
 use DebugBar\DebugBarException;

@@ -84,14 +84,14 @@ class DolibarrFilefunc
         return (!defined('DOL_INC_FOR_VERSION_ERROR'));
     }
 
-    public function defineVars(): array
+    static public function defineVars(): array
     {
         // Define vars
-        $conffiletoshowshort = "conf.php";
+        $conffiletoshowshort = DOLIBARR_CONFIG_FILENAME;
 
         // Define localization of conf file
         // --- Start of part replaced by Dolibarr packager makepack-dolibarr
-        $conffile = BASE_FOLDER . "/conf/conf.php";
+        $conffile = BASE_FOLDER . "/conf/" . $conffiletoshowshort;
         $conffiletoshow = "htdocs/conf/conf.php";
 
         // For debian/redhat like systems
@@ -138,6 +138,7 @@ class DolibarrFilefunc
                 }
             }
 
+            die("Location: " . $path . "install/index.php");
             header("Location: " . $path . "install/index.php");
             exit;
         }

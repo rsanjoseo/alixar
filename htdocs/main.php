@@ -31,11 +31,11 @@
  */
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Classes\MainView;
 use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 use Alxarafe\Dolibarr\Tpl\Login;
 
 /**
@@ -51,9 +51,8 @@ require_once('load.php');
  */
 
 $mw = new MainView();
-$cfg = new DolibarrConfig();
-$conf = $cfg->getConf();
-$langs = Translator::getInstance();
+$conf = DolibarrGlobals::getConf();
+$langs = DolibarrGlobals::getLangs();
 
 //@ini_set('memory_limit', '128M');	// This may be useless if memory is hard limited by your PHP
 

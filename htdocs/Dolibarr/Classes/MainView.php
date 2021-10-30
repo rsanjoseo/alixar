@@ -35,8 +35,8 @@ namespace Alxarafe\Dolibarr\Classes;
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Base\DolibarrFilefunc;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 class MainView
 {
@@ -82,8 +82,7 @@ class MainView
 
         $this->langs = Translator::getInstance();
 
-        $cfg = new DolibarrConfig();
-        $this->conf = $cfg->getConf();
+        $this->conf = DolibarrGlobals::getConf();
     }
 
     /**

@@ -50,11 +50,8 @@ use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Classes\Societe;
 use Alxarafe\Dolibarr\Classes\User;
-use Alxarafe\Dolibarr\Libraries\DolibarrDate;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
-use Alxarafe\Dolibarr\Libraries\DolibarrSecurity2;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
 
 /**
  * Class DolibarrView
@@ -80,10 +77,8 @@ class DolibarrView extends View
     {
         parent::__construct($controller);
 
-        $conf = DolibarrConfig::getInstance();
-        $this->conf = $conf->getConf();
-        $vars = $conf->getVars();
-        $this->forcehttps = empty($vars['dolibarr_main_force_https']) ? '' : $vars['dolibarr_main_force_https']; // Force https
+        $this->conf = DolibarrGlobals::getConf();
+        $this->forcehttps = $this->conf->file->main_force_https;
 
         $this->langs = Translator::getInstance();
         $this->db = Config::getInstance()->getEngine();
@@ -415,10 +410,11 @@ class DolibarrView extends View
                     $sensitiveget = true;
                 }
             }
+
             // Check a token is provided for all cases that need a mandatory token
             // (all POST actions + all login, actions and mass actions on pages with CSRFCHECK_WITH_TOKEN set + all sensitive GET actions)
-            if (
-                $_SERVER['REQUEST_METHOD'] == 'POST' ||
+            // TODO: CSRFCHECK_WITH_TOKEN temporarily disabled!
+            if (false && $_SERVER['REQUEST_METHOD'] == 'POST' ||
                 $sensitiveget ||
                 DolibarrFunctions::GETPOSTISSET('massaction') ||
                 ((DolibarrFunctions::GETPOSTISSET('actionlogin') || DolibarrFunctions::GETPOSTISSET('action')) && defined('CSRFCHECK_WITH_TOKEN'))
@@ -434,7 +430,7 @@ class DolibarrView extends View
                     } else {
                         if (defined('CSRFCHECK_WITH_TOKEN')) {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (CSRFCHECK_WITH_TOKEN protection) in main.inc.php. Token not provided.", LOG_WARNING);
-                            print "Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in main.php. Token not provided.\n";
+                            print "2Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in main.php. Token not provided.\n";
                         } else {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (POST method or GET with a sensible value for 'action' parameter) in main.inc.php. Token not provided.", LOG_WARNING);
                             print "Access to this page this way (POST method or GET with a sensible value for 'action' parameter) is refused by CSRF protection in main.inc.php. Token not provided.\n";

@@ -26,9 +26,7 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
-use Alxarafe\Core\Providers\Translator;
-use Alxarafe\Dolibarr\Classes\HookManager;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**
  * Class DolibarrSecurity2
@@ -74,7 +72,7 @@ abstract class DolibarrSecurity2
     static function checkLoginPassEntity($usertotest, $passwordtotest, $entitytotest, $authmode, $context = '')
     {
         global $conf, $langs;
-        $conf = DolibarrConfig::getInstance()->getConf();
+        $conf = DolibarrGlobals::getConf();
         //global $dolauthmode;    // To return authentication finally used
 
         // Check parameters
@@ -152,9 +150,9 @@ abstract class DolibarrSecurity2
         // global $dolibarr_main_demo, $dolibarr_main_force_https;
         // global $db, $hookmanager;
 
-        $conf = DolibarrConfig::getInstance()->getConf();
-        $langs = Translator::getInstance();
-        $hookmanager = new HookManager($conf->db);
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        $hookmanager = DolibarrGlobals::getHookManager();
 
         $langs->loadLangs(["main", "other", "help", "admin"]);
 

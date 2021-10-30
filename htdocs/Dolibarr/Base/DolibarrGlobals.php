@@ -4,31 +4,125 @@
  * Copyright (C) 2018 Alxarafe <info@alxarafe.com>
  */
 
-namespace Alxarafe\Dolibarr\Libraries;
+namespace Alxarafe\Dolibarr\Base;
 
+use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Database\Engine;
 use Alxarafe\Dolibarr\Classes\Conf;
 use Alxarafe\Dolibarr\Classes\HookManager;
+use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Classes\Societe;
 use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Exception;
 
-abstract class DolibarrMaster
+/**
+ * Class DolibarrGlobals
+ *
+ * This file replaces master.inc.php
+ *
+ * The file master.inc.php init the 5 global objects, this include will make the 'new Xxx()' and
+ * set properties for: $conf, $db, $langs, $user, $mysoc
+ *
+ * This class statically instantiates other classes that must be used from different places.
+ *
+ * @package Alxarafe\Dolibarr\Libraries
+ */
+class DolibarrGlobals
 {
-    static public function getConf(array $vars): Conf
+    static public Engine $db;
+    static public Translator $langs;
+    static public Conf $conf;
+    static public $user;
+    static public $hookmanager;
+    static public $mysoc;
+    static public $menumanager;
+
+    public function __construct()
     {
+        self::$db = self::getDb();
+        self::$langs = self::getLangs();
+        self::$conf = self::getConf();
+        self::$user = self::getUser();
+        self::$hookmanager = self::getHookManager();
+        self::$mysoc = self::getMySoc();
+        self::$menumanager = self::getMenuManager();
+    }
+
+    /**
+     * Returns the database engine instance
+     *
+     * @return Engine
+     */
+    static public function getDb(): Engine
+    {
+        if (isset(self::$db)) {
+            return self::$db;
+        }
+
+        self::$db = Config::getInstance()->getEngine();
+        return self::$db;
+    }
+
+    /**
+     * Returns the translator instance
+     *
+     * @return Translator
+     */
+    static public function getLangs(): Translator
+    {
+        if (isset(self::$langs)) {
+            return self::$langs;
+        }
+
+        self::$langs = Translator::getInstance();
+        return self::$langs;
+    }
+
+    /**
+     * Returns the configuration instance
+     *
+     * @return Conf
+     * @throws Exception
+     */
+    static public function getConf(): Conf
+    {
+        if (isset(self::$conf)) {
+            return self::$conf;
+        }
+
+        /**
+         * This should be the only point where the configuration file is read.
+         * Temporarily, it will also be done to generate the config.yaml in the first installation,
+         * although the idea would be in the near future to eliminate conf.php and leave only the
+         * yaml.
+         */
+        define('DOLIBARR_CONFIG_FILENAME', 'conf2.php');
+        $confFile = constant('BASE_FOLDER') . '/conf/' . DOLIBARR_CONFIG_FILENAME;
+        require_once $confFile;
+
+        /**
+         * Create $conf object
+         */
         $conf = new Conf();
-        $db = Config::getInstance()->getEngine();
 
         // Set properties specific to conf file
-        $conf->file->main_limit_users = $vars['dolibarr_main_limit_users'];
-        $conf->file->mailing_limit_sendbyweb = $vars['dolibarr_mailing_limit_sendbyweb'];
-        $conf->file->mailing_limit_sendbycli = $vars['dolibarr_mailing_limit_sendbycli'];
-        $conf->file->main_authentication = empty($vars['dolibarr_main_authentication']) ? '' : $vars['dolibarr_main_authentication']; // Identification mode
-        $conf->file->main_force_https = empty($vars['dolibarr_main_force_https']) ? '' : $vars['dolibarr_main_force_https']; // Force https
-        $conf->file->strict_mode = empty($vars['dolibarr_strict_mode']) ? '' : $vars['dolibarr_strict_mode']; // Force php strict mode (for debug)
-        $conf->file->instance_unique_id = empty($vars['dolibarr_main_instance_unique_id']) ? (empty($vars['dolibarr_main_cookie_cryptkey']) ? '' : $vars['dolibarr_main_cookie_cryptkey']) : $vars['dolibarr_main_instance_unique_id']; // Unique id of instance
-        $conf->file->dol_document_root = ['main' => (string) DOL_DOCUMENT_ROOT]; // Define array of document root directories ('/home/htdocs')
-        $conf->file->dol_url_root = ['main' => (string) DOL_URL_ROOT]; // Define array of url root path ('' or '/dolibarr')
+        $conf->file->main_limit_users = $dolibarr_main_limit_users;
+        $conf->file->mailing_limit_sendbyweb = $dolibarr_mailing_limit_sendbyweb;
+        $conf->file->mailing_limit_sendbycli = $dolibarr_mailing_limit_sendbycli;
+        $conf->file->main_authentication = $dolibarr_main_authentication ?? 'dolibarr'; // Identification mode
+        $conf->file->main_force_https = $dolibarr_main_force_https ?? true; // Force https
+        $conf->file->strict_mode = $dolibarr_strict_mode ?? ''; // Force php strict mode (for debug)
+        $conf->file->instance_unique_id = $dolibarr_main_instance_unique_id ?? $dolibarr_main_cookie_cryptkey ?? ''; // Unique id of instance
+        $conf->file->dol_document_root = $dolibarr_main_document_root ?? constant('BASE_FOLDER'); // Define array of document root directories ('/home/htdocs')
+        $conf->file->dol_url_root = $dolibarr_main_url_root ?? constant('BASE_URI'); // Define array of url root path ('' or '/dolibarr')
+        $conf->file->main_prod = !empty($dolibarr_main_prod);
+
+        define('DOL_DATA_ROOT', (isset($dolibarr_main_data_root) ? $dolibarr_main_data_root : DOL_DOCUMENT_ROOT . '/../documents'));
+        define('DOL_MAIN_URL_ROOT', (isset($dolibarr_main_url_root) ? $dolibarr_main_url_root : '')); // URL relative root
+        define('DOL_DOCUMENT_ROOT', constant('BASE_FOLDER'));
+
         if (!empty($vars['dolibarr_main_document_root_alt'])) {
             // dolibarr_main_document_root_alt can contains several directories
             $values = preg_split('/[;,]/', $vars['dolibarr_main_document_root_alt']);
@@ -142,22 +236,6 @@ abstract class DolibarrMaster
         // Here we read database (llx_const table) and define $conf->global->XXX var.
         $conf->setValues();
 
-        $requiredb = !defined('NOREQUIREDB') || !constant('NOREQUIREDB');
-        $requiresoc = !defined('NOREQUIRESOC') || !constant('NOREQUIRESOC');
-
-        // Create object $mysoc (A thirdparty object that contains properties of companies managed by Dolibarr.
-        if ($requiredb && $requiresoc) {
-            require_once DOL_DOCUMENT_ROOT . '/Modules/Societes/class/societe.class.php';
-
-            $mysoc = new Societe($db);
-            $mysoc->setMysoc($conf);
-
-            // For some countries, we need to invert our address with customer address
-            if ($mysoc->country_code == 'DE' && !isset($conf->global->MAIN_INVERT_SENDER_RECIPIENT)) {
-                $conf->global->MAIN_INVERT_SENDER_RECIPIENT = 1;
-            }
-        }
-
         if (!defined('MAIN_LABEL_MENTION_NPR')) {
             define('MAIN_LABEL_MENTION_NPR', 'NPR');
         }
@@ -166,13 +244,62 @@ abstract class DolibarrMaster
         return $conf;
     }
 
-    static function getUser()
+    static function getUser(): ?User
     {
-        $user = null;
-        if (!defined('NOREQUIREUSER')) {
-            $user = new User();
+        if (isset(self::$user)) {
+            return self::$user;
         }
-        return $user;
+
+        if (defined('NOREQUIREUSER')) {
+            return null;
+        }
+
+        return new User();
+    }
+
+    static function getHookManager()
+    {
+        if (isset(self::$hookmanager)) {
+            return self::$hookmanager;
+        }
+
+        // Create the global $hookmanager object
+        // include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
+        self::$hookmanager = new HookManager();
+        return self::$hookmanager;
+    }
+
+    static function getMySoc(): ?Societe
+    {
+        if (isset(self::$mysoc)) {
+            return self::$mysoc;
+        }
+
+        $requiredb = !defined('NOREQUIREDB') || !constant('NOREQUIREDB');
+        $requiresoc = !defined('NOREQUIRESOC') || !constant('NOREQUIRESOC');
+        if (!$requiredb || !$requiresoc) {
+            return null;
+        }
+
+        $mysoc = new Societe();
+        $mysoc->setMysoc(self::$conf);
+
+        // For some countries, we need to invert our address with customer address
+        if ($mysoc->country_code == 'DE' && !isset($conf->global->MAIN_INVERT_SENDER_RECIPIENT)) {
+            self::$conf->global->MAIN_INVERT_SENDER_RECIPIENT = 1;
+        }
+
+        return $mysoc;
+    }
+
+    static function getMenuManager()
+    {
+        if (isset(self::$menumanager)) {
+            return self::$menumanager;
+        }
+
+        self::$menumanager = new MenuManager(empty(self::$user->socid) ? 0 : 1);
+        return self::$menumanager;
     }
 
     static function getLang()
@@ -192,12 +319,4 @@ abstract class DolibarrMaster
         return $langs;
     }
 
-    static function getHookManager()
-    {
-        // Create the global $hookmanager object
-        // include_once DOL_DOCUMENT_ROOT . '/core/class/hookmanager.class.php';
-        $hookmanager = new HookManager();
-
-        return $hookmanager;
-    }
 }

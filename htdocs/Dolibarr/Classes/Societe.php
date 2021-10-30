@@ -34,8 +34,7 @@
 
 namespace Alxarafe\Dolibarr\Classes;
 
-use Alxarafe\Core\Singletons\Config;
-use Alxarafe\Dolibarr\Providers\DolibarrConfig;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**
  *    \file       htdocs/societe/class/societe.class.php
@@ -739,8 +738,8 @@ class Societe extends CommonObject
     public function __construct()
     {
         //global $conf;
-        $this->db = Config::getInstance()->getEngine();
-        $conf = DolibarrConfig::getInstance()->getConf();
+        $conf = DolibarrGlobals::getConf();
+        $this->db = DolibarrGlobals::getDb();
 
         $this->client = 0;
         $this->prospect = 0;

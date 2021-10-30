@@ -43,6 +43,7 @@ class Logger extends Singleton
             self::$logger->setTimezone(new DateTimeZone($timeZone));
             self::$logger->pushHandler(new StreamHandler(basePath(DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'core.log'), MonologLogger::DEBUG));
         } catch (Exception $e) {
+            dump('Singletons Logger error!');
             dump($e);
         }
         self::$logger->pushHandler(new FirePHPHandler());
@@ -56,6 +57,7 @@ class Logger extends Singleton
     public static function exceptionHandler($e): void
     {
         FlashMessages::getInstance()::setError($e->getMessage());
+        dump('Singleton Logger Error');
         dump($e);
         self::$logger->error(
             'Exception [' . $e->getCode() . ']: ' . $e->getMessage() . PHP_EOL
