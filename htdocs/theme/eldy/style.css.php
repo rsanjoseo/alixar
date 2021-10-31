@@ -67,7 +67,7 @@ session_cache_limiter('public');
 // require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 
 new DolibarrGlobals();
-$user=DolibarrGlobals::getUser();
+$user =DolibarrGlobals::getUser();
 $conf=DolibarrGlobals::getConf();
 $langs=DolibarrGlobals::getLangs();
 

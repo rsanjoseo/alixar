@@ -47,7 +47,7 @@ abstract class Globals
     /**
      * GET variable that contains the name of the module to use, if none is specified
      */
-    const DEFAULT_MODULE_NAME = 'main';
+    const DEFAULT_MODULE_NAME = 'admin';
 
     /**
      * GET variable that contains the name of the controller to use, if none is specified

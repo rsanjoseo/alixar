@@ -42,6 +42,7 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
+use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Classes\HookManager;
@@ -8823,6 +8824,9 @@ abstract class DolibarrFunctions
                 //print '</div>'."\n";
                 print "End of log output -->\n";
             }
+            print '<!-- Begin: DEBUG getRenderFooter -->' . "\n";
+            print DebugTool::getRenderFooter();
+            print '<!-- End: DEBUG getRenderFooter -->' . "\n";
         }
     }
 

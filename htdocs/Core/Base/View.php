@@ -538,7 +538,15 @@ abstract class View extends Globals
         if (!$this->render->hasTemplate()) {
             $this->render->setTemplate('default');
         }
-        echo $this->render->render($this->vars);
+
+        if (method_exists($this, 'printPage')) {
+            /**
+             * TODO: At the moment we are not using Twig because it is easier to debug that way.
+             */
+            $this->printPage(); // This replaces the call to Twig as long as we do not have it activated.
+        } else {
+            echo $this->render->render($this->vars);
+        }
     }
 
     /**

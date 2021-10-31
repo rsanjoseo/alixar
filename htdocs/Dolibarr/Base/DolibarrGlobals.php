@@ -100,24 +100,27 @@ class DolibarrGlobals
          */
         define('DOLIBARR_CONFIG_FILENAME', 'conf2.php');
         $confFile = constant('BASE_FOLDER') . '/conf/' . DOLIBARR_CONFIG_FILENAME;
-        require_once $confFile;
+        $result = require_once $confFile;
+        if (!$result) {
+            die($confFile . ' not found!');
+        }
 
         /**
-         * Create $conf object
+         * Create self::$conf object
          */
-        $conf = new Conf();
+        self::$conf = new Conf();
 
         // Set properties specific to conf file
-        $conf->file->main_limit_users = $dolibarr_main_limit_users;
-        $conf->file->mailing_limit_sendbyweb = $dolibarr_mailing_limit_sendbyweb;
-        $conf->file->mailing_limit_sendbycli = $dolibarr_mailing_limit_sendbycli;
-        $conf->file->main_authentication = $dolibarr_main_authentication ?? 'dolibarr'; // Identification mode
-        $conf->file->main_force_https = $dolibarr_main_force_https ?? true; // Force https
-        $conf->file->strict_mode = $dolibarr_strict_mode ?? ''; // Force php strict mode (for debug)
-        $conf->file->instance_unique_id = $dolibarr_main_instance_unique_id ?? $dolibarr_main_cookie_cryptkey ?? ''; // Unique id of instance
-        $conf->file->dol_document_root = $dolibarr_main_document_root ?? constant('BASE_FOLDER'); // Define array of document root directories ('/home/htdocs')
-        $conf->file->dol_url_root = $dolibarr_main_url_root ?? constant('BASE_URI'); // Define array of url root path ('' or '/dolibarr')
-        $conf->file->main_prod = !empty($dolibarr_main_prod);
+        self::$conf->file->main_limit_users = $dolibarr_main_limit_users;
+        self::$conf->file->mailing_limit_sendbyweb = $dolibarr_mailing_limit_sendbyweb;
+        self::$conf->file->mailing_limit_sendbycli = $dolibarr_mailing_limit_sendbycli;
+        self::$conf->file->main_authentication = $dolibarr_main_authentication ?? 'dolibarr'; // Identification mode
+        self::$conf->file->main_force_https = $dolibarr_main_force_https ?? true; // Force https
+        self::$conf->file->strict_mode = $dolibarr_strict_mode ?? ''; // Force php strict mode (for debug)
+        self::$conf->file->instance_unique_id = $dolibarr_main_instance_unique_id ?? $dolibarr_main_cookie_cryptkey ?? ''; // Unique id of instance
+        self::$conf->file->dol_document_root = $dolibarr_main_document_root ?? constant('BASE_FOLDER'); // Define array of document root directories ('/home/htdocs')
+        self::$conf->file->dol_url_root = $dolibarr_main_url_root ?? constant('BASE_URI'); // Define array of url root path ('' or '/dolibarr')
+        self::$conf->file->main_prod = !empty($dolibarr_main_prod);
 
         define('DOL_DATA_ROOT', (isset($dolibarr_main_data_root) ? $dolibarr_main_data_root : DOL_DOCUMENT_ROOT . '/../documents'));
         define('DOL_MAIN_URL_ROOT', (isset($dolibarr_main_url_root) ? $dolibarr_main_url_root : '')); // URL relative root
@@ -128,7 +131,7 @@ class DolibarrGlobals
             $values = preg_split('/[;,]/', $vars['dolibarr_main_document_root_alt']);
             $i = 0;
             foreach ($values as $value) {
-                $conf->file->dol_document_root['alt' . ($i++)] = (string) $value;
+                self::$conf->file->dol_document_root['alt' . ($i++)] = (string) $value;
             }
             $values = preg_split('/[;,]/', $vars['dolibarr_main_url_root_alt']);
             $i = 0;
@@ -148,7 +151,7 @@ class DolibarrGlobals
                     print "\"/custom\"<br>\n";
                     exit;
                 }
-                $conf->file->dol_url_root['alt' . ($i++)] = (string) $value;
+                self::$conf->file->dol_url_root['alt' . ($i++)] = (string) $value;
             }
         }
 
@@ -167,7 +170,7 @@ class DolibarrGlobals
          * Creation objet $langs (must be before all other code)
          */
         if (!defined('NOREQUIRETRAN')) {
-            $langs = new Translate('', $conf); // Must be after reading conf
+            $langs = new Translate('', self::$conf); // Must be after reading conf
         }
 
         /*
@@ -176,7 +179,7 @@ class DolibarrGlobals
         /*
         $db = null;
         if (!defined('NOREQUIREDB')) {
-            $db = getDoliDBInstance($conf->db->type, $conf->db->host, $conf->db->user, $conf->db->pass, $conf->db->name, $conf->db->port);
+            $db = getDoliDBInstance(self::$conf->db->type, self::$conf->db->host, self::$conf->db->user, self::$conf->db->pass, self::$conf->db->name, self::$conf->db->port);
 
             if ($db->error) {
                 // If we were into a website context
@@ -196,7 +199,7 @@ class DolibarrGlobals
                     print '</div>';
                     exit;
                 }
-                dol_print_error($db, "host=".$conf->db->host.", port=".$conf->db->port.", user=".$conf->db->user.", databasename=".$conf->db->name.", ".$db->error);
+                dol_print_error($db, "host=".self::$conf->db->host.", port=".self::$conf->db->port.", user=".self::$conf->db->user.", databasename=".self::$conf->db->name.", ".$db->error);
                 exit;
             }
         }
@@ -204,44 +207,44 @@ class DolibarrGlobals
 
         // Now database connexion is known, so we can forget password
         //unset($vars['dolibarr']_main_db_pass); 	// We comment this because this constant is used in a lot of pages
-        // unset($conf->db->pass); // This is to avoid password to be shown in memory/swap dump
+        // unset(self::$conf->db->pass); // This is to avoid password to be shown in memory/swap dump
 
         /*
-         * Load object $conf
+         * Load object self::$conf
          * After this, all parameters conf->global->CONSTANTS are loaded
          */
 
         // By default conf->entity is 1, but we change this if we ask another value.
         if (session_id() && !empty($_SESSION["dol_entity"])) {
             // Entity inside an opened session
-            $conf->entity = $_SESSION["dol_entity"];
+            self::$conf->entity = $_SESSION["dol_entity"];
         } elseif (!empty($_ENV["dol_entity"])) {
             // Entity inside a CLI script
-            $conf->entity = $_ENV["dol_entity"];
+            self::$conf->entity = $_ENV["dol_entity"];
         } elseif (DolibarrFunctions::GETPOSTISSET("loginfunction") && DolibarrFunctions::GETPOST("entity", 'int')) {
             // Just after a login page
-            $conf->entity = DolibarrFunctions::GETPOST("entity", 'int');
+            self::$conf->entity = DolibarrFunctions::GETPOST("entity", 'int');
         } elseif (defined('DOLENTITY') && is_numeric(constant('DOLENTITY'))) {
             // For public page with MultiCompany module
-            $conf->entity = constant('DOLENTITY');
+            self::$conf->entity = constant('DOLENTITY');
         }
 
         // Sanitize entity
-        if (!is_numeric($conf->entity)) {
-            $conf->entity = 1;
+        if (!is_numeric(self::$conf->entity)) {
+            self::$conf->entity = 1;
         }
 
-        //print "We work with data into entity instance number '".$conf->entity."'";
+        //print "We work with data into entity instance number '".self::$conf->entity."'";
 
-        // Here we read database (llx_const table) and define $conf->global->XXX var.
-        $conf->setValues();
+        // Here we read database (llx_const table) and define self::$conf->global->XXX var.
+        self::$conf->setValues();
 
         if (!defined('MAIN_LABEL_MENTION_NPR')) {
             define('MAIN_LABEL_MENTION_NPR', 'NPR');
         }
-        //if (! defined('PCLZIP_TEMPORARY_DIR')) define('PCLZIP_TEMPORARY_DIR', $conf->user->dir_temp);
+        //if (! defined('PCLZIP_TEMPORARY_DIR')) define('PCLZIP_TEMPORARY_DIR', self::$conf->user->dir_temp);
 
-        return $conf;
+        return self::$conf;
     }
 
     static function getUser(): ?User

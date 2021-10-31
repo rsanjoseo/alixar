@@ -336,8 +336,12 @@ class MenuManager
             $this->menu->add("/admin/modules.php", $this->langs->trans("Modules"), 1);
             $this->menu->add("/admin/menus.php", $this->langs->trans("Menus"), 1);
             $this->menu->add("/admin/ihm.php", $this->langs->trans("GUISetup"), 1);
-            $this->menu->add("/admin/translation.php?mainmenu=home", $this->langs->trans("Translation"), 1);
-            $this->menu->add("/admin/defaultvalues.php?mainmenu=home", $this->langs->trans("DefaultValues"), 1);
+
+            //$this->menu->add("/admin/translation.php?mainmenu=home", $this->langs->trans("Translation"), 1);
+            $this->menu->add("?module=Admin&controller=Translation&mainmenu=home", $this->langs->trans("Translation"), 1);
+
+            //$this->menu->add("/admin/defaultvalues.php?mainmenu=home", $this->langs->trans("DefaultValues"), 1);
+            $this->menu->add("?module=Admin&controller=Defaultvalues&mainmenu=home", $this->langs->trans("DefaultValues"), 1);
 
             $this->menu->add("/admin/boxes.php?mainmenu=home", $this->langs->trans("Boxes"), 1);
             $this->menu->add("/admin/delais.php?mainmenu=home", $this->langs->trans("Alerts"), 1);

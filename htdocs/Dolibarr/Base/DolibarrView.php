@@ -49,7 +49,6 @@ use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Classes\Societe;
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Libraries\DolibarrBookmarks;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
@@ -69,10 +68,10 @@ class DolibarrView extends View
     public Translator $langs;
     public string $sessionname;
     public string $forcehttps;
-    private $db;
-    private ?Societe $mysoc;
-    private HookManager $hookmanager;
-    private MenuManager $menumanager;
+    public $db;
+    public ?Societe $mysoc;
+    public HookManager $hookmanager;
+    public MenuManager $menumanager;
 
     function __construct(BasicController $controller)
     {
@@ -958,6 +957,10 @@ class DolibarrView extends View
                     print '">' . "\n";
                 }
             }
+
+            print '<!-- Begin: DEBUG getRenderHeader -->' . "\n";
+            print DebugTool::getRenderHeader();
+            print '<!-- End: DEBUG getRenderHeader -->' . "\n";
 
             // Output standard javascript links
             if (!defined('DISABLE_JQUERY') && !$disablejs && !empty($this->conf->use_javascript_ajax)) {
