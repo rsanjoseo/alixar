@@ -10,6 +10,7 @@ use Alxarafe\Core\Base\Provider;
 use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
+use Alxarafe\Core\Utils\ClassUtils;
 use NumberFormatter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -89,9 +90,17 @@ class Translator extends Provider
      */
     public function __construct()
     {
+        $shortName = ClassUtils::getShortName($this, static::class);
+        $debugTool = DebugTool::getInstance();
+
+        $debugTool->startTimer($shortName, $shortName . ' Constructor');
+
         parent::__construct();
 
+        $debugTool->startTimer($shortName . '1', $shortName . ' getConfig');
         $config = $this->getConfig();
+        $debugTool->stopTimer($shortName . '1', $shortName . ' getConfig');
+
         self::$languageFolder = constant('BASE_FOLDER') . self::LANG_FOLDER;
         self::$translator = new SymfonyTranslator($config['language'] ?? self::FALLBACK_LANG);
         self::$translator->setFallbackLocales([self::FALLBACK_LANG]);
@@ -99,7 +108,12 @@ class Translator extends Provider
         self::$usedStrings = [];
         self::$missingStrings = [];
         self::$languageFolders = [];
+
+        $debugTool->startTimer($shortName . '2', $shortName . ' loadLangs');
         $this->loadLangFiles();
+        $debugTool->stopTimer($shortName . '2', $shortName . ' loadLangs');
+
+        $debugTool->stopTimer($shortName, $shortName . ' Constructor');
     }
 
     /**
@@ -336,15 +350,15 @@ class Translator extends Provider
         return self::trans($txt, $parameters);
     }
 
+    public function getCurrencySymbol($currency_code)
+    {
+        return trim($this->getCurrencyAmount($currency_code), '0,.');
+    }
+
     public function getCurrencyAmount($currency_code, $amount = 0)
     {
         $obj = new NumberFormatter(null, NumberFormatter::CURRENCY);
         return $obj->formatCurrency($amount, $currency_code);
-    }
-
-    public function getCurrencySymbol($currency_code)
-    {
-        return trim($this->getCurrencyAmount($currency_code), '0,.');
     }
 
     public function convToOutputCharset($str, $pagecodefrom = 'UTF-8')

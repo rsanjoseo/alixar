@@ -38,7 +38,7 @@
 namespace Alxarafe\Modules\Admin\Controllers;
 
 use Alxarafe\Core\Base\View;
-use Alxarafe\Dolibarr\Base\DolibarrController;
+use Alxarafe\Dolibarr\Base\DolibarrListController;
 use Alxarafe\Dolibarr\Classes\DefaultValuesClass;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
@@ -51,19 +51,9 @@ use Alxarafe\Modules\Admin\Views\DefaultValuesView;
  *
  * @package Alxarafe\Modules\Admin\Controllers
  */
-class Defaultvalues extends DolibarrController
+class Defaultvalues extends DolibarrListController
 {
     public $object;
-    public $id;
-    public $optioncss;
-    public $mode;
-    public $limit;
-    public $sortfield;
-    public $sortorder;
-    public $page;
-    public $offset;
-    public $pageprev;
-    public $pagenext;
     public $defaulturl;
     public $defaultkey;
     public $defaultvalue;
@@ -85,28 +75,15 @@ class Defaultvalues extends DolibarrController
 
     public function getDolibarrVars(): void
     {
-        $this->id = DolibarrFunctions::GETPOST('rowid', 'int');
-        $this->action = DolibarrFunctions::GETPOST('action', 'aZ09');
-        $this->optioncss = DolibarrFunctions::GETPOST('optionscss', 'alphanohtml');
+        parent::getDolibarrVars();
 
-        $this->mode = DolibarrFunctions::GETPOST('mode', 'aZ09') ? DolibarrFunctions::GETPOST('mode', 'aZ09') : 'createform'; // 'createform', 'filters', 'sortorder', 'focus'
-
-        $this->limit = DolibarrFunctions::GETPOST('limit', 'int') ? DolibarrFunctions::GETPOST('limit', 'int') : $conf->liste_limit;
-        $this->sortfield = DolibarrFunctions::GETPOST("sortfield", 'alpha');
-        $this->sortorder = DolibarrFunctions::GETPOST("sortorder", 'alpha');
-        $this->page = DolibarrFunctions::GETPOSTISSET('pageplusone') ? (DolibarrFunctions::GETPOST('pageplusone') - 1) : DolibarrFunctions::GETPOST("page", 'int');
-        if (empty($this->page) || $this->page == -1) {
-            $this->page = 0;
-        }     // If $this->page is not defined, or '' or -1
-        $this->offset = $this->limit * $this->page;
-        $this->pageprev = $this->page - 1;
-        $this->pagenext = $this->page + 1;
         if (!$this->sortfield) {
             $this->sortfield = 'page,param';
         }
         if (!$this->sortorder) {
             $this->sortorder = 'ASC';
         }
+
 
         $this->defaulturl = DolibarrFunctions::GETPOST('defaulturl', 'alphanohtml');
         $this->defaultkey = DolibarrFunctions::GETPOST('defaultkey', 'alphanohtml');
@@ -126,28 +103,7 @@ class Defaultvalues extends DolibarrController
 
     public function getDolibarrActions(): void
     {
-        /*
-        if (isset($this->action)) {
-            dump('Action loaded in preLoad() in DefaultValues');
-            return;
-        }
-
-        $this->action = DolibarrFunctions::GETPOST('action', 'aZ09');
-        */
-
-        if (DolibarrFunctions::GETPOST('cancel', 'alpha')) {
-            $this->action = 'list';
-            $massaction = '';
-        }
-        if (!DolibarrFunctions::GETPOST('confirmmassaction', 'alpha') && !empty($massaction) && $massaction != 'presend' && $massaction != 'confirm_presend') {
-            $massaction = '';
-        }
-
-        $parameters = [];
-        $reshook = $this->hookmanager->executeHooks('doActions', $parameters, $this->object, $this->action); // Note that $this->action and $this->object may have been modified by some hooks
-        if ($reshook < 0) {
-            DolibarrFunctions::setEventMessages($this->hookmanager->error, $this->hookmanager->errors, 'errors');
-        }
+        parent::getDolibarrActions();
 
         // include DOL_DOCUMENT_ROOT . '/core/actions_changeselectedfields.inc.php';
 

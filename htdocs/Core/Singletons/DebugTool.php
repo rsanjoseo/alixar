@@ -19,12 +19,6 @@
 namespace Alxarafe\Core\Singletons;
 
 use Alxarafe\Core\Base\Singleton;
-use Alxarafe\Core\DebugBarCollectors\DolibarrCollector;
-use Alxarafe\Core\DebugBarCollectors\DolLogsCollector;
-use Alxarafe\Core\DebugBarCollectors\DolMemoryCollector;
-use Alxarafe\Core\DebugBarCollectors\DolQueryCollector;
-use Alxarafe\Core\DebugBarCollectors\DolRequestDataCollector;
-use Alxarafe\Core\DebugBarCollectors\DolTimeDataCollector;
 use Alxarafe\Core\DebugBarCollectors\PhpCollector;
 use Alxarafe\Core\DebugBarCollectors\TranslatorCollector;
 use Alxarafe\Core\Providers\Translator;
@@ -102,15 +96,15 @@ class DebugTool extends Singleton
         $this->debugBar->addCollector(new MonologCollector(self::$logger->getLogger()));
 
         // Dolibarr collectors
-        //$this->debugBar->addCollector(new PhpInfoCollector());
-        //$this->debugBar->addCollector(new DolMessagesCollector());
-        //        $this->debugBar->addCollector(new DolRequestDataCollector());
-        //$this->debugBar->addCollector(new DolConfigCollector());      // Disabled for security purpose
+        // $this->debugBar->addCollector(new PhpInfoCollector());
+        // $this->debugBar->addCollector(new DolMessagesCollector());
+        // $this->debugBar->addCollector(new DolRequestDataCollector());
+        // $this->debugBar->addCollector(new DolConfigCollector());      // Disabled for security purpose
         // $this->debugBar->addCollector(new DolTimeDataCollector());
-        //        $this->debugBar->addCollector(new DolMemoryCollector());
-        //$this->debugBar->addCollector(new DolExceptionsCollector());
-        //        $this->debugBar->addCollector(new DolQueryCollector());
-        //        $this->debugBar->addCollector(new DolibarrCollector());
+        // $this->debugBar->addCollector(new DolMemoryCollector());
+        // $this->debugBar->addCollector(new DolExceptionsCollector());
+        // $this->debugBar->addCollector(new DolQueryCollector());
+        // $this->debugBar->addCollector(new DolibarrCollector());
         // $this->debugBar->addCollector(new DolLogsCollector());
     }
 
@@ -138,7 +132,7 @@ class DebugTool extends Singleton
     public function startTimer(string $name, string $message): void
     {
         // TODO: Revisar dónde se llama antes de definir $this->debugBar
-        //        $this->debugBar['time']->startMeasure($name, $message);
+        $this->debugBar['time']->startMeasure($name, $message);
     }
 
     /**
@@ -149,7 +143,7 @@ class DebugTool extends Singleton
     public function stopTimer(string $name): void
     {
         // TODO: Revisar dónde se llama antes de definir $this->debugBar
-        //        $this->debugBar['time']->stopMeasure($name);
+        $this->debugBar['time']->stopMeasure($name);
     }
 
     /**

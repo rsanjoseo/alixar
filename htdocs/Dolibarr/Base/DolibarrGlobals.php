@@ -8,6 +8,8 @@ namespace Alxarafe\Dolibarr\Base;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Core\Singletons\DebugTool;
+use Alxarafe\Core\Utils\ClassUtils;
 use Alxarafe\Database\Engine;
 use Alxarafe\Dolibarr\Classes\Conf;
 use Alxarafe\Dolibarr\Classes\HookManager;
@@ -41,6 +43,10 @@ class DolibarrGlobals
 
     public function __construct()
     {
+        $shortName = ClassUtils::getShortName($this, static::class);
+        $debugTool = DebugTool::getInstance();
+        $debugTool->startTimer($shortName, $shortName . ' Constructor');
+
         self::$db = self::getDb();
         self::$langs = self::getLangs();
         self::$conf = self::getConf();
@@ -48,6 +54,8 @@ class DolibarrGlobals
         self::$hookmanager = self::getHookManager();
         self::$mysoc = self::getMySoc();
         self::$menumanager = self::getMenuManager();
+
+        $debugTool->stopTimer($shortName, $shortName . ' Constructor');
     }
 
     /**
@@ -111,9 +119,9 @@ class DolibarrGlobals
         self::$conf = new Conf();
 
         // Set properties specific to conf file
-        self::$conf->file->main_limit_users = $dolibarr_main_limit_users;
-        self::$conf->file->mailing_limit_sendbyweb = $dolibarr_mailing_limit_sendbyweb;
-        self::$conf->file->mailing_limit_sendbycli = $dolibarr_mailing_limit_sendbycli;
+        self::$conf->file->main_limit_users = $dolibarr_main_limit_users ?? 0;
+        self::$conf->file->mailing_limit_sendbyweb = $dolibarr_mailing_limit_sendbyweb ?? 0;
+        self::$conf->file->mailing_limit_sendbycli = $dolibarr_mailing_limit_sendbycli ?? 0;
         self::$conf->file->main_authentication = $dolibarr_main_authentication ?? 'dolibarr'; // Identification mode
         self::$conf->file->main_force_https = $dolibarr_main_force_https ?? true; // Force https
         self::$conf->file->strict_mode = $dolibarr_strict_mode ?? ''; // Force php strict mode (for debug)

@@ -38,15 +38,11 @@
 namespace Alxarafe\Modules\Admin\Views;
 
 use Alxarafe\Core\Base\BasicController;
-use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Base\DolibarrView;
-use Alxarafe\Dolibarr\Classes\DefaultValuesClass;
 use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Classes\FormAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
-use Sabre\DAV\Exception;
-use stdClass;
 
 /**
  * Class Login

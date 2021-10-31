@@ -27,6 +27,7 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use stdClass;
 
 /**
  * Class DolibarrSecurity2
@@ -83,53 +84,53 @@ abstract class DolibarrSecurity2
         $login = '';
 
         // Validation of login/pass/entity with standard modules
-            $test = true;
-            foreach ($authmode as $mode) {
-                if ($test && $mode && !$login) {
-                    // Validation of login/pass/entity for mode $mode
-                    $mode = trim($mode);
-                    $authfile = 'functions_' . $mode . '.php';
-                    $fullauthfile = '';
+        $test = true;
+        foreach ($authmode as $mode) {
+            if ($test && $mode && !$login) {
+                // Validation of login/pass/entity for mode $mode
+                $mode = trim($mode);
+                $authfile = 'functions_' . $mode . '.php';
+                $fullauthfile = '';
 
-                    $dirlogin = array_merge(["/core/login"], (array) $conf->modules_parts['login']);
-                    foreach ($dirlogin as $reldir) {
-                        $dir = DolibarrFunctions::dol_buildpath($reldir, 0);
-                        $newdir = DolibarrFunctions::dol_osencode($dir);
+                $dirlogin = array_merge(["/core/login"], (array) $conf->modules_parts['login']);
+                foreach ($dirlogin as $reldir) {
+                    $dir = DolibarrFunctions::dol_buildpath($reldir, 0);
+                    $newdir = DolibarrFunctions::dol_osencode($dir);
 
-                        // Check if file found (do not use dol_is_file to avoid loading files.lib.php)
-                        $tmpnewauthfile = $newdir . (preg_match('/\/$/', $newdir) ? '' : '/') . $authfile;
-                        if (is_file($tmpnewauthfile)) {
-                            $fullauthfile = $tmpnewauthfile;
-                        }
-                    }
-
-                    $result = false;
-                    if ($fullauthfile) {
-                        $result = include_once $fullauthfile;
-                    }
-                    if ($fullauthfile && $result) {
-                        // Call function to check user/password
-                        $function = 'check_user_password_' . $mode;
-                        $login = call_user_func($function, $usertotest, $passwordtotest, $entitytotest, $context);
-
-                        if ($login && $login != '--bad-login-validity--') {    // Login is successfull
-                            $test = false; // To stop once at first login success
-                            $conf->authmode = $mode; // This properties is defined only when logged to say what mode was successfully used
-                            $dol_tz = DolibarrFunctions::GETPOST('tz');
-                            $dol_dst = DolibarrFunctions::GETPOST('dst');
-                            $dol_screenwidth = DolibarrFunctions::GETPOST('screenwidth');
-                            $dol_screenheight = DolibarrFunctions::GETPOST('screenheight');
-                        }
-                    } else {
-                        DolibarrFunctions::dol_syslog("Authentication KO - failed to load file '" . $authfile . "'", LOG_ERR);
-                        sleep(1);
-                        // Load translation files required by the page
-                        //					$langs->loadLangs(array('other', 'main', 'errors'));
-
-                        $_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorFailedToLoadLoginFileForMode", $mode);
+                    // Check if file found (do not use dol_is_file to avoid loading files.lib.php)
+                    $tmpnewauthfile = $newdir . (preg_match('/\/$/', $newdir) ? '' : '/') . $authfile;
+                    if (is_file($tmpnewauthfile)) {
+                        $fullauthfile = $tmpnewauthfile;
                     }
                 }
+
+                $result = false;
+                if ($fullauthfile) {
+                    $result = include_once $fullauthfile;
+                }
+                if ($fullauthfile && $result) {
+                    // Call function to check user/password
+                    $function = 'check_user_password_' . $mode;
+                    $login = call_user_func($function, $usertotest, $passwordtotest, $entitytotest, $context);
+
+                    if ($login && $login != '--bad-login-validity--') {    // Login is successfull
+                        $test = false; // To stop once at first login success
+                        $conf->authmode = $mode; // This properties is defined only when logged to say what mode was successfully used
+                        $dol_tz = DolibarrFunctions::GETPOST('tz');
+                        $dol_dst = DolibarrFunctions::GETPOST('dst');
+                        $dol_screenwidth = DolibarrFunctions::GETPOST('screenwidth');
+                        $dol_screenheight = DolibarrFunctions::GETPOST('screenheight');
+                    }
+                } else {
+                    DolibarrFunctions::dol_syslog("Authentication KO - failed to load file '" . $authfile . "'", LOG_ERR);
+                    sleep(1);
+                    // Load translation files required by the page
+                    //					$langs->loadLangs(array('other', 'main', 'errors'));
+
+                    $_SESSION["dol_loginmesg"] = $langs->transnoentitiesnoconv("ErrorFailedToLoadLoginFileForMode", $mode);
+                }
             }
+        }
 
         return $login;
     }
@@ -141,13 +142,13 @@ abstract class DolibarrSecurity2
      * @param Translate $langs Lang object (must be initialized by a new).
      * @param Conf      $conf  Conf object
      * @param Societe   $mysoc Company object
-     *
-     * @return      void
      */
     static function dol_loginfunction($controller, $langs, $conf, $mysoc)
     {
         // global $dolibarr_main_demo, $dolibarr_main_force_https;
         // global $db, $hookmanager;
+
+        $data = new stdClass();
 
         $conf = DolibarrGlobals::getConf();
         $langs = DolibarrGlobals::getLangs();
@@ -158,19 +159,19 @@ abstract class DolibarrSecurity2
         // Instantiate hooks of thirdparty module only if not already define
         $hookmanager->initHooks(['mainloginpage']);
 
-        $main_authentication = $conf->file->main_authentication;
+        $data->main_authentication = $conf->file->main_authentication;
 
-        $session_name = session_name(); // Get current session name
+        $data->session_name = session_name(); // Get current session name
 
-        $dol_url_root = DOL_URL_ROOT;
+        $data->dol_url_root = DOL_URL_ROOT;
 
         // Title
         $appli = constant('DOL_APPLICATION_TITLE');
-        $title = $appli . ' ' . constant('DOL_VERSION');
+        $data->title = $appli . ' ' . constant('DOL_VERSION');
         if (!empty($conf->global->MAIN_APPLICATION_TITLE)) {
-            $title = $conf->global->MAIN_APPLICATION_TITLE;
+            $data->title = $conf->global->MAIN_APPLICATION_TITLE;
         }
-        $titletruedolibarrversion = constant('DOL_VERSION'); // $title used by login template after the @ to inform of true Dolibarr version
+        $data->titletruedolibarrversion = constant('DOL_VERSION'); // $title used by login template after the @ to inform of true Dolibarr version
 
         // Note: $conf->css looks like '/theme/eldy/style.css.php'
         /*
@@ -201,7 +202,7 @@ abstract class DolibarrSecurity2
                 }
             }
         } else {
-            $template_dir = DOL_DOCUMENT_ROOT . "/core/tpl/";
+            $data->template_dir = DOL_DOCUMENT_ROOT . "/core/tpl/";
         }
 
         // Set cookie for timeout management
@@ -218,9 +219,9 @@ abstract class DolibarrSecurity2
         }
 
         if (!DolibarrFunctions::GETPOST("username", 'alpha')) {
-            $focus_element = 'username';
+            $data->focus_element = 'username';
         } else {
-            $focus_element = 'password';
+            $data->focus_element = 'password';
         }
 
         $demologin = '';
@@ -233,95 +234,97 @@ abstract class DolibarrSecurity2
 
         // Execute hook getLoginPageOptions (for table)
         $parameters = ['entity' => DolibarrFunctions::GETPOST('entity', 'int')];
-        $reshook = $hookmanager->executeHooks('getLoginPageOptions', $parameters); // Note that $action and $object may have been modified by some hooks.
-        $morelogincontent = $hookmanager->resPrint;
+        $data->reshook = $hookmanager->executeHooks('getLoginPageOptions', $parameters); // Note that $action and $object may have been modified by some hooks.
+        $data->morelogincontent = $hookmanager->resPrint;
 
         // Execute hook getLoginPageExtraOptions (eg for js)
         $parameters = ['entity' => DolibarrFunctions::GETPOST('entity', 'int')];
-        $reshook = $hookmanager->executeHooks('getLoginPageExtraOptions', $parameters); // Note that $action and $object may have been modified by some hooks.
-        $moreloginextracontent = $hookmanager->resPrint;
+        $data->reshook = $hookmanager->executeHooks('getLoginPageExtraOptions', $parameters); // Note that $action and $object may have been modified by some hooks.
+        $data->moreloginextracontent = $hookmanager->resPrint;
 
         // Login
-        $login = (!empty($hookmanager->resArray['username']) ? $hookmanager->resArray['username'] : (DolibarrFunctions::GETPOST("username", "alpha") ? DolibarrFunctions::GETPOST("username", "alpha") : $demologin));
-        $password = $demopassword;
+        $data->login = (!empty($hookmanager->resArray['username']) ? $hookmanager->resArray['username'] : (DolibarrFunctions::GETPOST("username", "alpha") ? DolibarrFunctions::GETPOST("username", "alpha") : $demologin));
+        $data->password = $demopassword;
 
         // Show logo (search in order: small company logo, large company logo, theme logo, common logo)
-        $width = 0;
-        $urllogo = DOL_URL_ROOT . '/theme/common/login_logo.png';
+        $data->width = 0;
+        $data->urllogo = DOL_URL_ROOT . '/theme/common/login_logo.png';
 
         if (!empty($mysoc->logo_small) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $mysoc->logo_small)) {
-            $urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/thumbs/' . $mysoc->logo_small);
+            $data->urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/thumbs/' . $mysoc->logo_small);
         } elseif (!empty($mysoc->logo) && is_readable($conf->mycompany->dir_output . '/logos/' . $mysoc->logo)) {
-            $urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/' . $mysoc->logo);
-            $width = 128;
+            $data->urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/' . $mysoc->logo);
+            $data->width = 128;
         } elseif (!empty($mysoc->logo_squarred_small) && is_readable($conf->mycompany->dir_output . '/logos/thumbs/' . $mysoc->logo_squarred_small)) {
-            $urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/thumbs/' . $mysoc->logo_squarred_small);
+            $data->urllogo = DOL_URL_ROOT . '/viewimage.php?cache=1&amp;modulepart=mycompany&amp;file=' . urlencode('logos/thumbs/' . $mysoc->logo_squarred_small);
         } elseif (is_readable(DOL_DOCUMENT_ROOT . '/theme/dolibarr_logo.svg')) {
-            $urllogo = DOL_URL_ROOT . '/theme/dolibarr_logo.svg';
+            $data->urllogo = DOL_URL_ROOT . '/theme/dolibarr_logo.svg';
         }
 
         // Security graphical code
-        $captcha = 0;
-        $captcha_refresh = '';
+        $data->captcha = 0;
+        $data->captcha_refresh = '';
         if (function_exists("imagecreatefrompng") && !empty($conf->global->MAIN_SECURITY_ENABLECAPTCHA)) {
-            $captcha = 1;
-            $captcha_refresh = img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"');
+            $data->captcha = 1;
+            $data->captcha_refresh = img_picto($langs->trans("Refresh"), 'refresh', 'id="captcha_refresh_img"');
         }
 
         // Extra link
-        $forgetpasslink = 0;
-        $helpcenterlink = 0;
+        $data->forgetpasslink = 0;
+        $data->helpcenterlink = 0;
         if (empty($conf->global->MAIN_SECURITY_DISABLEFORGETPASSLINK) || empty($conf->global->MAIN_HELPCENTER_DISABLELINK)) {
             if (empty($conf->global->MAIN_SECURITY_DISABLEFORGETPASSLINK)) {
-                $forgetpasslink = 1;
+                $data->forgetpasslink = 1;
             }
 
             if (empty($conf->global->MAIN_HELPCENTER_DISABLELINK)) {
-                $helpcenterlink = 1;
+                $data->helpcenterlink = 1;
             }
         }
 
         // Home message
-        $main_home = '';
+        $data->main_home = '';
         if (!empty($conf->global->MAIN_HOME)) {
             $substitutionarray = getCommonSubstitutionArray($langs);
             complete_substitutions_array($substitutionarray, $langs);
             $texttoshow = make_substitutions($conf->global->MAIN_HOME, $substitutionarray, $langs);
 
-            $main_home = dol_htmlcleanlastbr($texttoshow);
+            $data->main_home = dol_htmlcleanlastbr($texttoshow);
         }
 
         // Google AD
-        $main_google_ad_client = ((!empty($conf->global->MAIN_GOOGLE_AD_CLIENT) && !empty($conf->global->MAIN_GOOGLE_AD_SLOT)) ? 1 : 0);
+        $data->main_google_ad_client = ((!empty($conf->global->MAIN_GOOGLE_AD_CLIENT) && !empty($conf->global->MAIN_GOOGLE_AD_SLOT)) ? 1 : 0);
 
         // Set jquery theme
-        $dol_loginmesg = (!empty($_SESSION["dol_loginmesg"]) ? $_SESSION["dol_loginmesg"] : '');
+        $data->dol_loginmesg = (!empty($_SESSION["dol_loginmesg"]) ? $_SESSION["dol_loginmesg"] : '');
 
-        $favicon = DOL_URL_ROOT . '/theme/dolibarr_256x256_color.png';
+        $data->favicon = DOL_URL_ROOT . '/theme/dolibarr_256x256_color.png';
         if (!empty($mysoc->logo_squarred_mini)) {
-            $favicon = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=mycompany&file=' . urlencode('logos/thumbs/' . $mysoc->logo_squarred_mini);
+            $data->favicon = DOL_URL_ROOT . '/viewimage.php?cache=1&modulepart=mycompany&file=' . urlencode('logos/thumbs/' . $mysoc->logo_squarred_mini);
         }
         if (!empty($conf->global->MAIN_FAVICON_URL)) {
-            $favicon = $conf->global->MAIN_FAVICON_URL;
+            $data->favicon = $conf->global->MAIN_FAVICON_URL;
         }
 
-        $jquerytheme = 'base';
+        $data->jquerytheme = 'base';
         if (!empty($conf->global->MAIN_USE_JQUERY_THEME)) {
-            $jquerytheme = $conf->global->MAIN_USE_JQUERY_THEME;
+            $data->jquerytheme = $conf->global->MAIN_USE_JQUERY_THEME;
         }
 
         // Set dol_hide_topmenu, dol_hide_leftmenu, dol_optimize_smallscreen, dol_no_mouse_hover
-        $dol_hide_topmenu = DolibarrFunctions::GETPOST('dol_hide_topmenu', 'int');
-        $dol_hide_leftmenu = DolibarrFunctions::GETPOST('dol_hide_leftmenu', 'int');
-        $dol_optimize_smallscreen = DolibarrFunctions::GETPOST('dol_optimize_smallscreen', 'int');
-        $dol_no_mouse_hover = DolibarrFunctions::GETPOST('dol_no_mouse_hover', 'int');
-        $dol_use_jmobile = DolibarrFunctions::GETPOST('dol_use_jmobile', 'int');
+        $data->dol_hide_topmenu = DolibarrFunctions::GETPOST('dol_hide_topmenu', 'int');
+        $data->dol_hide_leftmenu = DolibarrFunctions::GETPOST('dol_hide_leftmenu', 'int');
+        $data->dol_optimize_smallscreen = DolibarrFunctions::GETPOST('dol_optimize_smallscreen', 'int');
+        $data->dol_no_mouse_hover = DolibarrFunctions::GETPOST('dol_no_mouse_hover', 'int');
+        $data->dol_use_jmobile = DolibarrFunctions::GETPOST('dol_use_jmobile', 'int');
 
         // Include login page template
         // include $template_dir . 'login.tpl.php';
 
+        // dump($data);
+
         // TODO: Show the login form if the user is not identified. Includes side menú
-        new DolibarrLogin($controller);
+        new DolibarrLogin($controller, $data);
 
         // Global html output events ($mesgs, $errors, $warnings)
         DolibarrFunctions::dol_htmloutput_events(0);

@@ -24,7 +24,7 @@
  *                JQuery (providing object $) and JQuery-UI (providing $datepicker) libraries must be loaded before this file.
  */
 
-if (!defined('NOREQUIRESOC')) {
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;if (!defined('NOREQUIRESOC')) {
     define('NOREQUIRESOC', '1');
 }
 if (!defined('NOCSRFCHECK')) {
@@ -50,36 +50,35 @@ session_cache_limiter('public');
 
 require_once '../../main.php';
 
-
 /*
  * View
  */
 
 // Define javascript type
-top_httphead('text/javascript; charset=UTF-8');
+$mw->top_httphead('text/javascript; charset=UTF-8');
 // Important: Following code is to avoid page request by browser and PHP CPU at each Dolibarr page access.
 if (empty($dolibarr_nocache)) {
-    header('Cache-Control: max-age=10800, public, must-revalidate');
+    //header('Cache-Control: max-age=10800, public, must-revalidate');
 } else {
-    header('Cache-Control: no-cache');
+    //header('Cache-Control: no-cache');
 }
 
 
 
 // Define tradMonths javascript array (we define this in datepicker AND in parent page to avoid errors with IE8)
 $tradMonths = [
-    dol_escape_js($langs->transnoentitiesnoconv("Month01")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month02")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month03")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month04")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month05")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month06")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month07")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month08")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month09")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month10")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month11")),
-    dol_escape_js($langs->transnoentitiesnoconv("Month12")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month01")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month02")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month03")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month04")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month05")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month06")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month07")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month08")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month09")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month10")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month11")),
+    DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Month12")),
 ];
 
 $tradMonthsShort = [
@@ -177,23 +176,23 @@ jQuery(function ($) {
 
 var select2arrayoflanguage = {
     matches: function (matches) {
-        return matches + " <?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2ResultFoundUseArrows")); ?>";
+        return matches + " <?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2ResultFoundUseArrows")); ?>";
     },
     noResults: function () {
-        return "<?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2NotFound")); ?>";
+        return "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2NotFound")); ?>";
     },
     inputTooShort: function (input) {
         var n = input.minimum;
         /*console.log(input);
         console.log(input.minimum);*/
-        if (n > 1) return "<?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2Enter")); ?> " + n + " <?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2MoreCharacters")); ?>";
-        else return "<?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2Enter")); ?> " + n + " <?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2MoreCharacter")); ?>"
+        if (n > 1) return "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2Enter")); ?> " + n + " <?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2MoreCharacters")); ?>";
+        else return "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2Enter")); ?> " + n + " <?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2MoreCharacter")); ?>"
     },
     loadMore: function (pageNumber) {
-        return "<?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2LoadingMoreResults")); ?>";
+        return "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2LoadingMoreResults")); ?>";
     },
     searching: function () {
-        return "<?php echo dol_escape_js($langs->transnoentitiesnoconv("Select2SearchInProgress")); ?>";
+        return "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("Select2SearchInProgress")); ?>";
     }
 };
 
@@ -1012,11 +1011,11 @@ function document_preview(file, type, title) {
         optionsbuttons = {}
         if (mode == 'image' && showOriginalSizeButton) {
             optionsbuttons = {
-                "<?php echo dol_escape_js($langs->transnoentitiesnoconv("OriginalSize")); ?>": function () {
+                "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("OriginalSize")); ?>": function () {
                     console.log("Click on original size");
                     jQuery(".ui-dialog-content.ui-widget-content > object").css({"max-height": "none"});
                 },
-                "<?php echo dol_escape_js($langs->transnoentitiesnoconv("CloseWindow")); ?>": function () {
+                "<?php echo DolibarrFunctions::dol_escape_js($langs->transnoentitiesnoconv("CloseWindow")); ?>": function () {
                     $(this).dialog("close");
                 }
             };
@@ -1154,7 +1153,7 @@ function price2numjs(amount) {
     if ($thousand == 'Space') {
         $thousand = ' ';
     }
-    print "var dec='" . dol_escape_js($dec) . "'; var thousand='" . dol_escape_js($thousand) . "';\n"; // Set var in javascript
+    print "var dec='" . DolibarrFunctions::dol_escape_js($dec) . "'; var thousand='" . DolibarrFunctions::dol_escape_js($thousand) . "';\n"; // Set var in javascript
     ?>
 
     var main_max_dec_shown = <?php echo (int) str_replace('.', '', $conf->global->MAIN_MAX_DECIMALS_SHOWN); ?>;

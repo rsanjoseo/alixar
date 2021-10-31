@@ -31,7 +31,21 @@ class Logout extends DolibarrController
 {
     public function setView(): View
     {
-        die('Logout');
-        return new LogoutView($this);
+        unset($_SESSION['dol_login']);
+        unset($_SESSION['dol_entity']);
+        unset($_SESSION['urlfrom']);
+
+        header('location: index.php?module=admin&controller=init');
+        die();
+    }
+
+    function getDolibarrVars(): void
+    {
+        // TODO: Implement getDolibarrVars() method.
+    }
+
+    function getDolibarrActions(): void
+    {
+        // TODO: Implement getDolibarrActions() method.
     }
 }

@@ -28,6 +28,7 @@ namespace Alxarafe\Dolibarr\Libraries;
 use Alxarafe\Core\Base\BasicController;
 use Alxarafe\Dolibarr\Base\DolibarrController;
 use Alxarafe\Dolibarr\Base\DolibarrView;
+use stdClass;
 
 /**
  * Class DolibarrLogin
@@ -38,7 +39,7 @@ use Alxarafe\Dolibarr\Base\DolibarrView;
  */
 class DolibarrLogin extends DolibarrView
 {
-    public function __construct(BasicController $controller)
+    public function __construct(BasicController $controller, stdClass $data)
     {
         parent::__construct($controller);
 
@@ -100,10 +101,10 @@ class DolibarrLogin extends DolibarrView
         } else {
             $titleofloginpage = $this->langs->trans('Login');
         }
-        $titleofloginpage .= ' @ ' . $titletruedolibarrversion; // $titletruedolibarrversion is defined by dol_loginfunction in security2.lib.php. We must keep the @, some tools use it to know it is login page and find true dolibarr version.
+        $titleofloginpage .= ' @ ' . $data->titletruedolibarrversion; // $titletruedolibarrversion is defined by dol_loginfunction in security2.lib.php. We must keep the @, some tools use it to know it is login page and find true dolibarr version.
 
         $disablenofollow = 1;
-        if (!preg_match('/' . constant('DOL_APPLICATION_TITLE') . '/', $title)) {
+        if (!preg_match('/' . constant('DOL_APPLICATION_TITLE') . '/', $data->title)) {
             $disablenofollow = 0;
         }
         if (!empty($this->conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
@@ -121,24 +122,24 @@ class DolibarrLogin extends DolibarrView
 
         print "<!-- BEGIN PHP TEMPLATE LOGIN.TPL.PHP -->\n";
 
+        print '<body class="body bodylogin"';
         if (!empty($this->conf->global->ADD_UNSPLASH_LOGIN_BACKGROUND)) {
             // For example $this->conf->global->ADD_UNSPLASH_LOGIN_BACKGROUND = 'https://source.unsplash.com/random'
-            print '
-<body class="body bodylogin"
-      style="background-image: url(' . DolibarrFunctions::dol_escape_htmltag($this->conf->global->ADD_UNSPLASH_LOGIN_BACKGROUND) . '); background-repeat: no-repeat; background-position: center center; background-attachment: fixed; background-size: cover; background-color: #ffffff;">
-';
+            print ' style="background-image: url(' . "'" . DolibarrFunctions::dol_escape_htmltag($this->conf->global->ADD_UNSPLASH_LOGIN_BACKGROUND) . "'" . '"); background-repeat: no-repeat; background-position: center center; background-attachment: fixed; background-size: cover; background-color: #ffffff;';
         } else {
-            print '
-<body class="body bodylogin"' . empty($this->conf->global->MAIN_LOGIN_BACKGROUND) ? '' : ' style="background-size: cover; background-position: center center; background-attachment: fixed; background-repeat: no-repeat; background-image: url(\'' . DOL_URL_ROOT . '/viewimage.php?cache=1&noalt=1&modulepart=mycompany&file=logos/' . urlencode($this->conf->global->MAIN_LOGIN_BACKGROUND) . '\')"' . '>
-';
+            $tmpurl = DOL_URL_ROOT . '/viewimage.php?cache=1&noalt=1&modulepart=mycompany&file=logos/' . urlencode($this->conf->global->MAIN_LOGIN_BACKGROUND);
+            print empty($this->conf->global->MAIN_LOGIN_BACKGROUND)
+                ? ''
+                : ' style="background-size: cover; background-position: center center; background-attachment: fixed; background-repeat: no-repeat; background-image: url(' . "'" . $tmpurl . "'" . ')';
         }
+        print '>';
 
         if (empty($this->conf->dol_use_jmobile)) {
             print '<script>
         $(document).ready(function () {
             /* Set focus on correct field */';
-            if ($focus_element) {
-                print '$(' . $focus_element . ').focus();';
+            if ($data->focus_element) {
+                print '$(' . $data->focus_element . ').focus();';
             }        // Warning to use this only on visible element
             print '});
     </script>';
@@ -160,22 +161,22 @@ class DolibarrLogin extends DolibarrView
             <input type="hidden" name="screenwidth" id="screenwidth" value=""/>
             <input type="hidden" name="screenheight" id="screenheight" value=""/>
             <input type="hidden" name="dol_hide_topmenu" id="dol_hide_topmenu"
-                   value="' . $dol_hide_topmenu . '"/>
+                   value="' . $data->dol_hide_topmenu . '"/>
             <input type="hidden" name="dol_hide_leftmenu" id="dol_hide_leftmenu"
-                   value="' . $dol_hide_leftmenu . '"/>
+                   value="' . $data->dol_hide_leftmenu . '"/>
             <input type="hidden" name="dol_optimize_smallscreen" id="dol_optimize_smallscreen"
-                   value="' . $dol_optimize_smallscreen . '"/>
+                   value="' . $data->dol_optimize_smallscreen . '"/>
             <input type="hidden" name="dol_no_mouse_hover" id="dol_no_mouse_hover"
-                   value="' . $dol_no_mouse_hover . '"/>
-            <input type="hidden" name="dol_use_jmobile" id="dol_use_jmobile" value="' . $dol_use_jmobile . '"/>
+                   value="' . $data->dol_no_mouse_hover . '"/>
+            <input type="hidden" name="dol_use_jmobile" id="dol_use_jmobile" value="' . $data->dol_use_jmobile . '"/>
 
 
             <!-- Title with version -->
-            <div class="login_table_title center" title="' . DolibarrFunctions::dol_escape_htmltag($title) . '">';
+            <div class="login_table_title center" title="' . DolibarrFunctions::dol_escape_htmltag($data->title) . '">';
         if ($disablenofollow) {
             echo '<a class="login_table_title" href="https://www.dolibarr.org" target="_blank">';
         }
-        echo DolibarrFunctions::dol_escape_htmltag($title);
+        echo DolibarrFunctions::dol_escape_htmltag($data->title);
         if ($disablenofollow) {
             echo '</a>';
         }
@@ -187,7 +188,7 @@ class DolibarrLogin extends DolibarrView
                 <div id="login_line1">
 
                     <div id="login_left">
-                        <img alt="" src="' . $urllogo . '" id="img_logo"/>
+                        <img alt="" src="' . $data->urllogo . '" id="img_logo"/>
                     </div>
 
                     <br>
@@ -208,7 +209,7 @@ class DolibarrLogin extends DolibarrView
                                     <input type="text" id="username" maxlength="255"
                                            placeholder="' . $this->langs->trans("Login") . '" name="username"
                                            class="flat input-icon-user minwidth150"
-                                           value="' . DolibarrFunctions::dol_escape_htmltag($login) . '" tabindex="1"
+                                           value="' . DolibarrFunctions::dol_escape_htmltag($data->login) . '" tabindex="1"
                                            autofocus="autofocus"/>
                                 </div>
                             </div>
@@ -226,7 +227,7 @@ class DolibarrLogin extends DolibarrView
                                     <input type="password" id="password" maxlength="128"
                                            placeholder="' . $this->langs->trans("Password") . '" name="password"
                                            class="flat input-icon-password minwidth150"
-                                           value="' . DolibarrFunctions::dol_escape_htmltag($password) . '" tabindex="2"
+                                           value="' . DolibarrFunctions::dol_escape_htmltag($data->password) . '" tabindex="2"
                                            autocomplete="' . (empty($this->conf->global->MAIN_LOGIN_ENABLE_PASSWORD_AUTOCOMPLETE) ? 'off' : 'on') . '"/>
                                 </div>
                             </div>';
@@ -255,7 +256,7 @@ class DolibarrLogin extends DolibarrView
 	<img class="inline-block valignmiddle" src="' . DOL_URL_ROOT . '/core/antispamimage.php" border="0" width="80"
          height="32" id="img_securitycode"/>
 	<a class="inline-block valignmiddle" href="' . $php_self . '" tabindex="4"
-       data-role="button">' . $captcha_refresh . '</a>
+       data-role="button">' . $data->captcha_refresh . '</a>
 	</span>
 
                                     </div>
@@ -292,24 +293,24 @@ class DolibarrLogin extends DolibarrView
                         <input type="submit" class="button"
                                value="&nbsp; ' . $this->langs->trans('Connection') . ' &nbsp;" tabindex="5"/>
                     </div>';
-        if ($forgetpasslink || $helpcenterlink) {
+        if ($data->forgetpasslink || $data->helpcenterlink) {
             $moreparam = '';
-            if ($dol_hide_topmenu) {
-                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_hide_topmenu=' . $dol_hide_topmenu;
+            if ($data->dol_hide_topmenu) {
+                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_hide_topmenu=' . $data->dol_hide_topmenu;
             }
-            if ($dol_hide_leftmenu) {
-                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_hide_leftmenu=' . $dol_hide_leftmenu;
+            if ($data->dol_hide_leftmenu) {
+                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_hide_leftmenu=' . $data->dol_hide_leftmenu;
             }
-            if ($dol_no_mouse_hover) {
-                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_no_mouse_hover=' . $dol_no_mouse_hover;
+            if ($data->dol_no_mouse_hover) {
+                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_no_mouse_hover=' . $data->dol_no_mouse_hover;
             }
-            if ($dol_use_jmobile) {
-                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_use_jmobile=' . $dol_use_jmobile;
+            if ($data->dol_use_jmobile) {
+                $moreparam .= (strpos($moreparam, '?') === false ? '?' : '&') . 'dol_use_jmobile=' . $data->dol_use_jmobile;
             }
 
             echo '<br>';
             echo '<div class="center" style="margin-top: 5px;">';
-            if ($forgetpasslink) {
+            if ($data->forgetpasslink) {
                 $url = DOL_URL_ROOT . '/Modules/Users/passwordforgotten.php' . $moreparam;
                 if (!empty($this->conf->global->MAIN_PASSWORD_FORGOTLINK)) {
                     $url = $this->conf->global->MAIN_PASSWORD_FORGOTLINK;
@@ -319,11 +320,11 @@ class DolibarrLogin extends DolibarrView
                 echo '</a>';
             }
 
-            if ($forgetpasslink && $helpcenterlink) {
+            if ($data->forgetpasslink && $data->helpcenterlink) {
                 echo '&nbsp;-&nbsp;';
             }
 
-            if ($helpcenterlink) {
+            if ($data->helpcenterlink) {
                 $url = DOL_URL_ROOT . '/support/index.php' . $moreparam;
                 if (!empty($this->conf->global->MAIN_HELPCENTER_LINKTOUSE)) {
                     $url = $this->conf->global->MAIN_HELPCENTER_LINKTOUSE;
@@ -387,15 +388,15 @@ class DolibarrLogin extends DolibarrView
             }
         }
 
-        if ($main_home) {
+        if ($data->main_home) {
             print '<div class="center login_main_home paddingtopbottom ' . (empty($this->conf->global->MAIN_LOGIN_BACKGROUND) ? '' : ' backgroundsemitransparent boxshadow') . '"
                  style="max-width: 70%">
-                ' . $main_home . '</div><br>';
+                ' . $data->main_home . '</div><br>';
         }
 
         print'
-        <!-- authentication mode = ' . $main_authentication . ' -->
-        <!-- cookie name used for this session = ' . $session_name . ' -->
+        <!-- authentication mode = ' . $data->main_authentication . ' -->
+        <!-- cookie name used for this session = ' . $data->session_name . ' -->
         <!-- urlfrom in this session = ' . (isset($_SESSION["urlfrom"]) ? $_SESSION["urlfrom"] : '') . ' -->
 
         <!-- Common footer is not used for login page, this is same than footer but inside login tpl -->';

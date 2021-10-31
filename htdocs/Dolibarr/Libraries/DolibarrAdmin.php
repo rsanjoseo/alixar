@@ -22,6 +22,7 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
@@ -878,9 +879,12 @@ abstract class DolibarrAdmin
      *
      * @return  array                Array of tabs to show
      */
-    function translation_prepare_head()
+    static function translation_prepare_head()
     {
-        global $langs, $conf, $user;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        // $user=DolibarrGlobals::getUser();
+
         $h = 0;
         $head = [];
 
@@ -894,9 +898,9 @@ abstract class DolibarrAdmin
         $head[$h][2] = 'overwrite';
         $h++;
 
-        complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin');
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin');
 
-        complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin', 'remove');
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin', 'remove');
 
         return $head;
     }

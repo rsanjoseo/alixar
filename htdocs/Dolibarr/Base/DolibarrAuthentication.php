@@ -675,7 +675,7 @@ class DolibarrAuthentication
                 if ($_SERVER["HTTP_USER_AGENT"] == 'securitytest') {
                     http_response_code(401); // It makes easier to understand if session was broken during security tests
                 }
-                DolibarrSecurity2::dol_loginfunction($this->controller, $this->langs, $this->conf, (!empty($this->mysoc) ? $this->mysoc : ''));
+                $loginData = DolibarrSecurity2::dol_loginfunction($this->controller, $this->langs, $this->conf, (!empty($this->mysoc) ? $this->mysoc : ''));
             }
             exit;
         }

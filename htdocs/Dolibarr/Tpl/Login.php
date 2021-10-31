@@ -44,6 +44,8 @@ class Login extends MainView
 {
     public function __construct($conf)
     {
+        die('Use DolibarrLogin in libraries!');
+
         parent::__construct();
         $this->login();
         $this->login2($conf);
