@@ -72,6 +72,8 @@ class DolibarrView extends View
     public ?Societe $mysoc;
     public HookManager $hookmanager;
     public MenuManager $menumanager;
+    public $form;
+    public $formadmin;
 
     function __construct(BasicController $controller)
     {
@@ -416,7 +418,7 @@ class DolibarrView extends View
                     } else {
                         if (defined('CSRFCHECK_WITH_TOKEN')) {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (CSRFCHECK_WITH_TOKEN protection) in main.inc.php. Token not provided.", LOG_WARNING);
-                            print "Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in main.php. Token not provided.\n";
+                            print "Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in DolibarrView. Token not provided.\n";
                         } else {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (POST method or GET with a sensible value for 'action' parameter) in main.inc.php. Token not provided.", LOG_WARNING);
                             print "Access to this page this way (POST method or GET with a sensible value for 'action' parameter) is refused by CSRF protection in main.inc.php. Token not provided.\n";
@@ -746,11 +748,10 @@ class DolibarrView extends View
         //print '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">'."\n";
         if (empty($disablehead)) {
             if (!is_object($this->hookmanager)) {
-                $this->hookmanager = new HookManager($db);
+                $this->hookmanager = new HookManager();
             }
             $this->hookmanager->initHooks(["main"]);
 
-            dump($this->conf->browser);
             $ext = 'layout=' . $this->conf->browser->layout . '&version=' . urlencode(DOL_VERSION);
 
             print "<head>\n";
@@ -830,7 +831,7 @@ class DolibarrView extends View
                 $ext = 'version=' . DolibarrFunctions::GETPOST('version', 'int'); // usefull to force no cache on css/js
             }
 
-            $themeparam = '?lang=' . $this->langs->defaultlang . '&amp;theme=' . $this->conf->theme . (DolibarrFunctions::GETPOST('optioncss', 'aZ09') ? '&amp;optioncss=' . DolibarrFunctions::GETPOST('optioncss', 'aZ09', 1) : '') . '&amp;userid=' . $this->user->id . '&amp;entity=' . $this->conf->entity;
+            $themeparam = '?lang=' . $this->langs->getDefaultLang() . '&amp;theme=' . $this->conf->theme . (DolibarrFunctions::GETPOST('optioncss', 'aZ09') ? '&amp;optioncss=' . DolibarrFunctions::GETPOST('optioncss', 'aZ09', 1) : '') . '&amp;userid=' . $this->user->id . '&amp;entity=' . $this->conf->entity;
             $themeparam .= ($ext ? '&amp;' . $ext : '') . '&amp;revision=' . DolibarrFunctions::getDolGlobalInt("MAIN_IHM_PARAMS_REV");
             if (!empty($_SESSION['dol_resetcache'])) {
                 $themeparam .= '&amp;dol_resetcache=' . $_SESSION['dol_resetcache'];
@@ -1002,7 +1003,7 @@ class DolibarrView extends View
                 // jQuery Timepicker
                 if (!empty($this->conf->global->MAIN_USE_JQUERY_TIMEPICKER) || defined('REQUIRE_JQUERY_TIMEPICKER')) {
                     print '<script src="' . DOL_URL_ROOT . '/includes/jquery/plugins/timepicker/jquery-ui-timepicker-addon.js' . ($ext ? '?' . $ext : '') . '"></script>' . "\n";
-                    print '<script src="' . DOL_URL_ROOT . '/core/js/timepicker.js.php?lang=' . $this->langs->defaultlang . ($ext ? '&amp;' . $ext : '') . '"></script>' . "\n";
+                    print '<script src="' . DOL_URL_ROOT . '/core/js/timepicker.js.php?lang=' . $this->langs->getDefaultLang() . ($ext ? '&amp;' . $ext : '') . '"></script>' . "\n";
                 }
                 if (!defined('DISABLE_SELECT2') && (!empty($this->conf->global->MAIN_USE_JQUERY_MULTISELECT) || defined('REQUIRE_JQUERY_MULTISELECT'))) {
                     // jQuery plugin "mutiselect", "multiple-select", "select2", ...
@@ -1058,7 +1059,7 @@ class DolibarrView extends View
 
                 // Global js function
                 print '<!-- Includes JS of Dolibarr -->' . "\n";
-                print '<script src="' . DOL_URL_ROOT . '/core/js/lib_head.js.php?lang=' . $this->langs->defaultlang . ($ext ? '&amp;' . $ext : '') . '"></script>' . "\n";
+                print '<script src="' . DOL_URL_ROOT . '/core/js/lib_head.js.php?lang=' . $this->langs->getDefaultLang() . ($ext ? '&amp;' . $ext : '') . '"></script>' . "\n";
 
                 // JS forced by modules (relative url starting with /)
                 if (!empty($this->conf->modules_parts['js'])) {        // $this->conf->modules_parts['js'] is array('module'=>array('file1','file2'))
@@ -1067,7 +1068,7 @@ class DolibarrView extends View
                         $filesjs = (array) $filesjs; // To be sure filejs is an array
                         foreach ($filesjs as $jsfile) {
                             // jsfile is a relative path
-                            print '<!-- Include JS added by module ' . $modjs . '-->' . "\n" . '<script src="' . DolibarrFunctions::dol_buildpath($jsfile, 1) . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->defaultlang . '"></script>' . "\n";
+                            print '<!-- Include JS added by module ' . $modjs . '-->' . "\n" . '<script src="' . DolibarrFunctions::dol_buildpath($jsfile, 1) . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->getDefaultLang() . '"></script>' . "\n";
                         }
                     }
                 }
@@ -1076,9 +1077,9 @@ class DolibarrView extends View
                     print '<!-- Includes JS added by page -->' . "\n";
                     foreach ($arrayofjs as $jsfile) {
                         if (preg_match('/^(http|\/\/)/i', $jsfile)) {
-                            print '<script src="' . $jsfile . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->defaultlang . '"></script>' . "\n";
+                            print '<script src="' . $jsfile . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->getDefaultLang() . '"></script>' . "\n";
                         } else {
-                            print '<script src="' . DolibarrFunctions::dol_buildpath($jsfile, 1) . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->defaultlang . '"></script>' . "\n";
+                            print '<script src="' . DolibarrFunctions::dol_buildpath($jsfile, 1) . ((strpos($jsfile, '?') === false) ? '?' : '&amp;') . 'lang=' . $this->langs->getDefaultLang() . '"></script>' . "\n";
                         }
                     }
                 }
@@ -1128,7 +1129,7 @@ class DolibarrView extends View
             $contentsecuritypolicy = empty($this->conf->global->MAIN_HTTP_CONTENT_SECURITY_POLICY) ? '' : $this->conf->global->MAIN_HTTP_CONTENT_SECURITY_POLICY;
 
             if (!is_object($this->hookmanager)) {
-                $this->hookmanager = new HookManager($db);
+                $this->hookmanager = new HookManager();
             }
             $this->hookmanager->initHooks(["main"]);
 
@@ -1184,9 +1185,9 @@ class DolibarrView extends View
          * Top menu
          */
         if (!defined('MAIN_HIDE_TOP_MENU') || constant('MAIN_HIDE_TOP_MENU') != 1 || (empty($this->conf->dol_hide_topmenu) || DolibarrFunctions::GETPOST('dol_invisible_topmenu', 'int')) && (!defined('NOREQUIREMENU') || !constant('NOREQUIREMENU'))) {
-            if (!isset($form) || !is_object($form)) {
+            if (!isset($this->form) || !is_object($this->form)) {
                 //                include_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php';
-                $form = new Form($db);
+                $this->form = new Form();
             }
 
             print "\n" . '<!-- Start top horizontal -->' . "\n";
@@ -1257,7 +1258,7 @@ class DolibarrView extends View
                 //$text.= DolibarrFunctions::img_picto(":".$this->langs->trans("ModuleBuilder"), 'printer_top.png', 'class="printer"');
                 $text .= '<span class="fa fa-bug atoplogin valignmiddle"></span>';
                 $text .= '</a>';
-                $toprightmenu .= $form->textwithtooltip('', $this->langs->trans("ModuleBuilder"), 2, 1, $text, 'login_block_elem', 2);
+                $toprightmenu .= $this->form->textwithtooltip('', $this->langs->trans("ModuleBuilder"), 2, 1, $text, 'login_block_elem', 2);
             }
 
             // Link to print main content area
@@ -1276,7 +1277,7 @@ class DolibarrView extends View
                 //$text.= DolibarrFunctions::img_picto(":".$this->langs->trans("PrintContentArea"), 'printer_top.png', 'class="printer"');
                 $text .= '<span class="fa fa-print atoplogin valignmiddle"></span>';
                 $text .= '</a>';
-                $toprightmenu .= $form->textwithtooltip('', $this->langs->trans("PrintContentArea"), 2, 1, $text, 'login_block_elem', 2);
+                $toprightmenu .= $this->form->textwithtooltip('', $this->langs->trans("PrintContentArea"), 2, 1, $text, 'login_block_elem', 2);
             }
 
             // Link to Dolibarr wiki pages
@@ -1322,23 +1323,23 @@ class DolibarrView extends View
                     $text .= '<span class="fa fa-question-circle atoplogin valignmiddle' . ($helppresent ? ' ' . $helppresent : '') . '"></span>';
                     $text .= '<span class="fa fa-circle helppresentcircle' . ($helppresent ? '' : ' unvisible') . '"></span>';
                     $text .= '</a>';
-                    $toprightmenu .= $form->textwithtooltip('', $title, 2, 1, $text, 'login_block_elem', 2);
+                    $toprightmenu .= $this->form->textwithtooltip('', $title, 2, 1, $text, 'login_block_elem', 2);
                 }
 
                 // Version
                 if (!empty($this->conf->global->MAIN_SHOWDATABASENAMEINHELPPAGESLINK)) {
                     $this->langs->load('admin');
-                    $appli .= '<br>' . $this->langs->trans("Database") . ': ' . $db->database_name;
+                    $appli .= '<br>' . $this->langs->trans("Database") . ': ' . $this->db->database_name;
                 }
             }
 
             if (empty($this->conf->global->MAIN_OPTIMIZEFORTEXTBROWSER)) {
                 $text = '<span class="aversion"><span class="hideonsmartphone small">' . DOL_VERSION . '</span></span>';
-                $toprightmenu .= $form->textwithtooltip('', $appli, 2, 1, $text, 'login_block_elem', 2);
+                $toprightmenu .= $this->form->textwithtooltip('', $appli, 2, 1, $text, 'login_block_elem', 2);
             }
 
             // Logout link
-            $toprightmenu .= $form->textwithtooltip('', $logouthtmltext, 2, 1, $logouttext, 'login_block_elem logout-btn', 2);
+            $toprightmenu .= $this->form->textwithtooltip('', $logouthtmltext, 2, 1, $logouttext, 'login_block_elem logout-btn', 2);
 
             $toprightmenu .= '</div>'; // end div class="login_block_other"
 
@@ -1398,13 +1399,13 @@ class DolibarrView extends View
         } else {
             // If WIKI URL
             $reg = [];
-            if (preg_match('/^es/i', $this->langs->defaultlang)) {
+            if (preg_match('/^es/i', $this->langs->getDefaultLang())) {
                 $helpbaseurl = 'http://wiki.dolibarr.org/index.php/%s';
                 if (preg_match('/ES:([^|]+)/i', $helppagename, $reg)) {
                     $helppage = $reg[1];
                 }
             }
-            if (preg_match('/^fr/i', $this->langs->defaultlang)) {
+            if (preg_match('/^fr/i', $this->langs->getDefaultLang())) {
                 $helpbaseurl = 'http://wiki.dolibarr.org/index.php/%s';
                 if (preg_match('/FR:([^|]+)/i', $helppagename, $reg)) {
                     $helppage = $reg[1];
@@ -1902,7 +1903,7 @@ class DolibarrView extends View
             $dropdownBody .= '<br><b>' . $this->langs->trans("Administrator") . '</b>: ' . DolibarrFunctions::yn($this->user->admin);
         }
         if (!empty($this->user->socid)) {    // Add thirdparty for external users
-            $thirdpartystatic = new Societe($db);
+            $thirdpartystatic = new Societe();
             $thirdpartystatic->fetch($this->user->socid);
             $companylink = ' ' . $thirdpartystatic->getNomUrl(2); // picto only of company
             $company = ' (' . $this->langs->trans("Company") . ': ' . $thirdpartystatic->name . ')';
@@ -2099,8 +2100,8 @@ class DolibarrView extends View
 
             print "\n";
 
-            if (!is_object($form)) {
-                $form = new Form($db);
+            if (!is_object($this->form)) {
+                $this->form = new Form();
             }
             $selected = -1;
             if (empty($this->conf->global->MAIN_USE_TOP_MENU_SEARCH_DROPDOWN)) {
@@ -2109,7 +2110,7 @@ class DolibarrView extends View
                 include DOL_DOCUMENT_ROOT . '/core/ajax/selectsearchbox.php'; // This set $arrayresult
 
                 if ($this->conf->use_javascript_ajax && empty($this->conf->global->MAIN_USE_OLD_SEARCH_FORM)) {
-                    $searchform .= $form->selectArrayFilter('searchselectcombo', $arrayresult, $selected, '', 1, 0, (empty($this->conf->global->MAIN_SEARCHBOX_CONTENT_LOADED_BEFORE_KEY) ? 1 : 0), 'vmenusearchselectcombo', 1, $this->langs->trans("Search"), 1);
+                    $searchform .= $this->form->selectArrayFilter('searchselectcombo', $arrayresult, $selected, '', 1, 0, (empty($this->conf->global->MAIN_SEARCHBOX_CONTENT_LOADED_BEFORE_KEY) ? 1 : 0), 'vmenusearchselectcombo', 1, $this->langs->trans("Search"), 1);
                 } else {
                     if (is_array($arrayresult)) {
                         foreach ($arrayresult as $key => $val) {
@@ -2163,19 +2164,19 @@ class DolibarrView extends View
             if (!empty($this->conf->global->MAIN_SHOW_VERSION)) {    // Version is already on help picto and on login page.
                 $doliurl = 'https://www.dolibarr.org';
                 //local communities
-                if (preg_match('/fr/i', $this->langs->defaultlang)) {
+                if (preg_match('/fr/i', $this->langs->getDefaultLang())) {
                     $doliurl = 'https://www.dolibarr.fr';
                 }
-                if (preg_match('/es/i', $this->langs->defaultlang)) {
+                if (preg_match('/es/i', $this->langs->getDefaultLang())) {
                     $doliurl = 'https://www.dolibarr.es';
                 }
-                if (preg_match('/de/i', $this->langs->defaultlang)) {
+                if (preg_match('/de/i', $this->langs->getDefaultLang())) {
                     $doliurl = 'https://www.dolibarr.de';
                 }
-                if (preg_match('/it/i', $this->langs->defaultlang)) {
+                if (preg_match('/it/i', $this->langs->getDefaultLang())) {
                     $doliurl = 'https://www.dolibarr.it';
                 }
-                if (preg_match('/gr/i', $this->langs->defaultlang)) {
+                if (preg_match('/gr/i', $this->langs->getDefaultLang())) {
                     $doliurl = 'https://www.dolibarr.gr';
                 }
 
@@ -2232,7 +2233,7 @@ class DolibarrView extends View
                     $bugbaseurl .= urlencode("- **OS**: " . php_uname('s') . "\n");
                     $bugbaseurl .= urlencode("- **Web server**: " . $_SERVER["SERVER_SOFTWARE"] . "\n");
                     $bugbaseurl .= urlencode("- **PHP**: " . php_sapi_name() . ' ' . phpversion() . "\n");
-                    $bugbaseurl .= urlencode("- **Database**: " . $db::LABEL . ' ' . $db->getVersion() . "\n");
+                    $bugbaseurl .= urlencode("- **Database**: " . $this->db::LABEL . ' ' . $this->db->getVersion() . "\n");
                     $bugbaseurl .= urlencode("- **URL(s)**: " . $_SERVER["REQUEST_URI"] . "\n");
                     $bugbaseurl .= urlencode("\n");
                     $bugbaseurl .= urlencode("## Expected and actual behavior\n");
@@ -2465,7 +2466,7 @@ class DolibarrView extends View
 
         if (!empty($this->conf->use_javascript_ajax)) {
             print "\n" . '<!-- Includes JS Footer of Dolibarr -->' . "\n";
-            print '<script src="' . DOL_URL_ROOT . '/core/js/lib_foot.js.php?lang=' . $this->langs->defaultlang . ($ext ? '&' . $ext : '') . '"></script>' . "\n";
+            print '<script src="' . DOL_URL_ROOT . '/core/js/lib_foot.js.php?lang=' . $this->langs->getDefaultLang() . ($ext ? '&' . $ext : '') . '"></script>' . "\n";
         }
 
         // Wrapper to add log when clicking on download or preview
@@ -2548,7 +2549,7 @@ class DolibarrView extends View
                                         action: 'dolibarrping',
                                         version: '<?php echo (float) DOL_VERSION; ?>',
                                         entity: '<?php echo (int) $this->conf->entity; ?>',
-                                        dbtype: '<?php echo DolibarrFunctions::dol_escape_js($db->type); ?>',
+                                        dbtype: '<?php echo DolibarrFunctions::dol_escape_js($this->db->type); ?>',
                                         country_code: '<?php echo $this->mysoc->country_code ? DolibarrFunctions::dol_escape_js($this->mysoc->country_code) : 'unknown'; ?>',
                                         php_version: '<?php echo DolibarrFunctions::dol_escape_js(phpversion()); ?>',
                                         os_version: '<?php echo DolibarrFunctions::dol_escape_js(version_os('smr')); ?>',
@@ -2594,8 +2595,8 @@ class DolibarrView extends View
                     $now = dol_now();
                     print "\n<!-- NO JS CODE TO ENABLE the anonymous Ping. It was disabled -->\n";
                     include_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
-                    dolibarr_set_const($db, 'MAIN_FIRST_PING_OK_DATE', DolibarrFunctions::dol_print_date($now, 'dayhourlog', 'gmt'), 'chaine', 0, '', $this->conf->entity);
-                    dolibarr_set_const($db, 'MAIN_FIRST_PING_OK_ID', 'disabled', 'chaine', 0, '', $this->conf->entity);
+                    dolibarr_set_const($this->db, 'MAIN_FIRST_PING_OK_DATE', DolibarrFunctions::dol_print_date($now, 'dayhourlog', 'gmt'), 'chaine', 0, '', $this->conf->entity);
+                    dolibarr_set_const($this->db, 'MAIN_FIRST_PING_OK_ID', 'disabled', 'chaine', 0, '', $this->conf->entity);
                 }
             }
         }

@@ -38,7 +38,7 @@
 namespace Alxarafe\Modules\Admin\Views;
 
 use Alxarafe\Core\Base\BasicController;
-use Alxarafe\Dolibarr\Base\DolibarrView;
+use Alxarafe\Dolibarr\Base\DolibarrListView;
 use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Classes\FormAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrAdmin;
@@ -49,7 +49,7 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  *
  * @package Alxarafe\Views
  */
-class DefaultValuesView extends DolibarrView
+class DefaultValuesView extends DolibarrListView
 {
     public $object;
 

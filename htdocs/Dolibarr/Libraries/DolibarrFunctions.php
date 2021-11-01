@@ -127,7 +127,8 @@ abstract class DolibarrFunctions
      */
     static public function getEntity($element, $shared = 1, $currentobject = null)
     {
-        //global $conf, $mc, $hookmanager, $object, $action;
+        global $object;
+
         $conf = DolibarrGlobals::getConf();
         $hookmanager = DolibarrGlobals::getHookManager();
 
@@ -141,7 +142,7 @@ abstract class DolibarrFunctions
                 break; // "/Modules/Fourn/class/fournisseur.commande.class.php"
         }
 
-        if (is_object($mc)) {
+        if (isset($mc) && is_object($mc)) { // Multicompany it's a private module
             $out = $mc->getEntity($element, $shared, $currentobject);
         } else {
             $out = '';
@@ -156,7 +157,7 @@ abstract class DolibarrFunctions
         $parameters = [
             'element' => $element,
             'shared' => $shared,
-            'object' => $object,
+            'object' => $object ?? null,
             'currentobject' => $currentobject,
             'out' => $out,
         ];
@@ -2769,7 +2770,8 @@ abstract class DolibarrFunctions
      */
     static public function dol_trunc($string, $size = 40, $trunc = 'right', $stringencoding = 'UTF-8', $nodot = 0, $display = 0)
     {
-        global $conf;
+        // global $conf;
+        $conf = DolibarrGlobals::getConf();
 
         if (empty($size) || !empty($conf->global->MAIN_DISABLE_TRUNC)) {
             return $string;
@@ -8673,6 +8675,10 @@ abstract class DolibarrFunctions
                     print '  $("body").toggleClass("sidebar-collapse")' . "\n";
                     print '});' . "\n";
                 }
+
+                /**
+                 * TODO: action it's an attribute!
+                 */
 
                 // Management of focus and mandatory for fields
                 if ($action == 'create' || $action == 'edit' || (empty($action) && (preg_match('/new\.php/', $_SERVER["PHP_SELF"])))) {

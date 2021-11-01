@@ -52,8 +52,11 @@ class DolibarrGlobals
         self::$conf = self::getConf();
         self::$user = self::getUser();
         self::$hookmanager = self::getHookManager();
-        self::$mysoc = self::getMySoc();
         self::$menumanager = self::getMenuManager();
+        $mySoc = self::getMySoc();
+        if ($mySoc !== null) {
+            self::$mysoc = $mySoc;
+        }
 
         $debugTool->stopTimer($shortName, $shortName . ' Constructor');
     }
@@ -280,15 +283,31 @@ class DolibarrGlobals
         return self::$hookmanager;
     }
 
+    static function getMenuManager()
+    {
+        if (isset(self::$menumanager)) {
+            return self::$menumanager;
+        }
+
+        self::$menumanager = new MenuManager(empty(self::$user->socid) ? 0 : 1);
+        return self::$menumanager;
+    }
+
     static function getMySoc(): ?Societe
     {
-        if (isset(self::$mysoc)) {
-            return self::$mysoc;
-        }
+        /*
+         * The use of these types of constants creates quite a few problems, because
+         * the code is invoked several times to generate css and js.
+         *
         $requiredb = !defined('NOREQUIREDB') || !constant('NOREQUIREDB');
         $requiresoc = !defined('NOREQUIRESOC') || !constant('NOREQUIRESOC');
         if (!$requiredb || !$requiresoc) {
             return null;
+        }
+        */
+
+        if (isset(self::$mysoc)) {
+            return self::$mysoc;
         }
 
         self::$mysoc = new Societe();
@@ -300,16 +319,6 @@ class DolibarrGlobals
         }
 
         return self::$mysoc;
-    }
-
-    static function getMenuManager()
-    {
-        if (isset(self::$menumanager)) {
-            return self::$menumanager;
-        }
-
-        self::$menumanager = new MenuManager(empty(self::$user->socid) ? 0 : 1);
-        return self::$menumanager;
     }
 
     static function getLang()

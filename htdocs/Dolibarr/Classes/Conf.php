@@ -309,6 +309,7 @@ class Conf
                 }
             }
 
+            /*
             // Object $mc
             if (!defined('NOREQUIREMC') && !empty($this->multicompany->enabled)) {
                 global $mc;
@@ -318,6 +319,7 @@ class Conf
                     $this->mc = $mc;
                 }
             }
+            */
 
             // Clean some variables
             if (empty($this->global->MAIN_MENU_STANDARD)) {

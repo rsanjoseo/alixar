@@ -44,6 +44,11 @@ use Alxarafe\Modules\Admin\Views\TranslationView;
 
 class Translation extends DolibarrListController
 {
+    public $contextpage;
+    public $langcode;
+    public $transkey;
+    public $transvalue;
+
     public function __construct()
     {
         parent::__construct();
@@ -90,15 +95,15 @@ class Translation extends DolibarrListController
             $search_array_options = [];
         }
 
-        if ($action == 'setMAIN_ENABLE_OVERWRITE_TRANSLATION') {
+        if ($this->action == 'setMAIN_ENABLE_OVERWRITE_TRANSLATION') {
             if (DolibarrFunctions::GETPOST('value')) {
-                dolibarr_set_const($db, 'MAIN_ENABLE_OVERWRITE_TRANSLATION', 1, 'chaine', 0, '', $conf->entity);
+                dolibarr_set_const($this->db, 'MAIN_ENABLE_OVERWRITE_TRANSLATION', 1, 'chaine', 0, '', $conf->entity);
             } else {
-                dolibarr_set_const($db, 'MAIN_ENABLE_OVERWRITE_TRANSLATION', 0, 'chaine', 0, '', $conf->entity);
+                dolibarr_set_const($this->db, 'MAIN_ENABLE_OVERWRITE_TRANSLATION', 0, 'chaine', 0, '', $conf->entity);
             }
         }
 
-        if ($action == 'update') {
+        if ($this->action == 'update') {
             if ($transkey == '') {
                 setEventMessages($langs->trans("ErrorFieldRequired", $langs->transnoentitiesnoconv("Key")), null, 'errors');
                 $error++;
@@ -108,29 +113,29 @@ class Translation extends DolibarrListController
                 $error++;
             }
             if (!$error) {
-                $db->begin();
+                $this->db->begin();
 
-                $sql = "UPDATE " . MAIN_DB_PREFIX . "overwrite_trans set transkey = '" . $db->escape($transkey) . "', transvalue = '" . $db->escape($transvalue) . "' WHERE rowid = " . ((int) GETPOST('rowid', 'int'));
-                $result = $db->query($sql);
+                $sql = "UPDATE " . MAIN_DB_PREFIX . "overwrite_trans set transkey = '" . $this->db->escape($transkey) . "', transvalue = '" . $this->db->escape($transvalue) . "' WHERE rowid = " . ((int) GETPOST('rowid', 'int'));
+                $result = $this->db->query($sql);
                 if ($result > 0) {
-                    $db->commit();
+                    $this->db->commit();
                     setEventMessages($langs->trans("RecordSaved"), null, 'mesgs');
-                    $action = "";
+                    $this->action = "";
                     $transkey = "";
                     $transvalue = "";
                 } else {
-                    $db->rollback();
-                    if ($db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                    $this->db->rollback();
+                    if ($this->db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
                         setEventMessages($langs->trans("WarningAnEntryAlreadyExistForTransKey"), null, 'warnings');
                     } else {
-                        setEventMessages($db->lasterror(), null, 'errors');
+                        setEventMessages($this->db->lasterror(), null, 'errors');
                     }
-                    $action = '';
+                    $this->action = '';
                 }
             }
         }
 
-        if ($action == 'add') {
+        if ($this->action == 'add') {
             $error = 0;
 
             if (empty($langcode)) {
@@ -146,36 +151,36 @@ class Translation extends DolibarrListController
                 $error++;
             }
             if (!$error) {
-                $db->begin();
+                $this->db->begin();
 
-                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "overwrite_trans(lang, transkey, transvalue, entity) VALUES ('" . $db->escape($langcode) . "','" . $db->escape($transkey) . "','" . $db->escape($transvalue) . "', " . ((int) $conf->entity) . ")";
-                $result = $db->query($sql);
+                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "overwrite_trans(lang, transkey, transvalue, entity) VALUES ('" . $this->db->escape($langcode) . "','" . $this->db->escape($transkey) . "','" . $this->db->escape($transvalue) . "', " . ((int) $conf->entity) . ")";
+                $result = $this->db->query($sql);
                 if ($result > 0) {
-                    $db->commit();
+                    $this->db->commit();
                     setEventMessages($langs->trans("RecordSaved"), null, 'mesgs');
-                    $action = "";
+                    $this->action = "";
                     $transkey = "";
                     $transvalue = "";
                 } else {
-                    $db->rollback();
-                    if ($db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
+                    $this->db->rollback();
+                    if ($this->db->lasterrno() == 'DB_ERROR_RECORD_ALREADY_EXISTS') {
                         setEventMessages($langs->trans("WarningAnEntryAlreadyExistForTransKey"), null, 'warnings');
                     } else {
-                        setEventMessages($db->lasterror(), null, 'errors');
+                        setEventMessages($this->db->lasterror(), null, 'errors');
                     }
-                    $action = '';
+                    $this->action = '';
                 }
             }
         }
 
         // Delete line from delete picto
-        if ($action == 'delete') {
+        if ($this->action == 'delete') {
             $sql = "DELETE FROM " . MAIN_DB_PREFIX . "overwrite_trans WHERE rowid = " . ((int) $id);
-            $result = $db->query($sql);
+            $result = $this->db->query($sql);
             if ($result >= 0) {
                 setEventMessages($langs->trans("RecordDeleted"), null, 'mesgs');
             } else {
-                dol_print_error($db);
+                dol_print_error($this->db);
             }
         }
     }

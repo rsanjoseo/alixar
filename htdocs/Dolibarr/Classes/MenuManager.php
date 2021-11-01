@@ -105,7 +105,7 @@ class MenuManager
                 $classname = 'class="tmenu menuhider"';
                 $idsel = 'menu';
 
-                $this->menu->add('#', '', 0, $showmode, $atarget, "xxx", '', 0, $id, $idsel, $classname);
+                $this->menu->add('#', '', 0, $showmode, $this->atarget, "xxx", '', 0, $id, $idsel, $classname);
             }
 
             // Home
@@ -124,7 +124,7 @@ class MenuManager
                     $this->print_start_menu_entry_empty($menuval['idsel'], $menuval['classname'], $menuval['enabled']);
                 }
                 if (empty($noout)) {
-                    $this->print_text_menu_entry_empty($menuval['titre'], $menuval['enabled'], ($menuval['url'] != '#' ? DOL_URL_ROOT : '') . $menuval['url'], $menuval['id'], $menuval['idsel'], $menuval['classname'], ($menuval['target'] ? $menuval['target'] : $atarget));
+                    $this->print_text_menu_entry_empty($menuval['titre'], $menuval['enabled'], ($menuval['url'] != '#' ? DOL_URL_ROOT : '') . $menuval['url'], $menuval['id'], $menuval['idsel'], $menuval['classname'], ($menuval['target'] ? $menuval['target'] : $this->atarget));
                 }
                 if (empty($noout)) {
                     $this->print_end_menu_entry_empty($menuval['enabled']);
@@ -513,10 +513,10 @@ class MenuManager
     function print_text_menu_entry_empty($text, $showmode, $url, $id, $idsel, $classname, $atarget)
     {
         if ($showmode == 1) {
-            print '<a class="tmenuimage" tabindex="-1" href="' . $url . '"' . ($atarget ? ' target="' . $atarget . '"' : '') . '>';
+            print '<a class="tmenuimage" tabindex="-1" href="' . $url . '"' . ($this->atarget ? ' target="' . $this->atarget . '"' : '') . '>';
             print '<div class="' . $id . ' ' . $idsel . '"><span class="' . $id . ' tmenuimage" id="mainmenuspan_' . $idsel . '"></span></div>';
             print '</a>';
-            print '<a ' . $classname . ' id="mainmenua_' . $idsel . '" href="' . $url . '"' . ($atarget ? ' target="' . $atarget . '"' : '') . '>';
+            print '<a ' . $classname . ' id="mainmenua_' . $idsel . '" href="' . $url . '"' . ($this->atarget ? ' target="' . $this->atarget . '"' : '') . '>';
             print '<span class="mainmenuaspan">';
             print $text;
             print '</span>';

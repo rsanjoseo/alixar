@@ -38,20 +38,33 @@
 namespace Alxarafe\Modules\Admin\Views;
 
 use Alxarafe\Core\Base\BasicController;
-use Alxarafe\Dolibarr\Base\DolibarrView;
+use Alxarafe\Dolibarr\Base\DolibarrListView;
 use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Classes\FormAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
-class TranslationView extends DolibarrView
+class TranslationView extends DolibarrListView
 {
     public $object;
+
+    public $contextpage;
+    public $langcode;
+    public $transkey;
+    public $transvalue;
 
     public function __construct(BasicController $controller)
     {
         parent::__construct($controller);
         $this->object = $controller->object;
+
+        $this->contextpage = $controller->contextpage;
+        $this->langcode = $controller->langcode;
+        $this->transkey = $controller->transkey;
+        $this->transvalue = $controller->transvalue;
+
+        $this->form = new Form();
+        $this->formadmin = new FormAdmin();
     }
 
     function printPage(): string
@@ -60,13 +73,10 @@ class TranslationView extends DolibarrView
             '?' . self::MODULE_GET_VAR . '=' . $_GET[self::MODULE_GET_VAR] .
             '&' . self::CONTROLLER_GET_VAR . '=' . $_GET[self::CONTROLLER_GET_VAR];
 
-        $form = new Form($db);
-        $formadmin = new FormAdmin($db);
-
         $wikihelp = 'EN:Setup_Translation|FR:Paramétrage_Traduction|ES:Configuración_Traducción';
         $this->llxHeader('', $this->langs->trans("Setup"), $wikihelp);
 
-        $param = '&mode=' . urlencode($mode);
+        $param = '&mode=' . urlencode($this->mode);
 
         $enabledisablehtml = '';
         $enabledisablehtml .= $this->langs->trans("EnableOverwriteTranslation") . ' ';
@@ -84,28 +94,28 @@ class TranslationView extends DolibarrView
 
         print DolibarrFunctions::load_fiche_titre($this->langs->trans("Translation"), $enabledisablehtml, 'title_setup');
 
-        $current_language_code = $this->langs->defaultlang;
+        $current_language_code = $this->langs->getDefaultLang();
         $s = DolibarrFunctions::picto_from_langcode($current_language_code);
-        print $form->textwithpicto('<span class="opacitymedium">' . $this->langs->trans("CurrentUserLanguage") . ':</span> <strong>' . $s . ' ' . $current_language_code . '</strong>', $this->langs->trans("TranslationDesc")) . '</span><br>';
+        print $this->form->textwithpicto('<span class="opacitymedium">' . $this->langs->trans("CurrentUserLanguage") . ':</span> <strong>' . $s . ' ' . $current_language_code . '</strong>', $this->langs->trans("TranslationDesc")) . '</span><br>';
 
         print '<br>';
 
         if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
             $param .= '&contextpage=' . urlencode($contextpage);
         }
-        if ($this->controller->limit > 0 && $this->controller->limit != $conf->liste_limit) {
+        if ($this->controller->limit > 0 && $this->controller->limit != $this->conf->liste_limit) {
             $param .= '&limit=' . urlencode($this->controller->limit);
         }
         if (isset($optioncss) && $optioncss != '') {
             $param .= '&optioncss=' . urlencode($optioncss);
         }
-        if ($langcode) {
+        if ($this->langcode) {
             $param .= '&langcode=' . urlencode($langcode);
         }
-        if ($transkey) {
+        if ($this->transkey) {
             $param .= '&transkey=' . urlencode($transkey);
         }
-        if ($transvalue) {
+        if ($this->transvalue) {
             $param .= '&transvalue=' . urlencode($transvalue);
         }
 
@@ -120,9 +130,9 @@ class TranslationView extends DolibarrView
 
         $head = DolibarrAdmin::translation_prepare_head();
 
-        print DolibarrFunctions::dol_get_fiche_head($head, $mode, '', -1, '');
+        print DolibarrFunctions::dol_get_fiche_head($head, $this->mode, '', -1, '');
 
-        if ($mode == 'overwrite') {
+        if ($this->mode == 'overwrite') {
             print '<input type="hidden" name="page" value="' . $page . '">';
 
             $disabled = '';
@@ -145,7 +155,7 @@ class TranslationView extends DolibarrView
             print '<br>';
 
             print '<input type="hidden" name="action" value="' . ($action == 'edit' ? 'update' : 'add') . '">';
-            print '<input type="hidden" id="mode" name="mode" value="' . $mode . '">';
+            print '<input type="hidden" id="mode" name="mode" value="' . $this->mode . '">';
 
             print '<div class="div-table-responsive-no-min">';
             print '<table class="noborder centpercent">';
@@ -161,7 +171,7 @@ class TranslationView extends DolibarrView
             print "\n";
 
             print '<tr class="oddeven"><td>';
-            print $formadmin->select_language(GETPOST('langcode'), 'langcode', 0, null, 1, 0, $disablededit ? 1 : 0, 'maxwidth250', 1);
+            print $this->formadmin->select_language(GETPOST('langcode'), 'langcode', 0, null, 1, 0, $disablededit ? 1 : 0, 'maxwidth250', 1);
             print '</td>' . "\n";
             print '<td>';
             print '<input type="text" class="flat maxwidthonsmartphone"' . $disablededit . ' name="transkey" id="transkey" value="' . (!empty($transkey) ? $transkey : "") . '">';
@@ -179,17 +189,17 @@ class TranslationView extends DolibarrView
             $sql .= " FROM " . MAIN_DB_PREFIX . "overwrite_trans";
             $sql .= " WHERE 1 = 1";
             $sql .= " AND entity IN (" . getEntity('overwrite_trans') . ")";
-            $sql .= $db->order($this->controller->sortfield, $this->controller->sortorder);
+            $sql .= $this->db->order($this->controller->sortfield, $this->controller->sortorder);
 
             dol_syslog("translation::select from table", LOG_DEBUG);
 
-            $result = $db->query($sql);
+            $result = $this->db->query($sql);
             if ($result) {
-                $num = $db->num_rows($result);
+                $num = $this->db->num_rows($result);
                 $i = 0;
 
                 while ($i < $num) {
-                    $obj = $db->fetch_object($result);
+                    $obj = $this->db->fetch_object($result);
 
                     print "\n";
 
@@ -225,9 +235,9 @@ class TranslationView extends DolibarrView
                         print ' &nbsp; ';
                         print '<input type="submit" class="button buttongen button-cancel" name="cancel" value="' . dol_escape_htmltag($this->langs->trans("Cancel")) . '">';
                     } else {
-                        print '<a class="reposition editfielda paddingrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $obj->entity . '&mode=' . urlencode($mode) . '&action=edit&token=' . DolibarrFunctions::newToken() . '' . ((empty($user->entity) && $debug) ? '&debug=1' : '') . '">' . img_edit() . '</a>';
+                        print '<a class="reposition editfielda paddingrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $obj->entity . '&mode=' . urlencode($this->mode) . '&action=edit&token=' . DolibarrFunctions::newToken() . '' . ((empty($user->entity) && $debug) ? '&debug=1' : '') . '">' . img_edit() . '</a>';
                         print ' &nbsp; ';
-                        print '<a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $obj->entity . '&mode=' . urlencode($mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . ((empty($user->entity) && $debug) ? '&debug=1' : '') . '">' . img_delete() . '</a>';
+                        print '<a class="reposition" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $obj->entity . '&mode=' . urlencode($this->mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . ((empty($user->entity) && $debug) ? '&debug=1' : '') . '">' . img_delete() . '</a>';
                     }
                     print '</td>';
 
@@ -241,7 +251,7 @@ class TranslationView extends DolibarrView
             print '</div>';
         }
 
-        if ($mode == 'searchkey') {
+        if ($this->mode == 'searchkey') {
             $langcode = GETPOSTISSET('langcode') ? GETPOST('langcode') : $this->langs->defaultlang;
 
             $newlang = new Translate('', $conf);
@@ -334,14 +344,14 @@ class TranslationView extends DolibarrView
             $massactionbutton = '';
 
             print '<input type="hidden" id="action" name="action" value="search">';
-            print '<input type="hidden" id="mode" name="mode" value="' . $mode . '">';
+            print '<input type="hidden" id="mode" name="mode" value="' . $this->mode . '">';
 
             print '<div class="div-table-responsive-no-min">';
             print '<table class="noborder centpercent">';
 
             print '<tr class="liste_titre_filter"><td>';
-            //print $formadmin->select_language($langcode,'langcode',0,null,$this->langs->trans("All"),0,0,'',1);
-            print $formadmin->select_language($langcode, 'langcode', 0, null, 0, 0, 0, 'maxwidth250', 1);
+            //print $this->formadmin->select_language($langcode,'langcode',0,null,$this->langs->trans("All"),0,0,'',1);
+            print $this->formadmin->select_language($langcode, 'langcode', 0, null, 0, 0, 0, 'maxwidth250', 1);
             print '</td>' . "\n";
             print '<td>';
             print '<input type="text" class="flat maxwidthonsmartphone" name="transkey" value="' . $transkey . '">';
@@ -360,7 +370,7 @@ class TranslationView extends DolibarrView
             print '</td>';
             // Action column
             print '<td class="right nowraponall">';
-            $searchpicto = $form->showFilterAndCheckAddButtons(!empty($massactionbutton) ? 1 : 0, 'checkforselect', 1);
+            $searchpicto = $this->form->showFilterAndCheckAddButtons(!empty($massactionbutton) ? 1 : 0, 'checkforselect', 1);
             print $searchpicto;
             print '</td>';
             print '</tr>';
@@ -405,18 +415,18 @@ class TranslationView extends DolibarrView
                         $sql = "SELECT rowid";
                         $sql .= " FROM " . MAIN_DB_PREFIX . "overwrite_trans";
                         $sql .= " WHERE entity IN (" . getEntity('overwrite_trans') . ")";
-                        $sql .= " AND transkey = '" . $db->escape($key) . "'";
+                        $sql .= " AND transkey = '" . $this->db->escape($key) . "'";
                         dol_syslog("translation::select from table", LOG_DEBUG);
-                        $result = $db->query($sql);
+                        $result = $this->db->query($sql);
                         if ($result) {
-                            $obj = $db->fetch_object($result);
+                            $obj = $this->db->fetch_object($result);
                         }
                         print '<a class="editfielda reposition marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=overwrite&action=edit&token=' . DolibarrFunctions::newToken() . '">' . img_edit() . '</a>';
                         print ' ';
-                        print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=' . urlencode($mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . '&mode=' . urlencode($mode) . '">' . img_delete() . '</a>';
+                        print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=' . urlencode($this->mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . '&mode=' . urlencode($this->mode) . '">' . img_delete() . '</a>';
                         print '&nbsp;&nbsp;';
                         $htmltext = $this->langs->trans("OriginalValueWas", '<i>' . $newlangfileonly->tab_translate[$key] . '</i>');
-                        print $form->textwithpicto('', $htmltext, 1, 'info');
+                        print $this->form->textwithpicto('', $htmltext, 1, 'info');
                     } elseif (!empty($conf->global->MAIN_ENABLE_OVERWRITE_TRANSLATION)) {
                         //print $key.'-'.$val;
                         print '<a class="reposition paddingrightonly" href="' . $_SERVER['PHP_SELF'] . '?mode=overwrite&langcode=' . urlencode($langcode) . '&transkey=' . urlencode($key) . '">' . img_edit_add($this->langs->trans("TranslationOverwriteKey")) . '</a>';
@@ -434,19 +444,19 @@ class TranslationView extends DolibarrView
                     $sql = "SELECT rowid";
                     $sql .= " FROM " . MAIN_DB_PREFIX . "overwrite_trans";
                     $sql .= " WHERE entity IN (" . getEntity('overwrite_trans') . ")";
-                    $sql .= " AND transkey = '" . $db->escape($key) . "'";
+                    $sql .= " AND transkey = '" . $this->db->escape($key) . "'";
                     dol_syslog("translation::select from table", LOG_DEBUG);
-                    $result = $db->query($sql);
+                    $result = $this->db->query($sql);
                     if ($result) {
-                        $obj = $db->fetch_object($result);
+                        $obj = $this->db->fetch_object($result);
                     }
                     print '<a class="editfielda reposition marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=overwrite&action=edit&token=' . DolibarrFunctions::newToken() . '">' . img_edit() . '</a>';
                     print ' ';
-                    print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=' . urlencode($mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . '&mode=' . urlencode($mode) . '">' . img_delete() . '</a>';
+                    print '<a class="marginleftonly marginrightonly" href="' . $_SERVER['PHP_SELF'] . '?rowid=' . $obj->rowid . '&entity=' . $conf->entity . '&mode=' . urlencode($this->mode) . '&action=delete&token=' . DolibarrFunctions::newToken() . '&mode=' . urlencode($this->mode) . '">' . img_delete() . '</a>';
                     print '&nbsp;&nbsp;';
 
                     $htmltext = $this->langs->trans("TransKeyWithoutOriginalValue", $key);
-                    print $form->textwithpicto('', $htmltext, 1, 'warning');
+                    print $this->form->textwithpicto('', $htmltext, 1, 'warning');
                 }
                 /*if (! empty($conf->multicompany->enabled) && !$user->entity)
                 {
@@ -469,7 +479,7 @@ class TranslationView extends DolibarrView
 
         // End of page
         $this->llxFooter();
-        // $db->close();
+        // $this->db->close();
 
         return parent::printPage();
     }
