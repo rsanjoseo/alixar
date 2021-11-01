@@ -166,6 +166,20 @@ class Conf
         $this->mailing = new stdClass();
         $this->expensereport = new stdClass();
         $this->productbatch = new stdClass();
+
+        // Detection browser
+        if (isset($_SERVER["HTTP_USER_AGENT"])) {
+            $tmp = DolibarrFunctions::getBrowserInfo($_SERVER["HTTP_USER_AGENT"]);
+            $this->browser->name = $tmp['browsername'];
+            $this->browser->os = $tmp['browseros'];
+            $this->browser->version = $tmp['browserversion'];
+            $this->browser->layout = $tmp['layout']; // 'classic', 'phone', 'tablet'
+            //var_dump($this->conf->browser);
+
+            if ($this->browser->layout == 'phone') {
+                $this->dol_no_mouse_hover = 1;
+            }
+        }
     }
 
     /**

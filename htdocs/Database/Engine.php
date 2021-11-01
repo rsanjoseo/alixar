@@ -529,7 +529,7 @@ abstract class Engine
 
     public function idate($param, $gm = 'tzserver')
     {
-        return date('Y-m-d H:i:s', $$param);
+        return date('Y-m-d H:i:s', $param);
     }
 
     public function ifsql($test, $resok, $resko)

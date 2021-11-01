@@ -323,7 +323,6 @@ abstract class DolibarrSecurity2
 
         // dump($data);
 
-        // TODO: Show the login form if the user is not identified. Includes side menú
         new DolibarrLogin($controller, $data);
 
         // Global html output events ($mesgs, $errors, $warnings)

@@ -272,20 +272,6 @@ class DolibarrView extends View
         */
         $debugbar->debugBar['time']->startMeasure('pageaftermaster', 'Page generation (after environment init)');
 
-        // Detection browser
-        if (isset($_SERVER["HTTP_USER_AGENT"])) {
-            $tmp = DolibarrFunctions::getBrowserInfo($_SERVER["HTTP_USER_AGENT"]);
-            $this->conf->browser->name = $tmp['browsername'];
-            $this->conf->browser->os = $tmp['browseros'];
-            $this->conf->browser->version = $tmp['browserversion'];
-            $this->conf->browser->layout = $tmp['layout']; // 'classic', 'phone', 'tablet'
-            //var_dump($this->conf->browser);
-
-            if ($this->conf->browser->layout == 'phone') {
-                $this->conf->dol_no_mouse_hover = 1;
-            }
-        }
-
         // Set global MAIN_OPTIMIZEFORTEXTBROWSER (must be before login part)
         if (DolibarrFunctions::GETPOST('textbrowser', 'int') || (!empty($this->conf->browser->name) && $this->conf->browser->name == 'lynxlinks')) {   // If we must enable text browser
             $this->conf->global->MAIN_OPTIMIZEFORTEXTBROWSER = 1;
@@ -340,7 +326,7 @@ class DolibarrView extends View
             //            require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php'; // Need 660ko memory (800ko in 2.2)
         }
         if (!defined('NOREQUIREAJAX' || !constant('NOREQUIREAJAX'))) {
-            require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php'; // Need 22ko memory
+            // require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php'; // Need 22ko memory
         }
 
         // If install or upgrade process not done or not completely finished, we call the install page.
@@ -414,7 +400,6 @@ class DolibarrView extends View
 
             // Check a token is provided for all cases that need a mandatory token
             // (all POST actions + all login, actions and mass actions on pages with CSRFCHECK_WITH_TOKEN set + all sensitive GET actions)
-            // TODO: CSRFCHECK_WITH_TOKEN temporarily disabled!
             if (false && $_SERVER['REQUEST_METHOD'] == 'POST' ||
                 $sensitiveget ||
                 DolibarrFunctions::GETPOSTISSET('massaction') ||
@@ -431,7 +416,7 @@ class DolibarrView extends View
                     } else {
                         if (defined('CSRFCHECK_WITH_TOKEN')) {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (CSRFCHECK_WITH_TOKEN protection) in main.inc.php. Token not provided.", LOG_WARNING);
-                            print "2Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in main.php. Token not provided.\n";
+                            print "Access to a page that needs a token (constant CSRFCHECK_WITH_TOKEN is defined) is refused by CSRF protection in main.php. Token not provided.\n";
                         } else {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (POST method or GET with a sensible value for 'action' parameter) in main.inc.php. Token not provided.", LOG_WARNING);
                             print "Access to this page this way (POST method or GET with a sensible value for 'action' parameter) is refused by CSRF protection in main.inc.php. Token not provided.\n";
@@ -765,7 +750,8 @@ class DolibarrView extends View
             }
             $this->hookmanager->initHooks(["main"]);
 
-            $ext = 'layout=' . $this->conf->browser->layout . '&amp;version=' . urlencode(DOL_VERSION);
+            dump($this->conf->browser);
+            $ext = 'layout=' . $this->conf->browser->layout . '&version=' . urlencode(DOL_VERSION);
 
             print "<head>\n";
 

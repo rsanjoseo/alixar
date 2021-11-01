@@ -62,6 +62,11 @@ class DolibarrLogin extends DolibarrView
         header('Cache-Control: Public, must-revalidate');
         header("Content-type: text/html; charset=" . $this->conf->file->character_set_client);
 
+        if (empty($_SESSION['newtoken'])) {
+            $token = DolibarrSecurity::dol_hash(uniqid(mt_rand(), false), 'md5'); // Generates a hash of a random number. We don't need a secured hash, just a changing random value.
+            $_SESSION['newtoken'] = $token;
+        }
+
         if (DolibarrFunctions::GETPOST('dol_hide_topmenu')) {
             $this->conf->dol_hide_topmenu = 1;
         }

@@ -211,7 +211,7 @@ abstract class DolibarrFunctions
     static public function getBrowserInfo($user_agent)
     {
         //	include_once DOL_DOCUMENT_ROOT.'/includes/mobiledetect/mobiledetectlib/Mobile_Detect.php';
-        include_once DOL_DOCUMENT_ROOT . '/vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';
+        // include_once DOL_DOCUMENT_ROOT . '/vendor/mobiledetect/mobiledetectlib/Mobile_Detect.php';
 
         $name = 'unknown';
         $version = '';

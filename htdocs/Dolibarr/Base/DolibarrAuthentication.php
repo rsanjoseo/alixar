@@ -620,7 +620,7 @@ class DolibarrAuthentication
                 $dol_dst = 0;
                 // Keep $_POST here. Do not use DolibarrFunctions::GETPOSTISSET
                 if (isset($_POST["dst_first"]) && isset($_POST["dst_second"])) {
-                    include_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+                    // include_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
                     $datenow = DolibarrFunctions::dol_now();
                     $datefirst = DolibarrDate::dol_stringtotime($_POST["dst_first"]);
                     $datesecond = DolibarrDate::dol_stringtotime($_POST["dst_second"]);
@@ -674,7 +674,7 @@ class DolibarrAuthentication
                 if ($_SERVER["HTTP_USER_AGENT"] == 'securitytest') {
                     http_response_code(401); // It makes easier to understand if session was broken during security tests
                 }
-                $loginData = DolibarrSecurity2::dol_loginfunction($this->controller, $this->langs, $this->conf, (!empty($this->mysoc) ? $this->mysoc : ''));
+                DolibarrSecurity2::dol_loginfunction($this->controller, $this->langs, $this->conf, (!empty($this->mysoc) ? $this->mysoc : ''));
             }
             exit;
         }
