@@ -27,10 +27,11 @@
  *     \brief      File of class to manage user groups
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-if (!empty($conf->ldap->enabled)) {
-    require_once DOL_DOCUMENT_ROOT . "/core/class/ldap.class.php";
-}
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+//if (!empty($conf->ldap->enabled)) {
+//    require_once DOL_DOCUMENT_ROOT . "/core/class/ldap.class.php";
+//}
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**
  *    Class to manage user groups
@@ -129,9 +130,9 @@ class UserGroup extends CommonObject
      *
      * @param DoliDb $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = DolibarrGlobals::getDb();
         $this->nb_rights = 0;
     }
 

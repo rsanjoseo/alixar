@@ -54,6 +54,7 @@ htdocs/install_old/
 htdocs/core/db/
 htdocs/core/db_old/
 htdocs/core/class/
+htdocs/core/triggers/
 htdocs/langs
 htdocs/main.inc.php
 htdocs/master.inc.php

@@ -1,7 +1,10 @@
 <?php
-/*
- * Copyright (C) 2014-2016  Jean-François Ferry	<hello@librethic.io>
- * 				 2016       Christophe Battarel <christophe@altairis.fr>
+/**
+ * Alxarafe. Development of PHP applications in a flash!
+ * Copyright (C) 2018 Alxarafe <info@alxarafe.com>
+ *
+ * Copyright (C) 2014-2016  Jean-François Ferry    <hello@librethic.io>
+ *                 2016       Christophe Battarel <christophe@altairis.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +28,7 @@ use Alxarafe\Dolibarr\Classes\Conf;
  *  \ingroup    core
  *  \brief      File of trigger for ticket module
  */
-require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for ticket module

@@ -22,16 +22,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Alxarafe\Dolibarr\Classes;
+
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+
 /**
  *    \file       htdocs/mailmanspip/class/mailmanspip.class.php
  *    \ingroup    member
  *    \brief      File of class to manage mailman and spip actions
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
-require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+// require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+// require_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
+// require_once DOL_DOCUMENT_ROOT . '/core/lib/functions2.lib.php';
+// require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
 /**
  *    Class to manage mailman and spip
@@ -63,9 +67,9 @@ class MailmanSpip
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
-        $this->db = $db;
+        $this->db = DolibarrGlobals::getDb();
     }
 
     /**
@@ -85,7 +89,7 @@ class MailmanSpip
                 $mydb = $this->connectSpip();
 
                 if ($mydb) {
-                    require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
+                    // require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
                     $mdpass = dol_hash($object->pass);
                     $htpass = crypt($object->pass, makesalt());
                     $query = "INSERT INTO spip_auteurs (nom, email, login, pass, htpass, alea_futur, statut) VALUES(\"" . dolGetFirstLastname($object->firstname, $object->lastname) . "\",\"" . $object->email . "\",\"" . $object->login . "\",\"$mdpass\",\"$htpass\",FLOOR(32000*RAND()),\"1comite\")";

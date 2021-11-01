@@ -96,7 +96,8 @@ class Interfaces
         $orders = [];
         $i = 0;
 
-        $dirtriggers = array_merge(['/core/triggers'], $conf->modules_parts['triggers']);
+        // $dirtriggers = array_merge(['/core/triggers'], $conf->modules_parts['triggers']);
+        $dirtriggers = array_merge(['/Dolibarr/Triggers'], $conf->modules_parts['triggers']);
         foreach ($dirtriggers as $reldir) {
             $dir = DolibarrFunctions::dol_buildpath($reldir, 0);
             $newdir = DolibarrFunctions::dol_osencode($dir);

@@ -34,7 +34,7 @@ use Alxarafe\Dolibarr\Classes\Conf;
  * - The name property name must be MyTrigger
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for Zapier module

@@ -405,7 +405,6 @@ class DolibarrAuthentication
 
             // Call trigger
             $result = $this->user->call_trigger('USER_LOGIN', $this->user);
-            dump($result);
             if ($result < 0) {
                 $this->error++;
             }

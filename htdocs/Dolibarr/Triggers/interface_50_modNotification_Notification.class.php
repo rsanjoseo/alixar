@@ -25,7 +25,7 @@ use Alxarafe\Dolibarr\Classes\Conf;
  *  \ingroup    notification
  *  \brief      File of class of triggers for notification module
  */
-require_once DOL_DOCUMENT_ROOT . '/core/triggers/dolibarrtriggers.class.php';
+require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for notification module
