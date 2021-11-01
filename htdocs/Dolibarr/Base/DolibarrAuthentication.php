@@ -67,8 +67,8 @@ class DolibarrAuthentication
         $this->db = DolibarrGlobals::getDb();
         $this->user = DolibarrGlobals::getUser();
 
-        $this->login = $_POST['username'];
-        $this->password = $_POST['password'];
+        $this->login = $_POST['username'] ?? null;
+        $this->password = $_POST['password'] ?? null;
 
         $conf = $this->user->conf->file;
         /**
@@ -403,7 +403,7 @@ class DolibarrAuthentication
             // Call triggers for the "security events" log
             $this->user->trigger_mesg = $this->loginfo;
 
-            // Call trigger
+            // Call triggere
             $result = $this->user->call_trigger('USER_LOGIN', $this->user);
             if ($result < 0) {
                 $this->error++;

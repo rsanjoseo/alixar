@@ -39,11 +39,14 @@ abstract class DolibarrListController extends DolibarrController
     public function getDolibarrVars(): void
     {
         $this->action = DolibarrFunctions::GETPOST('action', 'aZ09');
+        if (empty($this->action)) {
+            $this->action = null;
+        }
 
         $this->id = DolibarrFunctions::GETPOST('rowid', 'int');
         $this->optioncss = DolibarrFunctions::GETPOST('optionscss', 'alphanohtml');
         $this->mode = DolibarrFunctions::GETPOST('mode', 'aZ09') ? DolibarrFunctions::GETPOST('mode', 'aZ09') : 'createform'; // 'createform', 'filters', 'sortorder', 'focus'
-        $this->limit = DolibarrFunctions::GETPOST('limit', 'int') ? DolibarrFunctions::GETPOST('limit', 'int') : $conf->liste_limit;
+        $this->limit = DolibarrFunctions::GETPOST('limit', 'int') ? DolibarrFunctions::GETPOST('limit', 'int') : $this->conf->liste_limit;
         $this->sortfield = DolibarrFunctions::GETPOST("sortfield", 'alpha');
         $this->sortorder = DolibarrFunctions::GETPOST("sortorder", 'alpha');
         $this->page = DolibarrFunctions::GETPOSTISSET('pageplusone') ? (DolibarrFunctions::GETPOST('pageplusone') - 1) : DolibarrFunctions::GETPOST("page", 'int');

@@ -19,20 +19,13 @@
 namespace Alxarafe\Modules\Admin\Views;
 
 use Alxarafe\Core\Base\BasicController;
+use Alxarafe\Dolibarr\Base\DolibarrController;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 class InitView extends DolibarrView
 {
-    public $object;
-
-    public function __construct(BasicController $controller)
-    {
-        parent::__construct($controller);
-        $this->object = $controller->object;
-    }
-
     function printPage(): string
     {
         $form = new Form();

@@ -126,7 +126,7 @@ class DolibarrGlobals
         self::$conf->file->main_force_https = $dolibarr_main_force_https ?? true; // Force https
         self::$conf->file->strict_mode = $dolibarr_strict_mode ?? ''; // Force php strict mode (for debug)
         self::$conf->file->instance_unique_id = $dolibarr_main_instance_unique_id ?? $dolibarr_main_cookie_cryptkey ?? ''; // Unique id of instance
-        self::$conf->file->dol_document_root = $dolibarr_main_document_root ?? constant('BASE_FOLDER'); // Define array of document root directories ('/home/htdocs')
+        self::$conf->file->dol_document_root = ['main' => $dolibarr_main_document_root ?? constant('BASE_FOLDER')]; // Define array of document root directories ('/home/htdocs')
         self::$conf->file->dol_url_root = $dolibarr_main_url_root ?? constant('BASE_URI'); // Define array of url root path ('' or '/dolibarr')
         self::$conf->file->main_prod = !empty($dolibarr_main_prod);
 

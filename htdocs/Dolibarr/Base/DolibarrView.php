@@ -100,6 +100,7 @@ class DolibarrView extends View
         // This create lock, released by session_write_close() or end of page.
         // We need this lock as long as we read/write $_SESSION ['vars']. We can remove lock when finished.
         if (!defined('NOSESSION')) {
+            // @link https://stackoverflow.com/questions/47700336/php-7-2-warning-cannot-change-session-name-when-session-is-active
             session_set_cookie_params(0, '/', null, (empty($this->forcehttps) ? false : true), true); // Add tag secure and httponly on session cookie (same as setting session.cookie_httponly into php.ini). Must be called before the session_start.
             session_name($this->sessionname);
             session_start();
@@ -420,13 +421,13 @@ class DolibarrView extends View
                 ((DolibarrFunctions::GETPOSTISSET('actionlogin') || DolibarrFunctions::GETPOSTISSET('action')) && defined('CSRFCHECK_WITH_TOKEN'))
             ) {
                 // If token is not provided or empty, error (we are in case it is mandatory)
-                if (!DolibarrFunctions::GETPOST('token', 'alpha') || DolibarrFunctions::GETPOST('token', 'alpha') == 'notrequired') {
+                $token = DolibarrFunctions::GETPOST('token', 'alpha');
+                if (!$token || $token == 'notrequired') {
                     if (DolibarrFunctions::GETPOST('uploadform', 'int')) {
                         DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused. File size too large.");
                         $this->langs->loadLangs(["errors", "install"]);
                         print $this->langs->trans("ErrorFileSizeTooLarge") . ' ';
                         print $this->langs->trans("ErrorGoBackAndCorrectParameters");
-                        die;
                     } else {
                         if (defined('CSRFCHECK_WITH_TOKEN')) {
                             DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (CSRFCHECK_WITH_TOKEN protection) in main.inc.php. Token not provided.", LOG_WARNING);
@@ -436,8 +437,8 @@ class DolibarrView extends View
                             print "Access to this page this way (POST method or GET with a sensible value for 'action' parameter) is refused by CSRF protection in main.inc.php. Token not provided.\n";
                             print "If you access your server behind a proxy using url rewriting and the parameter is provided by caller, you might check that all HTTP header are propagated (or add the line \$dolibarr_nocsrfcheck=1 into your conf.php file or MAIN_SECURITY_CSRF_WITH_TOKEN to 0 into setup).\n";
                         }
-                        die;
                     }
+                    die;
                 }
             }
 

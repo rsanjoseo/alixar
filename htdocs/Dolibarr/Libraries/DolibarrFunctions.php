@@ -1830,7 +1830,7 @@ abstract class DolibarrFunctions
      */
     static public function dol_buildpath($path, $type = 0, $returnemptyifnotfound = 0)
     {
-        global $conf;
+        $conf = DolibarrGlobals::getConf();
 
         $path = preg_replace('/^\//', '', $path);
 

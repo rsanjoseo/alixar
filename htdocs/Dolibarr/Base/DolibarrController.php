@@ -15,6 +15,7 @@ use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Classes\Societe;
 use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Dolibarr\Libraries\DolibarrFilefunc;
 use DebugBar\DebugBarException;
 
 /**
@@ -32,6 +33,7 @@ abstract class DolibarrController extends Controller
     public Engine $db;
     public Translator $langs;
     public ?Societe $mysoc;
+    public $object = null;
 
     /**
      * @throws DebugBarException
