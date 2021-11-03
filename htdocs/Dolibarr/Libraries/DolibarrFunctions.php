@@ -2294,7 +2294,9 @@ abstract class DolibarrFunctions
     static public function dol_get_fiche_head($links = [], $active = '', $title = '', $notab = 0, $picto = '', $pictoisfullpath = 0, $morehtmlright = '', $morecss = '', $limittoshow = 0, $moretabssuffix = '')
     {
         //        global $conf, $langs, $hookmanager;
-        $hookmanager = new HookManager();
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        $hookmanager = DolibarrGlobals::getHookManager();
 
         // Show title
         $showtitle = 1;
@@ -3268,7 +3270,9 @@ abstract class DolibarrFunctions
      */
     static public function dol_format_address($object, $withcountry = 0, $sep = "\n", $outputlangs = '', $mode = 0, $extralangcode = '')
     {
-        global $conf, $langs;
+        // global $conf, $langs;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         $ret = '';
         $countriesusingstate = ['AU', 'CA', 'US', 'IN', 'GB', 'ES', 'UK', 'TR', 'CN']; // See also MAIN_FORCE_STATE_INTO_ADDRESS
@@ -6956,7 +6960,13 @@ abstract class DolibarrFunctions
      */
     static public function getCommonSubstitutionArray($outputlangs, $onlykey = 0, $exclude = null, $object = null)
     {
-        global $db, $conf, $mysoc, $user, $extrafields;
+        // global $db, $conf, $mysoc, $user, $extrafields;
+        global $extrafields;
+
+        $conf = DolibarrGlobals::getConf();
+        $db = DolibarrGlobals::getDb();
+        $user = DolibarrGlobals::getUser();
+        $mysoc = DolibarrGlobals::getMySoc();
 
         $substitutionarray = [];
 

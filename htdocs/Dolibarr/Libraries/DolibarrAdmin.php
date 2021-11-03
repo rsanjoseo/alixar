@@ -40,7 +40,9 @@ abstract class DolibarrAdmin
     {
         // global $langs, $conf, $user;
 
-        $langs = Translator::getInstance();
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        $user = DolibarrGlobals::getUser();
 
         $h = 0;
         $head = [];
@@ -80,6 +82,37 @@ abstract class DolibarrAdmin
         DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'defaultvalues_admin');
 
         DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'defaultvalues_admin', 'remove');
+
+        return $head;
+    }
+
+    /**
+     * Prepare array with list of tabs
+     *
+     * @return  array                Array of tabs to show
+     */
+    static function translation_prepare_head()
+    {
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        // $user=DolibarrGlobals::getUser();
+
+        $h = 0;
+        $head = [];
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=searchkey';
+        $head[$h][1] = $langs->trans("TranslationKeySearch");
+        $head[$h][2] = 'searchkey';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=overwrite';
+        $head[$h][1] = $langs->trans("TranslationOverwriteKey") . '<span class="fa fa-plus-circle valignmiddle paddingleft"></span>';
+        $head[$h][2] = 'overwrite';
+        $h++;
+
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin');
+
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin', 'remove');
 
         return $head;
     }
@@ -870,37 +903,6 @@ abstract class DolibarrAdmin
         complete_head_from_modules($conf, $langs, $object, $head, $h, 'modulehelp_admin');
 
         complete_head_from_modules($conf, $langs, $object, $head, $h, 'modulehelp_admin', 'remove');
-
-        return $head;
-    }
-
-    /**
-     * Prepare array with list of tabs
-     *
-     * @return  array                Array of tabs to show
-     */
-    static function translation_prepare_head()
-    {
-        $conf = DolibarrGlobals::getConf();
-        $langs = DolibarrGlobals::getLangs();
-        // $user=DolibarrGlobals::getUser();
-
-        $h = 0;
-        $head = [];
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=searchkey';
-        $head[$h][1] = $langs->trans("TranslationKeySearch");
-        $head[$h][2] = 'searchkey';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Translation&mode=overwrite';
-        $head[$h][1] = $langs->trans("TranslationOverwriteKey") . '<span class="fa fa-plus-circle valignmiddle paddingleft"></span>';
-        $head[$h][2] = 'overwrite';
-        $h++;
-
-        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin');
-
-        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin', 'remove');
 
         return $head;
     }

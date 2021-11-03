@@ -909,7 +909,7 @@ abstract class CommonObject
             $this->region = $tmparray['region'];
         }
 
-        return dol_format_address($this, $withcountry, $sep, '', 0, $extralangcode);
+        return DolibarrFunctions::dol_format_address($this, $withcountry, $sep, '', 0, $extralangcode);
     }
 
     // phpcs:disable PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps

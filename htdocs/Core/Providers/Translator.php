@@ -239,7 +239,7 @@ class Translator extends Provider
      *
      * @return string
      */
-    public static function trans(string $txt, string|array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public static function trans(string $txt, $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         if (is_string($parameters)) {
             $x = $parameters;

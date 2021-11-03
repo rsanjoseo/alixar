@@ -26,6 +26,7 @@
 namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Base\BasicController;
+use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Dolibarr\Base\DolibarrController;
 use Alxarafe\Dolibarr\Base\DolibarrView;
 use stdClass;
@@ -421,6 +422,9 @@ class DolibarrLogin extends DolibarrView
             echo '<!-- Javascript by hook -->';
             echo $moreloginextracontent;
         }
+
+        print '<!-- Output debugbar data -->' . "\n";
+        print DebugTool::getInstance()->getRenderer();
 
         // Google Analytics
         // TODO Add a hook here
