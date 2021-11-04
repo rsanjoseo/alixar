@@ -22,7 +22,11 @@
  *      \ingroup    margin
  *      \brief      Description and activation file for the module Margin
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe module Margin
@@ -105,7 +109,7 @@ class modMargin extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=billing', // Put 0 if this is a top menu
             'type' => 'left', // This is a Top menu entry
             'titre' => 'Margins',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'billing',
             'leftmenu' => 'margins',
             'url' => '/margin/index.php',

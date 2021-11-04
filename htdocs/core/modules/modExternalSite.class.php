@@ -25,7 +25,11 @@
  * \brief      Description and activation file for the module ExternalSite
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Description and activation class for module ExternalSite
@@ -102,7 +106,7 @@ class modExternalSite extends DolibarrModules
             'fk_menu' => 0,
             'type' => 'top',
             'titre' => '__[EXTERNALSITE_LABEL]__',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'externalsite',
             'url' => '/externalsite/frames.php',
             'langs' => 'other',

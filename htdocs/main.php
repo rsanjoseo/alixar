@@ -30,12 +30,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Dolibarr\Base\DolibarrAuthentication;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Classes\MainView;
-use Alxarafe\Dolibarr\Classes\MenuManager;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
-use Alxarafe\Dolibarr\Tpl\Login;
+use Alxarafe\Modules\Admin\Controllers\NullController;
 
 /**
  * Load globals vars...
@@ -50,6 +50,7 @@ require_once('load.php');
  */
 
 $mw = new MainView();
+
 $conf = DolibarrGlobals::getConf();
 $langs = DolibarrGlobals::getLangs();
 
@@ -262,12 +263,12 @@ if (!defined('NOLOGIN') && !defined('NOIPCHECK') && !empty($dolibarr_main_restri
 }
 
 // Loading of additional presentation includes
-if (!defined('NOREQUIREHTML') || !constant('NOREQUIREHTML')) {
-    require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php'; // Need 660ko memory (800ko in 2.2)
-}
-if (!defined('NOREQUIREAJAX' || !constant('NOREQUIREAJAX'))) {
-    require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php'; // Need 22ko memory
-}
+//if (!defined('NOREQUIREHTML') || !constant('NOREQUIREHTML')) {
+//    require_once DOL_DOCUMENT_ROOT . '/core/class/html.form.class.php'; // Need 660ko memory (800ko in 2.2)
+//}
+//if (!defined('NOREQUIREAJAX' || !constant('NOREQUIREAJAX'))) {
+//    require_once DOL_DOCUMENT_ROOT . '/core/lib/ajax.lib.php'; // Need 22ko memory
+//}
 
 // If install or upgrade process not done or not completely finished, we call the install page.
 if (!empty($conf->global->MAIN_NOT_INSTALLED) || !empty($conf->global->MAIN_NOT_UPGRADED)) {
@@ -368,7 +369,7 @@ if ((!defined('NOCSRFCHECK') && empty($dolibarr_nocsrfcheck) && getDolGlobalInt(
 
     $sessiontokenforthisurl = (empty($_SESSION['token']) ? '' : $_SESSION['token']);
     // TODO Get the sessiontokenforthisurl into the array of session token
-    if (DolibarrFunctions::GETPOSTISSET('token') && DolibarrFunctions::GETPOST('token') != 'notrequired' && DolibarrFunctions::GETPOST('token', 'alpha') != $sessiontokenforthisurl) {
+    if (false && DolibarrFunctions::GETPOSTISSET('token') && DolibarrFunctions::GETPOST('token') != 'notrequired' && DolibarrFunctions::GETPOST('token', 'alpha') != $sessiontokenforthisurl) {
         DolibarrFunctions::dol_syslog("--- Access to " . (empty($_SERVER["REQUEST_METHOD"]) ? '' : $_SERVER["REQUEST_METHOD"] . ' ') . $_SERVER["PHP_SELF"] . " refused by CSRF protection (invalid token), so we disable POST and some GET parameters - referer=" . $_SERVER['HTTP_REFERER'] . ", action=" . DolibarrFunctions::GETPOST('action', 'aZ09') . ", _GET|POST['token']=" . DolibarrFunctions::GETPOST('token', 'alpha') . ", _SESSION['token']=" . $_SESSION['token'], LOG_WARNING);
         //print 'Unset POST by CSRF protection in main.inc.php.';	// Do not output anything because this create problems when using the BACK button on browsers.
         DolibarrFunctions::setEventMessages('SecurityTokenHasExpiredSoActionHasBeenCanceledPleaseRetry', null, 'warnings');
@@ -427,9 +428,18 @@ if (is_array($modulepart) && count($modulepart) > 0) {
     }
 }
 
+$auth = new DolibarrAuthentication(new NullController());
+if (!$auth->authenticated()) {
+    $auth->login();
+}
+
+$user = $auth->user;
+$langs = $auth->langs;
+$hookmanager = $auth->hookmanager;
+
 /*
  * Phase authentication / login
- */
+ * /
 $login = '';
 if (!defined('NOLOGIN')) {
     $x = new Login($conf);
@@ -609,3 +619,5 @@ if (!class_exists('MenuManager')) {
 $menumanager = new MenuManager($db, empty($user->socid) ? 0 : 1);
 $menumanager->loadMenu();
 //}
+
+*/

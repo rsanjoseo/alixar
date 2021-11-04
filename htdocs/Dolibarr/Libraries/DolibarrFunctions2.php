@@ -42,6 +42,8 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+
 /**
  *    \file            htdocs/core/lib/functions2.lib.php
  *    \brief            A set of functions for Dolibarr
@@ -222,9 +224,9 @@ abstract class DolibarrFunctions2
      *
      * @return    array                Array of directories that can contains module descriptors
      */
-    function dolGetModulesDirs($subdir = '')
+    static function dolGetModulesDirs($subdir = '')
     {
-        global $conf;
+        $conf = DolibarrGlobals::getConf();
 
         $modulesdir = [];
 

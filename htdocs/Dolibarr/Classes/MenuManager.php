@@ -332,26 +332,21 @@ class MenuManager
 
             $this->langs->load("admin"); // Load translation file admin.lang
             $this->menu->add(BASE_URI . "/admin/index.php?leftmenu=setup", $this->langs->trans("Setup"), 0);
-            $this->menu->add("/admin/company.php", $this->langs->trans("MenuCompanySetup"), 1);
-            $this->menu->add("/admin/modules.php", $this->langs->trans("Modules"), 1);
-            $this->menu->add("/admin/menus.php", $this->langs->trans("Menus"), 1);
-            $this->menu->add("/admin/ihm.php", $this->langs->trans("GUISetup"), 1);
-
-            //$this->menu->add("/admin/translation.php?mainmenu=home", $this->langs->trans("Translation"), 1);
+            $this->menu->add("?module=Admin&controller=Company", $this->langs->trans("MenuCompanySetup"), 1);
+            $this->menu->add("?module=Admin&controller=Modules", $this->langs->trans("Modules"), 1);
+            $this->menu->add("?module=Admin&controller=Menus", $this->langs->trans("Menus"), 1);
+            $this->menu->add("?module=Admin&controller=Ihm", $this->langs->trans("GUISetup"), 1);
             $this->menu->add("?module=Admin&controller=Translation&mainmenu=home", $this->langs->trans("Translation"), 1);
-
-            //$this->menu->add("/admin/defaultvalues.php?mainmenu=home", $this->langs->trans("DefaultValues"), 1);
             $this->menu->add("?module=Admin&controller=Defaultvalues&mainmenu=home", $this->langs->trans("DefaultValues"), 1);
-
-            $this->menu->add("/admin/boxes.php?mainmenu=home", $this->langs->trans("Boxes"), 1);
-            $this->menu->add("/admin/delais.php?mainmenu=home", $this->langs->trans("Alerts"), 1);
-            $this->menu->add("/admin/proxy.php?mainmenu=home", $this->langs->trans("Security"), 1);
-            $this->menu->add("/admin/limits.php?mainmenu=home", $this->langs->trans("MenuLimits"), 1);
-            $this->menu->add("/admin/pdf.php?mainmenu=home", $this->langs->trans("PDF"), 1);
-            $this->menu->add("/admin/mails.php?mainmenu=home", $this->langs->trans("Emails"), 1);
-            $this->menu->add("/admin/sms.php?mainmenu=home", $this->langs->trans("SMS"), 1);
-            $this->menu->add("/admin/dict.php?mainmenu=home", $this->langs->trans("DictionarySetup"), 1);
-            $this->menu->add("/admin/const.php?mainmenu=home", $this->langs->trans("OtherSetup"), 1);
+            $this->menu->add("?module=Admin&controller=Boxes&mainmenu=home", $this->langs->trans("Boxes"), 1);
+            $this->menu->add("?module=Admin&controller=Delais&mainmenu=home", $this->langs->trans("Alerts"), 1);
+            $this->menu->add("?module=Admin&controller=Proxy&mainmenu=home", $this->langs->trans("Security"), 1);
+            $this->menu->add("?module=Admin&controller=Limits&mainmenu=home", $this->langs->trans("MenuLimits"), 1);
+            $this->menu->add("?module=Admin&controller=Pdf&mainmenu=home", $this->langs->trans("PDF"), 1);
+            $this->menu->add("?module=Admin&controller=Mails&mainmenu=home", $this->langs->trans("Emails"), 1);
+            $this->menu->add("?module=Admin&controller=Sms&mainmenu=home", $this->langs->trans("SMS"), 1);
+            $this->menu->add("?module=Admin&controller=Dict&mainmenu=home", $this->langs->trans("DictionarySetup"), 1);
+            $this->menu->add("?module=Admin&controller=Const&mainmenu=home", $this->langs->trans("OtherSetup"), 1);
 
             // ***** END *****
 

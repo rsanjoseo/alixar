@@ -70,7 +70,16 @@ class InitView extends DolibarrView
         if (empty($this->conf->global->MAIN_INFO_SOCIETE_NOM) || empty($this->conf->global->MAIN_INFO_SOCIETE_COUNTRY)) {
             $setupcompanynotcomplete = 1;
         }
-        print DolibarrFunctions::img_picto('', 'company', 'class="paddingright valignmiddle double"') . ' ' . $this->langs->trans("SetupDescriptionLink", BASE_URI . '?module=Admin&controller=company&mainmenu=home' . (empty($setupcompanynotcomplete) ? '' : '&action=edit&token=' . DolibarrFunctions::newToken()), $this->langs->transnoentities("Setup"), $this->langs->transnoentities("MenuCompanySetup"));
+
+        $setup = $this->langs->transnoentities("Setup");
+        $menuEntity = $this->langs->transnoentities("MenuCompanySetup");
+        $params = [
+            '%link%' => BASE_URI . '?module=Admin&controller=company&mainmenu=home' . (empty($setupcompanynotcomplete) ? '' : '&action=edit&token=' . DolibarrFunctions::newToken()),
+            '%description%' => $setup . ' ' . $menuEntity,
+        ];
+        $setupDescriptionLink = $this->langs->trans("SetupDescriptionLink", $params) . $setup . $menuEntity;
+
+        print DolibarrFunctions::img_picto('', 'company', 'class="paddingright valignmiddle double"') . ' ' . $setupDescriptionLink;
         print '<br><br>' . $this->langs->trans("SetupDescription3b");
         if (!empty($setupcompanynotcomplete)) {
             $this->langs->load("errors");

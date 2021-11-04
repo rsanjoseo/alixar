@@ -24,7 +24,11 @@
  *     \ingroup     ticket
  *     \brief       Description and activation file for the module Ticket
  */
-require_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//require_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
 
 /**
  * Description and activation class for module Ticket
@@ -211,7 +215,7 @@ class modTicket extends DolibarrModules
         /*$this->menu[$r] = array('fk_menu' => 0, // Put 0 if this is a top menu
             'type' => 'top', // This is a Top menu entry
             'titre' => 'Ticket',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'ticket',
             'leftmenu' => '1', // Use 1 if you also want to add left menu entries using this descriptor.
             'url' => '/Modules/Tickets/index.php',
@@ -227,7 +231,7 @@ class modTicket extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=ticket',
             'type' => 'left',
             'titre' => 'Ticket',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'ticket',
             'leftmenu' => 'ticket',
             'url' => '/Modules/Tickets/index.php',

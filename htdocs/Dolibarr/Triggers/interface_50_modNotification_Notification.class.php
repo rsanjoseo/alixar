@@ -17,15 +17,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
+use Alxarafe\Dolibarr\Classes\User;
 
 /**
  *  \file       htdocs/core/triggers/interface_50_modNotification_Notification.class.php
  *  \ingroup    notification
  *  \brief      File of class of triggers for notification module
  */
-require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for notification module

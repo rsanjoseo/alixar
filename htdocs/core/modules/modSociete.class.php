@@ -27,7 +27,11 @@
  *    \ingroup    societe
  *    \brief      Description and activation file for the module societe (thirdparty)
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Societe
@@ -280,7 +284,7 @@ class modSociete extends DolibarrModules
         }
         // Add multicompany field
         if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
-            $nbofallowedentities = count(explode(',', getEntity('societe'))); // If project are shared, nb will be > 1
+            $nbofallowedentities = count(explode(',', DolibarrFunctions::getEntity('societe'))); // If project are shared, nb will be > 1
             if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
                 $this->export_fields_array[$r] += ['s.entity' => 'Entity'];
             }
@@ -335,7 +339,7 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_paiement as paymode ON s.mode_reglement = paymode.id';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bank_account as pbacc ON s.fk_account = pbacc.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_incoterms as incoterm ON s.fk_incoterms = incoterm.rowid';
-        $this->export_sql_end[$r] .= ' WHERE s.entity IN (' . getEntity('societe') . ')';
+        $this->export_sql_end[$r] .= ' WHERE s.entity IN (' . DolibarrFunctions::getEntity('societe') . ')';
         if (is_object($user) && empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
             if (!empty($conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
@@ -405,7 +409,7 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as co ON c.fk_pays = co.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople_extrafields as extra ON extra.fk_object = c.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_typent as t ON s.fk_typent = t.id';
-        $this->export_sql_end[$r] .= ' WHERE c.entity IN (' . getEntity('socpeople') . ')';
+        $this->export_sql_end[$r] .= ' WHERE c.entity IN (' . DolibarrFunctions::getEntity('socpeople') . ')';
         if (is_object($user) && empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
             if (!empty($conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
@@ -615,7 +619,7 @@ class modSociete extends DolibarrModules
                                                  's.barcode' => '123456789',
                                                  's.default_lang' => 'en_US / es_ES etc...matches a language directory in htdocs/langs/',
                                                  's.canvas' => "empty / a custom canvas form layout url e.g. mycanvas@mymodule",
-                                                 's.datec' => 'formatted as ' . dol_print_date(dol_now(), '%Y-%m-%d'),
+                                                 's.datec' => 'formatted as ' . DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), '%Y-%m-%d'),
                                                  's.fk_multicurrency' => '0 (use system default currency) / 1 (use local currency)',
                                                  's.multicurrency_code' => 'GBP/USD etc... matches field "code_iso" in table "' . MAIN_DB_PREFIX . 'c_currencies"',
         ];
@@ -705,7 +709,7 @@ class modSociete extends DolibarrModules
         ];
         $this->import_examplevalues_array[$r] = [//field order as per structure of table llx_socpeople
                                                  's.rowid' => '1',
-                                                 's.datec' => 'formatted as ' . dol_print_date(dol_now(), '%Y-%m-%d'),
+                                                 's.datec' => 'formatted as ' . DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), '%Y-%m-%d'),
                                                  's.fk_soc' => 'Third Party name eg. TPBigCompany',
                                                  's.civility' => 'Title of civility eg: MR...matches field "code" in table "' . MAIN_DB_PREFIX . 'c_civility"',
                                                  's.lastname' => "lastname or label",
@@ -715,7 +719,7 @@ class modSociete extends DolibarrModules
                                                  's.town' => 'Bigtown',
                                                  's.fk_departement' => 'matches field "code_departement" in table "' . MAIN_DB_PREFIX . 'c_departements"',
                                                  's.fk_pays' => 'US/FR/DE etc. matches field "code" in table "' . MAIN_DB_PREFIX . 'c_country"',
-                                                 's.birthday' => 'formatted as ' . dol_print_date(dol_now(), '%Y-%m-%d'),
+                                                 's.birthday' => 'formatted as ' . DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), '%Y-%m-%d'),
                                                  's.poste' => "Director",
                                                  's.phone' => "5551122",
                                                  's.phone_perso' => "5551133",
@@ -768,8 +772,8 @@ class modSociete extends DolibarrModules
         $this->import_examplevalues_array[$r] = [//field order as per structure of table llx_societe_rib
                                                  'sr.label' => 'eg. "account1"',
                                                  'sr.fk_soc' => 'eg. "TPBigCompany"',
-                                                 'sr.datec' => 'date used for creating direct debit UMR formatted as ' . dol_print_date(
-                                                         dol_now(),
+                                                 'sr.datec' => 'date used for creating direct debit UMR formatted as ' . DolibarrFunctions::dol_print_date(
+                                                         DolibarrFunctions::dol_now(),
                                                          '%Y-%m-%d'
                                                      ),
                                                  'sr.bank' => 'bank name eg: "ING-Direct"',

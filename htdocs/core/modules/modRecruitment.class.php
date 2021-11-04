@@ -25,7 +25,11 @@
  *  \ingroup    recruitment
  *  \brief      Description and activation file for the module Recruitment
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module Recruitment
@@ -269,7 +273,7 @@ class modRecruitment extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=hrm', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'left', // This is a Top menu entry
             'titre' => 'Recruitment',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'hrm',
             'leftmenu' => 'recruitmentjobposition',
             'url' => '/recruitment/recruitmentindex.php',

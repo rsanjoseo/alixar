@@ -28,7 +28,11 @@
  *    \brief      Description and activation file for the module Ficheinter
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Ficheinter
@@ -213,7 +217,7 @@ class modFicheinter extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'fichinterdet_extrafields as extradet ON fd.rowid = extradet.fk_object,';
         $this->export_sql_end[$r] .= ' ' . MAIN_DB_PREFIX . 'societe as s';
         $this->export_sql_end[$r] .= ' WHERE f.fk_soc = s.rowid';
-        $this->export_sql_end[$r] .= ' AND f.entity IN (' . getEntity('intervention') . ')';
+        $this->export_sql_end[$r] .= ' AND f.entity IN (' . DolibarrFunctions::getEntity('intervention') . ')';
         $r++;
     }
 

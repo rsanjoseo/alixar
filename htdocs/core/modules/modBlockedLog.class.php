@@ -22,7 +22,11 @@
  *  \ingroup    blockedlog
  *  \brief      Description and activation file for the module BlockedLog
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe a BlockedLog module
@@ -129,7 +133,7 @@ class modBlockedLog extends DolibarrModules
             'leftmenu' => 'blockedlogbrowser',
             'type' => 'left', // This is a Left menu entry
             'titre' => 'BrowseBlockedLog',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'url' => '/blockedlog/admin/blockedlog_list.php?mainmenu=tools&leftmenu=blockedlogbrowser',
             'langs' => 'blockedlog', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 200,

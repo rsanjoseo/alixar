@@ -27,7 +27,11 @@
  *    \ingroup    service
  *    \brief      Description and activation file for the module Service
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Service
@@ -270,7 +274,7 @@ class modService extends DolibarrModules
         if ((!empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) {
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_fournisseur_price as pf ON pf.fk_product = p.rowid LEFT JOIN ' . MAIN_DB_PREFIX . 'societe s ON s.rowid = pf.fk_soc';
         }
-        $this->export_sql_end[$r] .= ' WHERE p.fk_product_type = 1 AND p.entity IN (' . getEntity('product') . ')';
+        $this->export_sql_end[$r] .= ' WHERE p.fk_product_type = 1 AND p.entity IN (' . DolibarrFunctions::getEntity('product') . ')';
         if (!empty($conf->global->EXPORTTOOL_CATEGORIES)) {
             $this->export_sql_order[$r] = ' GROUP BY p.rowid'; // FIXME The group by used a generic value to say "all fields in select except function fields"
         }
@@ -311,7 +315,7 @@ class modService extends DolibarrModules
                 $this->export_sql_start[$r] = 'SELECT DISTINCT ';
                 $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p';
                 $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_price as pr ON p.rowid = pr.fk_product AND pr.entity = ' . $conf->entity; // export prices only for the current entity
-                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
+                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
             }
 
             if (!empty($conf->global->PRODUIT_CUSTOMER_PRICES)) {
@@ -348,7 +352,7 @@ class modService extends DolibarrModules
                 $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p';
                 $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_customer_price as pr ON p.rowid = pr.fk_product AND pr.entity = ' . $conf->entity; // export prices only for the current entity
                 $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON pr.fk_soc = s.rowid';
-                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
+                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
             }
 
             if (!empty($conf->global->PRODUIT_SOUSPRODUITS)) {
@@ -419,7 +423,7 @@ class modService extends DolibarrModules
                 }
                 $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra ON p.rowid = extra.fk_object,';
                 $this->export_sql_end[$r] .= ' ' . MAIN_DB_PREFIX . 'product_association as pa, ' . MAIN_DB_PREFIX . 'product as p2';
-                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
+                $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
                 $this->export_sql_end[$r] .= ' AND p.rowid = pa.fk_product_pere AND p2.rowid = pa.fk_product_fils';
             }
         }
@@ -616,7 +620,7 @@ class modService extends DolibarrModules
         // field order as per structure of table llx_product
         $import_sample = [
             'p.ref' => "ref:PREF123456",
-            'p.datec' => dol_print_date(dol_now(), '%Y-%m-%d'),
+            'p.datec' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), '%Y-%m-%d'),
             'p.label' => "Product name in default language",
             'p.description' => "Product description in default language",
             'p.note_public' => "a public note (free text)",

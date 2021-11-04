@@ -24,7 +24,9 @@
  *    \brief      Description and activation file for the module mailmanspip
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Click to Dial

@@ -26,7 +26,10 @@
  *    \brief      Description and activation file for the module barcode
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe Barcode
@@ -100,7 +103,7 @@ class modBarcode extends DolibarrModules
             'leftmenu' => 'barcodeprint',
             'type' => 'left', // This is a Left menu entry
             'titre' => 'BarCodePrintsheet',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'url' => '/barcode/printsheet.php?mainmenu=tools&leftmenu=barcodeprint',
             'langs' => 'products', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 200,

@@ -28,7 +28,10 @@
  *    \ingroup    supplier_proposal
  *    \brief      Description and activation file for the module supplier proposal
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module SupplierProposal

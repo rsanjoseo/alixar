@@ -24,7 +24,11 @@
  *  \ingroup    takepos
  *  \brief      Description and activation file for the module TakePos
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Class to describe and enable module TakePos
@@ -223,7 +227,7 @@ class modTakePos extends DolibarrModules
             'titre' => 'PointOfSaleShort',
             'mainmenu' => 'takepos',
             'leftmenu' => '',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'url' => '/takepos/index.php',
             'langs' => 'cashdesk', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,

@@ -25,7 +25,11 @@
  * \ingroup        Double entry accounting
  * \brief        Module to activate the double entry accounting module
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+// include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  * Class to describe and enable double entry accounting module
@@ -265,7 +269,7 @@ class modAccounting extends DolibarrModules
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'accounting_account as aa';
         $this->export_sql_end[$r] .= ' ,' . MAIN_DB_PREFIX . 'accounting_system as ac';
-        $this->export_sql_end[$r] .= ' WHERE ac.pcg_version = aa.fk_pcg_version AND aa.entity IN (' . getEntity('accounting') . ') ';
+        $this->export_sql_end[$r] .= ' WHERE ac.pcg_version = aa.fk_pcg_version AND aa.entity IN (' . DolibarrFunctions::getEntity('accounting') . ') ';
 
         // Imports
         //--------
@@ -294,7 +298,7 @@ class modAccounting extends DolibarrModules
             'b.credit' => "Credit",
             'b.sens' => 'Direction'    // This field is still used by accounting export. We can remove it once it has been replaced into accountancyexport.class.php by a detection using ->debit and ->credit
         ];
-        $this->import_fieldshidden_array[$r] = ['b.doc_type' => 'const-import_from_external', 'b.fk_doc' => 'const-0', 'b.fk_docdet' => 'const-0', 'b.fk_user_author' => 'user->id', 'b.date_creation' => 'const-' . dol_print_date(dol_now(), 'standard')]; // aliastable.field => ('user->id' or 'lastrowid-'.tableparent)
+        $this->import_fieldshidden_array[$r] = ['b.doc_type' => 'const-import_from_external', 'b.fk_doc' => 'const-0', 'b.fk_docdet' => 'const-0', 'b.fk_user_author' => 'user->id', 'b.date_creation' => 'const-' . DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), 'standard')]; // aliastable.field => ('user->id' or 'lastrowid-'.tableparent)
         $this->import_regex_array[$r] = ['b.doc_date' => '^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$'];
         $this->import_convertvalue_array[$r] = [
             'b.numero_compte' => ['rule' => 'accountingaccount'],
@@ -302,7 +306,7 @@ class modAccounting extends DolibarrModules
         ];
         $this->import_examplevalues_array[$r] = [
             'b.piece_num' => '123 (!!! use next value not already used)',
-            'b.doc_date' => dol_print_date(dol_now(), "%Y-%m-%d"),
+            'b.doc_date' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), "%Y-%m-%d"),
             //'b.doc_type'=>'import',
             'b.doc_ref' => 'My document ABC',
             'b.code_journal' => "VTE",
@@ -372,19 +376,19 @@ class modAccounting extends DolibarrModules
             'b.code_journal' => "VT",
             'b.journal_label' => "Sale journal",
             'b.piece_num' => '123 (!!! use next value not already used)',
-            'b.doc_date' => dol_print_date(dol_now(), "%Y%m%d"),
+            'b.doc_date' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), "%Y%m%d"),
             'b.numero_compte' => "707",
             'b.label_compte' => 'Sale',
             'b.subledger_account' => '',
             'b.subledger_label' => '',
             'b.doc_ref' => 'My document ABC',
-            'b.date_creation' => dol_print_date(dol_now(), "%Y%m%d"),
+            'b.date_creation' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), "%Y%m%d"),
             'b.label_operation' => "Sale of ABC",
             'b.debit' => "0",
             'b.credit' => "100",
             'b.lettering_code' => 'ABC',
-            'b.date_lettering' => dol_print_date(dol_now(), "%Y%m%d"),
-            'b.date_validated' => dol_print_date(dol_now(), "%Y%m%d"),
+            'b.date_lettering' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), "%Y%m%d"),
+            'b.date_validated' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), "%Y%m%d"),
             'b.multicurrency_amount' => "90 (Necessary if devise is different than EUR)",
             'b.multicurrency_code' => "US (Necessary if devise is different than EUR)",
         ];

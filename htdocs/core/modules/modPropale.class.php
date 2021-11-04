@@ -28,7 +28,11 @@
  *    \ingroup    propale
  *    \brief      Description and activation file for the module customer proposal
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Propale
@@ -260,7 +264,7 @@ class modPropale extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product as p on (cd.fk_product = p.rowid)';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra3 on p.rowid = extra3.fk_object';
         $this->export_sql_end[$r] .= ' WHERE c.fk_soc = s.rowid AND c.rowid = cd.fk_propal';
-        $this->export_sql_end[$r] .= ' AND c.entity IN (' . getEntity('propal') . ')';
+        $this->export_sql_end[$r] .= ' AND c.entity IN (' . DolibarrFunctions::getEntity('propal') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND sc.fk_user = ' . (empty($user) ? 0 : $user->id);
         }

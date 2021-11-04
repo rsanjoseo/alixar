@@ -24,7 +24,6 @@ namespace Alxarafe\Dolibarr\Classes;
  *  \brief      File of class to manage dynamic menu entries
  */
 
-use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
@@ -178,7 +177,9 @@ class MenuBase
      */
     public function create($user = null)
     {
-        global $conf, $langs;
+        // global $conf, $langs;
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
 
         // Clean parameters
         if (!isset($this->enabled)) {
@@ -247,11 +248,15 @@ class MenuBase
         $sql .= " AND url = '" . $this->db->escape($this->url) . "'";
         $sql .= " AND entity = " . $conf->entity;
 
-        $result = $this->db->query($sql);
-        if ($result) {
-            $row = $this->db->fetch_row($result);
+        // $result = $this->db->query($sql);
+        $result = $this->db->select($sql);
 
-            if ($row[0] == 0) {   // If not found
+        if (count($result) > 0) {
+            //        if ($result) {
+            //            $row = $this->db->fetch_row($result);
+            //
+            //            if ($row[0] == 0) {   // If not found
+            if ($result[0] === 0) {   // If not found
                 // Insert request
                 $sql = "INSERT INTO " . MAIN_DB_PREFIX . "menu(";
                 $sql .= "menu_handler,";
@@ -293,11 +298,11 @@ class MenuBase
                 $sql .= " '" . $this->db->escape($this->user) . "'";
                 $sql .= ")";
 
-                dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create", LOG_DEBUG);
                 $resql = $this->db->query($sql);
                 if ($resql) {
                     $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "menu");
-                    dol_syslog(get_class($this) . "::create record added has rowid=" . ((int) $this->id), LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::create record added has rowid=" . ((int) $this->id), LOG_DEBUG);
 
                     return $this->id;
                 } else {
@@ -305,7 +310,7 @@ class MenuBase
                     return -1;
                 }
             } else {
-                dol_syslog(get_class($this) . "::create menu entry already exists", LOG_WARNING);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create menu entry already exists", LOG_WARNING);
                 $this->error = 'Error Menu entry already exists';
                 return 0;
             }
@@ -370,7 +375,7 @@ class MenuBase
         $sql .= " usertype='" . $this->db->escape($this->user) . "'";
         $sql .= " WHERE rowid=" . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::update", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if (!$resql) {
             $this->error = "Error " . $this->db->lasterror();
@@ -416,7 +421,7 @@ class MenuBase
         $sql .= " FROM " . MAIN_DB_PREFIX . "menu as t";
         $sql .= " WHERE t.rowid = " . ((int) $id);
 
-        dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::fetch", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             if ($this->db->num_rows($resql)) {
@@ -467,7 +472,7 @@ class MenuBase
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "menu";
         $sql .= " WHERE rowid=" . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if (!$resql) {
             $this->error = "Error " . $this->db->lasterror();
@@ -609,7 +614,7 @@ class MenuBase
                     if ($found) {
                         $this->newmenu->insert($lastid, $val['url'], $val['titre'], $searchlastsub, $val['perms'], $val['target'], $val['mainmenu'], $val['leftmenu'], $val['position'], '', '', '', $val['prefix']);
                     } else {
-                        dol_syslog("Error. Modules " . $val['module'] . " has defined a menu entry with a parent='fk_mainmenu=" . $val['fk_leftmenu'] . ",fk_leftmenu=" . $val['fk_leftmenu'] . "' and position=" . $val['position'] . '. The parent was not found. May be you forget it into your definition of menu, or may be the parent has a "position" that is after the child (fix field "position" of parent or child in this case).', LOG_WARNING);
+                        DolibarrFunctions::dol_syslog("Error. Modules " . $val['module'] . " has defined a menu entry with a parent='fk_mainmenu=" . $val['fk_leftmenu'] . ",fk_leftmenu=" . $val['fk_leftmenu'] . "' and position=" . $val['position'] . '. The parent was not found. May be you forget it into your definition of menu, or may be the parent has a "position" that is after the child (fix field "position" of parent or child in this case).', LOG_WARNING);
                         //print "Parent menu not found !!<br>";
                     }
                 }
@@ -676,7 +681,7 @@ class MenuBase
         $sql .= " ORDER BY m.position, m.rowid";
         //print $sql;
 
-        //dol_syslog(get_class($this)."::menuLoad mymainmenu=".$mymainmenu." myleftmenu=".$myleftmenu." type_user=".$type_user." menu_handler=".$menu_handler." tabMenu size=".count($tabMenu)."", LOG_DEBUG);
+        //DolibarrFunctions::dol_syslog(get_class($this)."::menuLoad mymainmenu=".$mymainmenu." myleftmenu=".$myleftmenu." type_user=".$type_user." menu_handler=".$menu_handler." tabMenu size=".count($tabMenu)."", LOG_DEBUG);
         //		$resql = $this->db->query($sql);
         $resql = $this->db->select($sql);
         if (is_array($resql)) {

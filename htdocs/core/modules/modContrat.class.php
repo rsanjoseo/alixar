@@ -25,7 +25,10 @@
  *    \brief      Description and activation file for the module contract
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Contrat
@@ -211,7 +214,7 @@ class modContrat extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product as p ON (cod.fk_product = p.rowid)';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'contrat_extrafields as coextra on (co.rowid = coextra.fk_object)';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'contratdet_extrafields as codextra on (cod.rowid = codextra.fk_object)';
-        $this->export_sql_end[$r] .= ' WHERE co.entity IN (' . getEntity('contract') . ')';
+        $this->export_sql_end[$r] .= ' WHERE co.entity IN (' . DolibarrFunctions::getEntity('contract') . ')';
     }
 
     /**

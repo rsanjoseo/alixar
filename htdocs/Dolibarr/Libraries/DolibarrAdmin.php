@@ -23,6 +23,8 @@ namespace Alxarafe\Dolibarr\Libraries;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Classes\Form;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
@@ -115,6 +117,327 @@ abstract class DolibarrAdmin
         DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'translation_admin', 'remove');
 
         return $head;
+    }
+
+    /**
+     * Prepare array with list of tabs
+     *
+     * @param int $nbofactivatedmodules Number if activated modules
+     * @param int $nboftotalmodules     Nb of total modules
+     *
+     * @return  array                            Array of tabs to show
+     */
+    static function modules_prepare_head($nbofactivatedmodules, $nboftotalmodules)
+    {
+        // global $langs, $conf, $user, $form;
+
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+        $user = DolibarrGlobals::getUser();
+        $form = new Form();
+
+        $desc = $langs->trans("ModulesDesc", '{picto}');
+        $desc = str_replace('{picto}', DolibarrFunctions::img_picto('', 'switch_off'), $desc);
+
+        $h = 0;
+        $head = [];
+        $mode = empty($conf->global->MAIN_MODULE_SETUP_ON_LIST_BY_DEFAULT) ? 'commonkanban' : 'common';
+        $head[$h][0] = constant('BASE_URI') . '?modules=Admin&controller=Modules&mode=' . $mode;
+        if ($nbofactivatedmodules <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only minimal initial modules enabled)
+            $head[$h][1] = $form->textwithpicto($langs->trans("AvailableModules"), $desc);
+            $head[$h][1] .= img_warning($langs->trans("YouMustEnableOneModule"));
+        } else {
+            //$head[$h][1] = $langs->trans("AvailableModules").$form->textwithpicto('<span class="badge marginleftonly">'.$nbofactivatedmodules.' / '.$nboftotalmodules.'</span>', $desc, 1, 'help', '', 1, 3);
+            $head[$h][1] = $langs->trans("AvailableModules") . '<span class="badge marginleftonly">' . $nbofactivatedmodules . ' / ' . $nboftotalmodules . '</span>';
+        }
+        $head[$h][2] = 'modules';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=marketplace';
+        $head[$h][1] = $langs->trans("ModulesMarketPlaces");
+        $head[$h][2] = 'marketplace';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=deploy';
+        $head[$h][1] = $langs->trans("AddExtensionThemeModuleOrOther");
+        $head[$h][2] = 'deploy';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=develop';
+        $head[$h][1] = $langs->trans("ModulesDevelopYourModule");
+        $head[$h][2] = 'develop';
+        $h++;
+
+        return $head;
+    }
+
+    /**
+     *    Insert a parameter (key,value) into database (delete old key then insert it again).
+     *
+     * @param DoliDB $db      Database handler
+     * @param string $name    Name of constant
+     * @param string $value   Value of constant
+     * @param string $type    Type of constant. Deprecated, only strings are allowed for $value. Caller must json encode/decode to store other type of data.
+     * @param int    $visible Is constant visible in Setup->Other page (0 by default)
+     * @param string $note    Note on parameter
+     * @param int    $entity  Multi company id (0 means all entities)
+     *
+     * @return     int                    -1 if KO, 1 if OK
+     *
+     * @see        dolibarr_del_const(), dolibarr_get_const(), dol_set_user_param()
+     */
+    static function dolibarr_set_const($db, $name, $value, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
+    {
+        //global $conf;
+        $conf = DolibarrGlobals::getConf();
+
+        // Clean parameters
+        $name = trim($name);
+
+        // Check parameters
+        if (empty($name)) {
+            dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
+            exit;
+        }
+
+        //DolibarrFunctions::dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
+
+        $db->begin();
+
+        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
+        $sql .= " WHERE name = " . $db->encrypt($name);
+        if ($entity >= 0) {
+            $sql .= " AND entity = " . ((int) $entity);
+        }
+
+        DolibarrFunctions::dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
+        $resql = $db->query($sql);
+
+        if (strcmp($value, '')) {    // true if different. Must work for $value='0' or $value=0
+            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const(name,value,type,visible,note,entity)";
+            $sql .= " VALUES (";
+            $sql .= $db->encrypt($name);
+            $sql .= ", " . $db->encrypt($value);
+            $sql .= ",'" . $db->escape($type) . "'," . ((int) $visible) . ",'" . $db->escape($note) . "'," . ((int) $entity) . ")";
+
+            //print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
+            //print "xx".$db->escape($value);
+            DolibarrFunctions::dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
+            $resql = $db->query($sql);
+        }
+
+        if ($resql) {
+            $db->commit();
+            $conf->global->$name = $value;
+            return 1;
+        } else {
+            $error = $db->lasterror();
+            $db->rollback();
+            return -1;
+        }
+    }
+
+    /**
+     *  Disable a module
+     *
+     * @param string $value      Nom du module a desactiver
+     * @param int    $requiredby 1=Desactive aussi modules dependants
+     *
+     * @return     string                             Error message or '';
+     */
+    static function unActivateModule($value, $requiredby = 1)
+    {
+        //global $db, $modules, $conf;
+        $db = DolibarrGlobals::getDb();
+
+        // Check parameters
+        if (empty($value)) {
+            return 'ErrorBadParameter';
+        }
+
+        $ret = '';
+        $modName = $value;
+        $modFile = $modName . ".class.php";
+
+        // Loop on each directory to fill $modulesdir
+        $modulesdir = dolGetModulesDirs();
+
+        // Loop on each modulesdir directories
+        $found = false;
+        foreach ($modulesdir as $dir) {
+            if (file_exists($dir . $modFile)) {
+                $found = @include_once $dir . $modFile;
+                if ($found) {
+                    break;
+                }
+            }
+        }
+
+        if ($found) {
+            $objMod = new $modName($db);
+            $result = $objMod->remove();
+            if ($result <= 0) {
+                $ret = $objMod->error;
+            }
+        } else // We come here when we try to unactivate a module when module does not exists anymore in sources
+        {
+            //print $dir.$modFile;exit;
+            // TODO Replace this after DolibarrModules is moved as abstract class with a try catch to show module we try to disable has not been found or could not be loaded
+            include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+            $genericMod = new DolibarrModules($db);
+            $genericMod->name = preg_replace('/^mod/i', '', $modName);
+            $genericMod->rights_class = strtolower(preg_replace('/^mod/i', '', $modName));
+            $genericMod->const_name = 'MAIN_MODULE_' . strtoupper(preg_replace('/^mod/i', '', $modName));
+            DolibarrFunctions::dol_syslog("modules::unActivateModule Failed to find module file, we use generic function with name " . $modName);
+            $genericMod->remove('');
+        }
+
+        // Disable modules that depends on module we disable
+        if (!$ret && $requiredby && is_object($objMod) && is_array($objMod->requiredby)) {
+            $countrb = count($objMod->requiredby);
+            for ($i = 0; $i < $countrb; $i++) {
+                //var_dump($objMod->requiredby[$i]);
+                unActivateModule($objMod->requiredby[$i]);
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
+     *  Enable a module
+     *
+     * @param string $value    Name of module to activate
+     * @param int    $withdeps Activate/Disable also all dependencies
+     *
+     * @return     array                    array('nbmodules'=>nb modules activated with success, 'errors=>array of error messages, 'nbperms'=>Nb permission added);
+     */
+    static function activateModule($value, $withdeps = 1)
+    {
+        // global $db, $langs, $conf, $mysoc;
+        $conf = DolibarrGlobals::getConf();
+        $db = DolibarrGlobals::getDb();
+        $langs = DolibarrGlobals::getLangs();
+        $mysoc = DolibarrGlobals::getMySoc();
+
+        $ret = [];
+
+        // Check parameters
+        if (empty($value)) {
+            $ret['errors'][] = 'ErrorBadParameter';
+            return $ret;
+        }
+
+        $ret = ['nbmodules' => 0, 'errors' => [], 'nbperms' => 0];
+        $modName = $value;
+        $modFile = $modName . ".class.php";
+
+        // Loop on each directory to fill $modulesdir
+        $modulesdir = dolGetModulesDirs();
+
+        // Loop on each modulesdir directories
+        $found = false;
+        foreach ($modulesdir as $dir) {
+            if (file_exists($dir . $modFile)) {
+                $found = @include_once $dir . $modFile;
+                if ($found) {
+                    break;
+                }
+            }
+        }
+
+        $include = DOL_DOCUMENT_ROOT . '/core/modules/' . $modName . '.class.php';
+        // dump($include);
+        require $include;
+        $objMod = new $modName($db);
+
+        // Test if PHP version ok
+        $verphp = versionphparray();
+        $vermin = isset($objMod->phpmin) ? $objMod->phpmin : 0;
+        if (is_array($vermin) && versioncompare($verphp, $vermin) < 0) {
+            $ret['errors'][] = $langs->trans("ErrorModuleRequirePHPVersion", versiontostring($vermin));
+            return $ret;
+        }
+
+        // Test if Dolibarr version ok
+        $verdol = versiondolibarrarray();
+        $vermin = isset($objMod->need_dolibarr_version) ? $objMod->need_dolibarr_version : 0;
+        //print 'version: '.versioncompare($verdol,$vermin).' - '.join(',',$verdol).' - '.join(',',$vermin);exit;
+        if (is_array($vermin) && versioncompare($verdol, $vermin) < 0) {
+            $ret['errors'][] = $langs->trans("ErrorModuleRequireDolibarrVersion", versiontostring($vermin));
+            return $ret;
+        }
+
+        // Test if javascript requirement ok
+        if (!empty($objMod->need_javascript_ajax) && empty($conf->use_javascript_ajax)) {
+            $ret['errors'][] = $langs->trans("ErrorModuleRequireJavascript");
+            return $ret;
+        }
+
+        $const_name = $objMod->const_name;
+        if (!empty($conf->global->$const_name)) {
+            return $ret;
+        }
+
+        $result = $objMod->init(); // Enable module
+
+        if ($result <= 0) {
+            $ret['errors'][] = $objMod->error;
+        } else {
+            if ($withdeps) {
+                if (isset($objMod->depends) && is_array($objMod->depends) && !empty($objMod->depends)) {
+                    // Activation of modules this module depends on
+                    // this->depends may be array('modModule1', 'mmodModule2') or array('always1'=>"modModule1", 'FR'=>'modModule2')
+                    foreach ($objMod->depends as $key => $modulestring) {
+                        //var_dump((! is_numeric($key)) && ! preg_match('/^always/', $key) && $mysoc->country_code && ! preg_match('/^'.$mysoc->country_code.'/', $key));exit;
+                        if ((!is_numeric($key)) && !preg_match('/^always/', $key) && $mysoc->country_code && !preg_match('/^' . $mysoc->country_code . '/', $key)) {
+                            DolibarrFunctions::dol_syslog("We are not concerned by dependency with key=" . $key . " because our country is " . $mysoc->country_code);
+                            continue;
+                        }
+                        $activate = false;
+                        foreach ($modulesdir as $dir) {
+                            if (file_exists($dir . $modulestring . ".class.php")) {
+                                $resarray = activateModule($modulestring);
+                                if (empty($resarray['errors'])) {
+                                    $activate = true;
+                                } else {
+                                    foreach ($resarray['errors'] as $errorMessage) {
+                                        DolibarrFunctions::dol_syslog($errorMessage, LOG_ERR);
+                                    }
+                                }
+                                break;
+                            }
+                        }
+
+                        if ($activate) {
+                            $ret['nbmodules'] += $resarray['nbmodules'];
+                            $ret['nbperms'] += $resarray['nbperms'];
+                        } else {
+                            $ret['errors'][] = $langs->trans('activateModuleDependNotSatisfied', $objMod->name, $modulestring);
+                        }
+                    }
+                }
+
+                if (isset($objMod->conflictwith) && is_array($objMod->conflictwith) && !empty($objMod->conflictwith)) {
+                    // Desactivation des modules qui entrent en conflit
+                    $num = count($objMod->conflictwith);
+                    for ($i = 0; $i < $num; $i++) {
+                        foreach ($modulesdir as $dir) {
+                            if (file_exists($dir . $objMod->conflictwith[$i] . ".class.php")) {
+                                unActivateModule($objMod->conflictwith[$i], 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!count($ret['errors'])) {
+            $ret['nbmodules']++;
+            $ret['nbperms'] += count($objMod->rights);
+        }
+
+        return $ret;
     }
 
     /**
@@ -259,10 +582,10 @@ abstract class DolibarrAdmin
     {
         global $db, $conf, $langs, $user;
 
-        dol_syslog("Admin.lib::run_sql run sql file " . $sqlfile . " silent=" . $silent . " entity=" . $entity . " usesavepoint=" . $usesavepoint . " handler=" . $handler . " okerror=" . $okerror, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("Admin.lib::run_sql run sql file " . $sqlfile . " silent=" . $silent . " entity=" . $entity . " usesavepoint=" . $usesavepoint . " handler=" . $handler . " okerror=" . $okerror, LOG_DEBUG);
 
         if (!is_numeric($linelengthlimit)) {
-            dol_syslog("Admin.lib::run_sql param linelengthlimit is not a numeric", LOG_ERR);
+            DolibarrFunctions::dol_syslog("Admin.lib::run_sql param linelengthlimit is not a numeric", LOG_ERR);
             return -1;
         }
 
@@ -352,7 +675,7 @@ abstract class DolibarrAdmin
             }
             fclose($fp);
         } else {
-            dol_syslog("Admin.lib::run_sql failed to open file " . $sqlfile, LOG_ERR);
+            DolibarrFunctions::dol_syslog("Admin.lib::run_sql failed to open file " . $sqlfile, LOG_ERR);
         }
 
         // Loop on each request to see if there is a __+MAX_table__ key
@@ -387,7 +710,7 @@ abstract class DolibarrAdmin
                 $from = '__+MAX_' . $table . '__';
                 $to = '+' . $listofmaxrowid[$table];
                 $newsql = str_replace($from, $to, $newsql);
-                dol_syslog('Admin.lib::run_sql New Request ' . ($i + 1) . ' (replacing ' . $from . ' to ' . $to . ')', LOG_DEBUG);
+                DolibarrFunctions::dol_syslog('Admin.lib::run_sql New Request ' . ($i + 1) . ' (replacing ' . $from . ' to ' . $to . ')', LOG_DEBUG);
 
                 $arraysql[$i] = $newsql;
             }
@@ -428,7 +751,7 @@ abstract class DolibarrAdmin
                 if (!$silent) {
                     print '<tr class="trforrunsql"><td class="tdtop opacitymedium"' . ($colspan ? ' colspan="' . $colspan . '"' : '') . '>' . $langs->trans("Request") . ' ' . ($i + 1) . " sql='" . dol_htmlentities($newsql, ENT_NOQUOTES) . "'</td></tr>\n";
                 }
-                dol_syslog('Admin.lib::run_sql Request ' . ($i + 1), LOG_DEBUG);
+                DolibarrFunctions::dol_syslog('Admin.lib::run_sql Request ' . ($i + 1), LOG_DEBUG);
                 $sqlmodified = 0;
 
                 // Replace for encrypt data
@@ -474,7 +797,7 @@ abstract class DolibarrAdmin
                 }
 
                 if ($sqlmodified) {
-                    dol_syslog('Admin.lib::run_sql New Request ' . ($i + 1), LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog('Admin.lib::run_sql New Request ' . ($i + 1), LOG_DEBUG);
                 }
 
                 $result = $db->query($newsql, $usesavepoint);
@@ -490,7 +813,7 @@ abstract class DolibarrAdmin
                         $table = preg_replace('/([^a-zA-Z_]+)/i', '', $reg[1]);
                         $insertedrowid = $db->last_insert_id($table);
                         $listofinsertedrowid[$cursorinsert] = $insertedrowid;
-                        dol_syslog('Admin.lib::run_sql Insert nb ' . $cursorinsert . ', done in table ' . $table . ', rowid is ' . $listofinsertedrowid[$cursorinsert], LOG_DEBUG);
+                        DolibarrFunctions::dol_syslog('Admin.lib::run_sql Insert nb ' . $cursorinsert . ', done in table ' . $table . ', rowid is ' . $listofinsertedrowid[$cursorinsert], LOG_DEBUG);
                     }
                     // 	          print '<td class="right">OK</td>';
                 } else {
@@ -526,7 +849,7 @@ abstract class DolibarrAdmin
                             print '<div class="error">' . $langs->trans("Error") . " " . $db->errno() . ": " . $newsql . "<br>" . $db->error() . "</div>";
                             print '</td></tr>' . "\n";
                         }
-                        dol_syslog('Admin.lib::run_sql Request ' . ($i + 1) . " Error " . $db->errno() . " " . $newsql . "<br>" . $db->error(), LOG_ERR);
+                        DolibarrFunctions::dol_syslog('Admin.lib::run_sql Request ' . ($i + 1) . " Error " . $db->errno() . " " . $newsql . "<br>" . $db->error(), LOG_ERR);
                         $error++;
                     }
                 }
@@ -601,7 +924,7 @@ abstract class DolibarrAdmin
             $sql .= " AND entity = " . ((int) $entity);
         }
 
-        dol_syslog("admin.lib::dolibarr_del_const", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("admin.lib::dolibarr_del_const", LOG_DEBUG);
         $resql = $db->query($sql);
         if ($resql) {
             $conf->global->$name = '';
@@ -632,7 +955,7 @@ abstract class DolibarrAdmin
         $sql .= " WHERE name = " . $db->encrypt($name);
         $sql .= " AND entity = " . ((int) $entity);
 
-        dol_syslog("admin.lib::dolibarr_get_const", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("admin.lib::dolibarr_get_const", LOG_DEBUG);
         $resql = $db->query($sql);
         if ($resql) {
             $obj = $db->fetch_object($resql);
@@ -641,118 +964,6 @@ abstract class DolibarrAdmin
             }
         }
         return $value;
-    }
-
-    /**
-     *    Insert a parameter (key,value) into database (delete old key then insert it again).
-     *
-     * @param DoliDB $db      Database handler
-     * @param string $name    Name of constant
-     * @param string $value   Value of constant
-     * @param string $type    Type of constant. Deprecated, only strings are allowed for $value. Caller must json encode/decode to store other type of data.
-     * @param int    $visible Is constant visible in Setup->Other page (0 by default)
-     * @param string $note    Note on parameter
-     * @param int    $entity  Multi company id (0 means all entities)
-     *
-     * @return     int                    -1 if KO, 1 if OK
-     *
-     * @see        dolibarr_del_const(), dolibarr_get_const(), dol_set_user_param()
-     */
-    function dolibarr_set_const($db, $name, $value, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
-    {
-        global $conf;
-
-        // Clean parameters
-        $name = trim($name);
-
-        // Check parameters
-        if (empty($name)) {
-            dol_print_error($db, "Error: Call to function dolibarr_set_const with wrong parameters", LOG_ERR);
-            exit;
-        }
-
-        //dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
-
-        $db->begin();
-
-        $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
-        $sql .= " WHERE name = " . $db->encrypt($name);
-        if ($entity >= 0) {
-            $sql .= " AND entity = " . ((int) $entity);
-        }
-
-        dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
-        $resql = $db->query($sql);
-
-        if (strcmp($value, '')) {    // true if different. Must work for $value='0' or $value=0
-            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const(name,value,type,visible,note,entity)";
-            $sql .= " VALUES (";
-            $sql .= $db->encrypt($name);
-            $sql .= ", " . $db->encrypt($value);
-            $sql .= ",'" . $db->escape($type) . "'," . ((int) $visible) . ",'" . $db->escape($note) . "'," . ((int) $entity) . ")";
-
-            //print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
-            //print "xx".$db->escape($value);
-            dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
-            $resql = $db->query($sql);
-        }
-
-        if ($resql) {
-            $db->commit();
-            $conf->global->$name = $value;
-            return 1;
-        } else {
-            $error = $db->lasterror();
-            $db->rollback();
-            return -1;
-        }
-    }
-
-    /**
-     * Prepare array with list of tabs
-     *
-     * @param int $nbofactivatedmodules Number if activated modules
-     * @param int $nboftotalmodules     Nb of total modules
-     *
-     * @return  array                            Array of tabs to show
-     */
-    function modules_prepare_head($nbofactivatedmodules, $nboftotalmodules)
-    {
-        global $langs, $conf, $user, $form;
-
-        $desc = $langs->trans("ModulesDesc", '{picto}');
-        $desc = str_replace('{picto}', img_picto('', 'switch_off'), $desc);
-
-        $h = 0;
-        $head = [];
-        $mode = empty($conf->global->MAIN_MODULE_SETUP_ON_LIST_BY_DEFAULT) ? 'commonkanban' : 'common';
-        $head[$h][0] = constant('BASE_URI') . '?modules=Admin&controller=Modules&mode=' . $mode;
-        if ($nbofactivatedmodules <= (empty($conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING) ? 1 : $conf->global->MAIN_MIN_NB_ENABLED_MODULE_FOR_WARNING)) {    // If only minimal initial modules enabled)
-            $head[$h][1] = $form->textwithpicto($langs->trans("AvailableModules"), $desc);
-            $head[$h][1] .= img_warning($langs->trans("YouMustEnableOneModule"));
-        } else {
-            //$head[$h][1] = $langs->trans("AvailableModules").$form->textwithpicto('<span class="badge marginleftonly">'.$nbofactivatedmodules.' / '.$nboftotalmodules.'</span>', $desc, 1, 'help', '', 1, 3);
-            $head[$h][1] = $langs->trans("AvailableModules") . '<span class="badge marginleftonly">' . $nbofactivatedmodules . ' / ' . $nboftotalmodules . '</span>';
-        }
-        $head[$h][2] = 'modules';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=marketplace';
-        $head[$h][1] = $langs->trans("ModulesMarketPlaces");
-        $head[$h][2] = 'marketplace';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=deploy';
-        $head[$h][1] = $langs->trans("AddExtensionThemeModuleOrOther");
-        $head[$h][2] = 'deploy';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Modules&mode=develop';
-        $head[$h][1] = $langs->trans("ModulesDevelopYourModule");
-        $head[$h][2] = 'develop';
-        $h++;
-
-        return $head;
     }
 
     /**
@@ -924,7 +1135,7 @@ abstract class DolibarrAdmin
             $sessPath = $iniPath;
         }
         $sessPath .= '/'; // We need the trailing slash
-        dol_syslog('admin.lib:listOfSessions sessPath=' . $sessPath);
+        DolibarrFunctions::dol_syslog('admin.lib:listOfSessions sessPath=' . $sessPath);
 
         $dh = @opendir(dol_osencode($sessPath));
         if ($dh) {
@@ -974,7 +1185,7 @@ abstract class DolibarrAdmin
         global $conf;
 
         $sessPath = ini_get("session.save_path") . "/";
-        dol_syslog('admin.lib:purgeSessions mysessionid=' . $mysessionid . ' sessPath=' . $sessPath);
+        DolibarrFunctions::dol_syslog('admin.lib:purgeSessions mysessionid=' . $mysessionid . ' sessPath=' . $sessPath);
 
         $error = 0;
 
@@ -1013,201 +1224,6 @@ abstract class DolibarrAdmin
     }
 
     /**
-     *  Enable a module
-     *
-     * @param string $value    Name of module to activate
-     * @param int    $withdeps Activate/Disable also all dependencies
-     *
-     * @return     array                    array('nbmodules'=>nb modules activated with success, 'errors=>array of error messages, 'nbperms'=>Nb permission added);
-     */
-    function activateModule($value, $withdeps = 1)
-    {
-        global $db, $langs, $conf, $mysoc;
-
-        $ret = [];
-
-        // Check parameters
-        if (empty($value)) {
-            $ret['errors'][] = 'ErrorBadParameter';
-            return $ret;
-        }
-
-        $ret = ['nbmodules' => 0, 'errors' => [], 'nbperms' => 0];
-        $modName = $value;
-        $modFile = $modName . ".class.php";
-
-        // Loop on each directory to fill $modulesdir
-        $modulesdir = dolGetModulesDirs();
-
-        // Loop on each modulesdir directories
-        $found = false;
-        foreach ($modulesdir as $dir) {
-            if (file_exists($dir . $modFile)) {
-                $found = @include_once $dir . $modFile;
-                if ($found) {
-                    break;
-                }
-            }
-        }
-
-        $objMod = new $modName($db);
-
-        // Test if PHP version ok
-        $verphp = versionphparray();
-        $vermin = isset($objMod->phpmin) ? $objMod->phpmin : 0;
-        if (is_array($vermin) && versioncompare($verphp, $vermin) < 0) {
-            $ret['errors'][] = $langs->trans("ErrorModuleRequirePHPVersion", versiontostring($vermin));
-            return $ret;
-        }
-
-        // Test if Dolibarr version ok
-        $verdol = versiondolibarrarray();
-        $vermin = isset($objMod->need_dolibarr_version) ? $objMod->need_dolibarr_version : 0;
-        //print 'version: '.versioncompare($verdol,$vermin).' - '.join(',',$verdol).' - '.join(',',$vermin);exit;
-        if (is_array($vermin) && versioncompare($verdol, $vermin) < 0) {
-            $ret['errors'][] = $langs->trans("ErrorModuleRequireDolibarrVersion", versiontostring($vermin));
-            return $ret;
-        }
-
-        // Test if javascript requirement ok
-        if (!empty($objMod->need_javascript_ajax) && empty($conf->use_javascript_ajax)) {
-            $ret['errors'][] = $langs->trans("ErrorModuleRequireJavascript");
-            return $ret;
-        }
-
-        $const_name = $objMod->const_name;
-        if (!empty($conf->global->$const_name)) {
-            return $ret;
-        }
-
-        $result = $objMod->init(); // Enable module
-
-        if ($result <= 0) {
-            $ret['errors'][] = $objMod->error;
-        } else {
-            if ($withdeps) {
-                if (isset($objMod->depends) && is_array($objMod->depends) && !empty($objMod->depends)) {
-                    // Activation of modules this module depends on
-                    // this->depends may be array('modModule1', 'mmodModule2') or array('always1'=>"modModule1", 'FR'=>'modModule2')
-                    foreach ($objMod->depends as $key => $modulestring) {
-                        //var_dump((! is_numeric($key)) && ! preg_match('/^always/', $key) && $mysoc->country_code && ! preg_match('/^'.$mysoc->country_code.'/', $key));exit;
-                        if ((!is_numeric($key)) && !preg_match('/^always/', $key) && $mysoc->country_code && !preg_match('/^' . $mysoc->country_code . '/', $key)) {
-                            dol_syslog("We are not concerned by dependency with key=" . $key . " because our country is " . $mysoc->country_code);
-                            continue;
-                        }
-                        $activate = false;
-                        foreach ($modulesdir as $dir) {
-                            if (file_exists($dir . $modulestring . ".class.php")) {
-                                $resarray = activateModule($modulestring);
-                                if (empty($resarray['errors'])) {
-                                    $activate = true;
-                                } else {
-                                    foreach ($resarray['errors'] as $errorMessage) {
-                                        dol_syslog($errorMessage, LOG_ERR);
-                                    }
-                                }
-                                break;
-                            }
-                        }
-
-                        if ($activate) {
-                            $ret['nbmodules'] += $resarray['nbmodules'];
-                            $ret['nbperms'] += $resarray['nbperms'];
-                        } else {
-                            $ret['errors'][] = $langs->trans('activateModuleDependNotSatisfied', $objMod->name, $modulestring);
-                        }
-                    }
-                }
-
-                if (isset($objMod->conflictwith) && is_array($objMod->conflictwith) && !empty($objMod->conflictwith)) {
-                    // Desactivation des modules qui entrent en conflit
-                    $num = count($objMod->conflictwith);
-                    for ($i = 0; $i < $num; $i++) {
-                        foreach ($modulesdir as $dir) {
-                            if (file_exists($dir . $objMod->conflictwith[$i] . ".class.php")) {
-                                unActivateModule($objMod->conflictwith[$i], 0);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!count($ret['errors'])) {
-            $ret['nbmodules']++;
-            $ret['nbperms'] += count($objMod->rights);
-        }
-
-        return $ret;
-    }
-
-    /**
-     *  Disable a module
-     *
-     * @param string $value      Nom du module a desactiver
-     * @param int    $requiredby 1=Desactive aussi modules dependants
-     *
-     * @return     string                             Error message or '';
-     */
-    function unActivateModule($value, $requiredby = 1)
-    {
-        global $db, $modules, $conf;
-
-        // Check parameters
-        if (empty($value)) {
-            return 'ErrorBadParameter';
-        }
-
-        $ret = '';
-        $modName = $value;
-        $modFile = $modName . ".class.php";
-
-        // Loop on each directory to fill $modulesdir
-        $modulesdir = dolGetModulesDirs();
-
-        // Loop on each modulesdir directories
-        $found = false;
-        foreach ($modulesdir as $dir) {
-            if (file_exists($dir . $modFile)) {
-                $found = @include_once $dir . $modFile;
-                if ($found) {
-                    break;
-                }
-            }
-        }
-
-        if ($found) {
-            $objMod = new $modName($db);
-            $result = $objMod->remove();
-            if ($result <= 0) {
-                $ret = $objMod->error;
-            }
-        } else // We come here when we try to unactivate a module when module does not exists anymore in sources
-        {
-            //print $dir.$modFile;exit;
-            // TODO Replace this after DolibarrModules is moved as abstract class with a try catch to show module we try to disable has not been found or could not be loaded
-            include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
-            $genericMod = new DolibarrModules($db);
-            $genericMod->name = preg_replace('/^mod/i', '', $modName);
-            $genericMod->rights_class = strtolower(preg_replace('/^mod/i', '', $modName));
-            $genericMod->const_name = 'MAIN_MODULE_' . strtoupper(preg_replace('/^mod/i', '', $modName));
-            dol_syslog("modules::unActivateModule Failed to find module file, we use generic function with name " . $modName);
-            $genericMod->remove('');
-        }
-
-        // Disable modules that depends on module we disable
-        if (!$ret && $requiredby && is_object($objMod) && is_array($objMod->requiredby)) {
-            $countrb = count($objMod->requiredby);
-            for ($i = 0; $i < $countrb; $i++) {
-                //var_dump($objMod->requiredby[$i]);
-                unActivateModule($objMod->requiredby[$i]);
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
      *  Add external modules to list of dictionaries.
      *  Addition is done into var $taborder, $tabname, etc... that are passed with pointers.
      *
@@ -1230,7 +1246,7 @@ abstract class DolibarrAdmin
     {
         global $db, $modules, $conf, $langs;
 
-        dol_syslog("complete_dictionary_with_modules Search external modules to complete the list of dictionnary tables", LOG_DEBUG, 1);
+        DolibarrFunctions::dol_syslog("complete_dictionary_with_modules Search external modules to complete the list of dictionnary tables", LOG_DEBUG, 1);
 
         // Search modules
         $modulesdir = dolGetModulesDirs();
@@ -1240,7 +1256,7 @@ abstract class DolibarrAdmin
         foreach ($modulesdir as $dir) {
             // Load modules attributes in arrays (name, numero, orders) from dir directory
             //print $dir."\n<br>";
-            dol_syslog("Scan directory " . $dir . " for modules");
+            DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
             $handle = @opendir(dol_osencode($dir));
             if (is_resource($handle)) {
                 while (($file = readdir($handle)) !== false) {
@@ -1249,7 +1265,8 @@ abstract class DolibarrAdmin
                         $modName = substr($file, 0, dol_strlen($file) - 10);
 
                         if ($modName) {
-                            include_once $dir . $file;
+                            // include_once $dir . $file;
+                            dump($dir . $file);
                             $objMod = new $modName($db);
 
                             if ($objMod->numero > 0) {
@@ -1373,18 +1390,18 @@ abstract class DolibarrAdmin
                                 $j++;
                                 $i++;
                             } else {
-                                dol_syslog("Module " . get_class($objMod) . " not qualified");
+                                DolibarrFunctions::dol_syslog("Module " . get_class($objMod) . " not qualified");
                             }
                         }
                     }
                 }
                 closedir($handle);
             } else {
-                dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
+                DolibarrFunctions::dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
             }
         }
 
-        dol_syslog("", LOG_DEBUG, -1);
+        DolibarrFunctions::dol_syslog("", LOG_DEBUG, -1);
 
         return 1;
     }
@@ -1404,7 +1421,7 @@ abstract class DolibarrAdmin
 
         foreach ($modulesdir as $dir) {
             // Load modules attributes in arrays (name, numero, orders) from dir directory
-            dol_syslog("Scan directory " . $dir . " for modules");
+            DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
             $handle = @opendir(dol_osencode($dir));
             if (is_resource($handle)) {
                 while (($file = readdir($handle)) !== false) {
@@ -1438,14 +1455,14 @@ abstract class DolibarrAdmin
                                     setEventMessages($objMod->automatic_activation[$country_code], null, 'warnings');
                                 }
                             } else {
-                                dol_syslog("Module " . get_class($objMod) . " not qualified");
+                                DolibarrFunctions::dol_syslog("Module " . get_class($objMod) . " not qualified");
                             }
                         }
                     }
                 }
                 closedir($handle);
             } else {
-                dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
+                DolibarrFunctions::dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
             }
         }
 
@@ -1473,14 +1490,14 @@ abstract class DolibarrAdmin
         $i = 0; // is a sequencer of modules found
         $j = 0; // j is module number. Automatically affected if module number not defined.
 
-        dol_syslog("complete_elementList_with_modules Search external modules to complete the list of contact element", LOG_DEBUG, 1);
+        DolibarrFunctions::dol_syslog("complete_elementList_with_modules Search external modules to complete the list of contact element", LOG_DEBUG, 1);
 
         $modulesdir = dolGetModulesDirs();
 
         foreach ($modulesdir as $dir) {
             // Load modules attributes in arrays (name, numero, orders) from dir directory
             //print $dir."\n<br>";
-            dol_syslog("Scan directory " . $dir . " for modules");
+            DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
             $handle = @opendir(dol_osencode($dir));
             if (is_resource($handle)) {
                 while (($file = readdir($handle)) !== false) {
@@ -1540,18 +1557,18 @@ abstract class DolibarrAdmin
                                 $j++;
                                 $i++;
                             } else {
-                                dol_syslog("Module " . get_class($objMod) . " not qualified");
+                                DolibarrFunctions::dol_syslog("Module " . get_class($objMod) . " not qualified");
                             }
                         }
                     }
                 }
                 closedir($handle);
             } else {
-                dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
+                DolibarrFunctions::dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
             }
         }
 
-        dol_syslog("", LOG_DEBUG, -1);
+        DolibarrFunctions::dol_syslog("", LOG_DEBUG, -1);
 
         return 1;
     }
@@ -1575,7 +1592,7 @@ abstract class DolibarrAdmin
         $form = new Form($db);
 
         if (empty($strictw3c)) {
-            dol_syslog("Warning: Function form_constantes is calle with parameter strictw3c = 0, this is deprecated. Value must be 2 now.", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog("Warning: Function form_constantes is calle with parameter strictw3c = 0, this is deprecated. Value must be 2 now.", LOG_DEBUG);
         }
         if (!empty($strictw3c) && $strictw3c == 1) {
             print "\n" . '<form action="' . $_SERVER["PHP_SELF"] . '" method="POST">';
@@ -1625,7 +1642,7 @@ abstract class DolibarrAdmin
             $sql .= " ORDER BY name ASC, entity DESC";
             $result = $db->query($sql);
 
-            dol_syslog("List params", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog("List params", LOG_DEBUG);
             if ($result) {
                 $obj = $db->fetch_object($result); // Take first result of select
 
@@ -1822,7 +1839,7 @@ abstract class DolibarrAdmin
         $sql .= (!empty($description) ? "'" . $db->escape($description) . "'" : "null");
         $sql .= ")";
 
-        dol_syslog("admin.lib::addDocumentModel", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("admin.lib::addDocumentModel", LOG_DEBUG);
         $resql = $db->query($sql);
         if ($resql) {
             $db->commit();
@@ -1853,7 +1870,7 @@ abstract class DolibarrAdmin
         $sql .= " AND type = '" . $db->escape($type) . "'";
         $sql .= " AND entity = " . ((int) $conf->entity);
 
-        dol_syslog("admin.lib::delDocumentModel", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("admin.lib::delDocumentModel", LOG_DEBUG);
         $resql = $db->query($sql);
         if ($resql) {
             $db->commit();

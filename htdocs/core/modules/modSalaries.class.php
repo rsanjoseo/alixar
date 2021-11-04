@@ -29,7 +29,11 @@
  *  \ingroup    salaries
  *  \brief      Description and activation file for the module salaries
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to manage salaries module
@@ -157,7 +161,7 @@ class modSalaries extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'user as u';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'payment_salary as p ON p.fk_user = u.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_paiement as cp ON p.fk_typepayment = cp.id';
-        $this->export_sql_end[$r] .= ' AND u.entity IN (' . getEntity('user') . ')';
+        $this->export_sql_end[$r] .= ' AND u.entity IN (' . DolibarrFunctions::getEntity('user') . ')';
     }
 
     /**

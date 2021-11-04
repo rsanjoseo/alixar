@@ -15,6 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Alxarafe\Dolibarr\Classes;
+
 use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
 

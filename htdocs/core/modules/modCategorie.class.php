@@ -25,8 +25,13 @@
  *      \ingroup    category
  *      \brief      Description and activation file for the module Category
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
-include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
+
+use Alxarafe\Dolibarr\Classes\Categorie;
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+// include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+// include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
 
 /**
  *    Class to describe and enable module Categorie
@@ -169,7 +174,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'categorie as cat';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'categorie as pcat ON pcat.rowid = cat.fk_parent';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
 
         // 0 Products
         $r++;
@@ -192,7 +197,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'categorie_product as cp ON cp.fk_categorie = cat.rowid';
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'product as p ON p.rowid = cp.fk_product';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra ON extra.fk_object = p.rowid';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 0';
 
         // 1 Suppliers
@@ -238,7 +243,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe_extrafields as extra ON s.rowid = extra.fk_object';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as c ON s.fk_pays = c.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_typent as t ON s.fk_typent = t.id';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 1';
 
         // 2 Customers/Prospects
@@ -286,7 +291,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_typent as t ON s.fk_typent = t.id';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_prospectlevel as pl ON s.fk_prospectlevel = pl.code';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_stcomm as st ON s.fk_stcomm = st.id';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 2';
 
         // 3 Members
@@ -310,7 +315,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'categorie_member as cm ON cm.fk_categorie = cat.rowid';
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'adherent as p ON p.rowid = cm.fk_member';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'adherent_extrafields as extra ON cat.rowid = extra.fk_object ';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 3';
 
         // 4 Contacts
@@ -366,7 +371,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_civility as civ ON civ.code = p.civility';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as c ON c.rowid = p.fk_pays';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON s.rowid = p.fk_soc';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 4';
 
         // 5 Bank accounts, TODO ?
@@ -393,7 +398,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'projet as p ON p.rowid = cp.fk_project';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_extrafields as extra ON extra.fk_object = p.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON s.rowid = p.fk_soc';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 6';
 
         // 7 Users
@@ -417,7 +422,7 @@ class modCategorie extends DolibarrModules
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'categorie_user as cu ON cu.fk_categorie = cat.rowid';
         $this->export_sql_end[$r] .= ' INNER JOIN ' . MAIN_DB_PREFIX . 'user as p ON p.rowid = cu.fk_user';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user_extrafields as extra ON extra.fk_object = p.rowid';
-        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . getEntity('category') . ')';
+        $this->export_sql_end[$r] .= ' WHERE cat.entity IN (' . DolibarrFunctions::getEntity('category') . ')';
         $this->export_sql_end[$r] .= ' AND cat.type = 7';
 
         // 8 Bank Lines, TODO ?

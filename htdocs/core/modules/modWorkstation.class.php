@@ -26,7 +26,11 @@
  *  \ingroup    workstation
  *  \brief      Description and activation file for the module Workstation
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module Workstation
@@ -269,7 +273,7 @@ class modWorkstation extends DolibarrModules
             // This is a Left menu entry
             'type' => 'left',
             'titre' => 'Workstations',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'mrp',
             'leftmenu' => 'workstation_workstation',
             'url' => '',

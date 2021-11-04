@@ -1590,7 +1590,7 @@ SetupDescription2: 'The following two sections are mandatory (the two first entr
 SetupDescription3: '<a href="%s">%s -> %s</a><br><br>Basic parameters used to customize the default behavior of your application (e.g for country-related features).'
 SetupDescription4: '<a href="%s">%s -> %s</a><br><br>This software is a suite of many modules/applications. The modules related to your needs must be enabled and configured. Menu entries will appears with the activation of these modules.'
 SetupDescription5: 'Other Setup menu entries manage optional parameters.'
-SetupDescriptionLink: '<a href="%s">%s - %s</a>'
+SetupDescriptionLink: '<a href="%link%">%description%</a>'
 SetupDescription3b: 'Basic parameters used to customize the default behavior of your application (e.g for country-related features).'
 SetupDescription4b: 'This software is a suite of many modules/applications. The modules related to your needs must be enabled and configured. Menu entries will appears with the activation of these modules.'
 AuditedSecurityEvents: 'Security events that are audited'

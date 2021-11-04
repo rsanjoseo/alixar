@@ -22,7 +22,10 @@
  *  \ingroup    produit
  *  \brief      Description and activation file for the module to manage dynamic prices in products
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Class descriptor of DynamicPrices module

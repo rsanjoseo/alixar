@@ -28,7 +28,12 @@
  *    \ingroup    holiday
  *    \brief      Description and activation file for the module holiday
  */
-include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
 
 /**
  *        Description and activation class for module holiday
@@ -133,8 +138,8 @@ class modHoliday extends DolibarrModules
         //$r++;
 
         // Cronjobs
-        $arraydate = dol_getdate(dol_now());
-        $datestart = dol_mktime(4, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
+        $arraydate = DolibarrFunctions::dol_getdate(DolibarrFunctions::dol_now());
+        $datestart = DolibarrFunctions::dol_mktime(4, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
         $this->cronjobs = [
             0 => [
                 'label' => 'HolidayBalanceMonthlyUpdate',
@@ -258,7 +263,7 @@ class modHoliday extends DolibarrModules
         $this->export_sql_end[$r] .= ' ' . MAIN_DB_PREFIX . 'user as u';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'user_extrafields as extrau ON u.rowid = extrau.fk_object';
         $this->export_sql_end[$r] .= ' WHERE d.fk_user = u.rowid';
-        $this->export_sql_end[$r] .= ' AND d.entity IN (' . getEntity('holiday') . ')';
+        $this->export_sql_end[$r] .= ' AND d.entity IN (' . DolibarrFunctions::getEntity('holiday') . ')';
 
         // Example:
         // $this->export_code[$r]=$this->rights_class.'_'.$r;

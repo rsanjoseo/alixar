@@ -139,6 +139,8 @@ abstract class Globals
         $this->render = TemplateRender::getInstance();
         $this->session = Session::getInstance();
         $this->translator = Translator::getInstance();
+
+        $this->translator->setlocale(Config::getVar('translator', 'main', 'language') ?? 'en');
     }
 
     /**

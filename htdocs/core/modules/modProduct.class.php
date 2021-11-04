@@ -30,7 +30,11 @@
  *    \ingroup    produit
  *    \brief      Description and activation file for the module to manage catalog of predefined products
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class descriptor of Product module
@@ -310,7 +314,7 @@ class modProduct extends DolibarrModules
         if (!empty($conf->stock->enabled)) {
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'entrepot as e ON e.rowid = p.fk_default_warehouse';
         }
-        $this->export_sql_end[$r] .= ' WHERE p.fk_product_type = 0 AND p.entity IN (' . getEntity('product') . ')';
+        $this->export_sql_end[$r] .= ' WHERE p.fk_product_type = 0 AND p.entity IN (' . DolibarrFunctions::getEntity('product') . ')';
         if (!empty($conf->global->EXPORTTOOL_CATEGORIES)) {
             $this->export_sql_order[$r] = ' GROUP BY p.rowid'; // FIXME The group by used a generic value to say "all fields in select except function fields"
         }
@@ -350,8 +354,8 @@ class modProduct extends DolibarrModules
             $this->export_sql_start[$r] = 'SELECT DISTINCT ';
             $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p';
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_price as pr ON p.rowid = pr.fk_product AND pr.entity = ' . $conf->entity; // export prices only for the current entity
-            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
-            $this->export_sql_end[$r] .= ' AND pr.date_price = (SELECT MAX(pr2.date_price) FROM ' . MAIN_DB_PREFIX . 'product_price as pr2 WHERE pr2.fk_product = pr.fk_product AND pr2.entity IN (' . getEntity('product') . '))'; // export only latest prices not full history
+            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
+            $this->export_sql_end[$r] .= ' AND pr.date_price = (SELECT MAX(pr2.date_price) FROM ' . MAIN_DB_PREFIX . 'product_price as pr2 WHERE pr2.fk_product = pr.fk_product AND pr2.entity IN (' . DolibarrFunctions::getEntity('product') . '))'; // export only latest prices not full history
             $this->export_sql_end[$r] .= ' ORDER BY p.ref, pr.price_level';
         }
 
@@ -389,7 +393,7 @@ class modProduct extends DolibarrModules
             $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p';
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_customer_price as pr ON p.rowid = pr.fk_product AND pr.entity = ' . $conf->entity; // export prices only for the current entity
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON pr.fk_soc = s.rowid';
-            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
+            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
         }
 
         if (!empty($conf->global->PRODUIT_SOUSPRODUITS)) {
@@ -460,7 +464,7 @@ class modProduct extends DolibarrModules
             }
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra ON p.rowid = extra.fk_object,';
             $this->export_sql_end[$r] .= ' ' . MAIN_DB_PREFIX . 'product_association as pa, ' . MAIN_DB_PREFIX . 'product as p2';
-            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . getEntity('product') . ')'; // For product and service profile
+            $this->export_sql_end[$r] .= ' WHERE p.entity IN (' . DolibarrFunctions::getEntity('product') . ')'; // For product and service profile
             $this->export_sql_end[$r] .= ' AND p.rowid = pa.fk_product_pere AND p2.rowid = pa.fk_product_fils';
         }
 
@@ -670,7 +674,7 @@ class modProduct extends DolibarrModules
         // field order as per structure of table llx_product
         $import_sample = [
             'p.ref' => "ref:PREF123456",
-            'p.datec' => dol_print_date(dol_now(), '%Y-%m-%d'),
+            'p.datec' => DolibarrFunctions::dol_print_date(DolibarrFunctions::dol_now(), '%Y-%m-%d'),
             'p.label' => "Product name in default language",
             'p.description' => "Product description in default language",
             'p.note_public' => "a public note (free text)",

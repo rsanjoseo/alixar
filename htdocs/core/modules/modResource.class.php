@@ -25,7 +25,11 @@
  *    \ingroup    resource
  *    \brief        Description and activation file for the module Resource
  */
-include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
 
 /**
  * Description and activation class for module Resource
@@ -186,7 +190,7 @@ class modResource extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=tools',
             'type' => 'left',
             'titre' => 'MenuResourceIndex',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em92"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em92"'),
             'mainmenu' => 'tools',
             'leftmenu' => 'resource',
             'url' => '/resource/list.php',
@@ -249,7 +253,7 @@ class modResource extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'resource as r';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_type_resource as c ON c.rowid=r.fk_code_type_resource';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'resource_extrafields as extra ON extra.fk_object = r.rowid';
-        $this->export_sql_end[$r] .= ' AND r.entity IN (' . getEntity('resource') . ')';
+        $this->export_sql_end[$r] .= ' AND r.entity IN (' . DolibarrFunctions::getEntity('resource') . ')';
 
         // Imports
         //--------

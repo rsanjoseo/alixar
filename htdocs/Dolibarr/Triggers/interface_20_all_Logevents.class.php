@@ -23,10 +23,11 @@
  *  \brief      Trigger file for
  */
 
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
+use Alxarafe\Dolibarr\Classes\User;
 
-require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for security audit events

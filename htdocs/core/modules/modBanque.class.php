@@ -27,7 +27,10 @@
  *    \brief      Description and activation file for the module bank
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Banque
@@ -168,7 +171,7 @@ class modBanque extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "bank_url as bu ON (bu.fk_bank = b.rowid AND bu.type = 'company')";
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON bu.url_id = s.rowid';
         $this->export_sql_end[$r] .= ' WHERE ba.rowid = b.fk_account';
-        $this->export_sql_end[$r] .= ' AND ba.entity IN (' . getEntity('bank_account') . ')';
+        $this->export_sql_end[$r] .= ' AND ba.entity IN (' . DolibarrFunctions::getEntity('bank_account') . ')';
         $this->export_sql_order[$r] = ' ORDER BY b.datev, b.num_releve';
 
         //
@@ -200,7 +203,7 @@ class modBanque extends DolibarrModules
         $this->export_sql_end[$r] .= ' WHERE ba.rowid = b.fk_account AND bch.rowid = b.fk_bordereau and bch.fk_bank_account=ba.rowid';
         $this->export_sql_end[$r] .= " AND b.fk_type = 'CHQ'";
         $this->export_sql_end[$r] .= ' AND p.fk_paiement = 7';
-        $this->export_sql_end[$r] .= ' AND ba.entity IN (' . getEntity('bank_account') . ')';
+        $this->export_sql_end[$r] .= ' AND ba.entity IN (' . DolibarrFunctions::getEntity('bank_account') . ')';
         $this->export_sql_order[$r] = ' ORDER BY b.datev, b.num_releve';
 
         // Various Payment
@@ -236,7 +239,7 @@ class modBanque extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'payment_various as v';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "projet as p ON v.fk_projet = p.rowid";
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "c_paiement as cp ON v.fk_typepayment = cp.id";
-        $this->export_sql_end[$r] .= ' WHERE v.entity IN (' . getEntity('payment_various') . ')';
+        $this->export_sql_end[$r] .= ' WHERE v.entity IN (' . DolibarrFunctions::getEntity('payment_various') . ')';
         $this->export_sql_order[$r] = ' ORDER BY v.datep';
     }
 

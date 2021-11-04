@@ -27,7 +27,11 @@
  *  \ingroup    partnership
  *  \brief      Description and activation file for module Partnership
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module Partnership
@@ -177,7 +181,7 @@ class modPartnership extends DolibarrModules
         // Array to add new pages in new tabs
         $this->tabs = [];
 
-        $tabtoadd = (!empty(getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR')) && getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR') == 'member') ? 'member' : 'thirdparty';
+        $tabtoadd = (!empty(DolibarrFunctions::getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR')) && DolibarrFunctions::getDolGlobalString('PARTNERSHIP_IS_MANAGED_FOR') == 'member') ? 'member' : 'thirdparty';
 
         if ($tabtoadd == 'member') {
             $fk_mainmenu = "members";
@@ -248,8 +252,8 @@ class modPartnership extends DolibarrModules
         // Cronjobs (List of cron jobs entries to add when module is enabled)
         // unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week
 
-        $arraydate = dol_getdate(dol_now());
-        $datestart = dol_mktime(21, 15, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
+        $arraydate = DolibarrFunctions::dol_getdate(DolibarrFunctions::dol_now());
+        $datestart = DolibarrFunctions::dol_mktime(21, 15, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
 
         $this->cronjobs = [
             0 => ['priority' => 60, 'label' => 'CancelPartnershipForExpiredMembers', 'jobtype' => 'method', 'class' => '/partnership/class/partnershiputils.class.php', 'objectname' => 'PartnershipUtils', 'method' => 'doCancelStatusOfMemberPartnership', 'parameters' => '', 'comment' => 'Cancel status of partnership when subscription is expired + x days.', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 1, 'test' => '$conf->partnership->enabled', 'datestart' => $datestart],
@@ -304,7 +308,7 @@ class modPartnership extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=' . $fk_mainmenu, // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'left', // This is a Top menu entry
             'titre' => 'Partnership',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => $fk_mainmenu,
             'leftmenu' => 'partnership',
             'url' => '/partnership/partnership_list.php',
@@ -371,7 +375,7 @@ class modPartnership extends DolibarrModules
         $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'partnership as t';
         //$this->export_sql_end[$r]  =' LEFT JOIN '.MAIN_DB_PREFIX.'partnership_line as tl ON tl.fk_partnership = t.rowid';
         $this->export_sql_end[$r] .=' WHERE 1 = 1';
-        $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('partnership').')';
+        $this->export_sql_end[$r] .=' AND t.entity IN ('.DolibarrFunctions::getEntity('partnership').')';
         $r++; */
         /* END MODULEBUILDER EXPORT PARTNERSHIP */
 
@@ -391,7 +395,7 @@ class modPartnership extends DolibarrModules
          $this->export_sql_start[$r]='SELECT DISTINCT ';
          $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'partnership as t';
          $this->export_sql_end[$r] .=' WHERE 1 = 1';
-         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('partnership').')';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.DolibarrFunctions::getEntity('partnership').')';
          $r++; */
         /* END MODULEBUILDER IMPORT PARTNERSHIP */
     }
@@ -444,7 +448,7 @@ class modPartnership extends DolibarrModules
 
                 if (file_exists($src) && !file_exists($dest)) {
                     require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
-                    dol_mkdir($dirodt);
+                    DolibarrFunctions::dol_mkdir($dirodt);
                     $result = dol_copy($src, $dest, 0, 0);
                     if ($result < 0) {
                         $langs->load("errors");

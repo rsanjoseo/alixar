@@ -16,8 +16,10 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
+use Alxarafe\Dolibarr\Classes\Stripe;
+use Alxarafe\Dolibarr\Classes\User;
 
 /**
  *  \file       htdocs/core/triggers/interface_80_modStripe_Stripe.class.php
@@ -31,9 +33,7 @@ use Alxarafe\Dolibarr\Classes\Conf;
  *              - Le nom de la propriete name doit etre Mytrigger
  */
 
-use Stripe\Customer;
-
-require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for stripe module
@@ -79,8 +79,8 @@ class InterfaceStripe extends DolibarrTriggers
             return 0;
         }
 
-        require_once DOL_DOCUMENT_ROOT . '/Modules/Stripe/class/stripe.class.php';
-        $stripe = new Stripe($db);
+        // require_once DOL_DOCUMENT_ROOT . '/Modules/Stripe/class/stripe.class.php';
+        $stripe = new Stripe();
 
         $ok = 1;
 

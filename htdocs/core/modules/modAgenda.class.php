@@ -30,7 +30,11 @@
  *      \ingroup    agenda
  *      \brief      Description and activation file for the module agenda
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable/disable module Agenda
@@ -111,7 +115,7 @@ class modAgenda extends DolibarrModules
 
         // Cronjobs
         //------------
-        $datestart = dol_now();
+        $datestart = DolibarrFunctions::dol_now();
         $this->cronjobs = [
             0 => ['label' => 'SendEmailsReminders', 'jobtype' => 'method', 'class' => 'comm/action/class/actioncomm.class.php', 'objectname' => 'ActionComm', 'method' => 'sendEmailsReminder', 'parameters' => '', 'comment' => 'SendEMailsReminder', 'frequency' => 5, 'unitfrequency' => 60, 'priority' => 10, 'status' => 1, 'test' => '$conf->agenda->enabled', 'datestart' => $datestart],
         ];
@@ -206,7 +210,7 @@ class modAgenda extends DolibarrModules
             'fk_menu' => 0,
             'type' => 'top',
             'titre' => 'TMenuAgenda',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'agenda',
             'url' => '/Modules/Comm/action/index.php',
             'langs' => 'agenda',
@@ -222,7 +226,7 @@ class modAgenda extends DolibarrModules
             'fk_menu' => 'r=0',
             'type' => 'left',
             'titre' => 'Actions',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'agenda',
             'url' => '/Modules/Comm/action/index.php?mainmenu=agenda&amp;leftmenu=agenda',
             'langs' => 'agenda',
@@ -477,7 +481,7 @@ class modAgenda extends DolibarrModules
         }
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as co on s.fk_pays = co.rowid';
         $this->export_sql_end[$r] .= " LEFT JOIN " . MAIN_DB_PREFIX . "projet as p ON p.rowid = ac.fk_project";
-        $this->export_sql_end[$r] .= ' WHERE ac.entity IN (' . getEntity('agenda') . ')';
+        $this->export_sql_end[$r] .= ' WHERE ac.entity IN (' . DolibarrFunctions::getEntity('agenda') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . (empty($user) ? 0 : $user->id) . ' OR ac.fk_soc IS NULL)';
         }

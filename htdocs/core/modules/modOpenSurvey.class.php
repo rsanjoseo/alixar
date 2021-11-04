@@ -23,7 +23,11 @@
  *      \ingroup    opensurvey
  *      \brief      Description and activation file for the module OpenSurvey
  */
-include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . "/core/modules/DolibarrModules.class.php";
 
 /**
  * Description and activation class for module opensurvey
@@ -124,7 +128,7 @@ class modOpenSurvey extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=tools', // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'left',
             'titre' => 'Survey',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'tools',
             'leftmenu' => 'opensurvey',
             'url' => '/opensurvey/index.php?mainmenu=tools&leftmenu=opensurvey',

@@ -22,7 +22,11 @@
  *  \ingroup    websites
  *  \brief      Description and activation file for the module Website
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe Websites module
@@ -120,7 +124,7 @@ class modWebsite extends DolibarrModules
             'fk_menu' => '0', // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'top', // This is a Left menu entry
             'titre' => 'WebSites',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'website',
             'url' => '/website/index.php',
             'langs' => 'website', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
@@ -148,7 +152,7 @@ class modWebsite extends DolibarrModules
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'website_page as t, ' . MAIN_DB_PREFIX . 'website as p';
         $this->export_sql_end[$r] .= ' WHERE t.fk_website = p.rowid';
-        $this->export_sql_end[$r] .= ' AND p.entity IN (' . getEntity('website') . ')';
+        $this->export_sql_end[$r] .= ' AND p.entity IN (' . DolibarrFunctions::getEntity('website') . ')';
         $r++;
     }
 

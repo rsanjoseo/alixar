@@ -27,7 +27,11 @@
  *      \ingroup    tax
  *      \brief      Description and activation file for the module taxes
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Tax
@@ -134,7 +138,7 @@ class modTax extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'c_chargesociales as cc, ' . MAIN_DB_PREFIX . 'chargesociales as c';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'paiementcharge as p ON p.fk_charge = c.rowid';
         $this->export_sql_end[$r] .= ' WHERE c.fk_type = cc.id';
-        $this->export_sql_end[$r] .= ' AND c.entity IN (' . getEntity('tax') . ')';
+        $this->export_sql_end[$r] .= ' AND c.entity IN (' . DolibarrFunctions::getEntity('tax') . ')';
 
         // Import social contributions
         $r++;

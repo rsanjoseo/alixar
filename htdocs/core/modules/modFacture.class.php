@@ -27,7 +27,12 @@
  *        \ingroup    facture
  *        \brief      Description and activation file for the module customer invoices
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Class to describe module customer invoices
@@ -115,8 +120,8 @@ class modFacture extends DolibarrModules
         ];
 
         // Cronjobs
-        $arraydate = dol_getdate(dol_now());
-        $datestart = dol_mktime(23, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
+        $arraydate = DolibarrFunctions::dol_getdate(DolibarrFunctions::dol_now());
+        $datestart = DolibarrFunctions::dol_mktime(23, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
         $this->cronjobs = [
             0 => [
                 'label' => 'RecurringInvoices',
@@ -331,7 +336,7 @@ class modFacture extends DolibarrModules
         }
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra3 on p.rowid = extra3.fk_object';
         $this->export_sql_end[$r] .= ' WHERE f.fk_soc = s.rowid AND f.rowid = fd.fk_facture';
-        $this->export_sql_end[$r] .= ' AND f.entity IN (' . getEntity('invoice') . ')';
+        $this->export_sql_end[$r] .= ' AND f.entity IN (' . DolibarrFunctions::getEntity('invoice') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND sc.fk_user = ' . (empty($user) ? 0 : $user->id);
         }
@@ -413,7 +418,7 @@ class modFacture extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bank as b ON b.rowid = p.fk_bank';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bank_account as ba ON ba.rowid = b.fk_account';
         $this->export_sql_end[$r] .= ' WHERE f.fk_soc = s.rowid';
-        $this->export_sql_end[$r] .= ' AND f.entity IN (' . getEntity('invoice') . ')';
+        $this->export_sql_end[$r] .= ' AND f.entity IN (' . DolibarrFunctions::getEntity('invoice') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND sc.fk_user = ' . (empty($user) ? 0 : $user->id);
         }

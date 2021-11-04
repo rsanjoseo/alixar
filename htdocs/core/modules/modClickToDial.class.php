@@ -23,8 +23,9 @@
  *    \ingroup    clicktodial
  *    \brief      Description and activation file for the module Click to Dial
  */
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Click to Dial

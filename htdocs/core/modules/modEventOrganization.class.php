@@ -23,7 +23,12 @@
  *  \ingroup    eventorganization
  *  \brief      Description and activation file for the EventOrganization
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module EventOrganization
@@ -249,7 +254,7 @@ class modEventOrganization extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=project',        // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'left',                            // This is a Left menu entry
             'titre' => 'EventOrganizationMenuLeft',
-            'prefix' => img_picto('', 'eventorganization', 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', 'eventorganization', 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'project',
             'leftmenu' => 'eventorganization',
             'url' => '',
@@ -288,7 +293,7 @@ class modEventOrganization extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=project',        // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'left',                            // This is a Left menu entry
             'titre' => 'ConferenceOrBooth',
-            'prefix' => img_picto('', 'conferenceorbooth', 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', 'conferenceorbooth', 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'project',
             'leftmenu' => 'eventorganizationconforbooth',
             'url' => '',

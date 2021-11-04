@@ -22,7 +22,11 @@
  *  \ingroup    collab
  *  \brief      Description and activation file for the module Collab
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe Websites module
@@ -112,7 +116,7 @@ class modCollab extends DolibarrModules
             'fk_menu' => '0', // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type' => 'top', // This is a Left menu entry
             'titre' => 'Collab',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'collab',
             'url' => '/collab/index.php',
             'langs' => 'collab', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.

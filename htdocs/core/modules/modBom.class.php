@@ -26,7 +26,11 @@
  *  \ingroup    bom
  *  \brief      Description and activation file for the module Bom
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module Bom
@@ -305,7 +309,7 @@ class modBom extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bom_bom_extrafields as extra on (t.rowid = extra.fk_object)';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bom_bomline as tl ON tl.fk_bom = t.rowid';
         $this->export_sql_end[$r] .= ' WHERE 1 = 1';
-        $this->export_sql_end[$r] .= ' AND t.entity IN (' . getEntity('bom') . ')';
+        $this->export_sql_end[$r] .= ' AND t.entity IN (' . DolibarrFunctions::getEntity('bom') . ')';
         $r++;
         /* END MODULEBUILDER EXPORT BILLOFMATERIALS */
 

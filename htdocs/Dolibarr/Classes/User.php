@@ -33,6 +33,7 @@ namespace Alxarafe\Dolibarr\Classes;
 
 use Adherent;
 use Alxarafe\Core\Providers\Translator;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use stdClass;
 
@@ -484,7 +485,7 @@ class User extends CommonObject
     {
         $entity = (!empty($entity) ? $entity : $this->conf->entity);
 
-        dol_syslog(get_class($this) . "::addrights $rid, $allmodule, $allperms, $entity");
+        DolibarrFunctions::dol_syslog(get_class($this) . "::addrights $rid, $allmodule, $allperms, $entity");
         $error = 0;
         $whereforadd = '';
 
@@ -731,7 +732,7 @@ class User extends CommonObject
      */
     public function clearrights()
     {
-        dol_syslog(get_class($this) . "::clearrights reset user->rights");
+        DolibarrFunctions::dol_syslog(get_class($this) . "::clearrights reset user->rights");
         $this->rights = null;
         $this->nb_rights = 0;
         $this->all_permissions_are_loaded = 0;
@@ -933,7 +934,7 @@ class User extends CommonObject
         $sql .= " WHERE rowid = " . ((int) $this->id);
         $result = $this->db->query($sql);
 
-        dol_syslog(get_class($this) . "::setstatus", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setstatus", LOG_DEBUG);
         if ($result) {
             // Call trigger
             $result = $this->call_trigger('USER_ENABLEDISABLE', $user);
@@ -986,7 +987,7 @@ class User extends CommonObject
 
         $this->fetch($this->id);
 
-        dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
 
         // Remove rights
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "user_rights WHERE fk_user = " . ((int) $this->id);
@@ -1024,14 +1025,14 @@ class User extends CommonObject
             $result = $this->deleteExtraFields();
             if ($result < 0) {
                 $error++;
-                dol_syslog(get_class($this) . "::delete error -4 " . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::delete error -4 " . $this->error, LOG_ERR);
             }
         }
 
         // Remove user
         if (!$error) {
             $sql = "DELETE FROM " . MAIN_DB_PREFIX . "user WHERE rowid = " . ((int) $this->id);
-            dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
             if (!$this->db->query($sql)) {
                 $error++;
                 $this->error = $this->db->lasterror();
@@ -1387,7 +1388,7 @@ class User extends CommonObject
 
             $resql = $this->db->query($sql);
 
-            dol_syslog(get_class($this) . "::create_from_contact", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create_from_contact", LOG_DEBUG);
             if ($resql) {
                 $this->context['createfromcontact'] = 'createfromcontact';
 
@@ -1410,7 +1411,7 @@ class User extends CommonObject
             }
         } else {
             // $this->error deja positionne
-            dol_syslog(get_class($this) . "::create_from_contact - 0");
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create_from_contact - 0");
 
             $this->db->rollback();
             return $result;
@@ -1438,7 +1439,7 @@ class User extends CommonObject
             $this->entity = $this->conf->entity; // If not defined, we use default value
         }
 
-        dol_syslog(get_class($this) . "::create login=" . $this->login . ", user=" . (is_object($user) ? $user->id : ''), LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::create login=" . $this->login . ", user=" . (is_object($user) ? $user->id : ''), LOG_DEBUG);
 
         // Check parameters
         if (!empty($this->conf->global->USER_MAIL_REQUIRED) && !isValidEMail($this->email)) {
@@ -1468,7 +1469,7 @@ class User extends CommonObject
             if ($resqltochecklogin[0]['nb'] > 0) {
                 $this->langs->load("errors");
                 $this->error = $this->langs->trans("ErrorLoginAlreadyExists", $this->login);
-                dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
                 $this->db->rollback();
                 return -6;
             }
@@ -1482,7 +1483,7 @@ class User extends CommonObject
                 if ($objtochecklogin && $objtochecklogin->nb > 0) {
                     $this->langs->load("errors");
                     $this->error = $this->langs->trans("ErrorEmailAlreadyExists", $this->email);
-                    dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
                     $this->db->rollback();
                     return -6;
                 }
@@ -1495,7 +1496,7 @@ class User extends CommonObject
         $sql .= " VALUES('" . $this->db->idate($this->datec) . "', '" . $this->db->escape($this->login) . "', '" . $this->db->escape($this->ldap_sid) . "', " . ((int) $this->entity) . ")";
         $result = $this->db->query($sql);
 
-        dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::create", LOG_DEBUG);
         if ($result) {
             $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "user");
 
@@ -1541,7 +1542,7 @@ class User extends CommonObject
                 return $this->id;
             } else {
                 //$this->error=$interface->error;
-                dol_syslog(get_class($this) . "::create " . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->error, LOG_ERR);
                 $this->db->rollback();
                 return -3;
             }
@@ -1612,7 +1613,7 @@ class User extends CommonObject
         $nbrowsaffected = 0;
         $error = 0;
 
-        dol_syslog(get_class($this) . "::update notrigger=" . $notrigger . ", nosyncmember=" . $nosyncmember . ", nosyncmemberpass=" . $nosyncmemberpass);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update notrigger=" . $notrigger . ", nosyncmember=" . $nosyncmember . ", nosyncmemberpass=" . $nosyncmemberpass);
 
         // Clean parameters
         $this->civility_code = trim($this->civility_code);
@@ -1682,7 +1683,7 @@ class User extends CommonObject
                 if ($objtochecklogin && $objtochecklogin->nb > 0) {
                     $this->langs->load("errors");
                     $this->error = $this->langs->trans("ErrorLoginAlreadyExists", $this->login);
-                    dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
                     $this->db->rollback();
                     return -1;
                 }
@@ -1696,7 +1697,7 @@ class User extends CommonObject
                 if ($objtochecklogin && $objtochecklogin->nb > 0) {
                     $this->langs->load("errors");
                     $this->error = $this->langs->trans("ErrorEmailAlreadyExists", $this->email);
-                    dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->error, LOG_DEBUG);
                     $this->db->rollback();
                     return -1;
                 }
@@ -1763,7 +1764,7 @@ class User extends CommonObject
         $sql .= ", lang = " . ($this->lang ? "'" . $this->db->escape($this->lang) . "'" : "null");
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::update", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             // $nbrowsaffected += $this->db->affected_rows($resql);
@@ -1782,7 +1783,7 @@ class User extends CommonObject
 
             // If user is linked to a member, remove old link to this member
             if ($this->fk_member > 0) {
-                dol_syslog(get_class($this) . "::update remove link with member. We will recreate it later", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::update remove link with member. We will recreate it later", LOG_DEBUG);
                 $sql = "UPDATE " . MAIN_DB_PREFIX . "user SET fk_member = NULL where fk_member = " . ((int) $this->fk_member);
                 $resql = $this->db->query($sql);
                 if (!$resql) {
@@ -1792,7 +1793,7 @@ class User extends CommonObject
                 }
             }
             // Set link to user
-            dol_syslog(get_class($this) . "::update set link with member", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::update set link with member", LOG_DEBUG);
             $sql = "UPDATE " . MAIN_DB_PREFIX . "user SET fk_member =" . ($this->fk_member > 0 ? ((int) $this->fk_member) : 'null') . " where rowid = " . ((int) $this->id);
             $resql = $this->db->query($sql);
             if (!$resql) {
@@ -1803,7 +1804,7 @@ class User extends CommonObject
 
             if ($nbrowsaffected) {    // If something has changed in data
                 if ($this->fk_member > 0 && !$nosyncmember) {
-                    dol_syslog(get_class($this) . "::update user is linked with a member. We try to update member too.", LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::update user is linked with a member. We try to update member too.", LOG_DEBUG);
 
                     require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 
@@ -1844,7 +1845,7 @@ class User extends CommonObject
                         if ($result < 0) {
                             $this->error = $adh->error;
                             $this->errors = $adh->errors;
-                            dol_syslog(get_class($this) . "::update error after calling adh->update to sync it with user: " . $this->error, LOG_ERR);
+                            DolibarrFunctions::dol_syslog(get_class($this) . "::update error after calling adh->update to sync it with user: " . $this->error, LOG_ERR);
                             $error++;
                         }
                     } elseif ($result < 0) {
@@ -1855,7 +1856,7 @@ class User extends CommonObject
                 }
 
                 if ($this->contact_id > 0 && !$nosynccontact) {
-                    dol_syslog(get_class($this) . "::update user is linked with a contact. We try to update contact too.", LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::update user is linked with a contact. We try to update contact too.", LOG_DEBUG);
 
                     require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
 
@@ -1896,7 +1897,7 @@ class User extends CommonObject
                         if ($result < 0) {
                             $this->error = $tmpobj->error;
                             $this->errors = $tmpobj->errors;
-                            dol_syslog(get_class($this) . "::update error after calling adh->update to sync it with user: " . $this->error, LOG_ERR);
+                            DolibarrFunctions::dol_syslog(get_class($this) . "::update error after calling adh->update to sync it with user: " . $this->error, LOG_ERR);
                             $error++;
                         }
                     } else {
@@ -1930,7 +1931,7 @@ class User extends CommonObject
                 $this->db->commit();
                 return $nbrowsaffected;
             } else {
-                dol_syslog(get_class($this) . "::update error=" . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::update error=" . $this->error, LOG_ERR);
                 $this->db->rollback();
                 return -1;
             }
@@ -1960,7 +1961,7 @@ class User extends CommonObject
 
         $error = 0;
 
-        dol_syslog(get_class($this) . "::setPassword user=" . $user->id . " password=" . preg_replace('/./i', '*', $password) . " changelater=" . $changelater . " notrigger=" . $notrigger . " nosyncmember=" . $nosyncmember, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::setPassword user=" . $user->id . " password=" . preg_replace('/./i', '*', $password) . " changelater=" . $changelater . " notrigger=" . $notrigger . " nosyncmember=" . $nosyncmember, LOG_DEBUG);
 
         // If new password not provided, we generate one
         if (!$password) {
@@ -1990,7 +1991,7 @@ class User extends CommonObject
             }
             $sql .= " WHERE rowid = " . ((int) $this->id);
 
-            dol_syslog(get_class($this) . "::setPassword", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setPassword", LOG_DEBUG);
             $result = $this->db->query($sql);
             if ($result) {
                 if ($this->db->affected_rows($result)) {
@@ -2010,7 +2011,7 @@ class User extends CommonObject
                             $result = $adh->setPassword($user, $this->pass, (empty($this->conf->global->DATABASE_PWD_ENCRYPTED) ? 0 : 1), 1); // Cryptage non gere dans module adherent
                             if ($result < 0) {
                                 $this->error = $adh->error;
-                                dol_syslog(get_class($this) . "::setPassword " . $this->error, LOG_ERR);
+                                DolibarrFunctions::dol_syslog(get_class($this) . "::setPassword " . $this->error, LOG_ERR);
                                 $error++;
                             }
                         } else {
@@ -2019,7 +2020,7 @@ class User extends CommonObject
                         }
                     }
 
-                    dol_syslog(get_class($this) . "::setPassword notrigger=" . $notrigger . " error=" . $error, LOG_DEBUG);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::setPassword notrigger=" . $notrigger . " error=" . $error, LOG_DEBUG);
 
                     if (!$error && !$notrigger) {
                         // Call trigger
@@ -2050,7 +2051,7 @@ class User extends CommonObject
             $sql .= " SET pass_temp = '" . $this->db->escape($password) . "'";
             $sql .= " WHERE rowid = " . ((int) $this->id);
 
-            dol_syslog(get_class($this) . "::setPassword", LOG_DEBUG); // No log
+            DolibarrFunctions::dol_syslog(get_class($this) . "::setPassword", LOG_DEBUG); // No log
             $result = $this->db->query($sql);
             if ($result) {
                 return $password;
@@ -2127,7 +2128,7 @@ class User extends CommonObject
                 $sql .= " SET fk_soc=" . ((int) $member->fk_soc);
                 $sql .= " WHERE rowid=" . ((int) $this->id);
 
-                dol_syslog(get_class($this) . "::create_from_member", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create_from_member", LOG_DEBUG);
                 $resql = $this->db->query($sql);
                 if ($resql) {
                     $this->db->commit();
@@ -2243,7 +2244,7 @@ class User extends CommonObject
             $mesg .= "--\n";
             $mesg .= $user->getFullName($outputlangs); // Username that send the email (not the user for who we want to reset password)
 
-            dol_syslog(get_class($this) . "::send_password changelater is off, url=" . $url);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::send_password changelater is off, url=" . $url);
         } else {
             global $dolibarr_main_instance_unique_id;
 
@@ -2262,7 +2263,7 @@ class User extends CommonObject
             $mesg .= '<a href="' . $url . '" rel="noopener">' . $outputlangs->transnoentitiesnoconv("ConfirmPasswordChange") . '</a>' . "<br>\n<br>\n";
             $mesg .= $outputlangs->transnoentitiesnoconv("ForgetIfNothing") . "<br>\n<br>\n";
 
-            dol_syslog(get_class($this) . "::send_password changelater is on, url=" . $url);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::send_password changelater is on, url=" . $url);
         }
 
         $trackid = 'use' . $this->id;
@@ -2356,7 +2357,7 @@ class User extends CommonObject
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "user_clicktodial";
         $sql .= " WHERE fk_user = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . '::update_clicktodial', LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . '::update_clicktodial', LOG_DEBUG);
         $result = $this->db->query($sql);
 
         $sql = "INSERT INTO " . MAIN_DB_PREFIX . "user_clicktodial";
@@ -2367,7 +2368,7 @@ class User extends CommonObject
         $sql .= ", '" . $this->db->escape($this->clicktodial_password) . "'";
         $sql .= ", '" . $this->db->escape($this->clicktodial_poste) . "')";
 
-        dol_syslog(get_class($this) . '::update_clicktodial', LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . '::update_clicktodial', LOG_DEBUG);
         $result = $this->db->query($sql);
         if ($result) {
             $this->db->commit();
@@ -2424,7 +2425,7 @@ class User extends CommonObject
                 $this->db->commit();
                 return 1;
             } else {
-                dol_syslog(get_class($this) . "::SetInGroup " . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::SetInGroup " . $this->error, LOG_ERR);
                 $this->db->rollback();
                 return -2;
             }
@@ -2475,7 +2476,7 @@ class User extends CommonObject
                 $this->db->commit();
                 return 1;
             } else {
-                dol_syslog(get_class($this) . "::RemoveFromGroup " . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::RemoveFromGroup " . $this->error, LOG_ERR);
                 $this->db->rollback();
                 return -2;
             }
@@ -3124,7 +3125,7 @@ class User extends CommonObject
         if ($option == 'superadmin') {
             $sql .= " WHERE entity = 0";
         } else {
-            $sql .= " WHERE entity IN (" . getEntity('user', 0) . ")";
+            $sql .= " WHERE entity IN (" . DolibarrFunctions::getEntity('user', 0) . ")";
             if ($limitTo == 'active') {
                 $sql .= " AND statut = 1";
             }
@@ -3182,7 +3183,7 @@ class User extends CommonObject
 
         $result = $this->update($user);
 
-        dol_syslog(get_class($this) . "::update_ldap2dolibarr result=" . $result, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::update_ldap2dolibarr result=" . $result, LOG_DEBUG);
 
         return $result;
     }
@@ -3201,7 +3202,7 @@ class User extends CommonObject
         $sql = "SELECT rowid FROM " . MAIN_DB_PREFIX . "user";
         $sql .= " WHERE fk_user = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::get_children", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::get_children", LOG_DEBUG);
         $res = $this->db->query($sql);
         if ($res) {
             $users = [];
@@ -3238,7 +3239,7 @@ class User extends CommonObject
 
             $idtoscan = $this->id;
 
-            dol_syslog("Build childid for id = " . $idtoscan);
+            DolibarrFunctions::dol_syslog("Build childid for id = " . $idtoscan);
             foreach ($this->users as $id => $val) {
                 //var_dump($val['fullpath']);
                 if (preg_match('/_' . $idtoscan . '_/', $val['fullpath'])) {
@@ -3276,6 +3277,7 @@ class User extends CommonObject
         // phpcs:enable
         //        global $this->conf, $user;
         //        global $hookmanager;
+        $hookmanager = DolibarrGlobals::getHookmanager();
 
         // Actions hooked (by external module)
         $hookmanager->initHooks(['userdao']);
@@ -3294,13 +3296,13 @@ class User extends CommonObject
         if ($reshook > 0) {
             $sql .= $hookmanager->resPrint;
         } else {
-            $sql .= " WHERE u.entity IN (" . getEntity('user') . ")";
+            $sql .= " WHERE u.entity IN (" . DolibarrFunctions::getEntity('user') . ")";
         }
         if ($filter) {
             $sql .= " AND " . $filter;
         }
 
-        dol_syslog(get_class($this) . "::get_full_tree get user list", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::get_full_tree get user list", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $i = 0;
@@ -3326,7 +3328,7 @@ class User extends CommonObject
         }
 
         // We add the fullpath property to each elements of first level (no parent exists)
-        dol_syslog(get_class($this) . "::get_full_tree call to build_path_from_id_user", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::get_full_tree call to build_path_from_id_user", LOG_DEBUG);
         foreach ($this->users as $key => $val) {
             $result = $this->build_path_from_id_user($key, 0); // Process a branch from the root user key (this user has no parent)
             if ($result < 0) {
@@ -3350,8 +3352,8 @@ class User extends CommonObject
             }
         }
 
-        dol_syslog(get_class($this) . "::get_full_tree dol_sort_array", LOG_DEBUG);
-        $this->users = dol_sort_array($this->users, 'fullname', 'asc', true, false);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::get_full_tree DolibarrFunctions::dol_sort_array", LOG_DEBUG);
+        $this->users = DolibarrFunctions::dol_sort_array($this->users, 'fullname', 'asc', true, false);
 
         //var_dump($this->users);
 
@@ -3373,9 +3375,9 @@ class User extends CommonObject
         $sql = "SELECT fk_user as id_parent, rowid as id_son";
         $sql .= " FROM " . MAIN_DB_PREFIX . "user";
         $sql .= " WHERE fk_user <> 0";
-        $sql .= " AND entity IN (" . getEntity('user') . ")";
+        $sql .= " AND entity IN (" . DolibarrFunctions::getEntity('user') . ")";
 
-        dol_syslog(get_class($this) . "::loadParentOf", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::loadParentOf", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -3407,7 +3409,7 @@ class User extends CommonObject
 
         if (!empty($this->users[$id_user]['fullpath'])) {
             // Already defined
-            dol_syslog(get_class($this) . "::build_path_from_id_user fullpath and fullname already defined", LOG_WARNING);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::build_path_from_id_user fullpath and fullname already defined", LOG_WARNING);
             return 0;
         }
 
@@ -3420,7 +3422,7 @@ class User extends CommonObject
         $useridfound = [$id_user];
         while (!empty($this->parentof[$cursor_user]) && !empty($this->users[$this->parentof[$cursor_user]])) {
             if (in_array($this->parentof[$cursor_user], $useridfound)) {
-                dol_syslog("The hierarchy of user has a recursive loop", LOG_WARNING);
+                DolibarrFunctions::dol_syslog("The hierarchy of user has a recursive loop", LOG_WARNING);
                 return -1; // Should not happen. Protection against looping hierarchy
             }
             $useridfound[] = $this->parentof[$cursor_user];
@@ -3431,7 +3433,7 @@ class User extends CommonObject
         }
 
         // We count number of _ to have level
-        $this->users[$id_user]['level'] = dol_strlen(preg_replace('/[^_]/i', '', $this->users[$id_user]['fullpath']));
+        $this->users[$id_user]['level'] = DolibarrFunctions::dol_strlen(preg_replace('/[^_]/i', '', $this->users[$id_user]['fullpath']));
 
         return 1;
     }
@@ -3452,10 +3454,10 @@ class User extends CommonObject
         $sql .= " FROM " . MAIN_DB_PREFIX . "user as u";
         if (!empty($this->conf->multicompany->enabled) && !empty($this->conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
             $sql .= ", " . MAIN_DB_PREFIX . "usergroup_user as ug";
-            $sql .= " WHERE ug.entity IN (" . getEntity('usergroup') . ")";
+            $sql .= " WHERE ug.entity IN (" . DolibarrFunctions::getEntity('usergroup') . ")";
             $sql .= " AND ug.fk_user = u.rowid";
         } else {
-            $sql .= " WHERE u.entity IN (" . getEntity('user') . ")";
+            $sql .= " WHERE u.entity IN (" . DolibarrFunctions::getEntity('user') . ")";
         }
         $sql .= " AND u.statut > 0";
         //$sql.= " AND employee != 0";
@@ -3575,11 +3577,11 @@ class User extends CommonObject
                 } else {
                     $sql .= "," . MAIN_DB_PREFIX . "usergroup_user as ug";
                     $sql .= " WHERE ((ug.fk_user = t.rowid";
-                    $sql .= " AND ug.entity IN (" . getEntity('user') . "))";
+                    $sql .= " AND ug.entity IN (" . DolibarrFunctions::getEntity('user') . "))";
                     $sql .= " OR t.entity = 0)"; // Show always superadmin
                 }
             } else {
-                $sql .= " WHERE t.entity IN (" . getEntity('user') . ")";
+                $sql .= " WHERE t.entity IN (" . DolibarrFunctions::getEntity('user') . ")";
             }
         } else {
             $sql .= " WHERE 1 = 1";
@@ -3608,7 +3610,7 @@ class User extends CommonObject
             $sql .= $this->db->plimit($limit + 1, $offset);
         }
 
-        dol_syslog(__METHOD__, LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(__METHOD__, LOG_DEBUG);
 
         $resql = $this->db->query($sql);
         if ($resql) {

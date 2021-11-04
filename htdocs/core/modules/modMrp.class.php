@@ -26,7 +26,11 @@
  *  \ingroup    mrp
  *  \brief      Description and activation file for the module Mrp
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module Mrp
@@ -328,7 +332,7 @@ class modMrp extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'mrp_mo as m';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'mrp_mo_extrafields as extra ON m.rowid = extra.fk_object';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'entrepot as e ON e.rowid = m.fk_warehouse';
-        $this->export_sql_end[$r] .= ' WHERE m.entity IN (' . getEntity('mrp_mo') . ')'; // For product and service profile
+        $this->export_sql_end[$r] .= ' WHERE m.entity IN (' . DolibarrFunctions::getEntity('mrp_mo') . ')'; // For product and service profile
 
         // Imports profiles provided by this module
         $r = 0;
@@ -346,7 +350,7 @@ class modMrp extends DolibarrModules
          $this->export_sql_start[$r]='SELECT DISTINCT ';
          $this->export_sql_end[$r]  =' FROM '.MAIN_DB_PREFIX.'mo as t';
          $this->export_sql_end[$r] .=' WHERE 1 = 1';
-         $this->export_sql_end[$r] .=' AND t.entity IN ('.getEntity('mo').')';
+         $this->export_sql_end[$r] .=' AND t.entity IN ('.DolibarrFunctions::getEntity('mo').')';
          $r++; */
         /* END MODULEBUILDER IMPORT MO */
         $r++;

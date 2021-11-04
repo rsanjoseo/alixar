@@ -6561,7 +6561,7 @@ abstract class DolibarrFunctions
 
         DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: dir=" . $dir, LOG_INFO);
 
-        $dir_osencoded = dol_osencode($dir);
+        $dir_osencoded = self::dol_osencode($dir);
         if (@is_dir($dir_osencoded)) {
             return 0;
         }
@@ -6591,7 +6591,7 @@ abstract class DolibarrFunctions
             // Attention, le is_dir() peut echouer bien que le rep existe.
             // (ex selon config de open_basedir)
             if ($ccdir) {
-                $ccdir_osencoded = dol_osencode($ccdir);
+                $ccdir_osencoded = self::dol_osencode($ccdir);
                 if (!@is_dir($ccdir_osencoded)) {
                     DolibarrFunctions::dol_syslog("functions.lib::dol_mkdir: Directory '" . $ccdir . "' does not exists or is outside open_basedir PHP setting.", LOG_DEBUG);
 
@@ -6616,6 +6616,35 @@ abstract class DolibarrFunctions
             }
         }
         return ($nberr ? -$nberr : $nbcreated);
+    }
+
+    /**
+     *      Return a string encoded into OS filesystem encoding. This function is used to define
+     *        value to pass to filesystem PHP functions.
+     *
+     * @param string $str String to encode (UTF-8)
+     *
+     * @return    string                Encoded string (UTF-8, ISO-8859-1)
+     */
+    static public function dol_osencode($str)
+    {
+        global $conf;
+
+        $tmp = ini_get("unicode.filesystem_encoding"); // Disponible avec PHP 6.0
+        if (empty($tmp) && !empty($_SERVER["WINDIR"])) {
+            $tmp = 'iso-8859-1'; // By default for windows
+        }
+        if (empty($tmp)) {
+            $tmp = 'utf-8'; // By default for other
+        }
+        if (!empty($conf->global->MAIN_FILESYSTEM_ENCODING)) {
+            $tmp = $conf->global->MAIN_FILESYSTEM_ENCODING;
+        }
+
+        if ($tmp == 'iso-8859-1') {
+            return utf8_decode($str);
+        }
+        return $str;
     }
 
     /**
@@ -8141,35 +8170,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     *      Return a string encoded into OS filesystem encoding. This function is used to define
-     *        value to pass to filesystem PHP functions.
-     *
-     * @param string $str String to encode (UTF-8)
-     *
-     * @return    string                Encoded string (UTF-8, ISO-8859-1)
-     */
-    static public function dol_osencode($str)
-    {
-        global $conf;
-
-        $tmp = ini_get("unicode.filesystem_encoding"); // Disponible avec PHP 6.0
-        if (empty($tmp) && !empty($_SERVER["WINDIR"])) {
-            $tmp = 'iso-8859-1'; // By default for windows
-        }
-        if (empty($tmp)) {
-            $tmp = 'utf-8'; // By default for other
-        }
-        if (!empty($conf->global->MAIN_FILESYSTEM_ENCODING)) {
-            $tmp = $conf->global->MAIN_FILESYSTEM_ENCODING;
-        }
-
-        if ($tmp == 'iso-8859-1') {
-            return utf8_decode($str);
-        }
-        return $str;
-    }
-
-    /**
      *      Return an id or code from a code or id.
      *      Store also Code-Id into a cache to speed up next request on same key.
      *
@@ -8478,17 +8478,6 @@ abstract class DolibarrFunctions
         }
 
         return $return;
-    }
-
-    /**
-     * Return the value of token currently saved into session with name 'newtoken'.
-     * This token must be send by any POST as it will be used by next page for comparison with value in session.
-     *
-     * @return  string
-     */
-    static function newToken()
-    {
-        return $_SESSION['newtoken'];
     }
 
     /**
@@ -8924,6 +8913,129 @@ abstract class DolibarrFunctions
     }
 
     /**
+     * Set focus onto field with selector (similar behaviour of 'autofocus' HTML5 tag)
+     *
+     * @param string $selector Selector ('#id' or 'input[name="ref"]') to use to find the HTML input field that must get the autofocus. You must use a CSS selector, so unique id preceding with the '#' char.
+     *
+     * @return    string                HTML code to set focus
+     */
+    static function dol_set_focus($selector)
+    {
+        print "\n" . '<!-- Set focus onto a specific field -->' . "\n";
+        print '<script>jQuery(document).ready(function() { jQuery("' . DolibarrFunctions::dol_escape_js($selector) . '").focus(); });</script>' . "\n";
+    }
+
+    /**
+     * Function dolGetButtonTitle : this kind of buttons are used in title in list
+     *
+     * @param string $label     label of button
+     * @param string $helpText  optional : content for help tooltip
+     * @param string $iconClass class for icon element (Example: 'fa fa-file')
+     * @param string $url       the url for link
+     * @param string $id        attribute id of button
+     * @param int    $status    0 no user rights, 1 active, 2 current action or selected, -1 Feature Disabled, -2 disable Other reason use helpText as tooltip
+     * @param array  $params    various params for future : recommended rather than adding more function arguments
+     *
+     * @return string               html button
+     */
+    static function dolGetButtonTitle($label, $helpText = '', $iconClass = 'fa fa-file', $url = '', $id = '', $status = 1, $params = [])
+    {
+        //global $langs, $conf, $user;
+        $conf = DolibarrGlobals::getConf();
+        $user = DolibarrGlobals::getUser();
+        $langs = DolibarrGlobals::getLangs();
+
+        // Actually this conf is used in css too for external module compatibility and smooth transition to this function
+        if (!empty($conf->global->MAIN_BUTTON_HIDE_UNAUTHORIZED) && (!$user->admin) && $status <= 0) {
+            return '';
+        }
+
+        $class = 'btnTitle';
+        if (in_array($iconClass, ['fa fa-plus-circle', 'fa fa-comment-dots'])) {
+            $class .= ' btnTitlePlus';
+        }
+        $useclassfortooltip = 1;
+
+        if (!empty($params['morecss'])) {
+            $class .= ' ' . $params['morecss'];
+        }
+
+        $attr = [
+            'class' => $class,
+            'href' => empty($url) ? '' : $url,
+        ];
+
+        if (!empty($helpText)) {
+            $attr['title'] = DolibarrFunctions::dol_escape_htmltag($helpText);
+        } elseif (empty($attr['title']) && $label) {
+            $attr['title'] = $label;
+            $useclassfortooltip = 0;
+        }
+
+        if ($status == 2) {
+            $attr['class'] .= ' btnTitleSelected';
+        } elseif ($status <= 0) {
+            $attr['class'] .= ' refused';
+
+            $attr['href'] = '';
+
+            if ($status == -1) { // disable
+                $attr['title'] = DolibarrFunctions::dol_escape_htmltag($langs->transnoentitiesnoconv("FeatureDisabled"));
+            } elseif ($status == 0) { // Not enough permissions
+                $attr['title'] = DolibarrFunctions::dol_escape_htmltag($langs->transnoentitiesnoconv("NotEnoughPermissions"));
+            }
+        }
+
+        if (!empty($attr['title']) && $useclassfortooltip) {
+            $attr['class'] .= ' classfortooltip';
+        }
+
+        if (!empty($id)) {
+            $attr['id'] = $id;
+        }
+
+        // Override attr
+        if (!empty($params['attr']) && is_array($params['attr'])) {
+            foreach ($params['attr'] as $key => $value) {
+                if ($key == 'class') {
+                    $attr['class'] .= ' ' . $value;
+                } elseif ($key == 'classOverride') {
+                    $attr['class'] = $value;
+                } else {
+                    $attr[$key] = $value;
+                }
+            }
+        }
+
+        if (isset($attr['href']) && empty($attr['href'])) {
+            unset($attr['href']);
+        }
+
+        // TODO : add a hook
+
+        // escape all attribute
+        $attr = array_map('self::dol_escape_htmltag', $attr);
+
+        $TCompiledAttr = [];
+        foreach ($attr as $key => $value) {
+            $TCompiledAttr[] = $key . '="' . $value . '"';
+        }
+
+        $compiledAttributes = (empty($TCompiledAttr) ? '' : implode(' ', $TCompiledAttr));
+
+        $tag = (empty($attr['href']) ? 'span' : 'a');
+
+        $button = '<' . $tag . ' ' . $compiledAttributes . '>';
+        $button .= '<span class="' . $iconClass . ' valignmiddle btnTitle-icon"></span>';
+        if (!empty($params['forcenohideoftext'])) {
+            $button .= '<span class="valignmiddle text-plus-circle btnTitle-label' . (empty($params['forcenohideoftext']) ? ' hideonsmartphone' : '') . '">' . $label . '</span>';
+        }
+        $button .= '</' . $tag . '>';
+
+        return $button;
+    }
+
+    /**
      * Return if var element is ok
      *
      * @param string $element Variable to check
@@ -9193,19 +9305,6 @@ abstract class DolibarrFunctions
             return $ka;
         }
         return [];
-    }
-
-    /**
-     * Set focus onto field with selector (similar behaviour of 'autofocus' HTML5 tag)
-     *
-     * @param string $selector Selector ('#id' or 'input[name="ref"]') to use to find the HTML input field that must get the autofocus. You must use a CSS selector, so unique id preceding with the '#' char.
-     *
-     * @return    string                HTML code to set focus
-     */
-    function dol_set_focus($selector)
-    {
-        print "\n" . '<!-- Set focus onto a specific field -->' . "\n";
-        print '<script>jQuery(document).ready(function() { jQuery("' . DolibarrFunctions::dol_escape_js($selector) . '").focus(); });</script>' . "\n";
     }
 
     /**
@@ -10101,7 +10200,7 @@ abstract class DolibarrFunctions
         if ($actionType == 'danger' || $actionType == 'delete') {
             $class = 'butActionDelete';
             if (strpos($url, 'token=') === false) {
-                $url .= '&token=' . newToken();
+                $url .= '&token=' . self::newToken();
             }
         }
 
@@ -10202,13 +10301,24 @@ abstract class DolibarrFunctions
     }
 
     /**
+     * Return the value of token currently saved into session with name 'newtoken'.
+     * This token must be send by any POST as it will be used by next page for comparison with value in session.
+     *
+     * @return  string
+     */
+    static function newToken()
+    {
+        return $_SESSION['newtoken'];
+    }
+
+    /**
      * Add space between dolGetButtonTitle
      *
      * @param string $moreClass more css class label
      *
      * @return string                html of title separator
      */
-    function dolGetButtonTitleSeparator($moreClass = "")
+    static function dolGetButtonTitleSeparator($moreClass = "")
     {
         return '<span class="button-title-separator ' . $moreClass . '" ></span>';
     }
@@ -10230,113 +10340,6 @@ abstract class DolibarrFunctions
         }
 
         return $out;
-    }
-
-    /**
-     * Function dolGetButtonTitle : this kind of buttons are used in title in list
-     *
-     * @param string $label     label of button
-     * @param string $helpText  optional : content for help tooltip
-     * @param string $iconClass class for icon element (Example: 'fa fa-file')
-     * @param string $url       the url for link
-     * @param string $id        attribute id of button
-     * @param int    $status    0 no user rights, 1 active, 2 current action or selected, -1 Feature Disabled, -2 disable Other reason use helpText as tooltip
-     * @param array  $params    various params for future : recommended rather than adding more function arguments
-     *
-     * @return string               html button
-     */
-    function dolGetButtonTitle($label, $helpText = '', $iconClass = 'fa fa-file', $url = '', $id = '', $status = 1, $params = [])
-    {
-        global $langs, $conf, $user;
-
-        // Actually this conf is used in css too for external module compatibility and smooth transition to this function
-        if (!empty($conf->global->MAIN_BUTTON_HIDE_UNAUTHORIZED) && (!$user->admin) && $status <= 0) {
-            return '';
-        }
-
-        $class = 'btnTitle';
-        if (in_array($iconClass, ['fa fa-plus-circle', 'fa fa-comment-dots'])) {
-            $class .= ' btnTitlePlus';
-        }
-        $useclassfortooltip = 1;
-
-        if (!empty($params['morecss'])) {
-            $class .= ' ' . $params['morecss'];
-        }
-
-        $attr = [
-            'class' => $class,
-            'href' => empty($url) ? '' : $url,
-        ];
-
-        if (!empty($helpText)) {
-            $attr['title'] = DolibarrFunctions::dol_escape_htmltag($helpText);
-        } elseif (empty($attr['title']) && $label) {
-            $attr['title'] = $label;
-            $useclassfortooltip = 0;
-        }
-
-        if ($status == 2) {
-            $attr['class'] .= ' btnTitleSelected';
-        } elseif ($status <= 0) {
-            $attr['class'] .= ' refused';
-
-            $attr['href'] = '';
-
-            if ($status == -1) { // disable
-                $attr['title'] = DolibarrFunctions::dol_escape_htmltag($langs->transnoentitiesnoconv("FeatureDisabled"));
-            } elseif ($status == 0) { // Not enough permissions
-                $attr['title'] = DolibarrFunctions::dol_escape_htmltag($langs->transnoentitiesnoconv("NotEnoughPermissions"));
-            }
-        }
-
-        if (!empty($attr['title']) && $useclassfortooltip) {
-            $attr['class'] .= ' classfortooltip';
-        }
-
-        if (!empty($id)) {
-            $attr['id'] = $id;
-        }
-
-        // Override attr
-        if (!empty($params['attr']) && is_array($params['attr'])) {
-            foreach ($params['attr'] as $key => $value) {
-                if ($key == 'class') {
-                    $attr['class'] .= ' ' . $value;
-                } elseif ($key == 'classOverride') {
-                    $attr['class'] = $value;
-                } else {
-                    $attr[$key] = $value;
-                }
-            }
-        }
-
-        if (isset($attr['href']) && empty($attr['href'])) {
-            unset($attr['href']);
-        }
-
-        // TODO : add a hook
-
-        // escape all attribute
-        $attr = array_map('DolibarrFunctions::dol_escape_htmltag', $attr);
-
-        $TCompiledAttr = [];
-        foreach ($attr as $key => $value) {
-            $TCompiledAttr[] = $key . '="' . $value . '"';
-        }
-
-        $compiledAttributes = (empty($TCompiledAttr) ? '' : implode(' ', $TCompiledAttr));
-
-        $tag = (empty($attr['href']) ? 'span' : 'a');
-
-        $button = '<' . $tag . ' ' . $compiledAttributes . '>';
-        $button .= '<span class="' . $iconClass . ' valignmiddle btnTitle-icon"></span>';
-        if (!empty($params['forcenohideoftext'])) {
-            $button .= '<span class="valignmiddle text-plus-circle btnTitle-label' . (empty($params['forcenohideoftext']) ? ' hideonsmartphone' : '') . '">' . $label . '</span>';
-        }
-        $button .= '</' . $tag . '>';
-
-        return $button;
     }
 
     /**

@@ -27,6 +27,7 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
+use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 
 /**

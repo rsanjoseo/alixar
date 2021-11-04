@@ -26,7 +26,11 @@
  *  \ingroup    knowledgemanagement
  *  \brief      Description and activation file for module KnowledgeManagement
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Description and activation class for module KnowledgeManagement
@@ -287,7 +291,7 @@ class modKnowledgeManagement extends DolibarrModules
             'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
             'type'=>'top', // This is a Top menu entry
             'titre'=>'ModuleKnowledgeManagementName',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu'=>'knowledgemanagement',
             'leftmenu'=>'',
             'url'=>'/knowledgemanagement/knowledgerecord_list.php',
@@ -307,7 +311,7 @@ class modKnowledgeManagement extends DolibarrModules
             // This is a Left menu entry
             'type' => 'left',
             'titre' => 'MenuKnowledgeRecord',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth em092"'),
             'mainmenu' => 'ticket',
             'leftmenu' => 'knowledgemanagement_knowledgerecord',
             'url' => '/knowledgemanagement/knowledgerecord_list.php',

@@ -42,13 +42,13 @@ use Exception;
 class DolibarrAuthentication
 {
     protected $controller;
-    protected $hookmanager;
+    public $hookmanager;
     protected $conf;
-    protected $langs;
+    public $langs;
     protected $db;
 
     protected $authmode;
-    protected $user;
+    public $user;
     protected $login;
     protected $password;
     /**

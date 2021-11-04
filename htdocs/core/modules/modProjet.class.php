@@ -28,7 +28,11 @@
  *    \ingroup    projet
  *    \brief      Description and activation file for the module project
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Projet
@@ -236,7 +240,7 @@ class modProjet extends DolibarrModules
         ];
         // Add multicompany field
         if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
-            $nbofallowedentities = count(explode(',', getEntity('project'))); // If project are shared, nb will be > 1
+            $nbofallowedentities = count(explode(',', DolibarrFunctions::getEntity('project'))); // If project are shared, nb will be > 1
             if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
                 $this->export_fields_array[$r] += ['p.entity' => 'Entity'];
             }
@@ -280,7 +284,7 @@ class modProjet extends DolibarrModules
         if (empty($conf->global->PROJECT_HIDE_TASKS)) {
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'facture as f ON ptt.invoice_id = f.rowid';
         }
-        $this->export_sql_end[$r] .= " WHERE p.entity IN (" . getEntity('project') . ")";
+        $this->export_sql_end[$r] .= " WHERE p.entity IN (" . DolibarrFunctions::getEntity('project') . ")";
 
         // Import list of tasks
         if (empty($conf->global->PROJECT_HIDE_TASKS)) {

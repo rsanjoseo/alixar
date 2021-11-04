@@ -23,7 +23,13 @@
  *    \ingroup    deplacement
  *    \brief      Description and activation file for the module trips (deprecated)
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Deplacement
@@ -38,7 +44,9 @@ class modDeplacement extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user;
+        // global $conf, $user;
+        $conf = DolibarrGlobals::getConf();
+        $user = DolibarrGlobals::getUser();
 
         $this->db = $db;
         $this->numero = 75;
@@ -130,7 +138,7 @@ class modDeplacement extends DolibarrModules
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe_commerciaux as sc ON sc.fk_soc = s.rowid';
         }
         $this->export_sql_end[$r] .= ' WHERE d.fk_user = u.rowid';
-        $this->export_sql_end[$r] .= ' AND d.entity IN (' . getEntity('deplacement') . ')';
+        $this->export_sql_end[$r] .= ' AND d.entity IN (' . DolibarrFunctions::getEntity('deplacement') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . (empty($user) ? 0 : $user->id) . ' OR d.fk_soc IS NULL)';
         }

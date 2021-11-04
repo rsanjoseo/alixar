@@ -25,8 +25,9 @@
  *    \ingroup        prelevement
  *    \brief        Description and activation file for the module Prelevement
  */
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module of payment by Direct Debit

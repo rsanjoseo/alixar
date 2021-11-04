@@ -27,7 +27,11 @@
  *    \brief      Description and activation file for the module Expedition
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Expedition
@@ -315,7 +319,7 @@ class modExpedition extends DolibarrModules
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople_extrafields as extra3 ON sp.rowid = extra3.fk_object';
         }
         $this->export_sql_end[$r] .= ' WHERE c.fk_soc = s.rowid AND c.rowid = ed.fk_expedition AND ed.fk_origin_line = cd.rowid';
-        $this->export_sql_end[$r] .= ' AND c.entity IN (' . getEntity('expedition') . ')';
+        $this->export_sql_end[$r] .= ' AND c.entity IN (' . DolibarrFunctions::getEntity('expedition') . ')';
         if (empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND sc.fk_user = ' . (empty($user) ? 0 : $user->id);
         }

@@ -108,7 +108,7 @@ class MainView
     function llxHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '', $disablenofollow = 0)
     {
         // html header
-        top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, $disablenofollow);
+        self::top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, $disablenofollow);
 
         $tmpcsstouse = 'sidebar-collapse' . ($morecssonbody ? ' ' . $morecssonbody : '');
         // If theme MD and classic layer, we open the menulayer by default.
@@ -126,11 +126,11 @@ class MainView
 
         // top menu and left menu area
         if (empty($this->conf->dol_hide_topmenu) || DolibarrFunctions::GETPOST('dol_invisible_topmenu', 'int') || constant('MAIN_HIDE_TOP_MENU') != 1) {
-            top_menu($head, $title, $target, $disablejs, $disablehead, $arrayofjs, $arrayofcss, $morequerystring, $help_url);
+            self::top_menu($head, $title, $target, $disablejs, $disablehead, $arrayofjs, $arrayofcss, $morequerystring, $help_url);
         }
 
         if (empty($this->conf->dol_hide_leftmenu) || constant('MAIN_HIDE_LEFT_MENU') != 1) {
-            left_menu('', $help_url, '', '', 1, $title, 1); // $this->menumanager is retrieved with a global $this->menumanager inside this function
+            self::left_menu('', $help_url, '', '', 1, $title, 1); // $this->menumanager is retrieved with a global $this->menumanager inside this function
         }
 
         // main area
@@ -138,7 +138,7 @@ class MainView
             print $replacemainareaby;
             return;
         }
-        main_area($title);
+        self::main_area($title);
     }
 
     /**
@@ -676,11 +676,11 @@ class MainView
                     $logouthtmltext .= $this->langs->trans("Logout") . '<br>';
 
                     $logouttext .= '<a accesskey="l" href="' . DOL_URL_ROOT . '?module=Users&controller=logout">';
-                    $logouttext .= img_picto($this->langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin');
+                    $logouttext .= DolibarrFunctions::img_picto($this->langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin');
                     $logouttext .= '</a>';
                 } else {
                     $logouthtmltext .= $this->langs->trans("NoLogoutProcessWithAuthMode", $_SESSION["dol_authmode"]);
-                    $logouttext .= img_picto($this->langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin opacitymedium');
+                    $logouttext .= DolibarrFunctions::img_picto($this->langs->trans('Logout'), 'sign-out', '', false, 0, 0, '', 'atoplogin opacitymedium');
                 }
             }
 
@@ -712,7 +712,7 @@ class MainView
 
             // Link to print main content area
             if (empty($this->conf->global->MAIN_PRINT_DISABLELINK) && empty($this->conf->global->MAIN_OPTIMIZEFORTEXTBROWSER) && $this->conf->browser->layout != 'phone') {
-                $qs = dol_escape_htmltag($_SERVER["QUERY_STRING"]);
+                $qs = DolibarrFunctions::dol_escape_htmltag($_SERVER["QUERY_STRING"]);
 
                 if (isset($_POST) && is_array($_POST)) {
                     foreach ($_POST as $key => $value) {
@@ -722,7 +722,7 @@ class MainView
                     }
                 }
                 $qs .= (($qs && $morequerystring) ? '&' : '') . $morequerystring;
-                $text = '<a href="' . dol_escape_htmltag($_SERVER["PHP_SELF"]) . '?' . $qs . ($qs ? '&' : '') . 'optioncss=print" target="_blank">';
+                $text = '<a href="' . DolibarrFunctions::dol_escape_htmltag($_SERVER["PHP_SELF"]) . '?' . $qs . ($qs ? '&' : '') . 'optioncss=print" target="_blank">';
                 //$text.= img_picto(":".$this->langs->trans("PrintContentArea"), 'printer_top.png', 'class="printer"');
                 $text .= '<span class="fa fa-print atoplogin valignmiddle"></span>';
                 $text .= '</a>';
@@ -745,7 +745,7 @@ class MainView
                 }
 
                 // Get helpbaseurl, helppage and mode from helppagename and langs
-                $arrayres = getHelpParamFor($helppagename, $this->langs);
+                $arrayres = self::getHelpParamFor($helppagename, $this->langs);
                 $helpbaseurl = $arrayres['helpbaseurl'];
                 $helppage = $arrayres['helppage'];
                 $mode = $arrayres['mode'];
@@ -755,7 +755,7 @@ class MainView
                     $text = '';
                     $title = $this->langs->trans($mode == 'wiki' ? 'GoToWikiHelpPage' : 'GoToHelpPage') . '...';
                     if ($mode == 'wiki') {
-                        $title .= '<br>' . $this->langs->trans("PageWiki") . ' ' . dol_escape_htmltag('"' . strtr($helppage, '_', ' ') . '"');
+                        $title .= '<br>' . $this->langs->trans("PageWiki") . ' ' . DolibarrFunctions::dol_escape_htmltag('"' . strtr($helppage, '_', ' ') . '"');
                         if ($helppresent) {
                             $title .= ' <span class="opacitymedium">(' . $this->langs->trans("DedicatedPageAvailable") . ')</span>';
                         } else {
@@ -801,19 +801,19 @@ class MainView
 
             if (!empty($this->conf->global->MAIN_USE_TOP_MENU_SEARCH_DROPDOWN)) {
                 // Add search dropdown
-                $toprightmenu .= top_menu_search();
+                $toprightmenu .= self::top_menu_search();
             }
 
             if (!empty($this->conf->global->MAIN_USE_TOP_MENU_QUICKADD_DROPDOWN)) {
                 // Add search dropdown
-                $toprightmenu .= top_menu_quickadd();
+                $toprightmenu .= self::top_menu_quickadd();
             }
 
             // Add bookmark dropdown
-            $toprightmenu .= top_menu_bookmark();
+            $toprightmenu .= self::top_menu_bookmark();
 
             // Add user dropdown
-            $toprightmenu .= top_menu_user();
+            $toprightmenu .= self::top_menu_user();
 
             $toprightmenu .= '</div></div>';
 
@@ -869,24 +869,24 @@ class MainView
         $dropdownBody .= '<div id="topmenulogincompanyinfo" >';
 
         if ($this->langs->transcountry("ProfId1", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId1", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_SIREN")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId1", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_SIREN")) . '</span>';
         }
         if ($this->langs->transcountry("ProfId2", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId2", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_SIRET")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId2", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_SIRET")) . '</span>';
         }
         if ($this->langs->transcountry("ProfId3", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId3", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_APE")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId3", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_APE")) . '</span>';
         }
         if ($this->langs->transcountry("ProfId4", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId4", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_RCS")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId4", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_RCS")) . '</span>';
         }
         if ($this->langs->transcountry("ProfId5", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId5", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_PROFID5")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId5", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_PROFID5")) . '</span>';
         }
         if ($this->langs->transcountry("ProfId6", $this->mysoc->country_code) != '-') {
-            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId6", $this->mysoc->country_code) . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_PROFID6")) . '</span>';
+            $dropdownBody .= '<br><b>' . $this->langs->transcountry("ProfId6", $this->mysoc->country_code) . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_PROFID6")) . '</span>';
         }
-        $dropdownBody .= '<br><b>' . $this->langs->trans("VATIntraShort") . '</b>: <span>' . showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_TVAINTRA")) . '</span>';
+        $dropdownBody .= '<br><b>' . $this->langs->trans("VATIntraShort") . '</b>: <span>' . DolibarrFunctions::showValueWithClipboardCPButton(DolibarrFunctions::getDolGlobalString("MAIN_INFO_TVAINTRA")) . '</span>';
 
         $dropdownBody .= '</div>';
 
@@ -910,16 +910,16 @@ class MainView
         $dropdownBody .= '<br>';
 
         $dropdownBody .= '<br><u>' . $this->langs->trans("Session") . '</u>';
-        $dropdownBody .= '<br><b>' . $this->langs->trans("IPAddress") . '</b>: ' . dol_escape_htmltag($_SERVER["REMOTE_ADDR"]);
+        $dropdownBody .= '<br><b>' . $this->langs->trans("IPAddress") . '</b>: ' . DolibarrFunctions::dol_escape_htmltag($_SERVER["REMOTE_ADDR"]);
         if (!empty($this->conf->global->MAIN_MODULE_MULTICOMPANY)) {
             $dropdownBody .= '<br><b>' . $this->langs->trans("ConnectedOnMultiCompany") . ':</b> ' . $this->conf->entity . ' (user entity ' . $this->user->entity . ')';
         }
         $dropdownBody .= '<br><b>' . $this->langs->trans("AuthenticationMode") . ':</b> ' . $_SESSION["dol_authmode"] . (empty($this->dolibarr_main_demo) ? '' : ' (demo)');
-        $dropdownBody .= '<br><b>' . $this->langs->trans("ConnectedSince") . ':</b> ' . dol_print_date($this->user->datelastlogin, "dayhour", 'tzuser');
-        $dropdownBody .= '<br><b>' . $this->langs->trans("PreviousConnexion") . ':</b> ' . dol_print_date($this->user->datepreviouslogin, "dayhour", 'tzuser');
+        $dropdownBody .= '<br><b>' . $this->langs->trans("ConnectedSince") . ':</b> ' . DolibarrFunctions::dol_print_date($this->user->datelastlogin, "dayhour", 'tzuser');
+        $dropdownBody .= '<br><b>' . $this->langs->trans("PreviousConnexion") . ':</b> ' . DolibarrFunctions::dol_print_date($this->user->datepreviouslogin, "dayhour", 'tzuser');
         $dropdownBody .= '<br><b>' . $this->langs->trans("CurrentTheme") . ':</b> ' . $this->conf->theme;
         $dropdownBody .= '<br><b>' . $this->langs->trans("CurrentMenuManager") . ':</b> ' . (isset($this->menumanager) ? $this->menumanager->name : 'unknown');
-        $langFlag = picto_from_langcode($this->langs->getDefaultLang());
+        $langFlag = DolibarrFunctions::picto_from_langcode($this->langs->getDefaultLang());
         $dropdownBody .= '<br><b>' . $this->langs->trans("CurrentUserLanguage") . ':</b> ' . ($langFlag ? $langFlag . ' ' : '') . $this->langs->getDefaultLang();
 
         $tz = (int) $_SESSION['dol_tz'] + (int) $_SESSION['dol_dst'];
@@ -929,7 +929,7 @@ class MainView
         //if ($_SESSION['dol_dst'] > 0) $dropdownBody .= yn(1);
         //else $dropdownBody .= yn(0);
 
-        $dropdownBody .= '<br><b>' . $this->langs->trans("Browser") . ':</b> ' . $this->conf->browser->name . ($this->conf->browser->version ? ' ' . $this->conf->browser->version : '') . ' (' . dol_escape_htmltag($_SERVER['HTTP_USER_AGENT']) . ')';
+        $dropdownBody .= '<br><b>' . $this->langs->trans("Browser") . ':</b> ' . $this->conf->browser->name . ($this->conf->browser->version ? ' ' . $this->conf->browser->version : '') . ' (' . DolibarrFunctions::dol_escape_htmltag($_SERVER['HTTP_USER_AGENT']) . ')';
         $dropdownBody .= '<br><b>' . $this->langs->trans("Layout") . ':</b> ' . $this->conf->browser->layout;
         $dropdownBody .= '<br><b>' . $this->langs->trans("Screen") . ':</b> ' . $_SESSION['dol_screenwidth'] . ' x ' . $_SESSION['dol_screenheight'];
         if ($this->conf->browser->layout == 'phone') {
@@ -982,7 +982,7 @@ class MainView
             $btnUser = '<!-- div for user link -->
 	    <div id="topmenu-login-dropdown" class="userimg atoplogin dropdown user user-menu inline-block">
 	        <a href="' . DOL_URL_ROOT . '/Modules/Users/card.php?id=' . $this->user->id . '" class="dropdown-toggle login-dropdown-a" data-toggle="dropdown">
-	            ' . $this->userImage . '<span class="hidden-xs maxwidth200 atoploginusername hideonsmartphone paddingleft">' . dol_trunc($this->user->firstname ? $this->user->firstname : $this->user->login, 10) . '</span>
+	            ' . $this->userImage . '<span class="hidden-xs maxwidth200 atoploginusername hideonsmartphone paddingleft">' . DolibarrFunctions::dol_trunc($this->user->firstname ? $this->user->firstname : $this->user->login, 10) . '</span>
 	        </a>
 	        <div class="dropdown-menu">
 	            <!-- User image -->
@@ -996,9 +996,9 @@ class MainView
                     $title .= '<br>' . $this->langs->trans("PreviousConnexion") . ' : ' . dol_print_date($this->user->datepreviouslogin, "dayhour", 'tzuser');
                 }
             }
-            $btnUser .= '<small class="classfortooltip" title="' . dol_escape_htmltag($title) . '" ><i class="fa fa-user-clock"></i> ' . dol_print_date($this->user->datelastlogin, "dayhour", 'tzuser') . '</small><br>';
+            $btnUser .= '<small class="classfortooltip" title="' . DolibarrFunctions::dol_escape_htmltag($title) . '" ><i class="fa fa-user-clock"></i> ' . DolibarrFunctions::dol_print_date($this->user->datelastlogin, "dayhour", 'tzuser') . '</small><br>';
             if ($this->user->datepreviouslogin) {
-                $btnUser .= '<small class="classfortooltip" title="' . dol_escape_htmltag($title) . '" ><i class="fa fa-user-clock opacitymedium"></i> ' . dol_print_date($this->user->datepreviouslogin, "dayhour", 'tzuser') . '</small><br>';
+                $btnUser .= '<small class="classfortooltip" title="' . DolibarrFunctions::dol_escape_htmltag($title) . '" ><i class="fa fa-user-clock opacitymedium"></i> ' . DolibarrFunctions::dol_print_date($this->user->datepreviouslogin, "dayhour", 'tzuser') . '</small><br>';
             }
 
             //$btnUser .= '<small class="classfortooltip"><i class="fa fa-cog"></i> '.$this->langs->trans("Version").' '.$appli.'</small>';
@@ -1888,7 +1888,7 @@ class MainView
         $ext = 'layout=' . $this->conf->browser->layout . '&version=' . urlencode(DOL_VERSION);
 
         // Global html output events ($mesgs, $errors, $warnings)
-        dol_htmloutput_events($disabledoutputofmessages);
+        DolibarrFunctions::dol_htmloutput_events($disabledoutputofmessages);
 
         // Code for search criteria persistence.
         // $this->user->lastsearch_values was set by the DolibarrFunctions::GETPOST when form field search_xxx exists
@@ -1968,7 +1968,7 @@ class MainView
             print '<!-- ' . $comment . ' -->' . "\n";
         }
 
-        printCommonFooter($zone);
+        DolibarrFunctions::printCommonFooter($zone);
 
         if (!empty($delayedhtmlcontent)) {
             print $delayedhtmlcontent;

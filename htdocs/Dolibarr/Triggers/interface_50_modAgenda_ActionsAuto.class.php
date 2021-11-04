@@ -20,8 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
+use Alxarafe\Dolibarr\Classes\User;
 
 /**
  *    \file       htdocs/core/triggers/interface_50_modAgenda_ActionsAuto.class.php
@@ -29,7 +30,7 @@ use Alxarafe\Dolibarr\Classes\Conf;
  *  \brief      Trigger file for agenda module
  */
 
-require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggered functions for agenda module

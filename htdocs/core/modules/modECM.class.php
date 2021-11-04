@@ -23,7 +23,11 @@
  *      \brief      Description and activation file for the module ECM
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Description and activation class for module ECM
@@ -125,7 +129,7 @@ class modECM extends DolibarrModules
             'fk_menu' => 0,
             'type' => 'top',
             'titre' => 'MenuECM',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'ecm',
             'url' => '/ecm/index.php',
             'langs' => 'ecm',
@@ -142,7 +146,7 @@ class modECM extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=ecm',
             'type' => 'left',
             'titre' => 'ECMArea',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'ecm',
             'leftmenu' => 'ecm',
             'url' => '/ecm/index.php?mainmenu=ecm&leftmenu=ecm',

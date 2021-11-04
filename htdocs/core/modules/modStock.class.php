@@ -27,7 +27,10 @@
  *    \brief      Description and activation file for the module Stock
  */
 
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Class to describe and enable module Stock
@@ -220,7 +223,7 @@ class modStock extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as c ON c.rowid = e.fk_pays';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'entrepot as pe ON pe.rowid = e.fk_parent';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'entrepot_extrafields as extra ON extra.fk_object = e.rowid';
-        $this->export_sql_end[$r] .= ' WHERE e.entity IN (' . getEntity('stock') . ')';
+        $this->export_sql_end[$r] .= ' WHERE e.entity IN (' . DolibarrFunctions::getEntity('stock') . ')';
 
         // Export stock (without batch number)
         $r++;
@@ -258,7 +261,7 @@ class modStock extends DolibarrModules
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra ON extra.fk_object = p.rowid, ' . MAIN_DB_PREFIX . 'product_stock as ps, ' . MAIN_DB_PREFIX . 'entrepot as e';
         $this->export_sql_end[$r] .= ' WHERE p.rowid = ps.fk_product AND ps.fk_entrepot = e.rowid';
-        $this->export_sql_end[$r] .= ' AND e.entity IN (' . getEntity('stock') . ')';
+        $this->export_sql_end[$r] .= ' AND e.entity IN (' . DolibarrFunctions::getEntity('stock') . ')';
 
         // Export stock including batch number
         if (!empty($conf->productbatch->enabled)) {
@@ -309,7 +312,7 @@ class modStock extends DolibarrModules
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_lot_extrafields as extra ON extra.fk_object = pl.rowid,';
             $this->export_sql_end[$r] .= ' ' . MAIN_DB_PREFIX . 'entrepot as e';
             $this->export_sql_end[$r] .= ' WHERE ps.fk_entrepot = e.rowid';
-            $this->export_sql_end[$r] .= ' AND e.entity IN (' . getEntity('stock') . ')';
+            $this->export_sql_end[$r] .= ' AND e.entity IN (' . DolibarrFunctions::getEntity('stock') . ')';
         }
 
         // Export of stock movements
@@ -346,7 +349,7 @@ class modStock extends DolibarrModules
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'product as p, ' . MAIN_DB_PREFIX . 'stock_mouvement as sm, ' . MAIN_DB_PREFIX . 'entrepot as e';
         $this->export_sql_end[$r] .= ' WHERE p.rowid = sm.fk_product AND sm.fk_entrepot = e.rowid';
-        $this->export_sql_end[$r] .= ' AND e.entity IN (' . getEntity('stock') . ')';
+        $this->export_sql_end[$r] .= ' AND e.entity IN (' . DolibarrFunctions::getEntity('stock') . ')';
 
         // Imports
         //--------

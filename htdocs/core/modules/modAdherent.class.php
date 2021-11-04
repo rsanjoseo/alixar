@@ -29,7 +29,11 @@
  *      \ingroup    member
  *      \brief      Description and activation file for the module member
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *  Class to describe and enable module Adherent
@@ -317,14 +321,14 @@ class modAdherent extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'subscription as c ON c.fk_adherent = a.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_departements as d ON a.state_id = d.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_country as co ON a.country = co.rowid';
-        $this->export_sql_end[$r] .= ' WHERE a.fk_adherent_type = ta.rowid AND ta.entity IN (' . getEntity('member_type') . ') ';
+        $this->export_sql_end[$r] .= ' WHERE a.fk_adherent_type = ta.rowid AND ta.entity IN (' . DolibarrFunctions::getEntity('member_type') . ') ';
         $this->export_dependencies_array[$r] = ['subscription' => 'c.rowid']; // To add unique key if we ask a field of a child to avoid the DISTINCT to discard them
 
         // Imports
         //--------
         $r = 0;
 
-        $now = dol_now();
+        $now = DolibarrFunctions::dol_now();
         require_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
         $r++;
@@ -368,15 +372,15 @@ class modAdherent extends DolibarrModules
             'a.civility' => "MR", 'a.lastname' => 'Smith', 'a.firstname' => 'John', 'a.gender' => 'man or woman', 'a.login' => 'jsmith', 'a.pass' => 'passofjsmith', 'a.fk_adherent_type' => '1',
             'a.morphy' => '"mor" or "phy"', 'a.societe' => 'JS company', 'a.address' => '21 jump street', 'a.zip' => '55000', 'a.town' => 'New York', 'a.country' => '1',
             'a.email' => 'jsmith@example.com', 'a.birth' => '1972-10-10', 'a.statut' => "0 or 1", 'a.note_public' => "This is a public comment on member",
-            'a.note_private' => "This is private comment on member", 'a.datec' => dol_print_date($now, '%Y-%m__%d'), 'a.datefin' => dol_print_date(dol_time_plus_duree($now, 1, 'y'), '%Y-%m-%d'),
+            'a.note_private' => "This is private comment on member", 'a.datec' => DolibarrFunctions::dol_print_date($now, '%Y-%m__%d'), 'a.datefin' => DolibarrFunctions::dol_print_date(dol_time_plus_duree($now, 1, 'y'), '%Y-%m-%d'),
         ];
         if (!empty($conf->societe->enabled)) {
             $this->import_examplevalues_array[$r]['a.fk_soc'] = "rowid or name";
         }
 
         // Cronjobs
-        $arraydate = dol_getdate(dol_now());
-        $datestart = dol_mktime(22, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
+        $arraydate = DolibarrFunctions::dol_getdate(DolibarrFunctions::dol_now());
+        $datestart = DolibarrFunctions::dol_mktime(22, 0, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
         $this->cronjobs = [
             0 => [
                 'label' => 'SendReminderForExpiredSubscriptionTitle',
@@ -419,7 +423,7 @@ class modAdherent extends DolibarrModules
 
         if (file_exists($src) && ! file_exists($dest)) {
             require_once DOL_DOCUMENT_ROOT.'/core/lib/files.lib.php';
-            dol_mkdir($dirodt);
+            DolibarrFunctions::dol_mkdir($dirodt);
             $result=dol_copy($src,$dest,0,0);
             if ($result < 0) {
                 $langs->load("errors");

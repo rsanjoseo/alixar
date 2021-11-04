@@ -23,7 +23,11 @@
  *  \ingroup    stripe
  *  \brief      Description and activation file for the module Stripe
  */
-include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+
+use Alxarafe\Dolibarr\Classes\DolibarrModules;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+//include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
 /**
  *    Description and activation class for module Paybox
@@ -111,7 +115,7 @@ class modStripe extends DolibarrModules
             'fk_menu' => 'fk_mainmenu=bank',
             'type' => 'left',
             'titre' => 'StripeAccount',
-            'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
+            'prefix' => DolibarrFunctions::img_picto('', $this->picto, 'class="paddingright pictofixedwidth"'),
             'mainmenu' => 'bank',
             'leftmenu' => 'stripe',
             'url' => '',

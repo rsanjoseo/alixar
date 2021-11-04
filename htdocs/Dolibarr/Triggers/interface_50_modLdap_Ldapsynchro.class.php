@@ -17,8 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
+use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
@@ -27,7 +28,7 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  *  \brief      Fichier de gestion des triggers LDAP
  */
 
-require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 
 /**
  *  Class of triggers for ldap module
