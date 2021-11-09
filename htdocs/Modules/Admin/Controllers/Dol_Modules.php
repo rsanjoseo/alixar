@@ -267,23 +267,20 @@ if ($action == 'set' && $user->admin) {
     if (!empty($resarray['errors'])) {
         DolibarrFunctions::setEventMessages('', $resarray['errors'], 'errors');
     } else {
-        //var_dump($resarray);exit;
         if ($resarray['nbperms'] > 0) {
             $tmpsql = "SELECT COUNT(rowid) as nb FROM " . MAIN_DB_PREFIX . "user WHERE admin <> 1";
-            $resqltmp = $db->query($tmpsql);
-            if ($resqltmp) {
-                $obj = $db->fetch_object($resqltmp);
-                //var_dump($obj->nb);exit;
-                if ($obj && $obj->nb > 1) {
-                    $msg = $langs->trans('ModuleEnabledAdminMustCheckRights');
-                    DolibarrFunctions::setEventMessages($msg, null, 'warnings');
-                }
+            //$resqltmp = $db->query($tmpsql);
+            $data = $db->select($tmpsql);
+            if (count($data) > 0 && $data[0]['nb'] > 1) {
+                $msg = $langs->trans('ModuleEnabledAdminMustCheckRights');
+                DolibarrFunctions::setEventMessages($msg, null, 'warnings');
             } else {
                 dol_print_error($db);
             }
         }
     }
-    header("Location: " . $_SERVER["PHP_SELF"] . "?mode=" . $mode . $param . ($page_y ? '&page_y=' . $page_y : ''));
+    $goto = $_SERVER["PHP_SELF"] . "?mode=" . $mode . $param . ($page_y ? '&page_y=' . $page_y : '');
+    header("Location: " . $goto);
     exit;
 } elseif ($action == 'reset' && $user->admin && DolibarrFunctions::GETPOST('confirm') == 'yes') {
     $result = DolibarrAdmin::unActivateModule($value);
@@ -302,7 +299,7 @@ if ($action == 'set' && $user->admin) {
 $form = new Form();
 
 $morejs = [];
-$morecss = ["/admin/dolistore/css/dolistore.css"];
+//$morecss = ["/admin/dolistore/css/dolistore.css"];
 
 // Set dir where external modules are installed
 if (!DolibarrFiles::dol_is_dir($dirins)) {

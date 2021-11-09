@@ -354,7 +354,7 @@ input.buttonpaymentpaypal {
 }
 
 input.buttonpaymentpaybox {
-    background-image: url(/dolibarr/htdocs/paybox/img/object_paybox.png);
+    background-image: url(/htdocs/html/modules/paybox/img/4object_paybox.png);
     background-repeat: no-repeat;
     background-position: 8px 11px;
 }

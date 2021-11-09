@@ -190,6 +190,7 @@ abstract class DolibarrAdmin
     {
         //global $conf;
         $conf = DolibarrGlobals::getConf();
+        $db = DolibarrGlobals::getDb();
 
         // Clean parameters
         $name = trim($name);
@@ -202,7 +203,7 @@ abstract class DolibarrAdmin
 
         //DolibarrFunctions::dol_syslog("dolibarr_set_const name=$name, value=$value type=$type, visible=$visible, note=$note entity=$entity");
 
-        $db->begin();
+        $db->beginTransaction();
 
         $sql = "DELETE FROM " . MAIN_DB_PREFIX . "const";
         $sql .= " WHERE name = " . $db->encrypt($name);
@@ -211,7 +212,12 @@ abstract class DolibarrAdmin
         }
 
         DolibarrFunctions::dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
-        $resql = $db->query($sql);
+
+        // $resql = $db->query($sql);
+        if (!$db->exec($sql)) {
+            $db->rollback();
+            return 1;
+        }
 
         if (strcmp($value, '')) {    // true if different. Must work for $value='0' or $value=0
             $sql = "INSERT INTO " . MAIN_DB_PREFIX . "const(name,value,type,visible,note,entity)";
@@ -223,18 +229,17 @@ abstract class DolibarrAdmin
             //print "sql".$value."-".pg_escape_string($value)."-".$sql;exit;
             //print "xx".$db->escape($value);
             DolibarrFunctions::dol_syslog("admin.lib::dolibarr_set_const", LOG_DEBUG);
-            $resql = $db->query($sql);
+
+            //$resql = $db->query($sql);
+            if (!$db->exec($sql)) {
+                $db->rollback();
+                return 1;
+            }
         }
 
-        if ($resql) {
-            $db->commit();
-            $conf->global->$name = $value;
-            return 1;
-        } else {
-            $error = $db->lasterror();
-            $db->rollback();
-            return -1;
-        }
+        $db->commit();
+        $conf->global->$name = $value;
+        return 1;
     }
 
     /**

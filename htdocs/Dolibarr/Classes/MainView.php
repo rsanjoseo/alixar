@@ -34,6 +34,7 @@ namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
+use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFilefunc;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
@@ -48,6 +49,7 @@ class MainView
     public $user;
     public $mysoc;
     public $form;
+    public $debug;
 
     public $object;
     public $page;
@@ -83,6 +85,8 @@ class MainView
         $this->langs = Translator::getInstance();
 
         $this->conf = DolibarrGlobals::getConf();
+
+        $this->debug = DebugTool::getInstance();
     }
 
     /**
@@ -107,6 +111,8 @@ class MainView
      */
     function llxHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '', $disablenofollow = 0)
     {
+        $this->debug->addMessage('messages', 'llxHeader in MainView (duplicated code in DolibarrView)');
+
         // html header
         self::top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, $disablenofollow);
 
@@ -158,6 +164,7 @@ class MainView
      */
     function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $disablejmobile = 0, $disablenofollow = 0)
     {
+        $this->debug->addMessage('messages', 'top_htmlhead in MainView (duplicated code in DolibarrView)');
         $this->top_httphead();
 
         if (empty($this->conf->css)) {
@@ -211,7 +218,7 @@ class MainView
             // Mobile appli like icon
             $manifest = DOL_URL_ROOT . '/theme/' . $this->conf->theme . '/manifest.json.php';
             if (!empty($manifest)) {
-                print '<link rel="manifest" href="/' . $manifest . '" />' . "\n";
+                print '<link rel="manifest" href="' . $manifest . '" />' . "\n";
             }
 
             if (!empty($this->conf->global->THEME_ELDY_TOPMENU_BACK1)) {
@@ -371,6 +378,10 @@ class MainView
                     print '">' . "\n";
                 }
             }
+
+            print '<!-- Begin: DEBUG getRenderHeader -->' . "\n";
+            print DebugTool::getRenderHeader();
+            print '<!-- End: DEBUG getRenderHeader -->' . "\n";
 
             // Output standard javascript links
             if (!defined('DISABLE_JQUERY') && !$disablejs && !empty($this->conf->use_javascript_ajax)) {
@@ -534,6 +545,8 @@ class MainView
      */
     function top_httphead($contenttype = 'text/html', $forcenocache = 0)
     {
+        $this->debug->addMessage('messages', 'top_httphead in MainView (duplicated code in DolibarrView)');
+
         if ($contenttype == 'text/html') {
             header("Content-Type: text/html; charset=" . $this->conf->file->character_set_client);
         } else {
@@ -614,6 +627,7 @@ class MainView
         $this->hookmanager=new HookManager($this->db);
         $this->menumanager=new MenuManager($this->db, empty($this->user->socid) ? 0 : 1);
         */
+        $this->debug->addMessage('messages', 'top_menu in MainView (duplicated code in DolibarrView)');
 
         $searchform = '';
         $bookmarks = '';
@@ -844,6 +858,7 @@ class MainView
      */
     function top_menu_user($hideloginname = 0, $urllogout = '')
     {
+        $this->debug->addMessage('messages', 'top_menu_user in MainView (duplicated code in DolibarrView)');
         $this->langs->load('companies');
 
         $this->userImage = $this->userDropDownImage = '';
@@ -1079,6 +1094,8 @@ class MainView
      */
     function top_menu_quickadd()
     {
+        $this->debug->addMessage('messages', 'top_menu_quickadd in MainView (duplicated code in DolibarrView)');
+
         $html = '';
         // Define $dropDownQuickAddHtml
         $dropDownQuickAddHtml = '<div class="dropdown-header bookmark-header center">';
@@ -1296,6 +1313,7 @@ class MainView
      */
     function top_menu_bookmark()
     {
+        $this->debug->addMessage('messages', 'top_menu_bookmark in MainView (duplicated code in DolibarrView)');
         $html = '';
 
         // Define $bookmarks
@@ -1516,6 +1534,7 @@ class MainView
      */
     function left_menu($menu_array_before, $helppagename = '', $notused = '', $menu_array_after = '', $leftmenuwithoutmainarea = 0, $title = '', $acceptdelayedhtml = 0)
     {
+        $this->debug->addMessage('messages', 'left_menu in MainView (duplicated code in DolibarrView)');
         $searchform = '';
         $bookmarks = '';
 
@@ -1738,6 +1757,7 @@ class MainView
      */
     function main_area($title = '')
     {
+        $this->debug->addMessage('messages', 'main_area in MainView (duplicated code in DolibarrView)');
         if (empty($this->conf->dol_hide_leftmenu)) {
             print '<div id="id-right">';
         }
@@ -1848,6 +1868,7 @@ class MainView
      */
     function printSearchForm($urlaction, $urlobject, $title, $htmlmorecss, $htmlinputname, $accesskey = '', $prefhtmlinputname = '', $img = '', $showtitlebefore = 0, $autofocus = 0)
     {
+        $this->debug->addMessage('messages', 'printSearchForm in MainView (duplicated code in DolibarrView)');
         $ret = '';
         $ret .= '<form action="' . $urlaction . '" method="post" class="searchform nowraponall tagtr">';
         $ret .= '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -1885,6 +1906,7 @@ class MainView
      */
     function llxFooter($comment = '', $zone = 'private', $disabledoutputofmessages = 0)
     {
+        $this->debug->addMessage('messages', 'llxFooter in MainView (duplicated code in DolibarrView)');
         $ext = 'layout=' . $this->conf->browser->layout . '&version=' . urlencode(DOL_VERSION);
 
         // Global html output events ($mesgs, $errors, $warnings)

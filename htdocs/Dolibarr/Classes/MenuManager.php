@@ -77,7 +77,7 @@ class MenuManager
      */
     public function showmenu($mode, $moredata = null)
     {
-        global $user, $dolibarr_main_db_name;
+        // global $user, $dolibarr_main_db_name;
 
         $id = 'mainmenu';
 

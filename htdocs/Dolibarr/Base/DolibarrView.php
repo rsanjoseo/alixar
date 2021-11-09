@@ -696,6 +696,7 @@ class DolibarrView extends View
 
     function llxHeader($head = '', $title = '', $help_url = '', $target = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $morequerystring = '', $morecssonbody = '', $replacemainareaby = '', $disablenofollow = 0)
     {
+        $this->debug->addMessage('messages', 'llxHeader in DolibarrView (duplicated code in MainView)');
         // html header
         $this->top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss, 0, $disablenofollow);
 
@@ -732,6 +733,7 @@ class DolibarrView extends View
 
     function top_htmlhead($head, $title = '', $disablejs = 0, $disablehead = 0, $arrayofjs = '', $arrayofcss = '', $disablejmobile = 0, $disablenofollow = 0)
     {
+        $this->debug->addMessage('messages', 'top_htmlhead in DolibarrView (duplicated code in MainView)');
         $this->top_httphead();
 
         if (empty($this->conf->css)) {
@@ -1104,6 +1106,7 @@ class DolibarrView extends View
 
     function top_httphead($contenttype = 'text/html', $forcenocache = 0)
     {
+        $this->debug->addMessage('messages', 'top_httphead in DolibarrView (duplicated code in MainView)');
 
         if ($contenttype == 'text/html') {
             header("Content-Type: text/html; charset=" . $this->conf->file->character_set_client);
@@ -1165,6 +1168,7 @@ class DolibarrView extends View
         //        global $this->user, $this->conf, $this->langs, $db;
         //        global $dolibarr_main_authentication, $dolibarr_main_demo;
         //        global $this->hookmanager, $this->menumanager;
+        $this->debug->addMessage('messages', 'top_menu in DolibarrView (duplicated code in MainView)');
 
         $searchform = '';
         $bookmarks = '';
@@ -1846,6 +1850,7 @@ class DolibarrView extends View
         //        global $this->langs, $this->conf, $db, $this->hookmanager, $this->user, $this->mysoc;
         //        global $dolibarr_main_authentication, $dolibarr_main_demo;
         //        global $this->menumanager;
+        $this->debug->addMessage('messages', 'top_menu_user in DolibarrView (duplicated code in MainView)');
 
         $this->langs->load('companies');
 
@@ -2080,6 +2085,7 @@ class DolibarrView extends View
     {
         //        global $this->user, $this->conf, $this->langs, $db, $form;
         //        global $this->hookmanager, $this->menumanager;
+        $this->debug->addMessage('messages', 'left_menu in DolibarrView (duplicated code in MainView)');
 
         $searchform = '';
         $bookmarks = '';
@@ -2296,6 +2302,7 @@ class DolibarrView extends View
 
     function main_area($title = '')
     {
+        $this->debug->addMessage('messages', 'main_area in DolibarrView (duplicated code in MainView)');
         if (empty($this->conf->dol_hide_leftmenu)) {
             print '<div id="id-right">';
         }
@@ -2344,6 +2351,8 @@ class DolibarrView extends View
 
     function printSearchForm($urlaction, $urlobject, $title, $htmlmorecss, $htmlinputname, $accesskey = '', $prefhtmlinputname = '', $img = '', $showtitlebefore = 0, $autofocus = 0)
     {
+        $this->debug->addMessage('messages', 'printSearchForm in DolibarrView (duplicated code in MainView)');
+
         $ret = '';
         $ret .= '<form action="' . $urlaction . '" method="post" class="searchform nowraponall tagtr">';
         $ret .= '<input type="hidden" name="token" value="' . newToken() . '">';
@@ -2374,6 +2383,7 @@ class DolibarrView extends View
         // global $delayedhtmlcontent;
         // global $contextpage, $page, $limit;
         // global $dolibarr_distrib;
+        $this->debug->addMessage('messages', 'llxFooter in DolibarrView (duplicated code in MainView)');
 
         $ext = 'layout=' . $this->conf->browser->layout . '&version=' . urlencode(DOL_VERSION);
 

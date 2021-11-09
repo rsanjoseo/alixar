@@ -506,27 +506,31 @@ input.buttonpaymentcb {
 	background-position: 5px 4px;
 }
 input.buttonpaymentcheque {
-	background-image: url(<?php echo dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
-	background-repeat: no-repeat;
-	background-position: 5px 4px;
+    background-image: url(<?php echo dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
+    background-repeat: no-repeat;
+    background-position: 5px 4px;
 }
+
 input.buttonpaymentpaypal {
-	background-image: url(<?php echo dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
-	background-repeat: no-repeat;
-	background-position: 8px 7px;
+    background-image: url(<?php echo dol_buildpath($path.'/paypal/img/object_paypal.png', 1) ?>);
+    background-repeat: no-repeat;
+    background-position: 8px 7px;
 }
+
 input.buttonpaymentpaybox {
-	background-image: url(<?php echo dol_buildpath($path.'/paybox/img/object_paybox.png', 1) ?>);
-	background-repeat: no-repeat;
-	background-position: 8px 7px;
+    background-image: url(<?php echo dol_buildpath($path.'/sspaybox/img/1object_paybox.png', 1) ?>);
+    background-repeat: no-repeat;
+    background-position: 8px 7px;
 }
+
 input.buttonpaymentstripe {
-	background-image: url(<?php echo dol_buildpath($path.'/stripe/img/object_stripe.png', 1) ?>);
-	background-repeat: no-repeat;
-	background-position: 8px 7px;
+    background-image: url(<?php echo dol_buildpath($path.'/stripe/img/object_stripe.png', 1) ?>);
+    background-repeat: no-repeat;
+    background-position: 8px 7px;
 }
+
 .logopublicpayment #dolpaymentlogo {
-	max-height: 100px;
+    max-height: 100px;
 }
 a.butStatus {
 	padding-left: 5px;

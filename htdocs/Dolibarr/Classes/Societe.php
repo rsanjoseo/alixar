@@ -41,9 +41,9 @@ use Alxarafe\Dolibarr\Base\DolibarrGlobals;
  *    \ingroup    societe
  *    \brief      File for third party class
  */
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonincoterm.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Multicurrency/class/multicurrency.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonincoterm.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Multicurrency/class/multicurrency.class.php';
 
 /**
  *    Class to manage third parties objects (customers, suppliers, prospects...)
@@ -3944,9 +3944,10 @@ class Societe extends CommonObject
      *
      * @return    void
      */
-    public function setMysoc(Conf $conf)
+    public function setMysoc(Conf &$conf)
     {
-        global $langs;
+        //global $langs;
+        $langs = DolibarrGlobals::getLangs();
 
         $this->id = 0;
         $this->name = empty($conf->global->MAIN_INFO_SOCIETE_NOM) ? '' : $conf->global->MAIN_INFO_SOCIETE_NOM;

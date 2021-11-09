@@ -1131,9 +1131,10 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
     public function insert_cronjobs()
     {
         // phpcs:enable
-        include_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
+        // include_once DOL_DOCUMENT_ROOT . '/core/class/infobox.class.php';
 
-        global $conf;
+        //global $conf;
+        $conf = DolibarrGlobals::getConf();
 
         $err = 0;
 
@@ -1175,80 +1176,62 @@ class DolibarrModules // Can not be abstract, because we need to instantiate it 
                 }
                 $sql .= " AND entity = " . ((int) $entity); // Must be exact entity
 
-                $now = dol_now();
+                $now = DolibarrFunctions::dol_now();
 
-                $result = $this->db->query($sql);
-                if ($result) {
-                    $obj = $this->db->fetch_object($result);
-                    if ($obj->nb == 0) {
-                        $this->db->begin();
+                $result = $this->db->select($sql);
+                if (count($result) === 1 && $result[0]['nb'] === '1') {
+                    return 1;
+                }
 
-                        if (!$err) {
-                            $sql = "INSERT INTO " . MAIN_DB_PREFIX . "cronjob (module_name, datec, datestart, dateend, label, jobtype, classesname, objectname, methodename, command, params, note,";
-                            if (is_int($frequency)) {
-                                $sql .= ' frequency,';
-                            }
-                            if (is_int($unitfrequency)) {
-                                $sql .= ' unitfrequency,';
-                            }
-                            if (is_int($priority)) {
-                                $sql .= ' priority,';
-                            }
-                            if (is_int($status)) {
-                                $sql .= ' status,';
-                            }
-                            $sql .= " entity, test)";
-                            $sql .= " VALUES (";
-                            $sql .= "'" . $this->db->escape(empty($this->rights_class) ? strtolower($this->name) : $this->rights_class) . "', ";
-                            $sql .= "'" . $this->db->idate($now) . "', ";
-                            $sql .= ($datestart ? "'" . $this->db->idate($datestart) . "'" : "'" . $this->db->idate($now) . "'") . ", ";
-                            $sql .= ($dateend ? "'" . $this->db->idate($dateend) . "'" : "NULL") . ", ";
-                            $sql .= "'" . $this->db->escape($label) . "', ";
-                            $sql .= "'" . $this->db->escape($jobtype) . "', ";
-                            $sql .= ($class ? "'" . $this->db->escape($class) . "'" : "null") . ",";
-                            $sql .= ($objectname ? "'" . $this->db->escape($objectname) . "'" : "null") . ",";
-                            $sql .= ($method ? "'" . $this->db->escape($method) . "'" : "null") . ",";
-                            $sql .= ($command ? "'" . $this->db->escape($command) . "'" : "null") . ",";
-                            $sql .= ($parameters ? "'" . $this->db->escape($parameters) . "'" : "null") . ",";
-                            $sql .= ($comment ? "'" . $this->db->escape($comment) . "'" : "null") . ",";
-                            if (is_int($frequency)) {
-                                $sql .= "'" . $this->db->escape($frequency) . "', ";
-                            }
-                            if (is_int($unitfrequency)) {
-                                $sql .= "'" . $this->db->escape($unitfrequency) . "', ";
-                            }
-                            if (is_int($priority)) {
-                                $sql .= "'" . $this->db->escape($priority) . "', ";
-                            }
-                            if (is_int($status)) {
-                                $sql .= "'" . $this->db->escape($status) . "', ";
-                            }
-                            $sql .= $entity . ",";
-                            $sql .= "'" . $this->db->escape($test) . "'";
-                            $sql .= ")";
+                $sql = "INSERT INTO " . MAIN_DB_PREFIX . "cronjob (module_name, datec, datestart, dateend, label, jobtype, classesname, objectname, methodename, command, params, note,";
+                if (is_int($frequency)) {
+                    $sql .= ' frequency,';
+                }
+                if (is_int($unitfrequency)) {
+                    $sql .= ' unitfrequency,';
+                }
+                if (is_int($priority)) {
+                    $sql .= ' priority,';
+                }
+                if (is_int($status)) {
+                    $sql .= ' status,';
+                }
+                $sql .= " entity, test)";
+                $sql .= " VALUES (";
+                $sql .= "'" . $this->db->escape(empty($this->rights_class) ? strtolower($this->name) : $this->rights_class) . "', ";
+                $sql .= "'" . $this->db->idate($now) . "', ";
+                $sql .= ($datestart ? "'" . $this->db->idate($datestart) . "'" : "'" . $this->db->idate($now) . "'") . ", ";
+                $sql .= ($dateend ? "'" . $this->db->idate($dateend) . "'" : "NULL") . ", ";
+                $sql .= "'" . $this->db->escape($label) . "', ";
+                $sql .= "'" . $this->db->escape($jobtype) . "', ";
+                $sql .= ($class ? "'" . $this->db->escape($class) . "'" : "null") . ",";
+                $sql .= ($objectname ? "'" . $this->db->escape($objectname) . "'" : "null") . ",";
+                $sql .= ($method ? "'" . $this->db->escape($method) . "'" : "null") . ",";
+                $sql .= ($command ? "'" . $this->db->escape($command) . "'" : "null") . ",";
+                $sql .= ($parameters ? "'" . $this->db->escape($parameters) . "'" : "null") . ",";
+                $sql .= ($comment ? "'" . $this->db->escape($comment) . "'" : "null") . ",";
+                if (is_int($frequency)) {
+                    $sql .= "'" . $this->db->escape($frequency) . "', ";
+                }
+                if (is_int($unitfrequency)) {
+                    $sql .= "'" . $this->db->escape($unitfrequency) . "', ";
+                }
+                if (is_int($priority)) {
+                    $sql .= "'" . $this->db->escape($priority) . "', ";
+                }
+                if (is_int($status)) {
+                    $sql .= "'" . $this->db->escape($status) . "', ";
+                }
+                $sql .= $entity . ",";
+                $sql .= "'" . $this->db->escape($test) . "'";
+                $sql .= ")";
 
-                            $resql = $this->db->query($sql);
-                            if (!$resql) {
-                                $err++;
-                            }
-                        }
-
-                        if (!$err) {
-                            $this->db->commit();
-                        } else {
-                            $this->error = $this->db->lasterror();
-                            $this->db->rollback();
-                        }
-                    }
-                    // else box already registered into database
-                } else {
-                    $this->error = $this->db->lasterror();
-                    $err++;
+                if (!$this->db->query($sql)) {
+                    return 1;
                 }
             }
         }
-
-        return $err;
+        return 0;
     }
 
 

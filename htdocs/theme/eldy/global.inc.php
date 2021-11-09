@@ -396,7 +396,7 @@ if (!empty($conf->global->THEME_DARKMODEENABLED)) {
     }
 
     input.buttonpaymentpaybox {
-        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/paybox/img/object_paybox.png', 1) ?>);
+        background-image: url(<?php echo DolibarrFunctions::dol_buildpath($path.'/paybox/img/2object_paybox.png', 1) ?>);
         background-repeat: no-repeat;
         background-position: 8px 11px;
     }
