@@ -46,9 +46,8 @@ class modSupplierProposal extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 1120;
 
         $this->family = "srm";
@@ -181,8 +180,8 @@ class modSupplierProposal extends DolibarrModules
         }
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'supplier_proposal' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','supplier_proposal'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'supplier_proposal' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','supplier_proposal'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

@@ -46,9 +46,8 @@ class modSociete extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 1;
 
         $this->family = "crm";
@@ -276,16 +275,16 @@ class modSociete extends DolibarrModules
             'st.code' => 'ProspectStatus', 'payterm.libelle' => 'PaymentConditions', 'paymode.libelle' => 'PaymentMode',
             's.outstanding_limit' => 'OutstandingBill', 'pbacc.ref' => 'PaymentBankAccount', 'incoterm.code' => 'IncotermLabel',
         ];
-        if (!empty($conf->global->SOCIETE_USEPREFIX)) {
+        if (!empty($this->conf->global->SOCIETE_USEPREFIX)) {
             $this->export_fields_array[$r]['s.prefix'] = 'Prefix';
         }
-        if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
+        if (!empty($this->conf->global->PRODUIT_MULTIPRICES)) {
             $this->export_fields_array[$r]['s.price_level'] = 'PriceLevel';
         }
         // Add multicompany field
-        if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
+        if (!empty($this->conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
             $nbofallowedentities = count(explode(',', DolibarrFunctions::getEntity('societe'))); // If project are shared, nb will be > 1
-            if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
+            if (!empty($this->conf->multicompany->enabled) && $nbofallowedentities > 1) {
                 $this->export_fields_array[$r] += ['s.entity' => 'Entity'];
             }
         }
@@ -342,7 +341,7 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' WHERE s.entity IN (' . DolibarrFunctions::getEntity('societe') . ')';
         if (is_object($user) && empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
-            if (!empty($conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
+            if (!empty($this->conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
                 $subordinatesids = $user->getAllChildIds();
                 $this->export_sql_end[$r] .= count($subordinatesids) > 0 ? ' OR (sc.fk_user IN (' . $this->db->sanitize(implode(',', $subordinatesids)) . ')' : '';
             }
@@ -385,7 +384,7 @@ class modSociete extends DolibarrModules
             's.address' => "company", 's.zip' => "company", 's.town' => "company", 's.phone' => "company", 's.email' => "company",
             't.libelle' => "company",
         ]; // We define here only fields that use another picto
-        if (empty($conf->fournisseur->enabled) && empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD) || !empty($conf->supplier_order->enabled) || !empty($conf->supplier_invoice->enabled)) {
+        if (empty($this->conf->fournisseur->enabled) && empty($this->conf->global->MAIN_USE_NEW_SUPPLIERMOD) || !empty($this->conf->supplier_order->enabled) || !empty($this->conf->supplier_invoice->enabled)) {
             unset($this->export_fields_array[$r]['s.code_fournisseur']);
             unset($this->export_entities_array[$r]['s.code_fournisseur']);
         }
@@ -412,7 +411,7 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' WHERE c.entity IN (' . DolibarrFunctions::getEntity('socpeople') . ')';
         if (is_object($user) && empty($user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
-            if (!empty($conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
+            if (!empty($this->conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
                 $subordinatesids = $user->getAllChildIds();
                 $this->export_sql_end[$r] .= count($subordinatesids) > 0 ? ' OR (sc.fk_user IN (' . $this->db->sanitize(implode(',', $subordinatesids)) . ')' : '';
             }
@@ -485,11 +484,11 @@ class modSociete extends DolibarrModules
                                           's.fk_multicurrency' => 'MulticurrencyUsed',
                                           's.multicurrency_code' => 'MulticurrencyCurrency',
         ];
-        if (!empty($conf->global->PRODUIT_MULTIPRICES)) {
+        if (!empty($this->conf->global->PRODUIT_MULTIPRICES)) {
             $this->import_fields_array[$r]['s.price_level'] = 'PriceLevel';
         }
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'societe' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'societe' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {    // This can fail when class is used on old database (during migration for example)
             while ($obj = $this->db->fetch_object($resql)) {
@@ -665,7 +664,7 @@ class modSociete extends DolibarrModules
                                           's.note_public' => "NotePublic",
         ];
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'socpeople' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'socpeople' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {    // This can fail when class is used on an old database (during a migration for example)
             while ($obj = $this->db->fetch_object($resql)) {

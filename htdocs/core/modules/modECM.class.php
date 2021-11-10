@@ -42,7 +42,7 @@ class modECM extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id.
@@ -135,7 +135,7 @@ class modECM extends DolibarrModules
             'langs' => 'ecm',
             'position' => 82,
             'perms' => '$user->rights->ecm->read || $user->rights->ecm->upload || $user->rights->ecm->setup',
-            'enabled' => '$conf->ecm->enabled',
+            'enabled' => '$this->conf->ecm->enabled',
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
         ];
@@ -184,7 +184,7 @@ class modECM extends DolibarrModules
             'langs' => 'ecm',
             'position' => 103,
             'perms' => '$user->rights->ecm->read || $user->rights->ecm->upload',
-            'enabled' => '($user->rights->ecm->read || $user->rights->ecm->upload) && ! empty($conf->global->ECM_AUTO_TREE_ENABLED)',
+            'enabled' => '($user->rights->ecm->read || $user->rights->ecm->upload) && ! empty($this->conf->global->ECM_AUTO_TREE_ENABLED)',
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
         ];

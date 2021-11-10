@@ -42,9 +42,8 @@ class modProductBatch extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 39000;
 
         $this->family = "products";
@@ -100,9 +99,9 @@ class modProductBatch extends DolibarrModules
         $this->tabs = [];
 
         // Dictionaries
-        if (!isset($conf->productbatch->enabled)) {
-            $conf->productbatch = new stdClass();
-            $conf->productbatch->enabled = 0;
+        if (!isset($this->conf->productbatch->enabled)) {
+            $this->conf->productbatch = new stdClass();
+            $this->conf->productbatch->enabled = 0;
         }
         $this->dictionaries = [];
 
@@ -136,10 +135,10 @@ class modProductBatch extends DolibarrModules
 
         $sql = [];
 
-        if (!empty($conf->cashdesk->enabled)) {
-            if (empty($conf->global->CASHDESK_NO_DECREASE_STOCK)) {
+        if (!empty($this->conf->cashdesk->enabled)) {
+            if (empty($this->conf->global->CASHDESK_NO_DECREASE_STOCK)) {
                 include_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php';
-                $res = dolibarr_set_const($db, "CASHDESK_NO_DECREASE_STOCK", 1, 'chaine', 0, '', $conf->entity);
+                $res = dolibarr_set_const($db, "CASHDESK_NO_DECREASE_STOCK", 1, 'chaine', 0, '', $this->conf->entity);
             }
         }
 

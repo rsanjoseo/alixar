@@ -30,6 +30,7 @@
  *      \brief      Description and activation file for the module member
  */
 
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Classes\DolibarrModules;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
@@ -48,9 +49,8 @@ class modAdherent extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 310;
 
         $this->family = "hr";
@@ -345,11 +345,11 @@ class modAdherent extends DolibarrModules
             'a.email' => "Email", 'a.birth' => "Birthday", 'a.statut' => "Status*", 'a.photo' => "Photo", 'a.note_public' => "NotePublic", 'a.note_private' => "NotePrivate",
             'a.datec' => 'DateCreation', 'a.datefin' => 'DateEndSubscription',
         ];
-        if (!empty($conf->societe->enabled)) {
+        if (!empty($this->conf->societe->enabled)) {
             $this->import_fields_array[$r]['a.fk_soc'] = "ThirdParty";
         }
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'adherent' AND entity IN (0," . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'adherent' AND entity IN (0," . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {    // This can fail when class is used on old database (during migration for example)
             while ($obj = $this->db->fetch_object($resql)) {
@@ -360,7 +360,7 @@ class modAdherent extends DolibarrModules
         }
         // End add extra fields
         $this->import_convertvalue_array[$r] = [];
-        if (!empty($conf->societe->enabled)) {
+        if (!empty($this->conf->societe->enabled)) {
             $this->import_convertvalue_array[$r]['a.fk_soc'] = ['rule' => 'fetchidfromref', 'classfile' => '/Modules/Societes/class/societe.class.php', 'class' => 'Societe', 'method' => 'fetch', 'element' => 'ThirdParty'];
         }
         $this->import_fieldshidden_array[$r] = ['extra.fk_object' => 'lastrowid-' . MAIN_DB_PREFIX . 'adherent']; // aliastable.field => ('user->id' or 'lastrowid-'.tableparent)
@@ -374,7 +374,7 @@ class modAdherent extends DolibarrModules
             'a.email' => 'jsmith@example.com', 'a.birth' => '1972-10-10', 'a.statut' => "0 or 1", 'a.note_public' => "This is a public comment on member",
             'a.note_private' => "This is private comment on member", 'a.datec' => DolibarrFunctions::dol_print_date($now, '%Y-%m__%d'), 'a.datefin' => DolibarrFunctions::dol_print_date(dol_time_plus_duree($now, 1, 'y'), '%Y-%m-%d'),
         ];
-        if (!empty($conf->societe->enabled)) {
+        if (!empty($this->conf->societe->enabled)) {
             $this->import_examplevalues_array[$r]['a.fk_soc'] = "rowid or name";
         }
 
@@ -393,7 +393,7 @@ class modAdherent extends DolibarrModules
                 'unitfrequency' => 3600 * 24,
                 'priority' => 50,
                 'status' => 1,
-                'test' => '$conf->adherent->enabled',
+                'test' => '$this->conf->adherent->enabled',
                 'datestart' => $datestart,
             ],
         ];
@@ -410,7 +410,8 @@ class modAdherent extends DolibarrModules
      */
     public function init($options = '')
     {
-        global $conf, $langs;
+        //global $this->conf, $this->langs;
+        $this->conf = DolibarrGlobals::getConf();
 
         // Permissions
         $this->remove($options);
@@ -426,15 +427,15 @@ class modAdherent extends DolibarrModules
             DolibarrFunctions::dol_mkdir($dirodt);
             $result=dol_copy($src,$dest,0,0);
             if ($result < 0) {
-                $langs->load("errors");
-                $this->error=$langs->trans('ErrorFailToCopyFile',$src,$dest);
+                $this->langs->load("errors");
+                $this->error=$this->langs->trans('ErrorFailToCopyFile',$src,$dest);
                 return 0;
             }
         }*/
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type='member' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','member'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type='member' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','member'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

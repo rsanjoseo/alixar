@@ -40,9 +40,8 @@ class modIntracommreport extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $langs;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 68000;
 
         $this->family = "financial";
@@ -88,9 +87,9 @@ class modIntracommreport extends DolibarrModules
         $this->boxes = [];
 
         // Dictionaries
-        if (!isset($conf->intracommreport->enabled)) {
-            $conf->intracommreport = new stdClass();
-            $conf->intracommreport->enabled = 0;
+        if (!isset($this->conf->intracommreport->enabled)) {
+            $this->conf->intracommreport = new stdClass();
+            $this->conf->intracommreport->enabled = 0;
         }
         $this->dictionaries = [];
 

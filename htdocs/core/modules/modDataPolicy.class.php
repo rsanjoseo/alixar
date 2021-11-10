@@ -48,9 +48,7 @@ class modDataPolicy extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -64,7 +62,7 @@ class modDataPolicy extends DolibarrModules
         // Module position in the family on 2 digits ('01', '10', '20', ...)
         $this->module_position = '78';
         // Gives the possibility to the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
-        //$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $langs->trans("MyOwnFamily")));
+        //$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $this->langs->trans("MyOwnFamily")));
         // Module label (no space allowed), used if translation string 'ModuledatapolicyName' not found (MyModue is name of module).
         $this->name = preg_replace('/^mod/i', '', get_class($this));
         // Module description, used if translation string 'ModuledatapolicyDesc' not found (MyModue is name of module).
@@ -94,7 +92,7 @@ class modDataPolicy extends DolibarrModules
             'tpl' => 0, // Set this to 1 if module overwrite template dir (core/tpl)
             'barcode' => 0, // Set this to 1 if module has its own barcode directory (core/modules/barcode)
             'models' => 0, // Set this to 1 if module has its own models directory (core/modules/xxx)
-            'hooks' => ['data' => ['membercard', 'contactcard', 'thirdpartycard'], 'entity' => $conf->entity]  // Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context 'all'
+            'hooks' => ['data' => ['membercard', 'contactcard', 'thirdpartycard'], 'entity' => $this->conf->entity]  // Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context 'all'
         ];
 
         // Data directories to create when module is enabled.
@@ -122,20 +120,20 @@ class modDataPolicy extends DolibarrModules
         //                             1=>array('datapolicy_MYNEWCONST2','chaine','myvalue','This is another constant to add',0, 'current', 1)
         // );
         $this->const = [
-            ['DATAPOLICY_TIERS_CLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_TIERS_PROSPECT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_TIERS_PROSPECT_CLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_TIERS_NIPROSPECT_NICLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_TIERS_FOURNISSEUR', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_CONTACT_CLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_CONTACT_PROSPECT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_CONTACT_PROSPECT_CLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_CONTACT_NIPROSPECT_NICLIENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_CONTACT_FOURNISSEUR', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
-            ['DATAPOLICY_ADHERENT', 'chaine', '', $langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_TIERS_CLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_TIERS_PROSPECT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_TIERS_PROSPECT_CLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_TIERS_NIPROSPECT_NICLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_TIERS_FOURNISSEUR', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_CONTACT_CLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_CONTACT_PROSPECT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_CONTACT_PROSPECT_CLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_CONTACT_NIPROSPECT_NICLIENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_CONTACT_FOURNISSEUR', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
+            ['DATAPOLICY_ADHERENT', 'chaine', '', $this->langs->trans('NUMBER_MONTH_BEFORE_DELETION'), 0],
         ];
 
-        $country = explode(":", empty($conf->global->MAIN_INFO_SOCIETE_COUNTRY) ? '' : $conf->global->MAIN_INFO_SOCIETE_COUNTRY);
+        $country = explode(":", empty($this->conf->global->MAIN_INFO_SOCIETE_COUNTRY) ? '' : $this->conf->global->MAIN_INFO_SOCIETE_COUNTRY);
 
         // Some keys to add into the overwriting translation tables
         /* $this->overwrite_translation = array(
@@ -143,9 +141,9 @@ class modDataPolicy extends DolibarrModules
           'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
           ) */
 
-        if (!isset($conf->datapolicy) || !isset($conf->datapolicy->enabled)) {
-            $conf->datapolicy = new stdClass();
-            $conf->datapolicy->enabled = 0;
+        if (!isset($this->conf->datapolicy) || !isset($this->conf->datapolicy->enabled)) {
+            $this->conf->datapolicy = new stdClass();
+            $this->conf->datapolicy->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -186,7 +184,7 @@ class modDataPolicy extends DolibarrModules
         // Cronjobs (List of cron jobs entries to add when module is enabled)
         // unit_frequency must be 60 for minute, 3600 for hour, 86400 for day, 604800 for week
         $this->cronjobs = [
-            0 => ['label' => 'DATAPOLICYJob', 'jobtype' => 'method', 'class' => 'datapolicy/class/datapolicycron.class.php', 'objectname' => 'DataPolicyCron', 'method' => 'cleanDataForDataPolicy', 'parameters' => '', 'comment' => 'Clean data', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 1, 'test' => '$conf->datapolicy->enabled'],
+            0 => ['label' => 'DATAPOLICYJob', 'jobtype' => 'method', 'class' => 'datapolicy/class/datapolicycron.class.php', 'objectname' => 'DataPolicyCron', 'method' => 'cleanDataForDataPolicy', 'parameters' => '', 'comment' => 'Clean data', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 1, 'test' => '$this->conf->datapolicy->enabled'],
         ];
         // Example: $this->cronjobs=array(0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>true),
         //                                1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>true)
@@ -219,25 +217,25 @@ class modDataPolicy extends DolibarrModules
 
         /*
         // Extrafield contact
-        $result1 = $extrafields->addExtraField('datapolicy_consentement', $langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_date', $langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0);
-        $result1 = $extrafields->addExtraField('datapolicy_send', $langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'thirdparty', 0, 0, '', '', 0, '', '0', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_consentement', $this->langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $this->langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $this->langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_date', $this->langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'thirdparty', 0, 0, '', '', 1, '', '3', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_send', $this->langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'thirdparty', 0, 0, '', '', 0, '', '0', 0);
 
         // Extrafield Tiers
-        $result1 = $extrafields->addExtraField('datapolicy_consentement', $langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_date', $langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'contact', 0, 0, '', '', 1, '', '3', 0);
-        $result1 = $extrafields->addExtraField('datapolicy_send', $langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'contact', 0, 0, '', '', 0, '', '0', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_consentement', $this->langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $this->langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $this->langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'contact', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_date', $this->langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'contact', 0, 0, '', '', 1, '', '3', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_send', $this->langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'contact', 0, 0, '', '', 0, '', '0', 0);
 
         // Extrafield Adherent
-        $result1 = $extrafields->addExtraField('datapolicy_consentement', $langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$conf->datapolicy->enabled');
-        $result1 = $extrafields->addExtraField('datapolicy_date', $langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0);
-        $result1 = $extrafields->addExtraField('datapolicy_send', $langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'adherent', 0, 0, '', '', 0, '', '0', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_consentement', $this->langs->trans("DATAPOLICY_consentement"), 'boolean', 101, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_traitement', $this->langs->trans("DATAPOLICY_opposition_traitement"), 'boolean', 102, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_opposition_prospection', $this->langs->trans("DATAPOLICY_opposition_prospection"), 'boolean', 103, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0, '', '', 'datapolicy@datapolicy', '$this->conf->datapolicy->enabled');
+        $result1 = $extrafields->addExtraField('datapolicy_date', $this->langs->trans("DATAPOLICY_date"), 'date', 104, 3, 'adherent', 0, 0, '', '', 1, '', '3', 0);
+        $result1 = $extrafields->addExtraField('datapolicy_send', $this->langs->trans("DATAPOLICY_send"), 'date', 105, 3, 'adherent', 0, 0, '', '', 0, '', '0', 0);
         */
 
         $sql = [];

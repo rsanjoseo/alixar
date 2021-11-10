@@ -41,9 +41,8 @@ class modWebsite extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 10000;
 
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
@@ -67,7 +66,7 @@ class modWebsite extends DolibarrModules
         $this->config_page_url = ['website.php'];
 
         // Dependencies
-        $this->hidden = !empty($conf->global->MODULE_WEBSITE_DISABLED); // A condition to disable module
+        $this->hidden = !empty($this->conf->global->MODULE_WEBSITE_DISABLED); // A condition to disable module
         $this->depends = ['modFckeditor']; // List of modules id that must be enabled if this module is enabled
         $this->requiredby = []; // List of modules id to disable if this one is disabled
         $this->conflictwith = []; // List of modules id this module is in conflict with
@@ -129,7 +128,7 @@ class modWebsite extends DolibarrModules
             'url' => '/website/index.php',
             'langs' => 'website', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 100,
-            'enabled' => '$conf->website->enabled', // Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->website->enabled', // Define condition to show or hide menu entry. Use '$this->conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->website->read', // Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,

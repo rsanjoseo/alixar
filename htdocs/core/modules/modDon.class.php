@@ -43,7 +43,8 @@ class modDon extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
+
         $this->numero = 700;
 
         $this->family = "financial";
@@ -156,8 +157,8 @@ class modDon extends DolibarrModules
         global $conf;
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'donation' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','donation'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'donation' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','donation'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

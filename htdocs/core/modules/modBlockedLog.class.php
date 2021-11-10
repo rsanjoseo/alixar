@@ -40,9 +40,8 @@ class modBlockedLog extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf, $mysoc;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 3200;
         // Key text used to identify module (for permissions, menus, etc...)
         $this->rights_class = 'blockedlog';
@@ -83,9 +82,9 @@ class modBlockedLog extends DolibarrModules
 
         // Currently, activation is not automatic because only companies (in France) making invoices to non business customers must
         // enable this module.
-        /*if (! empty($conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY))
+        /*if (! empty($this->conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY))
         {
-            $tmp=explode(',', $conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY);
+            $tmp=explode(',', $this->conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY);
             $this->automatic_activation = array();
             foreach($tmp as $key)
             {
@@ -94,9 +93,9 @@ class modBlockedLog extends DolibarrModules
         }*/
         //var_dump($this->automatic_activation);
 
-        $this->always_enabled = (!empty($conf->blockedlog->enabled)
-            && !empty($conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY)
-            && in_array((empty($mysoc->country_code) ? '' : $mysoc->country_code), explode(',', $conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY))
+        $this->always_enabled = (!empty($this->conf->blockedlog->enabled)
+            && !empty($this->conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY)
+            && in_array((empty($mysoc->country_code) ? '' : $mysoc->country_code), explode(',', $this->conf->global->BLOCKEDLOG_DISABLE_NOT_ALLOWED_FOR_COUNTRY))
             && $this->alreadyUsed());
 
         // Constants
@@ -137,7 +136,7 @@ class modBlockedLog extends DolibarrModules
             'url' => '/blockedlog/admin/blockedlog_list.php?mainmenu=tools&leftmenu=blockedlogbrowser',
             'langs' => 'blockedlog', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 200,
-            'enabled' => '$conf->blockedlog->enabled', // Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->blockedlog->enabled', // Define condition to show or hide menu entry. Use '$this->conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->blockedlog->read', // Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -179,7 +178,7 @@ class modBlockedLog extends DolibarrModules
         $object->id = 1;
         $object->element = 'module';
         $object->ref = 'systemevent';
-        $object->entity = $conf->entity;
+        $object->entity = $this->conf->entity;
         $object->date = dol_now();
 
         $b = new BlockedLog($this->db);
@@ -223,7 +222,7 @@ class modBlockedLog extends DolibarrModules
         $object->id = 1;
         $object->element = 'module';
         $object->ref = 'systemevent';
-        $object->entity = $conf->entity;
+        $object->entity = $this->conf->entity;
         $object->date = dol_now();
 
         $b = new BlockedLog($this->db);

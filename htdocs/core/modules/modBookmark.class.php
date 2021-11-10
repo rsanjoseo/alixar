@@ -40,7 +40,8 @@ class modBookmark extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
+
         $this->numero = 330;
 
         $this->family = "technic";

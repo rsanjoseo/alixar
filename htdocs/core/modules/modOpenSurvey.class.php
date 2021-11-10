@@ -42,9 +42,7 @@ class modOpenSurvey extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used module id).
@@ -134,7 +132,7 @@ class modOpenSurvey extends DolibarrModules
             'url' => '/opensurvey/index.php?mainmenu=tools&leftmenu=opensurvey',
             'langs' => 'opensurvey',
             'position' => 200,
-            'enabled' => '$conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
+            'enabled' => '$this->conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$this->conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
             'perms' => '$user->rights->opensurvey->read',
             'target' => '',
             'user' => 0,
@@ -150,7 +148,7 @@ class modOpenSurvey extends DolibarrModules
             'url' => '/opensurvey/wizard/index.php',
             'langs' => 'opensurvey',
             'position' => 210,
-            'enabled' => '$conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
+            'enabled' => '$this->conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$this->conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
             'perms' => '$user->rights->opensurvey->write',
             'target' => '',
             'user' => 0,
@@ -166,7 +164,7 @@ class modOpenSurvey extends DolibarrModules
             'url' => '/opensurvey/list.php',
             'langs' => 'opensurvey',
             'position' => 220,
-            'enabled' => '$conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
+            'enabled' => '$this->conf->opensurvey->enabled', // Define condition to show or hide menu entry. Use '$this->conf->NewsSubmitter->enabled' if entry must be visible if module is enabled.
             'perms' => '$user->rights->opensurvey->read',
             'target' => '',
             'user' => 0,

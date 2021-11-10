@@ -43,9 +43,8 @@ class modExpenseReport extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user; // Required by some include code
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 770;
 
         $this->family = "hr";
@@ -257,8 +256,8 @@ class modExpenseReport extends DolibarrModules
         // Remove permissions and default values
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard' AND type='expensereport' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard','expensereport'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard' AND type='expensereport' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard','expensereport'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

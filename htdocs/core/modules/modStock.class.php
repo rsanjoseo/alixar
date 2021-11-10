@@ -44,9 +44,8 @@ class modStock extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $langs;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 52;
 
         $this->family = "products";
@@ -162,7 +161,7 @@ class modStock extends DolibarrModules
         $this->rights[6][4] = 'inventory_advance'; // In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
         $this->rights[6][5] = 'write'; // In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 
-        if ($conf->global->MAIN_FEATURES_LEVEL >= 2) {
+        if ($this->conf->global->MAIN_FEATURES_LEVEL >= 2) {
             $this->rights[8][0] = 1014;
             $this->rights[8][1] = 'inventoryValidatePermission'; // Permission label
             $this->rights[8][3] = 0; // Permission by default for new user (0/1)
@@ -264,8 +263,8 @@ class modStock extends DolibarrModules
         $this->export_sql_end[$r] .= ' AND e.entity IN (' . DolibarrFunctions::getEntity('stock') . ')';
 
         // Export stock including batch number
-        if (!empty($conf->productbatch->enabled)) {
-            $langs->load("productbatch");
+        if (!empty($this->conf->productbatch->enabled)) {
+            $this->langs->load("productbatch");
 
             // This request is same than previous but without field ps.stock (real stock in warehouse) and with link to subtable productbatch
             $r++;
@@ -338,7 +337,7 @@ class modStock extends DolibarrModules
             'p.rowid' => "product", 'p.ref' => "product", 'p.fk_product_type' => "product", 'p.label' => "product", 'p.description' => "product", 'p.note' => "product",
             'p.price' => "product", 'p.tva_tx' => 'product', 'p.tosell' => "product", 'p.tobuy' => "product", 'p.duration' => "product", 'p.datec' => 'product', 'p.tms' => 'product',
         ];    // We define here only fields that use another icon that the one defined into export_icon
-        if (!empty($conf->productbatch->enabled)) {
+        if (!empty($this->conf->productbatch->enabled)) {
             $this->export_fields_array[$r]['sm.batch'] = 'Batch';
             $this->export_TypeFields_array[$r]['sm.batch'] = 'Text';
             $this->export_entities_array[$r]['sm.batch'] = 'movement';
@@ -447,8 +446,8 @@ class modStock extends DolibarrModules
             dol_mkdir($dirodt);
             $result = dol_copy($src, $dest, 0, 0);
             if ($result < 0) {
-                $langs->load("errors");
-                $this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
+                $this->langs->load("errors");
+                $this->error = $this->langs->trans('ErrorFailToCopyFile', $src, $dest);
                 return 0;
             }
         }
@@ -456,10 +455,10 @@ class modStock extends DolibarrModules
         $sql = [];
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'stock' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "','stock'," . ((int) $conf->entity) . ")",
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[2][2]) . "' AND type = 'mouvement' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[2][2]) . "','mouvement'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'stock' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "','stock'," . ((int) $this->conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[2][2]) . "' AND type = 'mouvement' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[2][2]) . "','mouvement'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

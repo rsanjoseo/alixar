@@ -38,9 +38,7 @@ class modHRM extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         $this->numero = 4000;
         $this->rights_class = 'hrm';

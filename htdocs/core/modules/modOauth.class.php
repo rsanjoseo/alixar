@@ -43,7 +43,8 @@ class modOauth extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
+
         $this->numero = 66000;
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
         // It is used to group modules in module setup page
@@ -114,7 +115,7 @@ class modOauth extends DolibarrModules
         //                        'url'=>'/oauth/index.php',
         //                        'langs'=>'oauth',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //                        'position'=>300,
-        //                        'enabled'=>'$conf->oauth->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu)',
+        //                        'enabled'=>'$this->conf->oauth->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu)',
         //                        'perms'=>'$user->rights->oauth->read',    // Use 'perms'=>'1' if you want your menu with no permission rules
         //                        'target'=>'',
         //                        'user'=>0);                     // 0=Menu for internal users, 1=external users, 2=both

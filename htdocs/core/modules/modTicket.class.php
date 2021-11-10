@@ -42,9 +42,7 @@ class modTicket extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use a free id here
@@ -118,9 +116,9 @@ class modTicket extends DolibarrModules
         ];
 
         // Dictionaries
-        if (!isset($conf->ticket->enabled)) {
-            $conf->ticket = new stdClass();
-            $conf->ticket->enabled = 0;
+        if (!isset($this->conf->ticket->enabled)) {
+            $this->conf->ticket = new stdClass();
+            $this->conf->ticket->enabled = 0;
         }
         $this->dictionaries = [
             'langs' => 'ticket',
@@ -147,12 +145,12 @@ class modTicket extends DolibarrModules
             'tabfieldvalue' => ["code,label,pos,use_default", "code,label,pos,use_default", "code,label,pos,use_default,public,fk_parent", "code,label,pos,use_default"],
             'tabfieldinsert' => ["code,label,pos,use_default", "code,label,pos,use_default", "code,label,pos,use_default,public,fk_parent", "code,label,pos,use_default"],
             'tabrowid' => ["rowid", "rowid", "rowid", "rowid"],
-            'tabcond' => [$conf->ticket->enabled, $conf->ticket->enabled, $conf->ticket->enabled, $conf->ticket->enabled && !empty($conf->global->TICKET_ENABLE_RESOLUTION)],
+            'tabcond' => [$this->conf->ticket->enabled, $this->conf->ticket->enabled, $this->conf->ticket->enabled, $this->conf->ticket->enabled && !empty($this->conf->global->TICKET_ENABLE_RESOLUTION)],
             'tabhelp' => [
-                ['code' => $langs->trans("EnterAnyCode"), 'use_default' => $langs->trans("Enter0or1")],
-                ['code' => $langs->trans("EnterAnyCode"), 'use_default' => $langs->trans("Enter0or1")],
-                ['code' => $langs->trans("EnterAnyCode"), 'use_default' => $langs->trans("Enter0or1"), 'public' => $langs->trans("Enter0or1") . '<br>' . $langs->trans("TicketGroupIsPublicDesc"), 'fk_parent' => $langs->trans("IfThisCategoryIsChildOfAnother")],
-                ['code' => $langs->trans("EnterAnyCode"), 'use_default' => $langs->trans("Enter0or1")],
+                ['code' => $this->langs->trans("EnterAnyCode"), 'use_default' => $this->langs->trans("Enter0or1")],
+                ['code' => $this->langs->trans("EnterAnyCode"), 'use_default' => $this->langs->trans("Enter0or1")],
+                ['code' => $this->langs->trans("EnterAnyCode"), 'use_default' => $this->langs->trans("Enter0or1"), 'public' => $this->langs->trans("Enter0or1") . '<br>' . $this->langs->trans("TicketGroupIsPublicDesc"), 'fk_parent' => $this->langs->trans("IfThisCategoryIsChildOfAnother")],
+                ['code' => $this->langs->trans("EnterAnyCode"), 'use_default' => $this->langs->trans("Enter0or1")],
             ],
         ];
 
@@ -221,7 +219,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/index.php',
             'langs' => 'ticket', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 88,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->read', // Use 'perms'=>'$user->rights->ticket->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2); // 0=Menu for internal users, 1=external users, 2=both
@@ -237,7 +235,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/index.php',
             'langs' => 'ticket',
             'position' => 101,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->read',
             'target' => '',
             'user' => 2,
@@ -252,7 +250,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/card.php?action=create',
             'langs' => 'ticket',
             'position' => 102,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->write',
             'target' => '',
             'user' => 2,
@@ -268,7 +266,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/list.php?search_fk_status=non_closed',
             'langs' => 'ticket',
             'position' => 103,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->read',
             'target' => '',
             'user' => 2,
@@ -284,7 +282,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/list.php?mode=mine&search_fk_status=non_closed',
             'langs' => 'ticket',
             'position' => 105,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->read',
             'target' => '',
             'user' => 0,
@@ -299,7 +297,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Tickets/stats/index.php',
             'langs' => 'ticket',
             'position' => 107,
-            'enabled' => '$conf->ticket->enabled',
+            'enabled' => '$this->conf->ticket->enabled',
             'perms' => '$user->rights->ticket->read',
             'target' => '',
             'user' => 0,
@@ -314,7 +312,7 @@ class modTicket extends DolibarrModules
             'url' => '/Modules/Categories/index.php?type=12',
             'langs' => 'ticket',
             'position' => 107,
-            'enabled' => '$conf->categorie->enabled',
+            'enabled' => '$this->conf->categorie->enabled',
             'perms' => '$user->rights->ticket->read',
             'target' => '',
             'user' => 0,
@@ -348,8 +346,8 @@ class modTicket extends DolibarrModules
             dol_mkdir($dirodt);
             $result = dol_copy($src, $dest, 0, 0);
             if ($result < 0) {
-                $langs->load("errors");
-                $this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
+                $this->langs->load("errors");
+                $this->error = $this->langs->trans('ErrorFailToCopyFile', $src, $dest);
                 return 0;
             }
         }
@@ -359,8 +357,8 @@ class modTicket extends DolibarrModules
             ["sql" => "insert into llx_c_type_contact(rowid, element, source, code, libelle, active ) values (110121, 'ticket',  'internal', 'CONTRIBUTOR', 'Intervenant', 1);", "ignoreerror" => 1],
             ["sql" => "insert into llx_c_type_contact(rowid, element, source, code, libelle, active ) values (110122, 'ticket',  'external', 'SUPPORTCLI', 'Contact client suivi incident', 1);", "ignoreerror" => 1],
             ["sql" => "insert into llx_c_type_contact(rowid, element, source, code, libelle, active ) values (110123, 'ticket',  'external', 'CONTRIBUTOR', 'Intervenant', 1);", "ignoreerror" => 1],
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'TICKET_ADDON_PDF_ODT_PATH' AND type = 'ticket' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('TICKET_ADDON_PDF_ODT_PATH','ticket'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'TICKET_ADDON_PDF_ODT_PATH' AND type = 'ticket' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('TICKET_ADDON_PDF_ODT_PATH','ticket'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

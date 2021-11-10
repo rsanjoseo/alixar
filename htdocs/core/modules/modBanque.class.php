@@ -45,9 +45,8 @@ class modBanque extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 85;
 
         $this->family = "financial";
@@ -162,7 +161,7 @@ class modBanque extends DolibarrModules
             "s.nom" => "company", "s.code_compta" => "company", "s.code_compta_fournisseur" => "company",
         ];
         $this->export_special_array[$r] = ['-b.amount' => 'NULLIFNEG', 'b.amount' => 'NULLIFNEG'];
-        if ((empty($conf->fournisseur->enabled) && !empty($conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || empty($conf->supplier_order->enabled) || empty($conf->supplier_invoice->enabled)) {
+        if ((empty($this->conf->fournisseur->enabled) && !empty($this->conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || empty($this->conf->supplier_order->enabled) || empty($this->conf->supplier_invoice->enabled)) {
             unset($this->export_fields_array[$r]['s.code_compta_fournisseur']);
             unset($this->export_entities_array[$r]['s.code_compta_fournisseur']);
         }

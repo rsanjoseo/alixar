@@ -43,9 +43,8 @@ class modAccounting extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 50400;
 
         $this->family = "financial";

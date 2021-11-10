@@ -40,7 +40,7 @@ class modPayBox extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).

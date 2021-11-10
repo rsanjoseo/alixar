@@ -41,9 +41,7 @@ class modIncoterm extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -81,9 +79,9 @@ class modIncoterm extends DolibarrModules
         $this->tabs = [];
 
         // Dictionaries
-        if (!isset($conf->incoterm->enabled)) {
-            $conf->incoterm = new stdClass();
-            $conf->incoterm->enabled = 0;
+        if (!isset($this->conf->incoterm->enabled)) {
+            $this->conf->incoterm = new stdClass();
+            $this->conf->incoterm->enabled = 0;
         }
         $this->dictionaries = [
             'langs' => 'incoterm',
@@ -95,7 +93,7 @@ class modIncoterm extends DolibarrModules
             'tabfieldvalue' => ["code,libelle"], // List of fields (list of fields to edit a record)
             'tabfieldinsert' => ["code,libelle"], // List of fields (list of fields for insert)
             'tabrowid' => ["rowid"], // Name of columns with primary key (try to always name it 'rowid')
-            'tabcond' => [$conf->incoterm->enabled],
+            'tabcond' => [$this->conf->incoterm->enabled],
         ];
 
         $this->boxes = []; // List of boxes

@@ -41,9 +41,8 @@ class modLoan extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 520;
 
         $this->family = "financial";

@@ -41,9 +41,8 @@ class modZapier extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
         $this->numero = 50330;
@@ -153,9 +152,9 @@ class modZapier extends DolibarrModules
             'en_US:ParentCompany'=>'Parent company or reseller',
             'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
         )*/
-        if (!isset($conf->zapier) || !isset($conf->zapier->enabled)) {
-            $conf->zapier = new stdClass();
-            $conf->zapier->enabled = 0;
+        if (!isset($this->conf->zapier) || !isset($this->conf->zapier->enabled)) {
+            $this->conf->zapier = new stdClass();
+            $this->conf->zapier->enabled = 0;
         }
         // Array to add new pages in new tabs
         $this->tabs = [];
@@ -206,7 +205,7 @@ class modZapier extends DolibarrModules
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid'=>array("rowid","rowid","rowid"),
             // Condition to show each dictionary
-            'tabcond'=>array($conf->zapier->enabled,$conf->zapier->enabled,$conf->zapier->enabled)
+            'tabcond'=>array($this->conf->zapier->enabled,$this->conf->zapier->enabled,$this->conf->zapier->enabled)
         );
         */
         // Boxes/Widgets
@@ -234,13 +233,13 @@ class modZapier extends DolibarrModules
             //      'frequency' => 2,
             //      'unitfrequency' => 3600,
             //      'status' => 0,
-            //      'test' => '$conf->zapier->enabled',
+            //      'test' => '$this->conf->zapier->enabled',
             //      'priority' => 50,
             //  ),
         ];
         // Example: $this->cronjobs=array(
-        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$conf->zapier->enabled', 'priority'=>50),
-        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$conf->zapier->enabled', 'priority'=>50)
+        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$this->conf->zapier->enabled', 'priority'=>50),
+        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$this->conf->zapier->enabled', 'priority'=>50)
         // );
         // Permissions
         // Permission array used by this module
@@ -294,11 +293,11 @@ class modZapier extends DolibarrModules
         // Create extrafields
         //include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
         //$extrafields = new ExtraFields($this->db);
-        //$result1=$extrafields->addExtraField('myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$conf->zapier->enabled');
-        //$result2=$extrafields->addExtraField('myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$conf->zapier->enabled');
-        //$result3=$extrafields->addExtraField('myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$conf->zapier->enabled');
-        //$result4=$extrafields->addExtraField('myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'zapier@zapier', '$conf->zapier->enabled');
-        //$result5=$extrafields->addExtraField('myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$conf->zapier->enabled');
+        //$result1=$extrafields->addExtraField('myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$this->conf->zapier->enabled');
+        //$result2=$extrafields->addExtraField('myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$this->conf->zapier->enabled');
+        //$result3=$extrafields->addExtraField('myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$this->conf->zapier->enabled');
+        //$result4=$extrafields->addExtraField('myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'zapier@zapier', '$this->conf->zapier->enabled');
+        //$result5=$extrafields->addExtraField('myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'zapier@zapier', '$this->conf->zapier->enabled');
         $sql = [];
         return $this->_init($sql, $options);
     }

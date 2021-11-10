@@ -87,7 +87,8 @@ function dolGetModulesDirs($subdir = '')
     foreach ($conf->file->dol_document_root as $type => $dirroot) {
         // Default core/modules dir
         if ($type === 'main') {
-            $modulesdir[$dirroot . '/Modules' . $subdir . '/'] = $dirroot . '/Modules' . $subdir . '/';
+            // $modulesdir[$dirroot . '/Modules' . $subdir . '/'] = $dirroot . '/Modules' . $subdir . '/';
+            $modulesdir[$dirroot . '/core/modules' . $subdir . '/'] = $dirroot . '/core/modules' . $subdir . '/';
         }
 
         // Scan dir from external modules

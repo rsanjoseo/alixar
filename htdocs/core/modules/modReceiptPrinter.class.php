@@ -43,7 +43,8 @@ class modReceiptPrinter extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
+
         $this->numero = 67000;
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
         // It is used to group modules in module setup page
@@ -114,7 +115,7 @@ class modReceiptPrinter extends DolibarrModules
         //                        'url'=>'/printing/index.php',
         //                        'langs'=>'printing',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //                        'position'=>300,
-        //                        'enabled'=>'$conf->printing->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu)',
+        //                        'enabled'=>'$this->conf->printing->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu)',
         //                        'perms'=>'$user->rights->printing->read',    // Use 'perms'=>'1' if you want your menu with no permission rules
         //                        'target'=>'',
         //                        'user'=>0);                     // 0=Menu for internal users, 1=external users, 2=both

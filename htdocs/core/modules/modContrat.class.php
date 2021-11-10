@@ -42,9 +42,8 @@ class modContrat extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $langs;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 54;
 
         $this->family = "crm";
@@ -153,7 +152,7 @@ class modContrat extends DolibarrModules
 
         // Exports
         //--------
-        $langs->load("contracts");
+        $this->langs->load("contracts");
 
         $r = 1;
 
@@ -243,15 +242,15 @@ class modContrat extends DolibarrModules
             dol_mkdir($dirodt);
             $result = dol_copy($src, $dest, 0, 0);
             if ($result < 0) {
-                $langs->load("errors");
-                $this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
+                $this->langs->load("errors");
+                $this->error = $this->langs->trans('ErrorFailToCopyFile', $src, $dest);
                 return 0;
             }
         }
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'contract' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "', 'contract', " . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'contract' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "', 'contract', " . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

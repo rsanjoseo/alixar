@@ -44,8 +44,7 @@ class modWorkstation extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -148,9 +147,9 @@ class modWorkstation extends DolibarrModules
             'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
         )*/
 
-        if (!isset($conf->workstation) || !isset($conf->workstation->enabled)) {
-            $conf->workstation = new stdClass();
-            $conf->workstation->enabled = 0;
+        if (!isset($this->conf->workstation) || !isset($this->conf->workstation->enabled)) {
+            $this->conf->workstation = new stdClass();
+            $this->conf->workstation->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -203,7 +202,7 @@ class modWorkstation extends DolibarrModules
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid'=>array("rowid", "rowid", "rowid"),
             // Condition to show each dictionary
-            'tabcond'=>array($conf->workstation->enabled, $conf->workstation->enabled, $conf->workstation->enabled)
+            'tabcond'=>array($this->conf->workstation->enabled, $this->conf->workstation->enabled, $this->conf->workstation->enabled)
         );
         */
 
@@ -232,13 +231,13 @@ class modWorkstation extends DolibarrModules
             //      'frequency' => 2,
             //      'unitfrequency' => 3600,
             //      'status' => 0,
-            //      'test' => '$conf->workstation->enabled',
+            //      'test' => '$this->conf->workstation->enabled',
             //      'priority' => 50,
             //  ),
         ];
         // Example: $this->cronjobs=array(
-        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$conf->workstation->enabled', 'priority'=>50),
-        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$conf->workstation->enabled', 'priority'=>50)
+        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$this->conf->workstation->enabled', 'priority'=>50),
+        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$this->conf->workstation->enabled', 'priority'=>50)
         // );
 
         // Permissions provided by this module
@@ -280,8 +279,8 @@ class modWorkstation extends DolibarrModules
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs' => 'mrp',
             'position' => 1100 + $r,
-            // Define condition to show or hide menu entry. Use '$conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'enabled' => '$conf->workstation->enabled',
+            // Define condition to show or hide menu entry. Use '$this->conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->workstation->enabled',
             // Use 'perms'=>'$user->rights->workstation->level1->level2' if you want your menu with a permission rules
             'perms' => '$user->rights->workstation->workstation->read',
             'target' => '',
@@ -300,8 +299,8 @@ class modWorkstation extends DolibarrModules
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs' => 'mrp',
             'position' => 1100 + $r,
-            // Define condition to show or hide menu entry. Use '$conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'enabled' => '$conf->workstation->enabled',
+            // Define condition to show or hide menu entry. Use '$this->conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->workstation->enabled',
             // Use 'perms'=>'$user->rights->workstation->level1->level2' if you want your menu with a permission rules
             'perms' => '$user->rights->workstation->workstation->write',
             'target' => '',
@@ -320,8 +319,8 @@ class modWorkstation extends DolibarrModules
             // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'langs' => 'mrp',
             'position' => 1101 + $r,
-            // Define condition to show or hide menu entry. Use '$conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-            'enabled' => '$conf->workstation->enabled',
+            // Define condition to show or hide menu entry. Use '$this->conf->workstation->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->workstation->enabled',
             // Use 'perms'=>'$user->rights->workstation->level1->level2' if you want your menu with a permission rules
             'perms' => '$user->rights->workstation->workstation->read',
             'target' => '',
@@ -403,11 +402,11 @@ class modWorkstation extends DolibarrModules
         // Create extrafields during init
         //include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
         //$extrafields = new ExtraFields($this->db);
-        //$result1=$extrafields->addExtraField('workstation_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$conf->workstation->enabled');
-        //$result2=$extrafields->addExtraField('workstation_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$conf->workstation->enabled');
-        //$result3=$extrafields->addExtraField('workstation_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$conf->workstation->enabled');
-        //$result4=$extrafields->addExtraField('workstation_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'workstation@workstation', '$conf->workstation->enabled');
-        //$result5=$extrafields->addExtraField('workstation_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$conf->workstation->enabled');
+        //$result1=$extrafields->addExtraField('workstation_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$this->conf->workstation->enabled');
+        //$result2=$extrafields->addExtraField('workstation_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$this->conf->workstation->enabled');
+        //$result3=$extrafields->addExtraField('workstation_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$this->conf->workstation->enabled');
+        //$result4=$extrafields->addExtraField('workstation_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'workstation@workstation', '$this->conf->workstation->enabled');
+        //$result5=$extrafields->addExtraField('workstation_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'workstation@workstation', '$this->conf->workstation->enabled');
 
         // Permissions
         $this->remove($options);
@@ -440,10 +439,10 @@ class modWorkstation extends DolibarrModules
                 }
 
                 $sql = array_merge($sql, [
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . $this->db->escape(strtolower($myTmpObjectKey)) . "'," . ((int) $conf->entity) . ")",
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . $this->db->escape(strtolower($myTmpObjectKey)) . "', " . ((int) $conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . $this->db->escape(strtolower($myTmpObjectKey)) . "'," . ((int) $this->conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . $this->db->escape(strtolower($myTmpObjectKey)) . "', " . ((int) $this->conf->entity) . ")",
                 ]);
             }
         }

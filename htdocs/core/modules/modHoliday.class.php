@@ -47,9 +47,7 @@ class modHoliday extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user; // Required by some include code
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -153,7 +151,7 @@ class modHoliday extends DolibarrModules
                 'unitfrequency' => 3600 * 24,
                 'priority' => 50,
                 'status' => 1,
-                'test' => '$conf->holiday->enabled',
+                'test' => '$this->conf->holiday->enabled',
                 'datestart' => $datestart,
             ],
         ];
@@ -338,8 +336,8 @@ class modHoliday extends DolibarrModules
         */
 
         $sql = [
-            //	"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = '".$this->db->escape($this->const[0][2])."' AND type = 'holiday' AND entity = ".((int) $conf->entity),
-            //	"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('".$this->db->escape($this->const[0][2])."','holiday',".((int) $conf->entity).")"
+            //	"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = '".$this->db->escape($this->const[0][2])."' AND type = 'holiday' AND entity = ".((int) $this->conf->entity),
+            //	"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('".$this->db->escape($this->const[0][2])."','holiday',".((int) $this->conf->entity).")"
         ];
 
         return $this->_init($sql, $options);

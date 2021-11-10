@@ -41,9 +41,7 @@ class modAsset extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -106,9 +104,9 @@ class modAsset extends DolibarrModules
         // );
         $this->const = [];
 
-        if (!isset($conf->asset) || !isset($conf->asset->enabled)) {
-            $conf->asset = new stdClass();
-            $conf->asset->enabled = 0;
+        if (!isset($this->conf->asset) || !isset($this->conf->asset->enabled)) {
+            $this->conf->asset = new stdClass();
+            $this->conf->asset->enabled = 0;
         }
 
         // Array to add new pages in new tabs

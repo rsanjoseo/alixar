@@ -42,9 +42,7 @@ class modMultiCurrency extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -128,13 +126,13 @@ class modMultiCurrency extends DolibarrModules
         $this->tabs = [];
 
         // Dictionaries
-        if (!isset($conf->multicurrency->enabled)) {
-            $conf->multicurrency = new stdClass();
-            $conf->multicurrency->enabled = 0;
+        if (!isset($this->conf->multicurrency->enabled)) {
+            $this->conf->multicurrency = new stdClass();
+            $this->conf->multicurrency->enabled = 0;
         }
         $this->dictionaries = [];
         /* Example:
-        if (! isset($conf->multicurrency->enabled)) $conf->multicurrency->enabled=0;	// This is to avoid warnings
+        if (! isset($this->conf->multicurrency->enabled)) $this->conf->multicurrency->enabled=0;	// This is to avoid warnings
         $this->dictionaries=array(
             'langs'=>'mylangfile@multicurrency',
             'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
@@ -146,7 +144,7 @@ class modMultiCurrency extends DolibarrModules
             'tabfieldvalue'=>array("code,label","code,label","code,label"),																				// List of fields (list of fields to edit a record)
             'tabfieldinsert'=>array("code,label","code,label","code,label"),																			// List of fields (list of fields for insert)
             'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
-            'tabcond'=>array($conf->multicurrency->enabled,$conf->multicurrency->enabled,$conf->multicurrency->enabled)												// Condition to show each dictionary
+            'tabcond'=>array($this->conf->multicurrency->enabled,$this->conf->multicurrency->enabled,$this->conf->multicurrency->enabled)												// Condition to show each dictionary
         );
         */
 
@@ -188,7 +186,7 @@ class modMultiCurrency extends DolibarrModules
         //							'url'=>'/multicurrency/pagetop.php',
         //							'langs'=>'mylangfile@multicurrency',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //							'position'=>100,
-        //							'enabled'=>'$conf->multicurrency->enabled',	// Define condition to show or hide menu entry. Use '$conf->multicurrency->enabled' if entry must be visible if module is enabled.
+        //							'enabled'=>'$this->conf->multicurrency->enabled',	// Define condition to show or hide menu entry. Use '$this->conf->multicurrency->enabled' if entry must be visible if module is enabled.
         //							'perms'=>'1',			                // Use 'perms'=>'$user->rights->multicurrency->level1->level2' if you want your menu with a permission rules
         //							'target'=>'',
         //							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
@@ -203,7 +201,7 @@ class modMultiCurrency extends DolibarrModules
         //							'url'=>'/multicurrency/pagelevel2.php',
         //							'langs'=>'mylangfile@multicurrency',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //							'position'=>100,
-        //							'enabled'=>'$conf->multicurrency->enabled',  // Define condition to show or hide menu entry. Use '$conf->multicurrency->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+        //							'enabled'=>'$this->conf->multicurrency->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->multicurrency->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
         //							'perms'=>'1',			                // Use 'perms'=>'$user->rights->multicurrency->level1->level2' if you want your menu with a permission rules
         //							'target'=>'',
         //							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
@@ -287,12 +285,12 @@ class modMultiCurrency extends DolibarrModules
     {
         global $conf, $user, $langs;
 
-        if (!MultiCurrency::checkCodeAlreadyExists($conf->currency)) {
+        if (!MultiCurrency::checkCodeAlreadyExists($this->conf->currency)) {
             $langs->loadCacheCurrencies('');
 
             $multicurrency = new MultiCurrency($this->db);
-            $multicurrency->code = $conf->currency;
-            $multicurrency->name = $langs->cache_currencies[$conf->currency]['label'] . ' (' . $langs->getCurrencySymbol($conf->currency) . ')';
+            $multicurrency->code = $this->conf->currency;
+            $multicurrency->name = $langs->cache_currencies[$this->conf->currency]['label'] . ' (' . $langs->getCurrencySymbol($this->conf->currency) . ')';
             $r = $multicurrency->create($user);
 
             if ($r > 0) {

@@ -44,8 +44,7 @@ class modMrp extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -58,7 +57,7 @@ class modMrp extends DolibarrModules
         // Module position in the family on 2 digits ('01', '10', '20', ...)
         $this->module_position = '66';
         // Gives the possibility for the module, to provide his own family info and position of this family (Overwrite $this->family and $this->module_position. Avoid this)
-        //$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $langs->trans("MyOwnFamily")));
+        //$this->familyinfo = array('myownfamily' => array('position' => '01', 'label' => $this->langs->trans("MyOwnFamily")));
         // Module label (no space allowed), used if translation string 'ModuleMrpName' not found (Mrp is name of module).
         $this->name = preg_replace('/^mod/i', '', get_class($this));
         // Module description, used if translation string 'ModuleMrpDesc' not found (Mrp is name of module).
@@ -150,9 +149,9 @@ class modMrp extends DolibarrModules
             'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
         )*/
 
-        if (!isset($conf->mrp) || !isset($conf->mrp->enabled)) {
-            $conf->mrp = new stdClass();
-            $conf->mrp->enabled = 0;
+        if (!isset($this->conf->mrp) || !isset($this->conf->mrp->enabled)) {
+            $this->conf->mrp = new stdClass();
+            $this->conf->mrp->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -205,7 +204,7 @@ class modMrp extends DolibarrModules
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid'=>array("rowid","rowid","rowid"),
             // Condition to show each dictionary
-            'tabcond'=>array($conf->mrp->enabled,$conf->mrp->enabled,$conf->mrp->enabled)
+            'tabcond'=>array($this->conf->mrp->enabled,$this->conf->mrp->enabled,$this->conf->mrp->enabled)
         );
         */
 
@@ -229,13 +228,13 @@ class modMrp extends DolibarrModules
             //      'frequency' => 2,
             //      'unitfrequency' => 3600,
             //      'status' => 0,
-            //      'test' => '$conf->mrp->enabled',
+            //      'test' => '$this->conf->mrp->enabled',
             //      'priority' => 50,
             //  ),
         ];
         // Example: $this->cronjobs=array(
-        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$conf->mrp->enabled', 'priority'=>50),
-        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$conf->mrp->enabled', 'priority'=>50)
+        //    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$this->conf->mrp->enabled', 'priority'=>50),
+        //    1=>array('label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24, 'status'=>0, 'test'=>'$this->conf->mrp->enabled', 'priority'=>50)
         // );
 
         // Permissions provided by this module
@@ -267,7 +266,7 @@ class modMrp extends DolibarrModules
         /* BEGIN MODULEBUILDER TOPMENU */
         /* END MODULEBUILDER LEFTMENU MO */
 
-        $langs->loadLangs(["mrp", "stocks"]);
+        $this->langs->loadLangs(["mrp", "stocks"]);
 
         // Exports profiles provided by this module
         $r = 1;
@@ -336,7 +335,7 @@ class modMrp extends DolibarrModules
 
         // Imports profiles provided by this module
         $r = 0;
-        $langs->load("mrp");
+        $this->langs->load("mrp");
         /* BEGIN MODULEBUILDER IMPORT MO */
         /*
          $this->export_code[$r]=$this->rights_class.'_'.$r;
@@ -386,7 +385,7 @@ class modMrp extends DolibarrModules
 
         // Add extra fields
         $import_extrafield_sample = [];
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'mrp_mo' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'mrp_mo' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
 
         if ($resql) {
@@ -459,11 +458,11 @@ class modMrp extends DolibarrModules
         // Create extrafields during init
         //include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
         //$extrafields = new ExtraFields($this->db);
-        //$result1=$extrafields->addExtraField('myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$conf->mrp->enabled');
-        //$result2=$extrafields->addExtraField('myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$conf->mrp->enabled');
-        //$result3=$extrafields->addExtraField('myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$conf->mrp->enabled');
-        //$result4=$extrafields->addExtraField('myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'mrp', '$conf->mrp->enabled');
-        //$result5=$extrafields->addExtraField('myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$conf->mrp->enabled');
+        //$result1=$extrafields->addExtraField('myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$this->conf->mrp->enabled');
+        //$result2=$extrafields->addExtraField('myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$this->conf->mrp->enabled');
+        //$result3=$extrafields->addExtraField('myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$this->conf->mrp->enabled');
+        //$result4=$extrafields->addExtraField('myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'mrp', '$this->conf->mrp->enabled');
+        //$result5=$extrafields->addExtraField('myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'mrp', '$this->conf->mrp->enabled');
 
         // Permissions
         $this->remove($options);
@@ -480,15 +479,15 @@ class modMrp extends DolibarrModules
             dol_mkdir($dirodt);
             $result = dol_copy($src, $dest, 0, 0);
             if ($result < 0) {
-                $langs->load("errors");
-                $this->error = $langs->trans('ErrorFailToCopyFile', $src, $dest);
+                $this->langs->load("errors");
+                $this->error = $this->langs->trans('ErrorFailToCopyFile', $src, $dest);
                 return 0;
             }
         }
 
         $sql = [
-            //"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = '".$this->db->escape('standard')."' AND type = 'mo' AND entity = ".((int) $conf->entity),
-            //"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('".$this->db->escape('standard')."', 'mo', ".((int) $conf->entity).")"
+            //"DELETE FROM ".MAIN_DB_PREFIX."document_model WHERE nom = '".$this->db->escape('standard')."' AND type = 'mo' AND entity = ".((int) $this->conf->entity),
+            //"INSERT INTO ".MAIN_DB_PREFIX."document_model (nom, type, entity) VALUES('".$this->db->escape('standard')."', 'mo', ".((int) $this->conf->entity).")"
         ];
 
         return $this->_init($sql, $options);

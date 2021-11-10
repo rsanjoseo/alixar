@@ -44,8 +44,7 @@ class modEventOrganization extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-        $this->db = $db;
+        parent::__construct();
 
         $this->numero = 2450;
 
@@ -148,9 +147,9 @@ class modEventOrganization extends DolibarrModules
             'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
         )*/
 
-        if (!isset($conf->eventorganization) || !isset($conf->eventorganization->enabled)) {
-            $conf->eventorganization = new stdClass();
-            $conf->eventorganization->enabled = 0;
+        if (!isset($this->conf->eventorganization) || !isset($this->conf->eventorganization->enabled)) {
+            $this->conf->eventorganization = new stdClass();
+            $this->conf->eventorganization->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -203,7 +202,7 @@ class modEventOrganization extends DolibarrModules
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid'=>array("rowid", "rowid", "rowid"),
             // Condition to show each dictionary
-            'tabcond'=>array($conf->eventorganization->enabled, $conf->eventorganization->enabled, $conf->eventorganization->enabled)
+            'tabcond'=>array($this->conf->eventorganization->enabled, $this->conf->eventorganization->enabled, $this->conf->eventorganization->enabled)
         );
         */
 
@@ -260,7 +259,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '',
             'langs' => 'eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->read',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -272,7 +271,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '/Modules/Projects/list.php?search_usage_event_organization=1&search_status=99&mainmenu=project&contextpage=organizedevents',
             'langs' => 'eventorganization@eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->read',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -284,7 +283,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '/Modules/Projects/card.php?leftmenu=projects&action=create&usage_organize_event=1',
             'langs' => 'eventorganization@eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->write',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -299,7 +298,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '',
             'langs' => 'eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->read',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -311,7 +310,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '/Modules/Eventorganization/conferenceorbooth_list.php?mainmenu=project',
             'langs' => 'eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->read',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -323,7 +322,7 @@ class modEventOrganization extends DolibarrModules
             'url' => '/Modules/Eventorganization/conferenceorbooth_card.php?leftmenu=projects&action=create',
             'langs' => 'eventorganization',            // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->eventorganization->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->eventorganization->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->eventorganization->write',                            // Use 'perms'=>'$user->rights->eventorganization->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2,                                // 0=Menu for internal users, 1=external users, 2=both
@@ -389,10 +388,10 @@ class modEventOrganization extends DolibarrModules
                 }
 
                 $sql = array_merge($sql, [
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . $this->db->escape(strtolower($myTmpObjectKey)) . "'," . ((int) $conf->entity) . ")",
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . $this->db->escape(strtolower($myTmpObjectKey)) . "', " . ((int) $conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . $this->db->escape(strtolower($myTmpObjectKey)) . "'," . ((int) $this->conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . $this->db->escape(strtolower($myTmpObjectKey)) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . $this->db->escape(strtolower($myTmpObjectKey)) . "', " . ((int) $this->conf->entity) . ")",
                 ]);
             }
         }

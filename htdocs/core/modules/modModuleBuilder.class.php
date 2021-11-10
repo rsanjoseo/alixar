@@ -40,9 +40,8 @@ class modModuleBuilder extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 3300;
 
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
@@ -113,7 +112,7 @@ class modModuleBuilder extends DolibarrModules
             'langs' => 'modulebuilder',
             'position' => 100,
             'perms' => '1',
-            'enabled' => '$conf->modulebuilder->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu) && ($user->admin || $conf->global->MODULEBUILDER_FOREVERYONE)',
+            'enabled' => '$this->conf->modulebuilder->enabled && preg_match(\'/^(admintools|all)/\',$leftmenu) && ($user->admin || $this->conf->global->MODULEBUILDER_FOREVERYONE)',
             'target' => '_modulebuilder',
             'user' => 0,
         ];

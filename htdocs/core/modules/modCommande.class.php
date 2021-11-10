@@ -48,9 +48,8 @@ class modCommande extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 25;
 
         $this->family = "crm";
@@ -203,7 +202,7 @@ class modCommande extends DolibarrModules
             'cd.tva_tx' => "LineVATRate", 'cd.qty' => "LineQty", 'cd.total_ht' => "LineTotalHT", 'cd.total_tva' => "LineTotalVAT", 'cd.total_ttc' => "LineTotalTTC",
             'p.rowid' => 'ProductId', 'p.ref' => 'ProductRef', 'p.label' => 'ProductLabel',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['c.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['c.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['c.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -312,7 +311,7 @@ class modCommande extends DolibarrModules
             'c.model_pdf' => 'Model',
         ];
 
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['c.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['c.multicurrency_tx'] = 'CurrencyRate';
             $this->import_fields_array[$r]['c.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -322,7 +321,7 @@ class modCommande extends DolibarrModules
 
         // Add extra fields
         $import_extrafield_sample = [];
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
 
         if ($resql) {
@@ -394,7 +393,7 @@ class modCommande extends DolibarrModules
             'cd.rang' => 'LinePosition',
         ];
 
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['cd.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['cd.multicurrency_subprice'] = 'CurrencyRate';
             $this->import_fields_array[$r]['cd.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -403,7 +402,7 @@ class modCommande extends DolibarrModules
         }
 
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commandedet' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commandedet' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -465,8 +464,8 @@ class modCommande extends DolibarrModules
         }
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'order' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "', 'order', " . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'order' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "', 'order', " . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

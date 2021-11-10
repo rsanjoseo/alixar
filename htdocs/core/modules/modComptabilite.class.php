@@ -42,9 +42,8 @@ class modComptabilite extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 10;
 
         $this->family = "financial";

@@ -41,9 +41,8 @@ class modCollab extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 30000;
 
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
@@ -69,7 +68,7 @@ class modCollab extends DolibarrModules
 
         // Dependancies
         //-------------
-        $this->hidden = !empty($conf->global->MODULE_COLLAB_DISABLED); // A condition to disable module
+        $this->hidden = !empty($this->conf->global->MODULE_COLLAB_DISABLED); // A condition to disable module
         $this->depends = []; // List of modules id that must be enabled if this module is enabled
         $this->requiredby = []; // List of modules id to disable if this one is disabled
         $this->conflictwith = []; // List of modules id this module is in conflict with
@@ -121,7 +120,7 @@ class modCollab extends DolibarrModules
             'url' => '/collab/index.php',
             'langs' => 'collab', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 100,
-            'enabled' => '$conf->collab->enabled', // Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->collab->enabled', // Define condition to show or hide menu entry. Use '$this->conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '1', // Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2                                // 0=Menu for internal users, 1=external users, 2=both

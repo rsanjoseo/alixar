@@ -39,9 +39,7 @@ class modApi extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -119,9 +117,9 @@ class modApi extends DolibarrModules
         $this->tabs = [];
 
         // Dictionaries
-        if (!isset($conf->api->enabled)) {
-            $conf->api = new stdClass();
-            $conf->api->enabled = 0;
+        if (!isset($this->conf->api->enabled)) {
+            $this->conf->api = new stdClass();
+            $this->conf->api->enabled = 0;
         }
         $this->dictionaries = [];
 
@@ -161,7 +159,7 @@ class modApi extends DolibarrModules
         //							'url'=>'/api/pagetop.php',
         //							'langs'=>'mylangfile@api',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //							'position'=>100,
-        //							'enabled'=>'$conf->api->enabled',	// Define condition to show or hide menu entry. Use '$conf->api->enabled' if entry must be visible if module is enabled.
+        //							'enabled'=>'$this->conf->api->enabled',	// Define condition to show or hide menu entry. Use '$this->conf->api->enabled' if entry must be visible if module is enabled.
         //							'perms'=>'1',			                // Use 'perms'=>'$user->rights->api->level1->level2' if you want your menu with a permission rules
         //							'target'=>'',
         //							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
@@ -176,7 +174,7 @@ class modApi extends DolibarrModules
         //							'url'=>'/api/pagelevel2.php',
         //							'langs'=>'mylangfile@api',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //							'position'=>100,
-        //							'enabled'=>'$conf->api->enabled',  // Define condition to show or hide menu entry. Use '$conf->api->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+        //							'enabled'=>'$this->conf->api->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->api->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
         //							'perms'=>'1',			                // Use 'perms'=>'$user->rights->api->level1->level2' if you want your menu with a permission rules
         //							'target'=>'',
         //							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both

@@ -41,11 +41,10 @@ class modUser extends DolibarrModules
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 0;
 
         $this->family = "hr"; // Family for module (or "base" if core module)
@@ -264,7 +263,7 @@ class modUser extends DolibarrModules
         $keyforelement = 'user';
         $keyforaliasextra = 'extra';
         include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
-        if (empty($conf->adherent->enabled)) {
+        if (empty($this->conf->adherent->enabled)) {
             unset($this->export_fields_array[$r]['u.fk_member']);
             unset($this->export_entities_array[$r]['u.fk_member']);
         }
@@ -299,7 +298,7 @@ class modUser extends DolibarrModules
             'u.statut' => 'Status',
         ];
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'user' AND entity IN (0," . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'user' AND entity IN (0," . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {    // This can fail when class is used on old database (during migration for example)
             while ($obj = $this->db->fetch_object($resql)) {

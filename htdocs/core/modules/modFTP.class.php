@@ -41,7 +41,7 @@ class modFTP extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id.
@@ -119,7 +119,7 @@ class modFTP extends DolibarrModules
             'url' => '/ftp/index.php',
             'langs' => 'ftp',
             'position' => 100,
-            'enabled' => '$conf->ftp->enabled',
+            'enabled' => '$this->conf->ftp->enabled',
             'perms' => '$user->rights->ftp->read || $user->rights->ftp->write || $user->rights->ftp->setup',
             'target' => '',
             'user' => 2,

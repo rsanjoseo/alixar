@@ -42,9 +42,7 @@ class modTakePos extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -121,9 +119,9 @@ class modTakePos extends DolibarrModules
             //1=>array('TAKEPOS_MYCONSTANT', 'chaine', 'avalue', 'This is a constant to add', 1, 'allentities', 1)
         ];
 
-        if (!isset($conf->takepos) || !isset($conf->takepos->enabled)) {
-            $conf->takepos = new stdClass();
-            $conf->takepos->enabled = 0;
+        if (!isset($this->conf->takepos) || !isset($this->conf->takepos->enabled)) {
+            $this->conf->takepos = new stdClass();
+            $this->conf->takepos->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -167,7 +165,7 @@ class modTakePos extends DolibarrModules
             'tabfieldvalue'=>array("code,label","code,label","code,label"),																				// List of fields (list of fields to edit a record)
             'tabfieldinsert'=>array("code,label","code,label","code,label"),																			// List of fields (list of fields for insert)
             'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
-            'tabcond'=>array($conf->takepos->enabled,$conf->takepos->enabled,$conf->takepos->enabled)												// Condition to show each dictionary
+            'tabcond'=>array($this->conf->takepos->enabled,$this->conf->takepos->enabled,$this->conf->takepos->enabled)												// Condition to show each dictionary
         );
         */
 
@@ -231,7 +229,7 @@ class modTakePos extends DolibarrModules
             'url' => '/takepos/index.php',
             'langs' => 'cashdesk', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1000 + $r,
-            'enabled' => '$conf->takepos->enabled', // Define condition to show or hide menu entry. Use '$conf->takepos->enabled' if entry must be visible if module is enabled.
+            'enabled' => '$this->conf->takepos->enabled', // Define condition to show or hide menu entry. Use '$this->conf->takepos->enabled' if entry must be visible if module is enabled.
             'perms' => '$user->rights->takepos->run', // Use 'perms'=>'$user->rights->takepos->level1->level2' if you want your menu with a permission rules
             'target' => 'takepos',
             'user' => 2,
@@ -247,7 +245,7 @@ class modTakePos extends DolibarrModules
                                 'url'=>'/takepos/myobject_list.php',
                                 'langs'=>'cashdesk',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
                                 'position'=>1000+$r,
-                                'enabled'=>'$conf->takepos->enabled',  // Define condition to show or hide menu entry. Use '$conf->takepos->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+                                'enabled'=>'$this->conf->takepos->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->takepos->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
                                 'perms'=>'1',			                // Use 'perms'=>'$user->rights->takepos->level1->level2' if you want your menu with a permission rules
                                 'target'=>'',
                                 'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
@@ -259,7 +257,7 @@ class modTakePos extends DolibarrModules
                                 'url'=>'/takepos/myobject_page.php?action=create',
                                 'langs'=>'cashdesk',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
                                 'position'=>1000+$r,
-                                'enabled'=>'$conf->takepos->enabled',  // Define condition to show or hide menu entry. Use '$conf->takepos->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+                                'enabled'=>'$this->conf->takepos->enabled',  // Define condition to show or hide menu entry. Use '$this->conf->takepos->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
                                 'perms'=>'1',			                // Use 'perms'=>'$user->rights->takepos->level1->level2' if you want your menu with a permission rules
                                 'target'=>'',
                                 'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
@@ -279,7 +277,7 @@ class modTakePos extends DolibarrModules
     {
         global $conf, $db;
 
-        dolibarr_set_const($db, "TAKEPOS_PRINT_METHOD", "browser", 'chaine', 0, '', $conf->entity);
+        dolibarr_set_const($db, "TAKEPOS_PRINT_METHOD", "browser", 'chaine', 0, '', $this->conf->entity);
 
         $this->_load_tables('/takepos/sql/');
 

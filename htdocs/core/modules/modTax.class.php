@@ -46,9 +46,8 @@ class modTax extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 500;
 
         $this->family = "financial";

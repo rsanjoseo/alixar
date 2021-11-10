@@ -46,9 +46,8 @@ class modProjet extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 400;
 
         $this->family = "projects";
@@ -239,13 +238,13 @@ class modProjet extends DolibarrModules
             'p.datec' => "DateCreation", 'p.dateo' => "DateStart", 'p.datee' => "DateEnd", 'p.fk_statut' => 'ProjectStatus', 'cls.code' => 'OpportunityStatus', 'p.opp_percent' => 'OpportunityProbability', 'p.opp_amount' => 'OpportunityAmount', 'p.description' => "Description",
         ];
         // Add multicompany field
-        if (!empty($conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
+        if (!empty($this->conf->global->MULTICOMPANY_ENTITY_IN_EXPORT_IF_SHARED)) {
             $nbofallowedentities = count(explode(',', DolibarrFunctions::getEntity('project'))); // If project are shared, nb will be > 1
-            if (!empty($conf->multicompany->enabled) && $nbofallowedentities > 1) {
+            if (!empty($this->conf->multicompany->enabled) && $nbofallowedentities > 1) {
                 $this->export_fields_array[$r] += ['p.entity' => 'Entity'];
             }
         }
-        if (empty($conf->global->PROJECT_USE_OPPORTUNITIES)) {
+        if (empty($this->conf->global->PROJECT_USE_OPPORTUNITIES)) {
             unset($this->export_fields_array[$r]['p.opp_percent']);
             unset($this->export_fields_array[$r]['p.opp_amount']);
             unset($this->export_fields_array[$r]['cls.code']);
@@ -269,7 +268,7 @@ class modProjet extends DolibarrModules
         // End add extra fields
         $this->export_fields_array[$r] = array_merge($this->export_fields_array[$r], ['ptt.rowid' => 'IdTaskTime', 'ptt.task_date' => 'TaskTimeDate', 'ptt.task_duration' => "TimesSpent", 'ptt.fk_user' => "TaskTimeUser", 'ptt.note' => "TaskTimeNote"]);
         $this->export_entities_array[$r] = array_merge($this->export_entities_array[$r], ['ptt.rowid' => 'task_time', 'ptt.task_date' => 'task_time', 'ptt.task_duration' => "task_time", 'ptt.fk_user' => "task_time", 'ptt.note' => "task_time"]);
-        if (empty($conf->global->PROJECT_HIDE_TASKS)) {
+        if (empty($this->conf->global->PROJECT_HIDE_TASKS)) {
             $this->export_fields_array[$r] = array_merge($this->export_fields_array[$r], ['f.ref' => "Billed"]);
             $this->export_entities_array[$r] = array_merge($this->export_entities_array[$r], ['f.ref' => "task_time"]);
         }
@@ -281,13 +280,13 @@ class modProjet extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'projet_task_extrafields as extra2 ON pt.rowid = extra2.fk_object';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . "projet_task_time as ptt ON pt.rowid = ptt.fk_task";
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON p.fk_soc = s.rowid';
-        if (empty($conf->global->PROJECT_HIDE_TASKS)) {
+        if (empty($this->conf->global->PROJECT_HIDE_TASKS)) {
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'facture as f ON ptt.invoice_id = f.rowid';
         }
         $this->export_sql_end[$r] .= " WHERE p.entity IN (" . DolibarrFunctions::getEntity('project') . ")";
 
         // Import list of tasks
-        if (empty($conf->global->PROJECT_HIDE_TASKS)) {
+        if (empty($this->conf->global->PROJECT_HIDE_TASKS)) {
             $r++;
             $this->import_code[$r] = 'tasksofprojects';
             $this->import_label[$r] = 'ImportDatasetTasks';
@@ -296,7 +295,7 @@ class modProjet extends DolibarrModules
             $this->import_tables_array[$r] = ['t' => MAIN_DB_PREFIX . 'projet_task', 'extra' => MAIN_DB_PREFIX . 'projet_task_extrafields']; // List of tables to insert into (insert done in same order)
             $this->import_fields_array[$r] = ['t.fk_projet' => 'ProjectRef*', 't.ref' => 'RefTask*', 't.label' => 'LabelTask*', 't.dateo' => "DateStart", 't.datee' => "DateEnd", 't.planned_workload' => "PlannedWorkload", 't.progress' => "Progress", 't.note_private' => "NotePrivate", 't.note_public' => "NotePublic", 't.datec' => "DateCreation"];
             // Add extra fields
-            $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'projet_task' AND entity IN (0," . $conf->entity . ")";
+            $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'projet_task' AND entity IN (0," . $this->conf->entity . ")";
             $resql = $this->db->query($sql);
             if ($resql) {    // This can fail when class is used on old database (during migration for example)
                 while ($obj = $this->db->fetch_object($resql)) {
@@ -366,12 +365,12 @@ class modProjet extends DolibarrModules
         }
 
         $sql = [];
-        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[3][2]) . "' AND type = 'task' AND entity = " . ((int) $conf->entity);
-        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[3][2]) . "','task'," . ((int) $conf->entity) . ")";
-        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'beluga' AND type = 'project' AND entity = " . ((int) $conf->entity);
-        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('beluga','project'," . ((int) $conf->entity) . ")";
-        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'baleine' AND type = 'project' AND entity = " . ((int) $conf->entity);
-        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('baleine','project'," . ((int) $conf->entity) . ")";
+        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[3][2]) . "' AND type = 'task' AND entity = " . ((int) $this->conf->entity);
+        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[3][2]) . "','task'," . ((int) $this->conf->entity) . ")";
+        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'beluga' AND type = 'project' AND entity = " . ((int) $this->conf->entity);
+        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('beluga','project'," . ((int) $this->conf->entity) . ")";
+        $sql[] = "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'baleine' AND type = 'project' AND entity = " . ((int) $this->conf->entity);
+        $sql[] = "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('baleine','project'," . ((int) $this->conf->entity) . ")";
 
         return $this->_init($sql, $options);
     }

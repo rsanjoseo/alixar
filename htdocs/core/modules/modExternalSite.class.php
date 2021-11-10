@@ -44,7 +44,7 @@ class modExternalSite extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id.
@@ -112,7 +112,7 @@ class modExternalSite extends DolibarrModules
             'langs' => 'other',
             'position' => 100,
             'perms' => '',
-            'enabled' => '$conf->externalsite->enabled',
+            'enabled' => '$this->conf->externalsite->enabled',
             'target' => '',
             'user' => 0,
         ];

@@ -44,11 +44,8 @@ class modDeplacement extends DolibarrModules
      */
     public function __construct($db)
     {
-        // global $conf, $user;
-        $conf = DolibarrGlobals::getConf();
-        $user = DolibarrGlobals::getUser();
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 75;
 
         $this->family = "hr";

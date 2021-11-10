@@ -41,7 +41,7 @@ class modWorkflow extends DolibarrModules
      */
     public function __construct($db)
     {
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -124,7 +124,7 @@ class modWorkflow extends DolibarrModules
                                 'langs'=>'@workflow',
                                 'position'=>100,
                                 'perms'=>'$user->rights->workflow->read',
-                                'enabled'=>'$conf->workflow->enabled',
+                                'enabled'=>'$this->conf->workflow->enabled',
                                 'target'=>'',
                                 'user'=>0);
         $r++;

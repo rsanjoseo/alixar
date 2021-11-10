@@ -46,9 +46,8 @@ class modFournisseur extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 40;
 
         // Family can be 'crm','financial','hr','projects','product','ecm','technic','other'
@@ -210,7 +209,7 @@ class modFournisseur extends DolibarrModules
         $this->rights[$r][4] = 'commande';
         $this->rights[$r][5] = 'supprimer';
 
-        if (!empty($conf->global->SUPPLIER_ORDER_3_STEPS_TO_BE_APPROVED)) {
+        if (!empty($this->conf->global->SUPPLIER_ORDER_3_STEPS_TO_BE_APPROVED)) {
             $r++;
             $this->rights[$r][0] = 1190;
             $this->rights[$r][1] = 'Approve supplier order (second level)'; // $langs->trans("Permission1190");
@@ -300,7 +299,7 @@ class modFournisseur extends DolibarrModules
             'p.ref' => 'ProductRef', 'p.label' => 'ProductLabel', 'p.accountancy_code_buy' => 'ProductAccountancyBuyCode', 'project.rowid' => 'ProjectId',
             'project.ref' => 'ProjectRef', 'project.title' => 'ProjectLabel',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -372,7 +371,7 @@ class modFournisseur extends DolibarrModules
             'f.fk_statut' => 'InvoiceStatus', 'f.note_public' => "InvoiceNote", 'p.rowid' => 'PaymentId', 'pf.amount' => 'AmountPayment',
             'p.datep' => 'DatePayment', 'p.num_paiement' => 'PaymentNumber', 'p.fk_bank' => 'IdTransaction', 'project.rowid' => 'ProjectId', 'project.ref' => 'ProjectRef', 'project.title' => 'ProjectLabel',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -439,14 +438,14 @@ class modFournisseur extends DolibarrModules
             'fd.total_tva' => "LineTotalVAT", 'fd.product_type' => 'TypeOfLineServiceOrProduct', 'fd.ref' => 'RefSupplier', 'fd.fk_product' => 'ProductId',
             'p.ref' => 'ProductRef', 'p.label' => 'ProductLabel', 'project.rowid' => 'ProjectId', 'project.ref' => 'ProjectRef', 'project.title' => 'ProjectLabel',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
             $this->export_fields_array[$r]['f.multicurrency_total_tva'] = 'MulticurrencyAmountVAT';
             $this->export_fields_array[$r]['f.multicurrency_total_ttc'] = 'MulticurrencyAmountTTC';
         }
-        if (empty($conf->global->SUPPLIER_ORDER_3_STEPS_TO_BE_APPROVED)) {
+        if (empty($this->conf->global->SUPPLIER_ORDER_3_STEPS_TO_BE_APPROVED)) {
             unset($this->export_fields_array['f.date_approve2']);
             unset($this->export_fields_array['ua2.login']);
         }
@@ -535,7 +534,7 @@ class modFournisseur extends DolibarrModules
             'f.model_pdf' => 'Model',
             'f.date_valid' => 'Validation Date',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->import_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -544,7 +543,7 @@ class modFournisseur extends DolibarrModules
         }
         // Add extra fields
         $import_extrafield_sample = [];
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'facture_fourn' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'facture_fourn' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -622,7 +621,7 @@ class modFournisseur extends DolibarrModules
             'fd.date_end' => 'End Date',
             'fd.fk_unit' => 'Unit',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['fd.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['fd.multicurrency_subprice'] = 'CurrencyRate';
             $this->import_fields_array[$r]['fd.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -631,7 +630,7 @@ class modFournisseur extends DolibarrModules
         }
         // Add extra fields
         $import_extrafield_sample = [];
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'facture_fourn_det' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'facture_fourn_det' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -710,7 +709,7 @@ class modFournisseur extends DolibarrModules
             'c.model_pdf' => 'Model',
         ];
 
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['c.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['c.multicurrency_tx'] = 'CurrencyRate';
             $this->import_fields_array[$r]['c.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -720,7 +719,7 @@ class modFournisseur extends DolibarrModules
 
         // Add extra fields
         $import_extrafield_sample = [];
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande_fournisseur' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande_fournisseur' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
 
         if ($resql) {
@@ -787,7 +786,7 @@ class modFournisseur extends DolibarrModules
             'cd.fk_unit' => 'Unit',
         ];
 
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->import_fields_array[$r]['cd.multicurrency_code'] = 'Currency';
             $this->import_fields_array[$r]['cd.multicurrency_subprice'] = 'CurrencyRate';
             $this->import_fields_array[$r]['cd.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -796,7 +795,7 @@ class modFournisseur extends DolibarrModules
         }
 
         // Add extra fields
-        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande_fournisseurdet' AND entity IN (0, " . $conf->entity . ")";
+        $sql = "SELECT name, label, fieldrequired FROM " . MAIN_DB_PREFIX . "extrafields WHERE elementtype = 'commande_fournisseurdet' AND entity IN (0, " . $this->conf->entity . ")";
         $resql = $this->db->query($sql);
         if ($resql) {
             while ($obj = $this->db->fetch_object($resql)) {
@@ -859,8 +858,8 @@ class modFournisseur extends DolibarrModules
         }
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'order_supplier' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "', 'order_supplier', " . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'order_supplier' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "', 'order_supplier', " . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

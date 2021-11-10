@@ -47,9 +47,8 @@ class modFacture extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf, $user;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 30;
 
         $this->family = "financial";
@@ -135,7 +134,7 @@ class modFacture extends DolibarrModules
                 'unitfrequency' => 3600 * 24,
                 'priority' => 50,
                 'status' => 1,
-                'test' => '$conf->facture->enabled',
+                'test' => '$this->conf->facture->enabled',
                 'datestart' => $datestart,
             ],
             1 => [
@@ -150,7 +149,7 @@ class modFacture extends DolibarrModules
                 'unitfrequency' => 3600 * 24,
                 'priority' => 50,
                 'status' => 0,
-                'test' => '$conf->facture->enabled',
+                'test' => '$this->conf->facture->enabled',
                 'datestart' => $datestart,
             ],
         ];
@@ -237,7 +236,7 @@ class modFacture extends DolibarrModules
         //--------
         $r = 1;
 
-        $alias_product_perentity = empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED) ? "p" : "ppe";
+        $alias_product_perentity = empty($this->conf->global->MAIN_PRODUCT_PERENTITY_SHARED) ? "p" : "ppe";
         $this->export_code[$r] = $this->rights_class . '_' . $r;
         $this->export_label[$r] = 'CustomersInvoicesAndInvoiceLines'; // Translation key (used only if key ExportDataset_xxx_z not found)
         $this->export_icon[$r] = 'invoice';
@@ -260,14 +259,14 @@ class modFacture extends DolibarrModules
             'fd.product_type' => "TypeOfLineServiceOrProduct", 'fd.fk_product' => 'ProductId', 'p.ref' => 'ProductRef', 'p.label' => 'ProductLabel',
             $alias_product_perentity . '.accountancy_code_sell' => 'ProductAccountancySellCode',
         ];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
             $this->export_fields_array[$r]['f.multicurrency_total_tva'] = 'MulticurrencyAmountVAT';
             $this->export_fields_array[$r]['f.multicurrency_total_ttc'] = 'MulticurrencyAmountTTC';
         }
-        if (!empty($conf->cashdesk->enabled) || !empty($conf->takepos->enabled) || !empty($conf->global->INVOICE_SHOW_POS)) {
+        if (!empty($this->conf->cashdesk->enabled) || !empty($this->conf->takepos->enabled) || !empty($this->conf->global->INVOICE_SHOW_POS)) {
             $this->export_fields_array[$r]['f.module_source'] = 'Module';
             $this->export_fields_array[$r]['f.pos_source'] = 'POSTerminal';
         }
@@ -283,7 +282,7 @@ class modFacture extends DolibarrModules
             'fd.special_code' => 'Numeric', 'fd.product_type' => "Numeric", 'fd.fk_product' => 'List:product:label', 'p.ref' => 'Text', 'p.label' => 'Text',
             $alias_product_perentity . '.accountancy_code_sell' => 'Text',
         ];
-        if (!empty($conf->cashdesk->enabled) || !empty($conf->takepos->enabled) || !empty($conf->global->INVOICE_SHOW_POS)) {
+        if (!empty($this->conf->cashdesk->enabled) || !empty($this->conf->takepos->enabled) || !empty($this->conf->global->INVOICE_SHOW_POS)) {
             $this->export_TypeFields_array[$r]['f.module_source'] = 'Text';
             $this->export_TypeFields_array[$r]['f.pos_source'] = 'Text';
         }
@@ -331,8 +330,8 @@ class modFacture extends DolibarrModules
         $this->export_sql_end[$r] .= ' , ' . MAIN_DB_PREFIX . 'facturedet as fd';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'facturedet_extrafields as extra2 on fd.rowid = extra2.fk_object';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product as p on (fd.fk_product = p.rowid)';
-        if (!empty($conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
-            $this->export_sql_end[$r] .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_perentity as ppe ON ppe.fk_product = p.rowid AND ppe.entity = " . ((int) $conf->entity);
+        if (!empty($this->conf->global->MAIN_PRODUCT_PERENTITY_SHARED)) {
+            $this->export_sql_end[$r] .= " LEFT JOIN " . MAIN_DB_PREFIX . "product_perentity as ppe ON ppe.fk_product = p.rowid AND ppe.entity = " . ((int) $this->conf->entity);
         }
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'product_extrafields as extra3 on p.rowid = extra3.fk_object';
         $this->export_sql_end[$r] .= ' WHERE f.fk_soc = s.rowid AND f.rowid = fd.fk_facture';
@@ -361,7 +360,7 @@ class modFacture extends DolibarrModules
             'pt.code' => 'CodePaymentMode', 'pt.libelle' => 'LabelPaymentMode', 'p.note' => 'PaymentNote', 'p.fk_bank' => 'IdTransaction', 'ba.ref' => 'AccountRef',
         ];
         $this->export_help_array[$r] = ['f.paye' => 'InvoicePaidCompletelyHelp'];
-        if (!empty($conf->multicurrency->enabled)) {
+        if (!empty($this->conf->multicurrency->enabled)) {
             $this->export_fields_array[$r]['f.multicurrency_code'] = 'Currency';
             $this->export_fields_array[$r]['f.multicurrency_tx'] = 'CurrencyRate';
             $this->export_fields_array[$r]['f.multicurrency_total_ht'] = 'MulticurrencyAmountHT';
@@ -369,7 +368,7 @@ class modFacture extends DolibarrModules
             $this->export_fields_array[$r]['f.multicurrency_total_ttc'] = 'MulticurrencyAmountTTC';
             $this->export_examplevalues_array[$r]['f.multicurrency_code'] = 'EUR';
         }
-        if (!empty($conf->cashdesk->enabled) || !empty($conf->takepos->enabled) || !empty($conf->global->INVOICE_SHOW_POS)) {
+        if (!empty($this->conf->cashdesk->enabled) || !empty($this->conf->takepos->enabled) || !empty($this->conf->global->INVOICE_SHOW_POS)) {
             $this->export_fields_array[$r]['f.module_source'] = 'POSModule';
             $this->export_fields_array[$r]['f.pos_source'] = 'POSTerminal';
         }
@@ -383,7 +382,7 @@ class modFacture extends DolibarrModules
             'pj.ref' => 'Text', 'pj.title' => 'Text', 'p.amount' => 'Numeric', 'pf.amount' => 'Numeric', 'p.rowid' => 'Numeric', 'p.ref' => 'Text', 'p.title' => 'Text', 'p.datep' => 'Date', 'p.num_paiement' => 'Numeric',
             'p.fk_bank' => 'Numeric', 'p.note' => 'Text', 'pt.code' => 'Text', 'pt.libelle' => 'text', 'ba.ref' => 'Text',
         ];
-        if (!empty($conf->cashdesk->enabled) || !empty($conf->takepos->enabled) || !empty($conf->global->INVOICE_SHOW_POS)) {
+        if (!empty($this->conf->cashdesk->enabled) || !empty($this->conf->takepos->enabled) || !empty($this->conf->global->INVOICE_SHOW_POS)) {
             $this->export_fields_array[$r]['f.module_source'] = 'POSModule';
             $this->export_fields_array[$r]['f.pos_source'] = 'POSTerminal';
         }
@@ -458,8 +457,8 @@ class modFacture extends DolibarrModules
         }
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'invoice' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "','invoice'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[1][2]) . "' AND type = 'invoice' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[1][2]) . "','invoice'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

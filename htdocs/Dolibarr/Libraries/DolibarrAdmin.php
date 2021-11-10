@@ -352,8 +352,7 @@ abstract class DolibarrAdmin
         }
 
         $include = DOL_DOCUMENT_ROOT . '/core/modules/' . $modName . '.class.php';
-        // dump($include);
-        require $include;
+        //require $include;
         $objMod = new $modName($db);
 
         // Test if PHP version ok

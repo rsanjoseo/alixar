@@ -41,9 +41,8 @@ class modSocialNetworks extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 3400;
 
         // Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
@@ -68,7 +67,7 @@ class modSocialNetworks extends DolibarrModules
         $this->config_page_url = [DOL_URL_ROOT . '/admin/dict.php?id=38'];
 
         // Dependencies
-        $this->hidden = !empty($conf->global->MODULE_SOCIALNETWORKS_DISABLED); // A condition to hide module
+        $this->hidden = !empty($this->conf->global->MODULE_SOCIALNETWORKS_DISABLED); // A condition to hide module
         $this->depends = []; // List of module class names as string that must be enabled if this module is enabled
         $this->requiredby = []; // List of module ids to disable if this one is disabled
         $this->conflictwith = []; // List of module class names as string this module is in conflict with

@@ -47,9 +47,8 @@ class modFicheinter extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $conf;
+        parent::__construct();
 
-        $this->db = $db;
         $this->numero = 70;
 
         $this->family = "crm";
@@ -80,9 +79,9 @@ class modFicheinter extends DolibarrModules
         $this->const = [];
         $r = 0;
 
-        if (!isset($conf->ficheinter) || !isset($conf->ficheinter->enabled)) {
-            $conf->ficheinter = new stdClass();
-            $conf->ficheinter->enabled = 0;
+        if (!isset($this->conf->ficheinter) || !isset($this->conf->ficheinter->enabled)) {
+            $this->conf->ficheinter = new stdClass();
+            $this->conf->ficheinter->enabled = 0;
         }
 
         $this->const[$r][0] = "FICHEINTER_ADDON_PDF";
@@ -238,8 +237,8 @@ class modFicheinter extends DolibarrModules
         $this->remove($options);
 
         $sql = [
-            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'ficheinter' AND entity = " . ((int) $conf->entity),
-            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','ficheinter'," . ((int) $conf->entity) . ")",
+            "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = '" . $this->db->escape($this->const[0][2]) . "' AND type = 'ficheinter' AND entity = " . ((int) $this->conf->entity),
+            "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('" . $this->db->escape($this->const[0][2]) . "','ficheinter'," . ((int) $this->conf->entity) . ")",
         ];
 
         return $this->_init($sql, $options);

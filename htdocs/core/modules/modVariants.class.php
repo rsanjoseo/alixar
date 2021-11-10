@@ -43,9 +43,7 @@ class modVariants extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -99,9 +97,9 @@ class modVariants extends DolibarrModules
         ];
 
         // Dictionaries
-        if (!isset($conf->mymodule->enabled)) {
-            $conf->mymodule = new stdClass();
-            $conf->mymodule->enabled = 0;
+        if (!isset($this->conf->mymodule->enabled)) {
+            $this->conf->mymodule = new stdClass();
+            $this->conf->mymodule->enabled = 0;
         }
         $this->dictionaries = [];
 

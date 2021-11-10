@@ -47,8 +47,7 @@ class modPartnership extends DolibarrModules
      */
     public function __construct($db)
     {
-        global $langs, $conf;
-        $this->db = $db;
+        parent::__construct();
 
         // Id for module (must be unique).
         // Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -173,9 +172,9 @@ class modPartnership extends DolibarrModules
             'fr_FR:ParentCompany'=>'Maison mère ou revendeur'
         )*/
 
-        if (!isset($conf->partnership) || !isset($conf->partnership->enabled)) {
-            $conf->partnership = new stdClass();
-            $conf->partnership->enabled = 0;
+        if (!isset($this->conf->partnership) || !isset($this->conf->partnership->enabled)) {
+            $this->conf->partnership = new stdClass();
+            $this->conf->partnership->enabled = 0;
         }
 
         // Array to add new pages in new tabs
@@ -223,7 +222,7 @@ class modPartnership extends DolibarrModules
             // Label of tables
             'tablib' => ["PartnershipType"],
             // Request to select fields
-            'tabsql' => ['SELECT f.rowid as rowid, f.code, f.label, f.active FROM ' . MAIN_DB_PREFIX . 'c_partnership_type as f WHERE f.entity = ' . $conf->entity],
+            'tabsql' => ['SELECT f.rowid as rowid, f.code, f.label, f.active FROM ' . MAIN_DB_PREFIX . 'c_partnership_type as f WHERE f.entity = ' . $this->conf->entity],
             // Sort order
             'tabsqlsort' => ["label ASC"],
             // List of fields (result of select to show dictionary)
@@ -235,7 +234,7 @@ class modPartnership extends DolibarrModules
             // Name of columns with primary key (try to always name it 'rowid')
             'tabrowid' => ["rowid"],
             // Condition to show each dictionary
-            'tabcond' => [$conf->partnership->enabled],
+            'tabcond' => [$this->conf->partnership->enabled],
         ];
 
         // Boxes/Widgets
@@ -256,8 +255,8 @@ class modPartnership extends DolibarrModules
         $datestart = DolibarrFunctions::dol_mktime(21, 15, 0, $arraydate['mon'], $arraydate['mday'], $arraydate['year']);
 
         $this->cronjobs = [
-            0 => ['priority' => 60, 'label' => 'CancelPartnershipForExpiredMembers', 'jobtype' => 'method', 'class' => '/partnership/class/partnershiputils.class.php', 'objectname' => 'PartnershipUtils', 'method' => 'doCancelStatusOfMemberPartnership', 'parameters' => '', 'comment' => 'Cancel status of partnership when subscription is expired + x days.', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 1, 'test' => '$conf->partnership->enabled', 'datestart' => $datestart],
-            1 => ['priority' => 61, 'label' => 'PartnershipCheckBacklink', 'jobtype' => 'method', 'class' => '/partnership/class/partnershiputils.class.php', 'objectname' => 'PartnershipUtils', 'method' => 'doWarningOfPartnershipIfDolibarrBacklinkNotfound', 'parameters' => '', 'comment' => 'Warning of partnership if Dolibarr backlink not found on partner website.', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 0, 'test' => '$conf->partnership->enabled', 'datestart' => $datestart],
+            0 => ['priority' => 60, 'label' => 'CancelPartnershipForExpiredMembers', 'jobtype' => 'method', 'class' => '/partnership/class/partnershiputils.class.php', 'objectname' => 'PartnershipUtils', 'method' => 'doCancelStatusOfMemberPartnership', 'parameters' => '', 'comment' => 'Cancel status of partnership when subscription is expired + x days.', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 1, 'test' => '$this->conf->partnership->enabled', 'datestart' => $datestart],
+            1 => ['priority' => 61, 'label' => 'PartnershipCheckBacklink', 'jobtype' => 'method', 'class' => '/partnership/class/partnershiputils.class.php', 'objectname' => 'PartnershipUtils', 'method' => 'doWarningOfPartnershipIfDolibarrBacklinkNotfound', 'parameters' => '', 'comment' => 'Warning of partnership if Dolibarr backlink not found on partner website.', 'frequency' => 1, 'unitfrequency' => 86400, 'status' => 0, 'test' => '$this->conf->partnership->enabled', 'datestart' => $datestart],
         ];
 
         // Permissions provided by this module
@@ -296,8 +295,8 @@ class modPartnership extends DolibarrModules
         //     // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
         //     'langs'=>'partnership@partnership',
         //     'position'=>1100+$r,
-        //     // Define condition to show or hide menu entry. Use '$conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-        //     'enabled'=>'$conf->partnership->enabled',
+        //     // Define condition to show or hide menu entry. Use '$this->conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+        //     'enabled'=>'$this->conf->partnership->enabled',
         //     // Use 'perms'=>'$user->rights->partnership->level1->level2' if you want your menu with a permission rules
         //     'perms'=>'1',
         //     'target'=>'',
@@ -314,7 +313,7 @@ class modPartnership extends DolibarrModules
             'url' => '/partnership/partnership_list.php',
             'langs' => 'partnership', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1100 + $r,
-            'enabled' => '$conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$conf->partnership->enabled' if entry must be visible if module is enabled.
+            'enabled' => '$this->conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$this->conf->partnership->enabled' if entry must be visible if module is enabled.
             'perms' => '$user->rights->partnership->read', // Use 'perms'=>'$user->rights->partnership->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -328,7 +327,7 @@ class modPartnership extends DolibarrModules
             'url' => '/partnership/partnership_card.php?action=create',
             'langs' => 'partnership', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1100 + $r,
-            'enabled' => '$conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$this->conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->partnership->write', // Use 'perms'=>'$user->rights->partnership->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -342,7 +341,7 @@ class modPartnership extends DolibarrModules
             'url' => '/partnership/partnership_list.php',
             'langs' => 'partnership', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
             'position' => 1100 + $r,
-            'enabled' => '$conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+            'enabled' => '$this->conf->partnership->enabled', // Define condition to show or hide menu entry. Use '$this->conf->partnership->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
             'perms' => '$user->rights->partnership->read', // Use 'perms'=>'$user->rights->partnership->level1->level2' if you want your menu with a permission rules
             'target' => '',
             'user' => 2, // 0=Menu for internal users, 1=external users, 2=both
@@ -421,11 +420,11 @@ class modPartnership extends DolibarrModules
         // Create extrafields during init
         //include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
         //$extrafields = new ExtraFields($this->db);
-        //$result1=$extrafields->addExtraField('partnership_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$conf->partnership->enabled');
-        //$result2=$extrafields->addExtraField('partnership_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$conf->partnership->enabled');
-        //$result3=$extrafields->addExtraField('partnership_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$conf->partnership->enabled');
-        //$result4=$extrafields->addExtraField('partnership_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'partnership@partnership', '$conf->partnership->enabled');
-        //$result5=$extrafields->addExtraField('partnership_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$conf->partnership->enabled');
+        //$result1=$extrafields->addExtraField('partnership_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$this->conf->partnership->enabled');
+        //$result2=$extrafields->addExtraField('partnership_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$this->conf->partnership->enabled');
+        //$result3=$extrafields->addExtraField('partnership_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$this->conf->partnership->enabled');
+        //$result4=$extrafields->addExtraField('partnership_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'partnership@partnership', '$this->conf->partnership->enabled');
+        //$result5=$extrafields->addExtraField('partnership_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'partnership@partnership', '$this->conf->partnership->enabled');
 
         // Permissions
         $this->remove($options);
@@ -458,10 +457,10 @@ class modPartnership extends DolibarrModules
                 }
 
                 $sql = array_merge($sql, [
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . strtolower($myTmpObjectKey) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . strtolower($myTmpObjectKey) . "'," . ((int) $conf->entity) . ")",
-                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . strtolower($myTmpObjectKey) . "' AND entity = " . ((int) $conf->entity),
-                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . strtolower($myTmpObjectKey) . "', " . ((int) $conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'standard_" . strtolower($myTmpObjectKey) . "' AND type = '" . strtolower($myTmpObjectKey) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('standard_" . strtolower($myTmpObjectKey) . "','" . strtolower($myTmpObjectKey) . "'," . ((int) $this->conf->entity) . ")",
+                    "DELETE FROM " . MAIN_DB_PREFIX . "document_model WHERE nom = 'generic_" . strtolower($myTmpObjectKey) . "_odt' AND type = '" . strtolower($myTmpObjectKey) . "' AND entity = " . ((int) $this->conf->entity),
+                    "INSERT INTO " . MAIN_DB_PREFIX . "document_model (nom, type, entity) VALUES('generic_" . strtolower($myTmpObjectKey) . "_odt', '" . strtolower($myTmpObjectKey) . "', " . ((int) $this->conf->entity) . ")",
                 ]);
             }
         }
