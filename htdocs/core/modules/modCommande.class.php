@@ -43,10 +43,8 @@ class modCommande extends DolibarrModules
 
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 

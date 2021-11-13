@@ -40,7 +40,7 @@ use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
 use Alxarafe\Core\Singletons\Session;
 use Alxarafe\Core\Singletons\TemplateRender;
-use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Modules\Users\Classes\User;
 
 require_once 'vendor/autoload.php';
 

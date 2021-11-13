@@ -41,10 +41,8 @@ class modSociete extends DolibarrModules
 
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 
@@ -339,10 +337,10 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'bank_account as pbacc ON s.fk_account = pbacc.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_incoterms as incoterm ON s.fk_incoterms = incoterm.rowid';
         $this->export_sql_end[$r] .= ' WHERE s.entity IN (' . DolibarrFunctions::getEntity('societe') . ')';
-        if (is_object($user) && empty($user->rights->societe->client->voir)) {
-            $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
+        if (is_object($this->user) && empty($this->user->rights->societe->client->voir)) {
+            $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $this->user->id) . ' ';
             if (!empty($this->conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
-                $subordinatesids = $user->getAllChildIds();
+                $subordinatesids = $this->user->getAllChildIds();
                 $this->export_sql_end[$r] .= count($subordinatesids) > 0 ? ' OR (sc.fk_user IN (' . $this->db->sanitize(implode(',', $subordinatesids)) . ')' : '';
             }
             $this->export_sql_end[$r] .= ')';
@@ -400,7 +398,7 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'socpeople as c';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe as s ON c.fk_soc = s.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe_extrafields as extrasoc ON s.rowid = extrasoc.fk_object';
-        if (is_object($user) && empty($user->rights->societe->client->voir)) {
+        if (is_object($this->user) && empty($this->user->rights->societe->client->voir)) {
             $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'societe_commerciaux as sc ON sc.fk_soc = s.rowid';
         }
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_departements as d ON c.fk_departement = d.rowid';
@@ -409,10 +407,10 @@ class modSociete extends DolibarrModules
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'socpeople_extrafields as extra ON extra.fk_object = c.rowid';
         $this->export_sql_end[$r] .= ' LEFT JOIN ' . MAIN_DB_PREFIX . 'c_typent as t ON s.fk_typent = t.id';
         $this->export_sql_end[$r] .= ' WHERE c.entity IN (' . DolibarrFunctions::getEntity('socpeople') . ')';
-        if (is_object($user) && empty($user->rights->societe->client->voir)) {
-            $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $user->id) . ' ';
+        if (is_object($this->user) && empty($this->user->rights->societe->client->voir)) {
+            $this->export_sql_end[$r] .= ' AND (sc.fk_user = ' . ((int) $this->user->id) . ' ';
             if (!empty($this->conf->global->SOCIETE_EXPORT_SUBORDINATES_CHILDS)) {
-                $subordinatesids = $user->getAllChildIds();
+                $subordinatesids = $this->user->getAllChildIds();
                 $this->export_sql_end[$r] .= count($subordinatesids) > 0 ? ' OR (sc.fk_user IN (' . $this->db->sanitize(implode(',', $subordinatesids)) . ')' : '';
             }
             $this->export_sql_end[$r] .= ')';

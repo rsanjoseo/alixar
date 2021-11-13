@@ -25,6 +25,7 @@
 
 use Alxarafe\Dolibarr\Classes\DolibarrModules;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Modules\Fourn\Classes\CommandeFournisseur;
 
 //include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 
@@ -35,10 +36,8 @@ class modReception extends DolibarrModules
 {
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 
@@ -165,7 +164,7 @@ class modReception extends DolibarrModules
         //--------
         $r = 0;
 
-        include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.commande.class.php';
+        // include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.commande.class.php';
         $shipment = new CommandeFournisseur($this->db);
         $contact_arrays = $shipment->liste_type_contact('external', '', 0, 0, '');
         if (is_array($contact_arrays) && count($contact_arrays) > 0) {
@@ -210,16 +209,16 @@ class modReception extends DolibarrModules
             $keyforselect = 'socpeople';
             $keyforelement = 'contact';
             $keyforaliasextra = 'extra3';
-            include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
+            // include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
         }
         $keyforselect = 'reception';
         $keyforelement = 'reception';
         $keyforaliasextra = 'extra';
-        include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
+        //include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
         $keyforselect = 'commande_fournisseur_dispatch';
         $keyforelement = 'reception_line';
         $keyforaliasextra = 'extra2';
-        include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
+        //include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
 
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'reception as c';
@@ -268,7 +267,7 @@ class modReception extends DolibarrModules
         $dest = $dirodt . '/template_reception.odt';
 
         if (file_exists($src) && !file_exists($dest)) {
-            require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+            // require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
             dol_mkdir($dirodt);
             $result = dol_copy($src, $dest, 0, 0);
             if ($result < 0) {

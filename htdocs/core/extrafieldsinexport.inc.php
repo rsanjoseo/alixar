@@ -1,5 +1,9 @@
 <?php
 
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+
+$conf = DolibarrGlobals::getConf();
+
 // $keyforselect = name of main table
 // keyforelement = name of picto
 // $keyforaliasextra = a key to avoid conflict with extrafields of other objects
@@ -14,6 +18,16 @@ if (empty($keyforselect) || empty($keyforelement) || empty($keyforaliasextra)) {
 $sql = "SELECT name, label, type, param, fieldcomputed, fielddefault FROM " . MAIN_DB_PREFIX . "extrafields";
 $sql .= " WHERE elementtype = '" . $this->db->escape($keyforselect) . "' AND type != 'separate' AND entity IN (0, " . $conf->entity . ') ORDER BY pos ASC';
 //print $sql;
+
+$result = $this->db->select($sql);
+if (count($result) === 0) {
+    return;
+}
+
+dump($sql);
+dump($result);
+die('Continue rewriting the code from here.');
+
 $resql = $this->db->query($sql);
 if ($resql) {    // This can fail when class is used on old database (during migration for example)
     while ($obj = $this->db->fetch_object($resql)) {

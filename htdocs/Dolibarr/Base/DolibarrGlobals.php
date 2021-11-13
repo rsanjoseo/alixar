@@ -14,9 +14,9 @@ use Alxarafe\Database\Engine;
 use Alxarafe\Dolibarr\Classes\Conf;
 use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
-use Alxarafe\Dolibarr\Classes\Societe;
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Modules\Societes\Classes\Societe;
+use Alxarafe\Modules\Users\Classes\User;
 use Exception;
 
 /**

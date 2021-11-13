@@ -39,6 +39,14 @@ use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFilefunc;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
+/**
+ * Class MainView
+ *
+ * @package    Alxarafe\Dolibarr\Classes
+ *
+ * @deprecated Change the Dol_Controllername file to Controllername and use the DolibarrController class that
+ * DolibarrView already uses instead of MainView.
+ */
 class MainView
 {
     public $conf;

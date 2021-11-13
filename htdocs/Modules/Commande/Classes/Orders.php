@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+namespace Alxarafe\Modules\Commande\Classes;
 
 use Luracast\Restler\RestException;
 
-require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
 
 /**
  * API class for orders

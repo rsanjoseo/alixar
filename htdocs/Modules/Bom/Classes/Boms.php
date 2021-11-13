@@ -17,9 +17,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Alxarafe\Modules\Bom\Classes;
+
 use Luracast\Restler\RestException;
 
-require_once DOL_DOCUMENT_ROOT . '/Modules/Bom/class/bom.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Bom/class/bom.class.php';
 
 /**
  * \file    bom/class/api_boms.class.php

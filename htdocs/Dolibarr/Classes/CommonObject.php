@@ -36,6 +36,7 @@ use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Core\Singletons\Config;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use CommonObjectLine;
 
 /**
  *    \file       htdocs/core/class/commonobject.class.php
@@ -476,7 +477,7 @@ abstract class CommonObject
      *
      * @return int                <0 if KO, 0 if OK but not found, >0 if OK and exists
      */
-    public static function isExistingObject($element, $id, $ref = '', $ref_ext = '')
+    public function isExistingObject($element, $id, $ref = '', $ref_ext = '')
     {
         $sql = "SELECT rowid, ref, ref_ext";
         $sql .= " FROM " . MAIN_DB_PREFIX . $element;
@@ -520,7 +521,7 @@ abstract class CommonObject
      *
      * @return    array                            Array of record
      */
-    public static function getAllItemsLinkedByObjectID($fk_object_where, $field_select, $field_where, $table_element)
+    public function getAllItemsLinkedByObjectID($fk_object_where, $field_select, $field_where, $table_element)
     {
         if (empty($fk_object_where) || empty($field_where) || empty($table_element)) {
             return -1;
@@ -548,7 +549,7 @@ abstract class CommonObject
      *
      * @return    int                                <0 if KO, 0 if nothing done, >0 if OK and something done
      */
-    public static function deleteAllItemsLinkedByObjectID($fk_object_where, $field_where, $table_element)
+    public function deleteAllItemsLinkedByObjectID($fk_object_where, $field_where, $table_element)
     {
         if (empty($fk_object_where) || empty($field_where) || empty($table_element)) {
             return -1;
@@ -577,7 +578,7 @@ abstract class CommonObject
      *
      * @return bool                          True if success, False if error
      */
-    public static function commonReplaceThirdparty($db, $origin_id, $dest_id, array $tables, $ignoreerrors = 0)
+    public function commonReplaceThirdparty($db, $origin_id, $dest_id, array $tables, $ignoreerrors = 0)
     {
         foreach ($tables as $table) {
             $sql = 'UPDATE ' . MAIN_DB_PREFIX . $table . ' SET fk_soc = ' . ((int) $dest_id) . ' WHERE fk_soc = ' . ((int) $origin_id);
@@ -1032,7 +1033,7 @@ abstract class CommonObject
      */
     public function getLastMainDocLink($modulepart, $initsharekey = 0, $relativelink = 0)
     {
-        global $user, $dolibarr_main_url_root;
+        // global $this->user, $dolibarr_main_url_root;
 
         if (empty($this->last_main_doc)) {
             return ''; // No way to known which document name to use
@@ -1061,7 +1062,7 @@ abstract class CommonObject
 				$ecmfile->description = '';    // indexed content
 				$ecmfile->keywords = '';        // keyword content
 				$ecmfile->share = getRandomPassword(true);
-				$result = $ecmfile->create($user);
+				$result = $ecmfile->create($this->user);
 				if ($result < 0)
 				{
 					$this->error = $ecmfile->error;
@@ -1076,7 +1077,7 @@ abstract class CommonObject
             if ($initsharekey) {
                 require_once DOL_DOCUMENT_ROOT . '/core/lib/security2.lib.php';
                 $ecmfile->share = getRandomPassword(true);
-                $ecmfile->update($user);
+                $ecmfile->update($this->user);
             } else {
                 return '';
             }
@@ -1315,7 +1316,7 @@ abstract class CommonObject
             $resql = $this->db->query($sql);
             if ($resql) {
                 if (!$notrigger) {
-                    $result = $this->call_trigger(strtoupper($this->element) . '_ADD_CONTACT', $user);
+                    $result = $this->call_trigger(strtoupper($this->element) . '_ADD_CONTACT', $this->user);
                     if ($result < 0) {
                         $this->db->rollback();
                         return -1;
@@ -1349,7 +1350,7 @@ abstract class CommonObject
      * NB2: If return code of triggers are < 0, action calling trigger should cancel all transaction.
      *
      * @param string $triggerName trigger's name to execute
-     * @param User   $user        Object user
+     * @param User   $this-       >user        Object user
      *
      * @return  int                       Result of run_triggers
      */
@@ -1366,7 +1367,7 @@ abstract class CommonObject
 
         // include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
         $interface = new Interfaces($this->db);
-        $result = $interface->run_triggers($triggerName, $this, $user, $this->langs, $this->conf);
+        $result = $interface->run_triggers($triggerName, $this, $this->user, $this->langs, $this->conf);
 
         if ($result < 0) {
             if (!empty($this->errors)) {
@@ -1391,7 +1392,7 @@ abstract class CommonObject
     public function delete_contact($rowid, $notrigger = 0)
     {
         // phpcs:enable
-        global $user;
+        // global $this->user
 
         $this->db->begin();
 
@@ -1401,7 +1402,7 @@ abstract class CommonObject
         DolibarrFunctions::dol_syslog(get_class($this) . "::delete_contact", LOG_DEBUG);
         if ($this->db->query($sql)) {
             if (!$notrigger) {
-                $result = $this->call_trigger(strtoupper($this->element) . '_DELETE_CONTACT', $user);
+                $result = $this->call_trigger(strtoupper($this->element) . '_DELETE_CONTACT', $this->user);
                 if ($result < 0) {
                     $this->db->rollback();
                     return -1;
@@ -1930,18 +1931,18 @@ abstract class CommonObject
     }
 
     /**
-     *        Load the user with id $userid into this->user
+     *        Load the user with id $this->userid into this->user
      *
-     * @param int $userid Id du contact
+     * @param int $this- >userid Id du contact
      *
      * @return    int                        <0 if KO, >0 if OK
      */
     public function fetch_user($userid)
     {
         // phpcs:enable
-        $user = new User($this->db);
-        $result = $user->fetch($userid);
-        $this->user = $user;
+        $this->user = new User($this->db);
+        $result = $this->user->fetch($this->userid);
+        $this->user = $this->user;
         return $result;
     }
 
@@ -2091,7 +2092,7 @@ abstract class CommonObject
             if (!empty($fuser) && is_object($fuser)) {
                 $sql .= ", " . $fk_user_field . " = " . ((int) $fuser->id);
             } elseif (empty($fuser) || $fuser != 'none') {
-                $sql .= ", " . $fk_user_field . " = " . ((int) $user->id);
+                $sql .= ", " . $fk_user_field . " = " . ((int) $this->user->id);
             }
         }
 
@@ -2108,7 +2109,7 @@ abstract class CommonObject
                     $result = $this->fetchCommon($id);
                 }
                 if ($result >= 0) {
-                    $result = $this->call_trigger($trigkey, (!empty($fuser) && is_object($fuser)) ? $fuser : $user); // This may set this->errors
+                    $result = $this->call_trigger($trigkey, (!empty($fuser) && is_object($fuser)) ? $fuser : $this->user); // This may set this->errors
                 }
                 if ($result < 0) {
                     $error++;
@@ -2483,8 +2484,8 @@ abstract class CommonObject
 
         // Security on socid
         $socid = 0;
-        if ($user->socid > 0) {
-            $socid = $user->socid;
+        if ($this->user->socid > 0) {
+            $socid = $this->user->socid;
         }
 
         // this->ismultientitymanaged contains
@@ -2502,20 +2503,20 @@ abstract class CommonObject
         if (isset($this->ismultientitymanaged) && !is_numeric($this->ismultientitymanaged)) {
             $tmparray = explode('@', $this->ismultientitymanaged);
             $sql .= ", " . MAIN_DB_PREFIX . $tmparray[1] . " as " . ($tmparray[1] == 'societe' ? 's' : 'parenttable'); // If we need to link to this table to limit select to entity
-        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= ", " . MAIN_DB_PREFIX . "societe as s"; // If we need to link to societe to limit select to socid
-        } elseif ($restrictiononfksoc == 2 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 2 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s ON te.fk_soc = s.rowid"; // If we need to link to societe to limit select to socid
         }
-        if ($restrictiononfksoc && !$user->rights->societe->client->voir && !$socid) {
+        if ($restrictiononfksoc && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_commerciaux as sc ON " . $aliastablesociete . ".rowid = sc.fk_soc";
         }
         $sql .= " WHERE te." . $fieldid . " < '" . $this->db->escape($fieldid == 'rowid' ? $this->id : $this->ref) . "'"; // ->ref must always be defined (set to id if field does not exists)
-        if ($restrictiononfksoc == 1 && !$user->rights->societe->client->voir && !$socid) {
-            $sql .= " AND sc.fk_user = " . ((int) $user->id);
+        if ($restrictiononfksoc == 1 && !$this->user->rights->societe->client->voir && !$socid) {
+            $sql .= " AND sc.fk_user = " . ((int) $this->user->id);
         }
-        if ($restrictiononfksoc == 2 && !$user->rights->societe->client->voir && !$socid) {
-            $sql .= " AND (sc.fk_user = " . ((int) $user->id) . ' OR te.fk_soc IS NULL)';
+        if ($restrictiononfksoc == 2 && !$this->user->rights->societe->client->voir && !$socid) {
+            $sql .= " AND (sc.fk_user = " . ((int) $this->user->id) . ' OR te.fk_soc IS NULL)';
         }
         if (!empty($filter)) {
             if (!preg_match('/^\s*AND/i', $filter)) {
@@ -2526,12 +2527,12 @@ abstract class CommonObject
         if (isset($this->ismultientitymanaged) && !is_numeric($this->ismultientitymanaged)) {
             $tmparray = explode('@', $this->ismultientitymanaged);
             $sql .= " AND te." . $tmparray[0] . " = " . ($tmparray[1] == "societe" ? "s" : "parenttable") . ".rowid"; // If we need to link to this table to limit select to entity
-        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= ' AND te.fk_soc = s.rowid'; // If we need to link to societe to limit select to socid
         }
         if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
             if ($this->element == 'user' && !empty($this->conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-                if (!empty($user->admin) && empty($user->entity) && $this->conf->entity == 1) {
+                if (!empty($this->user->admin) && empty($this->user->entity) && $this->conf->entity == 1) {
                     $sql .= " AND te.entity IS NOT NULL"; // Show all users
                 } else {
                     $sql .= " AND ug.fk_user = te.rowid";
@@ -2575,20 +2576,20 @@ abstract class CommonObject
         if (isset($this->ismultientitymanaged) && !is_numeric($this->ismultientitymanaged)) {
             $tmparray = explode('@', $this->ismultientitymanaged);
             $sql .= ", " . MAIN_DB_PREFIX . $tmparray[1] . " as " . ($tmparray[1] == 'societe' ? 's' : 'parenttable'); // If we need to link to this table to limit select to entity
-        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= ", " . MAIN_DB_PREFIX . "societe as s"; // If we need to link to societe to limit select to socid
-        } elseif ($restrictiononfksoc == 2 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 2 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe as s ON te.fk_soc = s.rowid"; // If we need to link to societe to limit select to socid
         }
-        if ($restrictiononfksoc && !$user->rights->societe->client->voir && !$socid) {
+        if ($restrictiononfksoc && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_commerciaux as sc ON " . $aliastablesociete . ".rowid = sc.fk_soc";
         }
         $sql .= " WHERE te." . $fieldid . " > '" . $this->db->escape($fieldid == 'rowid' ? $this->id : $this->ref) . "'"; // ->ref must always be defined (set to id if field does not exists)
-        if ($restrictiononfksoc == 1 && !$user->rights->societe->client->voir && !$socid) {
-            $sql .= " AND sc.fk_user = " . ((int) $user->id);
+        if ($restrictiononfksoc == 1 && !$this->user->rights->societe->client->voir && !$socid) {
+            $sql .= " AND sc.fk_user = " . ((int) $this->user->id);
         }
-        if ($restrictiononfksoc == 2 && !$user->rights->societe->client->voir && !$socid) {
-            $sql .= " AND (sc.fk_user = " . ((int) $user->id) . ' OR te.fk_soc IS NULL)';
+        if ($restrictiononfksoc == 2 && !$this->user->rights->societe->client->voir && !$socid) {
+            $sql .= " AND (sc.fk_user = " . ((int) $this->user->id) . ' OR te.fk_soc IS NULL)';
         }
         if (!empty($filter)) {
             if (!preg_match('/^\s*AND/i', $filter)) {
@@ -2599,12 +2600,12 @@ abstract class CommonObject
         if (isset($this->ismultientitymanaged) && !is_numeric($this->ismultientitymanaged)) {
             $tmparray = explode('@', $this->ismultientitymanaged);
             $sql .= " AND te." . $tmparray[0] . " = " . ($tmparray[1] == "societe" ? "s" : "parenttable") . ".rowid"; // If we need to link to this table to limit select to entity
-        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$user->rights->societe->client->voir && !$socid) {
+        } elseif ($restrictiononfksoc == 1 && $this->element != 'societe' && !$this->user->rights->societe->client->voir && !$socid) {
             $sql .= ' AND te.fk_soc = s.rowid'; // If we need to link to societe to limit select to socid
         }
         if (isset($this->ismultientitymanaged) && $this->ismultientitymanaged == 1) {
             if ($this->element == 'user' && !empty($this->conf->global->MULTICOMPANY_TRANSVERSE_MODE)) {
-                if (!empty($user->admin) && empty($user->entity) && $this->conf->entity == 1) {
+                if (!empty($this->user->admin) && empty($this->user->entity) && $this->conf->entity == 1) {
                     $sql .= " AND te.entity IS NOT NULL"; // Show all users
                 } else {
                     $sql .= " AND ug.fk_user = te.rowid";
@@ -3171,16 +3172,16 @@ abstract class CommonObject
      *
      * @param int  $shipping_method_id Id of shipping method
      * @param bool $notrigger          false=launch triggers after, true=disable triggers
-     * @param User $userused           Object user
+     * @param User $this-              >userused           Object user
      *
      * @return     int              1 if OK, 0 if KO
      */
     public function setShippingMethod($shipping_method_id, $notrigger = false, $userused = null)
     {
-        global $user;
+        // global $this->user
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -3209,7 +3210,7 @@ abstract class CommonObject
             if (!$notrigger) {
                 // Call trigger
                 $this->context = ['shippingmethodupdate' => 1];
-                $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $userused);
+                $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $this->userused);
                 if ($result < 0) {
                     $error++;
                 }
@@ -3263,7 +3264,7 @@ abstract class CommonObject
     /**
      *        Set last model used by doc generator
      *
-     * @param User   $user     User object that make change
+     * @param User   $this-    >user     User object that make change
      * @param string $modelpdf Modele name
      *
      * @return        int                    <0 if KO, >0 if OK
@@ -3300,16 +3301,16 @@ abstract class CommonObject
      *
      * @param int  $fk_account Id of bank account
      * @param bool $notrigger  false=launch triggers after, true=disable triggers
-     * @param User $userused   Object user
+     * @param User $this-      >userused   Object user
      *
      * @return        int                1 if OK, 0 if KO
      */
     public function setBankAccount($fk_account, $notrigger = false, $userused = null)
     {
-        global $user;
+        // global $this->user
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -3338,7 +3339,7 @@ abstract class CommonObject
             if (!$notrigger) {
                 // Call trigger
                 $this->context = ['bankaccountupdate' => 1];
-                $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $userused);
+                $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $this->userused);
                 if ($result < 0) {
                     $error++;
                 }
@@ -3767,7 +3768,7 @@ abstract class CommonObject
     public function update_note($note, $suffix = '')
     {
         // phpcs:enable
-        global $user;
+        // global $this->user
 
         if (!$this->table_element) {
             $this->error = 'update_note was called on objet with property table_element not defined';
@@ -3795,7 +3796,7 @@ abstract class CommonObject
         }
         $sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
         $sql .= " SET note" . $newsuffix . " = " . (!empty($note) ? ("'" . $this->db->escape($note) . "'") : "NULL");
-        $sql .= ", " . $fieldusermod . " = " . ((int) $user->id);
+        $sql .= ", " . $fieldusermod . " = " . ((int) $this->user->id);
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
         DolibarrFunctions::dol_syslog(get_class($this) . "::update_note", LOG_DEBUG);
@@ -4108,10 +4109,10 @@ abstract class CommonObject
     public function add_object_linked($origin = null, $origin_id = null, $f_user = null, $notrigger = 0)
     {
         // phpcs:enable
-        global $user;
+        // global $this->user
         $origin = (!empty($origin) ? $origin : $this->origin);
         $origin_id = (!empty($origin_id) ? $origin_id : $this->origin_id);
-        $f_user = isset($f_user) ? $f_user : $user;
+        $f_user = isset($f_user) ? $f_user : $this->user;
 
         // Special case
         if ($origin == 'order') {
@@ -4406,10 +4407,10 @@ abstract class CommonObject
      */
     public function updateObjectLinked($sourceid = null, $sourcetype = '', $targetid = null, $targettype = '', $f_user = null, $notrigger = 0)
     {
-        global $user;
+        // global $this->user
         $updatesource = false;
         $updatetarget = false;
-        $f_user = isset($f_user) ? $f_user : $user;
+        $f_user = isset($f_user) ? $f_user : $this->user;
 
         if (!empty($sourceid) && !empty($sourcetype) && empty($targetid) && empty($targettype)) {
             $updatesource = true;
@@ -4481,10 +4482,10 @@ abstract class CommonObject
      */
     public function deleteObjectLinked($sourceid = null, $sourcetype = '', $targetid = null, $targettype = '', $rowid = '', $f_user = null, $notrigger = 0)
     {
-        global $user;
+        // global $this->user
         $deletesource = false;
         $deletetarget = false;
-        $f_user = isset($f_user) ? $f_user : $user;
+        $f_user = isset($f_user) ? $f_user : $this->user;
 
         if (!empty($sourceid) && !empty($sourcetype) && empty($targetid) && empty($targettype)) {
             $deletesource = true;
@@ -4595,7 +4596,7 @@ abstract class CommonObject
         $sql .= " SET " . $fieldstatus . " = " . ((int) $status);
         // If status = 1 = validated, update also fk_user_valid
         if ($status == 1 && $elementTable == 'expensereport') {
-            $sql .= ", fk_user_valid = " . ((int) $user->id);
+            $sql .= ", fk_user_valid = " . ((int) $this->user->id);
         }
         $sql .= " WHERE rowid=" . ((int) $elementId);
 
@@ -4627,7 +4628,7 @@ abstract class CommonObject
 
             if ($trigkey) {
                 // Call trigger
-                $result = $this->call_trigger($trigkey, $user);
+                $result = $this->call_trigger($trigkey, $this->user);
                 if ($result < 0) {
                     $error++;
                 }
@@ -5205,14 +5206,14 @@ abstract class CommonObject
      */
     public function getRights()
     {
-        global $user;
+        // global $this->user
 
         $element = $this->element;
         if ($element == 'facturerec') {
             $element = 'facture';
         }
 
-        return $user->rights->{$element};
+        return $this->user->rights->{$element};
     }
 
     /**
@@ -5491,7 +5492,7 @@ abstract class CommonObject
     public function delete_resource($rowid, $element, $notrigger = 0)
     {
         // phpcs:enable
-        global $user;
+        // global $this->user
 
         $this->db->begin();
 
@@ -5507,7 +5508,7 @@ abstract class CommonObject
             return -1;
         } else {
             if (!$notrigger) {
-                $result = $this->call_trigger(strtoupper($element) . '_DELETE_RESOURCE', $user);
+                $result = $this->call_trigger(strtoupper($element) . '_DELETE_RESOURCE', $this->user);
                 if ($result < 0) {
                     $this->db->rollback();
                     return -1;
@@ -5713,18 +5714,18 @@ abstract class CommonObject
      *  Data to describe values to insert/update are stored into $this->array_options=array('options_codeforfield1'=>'valueforfield1', 'options_codeforfield2'=>'valueforfield2', ...)
      *  This function delete record with all extrafields and insert them again from the array $this->array_options.
      *
-     * @param string $trigger  If defined, call also the trigger (for example COMPANY_MODIFY)
-     * @param User   $userused Object user
+     * @param string $trigger If defined, call also the trigger (for example COMPANY_MODIFY)
+     * @param User   $this-   >userused Object user
      *
      * @return int                        -1=error, O=did nothing, 1=OK
      * @see insertExtraFields(), updateExtraField(), setValueFrom()
      */
     public function insertExtraLanguages($trigger = '', $userused = null)
     {
-        global $user;
+        // global $this->user
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -5808,7 +5809,7 @@ abstract class CommonObject
             if (!$error && $trigger) {
                 // Call trigger
                 $this->context = ['extralanguagesaddupdate' => 1];
-                $result = $this->call_trigger($trigger, $userused);
+                $result = $this->call_trigger($trigger, $this->userused);
                 if ($result < 0) {
                     $error++;
                 }
@@ -5831,23 +5832,23 @@ abstract class CommonObject
      *    Update 1 extra field value for the current object. Keep other fields unchanged.
      *  Data to describe values to update are stored into $this->array_options=array('options_codeforfield1'=>'valueforfield1', 'options_codeforfield2'=>'valueforfield2', ...)
      *
-     * @param string $key      Key of the extrafield to update (without starting 'options_')
-     * @param string $trigger  If defined, call also the trigger (for example COMPANY_MODIFY)
-     * @param User   $userused Object user
+     * @param string $key     Key of the extrafield to update (without starting 'options_')
+     * @param string $trigger If defined, call also the trigger (for example COMPANY_MODIFY)
+     * @param User   $this-   >userused Object user
      *
      * @return int                        -1=error, O=did nothing, 1=OK
      * @see updateExtraLanguages(), insertExtraFields(), deleteExtraFields(), setValueFrom()
      */
     public function updateExtraField($key, $trigger = null, $userused = null)
     {
-        global $user;
+        // global $this->user
 
         if (!empty($this->conf->global->MAIN_EXTRAFIELDS_DISABLED)) {
             return 0;
         }
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -5988,7 +5989,7 @@ abstract class CommonObject
                 }
                 $sql .= " WHERE fk_object = " . ((int) $this->id);
             } else {
-                $result = $this->insertExtraFields('', $user);
+                $result = $this->insertExtraFields('', $this->user);
                 if ($result < 0) {
                     $error++;
                 }
@@ -6002,7 +6003,7 @@ abstract class CommonObject
             if (!$error && $trigger) {
                 // Call trigger
                 $this->context = ['extrafieldupdate' => 1];
-                $result = $this->call_trigger($trigger, $userused);
+                $result = $this->call_trigger($trigger, $this->userused);
                 if ($result < 0) {
                     $error++;
                 }
@@ -6027,22 +6028,22 @@ abstract class CommonObject
      *  Data to describe values to insert/update are stored into $this->array_options=array('options_codeforfield1'=>'valueforfield1', 'options_codeforfield2'=>'valueforfield2', ...)
      *  This function delete record with all extrafields and insert them again from the array $this->array_options.
      *
-     * @param string $trigger  If defined, call also the trigger (for example COMPANY_MODIFY)
-     * @param User   $userused Object user
+     * @param string $trigger If defined, call also the trigger (for example COMPANY_MODIFY)
+     * @param User   $this-   >userused Object user
      *
      * @return int                        -1=error, O=did nothing, 1=OK
      * @see insertExtraLanguages(), updateExtraField(), deleteExtraField(), setValueFrom()
      */
     public function insertExtraFields($trigger = '', $userused = null)
     {
-        global $user;
+        // global $this->user
 
         if (!empty($this->conf->global->MAIN_EXTRAFIELDS_DISABLED)) {
             return 0;
         }
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -6266,7 +6267,7 @@ abstract class CommonObject
             if (!$error && $trigger) {
                 // Call trigger
                 $this->context = ['extrafieldaddupdate' => 1];
-                $result = $this->call_trigger($trigger, $userused);
+                $result = $this->call_trigger($trigger, $this->userused);
                 if ($result < 0) {
                     $error++;
                 }
@@ -6289,19 +6290,19 @@ abstract class CommonObject
      *    Update an extra language value for the current object.
      *  Data to describe values to update are stored into $this->array_options=array('options_codeforfield1'=>'valueforfield1', 'options_codeforfield2'=>'valueforfield2', ...)
      *
-     * @param string $key      Key of the extrafield (without starting 'options_')
-     * @param string $trigger  If defined, call also the trigger (for example COMPANY_MODIFY)
-     * @param User   $userused Object user
+     * @param string $key     Key of the extrafield (without starting 'options_')
+     * @param string $trigger If defined, call also the trigger (for example COMPANY_MODIFY)
+     * @param User   $this-   >userused Object user
      *
      * @return int                        -1=error, O=did nothing, 1=OK
      * @see updateExtraFields(), insertExtraLanguages()
      */
     public function updateExtraLanguages($key, $trigger = null, $userused = null)
     {
-        global $user;
+        // global $this->user
 
-        if (empty($userused)) {
-            $userused = $user;
+        if (empty($this->userused)) {
+            $this->userused = $this->user;
         }
 
         $error = 0;
@@ -8094,7 +8095,7 @@ abstract class CommonObject
                                 $return .= '<a href="' . $_SERVER["PHP_SELF"] . '?id=' . $this->id . '&amp;action=addthumb&amp;file=' . urlencode($pdir . $viewfilename) . '">' . img_picto($this->langs->trans('GenerateThumb'), 'refresh') . '&nbsp;&nbsp;</a>';
                             }
                             // Special cas for product
-                            if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer)) {
+                            if ($modulepart == 'product' && ($this->user->rights->produit->creer || $this->user->rights->service->creer)) {
                                 // Link to resize
                                 $return .= '<a href="' . DOL_URL_ROOT . '/core/photos_resize.php?modulepart=' . urlencode('produit|service') . '&id=' . $this->id . '&file=' . urlencode($pdir . $viewfilename) . '" title="' . dol_escape_htmltag($this->langs->trans("Resize")) . '">' . img_picto($this->langs->trans("Resize"), 'resize', '') . '</a> &nbsp; ';
 
@@ -8123,7 +8124,7 @@ abstract class CommonObject
                         }
                         if ($showaction) {
                             // Special case for product
-                            if ($modulepart == 'product' && ($user->rights->produit->creer || $user->rights->service->creer)) {
+                            if ($modulepart == 'product' && ($this->user->rights->produit->creer || $this->user->rights->service->creer)) {
                                 // Link to resize
                                 $return .= '<a href="' . DOL_URL_ROOT . '/core/photos_resize.php?modulepart=' . urlencode('produit|service') . '&id=' . $this->id . '&file=' . urlencode($pdir . $viewfilename) . '" title="' . dol_escape_htmltag($this->langs->trans("Resize")) . '">' . img_picto($this->langs->trans("Resize"), 'resize', '') . '</a> &nbsp; ';
 
@@ -8183,7 +8184,7 @@ abstract class CommonObject
     /**
      * Create object into database
      *
-     * @param User $user      User that creates
+     * @param User $this-     >user      User that creates
      * @param bool $notrigger false=launch triggers after, true=disable triggers
      *
      * @return int             <0 if KO, Id of created object if OK
@@ -8202,7 +8203,7 @@ abstract class CommonObject
             $fieldvalues['date_creation'] = $this->db->idate($now);
         }
         if (array_key_exists('fk_user_creat', $fieldvalues) && !($fieldvalues['fk_user_creat'] > 0)) {
-            $fieldvalues['fk_user_creat'] = $user->id;
+            $fieldvalues['fk_user_creat'] = $this->user->id;
         }
         unset($fieldvalues['rowid']); // The field 'rowid' is reserved field name for autoincrement field so we don't need it into insert.
         if (array_key_exists('ref', $fieldvalues)) {
@@ -8312,7 +8313,7 @@ abstract class CommonObject
                     $line = (object) $line;
                 }
 
-                $result = $line->create($user, 1);
+                $result = $line->create($this->user, 1);
                 if ($result < 0) {
                     $this->error = $line->error;
                     $this->db->rollback();
@@ -8324,7 +8325,7 @@ abstract class CommonObject
         // Triggers
         if (!$error && !$notrigger) {
             // Call triggers
-            $result = $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $user);
+            $result = $this->call_trigger(strtoupper(get_class($this)) . '_CREATE', $this->user);
             if ($result < 0) {
                 $error++;
             }
@@ -8500,7 +8501,7 @@ abstract class CommonObject
     /**
      * Update object into database
      *
-     * @param User $user      User that modifies
+     * @param User $this-     >user      User that modifies
      * @param bool $notrigger false=launch triggers after, true=disable triggers
      *
      * @return int                <0 if KO, >0 if OK
@@ -8519,7 +8520,7 @@ abstract class CommonObject
             $fieldvalues['date_modification'] = $this->db->idate($now);
         }
         if (array_key_exists('fk_user_modif', $fieldvalues) && !($fieldvalues['fk_user_modif'] > 0)) {
-            $fieldvalues['fk_user_modif'] = $user->id;
+            $fieldvalues['fk_user_modif'] = $this->user->id;
         }
         unset($fieldvalues['rowid']); // The field 'rowid' is reserved field name for autoincrement field so we don't need it into update.
         if (array_key_exists('ref', $fieldvalues)) {
@@ -8577,7 +8578,7 @@ abstract class CommonObject
         // Triggers
         if (!$error && !$notrigger) {
             // Call triggers
-            $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $user);
+            $result = $this->call_trigger(strtoupper(get_class($this)) . '_MODIFY', $this->user);
             if ($result < 0) {
                 $error++;
             } //Do also here what you must do to rollback action if trigger fail
@@ -8597,7 +8598,7 @@ abstract class CommonObject
     /**
      * Delete object in database
      *
-     * @param User $user               User that deletes
+     * @param User $this-              >user               User that deletes
      * @param bool $notrigger          false=launch triggers after, true=disable triggers
      * @param int  $forcechilddeletion 0=no, 1=Force deletion of children
      *
@@ -8678,7 +8679,7 @@ abstract class CommonObject
         if (!$error) {
             if (!$notrigger) {
                 // Call triggers
-                $result = $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $user);
+                $result = $this->call_trigger(strtoupper(get_class($this)) . '_DELETE', $this->user);
                 if ($result < 0) {
                     $error++;
                 } // Do also here what you must do to rollback action if trigger fail
@@ -8910,7 +8911,7 @@ abstract class CommonObject
      */
     public function deleteByParentField($parentId = 0, $parentField = '')
     {
-        global $user;
+        // global $this->user
 
         $error = 0;
         $deleted = 0;
@@ -8935,7 +8936,7 @@ abstract class CommonObject
                         if (get_class($this) == 'Contact') { // TODO special code because delete() for contact has not been standardized like other delete.
                             $result = $this->delete();
                         } else {
-                            $result = $this->delete($user);
+                            $result = $this->delete($this->user);
                         }
                         if ($result < 0) {
                             $error++;
@@ -8963,7 +8964,7 @@ abstract class CommonObject
     /**
      *  Delete a line of object in database
      *
-     * @param User $user      User that delete
+     * @param User $this-     >user      User that delete
      * @param int  $idline    Id of line to delete
      * @param bool $notrigger false=launch triggers after, true=disable triggers
      *
@@ -8977,7 +8978,7 @@ abstract class CommonObject
         $tmpforobjectlineclass = ucfirst($tmpforobjectclass) . 'Line';
 
         // Call trigger
-        $result = $this->call_trigger('LINE' . strtoupper($tmpforobjectclass) . '_DELETE', $user);
+        $result = $this->call_trigger('LINE' . strtoupper($tmpforobjectclass) . '_DELETE', $this->user);
         if ($result < 0) {
             return -1;
         }
@@ -9021,7 +9022,7 @@ abstract class CommonObject
     /**
      *    Set to a status
      *
-     * @param User   $user        Object user that modify
+     * @param User   $this-       >user        Object user that modify
      * @param int    $status      New status to set (often a constant like self::STATUS_XXX)
      * @param int    $notrigger   1=Does not execute triggers, 0=Execute triggers
      * @param string $triggercode Trigger code to use
@@ -9050,7 +9051,7 @@ abstract class CommonObject
 
             if (!$error && !$notrigger) {
                 // Call trigger
-                $result = $this->call_trigger($triggercode, $user);
+                $result = $this->call_trigger($triggercode, $this->user);
                 if ($result < 0) {
                     $error++;
                 }
@@ -9079,7 +9080,7 @@ abstract class CommonObject
      */
     public function initAsSpecimenCommon()
     {
-        global $user;
+        // global $this->user
 
         $this->id = 0;
         $this->specimen = 1;
@@ -9092,8 +9093,8 @@ abstract class CommonObject
             'note_private' => 'Private note',
             'date_creation' => (DolibarrFunctions::dol_now() - 3600 * 48),
             'date_modification' => (DolibarrFunctions::dol_now() - 3600 * 24),
-            'fk_user_creat' => $user->id,
-            'fk_user_modif' => $user->id,
+            'fk_user_creat' => $this->user->id,
+            'fk_user_modif' => $this->user->id,
             'date' => DolibarrFunctions::dol_now(),
         ];
         foreach ($fields as $key => $value) {
@@ -9310,7 +9311,7 @@ abstract class CommonObject
      */
     protected function commonGenerateDocument($modelspath, $modele, $outputlangs, $hidedetails, $hidedesc, $hideref, $moreparams = null)
     {
-        global $user, $hookmanager, $action;
+        // global $user, $hookmanager, $action;
 
         $srctemplatepath = '';
 
@@ -9497,7 +9498,7 @@ abstract class CommonObject
                                 $ecmfile->gen_or_uploaded = 'generated';
                                 $ecmfile->description = ''; // indexed content
                                 $ecmfile->keywords = ''; // keyword content
-                                $result = $ecmfile->update($user);
+                                $result = $ecmfile->update($this->user);
                                 if ($result < 0) {
                                     setEventMessages($ecmfile->error, $ecmfile->errors, 'warnings');
                                 }
@@ -9513,7 +9514,7 @@ abstract class CommonObject
                                 $ecmfile->src_object_type = $this->table_element;
                                 $ecmfile->src_object_id = $this->id;
 
-                                $result = $ecmfile->create($user);
+                                $result = $ecmfile->create($this->user);
                                 if ($result < 0) {
                                     setEventMessages($ecmfile->error, $ecmfile->errors, 'warnings');
                                 }

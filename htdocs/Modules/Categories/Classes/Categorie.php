@@ -26,17 +26,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace Alxarafe\Modules\Categories\Classes;
+
+use Alxarafe\Dolibarr\Classes\CommonObject;
+
 /**
  *    \file       htdocs/Modules/Categories/class/categorie.class.php
  *    \ingroup    categorie
  *    \brief      File of class to manage categories
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Ticket/class/ticket.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Products/class/product.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Ticket/class/ticket.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Contacts/class/contact.class.php';
 
 /**
  *    Class to manage categories
@@ -241,11 +245,11 @@ class Categorie extends CommonObject
      *
      * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         global $hookmanager;
 
-        $this->db = $db;
+        parent::__construct();
 
         if (is_object($hookmanager)) {
             $hookmanager->initHooks(['category']);

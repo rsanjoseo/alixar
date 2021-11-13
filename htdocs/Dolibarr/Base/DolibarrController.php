@@ -13,9 +13,9 @@ use Alxarafe\Database\Engine;
 use Alxarafe\Dolibarr\Classes\Conf;
 use Alxarafe\Dolibarr\Classes\HookManager;
 use Alxarafe\Dolibarr\Classes\MenuManager;
-use Alxarafe\Dolibarr\Classes\Societe;
-use Alxarafe\Dolibarr\Classes\User;
 use Alxarafe\Dolibarr\Libraries\DolibarrFilefunc;
+use Alxarafe\Modules\Societes\Classes\Societe;
+use Alxarafe\Modules\Users\Classes\User;
 use DebugBar\DebugBarException;
 
 /**
@@ -80,7 +80,7 @@ abstract class DolibarrController extends Controller
     public function setView(): View
     {
         $view = new DolibarrView($this);
-        $view->setConf($this->conf);
+        // $view->setConf($this->conf);
         return $view;
     }
 }

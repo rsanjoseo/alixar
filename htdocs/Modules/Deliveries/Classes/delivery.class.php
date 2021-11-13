@@ -27,16 +27,16 @@
  *  \brief      Delivery Order Management Class File
  */
 
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
-require_once DOL_DOCUMENT_ROOT . '/core/class/commonincoterm.class.php';
-require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
-if (!empty($conf->propal->enabled)) {
-    require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/propal/class/propal.class.php';
-}
-if (!empty($conf->commande->enabled)) {
-    require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
-}
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Expedition/class/expedition.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/core/class/commonincoterm.class.php';
+//require_once DOL_DOCUMENT_ROOT . '/Modules/Products/stock/class/mouvementstock.class.php';
+//if (!empty($conf->propal->enabled)) {
+//    require_once DOL_DOCUMENT_ROOT . '/Modules/Comm/propal/class/propal.class.php';
+//}
+//if (!empty($conf->commande->enabled)) {
+//    require_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
+//}
 
 /**
  *  Class to manage receptions

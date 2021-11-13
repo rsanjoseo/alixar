@@ -18,16 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+namespace Alxarafe\Modules\Commande\Classes;
 
 /**
  *  \file       htdocs/commande/class/commandestats.class.php
  *  \ingroup    commandes
  *  \brief      File of class to manage order statistics
  */
-include_once DOL_DOCUMENT_ROOT . '/core/class/stats.class.php';
-include_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
-include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.commande.class.php';
-include_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
+//include_once DOL_DOCUMENT_ROOT . '/core/class/stats.class.php';
+//include_once DOL_DOCUMENT_ROOT . '/Modules/Commande/class/commande.class.php';
+//include_once DOL_DOCUMENT_ROOT . '/Modules/Fourn/class/fournisseur.commande.class.php';
+//include_once DOL_DOCUMENT_ROOT . '/core/lib/date.lib.php';
 
 /**
  *    Class to manage order statistics (customer and supplier)

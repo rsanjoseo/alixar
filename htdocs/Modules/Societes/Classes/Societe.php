@@ -32,9 +32,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Alxarafe\Dolibarr\Classes;
+namespace Alxarafe\Modules\Societes\Classes;
 
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Classes\CommonIncoterm;
+use Alxarafe\Dolibarr\Classes\CommonObject;
+use Alxarafe\Dolibarr\Classes\Conf;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
  *    \file       htdocs/societe/class/societe.class.php
@@ -771,7 +775,7 @@ class Societe extends CommonObject
     public static function replaceThirdparty(DoliDB $db, $origin_id, $dest_id)
     {
         if ($origin_id == $dest_id) {
-            dol_syslog('Error: Try to merge a thirdparty into itself');
+            DolibarrFunctions::DolibarrFunctions::dol_syslog('Error: Try to merge a thirdparty into itself');
             return false;
         }
 
@@ -937,7 +941,7 @@ class Societe extends CommonObject
             $num = $this->db->num_rows($resql);
             if ($num > 1) {
                 $this->error = 'Fetch found several records. Rename one of thirdparties to avoid duplicate.';
-                dol_syslog($this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog($this->error, LOG_ERR);
                 $result = -2;
             } elseif ($num) {   // $num = 1
                 $obj = $this->db->fetch_object($resql);
@@ -1123,7 +1127,7 @@ class Societe extends CommonObject
 
         $entity = isset($this->entity) ? $this->entity : $conf->entity;
 
-        dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::delete", LOG_DEBUG);
         $error = 0;
 
         // Test if child exists
@@ -1199,7 +1203,7 @@ class Societe extends CommonObject
                 $result = $this->deleteExtraFields();
                 if ($result < 0) {
                     $error++;
-                    dol_syslog(get_class($this) . "::delete error -3 " . $this->error, LOG_ERR);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::delete error -3 " . $this->error, LOG_ERR);
                 }
             }
 
@@ -1237,12 +1241,12 @@ class Societe extends CommonObject
 
                 return 1;
             } else {
-                dol_syslog($this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog($this->error, LOG_ERR);
                 $this->db->rollback();
                 return -1;
             }
         } else {
-            dol_syslog("Can't remove thirdparty with id " . $id . ". There is " . $objectisused . " childs", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Can't remove thirdparty with id " . $id . ". There is " . $objectisused . " childs", LOG_WARNING);
         }
         return 0;
     }
@@ -1296,7 +1300,7 @@ class Societe extends CommonObject
             return -2;
         }
 
-        dol_syslog(get_class($this) . "::set_remise_client " . $remise . ", " . $note . ", " . $user->id);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::set_remise_client " . $remise . ", " . $note . ", " . $user->id);
 
         if ($this->id) {
             $this->db->begin();
@@ -1355,7 +1359,7 @@ class Societe extends CommonObject
             return -2;
         }
 
-        dol_syslog(get_class($this) . "::set_remise_supplier " . $remise . ", " . $note . ", " . $user->id);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::set_remise_supplier " . $remise . ", " . $note . ", " . $user->id);
 
         if ($this->id) {
             $this->db->begin();
@@ -2141,7 +2145,7 @@ class Societe extends CommonObject
 
             $mod = new $module();
 
-            dol_syslog(get_class($this) . "::codeclient_modifiable code_client=" . $this->code_client . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::codeclient_modifiable code_client=" . $this->code_client . " module=" . $module);
             if ($mod->code_modifiable_null && !$this->code_client) {
                 return 1;
             }
@@ -2188,7 +2192,7 @@ class Societe extends CommonObject
 
             $mod = new $module();
 
-            dol_syslog(get_class($this) . "::check_codeclient code_client=" . $this->code_client . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::check_codeclient code_client=" . $this->code_client . " module=" . $module);
             $result = $mod->verif($this->db, $this->code_client, $this, 0);
             if ($result) {    // If error
                 $this->error = $mod->error;
@@ -2224,7 +2228,7 @@ class Societe extends CommonObject
 
             $mod = new $module();
 
-            dol_syslog(get_class($this) . "::codefournisseur_modifiable code_founisseur=" . $this->code_fournisseur . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::codefournisseur_modifiable code_founisseur=" . $this->code_fournisseur . " module=" . $module);
             if ($mod->code_modifiable_null && !$this->code_fournisseur) {
                 return 1;
             }
@@ -2270,7 +2274,7 @@ class Societe extends CommonObject
 
             $mod = new $module();
 
-            dol_syslog(get_class($this) . "::check_codefournisseur code_fournisseur=" . $this->code_fournisseur . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::check_codefournisseur code_fournisseur=" . $this->code_fournisseur . " module=" . $module);
             $result = $mod->verif($this->db, $this->code_fournisseur, $this, 1);
             if ($result) {    // If error
                 $this->error = $mod->error;
@@ -2294,7 +2298,7 @@ class Societe extends CommonObject
      */
     public function setParent($id)
     {
-        dol_syslog(get_class($this) . '::setParent', LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . '::setParent', LOG_DEBUG);
 
         if ($this->id) {
             // Check if the id we want to add as parent has not already one parent that is the current id we try to update
@@ -2337,7 +2341,7 @@ class Societe extends CommonObject
     public function validateFamilyTree($idparent, $idchild, $counter = 0)
     {
         if ($counter > 100) {
-            dol_syslog("Too high level of parent - child for company. May be an infinite loop ?", LOG_WARNING);
+            DolibarrFunctions::dol_syslog("Too high level of parent - child for company. May be an infinite loop ?", LOG_WARNING);
         }
 
         $sql = 'SELECT s.parent';
@@ -2743,7 +2747,7 @@ class Societe extends CommonObject
         // phpcs:enable
         global $conf, $user, $langs;
 
-        dol_syslog(get_class($this) . "::create_from_member", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::create_from_member", LOG_DEBUG);
 
         $name = $socname ? $socname : $member->societe;
         if (empty($name)) {
@@ -2785,7 +2789,7 @@ class Societe extends CommonObject
                 $this->firstname = $member->firstname;
                 $this->civility_id = $member->civility_id;
 
-                dol_syslog("We ask to create a contact/address too", LOG_DEBUG);
+                DolibarrFunctions::dol_syslog("We ask to create a contact/address too", LOG_DEBUG);
                 $result = $this->create_individual($user);
 
                 if ($result < 0) {
@@ -2811,7 +2815,7 @@ class Societe extends CommonObject
             }
         } else {
             // $this->error deja positionne
-            dol_syslog(get_class($this) . "::create_from_member - 2 - " . $this->error . " - " . join(',', $this->errors), LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create_from_member - 2 - " . $this->error . " - " . join(',', $this->errors), LOG_ERR);
 
             $this->db->rollback();
             return $result;
@@ -2858,7 +2862,7 @@ class Societe extends CommonObject
             $this->fk_multicurrency = 0;
         }
 
-        dol_syslog(get_class($this) . "::create " . $this->name);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::create " . $this->name);
 
         $now = dol_now();
 
@@ -2917,7 +2921,7 @@ class Societe extends CommonObject
             }
             $sql .= ")";
 
-            dol_syslog(get_class($this) . "::create", LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create", LOG_DEBUG);
             $result = $this->db->query($sql);
             if ($result) {
                 $this->id = $this->db->last_insert_id(MAIN_DB_PREFIX . "societe");
@@ -2966,11 +2970,11 @@ class Societe extends CommonObject
                 }
 
                 if (!$error) {
-                    dol_syslog(get_class($this) . "::Create success id=" . $this->id);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::Create success id=" . $this->id);
                     $this->db->commit();
                     return $this->id;
                 } else {
-                    dol_syslog(get_class($this) . "::Create echec update " . $this->error . (empty($this->errors) ? '' : ' ' . join(',', $this->errors)), LOG_ERR);
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::Create echec update " . $this->error . (empty($this->errors) ? '' : ' ' . join(',', $this->errors)), LOG_ERR);
                     $this->db->rollback();
                     return -4;
                 }
@@ -2987,7 +2991,7 @@ class Societe extends CommonObject
             }
         } else {
             $this->db->rollback();
-            dol_syslog(get_class($this) . "::Create fails verify " . join(',', $this->errors), LOG_WARNING);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::Create fails verify " . join(',', $this->errors), LOG_WARNING);
             return -3;
         }
     }
@@ -3022,7 +3026,7 @@ class Societe extends CommonObject
             $this->code_client = $mod->getNextValue($objsoc, $type);
             $this->prefixCustomerIsRequired = $mod->prefixIsRequired;
 
-            dol_syslog(get_class($this) . "::get_codeclient code_client=" . $this->code_client . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::get_codeclient code_client=" . $this->code_client . " module=" . $module);
         }
     }
 
@@ -3055,7 +3059,7 @@ class Societe extends CommonObject
 
             $this->code_fournisseur = $mod->getNextValue($objsoc, $type);
 
-            dol_syslog(get_class($this) . "::get_codefournisseur code_fournisseur=" . $this->code_fournisseur . " module=" . $module);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::get_codefournisseur code_fournisseur=" . $this->code_fournisseur . " module=" . $module);
         }
     }
 
@@ -3333,7 +3337,7 @@ class Societe extends CommonObject
 
         $error = 0;
 
-        dol_syslog(get_class($this) . "::Update id=" . $id . " call_trigger=" . $call_trigger . " allowmodcodeclient=" . $allowmodcodeclient . " allowmodcodefournisseur=" . $allowmodcodefournisseur);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::Update id=" . $id . " call_trigger=" . $call_trigger . " allowmodcodeclient=" . $allowmodcodeclient . " allowmodcodefournisseur=" . $allowmodcodefournisseur);
 
         $now = dol_now();
 
@@ -3491,7 +3495,7 @@ class Societe extends CommonObject
         }
 
         if ($result >= 0) {
-            dol_syslog(get_class($this) . "::update verify ok or not done");
+            DolibarrFunctions::dol_syslog(get_class($this) . "::update verify ok or not done");
 
             $sql = "UPDATE " . MAIN_DB_PREFIX . "societe SET ";
             $sql .= "entity = " . $this->db->escape($this->entity);
@@ -3632,7 +3636,7 @@ class Societe extends CommonObject
                     if (!$nosyncmember && !empty($conf->adherent->enabled)) {
                         require_once DOL_DOCUMENT_ROOT . '/Modules/Adherents/class/adherent.class.php';
 
-                        dol_syslog(get_class($this) . "::update update linked member");
+                        DolibarrFunctions::dol_syslog(get_class($this) . "::update update linked member");
 
                         $lmember = new Adherent($this->db);
                         $result = $lmember->fetch(0, 0, $this->id);
@@ -3654,7 +3658,7 @@ class Societe extends CommonObject
                             if ($result < 0) {
                                 $this->error = $lmember->error;
                                 $this->errors = array_merge($this->errors, $lmember->errors);
-                                dol_syslog(get_class($this) . "::update " . $this->error, LOG_ERR);
+                                DolibarrFunctions::dol_syslog(get_class($this) . "::update " . $this->error, LOG_ERR);
                                 $error++;
                             }
                         } elseif ($result < 0) {
@@ -3713,7 +3717,7 @@ class Societe extends CommonObject
                 }
 
                 if (!$error) {
-                    dol_syslog(get_class($this) . "::Update success");
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::Update success");
                     $this->db->commit();
                     return 1;
                 } else {
@@ -3734,7 +3738,7 @@ class Societe extends CommonObject
             }
         } else {
             $this->db->rollback();
-            dol_syslog(get_class($this) . "::Update fails verify " . join(',', $this->errors), LOG_WARNING);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::Update fails verify " . join(',', $this->errors), LOG_WARNING);
             return -3;
         }
     }
@@ -3818,7 +3822,7 @@ class Societe extends CommonObject
 
                 $resql = $this->db->query($sql);
                 if (!$resql) {
-                    dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
                     $error++;
                 }
             }
@@ -3830,7 +3834,7 @@ class Societe extends CommonObject
 
                 $resql = $this->db->query($sql);
                 if (!$resql) {
-                    dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
+                    DolibarrFunctions::dol_syslog(get_class($this) . "::add_commercial Error " . $this->db->lasterror());
                     $error++;
                 }
             }
@@ -3900,7 +3904,7 @@ class Societe extends CommonObject
             $error++;
             $this->error = $contact->error;
             $this->errors = $contact->errors;
-            dol_syslog(get_class($this) . "::create_individual ERROR:" . $this->error, LOG_ERR);
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create_individual ERROR:" . $this->error, LOG_ERR);
         }
 
         if (empty($error) && is_array($tags) && !empty($tags)) {
@@ -3909,7 +3913,7 @@ class Societe extends CommonObject
                 $error++;
                 $this->error = $contact->error;
                 $this->errors = array_merge($this->errors, $contact->errors);
-                dol_syslog(get_class($this) . "::create_individual Affect Tag ERROR:" . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create_individual Affect Tag ERROR:" . $this->error, LOG_ERR);
                 $contactId = $result;
             }
         }
@@ -3919,13 +3923,13 @@ class Societe extends CommonObject
             if ($result < 0) {
                 $this->error = $contact->error;
                 $this->errors = array_merge($this->errors, $contact->errors);
-                dol_syslog(get_class($this) . "::create_individual set mailing status ERROR:" . $this->error, LOG_ERR);
+                DolibarrFunctions::dol_syslog(get_class($this) . "::create_individual set mailing status ERROR:" . $this->error, LOG_ERR);
                 $contactId = $result;
             }
         }
 
         if (!empty($error)) {
-            dol_syslog(get_class($this) . "::create_individual success");
+            DolibarrFunctions::dol_syslog(get_class($this) . "::create_individual success");
             $this->db->commit();
         } else {
             $this->db->rollback();
@@ -3971,7 +3975,7 @@ class Societe extends CommonObject
                 $country_label = $tmp[2];
             } else // For backward compatibility
             {
-                dol_syslog("Your country setup use an old syntax. Reedit it using setup area.", LOG_WARNING);
+                DolibarrFunctions::dol_syslog("Your country setup use an old syntax. Reedit it using setup area.", LOG_WARNING);
                 include_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
                 $country_code = getCountry($country_id, 2, $this->db); // This need a SQL request, but it's the old feature that should not be used anymore
                 $country_label = getCountry($country_id, 0, $this->db); // This need a SQL request, but it's the old feature that should not be used anymore
@@ -3995,7 +3999,7 @@ class Societe extends CommonObject
                 $state_code = $tmp[1];
                 $state_label = $tmp[2];
             } else { // For backward compatibility
-                dol_syslog("Your setup of State an old syntax (entity=" . $conf->entity . "). Go in Home - Setup - Organization then Save should remove this error.", LOG_ERR);
+                DolibarrFunctions::dol_syslog("Your setup of State an old syntax (entity=" . $conf->entity . "). Go in Home - Setup - Organization then Save should remove this error.", LOG_ERR);
                 include_once DOL_DOCUMENT_ROOT . '/core/lib/company.lib.php';
                 $state_code = getState($state_id, 2, $this->db); // This need a SQL request, but it's the old feature that should not be used anymore
                 $state_label = getState($state_id, 0, $this->db); // This need a SQL request, but it's the old feature that should not be used anymore
@@ -4166,7 +4170,7 @@ class Societe extends CommonObject
         $sql .= " WHERE t.fk_pays = c.rowid AND c.code = '" . $this->db->escape($this->country_code) . "'";
         $sql .= " AND t.active = 1 AND t.recuperableonly = 1";
 
-        dol_syslog("useNPR", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("useNPR", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             return ($this->db->num_rows($resql) > 0);
@@ -4188,7 +4192,7 @@ class Societe extends CommonObject
         $sql .= " WHERE r.fk_pays = c.rowid AND c.code = '" . $this->db->escape($this->country_code) . "'";
         $sql .= " AND r.active = 1";
 
-        dol_syslog("useRevenueStamp", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("useRevenueStamp", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $obj = $this->db->fetch_object($resql);
@@ -4335,7 +4339,7 @@ class Societe extends CommonObject
             $sql .= " AND entity IN (" . getEntity('propal') . ")";
         }
 
-        dol_syslog("getOutstandingProposals for fk_soc = " . ((int) $this->id), LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("getOutstandingProposals for fk_soc = " . ((int) $this->id), LOG_DEBUG);
 
         $resql = $this->db->query($sql);
         if ($resql) {
@@ -4380,7 +4384,7 @@ class Societe extends CommonObject
             $sql .= " AND entity IN (" . getEntity('commande') . ")";
         }
 
-        dol_syslog("getOutstandingOrders", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("getOutstandingOrders", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $outstandingOpened = 0;
@@ -4435,7 +4439,7 @@ class Societe extends CommonObject
             $sql .= " AND entity IN (" . getEntity('invoice') . ")";
         }
 
-        dol_syslog("getOutstandingBills", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog("getOutstandingBills", LOG_DEBUG);
         $resql = $this->db->query($sql);
         if ($resql) {
             $outstandingOpened = 0;
@@ -4490,7 +4494,7 @@ class Societe extends CommonObject
             }
             return ['opened' => $outstandingOpened, 'total_ht' => $outstandingTotal, 'total_ttc' => $outstandingTotalIncTax, 'refs' => $arrayofref, 'refsopened' => $arrayofrefopened]; // 'opened' is 'incl taxes'
         } else {
-            dol_syslog("Sql error " . $this->db->lasterror, LOG_ERR);
+            DolibarrFunctions::dol_syslog("Sql error " . $this->db->lasterror, LOG_ERR);
             return [];
         }
     }
@@ -4606,7 +4610,7 @@ class Societe extends CommonObject
 
         // Decode type
         if (!in_array($type_categ, [Categorie::TYPE_CUSTOMER, Categorie::TYPE_SUPPLIER])) {
-            dol_syslog(__METHOD__ . ': Type ' . $type_categ . 'is an unknown company category type. Done nothing.', LOG_ERR);
+            DolibarrFunctions::dol_syslog(__METHOD__ . ': Type ' . $type_categ . 'is an unknown company category type. Done nothing.', LOG_ERR);
             return -1;
         }
 
@@ -4755,7 +4759,7 @@ class Societe extends CommonObject
             $sql .= " WHERE fk_soc = " . ((int) $this->id) . " AND fk_user = " . ((int) $commid);
 
             if (!$this->db->query($sql)) {
-                dol_syslog(get_class($this) . "::del_commercial Erreur");
+                DolibarrFunctions::dol_syslog(get_class($this) . "::del_commercial Erreur");
             }
         }
     }
@@ -4773,7 +4777,7 @@ class Societe extends CommonObject
             $sql = "UPDATE " . MAIN_DB_PREFIX . "societe";
             $sql .= " SET fk_typent = " . ($typent_id > 0 ? $typent_id : "null");
             $sql .= " WHERE rowid = " . ((int) $this->id);
-            dol_syslog(get_class($this) . '::setThirdpartyType', LOG_DEBUG);
+            DolibarrFunctions::dol_syslog(get_class($this) . '::setThirdpartyType', LOG_DEBUG);
             $resql = $this->db->query($sql);
             if ($resql) {
                 $this->typent_id = $typent_id;
@@ -4815,7 +4819,7 @@ class Societe extends CommonObject
         $sql .= $field . " = '" . $this->db->escape($value) . "'";
         $sql .= " WHERE rowid = " . ((int) $this->id);
 
-        dol_syslog(get_class($this) . "::" . __FUNCTION__ . "", LOG_DEBUG);
+        DolibarrFunctions::dol_syslog(get_class($this) . "::" . __FUNCTION__ . "", LOG_DEBUG);
         $resql = $this->db->query($sql);
 
         if ($resql) {

@@ -1,5 +1,11 @@
 <?php
 
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+
+dump('Include clause use at the beginning of the file, with the class ' . $keyforclassfile . '.');
+dump(debug_backtrace());
+die();
+
 if (empty($keyforclass) || empty($keyforclassfile) || empty($keyforelement)) {
     //print $keyforclass.' - '.$keyforclassfile.' - '.$keyforelement;
     dol_print_error('', 'include of file commonfieldsinexport.inc.php was done but var $keyforclass or $keyforclassfile or $keyforelement was not set');
@@ -9,7 +15,7 @@ if (empty($keyforalias)) {
     $keyforalias = 't';
 }
 
-dol_include_once($keyforclassfile);
+DolibarrFunctions::dol_include_once($keyforclassfile);
 if (class_exists($keyforclass)) {
     $tmpobject = new $keyforclass($this->db);
 
@@ -58,6 +64,6 @@ if (class_exists($keyforclass)) {
         }
     }
 } else {
-    dol_print_error($this->db, 'Failed to find class ' . $keyforclass . ', even after the include of ' . $keyforclassfile);
+    DolibarrFunctions::dol_print_error($this->db, 'Failed to find class ' . $keyforclass . ', even after the include of ' . $keyforclassfile);
 }
 // End add common fields

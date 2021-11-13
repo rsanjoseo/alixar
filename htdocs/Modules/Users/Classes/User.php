@@ -29,11 +29,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace Alxarafe\Dolibarr\Classes;
+namespace Alxarafe\Modules\Users\Classes;
 
-use Adherent;
 use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Classes\CommonObject;
+use Alxarafe\Dolibarr\Classes\DefaultValuesClass;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use stdClass;
 

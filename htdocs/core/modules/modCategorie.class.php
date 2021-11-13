@@ -26,9 +26,9 @@
  *      \brief      Description and activation file for the module Category
  */
 
-use Alxarafe\Dolibarr\Classes\Categorie;
 use Alxarafe\Dolibarr\Classes\DolibarrModules;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Modules\Categories\Classes\Categorie;
 
 // include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
 // include_once DOL_DOCUMENT_ROOT . '/Modules/Categories/class/categorie.class.php';
@@ -40,10 +40,8 @@ class modCategorie extends DolibarrModules
 {
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 

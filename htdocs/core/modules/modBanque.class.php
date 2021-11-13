@@ -40,10 +40,8 @@ class modBanque extends DolibarrModules
 
     /**
      *    Constructor.
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 

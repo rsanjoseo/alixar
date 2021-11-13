@@ -32,6 +32,8 @@ class ModulesView extends View
      */
     public function setTemplate(): void
     {
+        dump(debug_backtrace());
+        die('Does anyone use it?');
         $this->template = 'modules';
     }
 }

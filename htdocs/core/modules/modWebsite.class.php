@@ -36,10 +36,8 @@ class modWebsite extends DolibarrModules
 
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 
@@ -145,7 +143,10 @@ class modWebsite extends DolibarrModules
         $keyforclass = 'WebsitePage';
         $keyforclassfile = '/website/class/websitepage.class.php';
         $keyforelement = 'Website';
-        include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
+        // The use clause has been included with the WebsitePage class at the beginning of the file.
+        // include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
         //$keyforselect='myobject'; $keyforelement='myobject'; $keyforaliasextra='extra';
         //include DOL_DOCUMENT_ROOT.'/core/extrafieldsinexport.inc.php';
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';

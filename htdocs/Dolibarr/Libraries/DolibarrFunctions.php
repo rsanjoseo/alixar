@@ -1644,7 +1644,7 @@ abstract class DolibarrFunctions
         $temp = strip_tags($stringtoclean, $allowed_tags_string);    // Warning: This remove also undesired </> changing string obfuscated with </> that pass injection detection into harmfull string
 
         if ($cleanalsosomestyles) {    // Clean for remaining html tags
-            $temp = preg_replace('/position\s*:\s*(absolute|fixed)\s*!\s*important/i', '', $temp); // Note: If hacker try to introduce css comment into string to bypass this regex, the string must also be encoded by the dol_htmlentitiesbr during output so it become harmless
+            $temp = preg_replace('/position\s*:\s*(absolute|fixed)\s*!\s*important/i', '', $temp); // Note: If hacker try to introduce css comment into string to bypass this regex, the string must also be encoded by the self::dol_htmlentitiesbr during output so it become harmless
         }
         if ($removeclassattribute) {    // Clean for remaining html tags
             $temp = preg_replace('/(<[^>]+)\s+class=((["\']).*?\\3|\\w*)/i', '\\1', $temp);
@@ -4753,6 +4753,9 @@ abstract class DolibarrFunctions
         global $conf, $langs, $argv;
         global $dolibarr_main_prod;
 
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+
         $out = '';
         $syslog = '';
 
@@ -4773,23 +4776,23 @@ abstract class DolibarrFunctions
             }
             $out .= $langs->trans("InformationToHelpDiagnose") . ":<br>\n";
 
-            $out .= "<b>" . $langs->trans("Date") . ":</b> " . dol_print_date(time(), 'dayhourlog') . "<br>\n";
+            $out .= "<b>" . $langs->trans("Date") . ":</b> " . self::dol_print_date(time(), 'dayhourlog') . "<br>\n";
             $out .= "<b>" . $langs->trans("Dolibarr") . ":</b> " . DOL_VERSION . " - https://www.dolibarr.org<br>\n";
             if (isset($conf->global->MAIN_FEATURES_LEVEL)) {
-                $out .= "<b>" . $langs->trans("LevelOfFeature") . ":</b> " . dol_htmlentities($conf->global->MAIN_FEATURES_LEVEL, ENT_COMPAT) . "<br>\n";
+                $out .= "<b>" . $langs->trans("LevelOfFeature") . ":</b> " . self::dol_htmlentities($conf->global->MAIN_FEATURES_LEVEL, ENT_COMPAT) . "<br>\n";
             }
             if (function_exists("phpversion")) {
                 $out .= "<b>" . $langs->trans("PHP") . ":</b> " . phpversion() . "<br>\n";
             }
-            $out .= "<b>" . $langs->trans("Server") . ":</b> " . (isset($_SERVER["SERVER_SOFTWARE"]) ? dol_htmlentities($_SERVER["SERVER_SOFTWARE"], ENT_COMPAT) : '') . "<br>\n";
+            $out .= "<b>" . $langs->trans("Server") . ":</b> " . (isset($_SERVER["SERVER_SOFTWARE"]) ? self::dol_htmlentities($_SERVER["SERVER_SOFTWARE"], ENT_COMPAT) : '') . "<br>\n";
             if (function_exists("php_uname")) {
                 $out .= "<b>" . $langs->trans("OS") . ":</b> " . php_uname() . "<br>\n";
             }
-            $out .= "<b>" . $langs->trans("UserAgent") . ":</b> " . (isset($_SERVER["HTTP_USER_AGENT"]) ? dol_htmlentities($_SERVER["HTTP_USER_AGENT"], ENT_COMPAT) : '') . "<br>\n";
+            $out .= "<b>" . $langs->trans("UserAgent") . ":</b> " . (isset($_SERVER["HTTP_USER_AGENT"]) ? self::dol_htmlentities($_SERVER["HTTP_USER_AGENT"], ENT_COMPAT) : '') . "<br>\n";
             $out .= "<br>\n";
-            $out .= "<b>" . $langs->trans("RequestedUrl") . ":</b> " . dol_htmlentities($_SERVER["REQUEST_URI"], ENT_COMPAT) . "<br>\n";
-            $out .= "<b>" . $langs->trans("Referer") . ":</b> " . (isset($_SERVER["HTTP_REFERER"]) ? dol_htmlentities($_SERVER["HTTP_REFERER"], ENT_COMPAT) : '') . "<br>\n";
-            $out .= "<b>" . $langs->trans("MenuManager") . ":</b> " . (isset($conf->standard_menu) ? dol_htmlentities($conf->standard_menu, ENT_COMPAT) : '') . "<br>\n";
+            $out .= "<b>" . $langs->trans("RequestedUrl") . ":</b> " . self::dol_htmlentities($_SERVER["REQUEST_URI"], ENT_COMPAT) . "<br>\n";
+            $out .= "<b>" . $langs->trans("Referer") . ":</b> " . (isset($_SERVER["HTTP_REFERER"]) ? self::dol_htmlentities($_SERVER["HTTP_REFERER"], ENT_COMPAT) : '') . "<br>\n";
+            $out .= "<b>" . $langs->trans("MenuManager") . ":</b> " . (isset($conf->standard_menu) ? self::dol_htmlentities($conf->standard_menu, ENT_COMPAT) : '') . "<br>\n";
             $out .= "<br>\n";
             $syslog .= "url=" . DolibarrFunctions::dol_escape_htmltag($_SERVER["REQUEST_URI"]);
             $syslog .= ", query_string=" . DolibarrFunctions::dol_escape_htmltag($_SERVER["QUERY_STRING"]);
@@ -6678,7 +6681,7 @@ abstract class DolibarrFunctions
         }
 
         if ($cleanalsosomestyles) {
-            $temp = preg_replace('/position\s*:\s*(absolute|fixed)\s*!\s*important/', '', $temp); // Note: If hacker try to introduce css comment into string to avoid this, string should be encoded by the dol_htmlentitiesbr so be harmless
+            $temp = preg_replace('/position\s*:\s*(absolute|fixed)\s*!\s*important/', '', $temp); // Note: If hacker try to introduce css comment into string to avoid this, string should be encoded by the self::dol_htmlentitiesbr so be harmless
         }
 
         return $temp;
@@ -6787,7 +6790,7 @@ abstract class DolibarrFunctions
                 $newstring = preg_replace('/<br>$/i', '', $newstring); // Remove last <br> (remove only last one)
             }
             $newstring = strtr($newstring, ['&' => '__and__', '<' => '__lt__', '>' => '__gt__', '"' => '__dquot__']);
-            $newstring = dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom); // Make entity encoding
+            $newstring = self::dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom); // Make entity encoding
             $newstring = strtr($newstring, ['__and__' => '&', '__lt__' => '<', '__gt__' => '>', '__dquot__' => '"']);
         } else {
             if ($removelasteolbr) {
@@ -7206,8 +7209,8 @@ abstract class DolibarrFunctions
                     $substitutionarray['__THIRDPARTY_IDPROF5__'] = (is_object($object) ? $object->idprof5 : '');
                     $substitutionarray['__THIRDPARTY_IDPROF6__'] = (is_object($object) ? $object->idprof6 : '');
                     $substitutionarray['__THIRDPARTY_TVAINTRA__'] = (is_object($object) ? $object->tva_intra : '');
-                    $substitutionarray['__THIRDPARTY_NOTE_PUBLIC__'] = (is_object($object) ? dol_htmlentitiesbr($object->note_public) : '');
-                    $substitutionarray['__THIRDPARTY_NOTE_PRIVATE__'] = (is_object($object) ? dol_htmlentitiesbr($object->note_private) : '');
+                    $substitutionarray['__THIRDPARTY_NOTE_PUBLIC__'] = (is_object($object) ? self::dol_htmlentitiesbr($object->note_public) : '');
+                    $substitutionarray['__THIRDPARTY_NOTE_PRIVATE__'] = (is_object($object) ? self::dol_htmlentitiesbr($object->note_private) : '');
                 } elseif (is_object($object->thirdparty)) {
                     $substitutionarray['__THIRDPARTY_ID__'] = (is_object($object->thirdparty) ? $object->thirdparty->id : '');
                     $substitutionarray['__THIRDPARTY_NAME__'] = (is_object($object->thirdparty) ? $object->thirdparty->name : '');
@@ -7229,8 +7232,8 @@ abstract class DolibarrFunctions
                     $substitutionarray['__THIRDPARTY_IDPROF5__'] = (is_object($object->thirdparty) ? $object->thirdparty->idprof5 : '');
                     $substitutionarray['__THIRDPARTY_IDPROF6__'] = (is_object($object->thirdparty) ? $object->thirdparty->idprof6 : '');
                     $substitutionarray['__THIRDPARTY_TVAINTRA__'] = (is_object($object->thirdparty) ? $object->thirdparty->tva_intra : '');
-                    $substitutionarray['__THIRDPARTY_NOTE_PUBLIC__'] = (is_object($object->thirdparty) ? dol_htmlentitiesbr($object->thirdparty->note_public) : '');
-                    $substitutionarray['__THIRDPARTY_NOTE_PRIVATE__'] = (is_object($object->thirdparty) ? dol_htmlentitiesbr($object->thirdparty->note_private) : '');
+                    $substitutionarray['__THIRDPARTY_NOTE_PUBLIC__'] = (is_object($object->thirdparty) ? self::dol_htmlentitiesbr($object->thirdparty->note_public) : '');
+                    $substitutionarray['__THIRDPARTY_NOTE_PRIVATE__'] = (is_object($object->thirdparty) ? self::dol_htmlentitiesbr($object->thirdparty->note_private) : '');
                 }
 
                 if (is_object($object) && $object->element == 'recruitmentcandidature') {
@@ -7521,13 +7524,13 @@ abstract class DolibarrFunctions
 
                 if (empty($converttextinhtmlifnecessary)) {
                     // convert $newval into HTML is necessary
-                    $text = preg_replace('/__\(' . preg_quote($reg[1], '/') . '\)__/', $msgishtml ? dol_htmlentitiesbr($value) : $value, $text);
+                    $text = preg_replace('/__\(' . preg_quote($reg[1], '/') . '\)__/', $msgishtml ? self::dol_htmlentitiesbr($value) : $value, $text);
                 } else {
                     if (!$msgishtml) {
                         $valueishtml = self::dol_textishtml($value, 1);
 
                         if ($valueishtml) {
-                            $text = dol_htmlentitiesbr($text);
+                            $text = self::dol_htmlentitiesbr($text);
                             $msgishtml = 1;
                         }
                     } else {
@@ -7552,13 +7555,13 @@ abstract class DolibarrFunctions
 
             if (empty($converttextinhtmlifnecessary)) {
                 // convert $newval into HTML is necessary
-                $text = preg_replace('/__\[' . preg_quote($keyfound, '/') . '\]__/', $msgishtml ? dol_htmlentitiesbr($value) : $value, $text);
+                $text = preg_replace('/__\[' . preg_quote($keyfound, '/') . '\]__/', $msgishtml ? self::dol_htmlentitiesbr($value) : $value, $text);
             } else {
                 if (!$msgishtml) {
                     $valueishtml = self::dol_textishtml($value, 1);
 
                     if ($valueishtml) {
-                        $text = dol_htmlentitiesbr($text);
+                        $text = self::dol_htmlentitiesbr($text);
                         $msgishtml = 1;
                     }
                 } else {
@@ -7586,7 +7589,7 @@ abstract class DolibarrFunctions
                     $valueishtml = self::dol_textishtml($value, 1);
 
                     if ($valueishtml) {
-                        $text = dol_htmlentitiesbr($text);
+                        $text = self::dol_htmlentitiesbr($text);
                         $msgishtml = 1;
                     }
                 } else {
@@ -9036,6 +9039,18 @@ abstract class DolibarrFunctions
     }
 
     /**
+     * Add space between dolGetButtonTitle
+     *
+     * @param string $moreClass more css class label
+     *
+     * @return string                html of title separator
+     */
+    static function dolGetButtonTitleSeparator($moreClass = "")
+    {
+        return '<span class="button-title-separator ' . $moreClass . '" ></span>';
+    }
+
+    /**
      * Return if var element is ok
      *
      * @param string $element Variable to check
@@ -10309,18 +10324,6 @@ abstract class DolibarrFunctions
     static function newToken()
     {
         return $_SESSION['newtoken'];
-    }
-
-    /**
-     * Add space between dolGetButtonTitle
-     *
-     * @param string $moreClass more css class label
-     *
-     * @return string                html of title separator
-     */
-    static function dolGetButtonTitleSeparator($moreClass = "")
-    {
-        return '<span class="button-title-separator ' . $moreClass . '" ></span>';
     }
 
     /**

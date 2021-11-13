@@ -35,6 +35,8 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  * Class for MyObject
  *
  * @deprecated Dolibarr classes will all be completely rewritten.
+ *
+ * @note       Originally DefaultValues but a class with that name already exists.
  */
 class DefaultValuesClass extends CommonObject
 {

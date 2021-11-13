@@ -18,6 +18,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+use Alxarafe\Modules\Bom\Classes\Bom;
+use Alxarafe\Modules\Bom\Classes\BomLine;
+
 /**
  *    \defgroup   bom     Module Bom
  *  \brief      Bom module descriptor.
@@ -39,10 +42,8 @@ class modBom extends DolibarrModules
 {
     /**
      * Constructor. Define names, constants, directories, boxes, permissions
-     *
-     * @param DoliDB $db Database handler
      */
-    public function __construct($db)
+    public function __construct()
     {
         parent::__construct();
 
@@ -283,24 +284,37 @@ class modBom extends DolibarrModules
         $this->export_label[$r] = 'BomAndBomLines'; // Translation key (used only if key ExportDataset_xxx_z not found)
         $this->export_permission[$r] = [["bom", "read"]];
         $this->export_icon[$r] = 'bom';
+
         $keyforclass = 'BOM';
         $keyforclassfile = '/Modules/Bom/class/bom.class.php';
         $keyforelement = 'bom';
-        include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
+        // use Alxarafe\Modules\Bom\Classes\Bom;
+        // include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
         $keyforclass = 'BOMLine';
         $keyforclassfile = '/Modules/Bom/class/bom.class.php';
         $keyforelement = 'bomline';
         $keyforalias = 'tl';
-        include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
+        // use Alxarafe\Modules\Bom\Classes\BomLine;
+        // include DOL_DOCUMENT_ROOT . '/core/commonfieldsinexport.inc.php';
+
         unset($this->export_fields_array[$r]['tl.fk_bom']);
+        unset($keyforclassfile);
+
         $keyforselect = 'bom_bom';
         $keyforaliasextra = 'extra';
         $keyforelement = 'bom';
+
         include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
+
         $keyforselect = 'bom_bomline';
         $keyforaliasextra = 'extraline';
         $keyforelement = 'bomline';
+
         include DOL_DOCUMENT_ROOT . '/core/extrafieldsinexport.inc.php';
+
         $this->export_dependencies_array[$r] = ['bomline' => 'tl.rowid']; // To force to activate one or several fields if we select some fields that need same (like to select a unique key if we ask a field of a child to avoid the DISTINCT to discard them, or for computed field than need several other fields)
         $this->export_sql_start[$r] = 'SELECT DISTINCT ';
         $this->export_sql_end[$r] = ' FROM ' . MAIN_DB_PREFIX . 'bom_bom as t';

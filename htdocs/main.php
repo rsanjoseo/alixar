@@ -32,6 +32,7 @@
 
 use Alxarafe\Dolibarr\Base\DolibarrAuthentication;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Base\DolibarrView;
 use Alxarafe\Dolibarr\Classes\MainView;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrSecurity;
@@ -49,7 +50,8 @@ require_once('load.php');
  *    \brief      File that defines environment for Dolibarr GUI pages only (file not required by scripts)
  */
 
-$mw = new MainView();
+$nc = new NullController();
+$mw = new DolibarrView($nc);
 
 $conf = DolibarrGlobals::getConf();
 $langs = DolibarrGlobals::getLangs();
