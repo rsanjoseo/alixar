@@ -15,7 +15,6 @@ use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
 use Alxarafe\Core\Singletons\Session;
 use Alxarafe\Core\Singletons\TemplateRender;
-use Alxarafe\Modules\Main\Controllers\EditConfig;
 
 /**
  * Class Globals, load all globals utilities.

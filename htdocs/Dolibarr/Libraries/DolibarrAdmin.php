@@ -21,11 +21,9 @@
 
 namespace Alxarafe\Dolibarr\Libraries;
 
-use Alxarafe\Core\Providers\Translator;
 use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Classes\DolibarrModules;
 use Alxarafe\Dolibarr\Classes\Form;
-use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
 /**
  *    \file            htdocs/core/lib/admin.lib.php
@@ -188,9 +186,7 @@ abstract class DolibarrAdmin
      */
     static function dolibarr_set_const($db, $name, $value, $type = 'chaine', $visible = 0, $note = '', $entity = 1)
     {
-        //global $conf;
         $conf = DolibarrGlobals::getConf();
-        $db = DolibarrGlobals::getDb();
 
         // Clean parameters
         $name = trim($name);
@@ -250,7 +246,7 @@ abstract class DolibarrAdmin
      *
      * @return     string                             Error message or '';
      */
-    static function unActivateModule($value, $requiredby = 1)
+    static function unactivateModule($value, $requiredby = 1)
     {
         //global $db, $modules, $conf;
         $db = DolibarrGlobals::getDb();
@@ -265,7 +261,7 @@ abstract class DolibarrAdmin
         $modFile = $modName . ".class.php";
 
         // Loop on each directory to fill $modulesdir
-        $modulesdir = dolGetModulesDirs();
+        $modulesdir = DolibarrFunctions2::dolGetModulesDirs();
 
         // Loop on each modulesdir directories
         $found = false;
@@ -293,7 +289,7 @@ abstract class DolibarrAdmin
             $genericMod->name = preg_replace('/^mod/i', '', $modName);
             $genericMod->rights_class = strtolower(preg_replace('/^mod/i', '', $modName));
             $genericMod->const_name = 'MAIN_MODULE_' . strtoupper(preg_replace('/^mod/i', '', $modName));
-            DolibarrFunctions::dol_syslog("modules::unActivateModule Failed to find module file, we use generic function with name " . $modName);
+            DolibarrFunctions::dol_syslog("modules::unDolibarrAdmn::activateModule Failed to find module file, we use generic function with name " . $modName);
             $genericMod->remove('');
         }
 
@@ -302,11 +298,117 @@ abstract class DolibarrAdmin
             $countrb = count($objMod->requiredby);
             for ($i = 0; $i < $countrb; $i++) {
                 //var_dump($objMod->requiredby[$i]);
-                unActivateModule($objMod->requiredby[$i]);
+                unDolibarrAdmn::activateModule($objMod->requiredby[$i]);
             }
         }
 
         return $ret;
+    }
+
+    /**
+     *  Return array head with list of tabs to view object informations.
+     *
+     * @return    array                    head array with tabs
+     */
+    static function company_admin_prepare_head()
+    {
+        $conf = DolibarrGlobals::getConf();
+        $langs = DolibarrGlobals::getLangs();
+
+        $h = 0;
+        $head = [];
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company';
+        $head[$h][1] = $langs->trans("Company");
+        $head[$h][2] = 'company';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Openinghours';
+        $head[$h][1] = $langs->trans("OpeningHours");
+        $head[$h][2] = 'openinghours';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Accountant';
+        $head[$h][1] = $langs->trans("Accountant");
+        $head[$h][2] = 'accountant';
+        $h++;
+
+        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company_socialnetworks';
+        $head[$h][1] = $langs->trans("SocialNetworksInformation");
+        $head[$h][2] = 'socialnetworks';
+        $h++;
+
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'mycompany_admin', 'add');
+
+        DolibarrFunctions::complete_head_from_modules($conf, $langs, null, $head, $h, 'mycompany_admin', 'remove');
+
+        return $head;
+    }
+
+    /**
+     *  Activate external modules mandatory when country is country_code
+     *
+     * @param string $country_code CountryCode
+     *
+     * @return        int            1
+     */
+    static function activateModulesRequiredByCountry($country_code)
+    {
+        // global $db, $conf, $langs;
+        $conf = DolibarrGlobals::getConf();
+        $db = DolibarrGlobals::getDb();
+        $langs = DolibarrGlobals::getLangs();
+
+        $modulesdir = DolibarrFunctions2::dolGetModulesDirs();
+
+        foreach ($modulesdir as $dir) {
+            // Load modules attributes in arrays (name, numero, orders) from dir directory
+            DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
+            $handle = @opendir(DolibarrFunctions::dol_osencode($dir));
+            if (is_resource($handle)) {
+                while (($file = readdir($handle)) !== false) {
+                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, DolibarrFunctions::dol_strlen($file) - 10) == '.class.php') {
+                        $modName = substr($file, 0, DolibarrFunctions::dol_strlen($file) - 10);
+
+                        if ($modName) {
+                            include_once $dir . $file;
+                            $objMod = new $modName($db);
+
+                            $modulequalified = 1;
+
+                            // We discard modules according to features level (PS: if module is activated we always show it)
+                            $const_name = 'MAIN_MODULE_' . strtoupper(preg_replace('/^mod/i', '', get_class($objMod)));
+
+                            if ($objMod->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) {
+                                $modulequalified = 0;
+                            }
+                            if ($objMod->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) {
+                                $modulequalified = 0;
+                            }
+                            if (!empty($conf->global->$const_name)) {
+                                $modulequalified = 0; // already activated
+                            }
+
+                            if ($modulequalified) {
+                                // Load languages files of module
+                                if (isset($objMod->automatic_activation) && is_array($objMod->automatic_activation) && isset($objMod->automatic_activation[$country_code])) {
+                                    self::activateModule($modName);
+
+                                    setEventMessages($objMod->automatic_activation[$country_code], null, 'warnings');
+                                }
+                            } else {
+                                DolibarrFunctions::dol_syslog("Module " . get_class($objMod) . " not qualified");
+                            }
+                        }
+                    }
+                }
+                closedir($handle);
+            } else {
+                DolibarrFunctions::dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
+            }
+        }
+
+        return 1;
     }
 
     /**
@@ -338,7 +440,7 @@ abstract class DolibarrAdmin
         $modFile = $modName . ".class.php";
 
         // Loop on each directory to fill $modulesdir
-        $modulesdir = dolGetModulesDirs();
+        $modulesdir = DolibarrFunctions2::dolGetModulesDirs();
 
         // Loop on each modulesdir directories
         $found = false;
@@ -401,7 +503,7 @@ abstract class DolibarrAdmin
                         $activate = false;
                         foreach ($modulesdir as $dir) {
                             if (file_exists($dir . $modulestring . ".class.php")) {
-                                $resarray = activateModule($modulestring);
+                                $resarray = DolibarrAdmn::activateModule($modulestring);
                                 if (empty($resarray['errors'])) {
                                     $activate = true;
                                 } else {
@@ -417,7 +519,7 @@ abstract class DolibarrAdmin
                             $ret['nbmodules'] += $resarray['nbmodules'];
                             $ret['nbperms'] += $resarray['nbperms'];
                         } else {
-                            $ret['errors'][] = $langs->trans('activateModuleDependNotSatisfied', $objMod->name, $modulestring);
+                            $ret['errors'][] = $langs->trans('DolibarrAdmn::activateModuleDependNotSatisfied', $objMod->name, $modulestring);
                         }
                     }
                 }
@@ -428,7 +530,7 @@ abstract class DolibarrAdmin
                     for ($i = 0; $i < $num; $i++) {
                         foreach ($modulesdir as $dir) {
                             if (file_exists($dir . $objMod->conflictwith[$i] . ".class.php")) {
-                                unActivateModule($objMod->conflictwith[$i], 0);
+                                unDolibarrAdmn::activateModule($objMod->conflictwith[$i], 0);
                             }
                         }
                     }
@@ -1141,7 +1243,7 @@ abstract class DolibarrAdmin
         $sessPath .= '/'; // We need the trailing slash
         DolibarrFunctions::dol_syslog('admin.lib:listOfSessions sessPath=' . $sessPath);
 
-        $dh = @opendir(dol_osencode($sessPath));
+        $dh = @opendir(DolibarrFunctions::dol_osencode($sessPath));
         if ($dh) {
             while (($file = @readdir($dh)) !== false) {
                 if (preg_match('/^sess_/i', $file) && $file != "." && $file != "..") {
@@ -1193,7 +1295,7 @@ abstract class DolibarrAdmin
 
         $error = 0;
 
-        $dh = @opendir(dol_osencode($sessPath));
+        $dh = @opendir(DolibarrFunctions::dol_osencode($sessPath));
         if ($dh) {
             while (($file = @readdir($dh)) !== false) {
                 if ($file != "." && $file != "..") {
@@ -1253,7 +1355,7 @@ abstract class DolibarrAdmin
         DolibarrFunctions::dol_syslog("complete_dictionary_with_modules Search external modules to complete the list of dictionnary tables", LOG_DEBUG, 1);
 
         // Search modules
-        $modulesdir = dolGetModulesDirs();
+        $modulesdir = DolibarrFunctions2::dolGetModulesDirs();
         $i = 0; // is a sequencer of modules found
         $j = 0; // j is module number. Automatically affected if module number not defined.
 
@@ -1261,12 +1363,12 @@ abstract class DolibarrAdmin
             // Load modules attributes in arrays (name, numero, orders) from dir directory
             //print $dir."\n<br>";
             DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
-            $handle = @opendir(dol_osencode($dir));
+            $handle = @opendir(DolibarrFunctions::dol_osencode($dir));
             if (is_resource($handle)) {
                 while (($file = readdir($handle)) !== false) {
                     //print "$i ".$file."\n<br>";
-                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, dol_strlen($file) - 10) == '.class.php') {
-                        $modName = substr($file, 0, dol_strlen($file) - 10);
+                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, DolibarrFunctions::dol_strlen($file) - 10) == '.class.php') {
+                        $modName = substr($file, 0, DolibarrFunctions::dol_strlen($file) - 10);
 
                         if ($modName) {
                             // include_once $dir . $file;
@@ -1411,69 +1513,6 @@ abstract class DolibarrAdmin
     }
 
     /**
-     *  Activate external modules mandatory when country is country_code
-     *
-     * @param string $country_code CountryCode
-     *
-     * @return        int            1
-     */
-    function activateModulesRequiredByCountry($country_code)
-    {
-        global $db, $conf, $langs;
-
-        $modulesdir = dolGetModulesDirs();
-
-        foreach ($modulesdir as $dir) {
-            // Load modules attributes in arrays (name, numero, orders) from dir directory
-            DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
-            $handle = @opendir(dol_osencode($dir));
-            if (is_resource($handle)) {
-                while (($file = readdir($handle)) !== false) {
-                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, dol_strlen($file) - 10) == '.class.php') {
-                        $modName = substr($file, 0, dol_strlen($file) - 10);
-
-                        if ($modName) {
-                            include_once $dir . $file;
-                            $objMod = new $modName($db);
-
-                            $modulequalified = 1;
-
-                            // We discard modules according to features level (PS: if module is activated we always show it)
-                            $const_name = 'MAIN_MODULE_' . strtoupper(preg_replace('/^mod/i', '', get_class($objMod)));
-
-                            if ($objMod->version == 'development' && $conf->global->MAIN_FEATURES_LEVEL < 2) {
-                                $modulequalified = 0;
-                            }
-                            if ($objMod->version == 'experimental' && $conf->global->MAIN_FEATURES_LEVEL < 1) {
-                                $modulequalified = 0;
-                            }
-                            if (!empty($conf->global->$const_name)) {
-                                $modulequalified = 0; // already activated
-                            }
-
-                            if ($modulequalified) {
-                                // Load languages files of module
-                                if (isset($objMod->automatic_activation) && is_array($objMod->automatic_activation) && isset($objMod->automatic_activation[$country_code])) {
-                                    activateModule($modName);
-
-                                    setEventMessages($objMod->automatic_activation[$country_code], null, 'warnings');
-                                }
-                            } else {
-                                DolibarrFunctions::dol_syslog("Module " . get_class($objMod) . " not qualified");
-                            }
-                        }
-                    }
-                }
-                closedir($handle);
-            } else {
-                DolibarrFunctions::dol_syslog("htdocs/admin/modules.php: Failed to open directory " . $dir . ". See permission and open_basedir option.", LOG_WARNING);
-            }
-        }
-
-        return 1;
-    }
-
-    /**
      *  Search external modules to complete the list of contact element
      *
      * @param array $elementList elementList
@@ -1496,18 +1535,18 @@ abstract class DolibarrAdmin
 
         DolibarrFunctions::dol_syslog("complete_elementList_with_modules Search external modules to complete the list of contact element", LOG_DEBUG, 1);
 
-        $modulesdir = dolGetModulesDirs();
+        $modulesdir = DolibarrFunctions2::dolGetModulesDirs();
 
         foreach ($modulesdir as $dir) {
             // Load modules attributes in arrays (name, numero, orders) from dir directory
             //print $dir."\n<br>";
             DolibarrFunctions::dol_syslog("Scan directory " . $dir . " for modules");
-            $handle = @opendir(dol_osencode($dir));
+            $handle = @opendir(DolibarrFunctions::dol_osencode($dir));
             if (is_resource($handle)) {
                 while (($file = readdir($handle)) !== false) {
                     //print "$i ".$file."\n<br>";
-                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, dol_strlen($file) - 10) == '.class.php') {
-                        $modName = substr($file, 0, dol_strlen($file) - 10);
+                    if (is_readable($dir . $file) && substr($file, 0, 3) == 'mod' && substr($file, DolibarrFunctions::dol_strlen($file) - 10) == '.class.php') {
+                        $modName = substr($file, 0, DolibarrFunctions::dol_strlen($file) - 10);
 
                         if ($modName) {
                             include_once $dir . $file;
@@ -1913,45 +1952,6 @@ abstract class DolibarrAdmin
             }
         }
         return $info_arr;
-    }
-
-    /**
-     *  Return array head with list of tabs to view object informations.
-     *
-     * @return    array                    head array with tabs
-     */
-    function company_admin_prepare_head()
-    {
-        global $langs, $conf;
-
-        $h = 0;
-        $head = [];
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company';
-        $head[$h][1] = $langs->trans("Company");
-        $head[$h][2] = 'company';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Openinghours';
-        $head[$h][1] = $langs->trans("OpeningHours");
-        $head[$h][2] = 'openinghours';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Accountant';
-        $head[$h][1] = $langs->trans("Accountant");
-        $head[$h][2] = 'accountant';
-        $h++;
-
-        $head[$h][0] = constant('BASE_URI') . '?module=Admin&controller=Company_socialnetworks';
-        $head[$h][1] = $langs->trans("SocialNetworksInformation");
-        $head[$h][2] = 'socialnetworks';
-        $h++;
-
-        complete_head_from_modules($conf, $langs, null, $head, $h, 'mycompany_admin', 'add');
-
-        complete_head_from_modules($conf, $langs, null, $head, $h, 'mycompany_admin', 'remove');
-
-        return $head;
     }
 
     /**

@@ -20,6 +20,7 @@
 namespace Alxarafe\Dolibarr\Classes;
 
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
+use Alxarafe\Modules\Users\Classes\User;
 
 /**
  *   \file            htdocs/core/class/interfaces.class.php

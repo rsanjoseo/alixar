@@ -1995,7 +1995,7 @@ abstract class DolibarrFunctions
      */
     static public function dol_string_unaccent($str)
     {
-        if (utf8_check($str)) {
+        if (self::utf8_check($str)) {
             // See http://www.utf8-chartable.de/
             $string = rawurlencode($str);
             $replacements = [
@@ -2035,6 +2035,44 @@ abstract class DolibarrFunctions
             $string = strtr($string, ["\xC4" => "Ae", "\xC6" => "AE", "\xD6" => "Oe", "\xDC" => "Ue", "\xDE" => "TH", "\xDF" => "ss", "\xE4" => "ae", "\xE6" => "ae", "\xF6" => "oe", "\xFC" => "ue", "\xFE" => "th"]);
             return $string;
         }
+    }
+
+    /**
+     *      Check if a string is in UTF8
+     *
+     * @param string $str String to check
+     *
+     * @return    boolean                True if string is UTF8 or ISO compatible with UTF8, False if not (ISO with special char or Binary)
+     */
+    static public function utf8_check($str)
+    {
+        $str = (string) $str;    // Sometimes string is an int.
+
+        // We must use here a binary strlen function (so not DolibarrFunctions::dol_strlen)
+        $strLength = DolibarrFunctions::dol_strlen($str);
+        for ($i = 0; $i < $strLength; $i++) {
+            if (ord($str[$i]) < 0x80) {
+                continue; // 0bbbbbbb
+            } elseif ((ord($str[$i]) & 0xE0) == 0xC0) {
+                $n = 1; // 110bbbbb
+            } elseif ((ord($str[$i]) & 0xF0) == 0xE0) {
+                $n = 2; // 1110bbbb
+            } elseif ((ord($str[$i]) & 0xF8) == 0xF0) {
+                $n = 3; // 11110bbb
+            } elseif ((ord($str[$i]) & 0xFC) == 0xF8) {
+                $n = 4; // 111110bb
+            } elseif ((ord($str[$i]) & 0xFE) == 0xFC) {
+                $n = 5; // 1111110b
+            } else {
+                return false; // Does not match any model
+            }
+            for ($j = 0; $j < $n; $j++) { // n bytes matching 10bbbbbb follow ?
+                if ((++$i == strlen($str)) || ((ord($str[$i]) & 0xC0) != 0x80)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -4886,6 +4924,22 @@ abstract class DolibarrFunctions
     }
 
     /**
+     * Replace htmlentities functions.
+     * Goal of this function is to be sure to have default values of htmlentities that match what we need.
+     *
+     * @param string $string        The input string to encode
+     * @param int    $flags         Flags (see PHP doc above)
+     * @param string $encoding      Encoding page code
+     * @param bool   $double_encode When double_encode is turned off, PHP will not encode existing html entities
+     *
+     * @return  string  $ret            Encoded string
+     */
+    static public function dol_htmlentities($string, $flags = null, $encoding = 'UTF-8', $double_encode = false)
+    {
+        return htmlentities($string, $flags, $encoding, $double_encode);
+    }
+
+    /**
      * Show a public email and error code to contact if technical error
      *
      * @param string $prefixcode    Prefix of public error code
@@ -5918,7 +5972,7 @@ abstract class DolibarrFunctions
      */
     static public function isOnlyOneLocalTax($local)
     {
-        $tax = get_localtax_by_third($local);
+        $tax = self::get_localtax_by_third($local);
 
         $valors = explode(":", $tax);
 
@@ -5938,7 +5992,9 @@ abstract class DolibarrFunctions
      */
     static public function get_localtax_by_third($local)
     {
-        global $db, $mysoc;
+        $db = DolibarrGlobals::getDb();
+        $mysoc = DolibarrGlobals::getMySoc();
+
         $sql = "SELECT t.localtax1, t.localtax2 ";
         $sql .= " FROM " . MAIN_DB_PREFIX . "c_tva as t inner join " . MAIN_DB_PREFIX . "c_country as c ON c.rowid=t.fk_pays";
         $sql .= " WHERE c.code = '" . $db->escape($mysoc->country_code) . "' AND t.active = 1 AND t.taux=(";
@@ -6764,46 +6820,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     *    This function is called to encode a string into a HTML string but differs from htmlentities because
-     *    a detection is done before to see if text is already HTML or not. Also, all entities but &,<,>," are converted.
-     *  This permits to encode special chars to entities with no double encoding for already encoded HTML strings.
-     *    This function also remove last EOL or BR if $removelasteolbr=1 (default).
-     *  For PDF usage, you can show text by 2 ways:
-     *              - writeHTMLCell -> param must be encoded into HTML.
-     *              - MultiCell -> param must not be encoded into HTML.
-     *              Because writeHTMLCell convert also \n into <br>, if function
-     *              is used to build PDF, nl2brmode must be 1.
-     *
-     * @param string $stringtoencode  String to encode
-     * @param int    $nl2brmode       0=Adding br before \n, 1=Replacing \n by br (for use with FPDF writeHTMLCell function for example)
-     * @param string $pagecodefrom    Pagecode stringtoencode is encoded
-     * @param int    $removelasteolbr 1=Remove last br or lasts \n (default), 0=Do nothing
-     *
-     * @return    string                        String encoded
-     */
-    static public function dol_htmlentitiesbr($stringtoencode, $nl2brmode = 0, $pagecodefrom = 'UTF-8', $removelasteolbr = 1)
-    {
-        $newstring = $stringtoencode;
-        if (self::dol_textishtml($stringtoencode)) {    // Check if text is already HTML or not
-            $newstring = preg_replace('/<br(\s[\sa-zA-Z_="]*)?\/?>/i', '<br>', $newstring); // Replace "<br type="_moz" />" by "<br>". It's same and avoid pb with FPDF.
-            if ($removelasteolbr) {
-                $newstring = preg_replace('/<br>$/i', '', $newstring); // Remove last <br> (remove only last one)
-            }
-            $newstring = strtr($newstring, ['&' => '__and__', '<' => '__lt__', '>' => '__gt__', '"' => '__dquot__']);
-            $newstring = self::dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom); // Make entity encoding
-            $newstring = strtr($newstring, ['__and__' => '&', '__lt__' => '<', '__gt__' => '>', '__dquot__' => '"']);
-        } else {
-            if ($removelasteolbr) {
-                $newstring = preg_replace('/(\r\n|\r|\n)$/i', '', $newstring); // Remove last \n (may remove several)
-            }
-            $newstring = dol_nl2br(dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom), $nl2brmode);
-        }
-        // Other substitutions that htmlentities does not do
-        //$newstring=str_replace(chr(128),'&euro;',$newstring);	// 128 = 0x80. Not in html entity table.     // Seems useles with TCPDF. Make bug with UTF8 languages
-        return $newstring;
-    }
-
-    /**
      *    This function is called to decode a HTML string (it decodes entities and br tags)
      *
      * @param string $stringtodecode String to decode
@@ -6832,22 +6848,6 @@ abstract class DolibarrFunctions
     {
         $ret = preg_replace('/(<br>|<br(\s[\sa-zA-Z_="]*)?\/?>|' . "\n" . '|' . "\r" . ')+$/i', "", $stringtodecode);
         return $ret;
-    }
-
-    /**
-     * Replace htmlentities functions.
-     * Goal of this function is to be sure to have default values of htmlentities that match what we need.
-     *
-     * @param string $string        The input string to encode
-     * @param int    $flags         Flags (see PHP doc above)
-     * @param string $encoding      Encoding page code
-     * @param bool   $double_encode When double_encode is turned off, PHP will not encode existing html entities
-     *
-     * @return  string  $ret            Encoded string
-     */
-    static public function dol_htmlentities($string, $flags = null, $encoding = 'UTF-8', $double_encode = false)
-    {
-        return htmlentities($string, $flags, $encoding, $double_encode);
     }
 
     /**
@@ -7473,6 +7473,46 @@ abstract class DolibarrFunctions
         }
 
         return $substitutionarray;
+    }
+
+    /**
+     *    This function is called to encode a string into a HTML string but differs from htmlentities because
+     *    a detection is done before to see if text is already HTML or not. Also, all entities but &,<,>," are converted.
+     *  This permits to encode special chars to entities with no double encoding for already encoded HTML strings.
+     *    This function also remove last EOL or BR if $removelasteolbr=1 (default).
+     *  For PDF usage, you can show text by 2 ways:
+     *              - writeHTMLCell -> param must be encoded into HTML.
+     *              - MultiCell -> param must not be encoded into HTML.
+     *              Because writeHTMLCell convert also \n into <br>, if function
+     *              is used to build PDF, nl2brmode must be 1.
+     *
+     * @param string $stringtoencode  String to encode
+     * @param int    $nl2brmode       0=Adding br before \n, 1=Replacing \n by br (for use with FPDF writeHTMLCell function for example)
+     * @param string $pagecodefrom    Pagecode stringtoencode is encoded
+     * @param int    $removelasteolbr 1=Remove last br or lasts \n (default), 0=Do nothing
+     *
+     * @return    string                        String encoded
+     */
+    static public function dol_htmlentitiesbr($stringtoencode, $nl2brmode = 0, $pagecodefrom = 'UTF-8', $removelasteolbr = 1)
+    {
+        $newstring = $stringtoencode;
+        if (self::dol_textishtml($stringtoencode)) {    // Check if text is already HTML or not
+            $newstring = preg_replace('/<br(\s[\sa-zA-Z_="]*)?\/?>/i', '<br>', $newstring); // Replace "<br type="_moz" />" by "<br>". It's same and avoid pb with FPDF.
+            if ($removelasteolbr) {
+                $newstring = preg_replace('/<br>$/i', '', $newstring); // Remove last <br> (remove only last one)
+            }
+            $newstring = strtr($newstring, ['&' => '__and__', '<' => '__lt__', '>' => '__gt__', '"' => '__dquot__']);
+            $newstring = self::dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom); // Make entity encoding
+            $newstring = strtr($newstring, ['__and__' => '&', '__lt__' => '<', '__gt__' => '>', '__dquot__' => '"']);
+        } else {
+            if ($removelasteolbr) {
+                $newstring = preg_replace('/(\r\n|\r|\n)$/i', '', $newstring); // Remove last \n (may remove several)
+            }
+            $newstring = dol_nl2br(dol_htmlentities($newstring, ENT_COMPAT, $pagecodefrom), $nl2brmode);
+        }
+        // Other substitutions that htmlentities does not do
+        //$newstring=str_replace(chr(128),'&euro;',$newstring);	// 128 = 0x80. Not in html entity table.     // Seems useles with TCPDF. Make bug with UTF8 languages
+        return $newstring;
     }
 
     /**
@@ -8112,44 +8152,6 @@ abstract class DolibarrFunctions
     }
 
     /**
-     *      Check if a string is in UTF8
-     *
-     * @param string $str String to check
-     *
-     * @return    boolean                True if string is UTF8 or ISO compatible with UTF8, False if not (ISO with special char or Binary)
-     */
-    static public function utf8_check($str)
-    {
-        $str = (string) $str;    // Sometimes string is an int.
-
-        // We must use here a binary strlen function (so not DolibarrFunctions::dol_strlen)
-        $strLength = DolibarrFunctions::dol_strlen($str);
-        for ($i = 0; $i < $strLength; $i++) {
-            if (ord($str[$i]) < 0x80) {
-                continue; // 0bbbbbbb
-            } elseif ((ord($str[$i]) & 0xE0) == 0xC0) {
-                $n = 1; // 110bbbbb
-            } elseif ((ord($str[$i]) & 0xF0) == 0xE0) {
-                $n = 2; // 1110bbbb
-            } elseif ((ord($str[$i]) & 0xF8) == 0xF0) {
-                $n = 3; // 11110bbb
-            } elseif ((ord($str[$i]) & 0xFC) == 0xF8) {
-                $n = 4; // 111110bb
-            } elseif ((ord($str[$i]) & 0xFE) == 0xFC) {
-                $n = 5; // 1111110b
-            } else {
-                return false; // Does not match any model
-            }
-            for ($j = 0; $j < $n; $j++) { // n bytes matching 10bbbbbb follow ?
-                if ((++$i == strlen($str)) || ((ord($str[$i]) & 0xC0) != 0x80)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      *      Check if a string is in ASCII
      *
      * @param string $str String to check
@@ -8633,11 +8635,12 @@ abstract class DolibarrFunctions
      *        js for conf->global->MAIN_SHOW_TUNING_INFO or $_SERVER["MAIN_SHOW_TUNING_INFO"]
      *        js for conf->logbuffer
      *
+     * @param array  $vars
      * @param string $zone 'private' (for private pages) or 'public' (for public pages)
      *
-     * @return    void
+     * @throws Exception
      */
-    static function printCommonFooter($zone = 'private')
+    static function printCommonFooter(array $vars, string $zone = 'private')
     {
         //        global $conf, $hookmanager, $user, $debugbar;
         //        global $action;
@@ -8645,6 +8648,8 @@ abstract class DolibarrFunctions
         $conf = DolibarrGlobals::getConf();
         $hookmanager = DolibarrGlobals::getHookManager();
         $langs = DolibarrGlobals::getLangs();
+
+        $action = $vars['actions'];
 
         if ($zone == 'private') {
             print "\n" . '<!-- Common footer for private page -->' . "\n";

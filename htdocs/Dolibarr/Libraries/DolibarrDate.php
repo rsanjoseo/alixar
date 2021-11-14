@@ -991,7 +991,7 @@ abstract class DolibarrDate
      *
      * @return array                        Month string or array if selected < 0
      */
-    function monthArray($outputlangs, $short = 0)
+    static function monthArray($outputlangs, $short = 0)
     {
         $montharray = [
             1 => $outputlangs->trans("Month01"),

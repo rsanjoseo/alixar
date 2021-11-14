@@ -31,6 +31,7 @@
  *    \brief      Description and activation file for the module to manage catalog of predefined products
  */
 
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
 use Alxarafe\Dolibarr\Classes\DolibarrModules;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 
@@ -41,12 +42,16 @@ use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
  */
 class modProduct extends DolibarrModules
 {
+    private $mysoc;
+
     /**
      *   Constructor. Define names, constants, directories, boxes, permissions
      */
     public function __construct()
     {
         parent::__construct();
+
+        $this->mysoc = DolibarrGlobals::getMySoc();
 
         $this->numero = 50;
 
@@ -168,8 +173,8 @@ class modProduct extends DolibarrModules
         */
 
         $usenpr = 0;
-        if (is_object($mysoc)) {
-            $usenpr = $mysoc->useNPR();
+        if (is_object($this->mysoc)) {
+            $usenpr = $this->mysoc->useNPR();
         }
 
         // Exports
@@ -200,7 +205,7 @@ class modProduct extends DolibarrModules
             'p.tva_tx' => 'VATRate',
             'p.datec' => 'DateCreation', 'p.tms' => 'DateModification',
         ];
-        if (is_object($mysoc) && $usenpr) {
+        if (is_object($this->mysoc) && $usenpr) {
             $this->export_fields_array[$r]['p.recuperableonly'] = 'NPR';
         }
         if ((!empty($this->conf->fournisseur->enabled) && empty($this->conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($this->conf->supplier_order->enabled) || !empty($this->conf->supplier_invoice->enabled) || !empty($this->conf->margin->enabled)) {
@@ -330,7 +335,7 @@ class modProduct extends DolibarrModules
                 'pr.tva_tx' => 'PriceLevelVATRate',
                 'pr.date_price' => 'DateCreation',
             ];
-            if (is_object($mysoc) && $usenpr) {
+            if (is_object($this->mysoc) && $usenpr) {
                 $this->export_fields_array[$r]['pr.recuperableonly'] = 'NPR';
             }
             //$this->export_TypeFields_array[$r]=array(
@@ -372,7 +377,7 @@ class modProduct extends DolibarrModules
                 'pr.default_vat_code' => 'PriceVATCode',
                 'pr.datec' => 'DateCreation',
             ];
-            if (is_object($mysoc) && $usenpr) {
+            if (is_object($this->mysoc) && $usenpr) {
                 $this->export_fields_array[$r]['pr.recuperableonly'] = 'NPR';
             }
             $this->export_entities_array[$r] = [
@@ -628,13 +633,13 @@ class modProduct extends DolibarrModules
         if ((!empty($this->conf->fournisseur->enabled) && empty($this->conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($this->conf->supplier_order->enabled) || !empty($this->conf->supplier_invoice->enabled) || !empty($this->conf->margin->enabled)) {
             $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['p.cost_price' => 'CostPrice']);
         }
-        if (is_object($mysoc) && $usenpr) {
+        if (is_object($this->mysoc) && $usenpr) {
             $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['p.recuperableonly' => 'NPR']);
         }
-        if (is_object($mysoc) && $mysoc->useLocalTax(1)) {
+        if (is_object($this->mysoc) && $this->mysoc->useLocalTax(1)) {
             $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['p.localtax1_tx' => 'LT1', 'p.localtax1_type' => 'LT1Type']);
         }
-        if (is_object($mysoc) && $mysoc->useLocalTax(2)) {
+        if (is_object($this->mysoc) && $this->mysoc->useLocalTax(2)) {
             $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['p.localtax2_tx' => 'LT2', 'p.localtax2_type' => 'LT2Type']);
         }
         if (!empty($this->conf->barcode->enabled)) {
@@ -721,13 +726,13 @@ class modProduct extends DolibarrModules
         if ((!empty($this->conf->fournisseur->enabled) && empty($this->conf->global->MAIN_USE_NEW_SUPPLIERMOD)) || !empty($this->conf->supplier_order->enabled) || !empty($this->conf->supplier_invoice->enabled) || !empty($this->conf->margin->enabled)) {
             $import_sample = array_merge($import_sample, ['p.cost_price' => '90']);
         }
-        if (is_object($mysoc) && $usenpr) {
+        if (is_object($this->mysoc) && $usenpr) {
             $import_sample = array_merge($import_sample, ['p.recuperableonly' => '0']);
         }
-        if (is_object($mysoc) && $mysoc->useLocalTax(1)) {
+        if (is_object($this->mysoc) && $this->mysoc->useLocalTax(1)) {
             $import_sample = array_merge($import_sample, ['p.localtax1_tx' => '', 'p.localtax1_type' => '']);
         }
-        if (is_object($mysoc) && $mysoc->useLocalTax(2)) {
+        if (is_object($this->mysoc) && $this->mysoc->useLocalTax(2)) {
             $import_sample = array_merge($import_sample, ['p.localtax2_tx' => '', 'p.localtax2_type' => '']);
         }
         if (!empty($this->conf->barcode->enabled)) {
@@ -776,13 +781,13 @@ class modProduct extends DolibarrModules
                                               'sp.delivery_time_days' => 'DeliveryDelay',
                                               'sp.supplier_reputation' => 'SupplierReputation',
             ];
-            if (is_object($mysoc) && $usenpr) {
+            if (is_object($this->mysoc) && $usenpr) {
                 $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['sp.recuperableonly' => 'VATNPR']);
             }
-            if (is_object($mysoc) && $mysoc->useLocalTax(1)) {
+            if (is_object($this->mysoc) && $this->mysoc->useLocalTax(1)) {
                 $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['sp.localtax1_tx' => 'LT1', 'sp.localtax1_type' => 'LT1Type']);
             }
-            if (is_object($mysoc) && $mysoc->useLocalTax(2)) {
+            if (is_object($this->mysoc) && $this->mysoc->useLocalTax(2)) {
                 $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['sp.localtax2_tx' => 'LT2', 'sp.localtax2_type' => 'LT2Type']);
             }
             $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], [
@@ -838,13 +843,13 @@ class modProduct extends DolibarrModules
                 'sp.delivery_time_days' => '5',
                 'sp.supplier_reputation' => 'FAVORITE / NOTTHGOOD / DONOTORDER',
             ];
-            if (is_object($mysoc) && $usenpr) {
+            if (is_object($this->mysoc) && $usenpr) {
                 $this->import_examplevalues_array[$r] = array_merge($this->import_examplevalues_array[$r], ['sp.recuperableonly' => '']);
             }
-            if (is_object($mysoc) && $mysoc->useLocalTax(1)) {
+            if (is_object($this->mysoc) && $this->mysoc->useLocalTax(1)) {
                 $this->import_examplevalues_array[$r] = array_merge($this->import_examplevalues_array[$r], ['sp.localtax1_tx' => 'LT1', 'sp.localtax1_type' => 'LT1Type']);
             }
-            if (is_object($mysoc) && $mysoc->useLocalTax(2)) {
+            if (is_object($this->mysoc) && $this->mysoc->useLocalTax(2)) {
                 $this->import_examplevalues_array[$r] = array_merge($this->import_examplevalues_array[$r], ['sp.localtax2_tx' => 'LT2', 'sp.localtax2_type' => 'LT2Type']);
             }
             $this->import_examplevalues_array[$r] = array_merge($this->import_examplevalues_array[$r], [
@@ -891,7 +896,7 @@ class modProduct extends DolibarrModules
             if (!empty($this->conf->global->PRODUIT_MULTIPRICES_USE_VAT_PER_LEVEL)) {
                 $this->import_fields_array[$r]['pr.tva_tx'] = 'VATRate';
             }
-            if (is_object($mysoc) && $usenpr) {
+            if (is_object($this->mysoc) && $usenpr) {
                 $this->import_fields_array[$r] = array_merge($this->import_fields_array[$r], ['pr.recuperableonly' => 'NPR']);
             }
             $this->import_regex_array[$r] = ['pr.datec' => '^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$', 'pr.recuperableonly' => '^[0|1]$'];

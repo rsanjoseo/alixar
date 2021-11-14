@@ -25,7 +25,7 @@
 
 use Alxarafe\Dolibarr\Classes\Conf;
 use Alxarafe\Dolibarr\Classes\DolibarrTriggers;
-use Alxarafe\Dolibarr\Classes\User;
+use Alxarafe\Modules\Users\Classes\User;
 
 //require_once DOL_DOCUMENT_ROOT . '/Dolibarr/Triggers/dolibarrtriggers.class.php';
 

@@ -73,6 +73,7 @@ class DolibarrView extends View
     public MenuManager $menumanager;
     public $form;
     public $formadmin;
+    public $action;
 
     function __construct(BasicController $controller)
     {
@@ -85,8 +86,33 @@ class DolibarrView extends View
         $this->hookmanager = $controller->hookmanager;
         $this->menumanager = $controller->menumanager;
 
+        $this->action = $controller->action;
+
         $this->conf = DolibarrGlobals::getConf();
         $this->forcehttps = $this->conf->file->main_force_https;
+
+        // Constants used to defined number of lines in textarea
+        if (empty($this->conf->browser->firefox)) {
+            define('ROWS_1', 1);
+            define('ROWS_2', 2);
+            define('ROWS_3', 3);
+            define('ROWS_4', 4);
+            define('ROWS_5', 5);
+            define('ROWS_6', 6);
+            define('ROWS_7', 7);
+            define('ROWS_8', 8);
+            define('ROWS_9', 9);
+        } else {
+            define('ROWS_1', 0);
+            define('ROWS_2', 1);
+            define('ROWS_3', 2);
+            define('ROWS_4', 3);
+            define('ROWS_5', 4);
+            define('ROWS_6', 5);
+            define('ROWS_7', 6);
+            define('ROWS_8', 7);
+            define('ROWS_9', 8);
+        }
 
         // Init session. Name of session is specific to Dolibarr instance.
         // Must be done after the include of filefunc.inc.php so global variables of conf file are defined (like $dolibarr_main_instance_unique_id or $this->forcehttps).
@@ -513,29 +539,6 @@ class DolibarrView extends View
         $mesgs = [];
         $warnings = [];
         $errors = [];
-
-        // Constants used to defined number of lines in textarea
-        if (empty($this->conf->browser->firefox)) {
-            define('ROWS_1', 1);
-            define('ROWS_2', 2);
-            define('ROWS_3', 3);
-            define('ROWS_4', 4);
-            define('ROWS_5', 5);
-            define('ROWS_6', 6);
-            define('ROWS_7', 7);
-            define('ROWS_8', 8);
-            define('ROWS_9', 9);
-        } else {
-            define('ROWS_1', 0);
-            define('ROWS_2', 1);
-            define('ROWS_3', 2);
-            define('ROWS_4', 3);
-            define('ROWS_5', 4);
-            define('ROWS_6', 5);
-            define('ROWS_7', 6);
-            define('ROWS_8', 7);
-            define('ROWS_9', 8);
-        }
 
         $heightforframes = 50;
 
@@ -2467,7 +2470,9 @@ class DolibarrView extends View
             print '<!-- ' . $comment . ' -->' . "\n";
         }
 
-        DolibarrFunctions::printCommonFooter($zone);
+        DolibarrFunctions::printCommonFooter([
+            'actions' => $this->action,
+        ], $zone);
 
         if (!empty($delayedhtmlcontent)) {
             print $delayedhtmlcontent;

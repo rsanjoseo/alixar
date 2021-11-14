@@ -11,6 +11,8 @@ use Alxarafe\Core\Singletons\DebugTool;
 use Alxarafe\Core\Singletons\FlashMessages;
 use Alxarafe\Core\Singletons\Logger;
 use Alxarafe\Core\Utils\ClassUtils;
+use Alxarafe\Dolibarr\Base\DolibarrGlobals;
+use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use NumberFormatter;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Loader\YamlFileLoader;
@@ -430,11 +432,12 @@ class Translator extends Provider
 
     public function loadCacheCurrencies()
     {
-        global $db;
+        $db = DolibarrGlobals::getDb();
 
         if ($this->cache_currencies_all_loaded) {
             return 0; // Cache already loaded for all
         }
+
         if (!empty($currency_code) && isset($this->cache_currencies[$currency_code])) {
             return 0; // Cache already loaded for the currency
         }
@@ -447,41 +450,42 @@ class Translator extends Provider
         }
         //$sql.= " ORDER BY code_iso ASC"; // Not required, a sort is done later
 
-        dol_syslog(get_class($this) . '::loadCacheCurrencies', LOG_DEBUG);
-        $resql = $db->query($sql);
-        if ($resql) {
-            $this->load("dict");
-            $label = [];
-            if (!empty($currency_code)) {
-                foreach ($this->cache_currencies as $key => $val) {
-                    $label[$key] = $val['label']; // Label in already loaded cache
-                }
-            }
+        DolibarrFunctions::dol_syslog(get_class($this) . '::loadCacheCurrencies', LOG_DEBUG);
 
-            $num = $db->num_rows($resql);
-            $i = 0;
-            while ($i < $num) {
-                $obj = $db->fetch_object($resql);
-
-                // Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
-                $this->cache_currencies[$obj->code_iso]['label'] = ($obj->code_iso && $this->trans("Currency" . $obj->code_iso) != "Currency" . $obj->code_iso ? $this->trans("Currency" . $obj->code_iso) : ($obj->label != '-' ? $obj->label : ''));
-                $this->cache_currencies[$obj->code_iso]['unicode'] = (array) json_decode($obj->unicode, true);
-                $label[$obj->code_iso] = $this->cache_currencies[$obj->code_iso]['label'];
-                $i++;
-            }
-            if (empty($currency_code)) {
-                $this->cache_currencies_all_loaded = true;
-            }
-            //print count($label).' '.count($this->cache_currencies);
-
-            // Resort cache
-            array_multisort($label, SORT_ASC, $this->cache_currencies);
-            //var_dump($this->cache_currencies);	$this->cache_currencies is now sorted onto label
-            return $num;
-        } else {
+        $resql = $db->select($sql);
+        if ($resql == false) {
             dol_print_error($db);
             return -1;
         }
+
+        $num = count($resql);
+        $this->load("dict");
+        $label = [];
+        if (!empty($currency_code)) {
+            foreach ($this->cache_currencies as $key => $val) {
+                $label[$key] = $val['label']; // Label in already loaded cache
+            }
+        }
+
+        $i = 0;
+        while ($i < $num) { // We can use a foreach
+            $obj = (object) $resql[$i];
+
+            // Si traduction existe, on l'utilise, sinon on prend le libelle par defaut
+            $this->cache_currencies[$obj->code_iso]['label'] = ($obj->code_iso && $this->trans("Currency" . $obj->code_iso) != "Currency" . $obj->code_iso ? $this->trans("Currency" . $obj->code_iso) : ($obj->label != '-' ? $obj->label : ''));
+            $this->cache_currencies[$obj->code_iso]['unicode'] = (array) json_decode($obj->unicode, true);
+            $label[$obj->code_iso] = $this->cache_currencies[$obj->code_iso]['label'];
+            $i++;
+        }
+        if (empty($currency_code)) {
+            $this->cache_currencies_all_loaded = true;
+        }
+        //print count($label).' '.count($this->cache_currencies);
+
+        // Resort cache
+        array_multisort($label, SORT_ASC, $this->cache_currencies);
+        //var_dump($this->cache_currencies);	$this->cache_currencies is now sorted onto label
+        return $num;
     }
 
     public function load($domain, $alt = 0, $stopafterdirection = 0, $forcelangdir = '', $loadfromfileonly = 0, $forceloadifalreadynotfound = 0)

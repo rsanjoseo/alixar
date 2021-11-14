@@ -51,6 +51,7 @@ use Alxarafe\Dolibarr\Libraries\DolibarrAdmin;
 use Alxarafe\Dolibarr\Libraries\DolibarrFiles;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions;
 use Alxarafe\Dolibarr\Libraries\DolibarrFunctions2;
+use stdClass;
 
 /**
  * Class Modules
@@ -61,12 +62,14 @@ class ModulesView extends DolibarrView
 {
     public $object;
     public $dirins;
+    public $mode;
 
     public function __construct(BasicController $controller)
     {
         parent::__construct($controller);
         $this->object = $controller->object;
         $this->dirins = $controller->dirins;
+        $this->mode = $controller->mode;
     }
 
     function printPage(): string
@@ -235,6 +238,7 @@ class ModulesView extends DolibarrView
             }
         }
 
+        $formconfirm = '';
         if ($this->action == 'reset_confirm' && $this->user->admin) {
             if (!empty($modules[$this->value])) {
                 $objMod = $modules[$this->value];
@@ -243,7 +247,7 @@ class ModulesView extends DolibarrView
                     $this->langs->loadLangs($objMod->langfiles);
                 }
 
-                $form = new Form($db);
+                $form = new Form();
                 $formconfirm = $form->formconfirm($_SERVER["PHP_SELF"] . '?value=' . $this->value . '&mode=' . $this->mode . $this->param, $this->langs->trans('ConfirmUnactivation'), $this->langs->trans(DolibarrFunctions::GETPOST('confirm_message_code')), 'reset', '', 'no', 1);
             }
         }
@@ -292,7 +296,11 @@ class ModulesView extends DolibarrView
         if ($this->mode == 'common' || $this->mode == 'commonkanban') {
             DolibarrFunctions::dol_set_focus('#search_keyword');
 
-            print '<form method="POST" id="searchFormList" action="' . $_SERVER["PHP_SELF"] . '">';
+            $url = $_SERVER['PHP_SELF'] .
+                '?' . self::MODULE_GET_VAR . '=' . $_GET[self::MODULE_GET_VAR] .
+                '&' . self::CONTROLLER_GET_VAR . '=' . $_GET[self::CONTROLLER_GET_VAR];
+
+            print '<form method="POST" id="searchFormList" action="' . $url . '">';
             print '<input type="hidden" name="token" value="' . DolibarrFunctions::newToken() . '">';
             if (isset($optioncss) && $optioncss != '') {
                 print '<input type="hidden" name="optioncss" value="' . $optioncss . '">';
@@ -765,7 +773,7 @@ class ModulesView extends DolibarrView
             print '<br>';
 
             // Show warning about external users
-            print DolibarrFunctions::info_admin(showModulesExludedForExternal($modules)) . "\n";
+            print DolibarrFunctions::DolibarrFunctions::info_admin(showModulesExludedForExternal($modules)) . "\n";
 
             print '</form>';
         }
@@ -868,7 +876,7 @@ class ModulesView extends DolibarrView
             $dolibarrdataroot = preg_replace('/([\\/]+)$/i', '', DOL_DATA_ROOT);
             $allowonlineinstall = true;
             $allowfromweb = 1;
-            if (dol_is_file($dolibarrdataroot . '/installmodules.lock')) {
+            if (DolibarrFiles::dol_is_file($dolibarrdataroot . '/installmodules.lock')) {
                 $allowonlineinstall = false;
             }
 
@@ -876,22 +884,22 @@ class ModulesView extends DolibarrView
             $message = '';
             if (!empty($allowonlineinstall)) {
                 if (!in_array('/custom', explode(',', $dolibarr_main_url_root_alt))) {
-                    $message = info_admin($this->langs->trans("ConfFileMustContainCustom", DOL_DOCUMENT_ROOT . '/custom', DOL_DOCUMENT_ROOT));
+                    $message = DolibarrFunctions::info_admin($this->langs->trans("ConfFileMustContainCustom", DOL_DOCUMENT_ROOT . '/custom', DOL_DOCUMENT_ROOT));
                     $allowfromweb = -1;
                 } else {
                     if ($this->dirins_ok) {
                         if (!is_writable(dol_osencode($this->dirins))) {
                             $this->langs->load("errors");
-                            $message = info_admin($this->langs->trans("ErrorFailedToWriteInDir", $this->dirins), 0, 0, '1', 'warning');
+                            $message = DolibarrFunctions::info_admin($this->langs->trans("ErrorFailedToWriteInDir", $this->dirins), 0, 0, '1', 'warning');
                             $allowfromweb = 0;
                         }
                     } else {
-                        $message = info_admin($this->langs->trans("NotExistsDirect", $this->dirins) . $this->langs->trans("InfDirAlt") . $this->langs->trans("InfDirExample"));
+                        $message = DolibarrFunctions::info_admin($this->langs->trans("NotExistsDirect", $this->dirins) . $this->langs->trans("InfDirAlt") . $this->langs->trans("InfDirExample"));
                         $allowfromweb = 0;
                     }
                 }
             } else {
-                $message = info_admin($this->langs->trans("InstallModuleFromWebHasBeenDisabledByFile", $dolibarrdataroot . '/installmodules.lock'));
+                $message = DolibarrFunctions::info_admin($this->langs->trans("InstallModuleFromWebHasBeenDisabledByFile", $dolibarrdataroot . '/installmodules.lock'));
                 $allowfromweb = 0;
             }
 
@@ -1002,7 +1010,7 @@ class ModulesView extends DolibarrView
                         if ($this->user->admin) {
                             $this->langs->load('other');
                             print ' ';
-                            print info_admin($this->langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow, $maxphptoshowparam), 1);
+                            print DolibarrFunctions::info_admin($this->langs->trans("ThisLimitIsDefinedInSetup", $max, $maxphptoshow, $maxphptoshowparam), 1);
                         }
                     } else {
                         print ' (' . $this->langs->trans("UploadDisabled") . ')';

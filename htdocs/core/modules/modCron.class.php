@@ -98,7 +98,8 @@ class modCron extends DolibarrModules
         // Cronjobs
         $this->cronjobs = [
             0 => ['entity' => 0, 'label' => 'PurgeDeleteTemporaryFilesShort', 'jobtype' => 'method', 'class' => 'core/class/utils.class.php', 'objectname' => 'Utils', 'method' => 'purgeFiles', 'parameters' => 'tempfilesold+logfiles', 'comment' => 'PurgeDeleteTemporaryFiles', 'frequency' => 2, 'unitfrequency' => 3600 * 24 * 7, 'priority' => 50, 'status' => 1, 'test' => true],
-            1 => ['entity' => 0, 'label' => 'MakeLocalDatabaseDumpShort', 'jobtype' => 'method', 'class' => 'core/class/utils.class.php', 'objectname' => 'Utils', 'method' => 'dumpDatabase', 'parameters' => 'none,auto,1,auto,10', 'comment' => 'MakeLocalDatabaseDump', 'frequency' => 1, 'unitfrequency' => 3600 * 24 * 7, 'priority' => 90, 'status' => 0, 'test' => in_array($this->db->type, ['mysql', 'mysqli'])],
+            // 1 => ['entity' => 0, 'label' => 'MakeLocalDatabaseDumpShort', 'jobtype' => 'method', 'class' => 'core/class/utils.class.php', 'objectname' => 'Utils', 'method' => 'dumpDatabase', 'parameters' => 'none,auto,1,auto,10', 'comment' => 'MakeLocalDatabaseDump', 'frequency' => 1, 'unitfrequency' => 3600 * 24 * 7, 'priority' => 90, 'status' => 0, 'test' => in_array($this->db->type, ['mysql', 'mysqli'])],
+            1 => ['entity' => 0, 'label' => 'MakeLocalDatabaseDumpShort', 'jobtype' => 'method', 'class' => 'core/class/utils.class.php', 'objectname' => 'Utils', 'method' => 'dumpDatabase', 'parameters' => 'none,auto,1,auto,10', 'comment' => 'MakeLocalDatabaseDump', 'frequency' => 1, 'unitfrequency' => 3600 * 24 * 7, 'priority' => 90, 'status' => 0, 'test' => true],
             // 1=>array('entity'=>0, 'label'=>'My label', 'jobtype'=>'command', 'command'=>'', 'parameters'=>'', 'comment'=>'Comment', 'frequency'=>1, 'unitfrequency'=>3600*24)
         ];
 
